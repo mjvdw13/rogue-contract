@@ -40,8 +40,8 @@ The renderer already supports shifting the view up and down
 ## Phase 1: Height-grid engine (the biggest phase)
 
 1. [x] **Map data.** Each tile gets `floorZ` and `ceilZ`, set through the
-       legend (`'.': { floor, ceiling, floorZ: 0, ceilZ: 1.5 }`) or an
-       optional `heights` grid. The defaults (0 and 1) reproduce today's flat
+       legend (`'.': { floor, ceiling, floorZ: 0, ceilZ: 1.5 }`) or the
+       optional `floorHeights` / `ceilHeights` grids. The defaults (0 and 1) reproduce today's flat
        maps exactly.
 2. [x] **Renderer.** The ray doesn't stop at the first wall. As it crosses
        tiles it draws the step faces where the floor or ceiling changes height,
@@ -55,18 +55,37 @@ The renderer already supports shifting the view up and down
        doors (an animated ceiling height). Elevators are tiles whose floor
        height moves between stops, triggered by a switch or by stepping on
        them.
-5. [ ] **3D combat.** Shots aim along the camera's pitch with gentle
-       vertical auto-aim. Projectiles move in 3D and hit floors and ceilings.
-       Explosions measure distance in 3D.
-6. [ ] **Enemies.** Monsters follow floor heights, and pathfinding knows
+5. [ ] **Angled walls.** Each tile can hold one wall line, with its
+       endpoints on the tile's edges at 1/8-tile positions. The renderer
+       checks where each ray crosses the line, the same way it handles door
+       panels.
+       - Ship the four 45° presets first (`diagonal: 'NE' | 'NW' | 'SE' |
+         'SW'`, naming the solid corner). They give chamfered room corners,
+         octagonal rooms and angled corridors.
+       - The data model already allows any angle (for example about 26.6°
+         across two tiles), and chains of short lines for rounded corners.
+       - Later: two-sided lines that separate two floor heights instead of
+         wall and floor (diagonal ledges and step edges).
+       - Collision is circle against line. Enemy pathfinding treats
+         part-solid tiles as blocked. The automap, map viewer and validator
+         draw and understand the lines.
+       - Textures run along the line at a true 64 texels per unit, so they
+         aren't stretched.
+6. [ ] **3D combat.** Shots aim along the camera's pitch with gentle
+       vertical auto-aim. Projectiles move in 3D, hit floors, ceilings and
+       angled walls. Explosions measure distance in 3D.
+7. [ ] **Enemies.** Monsters follow floor heights, and pathfinding knows
        how high they can climb. Flying enemies hover at their own height.
-7. [ ] **Tools.** The validator checks reachability with step and jump
-       heights. The map viewer shades by height. Add tests.
-8. [ ] **Gate:** a sandbox map with stairs, a pit, a lift, a vent, a jump gap
-       and a sniper on a ledge. It must run near 60 fps on a phone.
+8. [ ] **Tools.** The validator checks reachability with step and jump
+       heights. The map viewer shades by height and draws angled walls. Add
+       tests.
+9. [ ] **Gate:** a sandbox map with stairs, a pit, a lift, a vent, a jump gap,
+       a sniper on a ledge and chamfered corners. It must run near 60 fps on a
+       phone.
 
-Grid limits we accept: no rooms stacked over rooms, and walls only at right
-angles. Thin diagonal tiles could come later.
+Grid limits we accept: no rooms stacked over rooms, and no sloped floors.
+Dark Forces had no slopes either. Walls can be at angles (step 5), but each
+tile holds at most one wall line.
 
 ## Phase 2: Dark Forces systems
 
@@ -128,8 +147,8 @@ update the smoke test.
 
 - **Renderer speed and sprite clipping** in pure JS. That's why Phase 1 ends
   with a performance check before any content work.
-- **Blocky architecture** from the grid. Lean on height variety, lighting and
-  texture detail.
+- **Blocky architecture** from the grid. Angled walls (Phase 1, step 5) help.
+  Otherwise lean on height variety, lighting and texture detail.
 
 ## Progress log
 
@@ -160,3 +179,9 @@ update the smoke test.
     - Hitscans and projectiles are still 2D (step 5).
     - The validator's reachability ignores heights (step 7).
     - Doors are still the sliding panels; rising doors and lifts are step 4.
+- 2026-10-11: Added Phase 1 step 5, angled walls, after doors and lifts. It
+  uses a line-in-tile data model, with the 45° presets first. Later steps
+  renumbered 6-9. Height granularity, for reference:
+  - heights are floats, so any value works
+  - the grids use `heightStep` (default 1/8) times `0`-`z` plus `heightBase`
+  - multiples of 1/8 keep textures aligned
