@@ -1,0 +1,136 @@
+# Plan: a Dark Forces-style Star Wars game
+
+A Star Wars first-person shooter that is heavily influenced by *Dark Forces*
+(LucasArts, 1995). It is forked from Raccoon Alex's browser engine
+(`C:\Mark\raccoon-alex`). This file is the durable plan: tick items off as they
+land, and record new decisions here.
+
+## Decisions (2026-10-11)
+
+| Question | Decision |
+|---|---|
+| Engine | **Height grid.** Keep the tile grid, but give each tile its own floor and ceiling height. Add elevators, looking up and down, jump and crouch. Not a flat reskin, and not a full sector/portal engine. |
+| Where | **New sibling repo**, `C:\Mark\dark-forces-clone`, copied from raccoon-alex with its history. Raccoon Alex stays untouched. |
+| Story | **Original story in Dark Forces' style.** A new mercenary working for the Rebellion, Imperial bases, mission briefings and objectives, a serious tone. No Kyle Katarn retelling. |
+| Scope | **A one-mission vertical slice first**, then decide whether to build more. |
+| Rights | A non-commercial fan game. All art, sound and music are generated or original. Nothing ripped from Dark Forces, and no note-for-note John Williams transcriptions. |
+
+## Starting point
+
+Raccoon Alex keeps the engine and the content apart. `src/engine/` doesn't
+know which game it runs, and `src/content/` is plain data. The engine is
+Wolfenstein-flat:
+
+- every wall is 1 unit tall (`render/walls.js`)
+- every floor is at height 0 (`render/flats.js`)
+- collision only checks x and y (`world/physics.js`)
+- combat is 2D (`combat/damage.js`)
+
+The renderer already supports shifting the view up and down
+(`view.horizonOffset`), which is how Dark Forces did looking up and down.
+
+## Phase 0: Fork
+
+- [ ] Create `C:\Mark\dark-forces-clone`, keeping the raccoon-alex history.
+- [ ] Rename the package, title and README, and keep `npm test`,
+      `npm run validate` and CI passing.
+- [ ] Replace the Alex content step by step as each Star Wars piece lands,
+      always keeping a playable build.
+
+## Phase 1: Height-grid engine (the biggest phase)
+
+1. [ ] **Map data.** Each tile gets `floorZ` and `ceilZ`, set through the
+       legend (`'.': { floor, ceiling, floorZ: 0, ceilZ: 1.5 }`) or an
+       optional `heights` grid. The defaults (0 and 1) reproduce today's flat
+       maps exactly.
+2. [ ] **Renderer.** The ray doesn't stop at the first wall. As it crosses
+       tiles it draws the step faces where the floor or ceiling changes height,
+       plus each tile's floor and ceiling. A running top and bottom limit per
+       screen column ("Doom on a grid") also lets sprites hide correctly behind
+       ledges. The sky still works.
+3. [ ] **Player movement.** Gravity, a step-up height, jump, crouch (lower
+       eyes and body), looking up and down (mouse, keys, gamepad), and damage
+       from long falls.
+4. [ ] **Doors and lifts.** Doors rise into the ceiling like Dark Forces
+       doors (an animated ceiling height). Elevators are tiles whose floor
+       height moves between stops, triggered by a switch or by stepping on
+       them.
+5. [ ] **3D combat.** Shots aim along the camera's pitch with gentle
+       vertical auto-aim. Projectiles move in 3D and hit floors and ceilings.
+       Explosions measure distance in 3D.
+6. [ ] **Enemies.** Monsters follow floor heights, and pathfinding knows
+       how high they can climb. Flying enemies hover at their own height.
+7. [ ] **Tools.** The validator checks reachability with step and jump
+       heights. The map viewer shades by height. Add tests.
+8. [ ] **Gate:** a sandbox map with stairs, a pit, a lift, a vent, a jump gap
+       and a sniper on a ledge. It must run near 60 fps on a phone.
+
+Grid limits we accept: no rooms stacked over rooms, and walls only at right
+angles. Thin diagonal tiles could come later.
+
+## Phase 2: Dark Forces systems
+
+- [ ] A mission briefing screen (scrolling text over a picture) before each
+      level.
+- [ ] Mission objectives. The exit only works once they're done.
+- [ ] A PDA screen with the map and an objectives checklist.
+- [ ] Lives and checkpoints instead of saves, with extra-life pickups.
+- [ ] HUD overlay: a full-screen view instead of the bottom status bar, with
+      shield and health readouts in the corners, plus ammo and lives.
+- [ ] Visible blaster bolts for both enemies and the player: slow and
+      dodgeable, with inaccurate stormtroopers.
+- [ ] A headlamp that drains batteries, infrared goggles and a gas mask.
+- [ ] Music that switches between exploration and combat tracks when enemies
+      wake up, like iMUSE.
+- [ ] Stretch goal: enemies drawn from 8 angles, rendered from the clay
+      models.
+
+## Phase 3: Content for the slice
+
+- [ ] **Palette:** Imperial greys and gloss blacks, desert ochre, and
+      glowing red and green bolts.
+- [ ] **Enemies:** Stormtrooper, Imperial Officer (drops keycards),
+      Commando, Probe Droid, and an original mini-boss (a prototype assault
+      droid).
+- [ ] **Weapons:** fists, blaster pistol, E-11-style rifle and thermal
+      detonators.
+- [ ] **Items:** shield units, med kits, batteries, power cells, red and blue
+      keycards, and the objective item (a data tape).
+- [ ] **Textures:** Imperial wall panels, light strips, grates, canyon rock
+      and sand, and a night sky.
+- [ ] **Sounds:** synthesized blaster shots, droid beeps and door hisses.
+- [ ] **Music:** original marches in a Star Wars style.
+
+## Phase 4: Mission 1 (the vertical slice)
+
+The player is an original mercenary hired by the Rebellion, who infiltrates an
+Imperial garrison in a desert canyon:
+
+1. Start in an outdoor canyon with ledges and snipers.
+2. Get in through a crouch vent.
+3. Take a lift up to the barracks.
+4. Find an officer carrying the red keycard.
+5. Reach the data vault (objective 1: steal the data tape).
+6. Overload the generator (objective 2). The lights fail, so the headlamp is
+   needed.
+7. Escape across a jump gap to the landing pad.
+
+The mission has 2 or 3 secrets and uses every new engine feature at least once
+on purpose. Then playtest, tune the ammo budget and difficulty levels, and
+update the smoke test.
+
+## Phase 5: Ship
+
+- [ ] README, CI and GitHub Pages, the same as Raccoon Alex.
+- [ ] Decide whether to build more missions.
+
+## Risks
+
+- **Renderer speed and sprite clipping** in pure JS. That's why Phase 1 ends
+  with a performance check before any content work.
+- **Blocky architecture** from the grid. Lean on height variety, lighting and
+  texture detail.
+
+## Progress log
+
+- 2026-10-11: Plan written. Starting Phase 0.

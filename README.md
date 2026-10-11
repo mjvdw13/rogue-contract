@@ -1,3 +1,8 @@
+> **Work in progress: a Dark Forces-style Star Wars fan game.** This repo is a
+> fork of Raccoon Alex's engine. See [PLAN.md](PLAN.md) for the roadmap. The
+> Raccoon Alex content below is temporary and gets replaced phase by phase.
+> Non-commercial fan project; all art, sound and music are original.
+
 # RACCOON ALEX
 
 *Knee-Deep in the Deadline.* A gritty, 80s-style first-person shooter that runs

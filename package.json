@@ -1,7 +1,7 @@
 {
-  "name": "raccoon-alex",
+  "name": "dark-forces-clone",
   "version": "1.0.0",
-  "description": "A gritty 80s-style browser FPS about the most sleep-deprived man in the office.",
+  "description": "A Dark Forces-style Star Wars fan FPS for the browser, built on the Raccoon Alex engine.",
   "private": true,
   "type": "module",
   "scripts": {
