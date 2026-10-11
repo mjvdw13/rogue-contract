@@ -1,7 +1,7 @@
 import { buildLevel } from './level.js';
 import { F_SECRET, F_DAMAGE, F_EXIT, F_USE } from './tilemap.js';
 import { initNpc, npcThink, npcReact } from '../things/npc.js';
-import { castRay, blockedByMap, rayCircle } from './physics.js';
+import { castRay, blockedByMap, rayCircle, slantNear } from './physics.js';
 import { updateDoors, openDoor, closeDoor } from './doors.js';
 import { updateLifts, startLift, liftAt } from './lifts.js';
 import { LightEffects } from './lights.js';
@@ -252,15 +252,31 @@ export class World {
         moved = true;
         continue;
       }
+      // (Tiny components, like cos(90 degrees), don't count as a slide.)
       let slid = false;
-      if (sx && this.checkPosition(t, t.x + sx, t.y)) {
+      if (Math.abs(sx) > 1e-9 && this.checkPosition(t, t.x + sx, t.y)) {
         t.x += sx;
         slid = true;
       } else if (t.player) t.vx = 0;
-      if (sy && this.checkPosition(t, t.x, t.y + sy)) {
+      if (Math.abs(sy) > 1e-9 && this.checkPosition(t, t.x, t.y + sy)) {
         t.y += sy;
         slid = true;
       } else if (t.player) t.vy = 0;
+      // Against an angled wall, slide along it: try the move turned 45 degrees each way.
+      if (!slid && slantNear(this.map, t.x, t.y, t.radius + 0.25)) {
+        for (const turn of [Math.PI / 4, -Math.PI / 4]) {
+          const c = Math.cos(turn) * Math.SQRT1_2;
+          const s = Math.sin(turn) * Math.SQRT1_2;
+          const mx = sx * c - sy * s;
+          const my = sx * s + sy * c;
+          if (this.checkPosition(t, t.x + mx, t.y + my)) {
+            t.x += mx;
+            t.y += my;
+            slid = true;
+            break;
+          }
+        }
+      }
       moved = moved || slid;
       if (!slid) break;
     }

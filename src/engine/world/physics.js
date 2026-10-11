@@ -1,4 +1,4 @@
-import { F_SOLID, F_DOOR } from './tilemap.js';
+import { F_SOLID, F_DOOR, F_SLANT } from './tilemap.js';
 
 /**
  * Cast a ray through the tile grid. Stops at walls, the map edge and the
@@ -30,6 +30,13 @@ export function castRay(map, x, y, dx, dy, maxDist = 64) {
     sdy = (mapY + 1 - y) * ddy;
   }
   let passedDoor = null;
+  // An angled wall in the starting tile.
+  const start = map.slantAt(mapX, mapY);
+  if (start) {
+    const t = start.ray(x, y, dx, dy);
+    const leave = Math.min(sdx, sdy);
+    if (t >= 0 && t <= leave && t <= maxDist) return { dist: t, tx: mapX, ty: mapY, door: null, passedDoor, slant: start };
+  }
   for (let i = 0; i < 256; i++) {
     let enter;
     if (sdx < sdy) {
@@ -47,6 +54,13 @@ export function castRay(map, x, y, dx, dy, maxDist = 64) {
     }
     const idx = mapY * map.w + mapX;
     const f = map.flags[idx];
+    if (f & F_SLANT) {
+      const sl = map.slants[map.slantIndex[idx]];
+      if (sl.solidAt(x + dx * enter, y + dy * enter)) return { dist: enter, tx: mapX, ty: mapY, door: null, passedDoor, slant: sl };
+      const t = sl.ray(x, y, dx, dy);
+      if (t >= enter && t <= Math.min(sdx, sdy) && t <= maxDist) return { dist: t, tx: mapX, ty: mapY, door: null, passedDoor, slant: sl };
+      continue;
+    }
     if (f & F_DOOR) {
       const door = map.doors[map.doorIndex[idx]];
       if (door.style === 'rise') {
@@ -84,7 +98,10 @@ export function lineOfSight(map, x0, y0, x1, y1) {
   return castRay(map, x0, y0, dx / d, dy / d, d).dist >= d - 1e-4;
 }
 
-/** Does a box of half-size r centred at (x, y) overlap any blocking tile? */
+/**
+ * Does a box of half-size r centred at (x, y) overlap any blocking tile, or a
+ * circle of radius r overlap the solid side of an angled wall?
+ */
 export function blockedByMap(map, x, y, r) {
   const x0 = Math.floor(x - r);
   const x1 = Math.floor(x + r);
@@ -93,6 +110,17 @@ export function blockedByMap(map, x, y, r) {
   for (let ty = y0; ty <= y1; ty++) {
     for (let tx = x0; tx <= x1; tx++) {
       if (map.blocks(tx, ty)) return true;
+      if (map.flags[ty * map.w + tx] & F_SLANT && map.slants[map.slantIndex[ty * map.w + tx]].touchesCircle(x, y, r)) return true;
+    }
+  }
+  return false;
+}
+
+/** Is there an angled wall in any tile a box of half-size r at (x, y) touches? */
+export function slantNear(map, x, y, r) {
+  for (let ty = Math.floor(y - r); ty <= Math.floor(y + r); ty++) {
+    for (let tx = Math.floor(x - r); tx <= Math.floor(x + r); tx++) {
+      if (map.inBounds(tx, ty) && map.flags[ty * map.w + tx] & F_SLANT) return true;
     }
   }
   return false;

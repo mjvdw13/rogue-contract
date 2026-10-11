@@ -5,7 +5,8 @@
 //   node tools/mapview.mjs e1m2 --skill 5  one level, things for skill 5
 //   node tools/mapview.mjs --scale 12      bigger tiles
 //
-// Walls and floors use their texture's average colour (floors are dimmed by
+// Walls and floors use their texture's average colour (angled walls fill the
+// solid side of their tile) (floors are dimmed by
 // their light level). Doors are brown, or the colour of their key; switches
 // have a yellow border; secret tiles are dotted purple; damaging floors are
 // striped green. Monsters are red squares, coworkers green, items yellow,
@@ -16,7 +17,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import content from '../src/content/index.js';
 import { Registry } from '../src/engine/registry.js';
-import { F_SOLID, F_DOOR, F_SKY, F_SECRET, F_DAMAGE, F_EXIT, F_USE, F_VOID } from '../src/engine/world/tilemap.js';
+import { F_SOLID, F_DOOR, F_SKY, F_SECRET, F_DAMAGE, F_EXIT, F_USE, F_VOID, F_SLANT } from '../src/engine/world/tilemap.js';
 import { decodePNG, encodePNG } from './art/lib/png.js';
 import { analyseLevel } from './lib/levelcheck.mjs';
 
@@ -114,6 +115,12 @@ function render(level) {
       let c = (e.floor ? textureColor(e.floor) : [90, 90, 90]).map((v) => v * (0.35 + light * 0.75));
       if (f & F_SKY) c = [c[0] * 0.7 + 10, c[1] * 0.7 + 20, c[2] * 0.7 + 60];
       rect(x, y, S, S, c);
+      if (f & F_SLANT) {
+        // Angled wall: paint the solid side of the line in the wall's colour.
+        const sl = map.slantAt(tx, ty);
+        const wc = textureColor(e.wall).map((v) => v * 0.75);
+        for (let yy = 0; yy < S; yy++) for (let xx = 0; xx < S; xx++) if (sl.solidAt(tx + (xx + 0.5) / S, ty + (yy + 0.5) / S)) put(x + xx, y + yy, wc);
+      }
       if (f & F_DAMAGE) for (let k = 0; k < S; k += 3) rect(x, y + k, S, 1, [60, 220, 60]);
       if (f & F_SECRET) for (let yy = 1; yy < S; yy += 3) for (let xx = 1; xx < S; xx += 3) put(x + xx, y + yy, [200, 90, 255]);
       if (f & F_EXIT) frame(x, y, S, S, [40, 255, 60]);

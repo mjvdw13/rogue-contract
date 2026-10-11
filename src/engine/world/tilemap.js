@@ -7,6 +7,8 @@ export const F_DAMAGE = 16;
 export const F_EXIT = 32;
 export const F_USE = 64;
 export const F_VOID = 128;
+/** The tile holds an angled wall (see slants.js): part solid, part open. */
+export const F_SLANT = 256;
 
 /** Light effects a tile can have (Doom sector light specials). */
 export const LIGHT_FX = { none: 0, flicker: 1, strobe: 2, glow: 3, fire: 4, blink: 5 };
@@ -68,6 +70,9 @@ export class TileMap {
     this.damage = new Uint8Array(n);
     this.doorIndex = new Int16Array(n).fill(-1);
     this.liftIndex = new Int16Array(n).fill(-1);
+    this.slantIndex = new Int16Array(n).fill(-1);
+    /** @type {import('./slants.js').Slant[]} */
+    this.slants = [];
     /** @type {import('./lifts.js').Lift[]} */
     this.lifts = [];
     this.tag = new Int16Array(n).fill(-1);
@@ -104,6 +109,22 @@ export class TileMap {
     if (f & F_SOLID) return true;
     if (f & F_DOOR) return !this.doors[this.doorIndex[i]].passable;
     return false;
+  }
+
+  /** The angled wall in a tile, or null. */
+  slantAt(x, y) {
+    if (!this.inBounds(x, y)) return null;
+    const s = this.slantIndex[y * this.w + x];
+    return s >= 0 ? this.slants[s] : null;
+  }
+
+  /** Is the point (x, y) inside something solid: a blocking tile or the solid side of an angled wall? */
+  solidPoint(x, y) {
+    const tx = Math.floor(x);
+    const ty = Math.floor(y);
+    if (this.blocks(tx, ty)) return true;
+    const s = this.slantAt(tx, ty);
+    return s ? s.solidAt(x, y) : false;
   }
 
   /** True if the tile blocks sight/bullets. Doors block until mostly open. */

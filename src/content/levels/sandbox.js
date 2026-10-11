@@ -12,7 +12,9 @@ import { defineLevel } from '../../engine/defs.js';
 // the east half of the hall. A window looks from the start room into the
 // courtyard through a rising door. The north end of the pit is a secret.
 // Lifts: one at the south end of the pit back up to the hall, and one at the
-// courtyard's east end up to the sniper ledge.
+// courtyard's east end up to the sniper ledge. Angled walls: chamfered corners
+// everywhere, a shallow two-tile wall in the start room, a diamond pillar and a
+// triangular block in the courtyard.
 export default defineLevel({
   id: 'sandbox',
   mapLabel: 'SBX',
@@ -32,6 +34,24 @@ export default defineLevel({
     w: { floor: 'concrete-floor', ceiling: 'concrete', light: 160, floorZ: 0.45, ceilZ: 1.05, side: 'concrete', upper: 'concrete' },
     y: { floor: 'dirt', ceiling: 'sky', light: 176, ceilZ: 3, side: 'brick-dirty' },
     L: { base: 'y', floorZ: 1.25, side: 'concrete-stripe' },
+    // Angled walls. Chamfered corners name their solid corner (NW, NE, SW, SE).
+    '{': { base: '.', wall: 'concrete', diagonal: 'NW' },
+    '}': { base: '.', wall: 'concrete', diagonal: 'NE' },
+    '[': { base: '.', wall: 'concrete', diagonal: 'SW' },
+    ']': { base: '.', wall: 'concrete', diagonal: 'SE' },
+    // A shallower (about 26.6 degree) wall across two tiles, solid to the north.
+    i: { base: '.', wall: 'concrete', line: [1, 0.5, 0, 1] },
+    j: { base: '.', wall: 'concrete', line: [1, 0, 0, 0.5] },
+    '(': { base: 'h', wall: 'tech-panel', diagonal: 'NW' },
+    ')': { base: 'h', wall: 'tech-panel', diagonal: 'NE' },
+    '<': { base: 'h', wall: 'tech-panel', diagonal: 'SW' },
+    '>': { base: 'h', wall: 'tech-panel', diagonal: 'SE' },
+    // Courtyard corners, plus a diamond pillar (four tiles, solid towards its
+    // centre) and a lone triangular block. Keypad layout: 7 NW, 9 NE, 4 SW, 6 SE.
+    7: { base: 'y', wall: 'concrete', diagonal: 'NW' },
+    9: { base: 'y', wall: 'concrete', diagonal: 'NE' },
+    4: { base: 'y', wall: 'concrete', diagonal: 'SW' },
+    6: { base: 'y', wall: 'concrete', diagonal: 'SE' },
     D: { door: 'door-metal', jamb: 'door-jamb', style: 'rise', floor: 'concrete-floor', ceiling: 'concrete', upper: 'concrete' },
     // Lifts: step on (or press use) and they rise, wait, and come back down.
     e: { base: 'y', floor: 'elevator-floor', side: 'rust-panel', lift: { stops: [0, 1.25], wait: 3 } },
@@ -42,23 +62,23 @@ export default defineLevel({
   },
   tiles: [
     'OOOOOOOOOOOOOOOOOOOOOOOO',
-    'O........OOOOhhhpPhhhhhO',
+    'O{...ij.}OOOO(hhpPhhhh)O',
     'O........OOOOhhhpphhhhhO',
     'O........sssshhhpphhhhhO',
     'X........sssshhhpphhhhhO',
     'O........sssshhhpphhhhhO',
     'O........OOOOhhhpphhhhhO',
-    'O........OOOOhhhffhhhhhO',
+    'O[......]OOOO<hhffhhhh>O',
     'OOOODOwwOOOOOOOOqqOOvOOO',
+    'O7yyyyyyyyyyyyyyyyyyyy9O',
     'OyyyyyyyyyyyyyyyyyyyyyyO',
     'OyyyyyyyyyyyyyyyyyyyyyyO',
+    'Oyyyyyyyyy64yyyyyyyyyyyO',
+    'Oyyyyyyyyy97yyyyyyyyyyyO',
+    'Oyyyyyyyyyyyyyyyy9yyyyyO',
     'OyyyyyyyyyyyyyyyyyyyyyyO',
     'OyyyyyyyyyyyyyyyyyyyyyyO',
-    'OyyyyyyyyyyyyyyyyyyyyyyO',
-    'OyyyyyyyyyyyyyyyyyyyyyyO',
-    'OyyyyyyyyyyyyyyyyyyyyyyO',
-    'OyyyyyyyyyyyyyyyyyyyyyyO',
-    'OyyyyyyyyyyyyyyyyyyyyeeO',
+    'O4yyyyyyyyyyyyyyyyyyyeeO',
     'OLLLLLLLLLLLLLLLLLLLLLLO',
     'OOOOOOOOOOOOOOOOOOOOOOOO',
   ],

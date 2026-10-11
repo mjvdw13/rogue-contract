@@ -55,7 +55,7 @@ The renderer already supports shifting the view up and down
        doors (an animated ceiling height). Elevators are tiles whose floor
        height moves between stops, triggered by a switch or by stepping on
        them.
-5. [ ] **Angled walls.** Each tile can hold one wall line, with its
+5. [x] **Angled walls.** Each tile can hold one wall line, with its
        endpoints on the tile's edges at 1/8-tile positions. The renderer
        checks where each ray crosses the line, the same way it handles door
        panels.
@@ -67,7 +67,8 @@ The renderer already supports shifting the view up and down
        - Later: two-sided lines that separate two floor heights instead of
          wall and floor (diagonal ledges and step edges).
        - Collision is circle against line. Enemy pathfinding treats
-         part-solid tiles as blocked. The automap, map viewer and validator
+         part-solid tiles as open, and collision keeps monsters out of the
+         solid part (so angled corridors stay walkable). The automap, map viewer and validator
          draw and understand the lines.
        - Textures run along the line at a true 64 texels per unit, so they
          aren't stretched.
@@ -228,3 +229,25 @@ update the smoke test.
 - 2026-10-11: Added a Phase 2 TODO: fill the whole screen on widescreen
   displays. Keep the 4:3 centre and draw more world at the edges (Hor+),
   instead of black bars.
+- 2026-10-11: Phase 1 step 5 done: angled walls.
+  - **Data:** `world/slants.js`. A tile holds one line with a solid side:
+    `diagonal: 'NE' | 'NW' | 'SE' | 'SW'` presets, or a general `line: [ax,
+    ay, bx, by]` with points on the tile edges. It's open floor on the other
+    side.
+  - **Renderer:** walls drawn where the ray crosses the line, plus the back
+    face when a ray enters through the solid side. Texture spacing stays true
+    along the line.
+  - **Physics:** rays (sight, use, hitscans) stop at the line. Collision is
+    circle against the clipped solid polygon. Players and monsters slide along
+    angled walls (the move turned 45° each way). Projectiles burst on them.
+  - **Maps:** the automap draws the lines, and the map viewer fills the
+    solid side.
+  - **Fix found on the way:** sliding treated a near-zero axis component
+    (cos 90° ≈ 6e-17) as a successful slide.
+  - **Sandbox:** chamfered corners in all three areas, a two-tile 26.6° wall,
+    a diamond pillar and a triangular block.
+  - **Tests:** `tests/slants.test.js` (6 tests). 72 tests pass. Checked in a
+    real browser too.
+  - **Still to do:** two-sided lines (a diagonal ledge between two floor
+    heights) and the validator's view of the solid part. Reachability treats
+    slant tiles as open for now.

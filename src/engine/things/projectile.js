@@ -46,7 +46,7 @@ export function projectileThink(world, p, dt) {
         return;
       }
     }
-    if (world.map.blocks(Math.floor(nx), Math.floor(ny))) {
+    if (world.map.solidPoint(nx, ny)) {
       explode(world, p, null);
       return;
     }

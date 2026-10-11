@@ -186,7 +186,12 @@ export class Hud {
     };
     // Closed secret doors look like plain wall on the map until found.
     const hiddenDoor = (i) => map.flags[i] & F_DOOR && map.doors[map.doorIndex[i]].secret && map.doors[map.doorIndex[i]].state === 'closed';
-    const open = (x, y) => map.inBounds(x, y) && !(map.flags[y * map.w + x] & F_SOLID) && !hiddenDoor(y * map.w + x);
+    // An edge next to an angled-wall tile counts as open only where that tile is open.
+    const open = (x, y, ex, ey) => {
+      if (!map.inBounds(x, y) || map.flags[y * map.w + x] & F_SOLID || hiddenDoor(y * map.w + x)) return false;
+      const sl = map.slantAt(x, y);
+      return !sl || !sl.solidAt(ex, ey);
+    };
     for (let y = y0; y <= y1; y++) {
       for (let x = x0; x <= x1; x++) {
         const i = y * map.w + x;
@@ -202,13 +207,15 @@ export class Hud {
         }
         if ((!(f & F_SOLID) && !hiddenDoor(i)) || f & F_VOID) {
           if (f & F_EXIT && seen) s.fillRect(sx(x + 0.3), sy(y + 0.3), Math.max(1, scale * 0.4), Math.max(1, scale * 0.4), cExit);
+          const sl = map.slantAt(x, y);
+          if (sl) clipLine(sx(sl.ax), sy(sl.ay), sx(sl.bx), sy(sl.by), seen ? cWall : cHidden);
           continue;
         }
         const c = !seen ? cHidden : f & F_USE ? cSwitch : cWall;
-        if (open(x, y - 1)) clipLine(sx(x), sy(y), sx(x + 1), sy(y), c);
-        if (open(x, y + 1)) clipLine(sx(x), sy(y + 1), sx(x + 1), sy(y + 1), c);
-        if (open(x - 1, y)) clipLine(sx(x), sy(y), sx(x), sy(y + 1), c);
-        if (open(x + 1, y)) clipLine(sx(x + 1), sy(y), sx(x + 1), sy(y + 1), c);
+        if (open(x, y - 1, x + 0.5, y - 0.01)) clipLine(sx(x), sy(y), sx(x + 1), sy(y), c);
+        if (open(x, y + 1, x + 0.5, y + 1.01)) clipLine(sx(x), sy(y + 1), sx(x + 1), sy(y + 1), c);
+        if (open(x - 1, y, x - 0.01, y + 0.5)) clipLine(sx(x), sy(y), sx(x), sy(y + 1), c);
+        if (open(x + 1, y, x + 1.01, y + 0.5)) clipLine(sx(x + 1), sy(y), sx(x + 1), sy(y + 1), c);
       }
     }
     if (this.revealThings) {

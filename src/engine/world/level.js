@@ -1,5 +1,6 @@
-import { TileMap, Door, F_SOLID, F_DOOR, F_SKY, F_SECRET, F_DAMAGE, F_EXIT, F_USE, F_VOID, LIGHT_FX } from './tilemap.js';
+import { TileMap, Door, F_SOLID, F_DOOR, F_SKY, F_SECRET, F_DAMAGE, F_EXIT, F_USE, F_VOID, F_SLANT, LIGHT_FX } from './tilemap.js';
 import { buildLifts } from './lifts.js';
+import { Slant, slantLine } from './slants.js';
 
 /** Glyphs in the `things` layer that place the player start, with facing. */
 export const PLAYER_START_GLYPHS = { '^': 90, '>': 0, v: 270, '<': 180 };
@@ -136,7 +137,16 @@ export function buildLevel(registry, level, opts = {}) {
       if (upper) map.upperTex[i] = slot(upper);
       if (map.ceilZ[i] < map.floorZ[i]) errors.push(`Tile (${x}, ${y}) has its ceiling below its floor`);
 
-      if (e.wall) {
+      if (e.wall && (e.diagonal !== undefined || e.line !== undefined)) {
+        // An angled wall: the tile stays open floor on one side of the line.
+        const line = slantLine(e);
+        if (typeof line === 'string') errors.push(`Tile (${x}, ${y}): ${line}`);
+        else {
+          map.flags[i] |= F_SLANT;
+          map.slantIndex[i] = map.slants.length;
+          map.slants.push(new Slant(line, x, y, slot(e.wall)));
+        }
+      } else if (e.wall) {
         map.flags[i] |= F_SOLID;
         map.wallTex[i] = slot(e.wall);
         if (e.use) {

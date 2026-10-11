@@ -1,4 +1,4 @@
-import { F_SOLID, F_DOOR, F_SKY } from '../world/tilemap.js';
+import { F_SOLID, F_DOOR, F_SKY, F_SLANT } from '../world/tilemap.js';
 import { DIMINISH } from './view.js';
 
 const MAX_STEPS = 160;
@@ -35,7 +35,8 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
   const SEG = view.SEG;
   const mw = map.w;
   const mh = map.h;
-  const { flags, wallTex, doorIndex, doors, light, seen, floorZ, ceilZ, floorTex, ceilTex, sideTex, upperTex } = map;
+  const { flags, wallTex, doorIndex, doors, light, seen, floorZ, ceilZ, floorTex, ceilTex, sideTex, upperTex, slantIndex, slants } = map;
+  const along = [0];
   const fixed = view.fixedColormap;
 
   // Sky: horizontal texel per column from the view angle; the texture spans 180 degrees.
@@ -252,6 +253,22 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
       }
       if (tExit < 1e-4) tExit = 1e-4;
 
+      // An angled wall in the current tile stops the ray where it crosses the line.
+      if (flags[cur] & F_SLANT) {
+        const sl = slants[slantIndex[cur]];
+        const t = sl.ray(px, py, rdx, rdy, along);
+        if (t >= tEnter - 1e-6 && t <= tExit + 1e-6) {
+          flats(cur, tEnter, t);
+          seen[cur] = 1;
+          // Texture runs right-to-left from the second point (as seen from the open side).
+          let u = (1 - along[0]) * sl.len;
+          u -= Math.floor(u);
+          face(t, rowOf(ceilZ[cur], t), rowOf(floorZ[cur], t), ceilZ[cur], sl.tex, u, faceLevel(cur, t, 0));
+          end = t;
+          break;
+        }
+      }
+
       // A door panel in the current tile can stop the ray partway through it.
       if (flags[cur] & F_DOOR && step > 0) {
         const door = doors[doorIndex[cur]];
@@ -315,6 +332,10 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
             u = du;
           }
         }
+      } else if (f & F_SLANT && slants[slantIndex[next]].solidAt(px + rdx * tExit, py + rdy * tExit)) {
+        // Entering an angled-wall tile through its solid side: the back of the wall.
+        solid = true;
+        tex = slants[slantIndex[next]].tex;
       } else if (solid && flags[cur] & F_DOOR) {
         const jamb = doors[doorIndex[cur]].jamb;
         if (jamb >= 0) tex = jamb;

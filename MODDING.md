@@ -359,6 +359,32 @@ Door options:
 Doors need walls on two opposite sides. A space is solid nothingness: keep
 every floor tile enclosed by walls (the validator checks this).
 
+### Angled walls
+
+A floor tile can hold one angled wall: a line across the tile, solid on one
+side and open floor (with the tile's own floor, ceiling and heights) on the
+other. Give the entry a `wall` texture plus either a 45° preset or a line:
+
+```js
+'{': { base: '.', wall: 'tech-panel', diagonal: 'NW' },        // chamfered corner, NW solid
+'i': { base: '.', wall: 'concrete', line: [1, 0.5, 0, 1] },    // any angle
+```
+
+- `diagonal`: `'NE'`, `'NW'`, `'SE'` or `'SW'` names the corner that is
+  solid. Four of them around a point make a diamond pillar.
+- `line: [ax, ay, bx, by]`: two points on the tile's edges, in tile units
+  (0 to 1, y down). The solid side is on the right as you go from the first
+  point to the second, looking at the map as drawn. Chain tiles for longer
+  or shallower walls. For example `[1, 0.5, 0, 1]` then `[1, 0, 0, 0.5]` in
+  the tile to its east makes a wall about 26.6° off horizontal across two
+  tiles.
+
+The wall texture runs along the line at 64 texels per unit, so it isn't
+stretched. Players and monsters slide along angled walls, and shots, sight
+and projectiles stop at them. Monsters path through these tiles like open
+floor and let collision keep them out of the solid part. Put walls (or more
+angled tiles) against the solid side; it renders as wall if you can see it.
+
 ### Lifts
 
 Give a floor glyph a `lift` and its tiles become a lift (an elevator, in Dark
