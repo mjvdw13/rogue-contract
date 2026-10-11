@@ -27,6 +27,12 @@ export const SKILLS = {
 };
 
 const USE_RANGE = 1.3;
+/**
+ * Items are in reach from slightly above them (Doom allows 8 map units, about
+ * 1/8 of a tile here) up to the top of the player's body. Jumping over an item
+ * doesn't pick it up.
+ */
+const PICKUP_BELOW_FEET = 0.15;
 const FLOOR_DAMAGE_INTERVAL = 0.9;
 
 /**
@@ -553,6 +559,8 @@ export class World {
       if (t.kind !== 'item' || t.removed) continue;
       const r = t.radius + pt.radius;
       if ((t.x - pt.x) ** 2 + (t.y - pt.y) ** 2 > r * r) continue;
+      const dz = t.z - pt.z;
+      if (dz < -PICKUP_BELOW_FEET || dz > pt.height) continue;
       if (!tryPickup(this, pt, t)) continue;
       t.removed = true;
       const p = pt.player;

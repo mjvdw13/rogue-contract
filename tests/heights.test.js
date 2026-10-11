@@ -121,3 +121,31 @@ test('monsters on a raised floor stand on it, and solid things only collide at t
   w.player.z = 1;
   assert.equal(w.checkPosition(w.player, 1.35, 1.5), false, 'same height: blocked by the ant');
 });
+
+test('items are picked up within reach of the body, not when jumping over them or below a ledge', () => {
+  const level = room(['######', '#....#', '#.hh.#', '######'], ['', ' >', ' '], {
+    legend: { '.': TALL, h: { ...TALL, floorZ: 1.5 } },
+    list: [{ type: 'donut', x: 2.5, y: 1.5 }, { type: 'donut', x: 2.5, y: 2.5 }],
+  });
+  const w = makeWorld(level);
+  const [floorDonut, ledgeDonut] = w.things.filter((t) => t.def.id === 'donut');
+  assert.equal(ledgeDonut.z, 1.5, 'the ledge donut sits on the ledge');
+  const pt = w.player;
+  pt.player.health = 50; // so donuts are wanted
+  // Hovering 0.5 above the floor donut (mid-jump): out of reach.
+  pt.x = 2.5;
+  pt.y = 1.5;
+  pt.z = 0.5;
+  pt.vz = 0;
+  w._pickups();
+  assert.equal(floorDonut.removed, false, 'jumping over it does not pick it up');
+  // Standing next to the ledge, with the donut above head height: out of reach.
+  pt.z = 0;
+  pt.y = 2.2;
+  w._pickups();
+  assert.equal(ledgeDonut.removed, false, 'a donut up on a ledge is out of reach');
+  // Back on the floor at the floor donut: picked up.
+  pt.y = 1.5;
+  w._pickups();
+  assert.equal(floorDonut.removed, true, 'standing on it picks it up');
+});
