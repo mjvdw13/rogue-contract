@@ -20,7 +20,7 @@ import { levels, episodes } from './levels/index.js';
 import cheats from './cheats.js';
 
 export default {
-  game: { id: 'raccoon-alex', title: 'RACCOON ALEX', storagePrefix: 'raccoon-alex' },
+  game: { id: 'rogue-contract', title: 'ROGUE CONTRACT', storagePrefix: 'rogue-contract' },
   palette,
   strings,
   config,

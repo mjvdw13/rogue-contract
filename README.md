@@ -1,9 +1,16 @@
-> **Work in progress: a Dark Forces-style Star Wars fan game.** This repo is a
-> fork of Raccoon Alex's engine. See [PLAN.md](PLAN.md) for the roadmap. The
-> Raccoon Alex content below is temporary and gets replaced phase by phase.
-> Non-commercial fan project; all art, sound and music are original.
+# ROGUE CONTRACT
 
-# RACCOON ALEX
+> **Work in progress: a Dark Forces-style Star Wars fan game for the
+> browser.** It's built on the Raccoon Alex engine, extended with floor and
+> ceiling heights, jumping, crouching, looking up and down, rising doors,
+> lifts and angled walls. See [PLAN.md](PLAN.md) for the roadmap.
+>
+> The Star Wars content hasn't landed yet: the art, levels and text below are
+> still Raccoon Alex's, and they get replaced phase by phase. Try the
+> height-engine test map with `?map=sandbox`. This is a non-commercial fan
+> project, and all art, sound and music are original.
+
+## Raccoon Alex (the engine's original game)
 
 *Knee-Deep in the Deadline.* A gritty, 80s-style first-person shooter that runs
 in the browser.
@@ -40,7 +47,7 @@ them, and the bugs ignore them. Bump into one, or press use, to say hi.
 
 ## Play
 
-The game lives at **https://mjvdw13.github.io/raccoon-alex/**. It runs in any modern desktop or
+The game lives at **https://mjvdw13.github.io/rogue-contract/**. It runs in any modern desktop or
 mobile browser. Click the game to capture the mouse.
 
 | Action | Keyboard and mouse | Gamepad | Touch |
@@ -72,7 +79,7 @@ example `idclev13` for E1M3).
 ## Publish on GitHub Pages
 
 The repository root *is* the website. There is no build step, and every path is
-relative, so it works at `https://<user>.github.io/raccoon-alex/`.
+relative, so it works at `https://<user>.github.io/rogue-contract/`.
 
 1. On GitHub, open **Settings → Pages**.
 2. Under **Build and deployment**, choose **Deploy from a branch**.

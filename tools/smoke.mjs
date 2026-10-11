@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Browser smoke test. Serves the repo under /raccoon-alex/ (the same subpath
+// Browser smoke test. Serves the repo under /rogue-contract/ (the same subpath
 // GitHub Pages uses), then in headless Chromium:
 //   1. loads the title screen and starts a new game through the menus,
 //   2. walks, shoots, uses a door and opens the automap,
@@ -19,7 +19,7 @@ import { Registry } from '../src/engine/registry.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const outDir = path.join(root, '.smoke');
-const BASE = '/raccoon-alex/';
+const BASE = '/rogue-contract/';
 
 async function loadPlaywright() {
   const candidates = [process.env.PLAYWRIGHT_MODULE, 'playwright', '@playwright/test'].filter(Boolean);

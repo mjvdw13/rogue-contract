@@ -1,4 +1,4 @@
-# Plan: a Dark Forces-style Star Wars game
+# Plan: Rogue Contract, a Dark Forces-style Star Wars game
 
 A Star Wars first-person shooter that is heavily influenced by *Dark Forces*
 (LucasArts, 1995). It is forked from Raccoon Alex's browser engine
@@ -13,6 +13,7 @@ land, and record new decisions here.
 | Where | **New sibling repo**, `C:\Mark\dark-forces-clone`, copied from raccoon-alex with its history. Raccoon Alex stays untouched. |
 | Story | **Original story in Dark Forces' style.** A new mercenary working for the Rebellion, Imperial bases, mission briefings and objectives, a serious tone. No Kyle Katarn retelling. |
 | Scope | **A one-mission vertical slice first**, then decide whether to build more. |
+| Title | **Rogue Contract** (chosen 2026-10-11). Repo `mjvdw13/rogue-contract`, public, served by GitHub Pages. "Star Wars" and "Dark Forces" stay out of the title. |
 | Rights | A non-commercial fan game. All art, sound and music are generated or original. Nothing ripped from Dark Forces, and no note-for-note John Williams transcriptions. |
 
 ## Starting point
@@ -251,3 +252,12 @@ update the smoke test.
   - **Still to do:** two-sided lines (a diagonal ledge between two floor
     heights) and the validator's view of the solid part. Reachability treats
     slant tiles as open for now.
+- 2026-10-11: Fixed items being picked up by jumping over them. Pickups now
+  need vertical reach: from 0.15 below the feet up to the top of the body.
+- 2026-10-11: Named the game **Rogue Contract**.
+  - Renamed the page title and link preview, the package, the README header,
+    the smoke-test subpath and the content pack's `game` id and title.
+  - The storage prefix is now `rogue-contract`, so it doesn't share saved
+    settings with Raccoon Alex on the same github.io origin.
+  - The local folder is still `C:\Mark\dark-forces-clone`.
+
