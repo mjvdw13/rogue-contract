@@ -31,24 +31,24 @@ The renderer already supports shifting the view up and down
 
 ## Phase 0: Fork
 
-- [ ] Create `C:\Mark\dark-forces-clone`, keeping the raccoon-alex history.
-- [ ] Rename the package, title and README, and keep `npm test`,
+- [x] Create `C:\Mark\dark-forces-clone`, keeping the raccoon-alex history.
+- [x] Rename the package, title and README, and keep `npm test`,
       `npm run validate` and CI passing.
 - [ ] Replace the Alex content step by step as each Star Wars piece lands,
       always keeping a playable build.
 
 ## Phase 1: Height-grid engine (the biggest phase)
 
-1. [ ] **Map data.** Each tile gets `floorZ` and `ceilZ`, set through the
+1. [x] **Map data.** Each tile gets `floorZ` and `ceilZ`, set through the
        legend (`'.': { floor, ceiling, floorZ: 0, ceilZ: 1.5 }`) or an
        optional `heights` grid. The defaults (0 and 1) reproduce today's flat
        maps exactly.
-2. [ ] **Renderer.** The ray doesn't stop at the first wall. As it crosses
+2. [x] **Renderer.** The ray doesn't stop at the first wall. As it crosses
        tiles it draws the step faces where the floor or ceiling changes height,
        plus each tile's floor and ceiling. A running top and bottom limit per
        screen column ("Doom on a grid") also lets sprites hide correctly behind
        ledges. The sky still works.
-3. [ ] **Player movement.** Gravity, a step-up height, jump, crouch (lower
+3. [x] **Player movement.** Gravity, a step-up height, jump, crouch (lower
        eyes and body), looking up and down (mouse, keys, gamepad), and damage
        from long falls.
 4. [ ] **Doors and lifts.** Doors rise into the ceiling like Dark Forces
@@ -134,3 +134,29 @@ update the smoke test.
 ## Progress log
 
 - 2026-10-11: Plan written. Starting Phase 0.
+- 2026-10-11: Phase 0 done: forked with history, renamed the package, added
+  the README note. The package name `dark-forces-clone` is a working name, and
+  the title is still to be decided.
+- 2026-10-11: Phase 1 steps 1-3 done.
+  - **Map data:** `floorZ`, `ceilZ`, `side` and `upper` in the legend, plus
+    `floorHeights` / `ceilHeights` grids. Documented in MODDING.md.
+  - **Renderer:** the new column renderer (`render/columns.js`) replaces
+    `walls.js` and `flats.js`. Flat maps render the same as before (under
+    0.25% of pixels differ, all floating-point rounding at texel edges).
+    Sprites are clipped by ledges using a per-column window.
+  - **Player:** jump (Space / A / JUMP), crouch (C / B / DUCK), gravity, eased
+    step-ups, fall damage, and mouse / key / stick look by y-shearing (±70 px).
+    Collision checks floor and ceiling heights, and solid things only collide
+    when they overlap in height.
+  - **Sandbox map:** `?map=sandbox`, a test map for all of this.
+  - **Tools:** `tools/snapshot.mjs` renders the 3D view headlessly.
+  - **Tests:** `tests/heights.test.js` covers stairs, ledges, jumping,
+    falling, crouching and the camera. 59 tests and the smoke test pass.
+  - **Speed:** about 1-2 ms per frame for the world on a desktop, versus
+    0.8-1.2 ms before. Recheck on a phone at the Phase 1 gate.
+  - **Notes for later steps:**
+    - Monsters snap to the floor and can walk off ledges (step 6 adds
+      drop-off limits).
+    - Hitscans and projectiles are still 2D (step 5).
+    - The validator's reachability ignores heights (step 7).
+    - Doors are still the sliding panels; rising doors and lifts are step 4.

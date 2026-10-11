@@ -16,6 +16,12 @@ export class View {
     this.fx = this.W / 2 / this.planeLen; // horizontal focal length (px)
     this.fy = this.fx / PIXEL_ASPECT; // vertical focal length (px), corrected for 4:3 display
     this.zbuf = new Float32Array(this.W);
+    /** Per column, the uncovered window of rows after each tile the ray crossed (for sprite clipping). */
+    this.SEG = 48;
+    this.segDist = new Float32Array(this.W * this.SEG);
+    this.segTop = new Int16Array(this.W * this.SEG);
+    this.segBot = new Int16Array(this.W * this.SEG);
+    this.segCount = new Uint8Array(this.W);
     this.lightStart = new Float32Array(256);
     this.skyU = new Int32Array(this.W);
     this.x = 0;

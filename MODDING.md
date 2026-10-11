@@ -296,6 +296,48 @@ Floor options:
 - `exit: true`: stepping here ends the level.
 - `tag`: a name that triggers and actions can refer to.
 
+### Heights
+
+Every floor tile has its own floor and ceiling height, in world units: one
+unit is one tile, or 64 texels of a wall texture. The defaults, `floorZ: 0` and
+`ceilZ: 1`, give the classic flat look.
+
+```js
+'h': { floor: 'server-floor', ceiling: 'ceiling-light', floorZ: 0.5, ceilZ: 2.5, side: 'tech-panel' },
+'p': { base: 'h', floorZ: -0.75 },               // a pit
+'v': { base: '.', floorZ: 0.25, ceilZ: 1 },      // a crawl space: crouch to get in
+```
+
+- `floorZ` / `ceilZ`: the heights. A solid wall is drawn from the floor to the
+  ceiling of the tile in front of it, so a tall sky courtyard (`ceiling: 'sky',
+  ceilZ: 3`) gets tall walls.
+- `side`: the texture on the faces of a raised floor (steps, ledges, platform
+  edges). It defaults to the floor texture.
+- `upper`: the texture under a lowered ceiling (the lintel above a door, the
+  mouth of a vent). It defaults to `side`, then to the ceiling texture.
+- Level-wide defaults go in the level's `defaults: { floorZ, ceilZ, side, upper }`.
+
+For stairs and terrain, a level can paint heights over the tiles with
+`floorHeights` and `ceilHeights`. These grids line up with `tiles`. Each
+character is a number of `heightStep`s (default 0.125) above `heightBase`
+(default 0): `0`-`9`, then `a`-`z` for 10-35. A space or `.` keeps the
+legend's height.
+
+```js
+floorHeights: [
+  '',
+  '         1234',    // four steps of 0.125 up to a 0.5 platform
+],
+```
+
+How the player moves (all overridable in `hero.js` as `body: {...}`): steps up
+to 0.4 are walked up, a jump rises about 0.63, and anything up to about 0.78
+can be jumped onto. The standing body is 0.85 tall, or 0.5 crouched. A space
+must be at least that tall to move through, measured as the lowest ceiling
+minus the highest floor under the player. Falls faster than 9 units per second
+(about a 3-unit drop) hurt. Monsters walk up steps of up to 0.4 (their
+`stepHeight`), and anything that isn't `flying` follows the floor.
+
 Door options:
 
 - `jamb`: the texture of the walls beside the door.

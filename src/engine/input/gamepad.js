@@ -41,7 +41,7 @@ export class GamepadPoller {
         }
       });
       this.prev.set(pad.index, now);
-      const [lx = 0, ly = 0, rx = 0] = pad.axes;
+      const [lx = 0, ly = 0, rx = 0, ry = 0] = pad.axes;
       const strafe = shape(lx);
       const move = -shape(ly);
       const turn = shape(rx);
@@ -49,6 +49,8 @@ export class GamepadPoller {
       this.input.analog.strafe = strafe || (this.input.lastDevice === 'gamepad' ? 0 : this.input.analog.strafe);
       this.input.analog.move = move || (this.input.lastDevice === 'gamepad' ? 0 : this.input.analog.move);
       if (turn) this.input.mouseDX += turn * this.turnSpeed;
+      const lookY = shape(ry);
+      if (lookY) this.input.mouseDY += lookY * this.turnSpeed * 0.6;
       break; // first active pad only
     }
     if (!any) this.connected = false;

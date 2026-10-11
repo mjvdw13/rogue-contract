@@ -51,6 +51,12 @@ export class TileMap {
     this.wallTex = new Int16Array(n).fill(-1);
     this.floorTex = new Int16Array(n).fill(-1);
     this.ceilTex = new Int16Array(n).fill(-1);
+    /** Floor and ceiling heights in world units (1 = one tile = 64 texels). */
+    this.floorZ = new Float32Array(n);
+    this.ceilZ = new Float32Array(n).fill(1);
+    /** Texture for the faces of a raised floor (its sides) and of a lowered ceiling (its underside edge). */
+    this.sideTex = new Int16Array(n).fill(-1);
+    this.upperTex = new Int16Array(n).fill(-1);
     this.baseLight = new Uint8Array(n);
     this.light = new Uint8Array(n);
     this.lightFx = new Uint8Array(n);
@@ -101,6 +107,42 @@ export class TileMap {
     if (f & F_SOLID) return true;
     if (f & F_DOOR) return this.doors[this.doorIndex[i]].open < 0.6;
     return false;
+  }
+
+  /** Highest floor under a box of half-size r centred at (x, y), ignoring solid tiles. */
+  floorAt(x, y, r = 0) {
+    let best = -Infinity;
+    const x0 = Math.floor(x - r);
+    const x1 = Math.floor(x + r);
+    const y0 = Math.floor(y - r);
+    const y1 = Math.floor(y + r);
+    for (let ty = y0; ty <= y1; ty++) {
+      for (let tx = x0; tx <= x1; tx++) {
+        if (!this.inBounds(tx, ty)) continue;
+        const i = ty * this.w + tx;
+        if (this.flags[i] & F_SOLID) continue;
+        if (this.floorZ[i] > best) best = this.floorZ[i];
+      }
+    }
+    return best === -Infinity ? 0 : best;
+  }
+
+  /** Lowest ceiling over a box of half-size r centred at (x, y), ignoring solid tiles. */
+  ceilAt(x, y, r = 0) {
+    let best = Infinity;
+    const x0 = Math.floor(x - r);
+    const x1 = Math.floor(x + r);
+    const y0 = Math.floor(y - r);
+    const y1 = Math.floor(y + r);
+    for (let ty = y0; ty <= y1; ty++) {
+      for (let tx = x0; tx <= x1; tx++) {
+        if (!this.inBounds(tx, ty)) continue;
+        const i = ty * this.w + tx;
+        if (this.flags[i] & F_SOLID) continue;
+        if (this.ceilZ[i] < best) best = this.ceilZ[i];
+      }
+    }
+    return best === Infinity ? 1 : best;
   }
 
   tilesWithTag(name) {

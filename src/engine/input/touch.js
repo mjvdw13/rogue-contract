@@ -1,6 +1,6 @@
 /**
  * On-screen controls for phones and tablets: a floating move stick on the
- * left, drag-to-turn on the right, and fire/use/weapon/map/menu buttons.
+ * left, drag-to-look on the right, and fire/use/jump/duck/weapon/map/menu buttons.
  * Everything feeds the shared Input object, so game code is unaware of touch.
  */
 export class TouchControls {
@@ -21,6 +21,8 @@ export class TouchControls {
       <div class="stick" hidden><div class="knob"></div></div>
       <div class="btn fire">FIRE</div>
       <div class="btn use">USE</div>
+      <div class="btn jump">JUMP</div>
+      <div class="btn crouch">DUCK</div>
       <div class="btn weapon">WPN</div>
       <div class="btn map">MAP</div>
       <div class="btn menu">MENU</div>`;
@@ -34,6 +36,8 @@ export class TouchControls {
     this._look(this.root.querySelector('.zone.look'));
     this._hold(this.root.querySelector('.btn.fire'), 'TouchFire');
     this._tap(this.root.querySelector('.btn.use'), 'TouchUse');
+    this._tap(this.root.querySelector('.btn.jump'), 'TouchJump');
+    this._hold(this.root.querySelector('.btn.crouch'), 'TouchCrouch');
     this._tap(this.root.querySelector('.btn.weapon'), 'TouchWeapon');
     this._tap(this.root.querySelector('.btn.map'), 'TouchMap');
     this._tap(this.root.querySelector('.btn.menu'), 'TouchMenu');
@@ -47,6 +51,7 @@ export class TouchControls {
       this.input.analog.move = 0;
       this.input.analog.strafe = 0;
       this.input.setVirtual('TouchFire', false);
+      this.input.setVirtual('TouchCrouch', false);
     }
   }
 

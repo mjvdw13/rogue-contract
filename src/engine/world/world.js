@@ -79,7 +79,7 @@ export class World {
       id: 'player',
       kind: 'player',
       radius: hero.radius ?? 0.25,
-      height: 0.85,
+      height: hero.body?.height ?? 0.85,
       health: hero.health ?? 100,
       solid: true,
       shootable: true,
@@ -92,6 +92,8 @@ export class World {
     };
     this.player = new Thing(this.playerDef, start.x, start.y, start.angle);
     this.player.player = new PlayerState(this.registry, snapshot);
+    this.player.z = this.map.floorAt(start.x, start.y, this.player.radius);
+    this.player.pitch = 0;
     this.player.health = this.player.player.health;
     this.things.push(this.player);
     this._lastTile = -1;
@@ -154,7 +156,8 @@ export class World {
     }
     if (def.kind === 'monster') t.timer = this.rng.range(0, 0.3);
     if (def.kind === 'npc') initNpc(this, t);
-    if (def.kind === 'decoration' && def.hanging) t.z = 1 - (t.sheet ? (t.sheet.fh / 64) * (def.scale ?? 1) : t.height);
+    if (def.kind === 'decoration' && def.hanging) t.z = this.map.ceilAt(x, y) - (t.sheet ? (t.sheet.fh / 64) * (def.scale ?? 1) : t.height);
+    else if (def.kind !== 'projectile' && def.kind !== 'effect') t.z = this.map.floorAt(x, y) + (def.z ?? 0);
     this.things.push(t);
     def.hooks?.onSpawn?.(this, t);
     return t;
@@ -177,13 +180,33 @@ export class World {
 
   // ------------------------------------------------------------ movement
 
-  /** Can thing `t` stand at (x, y)? Checks walls, closed doors and solid things. */
+  /** Highest floor under a box of half-size r at (x, y). */
+  floorAt(x, y, r = 0) {
+    return this.map.floorAt(x, y, r);
+  }
+
+  /** Lowest ceiling over a box of half-size r at (x, y). */
+  ceilAt(x, y, r = 0) {
+    return this.map.ceilAt(x, y, r);
+  }
+
+  /**
+   * Can thing `t` stand at (x, y)? Checks walls, closed doors, floors too high
+   * to step onto, ceilings too low to fit under, and solid things at the same
+   * height.
+   */
   checkPosition(t, x, y) {
-    if (blockedByMap(this.map, x, y, t.radius)) return false;
+    const map = this.map;
+    if (blockedByMap(map, x, y, t.radius)) return false;
+    const floor = map.floorAt(x, y, t.radius);
+    const ceil = map.ceilAt(x, y, t.radius);
+    if (floor - t.z > this.stepHeight(t)) return false;
+    if (ceil - Math.max(floor, t.z) < t.height) return false;
     if (!t.solid) return true;
     for (const o of this.things) {
       if (o === t || !o.solid || o.removed) continue;
       if (t.kind === 'projectile' || o.kind === 'projectile') continue;
+      if (o.z >= t.z + t.height || t.z >= o.z + o.height) continue;
       const r = o.radius + t.radius;
       const dx = o.x - x;
       const dy = o.y - y;
@@ -199,8 +222,24 @@ export class World {
     return true;
   }
 
+  /** How high a step thing `t` can walk up right now. */
+  stepHeight(t) {
+    if (t.player) {
+      const body = t.player.body;
+      return t.player.onGround ? body.stepHeight : body.airStep;
+    }
+    return t.def.stepHeight ?? 0.4;
+  }
+
   /** Move with wall sliding. Returns true if the thing moved at all. */
   tryMove(t, dx, dy) {
+    const moved = this._slide(t, dx, dy);
+    // Everything but the player (who has real gravity) follows the floor.
+    if (moved && !t.player && !t.def.flying) t.z = this.map.floorAt(t.x, t.y, t.radius) + (t.def.z ?? 0);
+    return moved;
+  }
+
+  _slide(t, dx, dy) {
     const steps = Math.max(1, Math.ceil(Math.max(Math.abs(dx), Math.abs(dy)) / 0.2));
     let moved = false;
     for (let i = 0; i < steps; i++) {

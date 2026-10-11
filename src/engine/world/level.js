@@ -67,6 +67,19 @@ export function buildLevel(registry, level, opts = {}) {
   const slot = opts.textureSlot ?? (() => 0);
   const { tiles: legend, things: thingLegend } = resolveLegend(registry, level);
   const defaults = { floor: undefined, ceiling: undefined, light: 160, ...(level.defaults ?? {}) };
+  const step = level.heightStep ?? 0.125;
+  const base = level.heightBase ?? 0;
+  /** A height from a `floorHeights` / `ceilHeights` grid: 0-9 then a-z count steps; space or '.' means "use the legend". */
+  const heightOverride = (grid, x, y) => {
+    const ch = grid?.[y]?.[x];
+    if (ch === undefined || ch === ' ' || ch === '.') return undefined;
+    const n = parseInt(ch, 36);
+    if (Number.isNaN(n)) {
+      errors.push(`Bad height "${ch}" at (${x}, ${y}) (use 0-9 and a-z)`);
+      return undefined;
+    }
+    return base + n * step;
+  };
   const rows = level.tiles;
   const h = rows.length;
   const w = Math.max(...rows.map((r) => r.length));
@@ -110,6 +123,14 @@ export function buildLevel(registry, level, opts = {}) {
       if (floor) map.floorTex[i] = slot(floor);
       if (ceiling === 'sky') map.flags[i] |= F_SKY;
       else if (ceiling) map.ceilTex[i] = slot(ceiling);
+      map.floorZ[i] = heightOverride(level.floorHeights, x, y) ?? e.floorZ ?? defaults.floorZ ?? 0;
+      map.ceilZ[i] = heightOverride(level.ceilHeights, x, y) ?? e.ceilZ ?? defaults.ceilZ ?? 1;
+      // Step faces: a raised floor shows its `side`, a lowered ceiling its `upper`.
+      const side = e.side ?? defaults.side ?? floor;
+      const upper = e.upper ?? e.side ?? defaults.upper ?? defaults.side ?? (ceiling === 'sky' ? null : ceiling);
+      if (side) map.sideTex[i] = slot(side);
+      if (upper) map.upperTex[i] = slot(upper);
+      if (map.ceilZ[i] < map.floorZ[i]) errors.push(`Tile (${x}, ${y}) has its ceiling below its floor`);
 
       if (e.wall) {
         map.flags[i] |= F_SOLID;

@@ -1,4 +1,5 @@
 import { World } from '../world/world.js';
+import { clampPitch } from '../things/player.js';
 import { VIEW_H } from '../config.js';
 import { PAL_NORMAL, PAL_RED_START, NUM_RED, PAL_BONUS_START, NUM_BONUS, PAL_HAZARD, PAL_NIGHTVISION } from '../gfx/palette.js';
 
@@ -78,12 +79,14 @@ export class LevelScene {
 
   /** Called every rendered frame (not just ticks) for smooth mouse look. */
   frame(dt, input) {
-    const { dx } = input.consumeMouse();
+    const { dx, dy } = input.consumeMouse();
     const p = this.world.player;
-    if (!p.player.dead && dx) {
-      const sens = 0.0006 + this.game.settings.mouseSensitivity * 0.00034;
-      p.angle += dx * sens;
-    }
+    if (p.player.dead) return;
+    const settings = this.game.settings;
+    const sens = 0.0006 + settings.mouseSensitivity * 0.00034;
+    if (dx) p.angle += dx * sens;
+    // Mouse look tilts the view (Dark Forces-style y-shearing), in horizon pixels.
+    if (dy && settings.mouseLook) p.pitch = clampPitch((p.pitch ?? 0) - dy * sens * 130 * (settings.invertMouseY ? -1 : 1));
   }
 
   render() {

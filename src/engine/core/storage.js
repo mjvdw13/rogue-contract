@@ -40,4 +40,5 @@ export const DEFAULT_SETTINGS = {
   messages: true,
   touchControls: 'auto', // 'auto' | 'on' | 'off'
   invertMouseY: false,
+  mouseLook: true,
 };

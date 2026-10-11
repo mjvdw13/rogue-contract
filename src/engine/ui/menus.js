@@ -97,9 +97,9 @@ export function optionsMenu(game) {
   return {
     id: 'options',
     title: t(game, 'options', 'OPTIONS'),
-    y: 26,
+    y: 24,
     x: 40,
-    lineHeight: 16,
+    lineHeight: 14,
     items: [
       { label: t(game, 'mouse', 'MOUSE'), slider: { get: () => s.mouseSensitivity, set: set('mouseSensitivity'), min: 1, max: 10 } },
       { label: t(game, 'music', 'MUSIC'), slider: { get: () => s.musicVolume, set: set('musicVolume'), min: 0, max: 10 } },
@@ -117,6 +117,8 @@ export function optionsMenu(game) {
         },
       },
       { label: t(game, 'alwaysRun', 'ALWAYS RUN'), toggle: { get: () => s.alwaysRun, set: set('alwaysRun') } },
+      { label: t(game, 'mouseLook', 'MOUSE LOOK'), toggle: { get: () => s.mouseLook, set: set('mouseLook') } },
+      { label: t(game, 'invertMouse', 'INVERT LOOK'), toggle: { get: () => s.invertMouseY, set: set('invertMouseY') } },
       { label: t(game, 'messages', 'MESSAGES'), toggle: { get: () => s.messages, set: set('messages') } },
       { label: t(game, 'showFps', 'SHOW FPS'), toggle: { get: () => s.showFps, set: set('showFps') } },
       {

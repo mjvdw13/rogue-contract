@@ -5,6 +5,28 @@ import { COLORMAP_INVERSE } from '../gfx/palette.js';
 /** Doom's ground friction, converted from 35 Hz tics to our 60 Hz ticks. */
 const FRICTION = Math.pow(0.90625, 35 / 60);
 
+/**
+ * Vertical movement defaults (world units: 1 = a tile = 64 texels). The hero
+ * content can override any of them.
+ */
+export const BODY = {
+  height: 0.85, // standing body height
+  eyeHeight: EYE_HEIGHT,
+  crouchHeight: 0.5,
+  crouchEyeHeight: 0.3,
+  crouchSpeed: 0.5, // speed multiplier while crouching
+  stepHeight: 0.4, // highest step you walk up
+  airStep: 0.15, // highest ledge edge you can scramble onto mid-jump
+  jumpSpeed: 4.2, // units per second upwards
+  gravity: 14, // units per second squared
+  fallDamageSpeed: 9, // landing faster than this hurts...
+  fallDamagePerSpeed: 8, // ...this much per unit/s over it
+};
+
+/** Furthest the view can tilt up or down, in pixels of horizon shift. */
+export const MAX_PITCH = 70;
+const LOOK_KEY_SPEED = 120; // pixels per second
+
 /** Everything about the player that isn't position: inventory, health, powers, HUD state. */
 export class PlayerState {
   /**
@@ -44,7 +66,12 @@ export class PlayerState {
     this.fireHeld = 0;
     this.dead = false;
     this.deathTime = 0;
-    this.viewHeight = EYE_HEIGHT;
+    this.body = { ...BODY, ...(hero.body ?? {}) };
+    this.viewHeight = this.body.eyeHeight;
+    /** Temporary eye offset that eases back to 0 (stepping up stairs, landing). */
+    this.viewOffset = 0;
+    this.crouching = false;
+    this.onGround = true;
     this.bobPhase = 0;
     this.bobAmount = 0;
     this.weaponState = new WeaponState();
@@ -106,9 +133,31 @@ export function playerThink(world, pt, input, dt, settings = {}) {
     p.viewHeight = Math.max(0.1, p.viewHeight - dt * 0.9);
     pt.vx *= 0.9;
     pt.vy *= 0.9;
+    verticalMove(world, pt, dt);
     weaponThink(world, pt, input, dt);
     if (world.time - p.deathTime > 1.2 && (input.wasPressed('use') || input.wasPressed('fire'))) world.requestRestart();
     return;
+  }
+
+  // Looking up and down with keys (the mouse is handled per frame by the scene).
+  const look = (input.isDown('lookUp') ? 1 : 0) - (input.isDown('lookDown') ? 1 : 0);
+  if (look) pt.pitch = clampPitch((pt.pitch ?? 0) + look * LOOK_KEY_SPEED * dt);
+  if (input.wasPressed('lookCenter')) pt.pitch = 0;
+
+  // Crouching: stand back up only where there's headroom.
+  const body = p.body;
+  const wantCrouch = input.isDown('crouch');
+  if (wantCrouch) p.crouching = true;
+  else if (p.crouching && world.ceilAt(pt.x, pt.y, pt.radius) - pt.z >= body.height) p.crouching = false;
+  pt.height = p.crouching ? body.crouchHeight : body.height;
+  const eye = p.crouching ? body.crouchEyeHeight : body.eyeHeight;
+  if (p.viewHeight < eye) p.viewHeight = Math.min(eye, p.viewHeight + dt * 2.5);
+  else if (p.viewHeight > eye) p.viewHeight = Math.max(eye, p.viewHeight - dt * 2.5);
+
+  if (input.wasPressed('jump') && p.onGround && !p.crouching) {
+    pt.vz = body.jumpSpeed;
+    p.onGround = false;
+    world.playSound(hero.sounds?.jump);
   }
 
   const run = !!settings.alwaysRun !== input.isDown('run');
@@ -124,7 +173,7 @@ export function playerThink(world, pt, input, dt, settings = {}) {
     fwd /= len;
     side /= len;
   }
-  const speed = run ? (hero.runSpeed ?? 8) : (hero.walkSpeed ?? 4.8);
+  const speed = (run ? (hero.runSpeed ?? 8) : (hero.walkSpeed ?? 4.8)) * (p.crouching ? body.crouchSpeed : 1);
   const ca = Math.cos(pt.angle);
   const sa = Math.sin(pt.angle);
   const wishX = ca * fwd - sa * side;
@@ -140,6 +189,7 @@ export function playerThink(world, pt, input, dt, settings = {}) {
   } else {
     world.tryMove(pt, pt.vx * dt, pt.vy * dt);
   }
+  verticalMove(world, pt, dt);
   const f = Math.pow(FRICTION, ticks);
   pt.vx *= f;
   pt.vy *= f;
@@ -155,6 +205,51 @@ export function playerThink(world, pt, input, dt, settings = {}) {
   weaponThink(world, pt, input, dt);
 }
 
+export function clampPitch(v) {
+  return Math.max(-MAX_PITCH, Math.min(MAX_PITCH, v));
+}
+
+/**
+ * Gravity, stepping up onto higher floors (with the view easing up after it),
+ * landing (and fall damage), and bumping your head on the ceiling.
+ */
+function verticalMove(world, pt, dt) {
+  const p = pt.player;
+  const body = p.body;
+  const floor = p.noclip ? world.floorAt(pt.x, pt.y, 0) : world.floorAt(pt.x, pt.y, pt.radius);
+  const ceil = world.ceilAt(pt.x, pt.y, pt.radius);
+  if (pt.z < floor) {
+    // Walked up a step (or a floor rose under us): ease the eye up after it.
+    p.viewOffset -= floor - pt.z;
+    pt.z = floor;
+    if (pt.vz < 0) pt.vz = 0;
+  }
+  if (pt.z > floor || pt.vz > 0) {
+    pt.vz -= body.gravity * dt;
+    pt.z += pt.vz * dt;
+    if (pt.z + pt.height > ceil && pt.vz > 0) {
+      pt.z = Math.max(floor, ceil - pt.height);
+      pt.vz = 0;
+    }
+    if (pt.z <= floor) {
+      const impact = -pt.vz;
+      pt.z = floor;
+      pt.vz = 0;
+      if (!p.dead && impact > 3) {
+        p.viewOffset -= Math.min(0.2, impact * 0.02);
+        if (impact > 6) world.playSound(p.hero.sounds?.land ?? 'oof');
+        if (impact > body.fallDamageSpeed && !p.noclip) {
+          const amount = Math.round((impact - body.fallDamageSpeed) * body.fallDamagePerSpeed);
+          world.damage(pt, amount, null, null, { environment: true, noThrust: true });
+        }
+      }
+    }
+  }
+  p.onGround = pt.z <= floor + 1e-4;
+  // The eye offset eases back: fast at first, like Doom's view height recovery.
+  if (p.viewOffset < 0) p.viewOffset = Math.min(0, p.viewOffset + Math.max(0.6, -p.viewOffset * 10) * dt);
+}
+
 /** Camera for the renderer: eye position, bob, muzzle-flash light, powerup colormaps. */
 export function playerCamera(world, pt) {
   const p = pt.player;
@@ -166,7 +261,8 @@ export function playerCamera(world, pt) {
     x: pt.x,
     y: pt.y,
     angle: pt.angle,
-    z: p.viewHeight + bob,
+    z: pt.z + Math.max(0.05, p.viewHeight + p.viewOffset + bob),
+    horizonOffset: pt.pitch ?? 0,
     extraLight: p.weaponState.flash ?? 0,
     fixedColormap,
   };

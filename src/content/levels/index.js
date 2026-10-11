@@ -7,8 +7,10 @@ import e1m2 from './e1m2.js';
 import e1m3 from './e1m3.js';
 import e1m4 from './e1m4.js';
 import e1m5 from './e1m5.js';
+import sandbox from './sandbox.js';
 
-export const levels = [e1m1, e1m2, e1m3, e1m4, e1m5];
+// The sandbox is a test map for the height engine (?map=sandbox), outside any episode.
+export const levels = [e1m1, e1m2, e1m3, e1m4, e1m5, sandbox];
 
 export const episodes = [
   defineEpisode({

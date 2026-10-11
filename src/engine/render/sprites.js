@@ -18,6 +18,7 @@ const FUZZ = [1, -1, 1, -1, 1, 1, -1, 1, 1, -1, 1, 1, 1, -1, 1, 1, 1, -1, -1, -1
  */
 export function drawSprites(view, things, map, fb, fbW, colormaps, skip) {
   const { W, H, x: px, y: py, dirX, dirY, planeX, planeY, fx, fy, camZ, horizon, zbuf } = view;
+  const { segDist, segTop, segBot, segCount, SEG } = view;
   const invDet = 1 / (planeX * dirY - dirX * planeY);
   visible.length = 0;
   for (const t of things) {
@@ -69,6 +70,15 @@ export function drawSprites(view, things, map, fb, fbW, colormaps, skip) {
 
     for (let x = x0; x < x1; x++) {
       if (depth >= zbuf[x]) continue;
+      // The rows still uncovered by ledges and overhangs nearer than the sprite.
+      let winTop = 0;
+      let winBot = H;
+      const sb = x * SEG;
+      for (let k = 0, n = segCount[x]; k < n && segDist[sb + k] < depth; k++) {
+        winTop = segTop[sb + k];
+        winBot = segBot[sb + k];
+      }
+      if (winBot <= winTop) continue;
       let tx = ((x + 0.5 - left) * texScaleX) | 0;
       if (tx >= frame.w) tx = frame.w - 1;
       if (t.flipX) tx = frame.w - 1 - tx;
@@ -77,8 +87,8 @@ export function drawSprites(view, things, map, fb, fbW, colormaps, skip) {
       const cb = frame.bottom[tx];
       let y0 = Math.ceil(top + ct / texScaleY - 0.5);
       let y1 = Math.ceil(top + (cb + 1) / texScaleY - 0.5);
-      if (y0 < 0) y0 = 0;
-      if (y1 > H) y1 = H;
+      if (y0 < winTop) y0 = winTop;
+      if (y1 > winBot) y1 = winBot;
       const base = tx * fh;
       for (let y = y0; y < y1; y++) {
         let ty = ((y + 0.5 - top) * texScaleY) | 0;

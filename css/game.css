@@ -176,6 +176,22 @@ body {
   height: 56px;
 }
 
+/* JUMP and DUCK sit left of FIRE, under the right thumb. */
+#touch .btn.jump {
+  right: calc(124px + env(safe-area-inset-right));
+  bottom: 24px;
+  width: 62px;
+  height: 62px;
+}
+
+#touch .btn.crouch {
+  right: calc(120px + env(safe-area-inset-right));
+  bottom: 96px;
+  width: 52px;
+  height: 52px;
+  font-size: 11px;
+}
+
 #touch .btn.map,
 #touch .btn.menu {
   top: calc(10px + env(safe-area-inset-top));

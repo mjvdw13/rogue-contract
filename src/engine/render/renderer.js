@@ -1,6 +1,5 @@
 import { View } from './view.js';
-import { drawFlats } from './flats.js';
-import { drawWalls } from './walls.js';
+import { drawWorld } from './columns.js';
 import { drawSprites } from './sprites.js';
 import { drawPsprites } from './psprite.js';
 
@@ -29,8 +28,7 @@ export class Renderer {
     const textures = this.assets.textures;
     const cms = this.palette.colormaps;
     view.setup(cam, scene.fog ?? 0.25);
-    drawFlats(view, scene.map, textures, scene.skyTexture ?? null, s.px, s.w, cms);
-    drawWalls(view, scene.map, textures, s.px, s.w, cms);
+    drawWorld(view, scene.map, textures, scene.skyTexture ?? null, s.px, s.w, cms);
     drawSprites(view, scene.things, scene.map, s.px, s.w, cms, extras.skip);
     if (extras.psprites?.length) {
       const map = scene.map;

@@ -47,8 +47,11 @@ mobile browser. Click the game to capture the mouse.
 |---|---|---|---|
 | Move / strafe | W A S D, arrow keys | Left stick | Left half of the screen |
 | Turn | Mouse, ← → | Right stick | Drag on the right half |
+| Look up / down | Mouse (Mouse Look in Options), Page Up / Page Down, End to centre | Right stick | Drag on the right half |
+| Jump | Space | A | JUMP |
+| Crouch | C (hold) | B | DUCK (hold) |
 | Fire | Left click, F, Ctrl | Right trigger | FIRE |
-| Use / open | E, Space, right click | A | USE |
+| Use / open | E, right click | X | USE |
 | Run | Shift (or Always Run in Options) | | |
 | Weapons | 1-6, mouse wheel, Q | Bumpers | WPN |
 | Automap | Tab or M (zoom with + and -) | Back / Select | MAP |
@@ -94,7 +97,7 @@ Handy URL parameters for testing:
 
 | Parameter | Effect |
 |---|---|
-| `?map=e1m3` | Jump straight into a level (`&skill=1`..`5`, default 3) |
+| `?map=e1m3` | Jump straight into a level (`&skill=1`..`5`, default 3). `?map=sandbox` is the height-engine test map |
 | `&god` / `&nomonsters` / `&all` | God mode / no monsters / all weapons |
 | `&crt=off` / `subtle` / `full` | CRT effect (also in Options) |
 | `&gl=0` | Plain 2D canvas instead of WebGL |
@@ -119,6 +122,7 @@ assets/                 PNG textures, sprites and UI art
 tools/art/              the generators that drew the built-in art
 tools/validate.mjs      content checks: references, files, level reachability
 tools/mapview.mjs       renders levels as top-down PNGs
+tools/snapshot.mjs      renders the 3D view of a level headlessly to a PNG
 tools/smoke.mjs         headless-browser smoke test
 tests/                  node --test unit and simulation tests
 ```
@@ -133,6 +137,7 @@ npm test             # unit tests + a headless minute of play in every level
 npm run validate     # check all content, assets and level layouts
 npm run art          # regenerate the built-in art (tools/art/generate.mjs)
 node tools/mapview.mjs e1m2        # draw a level map to tools/art/out/maps/
+node tools/snapshot.mjs sandbox --at 14.5,4.5,0 --pitch 30   # render the 3D view to a PNG
 npm run smoke        # browser smoke test (needs Playwright, see the file)
 ```
 
