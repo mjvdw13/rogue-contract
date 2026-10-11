@@ -96,6 +96,32 @@ tile holds at most one wall line.
 - [ ] Lives and checkpoints instead of saves, with extra-life pickups.
 - [ ] HUD overlay: a full-screen view instead of the bottom status bar, with
       shield and health readouts in the corners, plus ammo and lives.
+- [ ] **TODO: fill the whole screen (widescreen).** Today the game draws a
+      fixed 320×200 frame shown at 4:3, with black bars on wider screens
+      (`gfx/present.js` `resize()`).
+      - Keep today's 4:3 view as the guaranteed centre: the same vertical
+        view, the same 90° field of view in the middle 320 columns. On a
+        wider screen, draw more world at the left and right edges instead of
+        bars.
+      - The framebuffer stays 200 px tall, and its width follows the window:
+        320 at 4:3, about 427 at 16:9, wider on ultrawides. Cap it around
+        21:9, and use bars past that.
+      - The horizontal field of view grows with the width, so nothing in the
+        centre moves or changes size.
+      - This means making `SCREEN_W` / `VIEW_W` (about 47 uses) a runtime
+        value. The per-column buffers (`zbuf`, the sprite clip windows, sky
+        columns), the renderer, the weapon sprite, the CRT shader and the
+        touch layout all follow.
+      - The HUD, menus and full-screen pictures (title, briefing,
+        intermission) stay laid out for the centre 320 columns, so nothing
+        important is cut off on 4:3. Their backgrounds extend or tile to the
+        edges.
+      - Taller-than-4:3 screens keep their bars (we already ask phones to
+        turn sideways).
+      - The cost grows with the width: about 33% more columns at 16:9.
+        Re-check the Phase 1 phone performance target.
+      - Do it together with the HUD overlay above, since both rework the
+        screen layout.
 - [ ] Visible blaster bolts for both enemies and the player: slow and
       dodgeable, with inaccurate stormtroopers.
 - [ ] A headlamp that drains batteries, infrared goggles and a gas mask.
@@ -199,3 +225,6 @@ update the smoke test.
     of the pit.
   - **Tests:** `tests/lifts.test.js` (6 tests), plus a rising-door ray test.
     66 tests and the smoke test pass. Checked in a real browser too.
+- 2026-10-11: Added a Phase 2 TODO: fill the whole screen on widescreen
+  displays. Keep the 4:3 centre and draw more world at the edges (Hor+),
+  instead of black bars.
