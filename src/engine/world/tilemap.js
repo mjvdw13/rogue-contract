@@ -12,9 +12,11 @@ export const F_VOID = 128;
 export const LIGHT_FX = { none: 0, flicker: 1, strobe: 2, glow: 3, fire: 4, blink: 5 };
 
 /**
- * A door living in one tile. The door panel is a thin plane through the tile
- * centre: `axis: 'x'` means the plane is at constant x (you walk through it
- * along the x axis); `'y'` means constant y.
+ * A door living in one tile. Sliding and split doors are a thin panel through
+ * the tile centre: `axis: 'x'` means the plane is at constant x (you walk
+ * through it along the x axis); `'y'` means constant y. Rising doors
+ * (`style: 'rise'`, Dark Forces' kind) fill the tile: its ceiling rises from
+ * the floor to `openZ`.
  */
 export class Door {
   constructor(spec) {
@@ -23,7 +25,9 @@ export class Door {
     this.tex = spec.tex;
     this.jamb = spec.jamb ?? -1;
     this.axis = spec.axis ?? 'x';
-    this.style = spec.style ?? 'slide'; // 'slide' | 'split'
+    this.style = spec.style ?? 'slide'; // 'slide' | 'split' | 'rise'
+    /** For rising doors: the ceiling height when fully open (set by the level builder). */
+    this.openZ = spec.openZ ?? 1;
     this.lock = spec.lock ?? null; // key id, 'remote' (triggers only) or null
     this.secret = !!spec.secret;
     this.stayOpen = !!spec.stayOpen;
@@ -63,6 +67,9 @@ export class TileMap {
     this.lightGroup = new Int32Array(n).fill(-1);
     this.damage = new Uint8Array(n);
     this.doorIndex = new Int16Array(n).fill(-1);
+    this.liftIndex = new Int16Array(n).fill(-1);
+    /** @type {import('./lifts.js').Lift[]} */
+    this.lifts = [];
     this.tag = new Int16Array(n).fill(-1);
     this.seen = new Uint8Array(n);
     /** @type {Door[]} */

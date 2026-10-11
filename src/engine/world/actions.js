@@ -1,4 +1,5 @@
 import { openDoor, closeDoor } from './doors.js';
+import { startLift } from './lifts.js';
 
 /**
  * Built-in trigger actions. Triggers in a level run lists of these:
@@ -13,6 +14,10 @@ export const BUILTIN_ACTIONS = {
   },
   closeDoors(world, { tag }) {
     for (const d of world.map.doors) if (d.tag === tag) closeDoor(world, d);
+  },
+  /** Start every lift with the tag (optionally to stop index `to`). */
+  lift(world, { tag, to }) {
+    for (const l of world.map.lifts) if (l.tag === tag) startLift(world, l, to);
   },
   /** Finish the level (normal exit). */
   exit(world) {

@@ -51,7 +51,7 @@ The renderer already supports shifting the view up and down
 3. [x] **Player movement.** Gravity, a step-up height, jump, crouch (lower
        eyes and body), looking up and down (mouse, keys, gamepad), and damage
        from long falls.
-4. [ ] **Doors and lifts.** Doors rise into the ceiling like Dark Forces
+4. [x] **Doors and lifts.** Doors rise into the ceiling like Dark Forces
        doors (an animated ceiling height). Elevators are tiles whose floor
        height moves between stops, triggered by a switch or by stepping on
        them.
@@ -185,3 +185,17 @@ update the smoke test.
   - heights are floats, so any value works
   - the grids use `heightStep` (default 1/8) times `0`-`z` plus `heightBase`
   - multiples of 1/8 keep textures aligned
+- 2026-10-11: Phase 1 step 4 done.
+  - **Rising doors** (`style: 'rise'`): the door tile's ceiling animates up
+    to the lowest neighbouring ceiling. The lintel above it keeps its own
+    `upper` texture. The shared doors now rise; the split elevator door stays.
+  - **Lifts** (`lift: { stops, mode, speed, wait, on, moves }`) have three
+    modes: return (the default), toggle and cycle. Riders move with the
+    floor, a lift turns back instead of crushing, and `moves: 'both'` makes a
+    closed cab. They start when you step on them, press use, or a trigger
+    runs the new `lift` action.
+  - **Sounds:** `lift-start` and `lift-stop`.
+  - **Sandbox:** a rising door, a lift up to the sniper ledge, and a lift out
+    of the pit.
+  - **Tests:** `tests/lifts.test.js` (6 tests), plus a rising-door ray test.
+    66 tests and the smoke test pass. Checked in a real browser too.

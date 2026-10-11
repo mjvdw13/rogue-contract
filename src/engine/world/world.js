@@ -3,6 +3,7 @@ import { F_SECRET, F_DAMAGE, F_EXIT, F_USE } from './tilemap.js';
 import { initNpc, npcThink, npcReact } from '../things/npc.js';
 import { castRay, blockedByMap, rayCircle } from './physics.js';
 import { updateDoors, openDoor, closeDoor } from './doors.js';
+import { updateLifts, startLift, liftAt } from './lifts.js';
 import { LightEffects } from './lights.js';
 import { FlowField } from './nav.js';
 import { noiseAlert } from './noise.js';
@@ -371,8 +372,19 @@ export class World {
         return;
       }
       if (this.triggers.useTile(i)) return;
-      this.playSound('oof');
     }
+    // A lift underfoot or just ahead.
+    const map = this.map;
+    for (const d of [0, 0.9]) {
+      const tx = Math.floor(pt.x + dx * d);
+      const ty = Math.floor(pt.y + dy * d);
+      const lift = map.inBounds(tx, ty) ? liftAt(map, ty * map.w + tx) : null;
+      if (lift?.on.has('use')) {
+        if (!startLift(this, lift)) this.playSound('oof');
+        return;
+      }
+    }
+    if (hit.dist < USE_RANGE) this.playSound('oof');
   }
 
   _useDoor(d, pt) {
@@ -448,6 +460,7 @@ export class World {
     this.stats.time += dt;
     this.lights.update(dt);
     updateDoors(this, dt);
+    updateLifts(this, dt);
 
     const pt = this.player;
     playerThink(this, pt, input, dt, this.settings);
@@ -503,6 +516,8 @@ export class World {
         }
       }
       this.triggers.enterTile(i);
+      const lift = liftAt(this.map, i);
+      if (lift?.on.has('enter')) startLift(this, lift);
       if (f & F_EXIT) this.requestExit('normal');
     }
     if (f & F_DAMAGE) {

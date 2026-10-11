@@ -7,7 +7,7 @@ import { registry, room } from './helpers.js';
 const level = room(
   ['##########', '#........#', '#........#', '####D#####', '#........#', '###u######', '#........#', '##########'],
   ['', ' ^'],
-  { legend: { u: { door: 'drywall', secret: true } } },
+  { legend: { u: { door: 'drywall', secret: true }, D: { door: 'door-office', style: 'slide' } } },
 );
 const map = () => buildLevel(registry, level, {}).map;
 
@@ -24,6 +24,17 @@ test('closed doors block at their middle, open ones let rays through', () => {
   assert.ok(down.door, 'hits the door');
   assert.ok(Math.abs(down.dist - 2) < 1e-9, 'panel is at the tile centre (y = 3.5)');
   m.doors[0].open = 1;
+  const through = castRay(m, 4.5, 1.5, 0, 1);
+  assert.equal(through.door, null);
+  assert.equal(through.passedDoor, m.doors[0]);
+});
+
+test('rising doors block at the tile face until mostly open', () => {
+  const m = buildLevel(registry, { ...level, legend: { ...level.legend, D: { door: 'door-office', style: 'rise' } } }, {}).map;
+  const hit = castRay(m, 4.5, 1.5, 0, 1);
+  assert.equal(hit.door, m.doors[0]);
+  assert.ok(Math.abs(hit.dist - 1.5) < 1e-9, 'face at y = 3');
+  m.doors[0].open = 0.7;
   const through = castRay(m, 4.5, 1.5, 0, 1);
   assert.equal(through.door, null);
   assert.equal(through.passedDoor, m.doors[0]);

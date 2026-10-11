@@ -1,4 +1,5 @@
 import { TileMap, Door, F_SOLID, F_DOOR, F_SKY, F_SECRET, F_DAMAGE, F_EXIT, F_USE, F_VOID, LIGHT_FX } from './tilemap.js';
+import { buildLifts } from './lifts.js';
 
 /** Glyphs in the `things` layer that place the player start, with facing. */
 export const PLAYER_START_GLYPHS = { '^': 90, '>': 0, v: 270, '<': 180 };
@@ -88,6 +89,7 @@ export function buildLevel(registry, level, opts = {}) {
   const spawns = [];
   let playerStart = null;
   const glyphAt = new Array(w * h);
+  const explicitCeil = new Uint8Array(w * h);
 
   const tagIndex = (name) => {
     let idx = map.tagNames.indexOf(name);
@@ -124,7 +126,9 @@ export function buildLevel(registry, level, opts = {}) {
       if (ceiling === 'sky') map.flags[i] |= F_SKY;
       else if (ceiling) map.ceilTex[i] = slot(ceiling);
       map.floorZ[i] = heightOverride(level.floorHeights, x, y) ?? e.floorZ ?? defaults.floorZ ?? 0;
-      map.ceilZ[i] = heightOverride(level.ceilHeights, x, y) ?? e.ceilZ ?? defaults.ceilZ ?? 1;
+      const ceilOverride = heightOverride(level.ceilHeights, x, y) ?? e.ceilZ;
+      map.ceilZ[i] = ceilOverride ?? defaults.ceilZ ?? 1;
+      if (e.door && ceilOverride !== undefined) explicitCeil[i] = 1;
       // Step faces: a raised floor shows its `side`, a lowered ceiling its `upper`.
       const side = e.side ?? defaults.side ?? floor;
       const upper = e.upper ?? e.side ?? defaults.upper ?? defaults.side ?? (ceiling === 'sky' ? null : ceiling);
@@ -187,6 +191,26 @@ export function buildLevel(registry, level, opts = {}) {
     else if (solid(d.x - 1, d.y) && solid(d.x + 1, d.y)) d.axis = 'y';
     else errors.push(`Door at (${d.x}, ${d.y}) needs walls on two opposite sides`);
   }
+
+  // Door tiles without their own floor texture borrow a neighbour's. Rising
+  // doors start closed: their ceiling sits on the floor, and the renderer
+  // draws the door texture on the face under it. They open to their own ceilZ if the legend gave one,
+  // else to the lowest ceiling beside them (so there's no lintel).
+  for (const d of map.doors) {
+    const i = map.index(d.x, d.y);
+    const around = [[d.x + 1, d.y], [d.x - 1, d.y], [d.x, d.y + 1], [d.x, d.y - 1]]
+      .filter(([nx, ny]) => map.inBounds(nx, ny) && !(map.flags[map.index(nx, ny)] & F_SOLID))
+      .map(([nx, ny]) => map.index(nx, ny));
+    if (map.floorTex[i] < 0) map.floorTex[i] = around.map((n) => map.floorTex[n]).find((t) => t >= 0) ?? -1;
+    if (d.style !== 'rise') continue;
+    d.openZ = !explicitCeil[i] && around.length ? Math.min(...around.map((n) => map.ceilZ[n])) : map.ceilZ[i];
+    if (map.ceilTex[i] < 0) map.ceilTex[i] = d.tex;
+    // The lintel above the opening (when a neighbour's ceiling is higher).
+    if (map.upperTex[i] < 0) map.upperTex[i] = d.jamb >= 0 ? d.jamb : d.tex;
+    map.ceilZ[i] = map.floorZ[i];
+  }
+
+  buildLifts(map, glyphAt, legend);
 
   // Tiles sharing a glyph and light effect flicker together, like a Doom sector.
   let groups = 0;

@@ -93,6 +93,14 @@ export default [
     id: 'door-close',
     synth: { wave: 'saw', freq: 85, freqEnd: 55, duration: 0.6, attack: 0.05, release: 0.1, lowpass: 700, volume: 0.45, vibrato: { rate: 30, depth: 0.5 }, layers: [{ ...thump(90, 40, 0.2, 0.9), delay: 0.55 }, { ...burst(0.1, [2000, 400], 0.5), delay: 0.55 }] },
   }),
+  defineSound({
+    id: 'lift-start',
+    synth: { wave: 'saw', freq: 40, freqEnd: 70, duration: 0.9, attack: 0.08, release: 0.3, lowpass: 500, volume: 0.4, vibrato: { rate: 18, depth: 0.6 }, layers: [{ ...thump(70, 40, 0.15, 0.6) }, { wave: 'noise', duration: 0.9, lowpass: 900, volume: 0.15, release: 0.3 }] },
+  }),
+  defineSound({
+    id: 'lift-stop',
+    synth: { ...thump(80, 35, 0.25, 0.9), layers: [burst(0.08, [1800, 300], 0.45), { ...click(500, 0.4), delay: 0.05 }] },
+  }),
   defineSound({ id: 'switch', synth: { ...click(1200, 0.6), layers: [burst(0.04, [4000, 2000], 0.4), { ...click(800, 0.5), delay: 0.09 }] } }),
   defineSound({
     id: 'secret',

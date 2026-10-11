@@ -219,8 +219,9 @@ function verticalMove(world, pt, dt) {
   const floor = p.noclip ? world.floorAt(pt.x, pt.y, 0) : world.floorAt(pt.x, pt.y, pt.radius);
   const ceil = world.ceilAt(pt.x, pt.y, pt.radius);
   if (pt.z < floor) {
-    // Walked up a step (or a floor rose under us): ease the eye up after it.
-    p.viewOffset -= floor - pt.z;
+    // Walked up a step: ease the eye up after it. (Lifts move smoothly, so
+    // small rises are just followed.)
+    if (floor - pt.z > 0.06) p.viewOffset -= floor - pt.z;
     pt.z = floor;
     if (pt.vz < 0) pt.vz = 0;
   }

@@ -255,7 +255,8 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
       // A door panel in the current tile can stop the ray partway through it.
       if (flags[cur] & F_DOOR && step > 0) {
         const door = doors[doorIndex[cur]];
-        if (!door.secret) {
+        // Rising doors are drawn as the tile's lowered ceiling, not as a panel.
+        if (!door.secret && door.style !== 'rise') {
           const cx = cur % mw;
           const cy = (cur / mw) | 0;
           let t = -1;
@@ -342,7 +343,18 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
         if (flags[cur] & F_SKY && flags[next] & F_SKY) skyFill(rowOf(cC, tExit), b);
         else {
           seen[next] = 1;
-          face(tExit, rowOf(cC, tExit), b, cN + 1, upperTex[next], wx, faceLevel(cur, tExit, contrast));
+          const lv = faceLevel(cur, tExit, contrast);
+          const top = rowOf(cC, tExit);
+          const door = f & F_DOOR ? doors[doorIndex[next]] : null;
+          if (door?.style === 'rise') {
+            // The lintel above the opening keeps the tile's upper texture; only
+            // the moving part below openZ is the door, anchored to its bottom edge.
+            const split = cC > door.openZ ? rowOf(door.openZ, tExit) : top;
+            if (split > top) face(tExit, top, split, cC, upperTex[next], wx, lv);
+            face(tExit, split, b, cN + 1, door.tex, wx, lv);
+          } else {
+            face(tExit, top, b, cN + 1, upperTex[next], wx, lv);
+          }
         }
         if (b > clipTop) clipTop = b > clipBot ? clipBot : b;
       }

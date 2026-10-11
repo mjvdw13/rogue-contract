@@ -49,6 +49,12 @@ export function castRay(map, x, y, dx, dy, maxDist = 64) {
     const f = map.flags[idx];
     if (f & F_DOOR) {
       const door = map.doors[map.doorIndex[idx]];
+      if (door.style === 'rise') {
+        // A rising door fills its tile; it stops rays until it's mostly open.
+        if (door.open < 0.6) return { dist: enter, tx: mapX, ty: mapY, door, passedDoor };
+        passedDoor ??= door;
+        continue;
+      }
       // Panels run through the tile centre; secret doors sit on the tile face.
       const t = door.secret ? enter : door.axis === 'x' ? (dx === 0 ? -1 : (mapX + 0.5 - x) / dx) : dy === 0 ? -1 : (mapY + 0.5 - y) / dy;
       if (t >= 0 && t <= maxDist) {

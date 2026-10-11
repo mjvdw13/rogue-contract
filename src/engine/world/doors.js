@@ -20,7 +20,8 @@ export function closeDoor(world, door) {
 }
 
 export function updateDoors(world, dt) {
-  for (const d of world.map.doors) {
+  const map = world.map;
+  for (const d of map.doors) {
     switch (d.state) {
       case 'opening':
         d.open += d.speed * dt;
@@ -52,6 +53,11 @@ export function updateDoors(world, dt) {
         break;
       default:
         break;
+    }
+    if (d.style === 'rise') {
+      // The door is the tile's ceiling: it rises from the floor to openZ.
+      const i = d.y * map.w + d.x;
+      map.ceilZ[i] = map.floorZ[i] + d.open * (d.openZ - map.floorZ[i]);
     }
   }
 }

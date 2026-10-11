@@ -341,7 +341,15 @@ minus the highest floor under the player. Falls faster than 9 units per second
 Door options:
 
 - `jamb`: the texture of the walls beside the door.
-- `style: 'split'`: an elevator-style door that opens from the middle.
+- `style`: how it opens.
+  - `'rise'` (the shared doors): Dark Forces-style, the door slides up into
+    the ceiling. It opens to the lowest ceiling beside it, or to its own
+    `ceilZ` if you give one. If a neighbouring room's ceiling is higher, the
+    wall above the opening uses the door tile's `upper` texture (default: the
+    jamb).
+  - `'slide'` (the default): a panel through the middle of the tile slides
+    sideways.
+  - `'split'`: an elevator-style panel that opens from the middle.
 - `secret: true`: the door looks exactly like the wall around it (give it that
   wall's texture), stays open, and hides from the automap and from monsters
   until it's found.
@@ -350,6 +358,32 @@ Door options:
 
 Doors need walls on two opposite sides. A space is solid nothingness: keep
 every floor tile enclosed by walls (the validator checks this).
+
+### Lifts
+
+Give a floor glyph a `lift` and its tiles become a lift (an elevator, in Dark
+Forces' terms). Connected tiles with the same glyph move together.
+
+```js
+'e': { base: '.', floor: 'elevator-floor', side: 'rust-panel', tag: 'cargo',
+       lift: { stops: [0, 1.25], mode: 'return', speed: 1.5, wait: 3 } },
+```
+
+- `stops`: floor heights it moves between. It starts at `stops[start ?? 0]`.
+- `mode`:
+  - `'return'` (the default): goes to the next stop, waits `wait` seconds,
+    and comes back.
+  - `'toggle'`: moves one stop per activation and stays there.
+  - `'cycle'`: runs between its stops on its own (`auto: false` to hold it).
+- `on`: what starts it, `['enter', 'use']` by default. `'enter'` means
+  stepping onto it. `'use'` means pressing use while on it or facing it.
+  Triggers can start it too, with `{ action: 'lift', tag, to }`.
+- `moves: 'both'` carries the ceiling along too (a closed cab).
+- `speed` is in units per second. `sounds: { start, stop }` override
+  `lift-start` and `lift-stop`.
+
+Things standing on a lift ride with it. A lift that would squeeze someone
+against the ceiling turns back.
 
 ### Things
 
@@ -403,6 +437,8 @@ Actions:
 - `spawn` `{ thing, tag }`: a monster or item appears in teleport fog on every
   tile with the tag
 - `setLight` `{ tag, light }`
+- `lift` `{ tag, to }`: starts the lifts with the tag (to stop index `to`, or
+  the next stop)
 - `teleport` `{ tag, angle }`: moves the player to the first tile with the tag
 
 ### Checking a level

@@ -4,7 +4,8 @@
 // TILE entries (the `tiles` grid):
 //   { wall: 'texture' }                                  solid wall
 //   { wall: 'texture', use: 'exit', switchTo: 'tex' }    usable switch (any trigger action)
-//   { door: 'texture', jamb?, lock?, style?, secret?, tag? }
+//   { door: 'texture', jamb?, lock?, style? ('rise' | 'slide' | 'split'), secret?, tag? }
+//   { floor, ..., lift: { stops: [0, 1.5], mode?, speed?, wait?, on?, moves? } }  a lift
 //   { floor, ceiling ('sky' for open air), light (0-255), lightFx?, damage?, secret?, exit?, tag? }
 //   { base: '.', ...changes }                            copy another glyph and change parts
 // A space is solid nothingness outside the map.
@@ -53,14 +54,14 @@ export default {
     Y: { wall: 'flesh-eye' },
     b: { wall: 'bone-wall' },
 
-    // ---- Doors (they slide open; use them with E/Space)
-    D: { door: 'door-office', jamb: 'door-jamb' },
+    // ---- Doors (they rise into the ceiling, Dark Forces-style; use them with E)
+    D: { door: 'door-office', jamb: 'door-jamb', style: 'rise' },
     L: { door: 'door-elevator', jamb: 'door-jamb', style: 'split' },
-    M: { door: 'door-metal', jamb: 'door-jamb' },
-    R: { door: 'door-rusty', jamb: 'door-jamb-rust' },
-    1: { door: 'door-blue', jamb: 'door-jamb', lock: 'blue' },
-    2: { door: 'door-yellow', jamb: 'door-jamb', lock: 'yellow' },
-    3: { door: 'door-red', jamb: 'door-jamb', lock: 'red' },
+    M: { door: 'door-metal', jamb: 'door-jamb', style: 'rise' },
+    R: { door: 'door-rusty', jamb: 'door-jamb-rust', style: 'rise' },
+    1: { door: 'door-blue', jamb: 'door-jamb', lock: 'blue', style: 'rise' },
+    2: { door: 'door-yellow', jamb: 'door-jamb', lock: 'yellow', style: 'rise' },
+    3: { door: 'door-red', jamb: 'door-jamb', lock: 'red', style: 'rise' },
 
     // ---- Switches
     X: { wall: 'switch-exit', use: 'exit', switchTo: 'switch-exit-on' },
