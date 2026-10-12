@@ -178,7 +178,9 @@ renderer, collision) alone.
          stops, `heightStep` and `fog`.
        - **Unchanged:** slopes (auto-aim, pitch), screen-space sizes
          (weapon bob, the HUD), and times.
-2. [ ] **World-space texture mapping.** Today each tile shows a full 64 px
+2. [x] **World-space texture mapping** (done 2026-10-12, still at 64
+       texels per unit; 4 sandbox views render pixel-identical). The switch
+       to 32 comes with step 3. Today each tile shows a full 64 px
        texture (`render/columns.js`: `u = wx - floor(wx)`, and flats likewise).
        Map textures by world position instead, for walls, floors and
        ceilings, step faces, angled walls and door panels. Make

@@ -1,5 +1,6 @@
 import { F_SOLID, F_DOOR, F_SKY, F_SLANT } from '../world/tilemap.js';
 import { DIMINISH } from './view.js';
+import { TEXELS_PER_UNIT as TPU } from '../config.js';
 
 const MAX_STEPS = 160;
 const TAU = Math.PI * 2;
@@ -97,7 +98,9 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
     let end = 1e6;
 
     // Fill rows [a, b) of this column with a textured vertical face at distance t.
-    // The texture's top row sits at height `anchor` and repeats every unit.
+    // Textures are mapped in world units (TEXELS_PER_UNIT texels per unit), so
+    // they run on across tiles: `u` is the position along the wall in world
+    // units, and the texture's top row sits at height `anchor`.
     const face = (t, a, b, anchor, slot, u, lv) => {
       if (a < clipTop) a = clipTop;
       if (b > clipBot) b = clipBot;
@@ -109,13 +112,13 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
       }
       const tex = textures[slot];
       const th = tex.h;
-      let tx = (u * tex.w) | 0;
-      if (tx >= tex.w) tx = tex.w - 1;
+      let tx = Math.floor(u * TPU) % tex.w;
+      if (tx < 0) tx += tex.w;
       const col = tex.curCM;
       const colBase = tx * th;
       const cm = lv * 256;
-      const stepV = (th * t) / fy;
-      let v = (anchor - camZ) * th + (a + 0.5 - horizon) * stepV + V_BIAS * th;
+      const stepV = (TPU * t) / fy;
+      let v = (anchor - camZ) * TPU + (a + 0.5 - horizon) * stepV + V_BIAS * th;
       const hMask = tex.hMask;
       if (hMask >= 0) {
         for (let y = a; y < b; y++, o += fbW, v += stepV) fb[o] = colormaps[cm + col[colBase + ((v | 0) & hMask)]];
@@ -123,6 +126,8 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
         for (let y = a; y < b; y++, o += fbW, v += stepV) fb[o] = colormaps[cm + col[colBase + ((v | 0) % th)]];
       }
     };
+    /** A texture's height in world units (faces hung from their bottom edge use it). */
+    const texHeight = (slot) => (slot >= 0 ? textures[slot].h / TPU : 1);
     const faceLevel = (tile, t, contrast) => {
       let lv = view.level(light[tile], t) + (fixed >= 0 ? 0 : contrast);
       if (lv < 0) lv = 0;
@@ -152,8 +157,8 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
             const pix = tex.cur;
             for (let y = a, o = a * fbW + x; y < b; y++, o += fbW) {
               const dist = k / (y + 0.5 - horizon);
-              const tx = ((px + rdx * dist) * tw) & wm;
-              const ty = ((py + rdy * dist) * th) & hm;
+              const tx = ((px + rdx * dist) * TPU) & wm;
+              const ty = ((py + rdy * dist) * TPU) & hm;
               fb[o] = colormaps[flatLevel(l, dist) * 256 + pix[ty * tw + tx]];
             }
           }
@@ -193,8 +198,8 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
               const pix = tex.cur;
               for (let y = a, o = a * fbW + x; y < b; y++, o += fbW) {
                 const dist = k / (horizon - y - 0.5);
-                const tx = ((px + rdx * dist) * tw) & wm;
-                const ty = ((py + rdy * dist) * th) & hm;
+                const tx = ((px + rdx * dist) * TPU) & wm;
+                const ty = ((py + rdy * dist) * TPU) & hm;
                 fb[o] = colormaps[flatLevel(l, dist) * 256 + pix[ty * tw + tx]];
               }
             }
@@ -261,8 +266,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
           flats(cur, tEnter, t);
           seen[cur] = 1;
           // Texture runs right-to-left from the second point (as seen from the open side).
-          let u = (1 - along[0]) * sl.len;
-          u -= Math.floor(u);
+          const u = (1 - along[0]) * sl.len;
           face(t, rowOf(ceilZ[cur], t), rowOf(floorZ[cur], t), ceilZ[cur], sl.tex, u, faceLevel(cur, t, 0));
           end = t;
           break;
@@ -294,7 +298,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
             if (blocked) {
               flats(cur, tEnter, t);
               seen[cur] = 1;
-              face(t, rowOf(ceilZ[cur], t), rowOf(floorZ[cur], t), ceilZ[cur], door.tex, du, faceLevel(cur, t, door.axis === 'x' ? 1 : -1));
+              face(t, rowOf(ceilZ[cur], t), rowOf(floorZ[cur], t), ceilZ[cur], door.tex, du + (door.axis === 'x' ? cy : cx), faceLevel(cur, t, door.axis === 'x' ? 1 : -1));
               end = t;
               break;
             }
@@ -312,9 +316,10 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
       const next = mapY * mw + mapX;
       const f = flags[next];
       const contrast = side === 0 ? 1 : -1;
+      // Position along the wall in world units (mirrored on two sides so
+      // textures read left to right from every direction).
       let wx = side === 0 ? py + tExit * rdy : px + tExit * rdx;
-      wx -= Math.floor(wx);
-      if (side === 0 ? rdx < 0 : rdy > 0) wx = 1 - wx;
+      if (side === 0 ? rdx < 0 : rdy > 0) wx = -wx;
 
       let solid = (f & F_SOLID) !== 0;
       let tex = wallTex[next];
@@ -326,7 +331,8 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
           let du = door.axis === 'x' ? py + rdy * tExit - mapY : px + rdx * tExit - mapX;
           if (du >= door.open) {
             du -= door.open;
-            if (side === 0 ? rdx < 0 : rdy > 0) du = 1 - du;
+            du += door.axis === 'x' ? mapY : mapX;
+            if (side === 0 ? rdx < 0 : rdy > 0) du = -du;
             solid = true;
             tex = door.tex;
             u = du;
@@ -372,9 +378,9 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
             // the moving part below openZ is the door, anchored to its bottom edge.
             const split = cC > door.openZ ? rowOf(door.openZ, tExit) : top;
             if (split > top) face(tExit, top, split, cC, upperTex[next], wx, lv);
-            face(tExit, split, b, cN + 1, door.tex, wx, lv);
+            face(tExit, split, b, cN + texHeight(door.tex), door.tex, wx, lv);
           } else {
-            face(tExit, top, b, cN + 1, upperTex[next], wx, lv);
+            face(tExit, top, b, cN + texHeight(upperTex[next]), upperTex[next], wx, lv);
           }
         }
         if (b > clipTop) clipTop = b > clipBot ? clipBot : b;
