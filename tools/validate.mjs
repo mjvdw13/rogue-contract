@@ -3,10 +3,12 @@
 //   - every definition and reference (same checks the game runs at startup)
 //   - every asset file exists, and PNG sizes fit their frame sizes
 //   - every level: the exit is reachable from the start, keys can be found,
-//     secrets can be entered, nothing is stuck in a wall
+//     secrets can be entered, nothing is stuck in a wall. Reachability knows
+//     heights: steps, jumps, drops, crouching, lifts and jump gaps
 //
 //   node tools/validate.mjs            summary + problems (exit code 1 on errors)
-//   node tools/validate.mjs --verbose  also list unreachable items per level
+//   node tools/validate.mjs --verbose  also list unreachable items and one-way areas
+//                                      (drops you can't climb back out of) per level
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -68,7 +70,7 @@ for (const level of reg.levels.values()) {
     continue;
   }
   for (const p of normal.problems) errors.push(`${owner}: ${p}`);
-  if (verbose) for (const n of normal.notes) warnings.push(`${owner}: ${n}`);
+  if (verbose) for (const n of [...normal.notes, ...normal.oneWay]) warnings.push(`${owner}: ${n}`);
   else if (normal.notes.length) warnings.push(`${owner}: ${normal.notes.length} item(s) can't be reached (--verbose lists them)`);
   for (const skill of [1, 5]) {
     const a = analyseLevel(reg, level, skill);

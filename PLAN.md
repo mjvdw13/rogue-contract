@@ -78,7 +78,7 @@ The renderer already supports shifting the view up and down
        angled walls. Explosions measure distance in 3D.
 7. [x] **Enemies.** Monsters follow floor heights, and pathfinding knows
        how high they can climb. Flying enemies hover at their own height.
-8. [ ] **Tools.** The validator checks reachability with step and jump
+8. [x] **Tools.** The validator checks reachability with step and jump
        heights. The map viewer shades by height and draws angled walls. Add
        tests.
 9. [ ] **Gate:** a sandbox map with stairs, a pit, a lift, a vent, a jump gap,
@@ -126,6 +126,15 @@ tile holds at most one wall line.
         screen layout.
 - [ ] Visible blaster bolts for both enemies and the player: slow and
       dodgeable, with inaccurate stormtroopers.
+- [ ] **TODO: smarter enemies around heights** (left over from Phase 1
+      step 7):
+      - Monsters with no walking route to the player hold still and shoot
+        when they can see them. Today they walk at the player and stall
+        against the ledge face.
+      - A sniper on a ledge holds its position instead of pacing along the
+        edge.
+      - Monsters ride lifts on purpose: wait for one, step on it and ride it
+        to the player's level. Today they only end up on one by accident.
 - [ ] A headlamp that drains batteries, infrared goggles and a gas mask.
 - [ ] Music that switches between exploration and combat tracks when enemies
       wake up, like iMUSE.
@@ -317,3 +326,26 @@ update the smoke test.
   - **Not done:** monsters don't ride lifts on purpose, and one that can't
     reach the player just heads toward them and gets stuck at the ledge
     face. A sniper on a ledge paces along its edge.
+- 2026-10-12: Recorded the rough edges from step 7 as a Phase 2 TODO
+  (smarter enemies around heights).
+- 2026-10-12: Phase 1 step 8 done: tools.
+  - **Reachability** (`tools/lib/levelcheck.mjs`) searches standing spots
+    (a tile at one of its floors, so each lift stop counts) using the hero's
+    body. It handles 0.4 steps, jumps up to about 0.78 (less under a low
+    ceiling), any drop, crouching through 0.5, lifts to every stop, and
+    running jumps over gaps of up to two tiles. `canCross` and `bodyLimits`
+    are exported for tests.
+  - **One-way areas:** spots you can reach but can't get back to the start
+    from, found by walking the moves backwards. `validate --verbose` lists
+    them.
+  - **Map viewer:** floors are shaded by height, with black edges for
+    ledges too high to walk up, grey ones for steps, orange frames for lifts
+    and cyan ones for crouch-only spaces. Angled walls were already drawn in
+    step 5.
+  - **Found on the way:** the sandbox's start-room window (sill 0.45,
+    ceiling 1.05) can't be climbed through, which matches the game. You can't
+    jump while crouched, and standing doesn't fit.
+  - **Tests:** `tests/reach.test.js` (6 tests). 95 tests, the validator and
+    the smoke test pass.
+  - **Still rough:** angled-wall tiles count as fully open for reachability,
+    so a gap squeezed between two angled walls isn't checked.

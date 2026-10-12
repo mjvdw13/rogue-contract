@@ -6,8 +6,11 @@
 //   node tools/mapview.mjs --scale 12      bigger tiles
 //
 // Walls and floors use their texture's average colour (angled walls fill the
-// solid side of their tile) (floors are dimmed by
-// their light level). Doors are brown, or the colour of their key; switches
+// solid side of their tile). Floors are dimmed by their light level and
+// shaded by height: higher floors are brighter. A black edge marks a ledge
+// too high to walk up, a grey one a step. Lifts have an orange frame, and
+// spaces too low to stand in (crouch only) a cyan one. Doors are brown, or
+// the colour of their key; switches
 // have a yellow border; secret tiles are dotted purple; damaging floors are
 // striped green. Monsters are red squares, coworkers green, items yellow,
 // keys and weapons bright, decorations grey, the start is a white arrow.
@@ -19,7 +22,7 @@ import content from '../src/content/index.js';
 import { Registry } from '../src/engine/registry.js';
 import { F_SOLID, F_DOOR, F_SKY, F_SECRET, F_DAMAGE, F_EXIT, F_USE, F_VOID, F_SLANT } from '../src/engine/world/tilemap.js';
 import { decodePNG, encodePNG } from './art/lib/png.js';
-import { analyseLevel } from './lib/levelcheck.mjs';
+import { analyseLevel, bodyLimits } from './lib/levelcheck.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -86,6 +89,16 @@ function render(level) {
     rect(x, y, 1, h, c);
     rect(x + w - 1, y, 1, h, c);
   };
+  // Height shading: the level's lowest floor is dimmest, its highest brightest.
+  const body = bodyLimits(reg);
+  let low = Infinity;
+  let high = -Infinity;
+  for (let i = 0; i < map.w * map.h; i++) {
+    if (map.flags[i] & F_SOLID) continue;
+    low = Math.min(low, map.floorZ[i]);
+    high = Math.max(high, map.floorZ[i]);
+  }
+  const shade = (z) => (high > low ? 0.6 + (0.7 * (z - low)) / (high - low) : 1);
   for (let ty = 0; ty < map.h; ty++) {
     for (let tx = 0; tx < map.w; tx++) {
       const i = ty * map.w + tx;
@@ -112,7 +125,8 @@ function render(level) {
         continue;
       }
       const light = map.baseLight[i] / 255;
-      let c = (e.floor ? textureColor(e.floor) : [90, 90, 90]).map((v) => v * (0.35 + light * 0.75));
+      const lit = (0.35 + light * 0.75) * shade(map.floorZ[i]);
+      let c = (e.floor ? textureColor(e.floor) : [90, 90, 90]).map((v) => v * lit);
       if (f & F_SKY) c = [c[0] * 0.7 + 10, c[1] * 0.7 + 20, c[2] * 0.7 + 60];
       rect(x, y, S, S, c);
       if (f & F_SLANT) {
@@ -121,6 +135,19 @@ function render(level) {
         const wc = textureColor(e.wall).map((v) => v * 0.75);
         for (let yy = 0; yy < S; yy++) for (let xx = 0; xx < S; xx++) if (sl.solidAt(tx + (xx + 0.5) / S, ty + (yy + 0.5) / S)) put(x + xx, y + yy, wc);
       }
+      // Edges up to higher neighbours: black where it's too high to walk up, grey for a step.
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const nx = tx + dx;
+        const ny = ty + dy;
+        if (!map.inBounds(nx, ny) || map.flags[ny * map.w + nx] & F_SOLID) continue;
+        const rise = map.floorZ[ny * map.w + nx] - map.floorZ[i];
+        if (rise <= 1e-6) continue;
+        const ec = rise > body.step + 1e-6 ? [0, 0, 0] : [110, 110, 110];
+        if (dx) rect(dx > 0 ? x + S - 1 : x, y, 1, S, ec);
+        else rect(x, dy > 0 ? y + S - 1 : y, S, 1, ec);
+      }
+      if (map.liftIndex[i] >= 0) frame(x + 1, y + 1, S - 2, S - 2, [255, 150, 30]);
+      else if (map.ceilZ[i] - map.floorZ[i] < body.stand - 1e-6) frame(x + 1, y + 1, S - 2, S - 2, [60, 220, 255]);
       if (f & F_DAMAGE) for (let k = 0; k < S; k += 3) rect(x, y + k, S, 1, [60, 220, 60]);
       if (f & F_SECRET) for (let yy = 1; yy < S; yy += 3) for (let xx = 1; xx < S; xx += 3) put(x + xx, y + yy, [200, 90, 255]);
       if (f & F_EXIT) frame(x, y, S, S, [40, 255, 60]);

@@ -489,10 +489,20 @@ Actions:
 - `npm run validate` reports problems such as an unreachable exit, a key that
   can't be found, a sealed-off secret, a thing inside a wall, unknown glyphs,
   doors without walls, or a low ammo budget.
+- Reachability knows heights, using the hero's `body`. The player walks up
+  steps of up to 0.4 and jumps onto ledges of up to about 0.78, less under a
+  low ceiling. Any drop is allowed. Crouching gets through spaces 0.5 high.
+  Lifts reach every stop. A running jump clears a gap of up to two tiles,
+  landing no higher than a step.
+- `npm run validate -- --verbose` also lists unreachable items and one-way
+  areas: places the player can drop into but never get back out of to the
+  start. Some are on purpose, but a pit with no lift or stairs out is a trap.
 - `node tools/mapview.mjs e1m6` writes `tools/art/out/maps/e1m6.png`, a
   top-down picture with monsters in red, items in yellow, keys in their colour
-  and unreachable floor cross-hatched. Add `--skill 5` to see nightmare
-  placement.
+  and unreachable floor cross-hatched. Floors are shaded by height (higher is
+  brighter), with a black edge where a ledge is too high to walk up and a grey
+  one at a step. Lifts have an orange frame, and crouch-only spaces a cyan
+  one. Add `--skill 5` to see nightmare placement.
 
 Tips from the built-in maps:
 

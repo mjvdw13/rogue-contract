@@ -1,14 +1,81 @@
 // Static level analysis for the dev tools: reachability from the player start
 // (collecting keys as it goes), exits, secrets and per-skill thing counts.
+// Reachability knows heights: what the hero's body can walk up, jump onto,
+// drop from, crouch under and jump across, and where lifts carry it.
 import { buildLevel } from '../../src/engine/world/level.js';
 import { F_SOLID, F_DOOR, F_EXIT, F_USE, F_SECRET } from '../../src/engine/world/tilemap.js';
+import { BODY } from '../../src/engine/things/player.js';
 
 const EXIT_ACTIONS = ['exit', 'secretExit', 'finale'];
 const actionsOf = (list) => [].concat(list ?? []).map((a) => (typeof a === 'string' ? { action: a } : a));
+const DIRS = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+const EPS = 1e-6;
+/** Widest gap (in tiles) a running jump is counted on to clear. */
+const MAX_GAP = 2;
+
+/**
+ * What the player's body can do, from the hero's `body` settings: walk up
+ * `step`, jump `apex` high and scramble `airStep` more onto a ledge, stand
+ * `stand` tall or crouch to `crouch`.
+ */
+export function bodyLimits(reg) {
+  const b = { ...BODY, ...(reg.hero?.body ?? {}) };
+  return {
+    step: b.stepHeight,
+    airStep: b.airStep,
+    apex: (b.jumpSpeed * b.jumpSpeed) / (2 * b.gravity),
+    stand: b.height,
+    crouch: b.crouchHeight,
+  };
+}
+
+/**
+ * The floors a player can stand at in each tile, as [floor, ceiling] pairs:
+ * one for most tiles, one per stop on a lift, nothing in a solid tile.
+ * Rising doors count as open.
+ */
+function standingSpots(map) {
+  const spots = [];
+  for (let i = 0; i < map.w * map.h; i++) {
+    const f = map.flags[i];
+    if (f & F_SOLID) {
+      spots.push([]);
+      continue;
+    }
+    const lift = map.liftIndex[i] >= 0 ? map.lifts[map.liftIndex[i]] : null;
+    if (lift) {
+      const room = lift.headroom[lift.tiles.indexOf(i)];
+      spots.push(lift.stops.map((z) => [z, lift.moves === 'both' ? z + room : map.ceilZ[i]]));
+      continue;
+    }
+    let ceil = map.ceilZ[i];
+    if (f & F_DOOR) {
+      const d = map.doors[map.doorIndex[i]];
+      if (d.style === 'rise') ceil = d.openZ;
+    }
+    spots.push([[map.floorZ[i], ceil]]);
+  }
+  return spots;
+}
+
+/**
+ * Can the body get from a spot (floor fa, ceiling ca) into the neighbouring
+ * one (fb, cb)? Drops are always fine. Rises up to a step are walked, higher
+ * ones need a standing jump whose head stays under both ceilings. Crouching
+ * gets through anything at least `crouch` high.
+ */
+export function canCross(body, fa, ca, fb, cb) {
+  if (cb - fb < body.crouch - EPS || Math.min(ca, cb) - Math.max(fa, fb) < body.crouch - EPS) return false;
+  const rise = fb - fa;
+  if (rise <= body.step + EPS) return true;
+  if (ca - fa < body.stand - EPS) return false;
+  const jump = Math.min(body.apex, Math.min(ca, cb) - fa - body.stand);
+  return rise <= jump + body.airStep + EPS;
+}
 
 /**
  * Analyse one level at one skill.
- * @returns {{ built, reached: Uint8Array, keys: Set<string>, exit: boolean, problems: string[], notes: string[], counts: object }}
+ * @returns {{ built, reached: Uint8Array, keys: Set<string>, exit: boolean, problems: string[], notes: string[], oneWay: string[], counts: object }}
  */
 export function analyseLevel(reg, level, skill = 3) {
   const built = buildLevel(reg, level, { skill, textureSlot: () => 0 });
@@ -48,25 +115,72 @@ export function analyseLevel(reg, level, skill = 3) {
     }
     return !(f & F_SOLID) && !blocked[i];
   };
-  if (!playerStart) return { built, reached, keys, exit: false, problems: ['no player start'], notes, counts: {} };
+  if (!playerStart) return { built, reached, keys, exit: false, problems: ['no player start'], notes, oneWay: [], counts: {} };
+
+  // Search over standing spots (a tile, at one of its floors), not just tiles.
+  const body = bodyLimits(reg);
+  const spots = standingSpots(map);
+  const base = new Int32Array(W * map.h + 1);
+  for (let i = 0; i < W * map.h; i++) base[i + 1] = base[i] + spots[i].length;
+  const visited = new Uint8Array(base[W * map.h]);
   const start = Math.floor(playerStart.y) * W + Math.floor(playerStart.x);
+  const startSpot = Math.max(0, spots[start].findIndex(([z]) => Math.abs(z - map.floorZ[start]) < EPS));
+  // Every spot you can move to from spot k of tile c: call go(tile, spot).
+  const moves = (c, k, go) => {
+    const [fa, ca] = spots[c][k];
+    const lift = map.liftIndex[c];
+    // A lift carries you to each of its stops.
+    if (lift >= 0) for (let s = 0; s < spots[c].length; s++) if (s !== k) go(c, s);
+    const cx = c % W;
+    const cy = (c / W) | 0;
+    for (const [dx, dy] of DIRS) {
+      // Walking, climbing or dropping into the next tile...
+      const nx = cx + dx;
+      const ny = cy + dy;
+      if (nx < 0 || ny < 0 || nx >= W || ny >= map.h) continue;
+      const n = ny * W + nx;
+      if (!passable(n)) continue;
+      spots[n].forEach(([fb, cb], s) => {
+        // (Tiles of one lift move together.)
+        if (lift >= 0 && map.liftIndex[n] === lift && s !== k) return;
+        if (canCross(body, fa, ca, fb, cb)) go(n, s);
+      });
+      // ...or a running jump over a gap of up to MAX_GAP tiles (no higher
+      // than the take-off), landing no higher than a step, with headroom to
+      // stand all the way across.
+      if (ca - fa < body.stand - EPS) continue;
+      for (let gap = 1; gap <= MAX_GAP; gap++) {
+        const mid = (cy + dy * gap) * W + cx + dx * gap;
+        const lx = cx + dx * (gap + 1);
+        const ly = cy + dy * (gap + 1);
+        if (!passable(mid) || map.flags[mid] & F_DOOR) break;
+        if (spots[mid].some(([fm, cm]) => fm > fa + EPS || cm - fa < body.stand - EPS)) break;
+        if (lx < 0 || ly < 0 || lx >= W || ly >= map.h) break;
+        const land = ly * W + lx;
+        if (!passable(land)) break;
+        spots[land].forEach(([fb, cb], s) => {
+          if (fb - fa <= body.step + EPS && canCross(body, fa, ca, fb, cb)) go(land, s);
+        });
+      }
+    }
+  };
+
   let changed = true;
   while (changed) {
     changed = false;
-    const stack = [start];
+    visited.fill(0);
     reached.fill(0);
-    reached[start] = 1;
+    const stack = [];
+    const visit = (i, k) => {
+      if (visited[base[i] + k]) return;
+      visited[base[i] + k] = 1;
+      reached[i] = 1;
+      stack.push(i, k);
+    };
+    visit(start, startSpot);
     while (stack.length) {
-      const c = stack.pop();
-      const cx = c % W;
-      const cy = (c / W) | 0;
-      for (const [nx, ny] of [[cx + 1, cy], [cx - 1, cy], [cx, cy + 1], [cx, cy - 1]]) {
-        if (nx < 0 || ny < 0 || nx >= W || ny >= map.h) continue;
-        const n = ny * W + nx;
-        if (reached[n] || !passable(n)) continue;
-        reached[n] = 1;
-        stack.push(n);
-      }
+      const k = stack.pop();
+      moves(stack.pop(), k, visit);
     }
     for (const [i, list] of byTile) {
       if (!reached[i]) continue;
@@ -78,6 +192,42 @@ export function analyseLevel(reg, level, skill = 3) {
         }
       }
     }
+  }
+
+  // One-way areas: places you can get to (by dropping, say) but can't get
+  // back to the start from. Walk the moves backwards from the start.
+  const back = Array.from({ length: visited.length }, () => []);
+  for (let c = 0; c < W * map.h; c++) {
+    for (let k = 0; k < spots[c].length; k++) {
+      if (visited[base[c] + k]) moves(c, k, (n, s) => back[base[n] + s].push(base[c] + k));
+    }
+  }
+  const returns = new Uint8Array(visited.length);
+  const queue = [base[start] + startSpot];
+  returns[queue[0]] = 1;
+  while (queue.length) for (const p of back[queue.pop()]) if (!returns[p]) queue.push(p), (returns[p] = 1);
+  const stuck = new Uint8Array(W * map.h);
+  for (let c = 0; c < W * map.h; c++) {
+    for (let k = 0; k < spots[c].length; k++) if (visited[base[c] + k] && !returns[base[c] + k]) stuck[c] = 1;
+  }
+  const oneWay = [];
+  for (let i = 0; i < W * map.h; i++) {
+    if (!stuck[i]) continue;
+    // Gather the connected patch of such tiles.
+    let size = 0;
+    const patch = [i];
+    stuck[i] = 0;
+    while (patch.length) {
+      const c = patch.pop();
+      size++;
+      for (const [dx, dy] of DIRS) {
+        const nx = (c % W) + dx;
+        const ny = ((c / W) | 0) + dy;
+        const n = ny * W + nx;
+        if (nx >= 0 && ny >= 0 && nx < W && ny < map.h && stuck[n]) patch.push(n), (stuck[n] = 0);
+      }
+    }
+    oneWay.push(`${size} tile(s) near (${i % W}, ${(i / W) | 0}) can be reached but not left back to the start`);
   }
 
   // Exits: exit floors, exit switches next to a reached tile, exit triggers on reached tags.
@@ -144,7 +294,7 @@ export function analyseLevel(reg, level, skill = 3) {
     if (!ok) problems.push(`secret area near (${i % W}, ${(i / W) | 0}) can't be reached`);
   }
   counts.secrets = secrets;
-  return { built, reached, keys, exit, problems, notes, counts };
+  return { built, reached, keys, exit, problems, notes, oneWay, counts };
 }
 
 const avg = (d) => (Array.isArray(d) ? (d[0] + d[1]) / 2 : d ?? 0);
