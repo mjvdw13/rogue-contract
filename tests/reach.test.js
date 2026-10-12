@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { analyseLevel, bodyLimits, canCross } from '../tools/lib/levelcheck.mjs';
 import { room, registry } from './helpers.js';
 
-const TALL = { floor: 'carpet', ceiling: 'ceiling-tile', light: 160, ceilZ: 3 };
+const TALL = { floor: 'imp-floor', ceiling: 'imp-ceiling', light: 160, ceilZ: 3 };
 const at = (floorZ, ceilZ = 3) => ({ ...TALL, floorZ, ceilZ });
 
 /** Which open tiles of row 1 the player can reach, as a string: '.' reached, 'x' not. */

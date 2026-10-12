@@ -448,7 +448,7 @@ export class World {
     const dx = Math.cos(pt.angle);
     const dy = Math.sin(pt.angle);
     const hit = castRay(this.map, pt.x, pt.y, dx, dy, USE_RANGE);
-    // Coworkers in front of the player get talked to first.
+    // Friendly characters (NPCs) in front of the player get talked to first.
     for (const t of this.things) {
       if (t.kind !== 'npc' || t.removed) continue;
       const d = rayCircle(pt.x, pt.y, dx, dy, t.x, t.y, t.radius + 0.1);

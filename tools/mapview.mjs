@@ -2,7 +2,7 @@
 // Renders levels as top-down PNGs for checking layouts:
 //
 //   node tools/mapview.mjs                 every level -> tools/art/out/maps/<id>.png
-//   node tools/mapview.mjs e1m2 --skill 5  one level, things for skill 5
+//   node tools/mapview.mjs sandbox --skill 5  one level, things for skill 5
 //   node tools/mapview.mjs --scale 12      bigger tiles
 //
 // Walls and floors use their texture's average colour (angled walls fill the

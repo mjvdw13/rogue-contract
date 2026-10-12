@@ -2,7 +2,7 @@
 // Browser smoke test. Serves the repo under /rogue-contract/ (the same subpath
 // GitHub Pages uses), then in headless Chromium:
 //   1. loads the title screen and starts a new game through the menus,
-//   2. walks, shoots, uses a door and opens the automap,
+//   2. walks, shoots and opens the automap,
 //   3. warps through every level with ?map=,
 // failing on any page error or console error. Screenshots go to .smoke/.
 //
@@ -99,19 +99,13 @@ const check = (cond, what) => {
     .then(() => true, () => false);
   check(started, 'NEW GAME starts the first level');
   await p.waitForTimeout(1500); // let the screen melt finish and the weapon come up
-  // 2. Play a little: out of the elevator, pick up the staple gun in the
-  // lobby (Alex starts with only his paws), and fire it.
+  // 2. Play a little: walk forward, check the blaster is out, and fire it.
   await p.keyboard.down('KeyW');
   await p.waitForTimeout(700);
   await p.keyboard.up('KeyW');
-  await p.keyboard.press('KeyE'); // the elevator doors
-  await p.waitForTimeout(1200);
-  await p.keyboard.down('KeyW');
-  await p.waitForTimeout(2200);
-  await p.keyboard.up('KeyW');
-  await p.waitForTimeout(1000);
+  await p.waitForTimeout(500);
   const armed = await p.evaluate(() => ({ weapon: window.game.scene.world.player.player.weapon, ammo: { ...window.game.scene.world.player.player.ammo } }));
-  check(armed.weapon === 'staple-gun', 'picks up the staple gun in the lobby');
+  check(armed.weapon === 'blaster', 'starts with the blaster out');
   await p.keyboard.down('KeyF');
   await p.waitForTimeout(1500);
   await p.keyboard.up('KeyF');

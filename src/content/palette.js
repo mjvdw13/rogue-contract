@@ -1,10 +1,11 @@
 /**
- * The RACCOON ALEX palette: 256 grimy colours.
+ * The ROGUE CONTRACT palette: 256 colours (inherited from Raccoon Alex; the
+ * Imperial greys, desert ochres and blaster glows all fit in its ramps).
  *
  * - Index 0 is black.
  * - Indices 1..223 are colour ramps (dark → light). Lighting darkens these.
  * - Indices 224..254 are FULLBRIGHT: they glow in the dark and ignore
- *   lighting (eyes, LEDs, fire, screens, neon, exit signs). Use them in art
+ *   lighting (blaster bolts, LEDs, fire, screens, light strips). Use them in art
  *   for anything that should shine.
  * - Index 255 is transparent.
  *

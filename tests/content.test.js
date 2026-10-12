@@ -12,7 +12,7 @@ test('the content pack validates without errors', () => {
 
 test('the episode lists every level once, in order', () => {
   const ep = registry.firstEpisode();
-  assert.deepEqual(ep.levels, ['e1m1', 'e1m2', 'e1m3', 'e1m4', 'e1m5']);
+  assert.deepEqual(ep.levels, ['sandbox']);
   assert.ok(ep.finale?.text);
 });
 
@@ -59,61 +59,21 @@ for (const level of registry.levels.values()) {
   });
 }
 
-test('killing the Pumpkin King rolls the finale', () => {
-  const w = makeWorld('e1m5');
-  const king = w.things.find((t) => t.def.id === 'pumpkin-king');
-  w.damage(king, 99999, w.player, w.player);
-  assert.equal(w.exitRequested, 'finale');
+test('the garrison is held by stormtroopers, an officer and a probe droid', () => {
+  const w = makeWorld('sandbox');
+  const ids = w.things.filter((t) => t.kind === 'monster').map((t) => t.def.id);
+  for (const id of ['stormtrooper', 'officer', 'probe-droid']) assert.ok(ids.includes(id), `has a ${id}`);
+  assert.ok(w.things.every((t) => t.kind !== 'npc'), 'no friendlies (yet)');
 });
 
-test("the staple gun waits in E1M1's lobby, among the coworkers", () => {
-  const w = makeWorld('e1m1');
-  const gun = w.things.find((t) => t.def.id === 'pickup-staple-gun');
-  assert.ok(gun, 'the staple gun is in E1M1');
-  const coworkers = w.things.filter((t) => t.kind === 'npc');
-  assert.ok(coworkers.length > 0);
-  for (const c of coworkers) assert.ok(Math.hypot(c.x - gun.x, c.y - gun.y) < 8, `${c.def.id} is in the same room`);
-});
-
-test('the raccoon cheat gives god mode, every weapon and every badge', () => {
-  const w = makeWorld('e1m1');
+test('the mercenary cheat gives god mode, every weapon and every keycard', () => {
+  const w = makeWorld('sandbox');
   const game = { registry, giveEverything: Game.prototype.giveEverything };
   const p = w.player.player;
   for (let k = 0; k < 2; k++) {
-    registry.cheats.find((c) => c.code === 'raccoon').run(game, w);
+    registry.cheats.find((c) => c.code === 'mercenary').run(game, w);
     assert.equal(p.god, true, 'stays on when typed again');
   }
   assert.deepEqual([...p.weapons].sort(), [...registry.weapons.keys()].sort());
   assert.deepEqual([...p.keys].sort(), ['blue', 'red', 'yellow']);
-});
-
-test('the conference room ambush opens the closets', () => {
-  const w = makeWorld('e1m1');
-  const shotgun = w.things.find((t) => t.def.id === 'pickup-tack-shotgun');
-  w.player.x = shotgun.x;
-  w.player.y = shotgun.y;
-  run(w, mockInput(), 0.2);
-  assert.ok(w.player.player.weapons.has('tack-shotgun'));
-  const closets = w.map.doors.filter((d) => d.tag === 'closets');
-  assert.equal(closets.length, 2);
-  assert.ok(closets.every((d) => d.state === 'opening' || d.state === 'open'));
-});
-
-test('the E1M1 lobby is safe until Alex walks out of it', () => {
-  const w = makeWorld('e1m1', { skill: 5 });
-  const inLobby = (t) => t.x >= 6 && t.x < 19 && t.y >= 20 && t.y < 37;
-  assert.equal(w.things.filter((t) => t.kind === 'monster' && inLobby(t)).length, 0, 'no monsters in the lobby');
-  assert.equal(w.things.filter((t) => t.kind === 'npc' && inLobby(t)).length, 5, 'the coworkers are there');
-  // Its doors are shut, so shooting in there wakes nobody.
-  w.player.x = 12.5;
-  w.player.y = 28.5;
-  const input = mockInput();
-  input.hold('fire');
-  run(w, input, 10);
-  assert.ok(w.things.filter((t) => t.kind === 'monster').every((t) => t.state === 'idle'));
-  assert.ok(!w.messages.some((m) => m.includes('SCREAMING')));
-  // Stepping out through the north door starts the night.
-  w.player.y = 18.5;
-  run(w, mockInput(), 0.1);
-  assert.ok(w.messages.some((m) => m.includes('SCREAMING')));
 });

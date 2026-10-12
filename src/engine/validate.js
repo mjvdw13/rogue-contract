@@ -107,7 +107,6 @@ export function validateContent(reg) {
   else {
     for (const w of hero.startWeapons ?? []) if (!reg.weapons.has(w)) err(`hero: unknown start weapon "${w}"`);
     for (const a of Object.keys(hero.startAmmo ?? {})) if (!reg.ammo.has(a)) err(`hero: unknown start ammo "${a}"`);
-    if (!hero.face?.sheet) err('hero: needs face.sheet');
   }
 
   for (const level of reg.levels.values()) {

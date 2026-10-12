@@ -5,12 +5,12 @@ import { F_SOLID, F_DOOR, F_SKY, F_SECRET, F_DAMAGE, F_EXIT } from '../src/engin
 import { registry, room } from './helpers.js';
 
 test('legend entries inherit from their base and can be overridden per level', () => {
-  const level = room(['#'], [''], { legend: { k: { base: '.', light: 40, tag: 'dark' }, '.': { floor: 'linoleum', light: 99 } } });
+  const level = room(['#'], [''], { legend: { k: { base: '.', light: 40, tag: 'dark' }, '.': { floor: 'imp-grate', light: 99 } } });
   const { tiles } = resolveLegend(registry, level);
-  assert.equal(tiles.k.floor, 'linoleum');
+  assert.equal(tiles.k.floor, 'imp-grate');
   assert.equal(tiles.k.light, 40);
   assert.equal(tiles.k.tag, 'dark');
-  assert.equal(tiles['#'].wall, 'drywall');
+  assert.equal(tiles['#'].wall, 'imp-panel');
 });
 
 test('circular legend bases are reported', () => {
@@ -22,7 +22,7 @@ test('tiles, doors, flags and the player start are parsed', () => {
   const level = room(
     ['#######', '#..D.~#', '#?#####', '#*:##X#', '#######'],
     ['       ', ' >     ', '       '],
-    { legend: { '?': { base: '.', secret: true }, ':': { base: '.', exit: true } } },
+    { legend: { '?': { base: '.', secret: true }, ':': { base: '.', exit: true }, '~': { base: '.', damage: 6 }, '*': { base: '_' } } },
   );
   const b = buildLevel(registry, level, { skill: 3 });
   assert.deepEqual(b.errors, []);
@@ -43,8 +43,8 @@ test('things are filtered by skill and unknown glyphs are errors', () => {
   const level = room(['#####', '#...#', '#####'], ['', ' ^!?']);
   const easy = buildLevel(registry, level, { skill: 1 });
   const hard = buildLevel(registry, level, { skill: 4 });
-  assert.equal(easy.spawns.filter((s) => s.type === 'ant').length, 0, '"!" ants only appear on skill 3+');
-  assert.equal(hard.spawns.filter((s) => s.type === 'ant').length, 1);
+  assert.equal(easy.spawns.filter((s) => s.type === 'stormtrooper').length, 0, '"!" ants only appear on skill 3+');
+  assert.equal(hard.spawns.filter((s) => s.type === 'stormtrooper').length, 1);
   assert.ok(hard.errors.some((e) => e.includes('Unknown thing glyph "?"')));
 });
 

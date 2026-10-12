@@ -5,302 +5,116 @@ import { darken, lighten, mix } from '../lib/canvas.js';
 import { C, G } from '../lib/pal.js';
 import { Model, MAT } from '../lib/model.js';
 import { sheet, flash } from '../lib/sprite.js';
-import { hash2 } from '../lib/noise.js';
-import { tinyText } from '../lib/tex.js';
 
 const W = (name) => `assets/sprites/weapons/${name}.png`;
-// Alex's raccoon costume: furry grey sleeves, a pale cuff, dark paw gloves.
-const FUR = C('concrete', 0.5);
-const CUFF = C('beige', 0.86);
-const GLOVE = C('gray', 0.17);
+// The mercenary's kit: a worn brown flight jacket and black leather gloves.
+const SLEEVE = mix(C('rust', 0.32), C('olive', 0.3), 0.4);
+const CUFF = C('gray', 0.2);
+const GLOVE = C('gray', 0.1);
+const GUNMETAL = C('gray', 0.3);
 const RENDER = { light: [-0.55, -0.7, 0.5], ambient: 0.32, aoStrength: 0.55, bounce: 0.05 };
 
-/** Forearm in the costume's furry sleeve, entering from off-screen, with a pale cuff at the wrist. Returns the wrist point. */
+/** Forearm in the jacket sleeve, entering from off-screen, with a dark cuff at the wrist. */
 function forearm(m, from, to, r = 8) {
-  m.capsule(...from, ...to, r + 1.6, r * 0.78 + 1.6, FUR, MAT.fur);
-  const t = 0.9;
+  m.capsule(...from, ...to, r + 1.6, r * 0.78 + 1.6, SLEEVE, MAT.leather);
+  const t = 0.88;
   const cuff = [from[0] + (to[0] - from[0]) * t, from[1] + (to[1] - from[1]) * t, from[2] + (to[2] - from[2]) * t];
-  m.capsule(...cuff, ...to, r + 2.2, r * 0.78 + 2, CUFF, MAT.fur);
-  return to;
+  m.capsule(...cuff, ...to, r + 1.8, r * 0.78 + 1.6, CUFF, MAT.leather);
 }
 
-/** A gripping paw glove: palm plus four curled fingers wrapping toward `dir` (1 = right). */
-function fist(m, x, y, z, r = 7, dir = 1) {
-  m.ellipsoid(x, y, z, r, r * 0.85, r * 0.8, GLOVE, MAT.fur);
+/** A clenched gloved fist: palm, four curled fingers and a thumb. `dir` 1 = right hand. */
+function fist(m, x, y, z, r = 9, dir = 1) {
+  m.ellipsoid(x, y, z, r, r * 0.85, r * 0.8, GLOVE, MAT.leather);
   for (let k = 0; k < 4; k++) {
-    const fy = y - r * 0.55 + k * r * 0.38;
-    m.capsule(x - dir * r * 0.1, fy, z + r * 0.5, x - dir * r * 0.75, fy + r * 0.12, z + r * 0.75, r * 0.24, r * 0.2, darken(GLOVE, 0.04), MAT.fur);
+    const fx = x - r * 0.62 + k * r * 0.42;
+    m.capsule(fx, y - r * 0.55, z + r * 0.45, fx + dir * 0.4, y - r * 0.1, z + r * 0.85, r * 0.27, r * 0.24, lighten(GLOVE, 0.05), MAT.leather);
   }
-  m.capsule(x + dir * r * 0.3, y - r * 0.6, z + r * 0.4, x - dir * r * 0.25, y - r * 0.95, z + r * 0.85, r * 0.26, r * 0.22, GLOVE, MAT.fur); // thumb
+  m.capsule(x - dir * r * 0.7, y + r * 0.1, z + r * 0.5, x - dir * r * 0.1, y - r * 0.15, z + r * 0.95, r * 0.28, r * 0.24, GLOVE, MAT.leather); // thumb
 }
 
-function render(m) {
+// ------------------------------------------------------------------ fists
+
+function fistsFrame({ right = [118, 62, 14], left = [40, 66, 12], rs = 10, ls = 9.5 } = {}) {
+  const m = new Model(160, 80, { seed: 101 });
+  forearm(m, [left[0] - 26, 104, left[2] - 6], [left[0] - 4, left[1] + 6, left[2]], 9);
+  fist(m, ...left, ls, -1);
+  forearm(m, [right[0] + 26, 104, right[2] - 6], [right[0] + 4, right[1] + 6, right[2]], 9);
+  fist(m, ...right, rs, 1);
   return m.render(RENDER);
 }
 
-// ------------------------------------------------------------------ paws
-
-function paw(m, x, y, flip, spread = 0) {
-  const s = flip ? -1 : 1;
-  const fur = FUR;
-  m.capsule(x + s * 22, y + 46, 18, x, y + 6, 6, 12, 9, fur, MAT.fur);
-  for (let k = 0; k < 4; k++) {
-    const t = 0.25 + k * 0.17;
-    const rx = x + s * 22 * (1 - t);
-    const ry = y + 6 + 40 * t;
-    m.paint(rx, ry, 11, 1.6, C('gray', 0.14)); // raccoon rings
-  }
-  m.ellipsoid(x, y + 3, 8, 9, 7, 6, C('gray', 0.14), MAT.skin);
-  for (let f = -2; f <= 2; f++) {
-    const fx = x + f * 4.3 + s * spread * f;
-    const tip = y - 9 - (2 - Math.abs(f)) * 2.2;
-    m.capsule(x + f * 3, y, 10, fx, tip, 12, 2.1, 1.5, C('gray', 0.12), MAT.skin);
-    m.capsule(fx, tip, 12, fx + f * 0.3, tip - 2.6, 13, 0.9, 0.3, C('beige', 0.75), MAT.bone);
-  }
+function fistsSheet() {
+  return sheet([
+    fistsFrame(),
+    fistsFrame({ right: [130, 58, 10] }), // wind up
+    fistsFrame({ right: [88, 30, 30], rs: 14 }), // punch toward the crosshair
+    fistsFrame({ right: [110, 50, 18], rs: 11 }),
+  ]);
 }
 
-function pawsFrame(right = [116, 50], left = [42, 56], { swipe = false, spread = 0 } = {}) {
-  const m = new Model(160, 80, { seed: 101 });
-  paw(m, left[0], left[1], true);
-  paw(m, right[0], right[1], false, spread);
-  const c = render(m);
-  if (swipe) {
-    for (let k = 0; k < 4; k++) {
-      c.line(118 - k * 2, 18 + k * 6, 52, 30 + k * 7, G('tube', 1));
-      c.line(116 - k * 2, 19 + k * 6, 56, 31 + k * 7, C('gray', 0.65));
-    }
-  }
-  return c;
-}
+// ------------------------------------------------------------------ blaster pistol
 
-function pawsSheet() {
-  return sheet([pawsFrame(), pawsFrame([132, 38], undefined, { spread: 0.6 }), pawsFrame([80, 34], undefined, { swipe: true, spread: 0.8 }), pawsFrame([100, 46])]);
-}
-
-// ------------------------------------------------------------------ staple gun
-
-function stapleGunFrame({ y: oy = 12, fire = false, squeeze = 0 } = {}) {
+function blasterFrame({ kick = 0, fire = false } = {}) {
   const m = new Model(96, 88, { seed: 103 });
-  // Modelled in profile (nose at x = 0, lever on top at negative y), then
-  // turned so the nose points up at the crosshair: a three-quarter view.
-  const th = (68 * Math.PI) / 180;
-  const [ox, oy0] = [41, 4 + oy];
-  const T = (x, y) => [ox + x * Math.cos(th) - y * Math.sin(th), oy0 + x * Math.sin(th) + y * Math.cos(th)];
+  // Modelled in profile (muzzle at x = 0, scope toward +y, grip toward -y),
+  // then turned so the muzzle points up at the crosshair: a three-quarter view
+  // from behind the right hand.
+  const th = (64 * Math.PI) / 180;
+  const [ox, oy] = [42, 6 + kick];
+  const T = (x, y) => [ox + x * Math.cos(th) - y * Math.sin(th), oy + x * Math.sin(th) + y * Math.cos(th)];
   const poly = (pts) => pts.map(([x, y]) => T(x, y));
-  const paint = mix(C('orange', 0.5), C('rust', 0.5), 0.3);
-  const body = { ...MAT.metal, spec: 0.35, shine: 18, grain: 0.06 };
-  // Body (the magazine) with a chrome nose plate and the staple slot.
-  m.slab(poly([[2, 0], [62, 0], [64, 3], [64, 15], [6, 15], [2, 11]]), 12, paint, body, { bevel: 3, thickness: 3 });
-  m.slab(poly([[0, -1], [9, -1], [9, 16], [3, 16], [0, 12]]), 14, C('steel', 0.68), MAT.metal, { bevel: 1.5, thickness: 1.5 });
-  m.paint(...T(3, 13.5), 2.2, 2.2, C('gray', 0.02));
-  // A worn maker's label and a dent.
-  m.paintPoly(poly([[22, 4], [44, 4], [44, 11], [22, 11]]), C('beige', 0.7));
-  m.paintPoly(poly([[22, 7], [44, 7], [44, 8.5], [22, 8.5]]), C('blood', 0.45));
-  m.dent(...T(50, 9), 3, 2.4, 1);
-  m.tint((x, y, c) => {
-    const h = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453;
-    const r = h - Math.floor(h);
-    if (r > 0.985) return mix(c, C('steel', 0.75), 0.6); // chipped paint
-    if (r < 0.07) return darken(c, 0.25);
-    return undefined;
-  });
-  // The squeeze lever, hinged at the back, black rubber grip.
-  const lift = 3.2 - squeeze;
-  const lever = [[61, -1], [46, -2.5 - lift * 0.4], [30, -3 - lift * 0.8], [14, -3.5 - lift]];
-  for (let k = 0; k + 1 < lever.length; k++) {
-    const [a, b] = [T(...lever[k]), T(...lever[k + 1])];
-    m.capsule(a[0], a[1], 16, b[0], b[1], 16, 3.4 - k * 0.3, 3.1 - k * 0.3, k < 2 ? C('gray', 0.1) : C('steel', 0.55), k < 2 ? MAT.leather : MAT.metal);
-  }
-  m.sphere(...T(61, 0), 18, 2.6, C('steel', 0.6), MAT.metal);
-  // Alex's paw glove: the back of it along the lever, fingers wrapped under the body.
-  const sq = squeeze * 0.5;
-  const [w0, w1] = [T(58, -4 + sq), T(36, -5 + sq)];
-  forearm(m, [106, 112, 24], [w0[0] + 10, w0[1] + 12, 22], 8.5);
-  m.capsule(w0[0], w0[1], 22, w1[0], w1[1], 24, 8, 6.8, GLOVE, MAT.fur);
+  const metal = { ...MAT.metal, spec: 0.45, shine: 20, grain: 0.05 };
+  // Barrel: a long cylinder with a slotted flash suppressor at the muzzle.
+  const [b0, b1] = [T(2, 0), T(34, 0)];
+  m.capsule(b0[0], b0[1], 14, b1[0], b1[1], 14, 3.4, 3.6, GUNMETAL, metal);
+  const [s0, s1] = [T(0, 0), T(9, 0)];
+  m.capsule(s0[0], s0[1], 15, s1[0], s1[1], 15, 4.6, 4.6, C('gray', 0.26), metal);
+  for (let k = 1; k < 4; k++) m.paint(...T(k * 2.3, 2.6), 0.8, 1.6, C('gray', 0.04));
+  // Receiver body, a power cell under it, and the scope on top.
+  m.slab(poly([[28, -6], [62, -6], [64, -2], [64, 7], [30, 7], [26, 2]]), 12, C('gray', 0.34), metal, { bevel: 2.5, thickness: 3 });
+  m.slab(poly([[34, -7], [48, -7], [48, -12], [34, -12]]), 13, C('steel', 0.35), metal, { bevel: 1.2, thickness: 1.5 });
+  const [c0, c1] = [T(30, 10), T(50, 10)];
+  m.capsule(c0[0], c0[1], 15, c1[0], c1[1], 15, 2.4, 2.4, C('gray', 0.12), metal);
+  m.sphere(c0[0], c0[1], 16, 2.2, C('steel', 0.5), MAT.glass);
+  m.paint(...T(56, 3), 1.2, 1.2, G('red', 1), MAT.glow); // charge light
+  // Grip, angled back toward the hand.
+  m.slab(poly([[50, -6], [62, -6], [72, -26], [60, -28]]), 12, C('gray', 0.14), MAT.leather, { bevel: 2, thickness: 2.5 });
+  // The gloved hand round the grip, the arm coming in from below right.
+  const [g0, g1] = [T(56, -10), T(66, -24)];
+  forearm(m, [104, 116, 18], [g1[0] + 6, g1[1] + 10, 18], 9);
+  m.capsule(g0[0], g0[1], 20, g1[0], g1[1], 20, 7.5, 7, GLOVE, MAT.leather);
   for (let k = 0; k < 4; k++) {
-    const [kx, ky] = T(35 + k * 5.4, -7.5 + sq);
-    m.sphere(kx, ky, 27, 2.6, lighten(GLOVE, 0.04), MAT.fur); // knuckles
-    const [fx, fy] = T(35 + k * 5.4, 14);
-    m.sphere(fx, fy, 22, 2.5, darken(GLOVE, 0.08), MAT.fur); // fingertips curling round
+    const [kx, ky] = T(54 + k * 3.6, -16 - k * 3);
+    m.sphere(kx, ky, 25, 2.6, lighten(GLOVE, 0.05), MAT.leather);
   }
-  const [t0, t1] = [T(54, 3), T(30, 4)];
-  m.capsule(t0[0], t0[1], 26, t1[0], t1[1], 25, 3, 2.3, GLOVE, MAT.fur); // thumb along the near side
-  const c = render(m);
+  const [t0, t1] = [T(50, -4), T(40, -2)];
+  m.capsule(t0[0], t0[1], 23, t1[0], t1[1], 22, 2.8, 2.3, GLOVE, MAT.leather); // trigger finger along the frame
+  const c = m.render(RENDER);
   if (fire) {
-    const [nx, ny] = T(-2, 13);
-    flash(c, nx, ny, 7, G('yellow', 1), G('yellow', 0.45));
+    const [nx, ny] = T(-3, 0);
+    flash(c, nx, ny, 8, G('red', 1), G('red', 0), 5);
   }
   return c;
 }
 
-function stapleGunSheet() {
-  return sheet([stapleGunFrame(), stapleGunFrame({ fire: true, y: 14, squeeze: 3 }), stapleGunFrame({ y: 20, squeeze: 3 }), stapleGunFrame({ y: 16 })]);
+function blasterSheet() {
+  return sheet([blasterFrame(), blasterFrame({ fire: true, kick: 3 }), blasterFrame({ kick: 7 }), blasterFrame({ kick: 3 })]);
 }
 
-// ------------------------------------------------------------------ thumbtack shotgun
-
-function shotgunFrame({ fire = false, pump = 0, kick = 0 } = {}) {
-  const m = new Model(128, 96, { seed: 107 });
-  const cx = 64;
-  const top = 9 + kick;
-  // Seen from behind and a little above: the barrel and a clear magazine tube
-  // full of thumbtacks run side by side toward the crosshair.
-  const lerp = (a, b, t) => a + (b - a) * t;
-  m.slab([[cx - 21, 76 + kick], [cx + 21, 76 + kick], [cx + 26, 98], [cx - 26, 98]], 26, C('gray', 0.2), MAT.metal, { bevel: 4, thickness: 3, tilt: [0, -0.7] });
-  m.paint(cx + 6, 82 + kick, 6, 2, C('gray', 0.04)); // ejection port
-  m.capsule(cx + 10, 98, 22, cx + 3.5, top + 12, 6, 6.6, 3.2, C('steel', 0.62), MAT.glass);
-  for (let k = 0; k < 11; k++) {
-    const t = k / 11;
-    const y = lerp(92, top + 16, t);
-    const x = lerp(cx + 10, cx + 3.5, (98 - y) / (98 - top - 12));
-    m.paint(x, y, lerp(4.4, 2.2, t), lerp(2, 1.1, t), [C('blood', 0.6), C('yellow', 0.7), C('steel', 0.78)][k % 3], MAT.plastic);
-  }
-  m.capsule(cx - 4, 98, 30, cx - 0.5, top, 4, 7, 3.4, C('steel', 0.3), MAT.metal);
-  m.paint(cx - 0.5, top + 0.8, 2.3, 1.6, C('gray', 0.02));
-  m.sphere(cx - 0.5, top + 5, 6, 1.3, C('steel', 0.8), MAT.metal); // front sight
-  // Wooden pump around the tube, under the barrel; it slides toward us when racked.
-  const py = 44 + pump;
-  const w0 = 12 - pump * 0.05;
-  m.slab([[cx - w0 + 1, py], [cx + w0 + 3, py], [cx + w0 + 6, py + 22], [cx - w0 - 3, py + 22]], 20.5, C('rust', 0.3), MAT.wood, { bevel: 3.5, thickness: 3, tilt: [0, -0.35] });
-  // Hands: the left cups the pump, the right holds the grip.
-  forearm(m, [6, 122, 30], [cx - 18, py + 18, 34], 10);
-  fist(m, cx - 15, py + 12, 36, 8, 1);
-  forearm(m, [126, 124, 26], [cx + 32, 94, 30], 10);
-  fist(m, cx + 28, 90, 32, 8.5, -1);
-  const c = render(m);
-  if (fire) flash(c, cx - 0.5, top - 3, 16, G('yellow', 1), G('yellow', 0.4));
-  return c;
-}
-
-function shotgunSheet() {
-  return sheet([shotgunFrame(), shotgunFrame({ fire: true, kick: 2 }), shotgunFrame({ kick: 8 }), shotgunFrame({ pump: 14 }), shotgunFrame({ pump: 26 })]);
-}
-
-// ------------------------------------------------------------------ chicago typewriter
-
-function typewriterFrame({ fire = 0 } = {}) {
-  const m = new Model(128, 96, { seed: 109 });
-  const cx = 64;
-  const shake = fire ? (fire === 1 ? -1 : 1) : 0;
-  // Barrel with a perforated cooling jacket.
-  m.capsule(cx + shake, 60, 18, cx + shake, 5, 2, 8, 4.4, C('gray', 0.22), MAT.metal);
-  for (let y = 12; y < 52; y += 5) m.paint(cx + shake + (y % 10 ? 1 : -1), y, 1.2, 1, C('gray', 0.04));
-  m.paint(cx + shake, 5, 2.6, 1.6, C('gray', 0.02));
-  // The day's report, still in the roller.
-  m.slab([[cx - 22, 30], [cx + 22, 30], [cx + 24, 54], [cx - 24, 54]], 14, C('beige', 0.88), MAT.paper, { bevel: 1, tilt: [0, -0.8] });
-  // Machine body.
-  m.slab([[cx - 40, 52], [cx + 40, 52], [cx + 54, 100], [cx - 54, 100]], 22, C('olive', 0.32), MAT.plastic, { bevel: 7, thickness: 6, tilt: [0, -0.5] });
-  m.capsule(cx - 46, 52, 22, cx + 46, 52, 22, 4, 4, C('gray', 0.12), MAT.leather); // platen roller
-  // Keys.
-  for (let row = 0; row < 3; row++) {
-    for (let k = 0; k < 9 + row; k++) {
-      const kx = cx - 34 - row * 4 + k * 8;
-      const ky = 64 + row * 10 + (fire && (k + row + fire) % 4 === 0 ? 2 : 0);
-      m.capsule(kx, ky + 2, 26, kx, ky, 29, 2.6, 2.6, C('gray', 0.12), MAT.metal);
-      m.ellipsoid(kx, ky - 0.5, 30, 3, 2.4, 1.2, C('beige', 0.75), MAT.plastic);
-    }
-  }
-  forearm(m, [-6, 112, 30], [14, 78, 28], 11);
-  fist(m, 18, 74, 30, 9, 1);
-  forearm(m, [134, 112, 30], [114, 78, 28], 11);
-  fist(m, 110, 74, 30, 9, -1);
-  const c = render(m);
-  for (let l = 0; l < 4; l++) {
-    for (let x = cx - 18; x < cx + 18; x++) if (hash2(x, l, 5) > 0.3) c.set(x, 35 + l * 4, C('gray', 0.35));
-  }
-  if (fire) flash(c, cx + shake, 2, 15, G('yellow', 1), G('yellow', fire === 1 ? 0.4 : 0.55));
-  return c;
-}
-
-function typewriterSheet() {
-  return sheet([typewriterFrame(), typewriterFrame({ fire: 1 }), typewriterFrame({ fire: 2 })]);
-}
-
-// ------------------------------------------------------------------ toner launcher
-
-function launcherFrame({ fire = false, kick = 0 } = {}) {
-  const m = new Model(128, 96, { seed: 113 });
-  const cx = 64;
-  const y = 14 + kick;
-  m.capsule(cx, 118, 34, cx, y + 8, 4, 30, 13, C('gray', 0.52), MAT.plastic);
-  for (const t of [0.12, 0.42, 0.78]) {
-    const yy = y + 8 + (118 - y - 8) * t;
-    m.paint(cx, yy, 30, 1.6, C('gray', 0.18));
-  }
-  m.paint(cx, y + 42, 15, 5.5, C('blood', 0.45));
-  // The muzzle opening.
-  m.dent(cx, y + 6, 11, 4, 2);
-  m.paint(cx, y + 6, 10, 3.6, C('gray', 0.04));
-  m.slab([[cx - 2, y - 5], [cx + 2, y - 5], [cx + 2, y + 4], [cx - 2, y + 4]], 14, C('gray', 0.15), MAT.metal, { bevel: 1 });
-  forearm(m, [10, 118, 44], [cx - 26, 82, 40], 11);
-  fist(m, cx - 24, 76, 42, 9, 1);
-  forearm(m, [124, 112, 44], [cx + 28, 74, 40], 11);
-  fist(m, cx + 26, 68, 42, 9, -1);
-  const c = render(m);
-  tinyText(c, 'TONER', cx - 9, y + 40, C('beige', 0.9));
-  if (fire) {
-    flash(c, cx, y + 2, 22, G('yellow', 1), G('red', 0.8));
-    c.ellipse(cx - 14, y - 2, 6, 4, C('gray', 0.5));
-    c.ellipse(cx + 15, y - 5, 5, 4, C('gray', 0.45));
-  }
-  return c;
-}
-
-function launcherSheet() {
-  return sheet([launcherFrame(), launcherFrame({ fire: true, kick: 3 }), launcherFrame({ kick: 10 })]);
-}
-
-// ------------------------------------------------------------------ B.F.C. 9000
-
-function bfcFrame({ bubble = 0, charge = 0, fire = false, kick = 0 } = {}) {
-  const m = new Model(128, 96, { seed: 127 });
-  const cx = 64;
-  const y = 18 + kick;
-  // Chrome housing and nozzle.
-  m.slab([[cx - 34, y + 16], [cx + 34, y + 16], [cx + 48, 100], [cx - 48, 100]], 18, C('steel', 0.62), MAT.metal, { bevel: 8, thickness: 6, tilt: [0, -0.4] });
-  m.slab([[cx - 30, y + 2], [cx + 30, y + 2], [cx + 32, y + 18], [cx - 32, y + 18]], 16, C('steel', 0.45), MAT.metal, { bevel: 4, thickness: 3, tilt: [0, -0.9] });
-  m.capsule(cx, y + 8, 18, cx, y - 8, 10, 7, 5, C('gray', 0.25), MAT.metal);
-  m.paint(cx, y - 8, 4, 2, C('gray', 0.03));
-  // The carafe of glowing coffee.
-  m.ellipsoid(cx, y + 52, 26, 24, 20, 12, C('steel', 0.72), MAT.glass);
-  m.paint(cx, y + 56, 21, 15, G('amber', Math.min(1, 0.25 + charge * 0.4)), MAT.glow);
-  m.paint(cx, y + 59, 15, 10, G('yellow', Math.min(1, 0.05 + charge * 0.3)), MAT.glow);
-  for (let k = 0; k < 6; k++) {
-    const bx = cx - 14 + ((k * 11 + bubble * 7) % 28);
-    const by = y + 48 + ((k * 5 + bubble * 3) % 16);
-    m.paint(bx, by, 1.4, 1.4, G('yellow', 0.85), MAT.glow);
-  }
-  // Control panel.
-  m.slab([[cx - 22, y + 6], [cx + 22, y + 6], [cx + 22, y + 14], [cx - 22, y + 14]], 18, C('gray', 0.1), MAT.plastic, { bevel: 1 });
-  forearm(m, [2, 116, 40], [cx - 40, 84, 36], 11);
-  fist(m, cx - 38, 78, 38, 9, 1);
-  forearm(m, [126, 116, 40], [cx + 40, 84, 36], 11);
-  fist(m, cx + 38, 78, 38, 9, -1);
-  const c = render(m);
-  // Glass highlight and LED readout.
-  c.line(cx - 18, y + 40, cx - 12, y + 64, C('steel', 0.95));
-  const txt = charge > 0.5 ? G('red', 1) : G('red', 0.5);
-  for (let k = 0; k < 8; k++) c.set(cx - 14 + k * 4, y + 10, txt);
-  c.set(cx + 19, y + 10, charge > 0 ? G('green', 1) : C('gray', 0.3));
-  if (charge > 0.5) for (let k = 0; k < 4; k++) c.ellipse(cx - 12 + k * 8, y - 12 - k * 2, 4, 3, C('steel', 0.85));
-  if (fire) {
-    flash(c, cx, y - 12, 24, G('yellow', 1), G('amber', 1));
-    c.ellipse(cx, y - 12, 9, 7, G('lamp', 1));
-  }
-  return c;
-}
-
-function bfcSheet() {
-  return sheet([bfcFrame({ bubble: 0 }), bfcFrame({ bubble: 1 }), bfcFrame({ charge: 1, bubble: 2 }), bfcFrame({ fire: true, charge: 1, kick: 2 }), bfcFrame({ kick: 10, bubble: 3 })]);
+/** The blaster lying on the floor, for a pickup. 64x32. */
+function blasterPickup() {
+  const m = new Model(64, 32, { seed: 105 });
+  const metal = { ...MAT.metal, spec: 0.45, shine: 20, grain: 0.05 };
+  m.capsule(6, 18, 4, 34, 18, 4, 2.6, 2.8, GUNMETAL, metal);
+  m.capsule(4, 18, 5, 11, 18, 5, 3.4, 3.4, C('gray', 0.26), metal);
+  m.slab([[30, 13], [56, 13], [58, 16], [58, 22], [32, 22]], 4, C('gray', 0.22), metal, { bevel: 1.5, thickness: 2 });
+  m.capsule(32, 11, 6, 48, 11, 6, 1.8, 1.8, C('gray', 0.12), metal);
+  m.slab([[48, 22], [57, 22], [60, 29], [52, 30]], 4, C('gray', 0.14), MAT.leather, { bevel: 1, thickness: 1.5 });
+  return m.render({ ...RENDER, light: [-0.4, -0.8, 0.45] });
 }
 
 export default [
-  { name: 'paws', out: W('paws'), draw: pawsSheet, dither: 'fs' },
-  { name: 'staple-gun', out: W('staple-gun'), draw: stapleGunSheet, dither: 'fs' },
-  { name: 'tack-shotgun', out: W('tack-shotgun'), draw: shotgunSheet, dither: 'fs' },
-  { name: 'typewriter', out: W('typewriter'), draw: typewriterSheet, dither: 'fs' },
-  { name: 'toner-launcher', out: W('toner-launcher'), draw: launcherSheet, dither: 'fs' },
-  { name: 'bfc', out: W('bfc'), draw: bfcSheet, dither: 'fs' },
+  { name: 'fists', out: W('fists'), draw: fistsSheet, dither: 'fs' },
+  { name: 'blaster', out: W('blaster'), draw: blasterSheet, dither: 'fs' },
+  { name: 'pickup-blaster', out: 'assets/sprites/items/pickup-blaster.png', draw: blasterPickup, dither: 'fs' },
 ];
-
-export { forearm, fist };

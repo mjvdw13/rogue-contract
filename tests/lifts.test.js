@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { makeWorld, mockInput, room, run } from './helpers.js';
 import { runActions } from '../src/engine/world/actions.js';
 
-const TALL = { floor: 'carpet', ceiling: 'ceiling-tile', light: 160, ceilZ: 4 };
+const TALL = { floor: 'imp-floor', ceiling: 'imp-ceiling', light: 160, ceilZ: 4 };
 
 // The player starts on tile 1; the lift `L` is the tile east of the start.
 function liftRoom(lift, extra = {}) {
@@ -81,7 +81,7 @@ test('an elevator cab that moves its ceiling too', () => {
 
 test('rising doors open to the lowest ceiling beside them and let the player through', () => {
   const level = room(['#####', '#.D,#', '#####'], ['', ' >'], {
-    legend: { '.': { ...TALL, ceilZ: 1.5 }, ',': TALL, D: { door: 'door-metal', style: 'rise' } },
+    legend: { '.': { ...TALL, ceilZ: 1.5 }, ',': TALL, D: { door: 'imp-door', style: 'rise' } },
   });
   const w = makeWorld(level);
   const door = w.map.doors[0];

@@ -5,7 +5,7 @@ import { makeWorld, mockInput, room, run } from './helpers.js';
 import { registry } from './helpers.js';
 
 // A plain floor with a tall ceiling, so jumps don't hit their heads.
-const TALL = { floor: 'carpet', ceiling: 'ceiling-tile', light: 160, ceilZ: 6 };
+const TALL = { floor: 'imp-floor', ceiling: 'imp-ceiling', light: 160, ceilZ: 6 };
 
 // A corridor running east from the player start. `row` is the floor glyphs
 // east of the start tile; the legend gives each glyph a height.
@@ -111,41 +111,41 @@ test('monsters on a raised floor stand on it, and solid things only collide at t
     legend: { h: { base: '.', floorZ: 1, ceilZ: 3 }, '.': TALL },
   });
   const w = makeWorld(level);
-  const ant = w.things.find((t) => t.def.id === 'ant');
-  assert.equal(ant.z, 1);
-  // Put the ant just ahead of the player, still at its ledge height.
-  ant.x = 1.85;
+  const trooper = w.things.find((t) => t.def.id === 'stormtrooper');
+  assert.equal(trooper.z, 1);
+  // Put the trooper just ahead of the player, still at its ledge height.
+  trooper.x = 1.85;
   w.player.x = 1.3;
   w.player.z = 0;
-  assert.equal(w.checkPosition(w.player, 1.35, 1.5), true, 'below the ant: walks under it');
+  assert.equal(w.checkPosition(w.player, 1.35, 1.5), true, 'below the trooper: walks under it');
   w.player.z = 1;
-  assert.equal(w.checkPosition(w.player, 1.35, 1.5), false, 'same height: blocked by the ant');
+  assert.equal(w.checkPosition(w.player, 1.35, 1.5), false, 'same height: blocked by the trooper');
 });
 
 test('items are picked up within reach of the body, not when jumping over them or below a ledge', () => {
   const level = room(['######', '#....#', '#.hh.#', '######'], ['', ' >', ' '], {
     legend: { '.': TALL, h: { ...TALL, floorZ: 1.5 } },
-    list: [{ type: 'donut', x: 2.5, y: 1.5 }, { type: 'donut', x: 2.5, y: 2.5 }],
+    list: [{ type: 'med-kit', x: 2.5, y: 1.5 }, { type: 'med-kit', x: 2.5, y: 2.5 }],
   });
   const w = makeWorld(level);
-  const [floorDonut, ledgeDonut] = w.things.filter((t) => t.def.id === 'donut');
-  assert.equal(ledgeDonut.z, 1.5, 'the ledge donut sits on the ledge');
+  const [floorKit, ledgeKit] = w.things.filter((t) => t.def.id === 'med-kit');
+  assert.equal(ledgeKit.z, 1.5, 'the ledge med kit sits on the ledge');
   const pt = w.player;
-  pt.player.health = 50; // so donuts are wanted
-  // Hovering 0.5 above the floor donut (mid-jump): out of reach.
+  pt.player.health = 50; // so med kits are wanted
+  // Hovering 0.5 above the floor med kit (mid-jump): out of reach.
   pt.x = 2.5;
   pt.y = 1.5;
   pt.z = 0.5;
   pt.vz = 0;
   w._pickups();
-  assert.equal(floorDonut.removed, false, 'jumping over it does not pick it up');
-  // Standing next to the ledge, with the donut above head height: out of reach.
+  assert.equal(floorKit.removed, false, 'jumping over it does not pick it up');
+  // Standing next to the ledge, with the med kit above head height: out of reach.
   pt.z = 0;
   pt.y = 2.2;
   w._pickups();
-  assert.equal(ledgeDonut.removed, false, 'a donut up on a ledge is out of reach');
-  // Back on the floor at the floor donut: picked up.
+  assert.equal(ledgeKit.removed, false, 'a med kit up on a ledge is out of reach');
+  // Back on the floor at the floor med kit: picked up.
   pt.y = 1.5;
   w._pickups();
-  assert.equal(floorDonut.removed, true, 'standing on it picks it up');
+  assert.equal(floorKit.removed, true, 'standing on it picks it up');
 });

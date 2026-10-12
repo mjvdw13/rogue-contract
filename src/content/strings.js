@@ -1,4 +1,4 @@
-// Every piece of text in RACCOON ALEX. Change anything here; the engine
+// Every piece of text in ROGUE CONTRACT. Change anything here; the engine
 // looks these up by key. {placeholders} are filled in by the game.
 
 export default {
@@ -8,10 +8,10 @@ export default {
   cheatActivated: 'CHEAT ACTIVATED',
   secretFound: 'A SECRET IS REVEALED!',
   needKey: 'You need a {key} to open this door.',
-  deathMessage: 'ALEX FELL ASLEEP. PERMANENTLY.',
+  deathMessage: 'CONTRACT TERMINATED.',
   respawnPrompt: 'PRESS USE TO TRY AGAIN',
 
-  hud: { ammo: 'AMMO', health: 'HEALTH', arms: 'ARMS', armor: 'CAFFEINE' },
+  hud: { ammo: 'ENERGY', health: 'HEALTH', arms: 'ARMS', armor: 'SHIELD' },
   automap: { kills: 'KILLS', items: 'ITEMS', secrets: 'SECRETS' },
   intermission: {
     finished: 'FINISHED',
@@ -24,7 +24,7 @@ export default {
     youAreHere: 'YOU ARE HERE',
   },
 
-  skills: ['I SLEPT FINE', 'ONE MORE EPISODE', 'RED-EYE FLIGHT', 'ALL-NIGHTER', 'INSOMNIA!'],
+  skills: ['RECRUIT', 'SMUGGLER', 'MERCENARY', 'BOUNTY HUNTER', 'NO WITNESSES'],
 
   menu: {
     newGame: 'NEW GAME',
@@ -36,9 +36,9 @@ export default {
     resume: 'RESUME',
     restart: 'RESTART LEVEL',
     quitToTitle: 'QUIT TO TITLE',
-    chooseSkill: 'HOW TIRED ARE YOU?',
-    whichEpisode: 'WHICH EPISODE?',
-    nightmareConfirm: 'Are you sure? You will not sleep for a week. This skill level is not even remotely fair.',
+    chooseSkill: 'CHOOSE YOUR RATE:',
+    whichEpisode: 'WHICH MISSION?',
+    nightmareConfirm: 'Are you sure? The Empire sends everything it has. This level is not even remotely fair.',
     restartConfirm: 'Restart this level from the beginning?',
     mouse: 'MOUSE',
     music: 'MUSIC',
@@ -55,18 +55,14 @@ export default {
   },
 
   quitMessages: [
-    "Don't go! Alex STILL hasn't slept.",
-    'The report is due at 9 AM. You can sleep when you are dead.',
-    "There's still coffee in the break room...",
-    "Quitting? That's exactly what HR wants.",
-    'Go ahead, log off. The bugs will be waiting.',
-    'Alex has been awake for 72 hours and HE is not quitting.',
-    'Are you sure? Those raccoon eyes say otherwise.',
-    'If you leave now, the bugs ship to production.',
-    'Please don\'t go. The printer is jammed again.',
+    'Walk away now and the contract goes to someone else.',
+    'The Rebellion pays on completion. Not on retreat.',
+    'The garrison will still be there tomorrow. So will the stormtroopers.',
+    'Leaving? The Empire will be relieved.',
+    'You came all this way across the canyon for this?',
   ],
 
-  goodbye: ["It's now safe to turn off", 'your computer.', '', 'Go to bed. Seriously.'],
+  goodbye: ["It's now safe to turn off", 'your computer.', '', 'The contract will keep.'],
 
   help: [
     { text: 'MOVE ......... W A S D / ARROW KEYS', tint: 'beige' },
@@ -76,27 +72,23 @@ export default {
     { text: 'JUMP / DUCK .. SPACE / C', tint: 'beige' },
     { text: 'LOOK ......... MOUSE / PGUP PGDN / END', tint: 'beige' },
     { text: 'RUN .......... SHIFT (OR ALWAYS RUN)', tint: 'beige' },
-    { text: 'WEAPONS ...... 1-6 / MOUSE WHEEL / Q', tint: 'beige' },
+    { text: 'WEAPONS ...... 1-2 / MOUSE WHEEL / Q', tint: 'beige' },
     { text: 'AUTOMAP ...... TAB / M   (ZOOM + -)', tint: 'beige' },
     { text: 'MENU ......... ESC', tint: 'beige' },
     { text: '' },
-    { text: 'It is 3 AM. Alex has been awake for', tint: 'steel' },
-    { text: '72 hours. The deadline has opened a', tint: 'steel' },
-    { text: 'portal, and it is crawling with bugs.', tint: 'steel' },
-    { text: 'Find the exit on every floor. Badges', tint: 'steel' },
-    { text: 'open colored doors. Coffee is armor.', tint: 'steel' },
+    { text: 'You are a mercenary. The Rebellion has', tint: 'steel' },
+    { text: 'hired you to break into an Imperial', tint: 'steel' },
+    { text: 'garrison hidden in a desert canyon.', tint: 'steel' },
+    { text: 'Find the exit switch. Keycards open', tint: 'steel' },
+    { text: 'colored doors. Shield units absorb hits.', tint: 'steel' },
   ],
 
-  episodeName: 'KNEE-DEEP IN THE DEADLINE',
+  episodeName: 'THE CANYON GARRISON',
 
   finale:
-    'With one last cackle, the Pumpkin King splits down the middle and bursts over the landfill in a ' +
-    'shower of seeds and burning pulp. All over the building, the bugs go still.\n\n' +
-    'Silence. Real silence. The first in 72 hours.\n\n' +
-    'Alex crawls out of the garbage, back up through the sewers, past the boiler room, past the cubicles, ' +
-    'and collapses face-first onto his desk.\n\n' +
-    'The quarterly report is finished. Nobody will ever read it.\n\n' +
-    'His eyes close. The bags under them finally begin to fade...\n\n' +
-    '...and then his phone buzzes.\n\n' +
-    '7:00 AM. STANDUP IN FIVE MINUTES.',
+    'The exit door seals behind you, and the canyon wind carries the sound of alarms back down the ' +
+    'corridors.\n\n' +
+    'Somewhere above the mesas, a Rebel transport is already on its way. Your contact said the job would ' +
+    'be simple. They always say that.\n\n' +
+    'The data you came for is still inside. This was only the way in.',
 };

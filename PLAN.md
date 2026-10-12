@@ -349,3 +349,33 @@ update the smoke test.
     the smoke test pass.
   - **Still rough:** angled-wall tiles count as fully open for reachability,
     so a gap squeezed between two angled walls isn't checked.
+- 2026-10-12: First Star Wars pass (Phase 0's "replace the Alex content", and
+  a start on Phase 3).
+  - **Removed:** levels E1M1-E1M5, the coworkers, the bugs and the Pumpkin
+    King, every weapon but fists, the office/basement/sewer textures, the
+    old items, decor, music and the HUD face. The validator no longer
+    requires a face.
+  - **New art** (all generated in tools/art):
+    - Imperial wall, floor, ceiling, door and switch textures, plus canyon
+      rock, sand and a night sky.
+    - A stormtrooper, an officer and a probe droid (a flyer that explodes).
+    - Fists and a blaster pistol.
+    - Med kits, shield units, power cells, energy packs and keycards.
+    - Crates, fuel barrels, consoles and lamps.
+    - Blaster bolts, a new title screen and an intermission backdrop.
+  - **Content:**
+    - The blaster fires visible projectile bolts on `energy` ammo. Troopers
+      fire slower bolts you can dodge.
+    - The sandbox is the only mission, rethemed as CANYON GARRISON.
+    - A new original march, Star Wars-toned text, and the `mercenary`
+      cheat.
+    - The NPC tests use test-only friendlies (tests/fixtures/friendlies.js).
+  - **Checks:** 82 tests, the validator and the smoke test pass.
+  - **Still to do:**
+    - The HUD: the ARMS panel still shows slots 2-7, and the face panel is
+      empty.
+    - The finale reuses the title and intermission pictures.
+    - MODDING.md and the README still describe Alex content.
+    - The smoke test's first four screenshots come out as a blank page with
+      a broken-image icon. The checks still pass; not investigated yet.
+

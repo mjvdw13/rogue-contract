@@ -1,5 +1,5 @@
-// The RACCOON ALEX content pack: everything that makes this game *this* game.
-// The engine (src/engine) knows nothing about Alex; it only reads this pack.
+// The ROGUE CONTRACT content pack: everything that makes this game *this* game.
+// The engine (src/engine) knows nothing about it; it only reads this pack.
 import palette from './palette.js';
 import strings from './strings.js';
 import config from './config.js';
@@ -9,7 +9,6 @@ import { fonts, images, sheets } from './ui.js';
 import ammo from './ammo.js';
 import weapons from './weapons/index.js';
 import monsters from './monsters/index.js';
-import coworkers from './coworkers.js';
 import items from './items/index.js';
 import decorations from './decor.js';
 import { effects, projectiles } from './effects.js';
@@ -31,7 +30,7 @@ export default {
   sheets,
   ammo,
   weapons,
-  things: [...monsters, ...coworkers, ...items, ...decorations, ...effects, ...projectiles],
+  things: [...monsters, ...items, ...decorations, ...effects, ...projectiles],
   sounds,
   songs,
   legend,

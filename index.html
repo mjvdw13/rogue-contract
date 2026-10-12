@@ -19,15 +19,15 @@
 </head>
 <body>
   <main id="stage">
-    <canvas id="screen" width="320" height="200" aria-label="Raccoon Alex game screen" tabindex="0"></canvas>
+    <canvas id="screen" width="320" height="200" aria-label="Rogue Contract game screen" tabindex="0"></canvas>
     <div id="boot-message" role="status">LOADING...</div>
   </main>
-  <noscript><p class="noscript">RACCOON ALEX needs JavaScript to run.</p></noscript>
+  <noscript><p class="noscript">ROGUE CONTRACT needs JavaScript to run.</p></noscript>
   <script>
     // ES modules don't load from file:// URLs, so explain how to run the game locally.
     if (location.protocol === 'file:') {
       document.getElementById('boot-message').innerHTML =
-        'RACCOON ALEX must be served over HTTP.<br>Run <code>npx http-server</code> in the repo folder<br>and open the URL it prints.';
+        'ROGUE CONTRACT must be served over HTTP.<br>Run <code>npx http-server</code> in the repo folder<br>and open the URL it prints.';
     }
   </script>
   <script type="module" src="src/main.js"></script>

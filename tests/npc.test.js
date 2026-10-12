@@ -1,40 +1,43 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { wanderArea } from '../src/engine/things/npc.js';
-import { makeWorld, mockInput, room, run } from './helpers.js';
+import { makeWorld, mockInput, room, run, npcRegistry } from './helpers.js';
+
+// The friendlies are test-only (tests/fixtures/friendlies.js).
+const world = (level, opts = {}) => makeWorld(level, { ...opts, registry: npcRegistry });
 
 // Dale ('1') never wanders, so he makes a reliable target to shoot past.
-const hall = room(['###########', '#.........#', '#.........#', '#.........#', '###########'], ['', '', ' >  1   i']);
+const hall = room(['###########', '#.........#', '#.........#', '#.........#', '###########'], ['', '', ' >  1   t']);
 
 const npc = (w, id) => w.things.find((t) => t.def.id === id);
 const said = (w, name) => w.messages.filter((m) => m.startsWith(`${name}: `));
 
-test('coworkers are friendlies: bullets, explosions and fireballs pass through them', () => {
-  const w = makeWorld(hall);
+test('friendlies: bullets, explosions and bolts pass through them', () => {
+  const w = world(hall);
   const dale = npc(w, 'dale');
-  const ant = w.things.find((t) => t.kind === 'monster');
+  const trooper = w.things.find((t) => t.kind === 'monster');
   assert.equal(dale.kind, 'npc');
   assert.equal(w.stats.totalKills, 1, 'coworkers are not counted as kills');
-  assert.equal(w.hitscan(w.player, 0, 20, 5), ant, 'a shot straight through Dale hits the ant behind him');
-  assert.equal(ant.health, ant.def.health - 5);
+  assert.equal(w.hitscan(w.player, 0, 20, 5), trooper, 'a shot straight through Dale hits the trooper behind him');
+  assert.equal(trooper.health, trooper.def.health - 5);
   w.radiusDamage(dale.x, dale.y, 3, 500, null, w.player);
   w.damage(dale, 1000, w.player, w.player);
   assert.ok(!dale.dead && !dale.removed, 'Dale is fine');
 
-  const quiet = makeWorld(hall, { noMonsters: true });
+  const quiet = world(hall, { noMonsters: true });
   const shooter = { x: 8.5, y: 2.5, radius: 0.3, kind: 'monster' };
-  quiet.spawnProjectile('exception-fireball', shooter, Math.PI);
+  quiet.spawnProjectile('trooper-bolt', shooter, Math.PI);
   run(quiet, mockInput(), 2);
-  assert.ok(quiet.player.player.health < 100, 'the fireball went through Dale and hit Alex');
+  assert.ok(quiet.player.player.health < 100, 'the bolt went through Dale and hit the player');
 });
 
 test('bumping into a coworker makes them react', () => {
-  const w = makeWorld(hall, { noMonsters: true });
+  const w = world(hall, { noMonsters: true });
   const dale = npc(w, 'dale');
   const input = mockInput();
   input.hold('forward');
   run(w, input, 1.5);
-  assert.ok(w.player.x < dale.x - dale.radius, 'Alex cannot walk through Dale');
+  assert.ok(w.player.x < dale.x - dale.radius, 'the player cannot walk through Dale');
   assert.equal(said(w, 'DALE').length, 1, 'one line per bump, then a cooldown');
   assert.equal(dale.state, 'react');
   const bubble = w.things.find((t) => t.def.id === 'bubble-ugh' && !t.removed);
@@ -46,7 +49,7 @@ test('bumping into a coworker makes them react', () => {
 });
 
 test('pressing use on a coworker makes them say something new', () => {
-  const w = makeWorld(hall, { noMonsters: true });
+  const w = world(hall, { noMonsters: true });
   const input = mockInput();
   w.player.x = 3.6;
   input.tap('use');
@@ -81,7 +84,7 @@ const office = room(
 );
 
 test('coworkers stay out of doorways, hazards and narrow passages', () => {
-  const w = makeWorld(office, { noMonsters: true });
+  const w = world(office, { noMonsters: true });
   const terry = npc(w, 'terry');
   const at = (x, y) => w.map.index(x, y);
   assert.equal(terry.area.size, 17);
@@ -102,10 +105,10 @@ test('coworkers stay out of doorways, hazards and narrow passages', () => {
 });
 
 test('monsters never go after coworkers', () => {
-  const w = makeWorld(room(['#########', '#.......#', '#.......#', '#.......#', '#########'], ['', ' > 0  i', '    2']));
+  const w = world(room(['#########', '#.......#', '#.......#', '#.......#', '#########'], ['', ' > 0  t', '    2']));
   w.player.player.god = true;
   const monster = w.things.find((t) => t.kind === 'monster');
   run(w, mockInput(), 15, () => assert.notEqual(monster.target?.kind, 'npc'));
-  assert.ok(monster.target === w.player, 'the ant went for Alex');
+  assert.ok(monster.target === w.player, 'the trooper went for the player');
   assert.ok(w.things.filter((t) => t.kind === 'npc').every((t) => !t.dead && !t.removed));
 });

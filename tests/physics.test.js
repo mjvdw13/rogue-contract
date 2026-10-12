@@ -7,7 +7,7 @@ import { registry, room } from './helpers.js';
 const level = room(
   ['##########', '#........#', '#........#', '####D#####', '#........#', '###u######', '#........#', '##########'],
   ['', ' ^'],
-  { legend: { u: { door: 'drywall', secret: true }, D: { door: 'door-office', style: 'slide' } } },
+  { legend: { u: { door: 'imp-panel', secret: true }, D: { door: 'imp-door', style: 'slide' } } },
 );
 const map = () => buildLevel(registry, level, {}).map;
 
@@ -30,7 +30,7 @@ test('closed doors block at their middle, open ones let rays through', () => {
 });
 
 test('rising doors block at the tile face until mostly open', () => {
-  const m = buildLevel(registry, { ...level, legend: { ...level.legend, D: { door: 'door-office', style: 'rise' } } }, {}).map;
+  const m = buildLevel(registry, { ...level, legend: { ...level.legend, D: { door: 'imp-door', style: 'rise' } } }, {}).map;
   const hit = castRay(m, 4.5, 1.5, 0, 1);
   assert.equal(hit.door, m.doors[0]);
   assert.ok(Math.abs(hit.dist - 1.5) < 1e-9, 'face at y = 3');

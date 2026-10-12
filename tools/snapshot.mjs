@@ -2,10 +2,10 @@
 // Renders the 3D view headlessly to a PNG, without a browser. It's handy for
 // checking renderer changes and for looking at a spot in a level:
 //
-//   node tools/snapshot.mjs e1m1                       from the player start
-//   node tools/snapshot.mjs e1m1 --at 12.5,7.5,90      x,y,angle (content degrees: 0 east, 90 north)
-//   node tools/snapshot.mjs e1m1 --pitch 30 --z 0.2    look up 30 px, raise the eye 0.2 above the floor
-//   node tools/snapshot.mjs e1m1 --out shot.png --scale 3 --nomonsters
+//   node tools/snapshot.mjs sandbox                       from the player start
+//   node tools/snapshot.mjs sandbox --at 12.5,7.5,90      x,y,angle (content degrees: 0 east, 90 north)
+//   node tools/snapshot.mjs sandbox --pitch 30 --z 0.2    look up 30 px, raise the eye 0.2 above the floor
+//   node tools/snapshot.mjs sandbox --out shot.png --scale 3 --nomonsters
 //
 // The default output is tools/art/out/snapshots/<level>.png.
 import fs from 'node:fs';
@@ -100,7 +100,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   const args = process.argv.slice(2);
   const opt = (name, def) => (args.includes(name) ? args[args.indexOf(name) + 1] : def);
   const valued = new Set(['--at', '--pitch', '--z', '--out', '--scale', '--skill']);
-  const levelId = args.find((a, i) => !a.startsWith('--') && !valued.has(args[i - 1])) ?? 'e1m1';
+  const levelId = args.find((a, i) => !a.startsWith('--') && !valued.has(args[i - 1])) ?? 'sandbox';
   const at = opt('--at') ? opt('--at').split(',').map(Number) : undefined;
   const ctx = await headless();
   const shot = snapshot(ctx, levelId, {

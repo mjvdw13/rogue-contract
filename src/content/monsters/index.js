@@ -1,12 +1,8 @@
-// The monster roster: the bugs. To add a monster: create a file like the
-// others, draw a sprite sheet, and import it here. Its `glyph` becomes usable
-// in level maps.
-import ant from './ant.js';
-import firefly from './firefly.js';
-import roach from './roach.js';
-import beetle from './beetle.js';
-import mite from './mite.js';
-import garbageCollector from './garbage-collector.js';
-import pumpkinKing from './pumpkin-king.js';
+// The enemy roster. To add one: create a file like the others, draw a sprite
+// sheet (tools/art/sprites/imperials.js), and import it here. Its `glyph`
+// becomes usable in level maps.
+import stormtrooper from './stormtrooper.js';
+import officer from './officer.js';
+import probeDroid from './probe-droid.js';
 
-export default [ant, firefly, roach, beetle, mite, garbageCollector, pumpkinKing];
+export default [stormtrooper, officer, probeDroid];

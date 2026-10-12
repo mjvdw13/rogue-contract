@@ -5,8 +5,12 @@ import { Registry } from '../src/engine/registry.js';
 import { defineLevel } from '../src/engine/defs.js';
 import { World } from '../src/engine/world/world.js';
 import { Rng } from '../src/engine/core/rng.js';
+import friendlies, { bubbles } from './fixtures/friendlies.js';
 
 export const registry = new Registry(content);
+
+/** The content pack plus test-only friendlies (tests/fixtures/friendlies.js), for the NPC tests. */
+export const npcRegistry = new Registry({ ...content, things: [...content.things, ...friendlies, ...bubbles] });
 
 /** An input stand-in: `hold` actions stay down, `tap` actions fire once. */
 export function mockInput() {
@@ -25,11 +29,11 @@ export function mockInput() {
 }
 
 /** Build a World for a level def (or level id) without any browser bits. */
-export function makeWorld(level, { skill = 3, seed = 1, noMonsters = false } = {}) {
-  const def = typeof level === 'string' ? registry.levels.get(level) : level;
+export function makeWorld(level, { skill = 3, seed = 1, noMonsters = false, registry: reg = registry } = {}) {
+  const def = typeof level === 'string' ? reg.levels.get(level) : level;
   const messages = [];
   const world = new World(
-    { registry, rng: new Rng(seed), settings: { noMonsters }, hooks: { message: (t) => messages.push(t) } },
+    { registry: reg, rng: new Rng(seed), settings: { noMonsters }, hooks: { message: (t) => messages.push(t) } },
     def,
     { skill },
   );

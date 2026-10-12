@@ -5,7 +5,7 @@ import { castRay } from '../src/engine/world/physics.js';
 import { Slant, DIAGONALS } from '../src/engine/world/slants.js';
 import { makeWorld, mockInput, room, run, registry } from './helpers.js';
 
-const FLOOR = { floor: 'carpet', ceiling: 'ceiling-tile', light: 160 };
+const FLOOR = { floor: 'imp-floor', ceiling: 'imp-ceiling', light: 160 };
 
 test('each diagonal preset is solid in the corner it names', () => {
   const corners = { NE: [0.9, 0.1], NW: [0.1, 0.1], SE: [0.9, 0.9], SW: [0.1, 0.9] };
@@ -31,7 +31,7 @@ test('a ray meets a 45 degree wall where the geometry says', () => {
 const chamfer = room(
   ['#######', '#....n#', '#.....#', '#.....#', '#.....#', '#.....#', '#######'],
   ['', '', '', '', '', ' ^'],
-  { legend: { '.': FLOOR, n: { ...FLOOR, wall: 'drywall', diagonal: 'NE' } } },
+  { legend: { '.': FLOOR, n: { ...FLOOR, wall: 'imp-panel', diagonal: 'NE' } } },
 );
 
 test('angled-wall tiles parse as open floor with a slant, and bad lines are errors', () => {
@@ -42,7 +42,7 @@ test('angled-wall tiles parse as open floor with a slant, and bad lines are erro
   assert.equal(b.map.blocks(5, 1), false, 'the tile itself is open');
   assert.ok(b.map.solidPoint(5.9, 1.1));
   assert.ok(!b.map.solidPoint(5.1, 1.9));
-  const bad = buildLevel(registry, room(['###', '#x#', '###'], [''], { legend: { x: { ...FLOOR, wall: 'drywall', line: [0.5, 0.5, 1, 1] } } }));
+  const bad = buildLevel(registry, room(['###', '#x#', '###'], [''], { legend: { x: { ...FLOOR, wall: 'imp-panel', line: [0.5, 0.5, 1, 1] } } }));
   assert.ok(bad.errors.some((e) => e.includes('on the tile edges')));
 });
 
@@ -57,7 +57,7 @@ test('rays stop at angled walls from the front and from behind', () => {
   const hy = 3.5 - hit.dist * d;
   assert.ok(Math.abs(hx - hy - 4) < 1e-6, `on the line (${hx.toFixed(3)}, ${hy.toFixed(3)})`);
   // A triangular block in the open, entered through its solid side.
-  const block = buildLevel(registry, room(['#######', '#.....#', '#..n..#', '#.....#', '#######'], [''], { legend: { '.': FLOOR, n: { ...FLOOR, wall: 'drywall', diagonal: 'NE' } } })).map;
+  const block = buildLevel(registry, room(['#######', '#.....#', '#..n..#', '#.....#', '#######'], [''], { legend: { '.': FLOOR, n: { ...FLOOR, wall: 'imp-panel', diagonal: 'NE' } } })).map;
   const back = castRay(block, 3.5, 1.2, 0, 1); // heading south into the block's north edge
   assert.ok(back.slant && Math.abs(back.dist - 0.8) < 1e-9, `back face at y = 2 (dist ${back.dist})`);
 });
@@ -86,7 +86,7 @@ test('the player stops at a chamfered corner and slides along it', () => {
 
 test('projectiles burst on angled walls', () => {
   const w = makeWorld(chamfer, { noMonsters: true });
-  const p = w.spawnProjectile('exception-fireball', w.player, -Math.PI / 4, {});
+  const p = w.spawnProjectile('trooper-bolt', w.player, -Math.PI / 4, {});
   p.x = 4.5;
   p.y = 2.5;
   let burst = false;
