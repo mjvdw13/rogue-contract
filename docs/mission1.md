@@ -4,7 +4,7 @@ The first real level (PLAN.md Phase 1b B, then Phase 4). An original
 mercenary, hired by the Rebellion, breaks into an Imperial garrison dug into
 a desert canyon at night. The objectives and the briefing (Phase 2) don't
 exist yet, so for now the level runs from the canyon to an exit switch on a
-landing pad. The red keycard and a generator switch gate the way.
+landing pad's pickup spot. The red keycard and a generator switch gate the way.
 
 ## Grid and building
 
@@ -26,7 +26,7 @@ canyon (0) → crouch vent (0.5) → maintenance (0) → lift L1 to 6 → barrac
 corridor (6) → officer's office (red keycard) → red door → data vault (6) →
 generator catwalks (6) → lift L2 down to the generator floor (-6) → overload
 switch (opens the escape hatch) → back up → escape hatch → gantry stairs
-(6 → 8) → jump the 3-tile chasm → landing pad (8) → exit switch.
+(6 → 8) → jump the 3-tile chasm → landing pad (8) → the marked pickup spot (exit).
 
 ## Areas (x, y in tiles; heights in units)
 
@@ -44,11 +44,11 @@ switch (opens the escape hatch) → back up → escape hatch → gantry stairs
 | 10 | Officer's office | 62..72, 4..14 | 6 / 9 | Door 65..68 x 14..16. An officer, the **red keycard**, a console. |
 | 11 | Red door | 76..78, 16..20 | 6 | Into the vault. |
 | 12 | Data vault | 78..92, 10..24 | 6 / 9 | Dark (light 96), computer-bank walls, chamfered corners, ammo. Secret niche (92..96, 14..18) behind a computer-bank door: a shield. South door 83..87 x 24..26 onto the generator catwalk. |
-| 13 | Generator chamber | 72..108, 26..62 | -6 / 18 | Catwalk ring at 6 (3 wide). Central reactor column (86..94, 40..48) with chamfered corners. North and south bridges (88..92) join the ring to the column. Lift L2 (76..80, 54..58) runs -6 ↔ 6. The overload switch is on the column's south face at the bottom: it opens `escape`, dims the chamber and shows a message. Probe droid, troopers, fuel barrels at the bottom. |
+| 13 | Generator chamber | 72..108, 26..62 | -6 / 18 | Catwalk ring at 6 (3 wide). Central reactor column (86..94, 40..48) with chamfered corners. North and south bridges (88..92) join the ring to the column; they reach down to the floor, splitting the bottom into west and east halves. Lifts L2 (75..79, 55..59, west) and L2b (101..105, 29..33, east) run -6 ↔ 6. The overload switch is on the column's south face at the bottom: it opens `escape`, dims the chamber and shows a message. Probe droid, troopers, fuel barrels at the bottom. |
 | 14 | Escape hatch | 108..110, 42..46 | 6 | Remote-locked door, tag `escape`. |
 | 15 | Gantry | 110..118, 42..46 | 6 → 8 / sky | Stairs up 0.5 per tile to 8. |
 | 16 | Chasm | 118..121, 34..58 | -2 / sky | The 3-tile jump. Lift L3 (118..121, 54..58) runs back up (-2 ↔ 8) if you fall. |
-| 17 | Landing pad | 121..126, 34..58 | 8 / sky | Troopers. Exit switch in the east wall (126, 44..46). |
+| 17 | Landing pad | 121..126, 34..58 | 8 / sky | Troopers. The exit is the marked pickup spot on the pad (122..126, 43..47). |
 
 ## Secrets (3)
 

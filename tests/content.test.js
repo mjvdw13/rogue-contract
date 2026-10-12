@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { validateContent } from '../src/engine/validate.js';
 import { analyseLevel, ammoBudget } from '../tools/lib/levelcheck.mjs';
 import { Game } from '../src/engine/game.js';
+import { blockedByMap } from '../src/engine/world/physics.js';
 import { registry, makeWorld, mockInput, run } from './helpers.js';
 
 test('the content pack validates without errors', () => {
@@ -12,7 +13,7 @@ test('the content pack validates without errors', () => {
 
 test('the episode lists every level once, in order', () => {
   const ep = registry.firstEpisode();
-  assert.deepEqual(ep.levels, ['sandbox']);
+  assert.deepEqual(ep.levels, ['m1']);
   assert.ok(ep.finale?.text);
 });
 
@@ -31,13 +32,14 @@ for (const level of registry.levels.values()) {
   test(`${level.id}: simulates a minute of chaos without errors`, () => {
     for (const skill of [1, 5]) {
       const w = makeWorld(level, { skill, seed: 7 });
-      // Start deep in the level (by the item farthest from the start) so the
-      // shooting wakes the neighbourhood up.
-      const far = w.things
-        .filter((t) => t.kind === 'item')
-        .sort((a, b) => b.distanceTo(w.player) - a.distanceTo(w.player))[0];
-      w.player.x = far.x;
-      w.player.y = far.y;
+      // Start deep in the level, next to the enemy farthest from the start,
+      // so the shooting wakes the neighbourhood up.
+      const far = w.things.filter((t) => t.kind === 'monster').sort((a, b) => b.distanceTo(w.player) - a.distanceTo(w.player))[0];
+      const spot = [0, 1, 2, 3, 4, 5, 6, 7]
+        .map((k) => [far.x + Math.cos((k * Math.PI) / 4) * 2, far.y + Math.sin((k * Math.PI) / 4) * 2])
+        .find(([x, y]) => !blockedByMap(w.map, x, y, w.player.radius) && w.map.floorAt(x, y) === w.map.floorAt(far.x, far.y));
+      [w.player.x, w.player.y] = spot ?? [far.x, far.y];
+      w.player.z = w.map.floorAt(w.player.x, w.player.y, w.player.radius);
       const input = mockInput();
       input.hold('fire');
       input.hold('forward');

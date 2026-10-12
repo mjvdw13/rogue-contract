@@ -235,7 +235,8 @@ Design rules (what makes it feel like Dark Forces):
        `docs/mission1.md` (done 2026-10-12). Decided there: the map is
        painted in code by `src/content/levels/lib/painter.js`, not typed as
        ASCII.
-2. [ ] Build it at the fine grid as `src/content/levels/m1.js`. It becomes
+2. [x] Build it at the fine grid as `src/content/levels/m1.js` (first build,
+       2026-10-12). It becomes
        the episode's level, and the sandbox goes back to being a test map
        outside the episode.
 3. [ ] Lighting pass: light levels, flicker and light strips.
@@ -605,4 +606,25 @@ update the smoke test.
     gate.
   - **Next:** Phase 1b B, the Mission 1 map. Start with the sketch in
     `docs/mission1.md`.
+- 2026-10-12: Phase 1b B2: first build of Mission 1 (`m1`).
+  - **The map:** painted in code by `levels/lib/painter.js` (rects,
+    chamfers, angled pillars, stairs, and dedupe into glyphs), 128x100. It's
+    now the episode's level; the sandbox stays a test map.
+  - **The route:** all 17 areas from `docs/mission1.md`, with 3 secrets, the
+    red keycard, and the overload switch that opens the escape hatch. The
+    exit is a marked pickup spot on the pad (a full-height switch column
+    looked wrong).
+  - **Fixes found on the way:**
+    - The generator's bridges reach down to its floor and split the bottom
+      in two, so the east half got its own lift (L2b).
+    - Lift L2 has to touch the catwalks. The validator's one-way check
+      caught both.
+    - The chaos test now starts beside the farthest enemy, since a far item
+      can be in a sealed room.
+  - **Checks:** the validator is clean, and 87 tests and the smoke test
+    pass.
+  - **Next:**
+    - B3 lighting pass: the generator is still dim, and the canyon is flat.
+    - B4 enemy and item tuning: ammo is 15x the budget, far too generous.
+    - B5 playtest in a browser.
 
