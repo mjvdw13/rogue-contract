@@ -231,8 +231,10 @@ Design rules (what makes it feel like Dark Forces):
 - detail built as geometry: pillars, trims, consoles and window frames
 - no long box corridors
 
-1. [ ] Sketch first: write the area list (sizes, floor and ceiling heights,
-       connections, landmarks) and an ASCII overview in `docs/mission1.md`.
+1. [x] Sketch first: the area table, route, secrets and enemies are in
+       `docs/mission1.md` (done 2026-10-12). Decided there: the map is
+       painted in code by `src/content/levels/lib/painter.js`, not typed as
+       ASCII.
 2. [ ] Build it at the fine grid as `src/content/levels/m1.js`. It becomes
        the episode's level, and the sandbox goes back to being a test map
        outside the episode.
