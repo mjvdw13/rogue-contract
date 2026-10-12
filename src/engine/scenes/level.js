@@ -71,8 +71,8 @@ export class LevelScene {
     }
     if (input.wasPressed('automap')) g.hud.automap = !g.hud.automap;
     if (g.hud.automap) {
-      if (input.isDown('zoomIn')) g.hud.mapScale = Math.min(24, g.hud.mapScale * (1 + dt * 2));
-      if (input.isDown('zoomOut')) g.hud.mapScale = Math.max(2, g.hud.mapScale / (1 + dt * 2));
+      if (input.isDown('zoomIn')) g.hud.mapScale = Math.min(12, g.hud.mapScale * (1 + dt * 2));
+      if (input.isDown('zoomOut')) g.hud.mapScale = Math.max(1, g.hud.mapScale / (1 + dt * 2));
     }
     w.tick(dt, input);
     g.hud.update(dt, w);

@@ -1,7 +1,7 @@
 import { VIEW_W, VIEW_H, PIXEL_ASPECT, FOV_DEG, LIGHT_LEVELS } from '../config.js';
 
 /** How much nearby surfaces brighten (Doom's light diminishing), in colormap levels at 1 tile. */
-export const DIMINISH = 20;
+export const DIMINISH = 40;
 const MAX_BRIGHTEN = 24;
 
 /**
@@ -33,7 +33,7 @@ export class View {
     this.planeY = this.planeLen;
     this.camZ = 0.5;
     this.horizon = this.H / 2;
-    this.fog = 0.25;
+    this.fog = 0.125;
     this.fixedColormap = -1;
   }
 
@@ -42,7 +42,7 @@ export class View {
    *          fixedColormap?:number, horizonOffset?:number}} cam
    * @param {number} fog extra darkness per tile of distance
    */
-  setup(cam, fog = 0.25) {
+  setup(cam, fog = 0.125) {
     this.x = cam.x;
     this.y = cam.y;
     this.angle = cam.angle;
@@ -61,7 +61,7 @@ export class View {
   /** Colormap level (0 = bright .. 31 = dark) for a tile light value seen at a distance. */
   level(light, dist) {
     if (this.fixedColormap >= 0) return this.fixedColormap;
-    const d = dist < 0.25 ? 0.25 : dist;
+    const d = dist < 0.5 ? 0.5 : dist;
     let b = DIMINISH / d;
     if (b > MAX_BRIGHTEN) b = MAX_BRIGHTEN;
     const l = (this.lightStart[light] - b + d * this.fog) | 0;

@@ -12,7 +12,7 @@ const FOCAL_Y = VIEW_W / 2 / Math.tan((FOV_DEG * Math.PI) / 360) / PIXEL_ASPECT;
 export const AUTOAIM_SLOPE = 0.12;
 
 /** Player missiles leave a little below the eye, so they don't fill the view. */
-const MISSILE_DROP = 0.1;
+const MISSILE_DROP = 0.2;
 
 /** Height a thing's shots start from: the player's eye, or most of the way up a monster. */
 export function fireZ(t) {
@@ -42,7 +42,7 @@ export function pitchSlope(pt) {
  * off). Monsters aim straight at their target's body.
  * @returns {{z:number, slope:number}}
  */
-export function aimAttack(world, attacker, angle, range = 48) {
+export function aimAttack(world, attacker, angle, range = 96) {
   const z = fireZ(attacker);
   if (attacker.player) {
     const slope = pitchSlope(attacker);
@@ -75,7 +75,7 @@ function autoAim(world, shooter, angle, z, slope, range) {
     if (d < 0 || d > range || d >= bestD) continue;
     const at = Math.max(0.1, d);
     // The slopes that land on its body, with a little margin inside the edges.
-    const margin = Math.min(0.1, t.height * 0.2);
+    const margin = Math.min(0.2, t.height * 0.2);
     const lo = (t.z + margin - z) / at;
     const hi = (t.z + t.height - margin - z) / at;
     const want = Math.min(hi, Math.max(lo, slope));

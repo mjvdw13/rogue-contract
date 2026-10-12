@@ -2,8 +2,8 @@ import { renderSynth, SYNTH_RATE } from './synth.js';
 import { MusicPlayer } from './music.js';
 
 const MAX_VOICES = 18;
-const NEAR = 1.6; // full volume inside this distance (tiles)
-const FAR = 24; // silent beyond this distance
+const NEAR = 3.2; // full volume inside this distance (tiles)
+const FAR = 48; // silent beyond this distance
 
 /**
  * Sound effects and music. Synthesized sounds are rendered on first use;

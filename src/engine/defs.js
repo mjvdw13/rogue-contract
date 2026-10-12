@@ -90,10 +90,10 @@ export function normalizeAttack(spec) {
   if (a.kind === 'hitscan') {
     a.pellets ??= 1;
     a.spread ??= 0;
-    a.range ??= 48;
+    a.range ??= 96;
     a.damage ??= [5, 15];
   } else if (a.kind === 'melee') {
-    a.range ??= 1.1;
+    a.range ??= 2.2;
     a.damage ??= [2, 20];
   } else if (a.kind === 'projectile') {
     a.count ??= 1;
@@ -182,8 +182,8 @@ function baseThing(def, kind, defaults) {
   requireId(def, kind);
   const merged = {
     name: def.id,
-    radius: 0.25,
-    height: 0.8,
+    radius: 0.5,
+    height: 1.6,
     z: 0,
     scale: 1,
     solid: false,
@@ -205,10 +205,10 @@ function baseThing(def, kind, defaults) {
 
 /**
  * A monster. Movement speed is in tiles per second; cooldowns in seconds.
- * Walkers step up to `stepHeight` (default 0.4) and won't walk off drops
+ * Walkers step up to `stepHeight` (default 0.8) and won't walk off drops
  * deeper than `dropHeight` (default: their step height). `flying` monsters
  * ignore floors, hovering `z` above the floor their target stands on, and
- * climb or sink at `flySpeed` (default 1.5 per second).
+ * climb or sink at `flySpeed` (default 3 per second).
  * @param {{id:string, name?:string, glyph?:string, sheet:SheetSpec, anims:Record<string,AnimSpec>,
  *   health:number, speed?:number, radius?:number, height?:number, painChance?:number,
  *   stepHeight?:number, dropHeight?:number, flying?:boolean, flySpeed?:number, z?:number,
@@ -222,9 +222,9 @@ export function defineMonster(def) {
     solid: true,
     shootable: true,
     health: 20,
-    speed: 2,
-    radius: 0.3,
-    height: 0.85,
+    speed: 4,
+    radius: 0.6,
+    height: 1.7,
     painChance: 0.5,
     reactionTime: 0.4,
     cooldown: [1, 2.5],
@@ -261,10 +261,10 @@ export function defineNpc(def) {
   return baseThing(def, 'npc', {
     solid: true,
     shootable: false,
-    radius: 0.28,
-    height: 0.85,
-    speed: 1.1,
-    wander: 3,
+    radius: 0.56,
+    height: 1.7,
+    speed: 2.2,
+    wander: 6,
     idleTime: [2, 5],
     reactTime: 1.8,
     reactCooldown: 2.5,
@@ -280,7 +280,7 @@ export function defineNpc(def) {
  *   hooks?:{onPickup?:Function}}} def
  */
 export function defineItem(def) {
-  const it = baseThing(def, 'item', { radius: 0.3, height: 0.4, countItem: false, sound: 'item', pickup: {} });
+  const it = baseThing(def, 'item', { radius: 0.6, height: 0.8, countItem: false, sound: 'item', pickup: {} });
   if (!it.anims.idle) it.anims.idle = normalizeAnim([0], ANIM_DEFAULTS.idle);
   return it;
 }
@@ -293,7 +293,7 @@ export function defineItem(def) {
  *   explode?:{radius:number, damage:number, sound?:string}}} def
  */
 export function defineDecoration(def) {
-  const d = baseThing(def, 'decoration', { radius: 0.25, height: 0.8 });
+  const d = baseThing(def, 'decoration', { radius: 0.5, height: 1.6 });
   if (d.health > 0) d.shootable = def.shootable ?? true;
   if (!d.anims.idle) d.anims.idle = normalizeAnim([0], ANIM_DEFAULTS.idle);
   return d;
@@ -309,10 +309,10 @@ export function defineDecoration(def) {
  */
 export function defineProjectile(def) {
   const p = baseThing(def, 'projectile', {
-    speed: 10,
+    speed: 20,
     damage: [5, 20],
-    radius: 0.12,
-    height: 0.25,
+    radius: 0.24,
+    height: 0.5,
     z: null,
     fullbright: true,
     gravity: 0,
@@ -376,7 +376,7 @@ export function defineLevel(def) {
     thingLegend: {},
     list: [],
     triggers: [],
-    fog: 0.3,
+    fog: 0.15,
     par: 0,
     defaults: {},
     ...def,

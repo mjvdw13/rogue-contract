@@ -6,21 +6,21 @@ import { COLORMAP_INVERSE } from '../gfx/palette.js';
 const FRICTION = Math.pow(0.90625, 35 / 60);
 
 /**
- * Vertical movement defaults (world units: 1 = a tile = 64 texels). The hero
- * content can override any of them.
+ * Vertical movement defaults (world units: 1 = a tile = 32 texels; a person
+ * is about two tiles tall). The hero content can override any of them.
  */
 export const BODY = {
-  height: 0.85, // standing body height
+  height: 1.7, // standing body height
   eyeHeight: EYE_HEIGHT,
-  crouchHeight: 0.5,
-  crouchEyeHeight: 0.3,
+  crouchHeight: 1,
+  crouchEyeHeight: 0.6,
   crouchSpeed: 0.5, // speed multiplier while crouching
-  stepHeight: 0.4, // highest step you walk up
-  airStep: 0.15, // highest ledge edge you can scramble onto mid-jump
-  jumpSpeed: 4.2, // units per second upwards
-  gravity: 14, // units per second squared
-  fallDamageSpeed: 9, // landing faster than this hurts...
-  fallDamagePerSpeed: 8, // ...this much per unit/s over it
+  stepHeight: 0.8, // highest step you walk up
+  airStep: 0.3, // highest ledge edge you can scramble onto mid-jump
+  jumpSpeed: 8.4, // units per second upwards
+  gravity: 28, // units per second squared
+  fallDamageSpeed: 18, // landing faster than this hurts...
+  fallDamagePerSpeed: 4, // ...this much per unit/s over it
 };
 
 /** Furthest the view can tilt up or down, in pixels of horizon shift. */
@@ -130,7 +130,7 @@ export function playerThink(world, pt, input, dt, settings = {}) {
   p.bonusCount = Math.max(0, p.bonusCount - dt * 30);
 
   if (p.dead) {
-    p.viewHeight = Math.max(0.1, p.viewHeight - dt * 0.9);
+    p.viewHeight = Math.max(0.2, p.viewHeight - dt * 1.8);
     pt.vx *= 0.9;
     pt.vy *= 0.9;
     verticalMove(world, pt, dt);
@@ -151,8 +151,8 @@ export function playerThink(world, pt, input, dt, settings = {}) {
   else if (p.crouching && world.ceilAt(pt.x, pt.y, pt.radius) - pt.z >= body.height) p.crouching = false;
   pt.height = p.crouching ? body.crouchHeight : body.height;
   const eye = p.crouching ? body.crouchEyeHeight : body.eyeHeight;
-  if (p.viewHeight < eye) p.viewHeight = Math.min(eye, p.viewHeight + dt * 2.5);
-  else if (p.viewHeight > eye) p.viewHeight = Math.max(eye, p.viewHeight - dt * 2.5);
+  if (p.viewHeight < eye) p.viewHeight = Math.min(eye, p.viewHeight + dt * 5);
+  else if (p.viewHeight > eye) p.viewHeight = Math.max(eye, p.viewHeight - dt * 5);
 
   if (input.wasPressed('jump') && p.onGround && !p.crouching) {
     pt.vz = body.jumpSpeed;
@@ -173,7 +173,7 @@ export function playerThink(world, pt, input, dt, settings = {}) {
     fwd /= len;
     side /= len;
   }
-  const speed = (run ? (hero.runSpeed ?? 8) : (hero.walkSpeed ?? 4.8)) * (p.crouching ? body.crouchSpeed : 1);
+  const speed = (run ? (hero.runSpeed ?? 16) : (hero.walkSpeed ?? 9.6)) * (p.crouching ? body.crouchSpeed : 1);
   const ca = Math.cos(pt.angle);
   const sa = Math.sin(pt.angle);
   const wishX = ca * fwd - sa * side;
@@ -193,11 +193,11 @@ export function playerThink(world, pt, input, dt, settings = {}) {
   const f = Math.pow(FRICTION, ticks);
   pt.vx *= f;
   pt.vy *= f;
-  if (Math.abs(pt.vx) < 0.005) pt.vx = 0;
-  if (Math.abs(pt.vy) < 0.005) pt.vy = 0;
+  if (Math.abs(pt.vx) < 0.01) pt.vx = 0;
+  if (Math.abs(pt.vy) < 0.01) pt.vy = 0;
 
   const moving = Math.hypot(pt.vx, pt.vy);
-  const target = Math.min(1, moving / (hero.runSpeed ?? 8));
+  const target = Math.min(1, moving / (hero.runSpeed ?? 16));
   p.bobAmount += (target - p.bobAmount) * Math.min(1, dt * 10);
   p.bobPhase += dt * (6 + 6 * target);
 
@@ -221,7 +221,7 @@ function verticalMove(world, pt, dt) {
   if (pt.z < floor) {
     // Walked up a step: ease the eye up after it. (Lifts move smoothly, so
     // small rises are just followed.)
-    if (floor - pt.z > 0.06) p.viewOffset -= floor - pt.z;
+    if (floor - pt.z > 0.12) p.viewOffset -= floor - pt.z;
     pt.z = floor;
     if (pt.vz < 0) pt.vz = 0;
   }
@@ -236,9 +236,9 @@ function verticalMove(world, pt, dt) {
       const impact = -pt.vz;
       pt.z = floor;
       pt.vz = 0;
-      if (!p.dead && impact > 3) {
-        p.viewOffset -= Math.min(0.2, impact * 0.02);
-        if (impact > 6) world.playSound(p.hero.sounds?.land ?? 'oof');
+      if (!p.dead && impact > 6) {
+        p.viewOffset -= Math.min(0.4, impact * 0.02);
+        if (impact > 12) world.playSound(p.hero.sounds?.land ?? 'oof');
         if (impact > body.fallDamageSpeed && !p.noclip) {
           const amount = Math.round((impact - body.fallDamageSpeed) * body.fallDamagePerSpeed);
           world.damage(pt, amount, null, null, { environment: true, noThrust: true });
@@ -248,13 +248,13 @@ function verticalMove(world, pt, dt) {
   }
   p.onGround = pt.z <= floor + 1e-4;
   // The eye offset eases back: fast at first, like Doom's view height recovery.
-  if (p.viewOffset < 0) p.viewOffset = Math.min(0, p.viewOffset + Math.max(0.6, -p.viewOffset * 10) * dt);
+  if (p.viewOffset < 0) p.viewOffset = Math.min(0, p.viewOffset + Math.max(1.2, -p.viewOffset * 10) * dt);
 }
 
 /** Camera for the renderer: eye position, bob, muzzle-flash light, powerup colormaps. */
 export function playerCamera(world, pt) {
   const p = pt.player;
-  const bob = p.dead ? 0 : Math.sin(p.bobPhase * 2) * 0.018 * p.bobAmount;
+  const bob = p.dead ? 0 : Math.sin(p.bobPhase * 2) * 0.036 * p.bobAmount;
   let fixedColormap = -1;
   if (p.powerVisible('invulnerable', world.time)) fixedColormap = COLORMAP_INVERSE;
   else if (p.powerVisible('nightvision', world.time)) fixedColormap = 0;
@@ -262,7 +262,7 @@ export function playerCamera(world, pt) {
     x: pt.x,
     y: pt.y,
     angle: pt.angle,
-    z: pt.z + Math.max(0.05, p.viewHeight + p.viewOffset + bob),
+    z: pt.z + Math.max(0.1, p.viewHeight + p.viewOffset + bob),
     horizonOffset: pt.pitch ?? 0,
     extraLight: p.weaponState.flash ?? 0,
     fixedColormap,

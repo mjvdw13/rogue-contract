@@ -14,6 +14,6 @@ export default defineWeapon({
     idle: [0],
     fire: { frames: [1, 2, 3, 0], durations: [0.08, 0.1, 0.12, 0.1], fireAt: 1 },
   },
-  fire: { kind: 'melee', damage: [4, 16], range: 1.15, arc: 0.6, berserkMultiplier: 10, hitSound: 'punch-hit', missSound: 'punch-swing' },
+  fire: { kind: 'melee', damage: [4, 16], range: 2.3, arc: 0.6, berserkMultiplier: 10, hitSound: 'punch-hit', missSound: 'punch-swing' },
   bob: 1.2,
 });

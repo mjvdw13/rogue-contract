@@ -561,4 +561,24 @@ update the smoke test.
   "real Star Wars". Planned Phase 1b (look and feel): the finer grid, then
   the Mission 1 map, then better placeholder textures. Enemy art, sound
   and music to be outsourced later. Starting Phase 1b step A1.
+- 2026-10-12: Phase 1b A3 and A5 are in progress on branch `finer-grid`
+  (not merged; `main` is still the coarse grid).
+  - **Done on the branch:**
+    - All the engine and content numbers from the A1 audit are doubled:
+      `TEXELS_PER_UNIT` is 32, and the default ceiling (2), height step
+      (0.25) and fog (0.15) changed too.
+    - The converter (`tools/lib/upscale.mjs` and `tools/upscale-map.mjs`)
+      works, and the sandbox has been converted with it (`DD` is now a 2x2
+      door).
+  - **Next:**
+    1. A4: the validator rejects the 2x2 door ("needs walls on two opposite
+       sides"). In `world/level.js` (around line 197), count neighbouring
+       door tiles of the same glyph as part of the door, and group them (a
+       `door.group` that `openDoor`/`closeDoor` in `world/doors.js` apply
+       together, like lifts).
+    2. A6: fix the tests. They still use coarse-grid positions and heights.
+       Upscale their test maps with `upscaleLevel` and double their
+       coordinates and heights.
+    3. A7 (performance) and A8 (docs: MODDING.md heights and sizes, and a
+       browser check), then merge into main.
 

@@ -3,9 +3,9 @@
 import { F_SKY } from '../world/tilemap.js';
 import { aimAttack, missileZ } from '../combat/aim.js';
 
-const STEP = 0.1;
+const STEP = 0.2;
 /** A projectile's z is its centre; it bursts this close to a floor or ceiling. */
-const CLEARANCE = 0.05;
+const CLEARANCE = 0.1;
 
 function skyAt(map, x, y) {
   const tx = Math.floor(x);
@@ -21,8 +21,8 @@ function explode(world, p, hit, pull = true) {
   p.vy = 0;
   p.vz = 0;
   if (pull) {
-    p.x -= Math.cos(p.angle) * 0.15;
-    p.y -= Math.sin(p.angle) * 0.15;
+    p.x -= Math.cos(p.angle) * 0.3;
+    p.y -= Math.sin(p.angle) * 0.3;
   }
   if (p.def.splash) {
     world.radiusDamage(p.x, p.y, p.def.splash.radius ?? 2, p.def.splash.damage ?? 100, p, p.owner, p.z);
@@ -111,7 +111,7 @@ export function launchProjectile(world, id, owner, angle, spec = {}, aim = aimAt
     console.warn(`Unknown projectile "${id}"`);
     return null;
   }
-  const off = (owner.radius ?? 0.25) + def.radius + 0.05;
+  const off = (owner.radius ?? 0.5) + def.radius + 0.1;
   const p = world.spawn(id, owner.x + Math.cos(angle) * off, owner.y + Math.sin(angle) * off, angle);
   if (!p) return null;
   const speed = def.speed * (owner.kind === 'monster' && world.skillInfo.fast ? 1.4 : 1);
@@ -126,12 +126,12 @@ export function launchProjectile(world, id, owner, angle, spec = {}, aim = aimAt
   const ceil = world.map.ceilAt(p.x, p.y);
   p.z = Math.max(floor + CLEARANCE, Math.min(ceil - CLEARANCE, p.z));
   if (def.gravity) {
-    // Lob so it lands near the target (or 6 tiles ahead, plus the aim).
+    // Lob so it lands near the target (or 12 tiles ahead, plus the aim).
     const target = owner.target ?? null;
-    const dist = target ? Math.hypot(target.x - owner.x, target.y - owner.y) : 6;
+    const dist = target ? Math.hypot(target.x - owner.x, target.y - owner.y) : 12;
     const land = target ? target.z : p.z + aim.slope * dist;
     const time = Math.max(0.25, dist / speed);
-    p.vz = (def.gravity * time) / 2 + (land - p.z) / time + 0.1;
+    p.vz = (def.gravity * time) / 2 + (land - p.z) / time + 0.2;
   } else {
     p.vz = aim.slope * speed;
   }

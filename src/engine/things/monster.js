@@ -36,7 +36,7 @@ export function monsterPain(world, m) {
 function canSee(world, m, t) {
   if (!t || t.dead || t.removed) return false;
   if (t.player?.notarget) return false;
-  if (m.distanceTo(t) > (m.def.sightRange ?? 40)) return false;
+  if (m.distanceTo(t) > (m.def.sightRange ?? 80)) return false;
   return canSeeBody(world.map, m, t);
 }
 
@@ -54,9 +54,9 @@ function fireAttack(world, m) {
 
 function chooseAttack(world, m, t, d, los) {
   const def = m.def;
-  if (def.melee && los && d <= (def.melee.range ?? 1.1) + t.radius) return def.melee;
+  if (def.melee && los && d <= (def.melee.range ?? 2.2) + t.radius) return def.melee;
   if (!def.attack || !los || m.reaction > 0 || m.cooldown > 0) return null;
-  const range = def.attack.range ?? 40;
+  const range = def.attack.range ?? 80;
   if (d > range) return null;
   const minRange = def.attack.minRange ?? 0;
   if (d < minRange) return null;
@@ -79,13 +79,13 @@ function startAttack(world, m, spec) {
 }
 
 function moveToward(world, m, dt, t, d, los) {
-  const speed = (m.def.speed ?? 2) * (world.skillInfo.monsterSpeed ?? 1);
+  const speed = (m.def.speed ?? 4) * (world.skillInfo.monsterSpeed ?? 1);
   let gx;
   let gy;
   // The route to the player for this body. Head straight for a target in
   // view, unless the route is a long way round (a ledge or a pit between).
   const nav = t === world.player ? world.navFor(m) : null;
-  const direct = los && (!nav || (d < 5 && nav.distanceAt(Math.floor(m.x), Math.floor(m.y)) <= d + 2));
+  const direct = los && (!nav || (d < 10 && nav.distanceAt(Math.floor(m.x), Math.floor(m.y)) <= d + 4));
   if (m.stuck > 0) {
     m.stuck -= dt;
     gx = m.x + Math.cos(m.wander);
@@ -110,14 +110,14 @@ function moveToward(world, m, dt, t, d, los) {
   m.strafeTimer = (m.strafeTimer ?? 0) - dt;
   if (m.strafeTimer <= 0) {
     m.strafeTimer = world.rng.range(0.4, 1.4);
-    m.strafe = los && d > 2 ? world.rng.pick([-0.5, 0, 0, 0.5]) : 0;
+    m.strafe = los && d > 4 ? world.rng.pick([-0.5, 0, 0, 0.5]) : 0;
   }
   const a = Math.atan2(gy - m.y, gx - m.x) + (m.stuck > 0 ? 0 : (m.strafe ?? 0));
   const ca = Math.cos(a);
   const sa = Math.sin(a);
   // Open doors in the way.
-  const ax = Math.floor(m.x + ca * (m.radius + 0.35));
-  const ay = Math.floor(m.y + sa * (m.radius + 0.35));
+  const ax = Math.floor(m.x + ca * (m.radius + 0.7));
+  const ay = Math.floor(m.y + sa * (m.radius + 0.7));
   const door = world.map.doorAt(ax, ay);
   if (door && !door.passable && !door.lock && !door.secret) world.openDoor(door);
 
@@ -136,10 +136,10 @@ function moveToward(world, m, dt, t, d, los) {
  * target stands on, and climb over any raised floor just ahead.
  */
 function hover(world, m, t, dt, ca, sa) {
-  const reach = m.radius + 0.3;
+  const reach = m.radius + 0.6;
   const ahead = world.map.floorAt(m.x + ca * reach, m.y + sa * reach, m.radius);
   const want = Math.max(t.z, ahead) + (m.def.z ?? 0);
-  const climb = (m.def.flySpeed ?? 1.5) * dt;
+  const climb = (m.def.flySpeed ?? 3) * dt;
   m.z += Math.max(-climb, Math.min(climb, want - m.z));
 }
 
@@ -149,8 +149,8 @@ function applyMomentum(world, t, dt) {
   const f = Math.pow(0.82, dt * 60);
   t.vx *= f;
   t.vy *= f;
-  if (Math.abs(t.vx) < 0.01) t.vx = 0;
-  if (Math.abs(t.vy) < 0.01) t.vy = 0;
+  if (Math.abs(t.vx) < 0.02) t.vx = 0;
+  if (Math.abs(t.vy) < 0.02) t.vy = 0;
 }
 
 export function monsterThink(world, m, dt) {

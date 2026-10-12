@@ -14,7 +14,7 @@ export class Lift {
     this.tiles = tiles;
     this.stops = spec.stops?.length ? spec.stops.slice() : [0, 1];
     this.mode = spec.mode ?? 'return';
-    this.speed = spec.speed ?? 1.5; // units per second
+    this.speed = spec.speed ?? 3; // units per second
     this.wait = spec.wait ?? 3;
     this.moves = spec.moves ?? 'floor';
     this.on = new Set([].concat(spec.on ?? ['enter', 'use']));

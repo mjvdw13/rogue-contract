@@ -6,7 +6,7 @@ import { F_SOLID, F_DOOR, F_SKY, F_SLANT } from './tilemap.js';
  * @param {import('./tilemap.js').TileMap} map
  * @returns {{dist:number, tx:number, ty:number, door:any|null, passedDoor:any|null}}
  */
-export function castRay(map, x, y, dx, dy, maxDist = 64) {
+export function castRay(map, x, y, dx, dy, maxDist = 128) {
   let mapX = Math.floor(x);
   let mapY = Math.floor(y);
   const ddx = dx === 0 ? 1e30 : Math.abs(1 / dx);
@@ -37,7 +37,7 @@ export function castRay(map, x, y, dx, dy, maxDist = 64) {
     const leave = Math.min(sdx, sdy);
     if (t >= 0 && t <= leave && t <= maxDist) return { dist: t, tx: mapX, ty: mapY, door: null, passedDoor, slant: start };
   }
-  for (let i = 0; i < 256; i++) {
+  for (let i = 0; i < 512; i++) {
     let enter;
     if (sdx < sdy) {
       enter = sdx;
@@ -109,7 +109,7 @@ function doorPanel(door, x, y, dx, dy, mapX, mapY, enter, maxDist) {
  * `maxDist`. `sky` is true when the ray went up into the sky.
  * @returns {{dist:number, z:number, hit:'wall'|'floor'|'ceiling'|null, sky:boolean, tx:number, ty:number}}
  */
-export function traceRay3D(map, x, y, z, dx, dy, slope, maxDist = 64) {
+export function traceRay3D(map, x, y, z, dx, dy, slope, maxDist = 128) {
   const { flags, floorZ, ceilZ } = map;
   let mapX = Math.floor(x);
   let mapY = Math.floor(y);
@@ -124,7 +124,7 @@ export function traceRay3D(map, x, y, z, dx, dy, slope, maxDist = 64) {
   let enter = 0;
   // Where the ray reaches height h (never before it entered the current tile).
   const crossing = (h) => (slope === 0 ? enter : Math.max(enter, (h - z) / slope));
-  for (let i = 0; i < 512; i++) {
+  for (let i = 0; i < 1024; i++) {
     const idx = mapY * map.w + mapX;
     const f = flags[idx];
     const leave = Math.min(sdx, sdy, maxDist);

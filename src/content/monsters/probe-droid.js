@@ -8,15 +8,15 @@ export default defineMonster({
   glyph: 'p',
   sheet: { src: 'assets/sprites/monsters/probe-droid.png', frameWidth: 64, frameHeight: 64 },
   health: 45,
-  speed: 1.8,
-  radius: 0.32,
-  height: 0.9,
+  speed: 3.6,
+  radius: 0.64,
+  height: 1.8,
   flying: true,
-  z: 0.45, // hovers this far above the floor its target stands on
+  z: 0.9, // hovers this far above the floor its target stands on
   painChance: 0.3,
   reactionTime: 0.5,
   cooldown: [1.2, 2.6],
-  attack: { kind: 'projectile', projectile: 'trooper-bolt', spread: 0.04, range: 34, sound: 'blaster-enemy' },
+  attack: { kind: 'projectile', projectile: 'trooper-bolt', spread: 0.04, range: 68, sound: 'blaster-enemy' },
   anims: {
     idle: { frames: [0, 1, 2, 3], fps: 4, loop: true },
     walk: { frames: [0, 1, 2, 3], fps: 6 },
@@ -26,6 +26,6 @@ export default defineMonster({
   },
   sounds: { sight: 'droid-sight', active: 'droid-active', pain: 'droid-pain', death: 'explode' },
   bleeds: false,
-  explode: { radius: 1.6, damage: 30 },
+  explode: { radius: 3.2, damage: 30 },
   mass: 60,
 });

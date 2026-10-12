@@ -11,7 +11,7 @@ const actionsOf = (list) => [].concat(list ?? []).map((a) => (typeof a === 'stri
 const DIRS = [[1, 0], [-1, 0], [0, 1], [0, -1]];
 const EPS = 1e-6;
 /** Widest gap (in tiles) a running jump is counted on to clear. */
-const MAX_GAP = 2;
+const MAX_GAP = 4;
 
 /**
  * What the player's body can do, from the hero's `body` settings: walk up

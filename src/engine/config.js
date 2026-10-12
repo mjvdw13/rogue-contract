@@ -13,8 +13,11 @@ export const PIXEL_ASPECT = 1.2;
 export const TICK_RATE = 60;
 export const TICK = 1 / TICK_RATE;
 
-/** Texture density: a 64px texture covers one map tile (1 world unit). */
-export const TEXELS_PER_UNIT = 64;
+/**
+ * Texture density: texels per world unit (1 unit = 1 map tile). A 64px
+ * texture spans two tiles, about the height of a person.
+ */
+export const TEXELS_PER_UNIT = 32;
 
 /** Number of light levels in the colormap (0 = full bright, 31 = black). */
 export const LIGHT_LEVELS = 32;
@@ -23,4 +26,4 @@ export const LIGHT_LEVELS = 32;
 export const TRANSPARENT = 255;
 
 export const FOV_DEG = 90;
-export const EYE_HEIGHT = 0.5;
+export const EYE_HEIGHT = 1;

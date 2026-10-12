@@ -24,7 +24,7 @@ export class Hud {
     this.game = game;
     this.messages = [];
     this.automap = false;
-    this.mapScale = 6;
+    this.mapScale = 3; // pixels per tile
     this.face = new FaceController(game.rng);
     this.faceSheet = null;
     this.revealThings = false;

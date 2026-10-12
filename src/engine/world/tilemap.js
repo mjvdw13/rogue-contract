@@ -29,7 +29,7 @@ export class Door {
     this.axis = spec.axis ?? 'x';
     this.style = spec.style ?? 'slide'; // 'slide' | 'split' | 'rise'
     /** For rising doors: the ceiling height when fully open (set by the level builder). */
-    this.openZ = spec.openZ ?? 1;
+    this.openZ = spec.openZ ?? 2;
     this.lock = spec.lock ?? null; // key id, 'remote' (triggers only) or null
     this.secret = !!spec.secret;
     this.stayOpen = !!spec.stayOpen;
@@ -59,7 +59,7 @@ export class TileMap {
     this.ceilTex = new Int16Array(n).fill(-1);
     /** Floor and ceiling heights in world units (1 = one tile = 64 texels). */
     this.floorZ = new Float32Array(n);
-    this.ceilZ = new Float32Array(n).fill(1);
+    this.ceilZ = new Float32Array(n).fill(2);
     /** Texture for the faces of a raised floor (its sides) and of a lowered ceiling (its underside edge). */
     this.sideTex = new Int16Array(n).fill(-1);
     this.upperTex = new Int16Array(n).fill(-1);
@@ -184,7 +184,7 @@ export class TileMap {
         if (this.ceilZ[i] < best) best = this.ceilZ[i];
       }
     }
-    return best === Infinity ? 1 : best;
+    return best === Infinity ? 2 : best;
   }
 
   tilesWithTag(name) {

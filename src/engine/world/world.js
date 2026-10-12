@@ -26,16 +26,16 @@ export const SKILLS = {
   5: { damageTaken: 1, ammoMultiplier: 2, monsterSpeed: 1.45, cooldownMultiplier: 0.55, fast: true },
 };
 
-const USE_RANGE = 1.3;
+const USE_RANGE = 2.6;
 /**
  * Items are in reach from slightly above them (Doom allows 8 map units, about
- * 1/8 of a tile here) up to the top of the player's body. Jumping over an item
- * doesn't pick it up.
+ * a quarter of a tile here) up to the top of the player's body. Jumping over
+ * an item doesn't pick it up.
  */
-const PICKUP_BELOW_FEET = 0.15;
+const PICKUP_BELOW_FEET = 0.3;
 const FLOOR_DAMAGE_INTERVAL = 0.9;
 /** Gravity for everything but the player (who has its own in the hero's body). */
-const GRAVITY = 14;
+const GRAVITY = 28;
 /** While a lift moves, flow fields are refreshed this often (seconds). */
 const NAV_REFRESH = 0.25;
 
@@ -74,7 +74,7 @@ export class World {
     const built = buildLevel(this.registry, level, { skill, textureSlot: slot });
     this.buildErrors = built.errors;
     this.map = built.map;
-    this.fog = level.fog ?? 0.3;
+    this.fog = level.fog ?? 0.15;
     this.skyTexture = level.sky && this.assets ? this.assets.textures[this.assets.textureSlot(level.sky)] : null;
     this.lights = new LightEffects(this.map, this.rng);
     this.nav = new FlowField(this.map);
@@ -92,8 +92,8 @@ export class World {
     this.playerDef = {
       id: 'player',
       kind: 'player',
-      radius: hero.radius ?? 0.25,
-      height: hero.body?.height ?? 0.85,
+      radius: hero.radius ?? 0.5,
+      height: hero.body?.height ?? 1.7,
       health: hero.health ?? 100,
       solid: true,
       shootable: true,
@@ -325,7 +325,7 @@ export class World {
   }
 
   _slide(t, dx, dy, walk = false) {
-    const steps = Math.max(1, Math.ceil(Math.max(Math.abs(dx), Math.abs(dy)) / 0.2));
+    const steps = Math.max(1, Math.ceil(Math.max(Math.abs(dx), Math.abs(dy)) / 0.4));
     let moved = false;
     for (let i = 0; i < steps; i++) {
       const sx = dx / steps;

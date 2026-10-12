@@ -69,7 +69,7 @@ export function buildLevel(registry, level, opts = {}) {
   const slot = opts.textureSlot ?? (() => 0);
   const { tiles: legend, things: thingLegend } = resolveLegend(registry, level);
   const defaults = { floor: undefined, ceiling: undefined, light: 160, ...(level.defaults ?? {}) };
-  const step = level.heightStep ?? 0.125;
+  const step = level.heightStep ?? 0.25;
   const base = level.heightBase ?? 0;
   /** A height from a `floorHeights` / `ceilHeights` grid: 0-9 then a-z count steps; space or '.' means "use the legend". */
   const heightOverride = (grid, x, y) => {
@@ -128,7 +128,7 @@ export function buildLevel(registry, level, opts = {}) {
       else if (ceiling) map.ceilTex[i] = slot(ceiling);
       map.floorZ[i] = heightOverride(level.floorHeights, x, y) ?? e.floorZ ?? defaults.floorZ ?? 0;
       const ceilOverride = heightOverride(level.ceilHeights, x, y) ?? e.ceilZ;
-      map.ceilZ[i] = ceilOverride ?? defaults.ceilZ ?? 1;
+      map.ceilZ[i] = ceilOverride ?? defaults.ceilZ ?? 2;
       if (e.door && ceilOverride !== undefined) explicitCeil[i] = 1;
       // Step faces: a raised floor shows its `side`, a lowered ceiling its `upper`.
       const side = e.side ?? defaults.side ?? floor;

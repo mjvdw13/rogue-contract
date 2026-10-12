@@ -120,7 +120,7 @@ export function npcReact(world, t) {
   const a = p.angleTo(t);
   if (def.bubble) {
     // Beside their head, on the player's right, and under the ceiling.
-    const z = Math.min((def.height ?? 0.85) + 0.04, 0.82);
+    const z = Math.min((def.height ?? 1.7) + 0.08, 1.64);
     world.spawnEffect(def.bubble, t.x - Math.sin(a) * 0.22, t.y + Math.cos(a) * 0.22, z);
   }
   // Shuffle half a step away from whoever bumped into them.

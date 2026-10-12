@@ -13,11 +13,11 @@ export const effects = [
 const BOLT = {
   sheet: FX('blaster-bolt', 32, 32),
   anims: { fly: { frames: [0, 1], fps: 12, loop: true }, explode: { frames: [2, 3, 4], fps: 16 } },
-  radius: 0.08,
+  radius: 0.16,
   sounds: { explode: 'bolt-hit' },
 };
 
 export const projectiles = [
-  defineProjectile({ id: 'blaster-bolt', ...BOLT, speed: 30, damage: [10, 20] }),
-  defineProjectile({ id: 'trooper-bolt', ...BOLT, speed: 14, damage: [5, 12] }),
+  defineProjectile({ id: 'blaster-bolt', ...BOLT, speed: 60, damage: [10, 20] }),
+  defineProjectile({ id: 'trooper-bolt', ...BOLT, speed: 28, damage: [5, 12] }),
 ];

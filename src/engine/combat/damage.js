@@ -2,7 +2,7 @@ import { traceRay3D, rayCylinder, lineOfSight3D } from '../world/physics.js';
 import { aimAttack, aimZ } from './aim.js';
 
 /** Puffs and blood stay this far inside the floor and ceiling. */
-const PUFF_INSET = 0.06;
+const PUFF_INSET = 0.12;
 
 /**
  * Apply damage to a thing. `inflictor` is what hit it (projectile, shooter),
@@ -21,9 +21,9 @@ export function damage(world, target, amount, inflictor, source, opts = {}) {
   // Knockback.
   if (inflictor && !opts.noThrust) {
     const a = Math.atan2(target.y - inflictor.y, target.x - inflictor.x);
-    const k = (amount * 0.02) / Math.max(0.2, (target.def.mass ?? 100) / 100);
-    target.vx += Math.cos(a) * Math.min(k, 1.2);
-    target.vy += Math.sin(a) * Math.min(k, 1.2);
+    const k = (amount * 0.04) / Math.max(0.2, (target.def.mass ?? 100) / 100);
+    target.vx += Math.cos(a) * Math.min(k, 2.4);
+    target.vy += Math.sin(a) * Math.min(k, 2.4);
   }
 
   target.health -= amount;
@@ -68,7 +68,7 @@ function damagePlayer(world, target, amount, inflictor, source, opts) {
   else p.attackerAngle = null;
   if (inflictor && !opts.noThrust && inflictor !== target) {
     const a = Math.atan2(target.y - inflictor.y, target.x - inflictor.x);
-    const k = Math.min(0.35, amount * 0.004);
+    const k = Math.min(0.7, amount * 0.008);
     target.vx += Math.cos(a) * k;
     target.vy += Math.sin(a) * k;
   }
@@ -117,7 +117,7 @@ export function kill(world, target, source) {
  * the nearest point of each body, and floors, ledges and walls block it. `z`
  * defaults to the middle of a standing body above the floor there.
  */
-export function radiusDamage(world, x, y, radius, maxDamage, inflictor, source, z = world.map.floorAt(x, y) + 0.4) {
+export function radiusDamage(world, x, y, radius, maxDamage, inflictor, source, z = world.map.floorAt(x, y) + 0.8) {
   for (const t of [...world.things]) {
     if (!t.shootable || t.dead || t.removed) continue;
     if (t.def.splashImmune) continue;
@@ -127,7 +127,7 @@ export function radiusDamage(world, x, y, radius, maxDamage, inflictor, source, 
     if (d >= radius) continue;
     // Sight to the nearest height on the body, a little inside it so the line
     // doesn't graze the floor it stands on.
-    const inset = Math.min(0.1, t.height / 4);
+    const inset = Math.min(0.2, t.height / 4);
     const tz = Math.max(t.z + inset, Math.min(t.z + t.height - inset, z));
     if (!lineOfSight3D(world.map, x, y, z, t.x, t.y, tz)) continue;
     const dmg = maxDamage * (1 - d / radius);
@@ -155,12 +155,12 @@ export function hitscan(world, shooter, angle, range, amount, spec = {}, aim = a
       best = t;
     }
   }
-  const back = Math.max(0, bestT - 0.06);
+  const back = Math.max(0, bestT - 0.12);
   const hx = shooter.x + dx * back;
   const hy = shooter.y + dy * back;
   const floor = world.map.floorAt(hx, hy);
   const ceil = world.map.ceilAt(hx, hy);
-  const hz = Math.max(floor + PUFF_INSET, Math.min(ceil - PUFF_INSET, z + slope * back + world.rng.signed() * 0.04));
+  const hz = Math.max(floor + PUFF_INSET, Math.min(ceil - PUFF_INSET, z + slope * back + world.rng.signed() * 0.08));
   if (best) {
     damage(world, best, amount, shooter, shooter);
     const fx = best.def.bleeds === false ? (spec.puff ?? 'puff') : (best.def.blood ?? 'blood');
@@ -172,7 +172,7 @@ export function hitscan(world, shooter, angle, range, amount, spec = {}, aim = a
 }
 
 /** How far above or below its own body a melee attack still reaches. */
-const MELEE_REACH_Z = 0.25;
+const MELEE_REACH_Z = 0.5;
 
 /** Nearest shootable thing within melee reach and in front of the attacker. */
 export function meleeTarget(world, attacker, angle, range, arc = 0.7) {

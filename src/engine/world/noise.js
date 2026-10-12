@@ -4,7 +4,7 @@ import { F_SOLID, F_DOOR } from './tilemap.js';
  * Doom's noise alert: gunfire wakes every monster that can "hear" it,
  * i.e. is connected to the shooter through open space (closed doors block).
  */
-export function noiseAlert(world, source, maxSteps = 26) {
+export function noiseAlert(world, source, maxSteps = 52) {
   const map = world.map;
   const w = map.w;
   const start = Math.floor(source.y) * w + Math.floor(source.x);

@@ -2,7 +2,7 @@ import { F_SOLID, F_DOOR, F_SKY, F_SLANT } from '../world/tilemap.js';
 import { DIMINISH } from './view.js';
 import { TEXELS_PER_UNIT as TPU } from '../config.js';
 
-const MAX_STEPS = 160;
+const MAX_STEPS = 320;
 const TAU = Math.PI * 2;
 /** Added to texture coordinates so they stay positive before masking. */
 const V_BIAS = 1 << 16;

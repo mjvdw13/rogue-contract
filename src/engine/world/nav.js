@@ -7,7 +7,7 @@ const DIRS = [
 ];
 
 /** The body a flow field plans for: walkers by default. */
-export const WALKER = { step: 0.4, drop: 0.4, height: 0.85, flying: false };
+export const WALKER = { step: 0.8, drop: 0.8, height: 1.7, flying: false };
 
 /**
  * A breadth-first distance field toward the player. Monsters walk downhill to
