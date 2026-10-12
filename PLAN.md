@@ -117,9 +117,67 @@ heights, ranges and texture density. A person becomes about two tiles tall,
 and a corridor about two tiles wide. This leaves the geometry code (DDA,
 renderer, collision) alone.
 
-1. [ ] **Audit.** List every tile-scale number in the engine and content,
-       and record the list here. Collect the engine ones into named
-       constants in `src/engine/config.js` where sensible.
+1. [x] **Audit** (2026-10-12). The tile-scale numbers to double (×2) or
+       halve:
+       - **Textures (`render/columns.js`).** Textures repeat once per unit.
+         Flats use `world * tex.w`. Walls use `v = (anchor - camZ) * th`,
+         and `u` is the fraction inside the tile (`face()` wants `u` in
+         0..1). Slants use `u` in units. Door panels use `du` inside the
+         tile. Change all of these to world units × `TEXELS_PER_UNIT` (64
+         → 32), with `face()` taking `u` in world units. Sprites already
+         use `TEXELS_PER_UNIT`.
+       - **`config.js`.** `EYE_HEIGHT` 0.5.
+       - **`player.js`:**
+         - `BODY`: height 0.85, eyeHeight, crouchHeight 0.5,
+           crouchEyeHeight 0.3, stepHeight 0.4, airStep 0.15, jumpSpeed
+           4.2, gravity 14, fallDamageSpeed 9. Halve fallDamagePerSpeed 8.
+         - View easing: step-up threshold 0.06, eye ease `dt * 2.5`,
+           landing `impact > 3 / > 6`, `min(0.2, impact * 0.02)`, recovery
+           `max(0.6, ...)`, bob 0.018, dead eye `0.1` and `dt * 0.9`, and
+           the velocity cutoff 0.005.
+       - **`world.js`.** `USE_RANGE` 1.3, `PICKUP_BELOW_FEET` 0.15,
+         `GRAVITY` 14, the `_slide` sub-step 0.2, and the default player
+         radius and height.
+       - **`nav.js`.** `WALKER` step 0.4, drop 0.4, height 0.85.
+       - **`monster.js`:**
+         - Default ranges: sightRange 40, attack range 40, melee range 1.1.
+         - Movement: speed 2, the `d < 5` direct rule, the door probe
+           `+0.35`, strafe `d > 2`.
+         - Flying: hover reach `+0.3`, flySpeed 1.5.
+         - Momentum cutoff 0.01.
+       - **`combat`:**
+         - `aim.js`: `MISSILE_DROP` 0.1, and the auto-aim margin
+           `min(0.1, ...)`.
+         - `damage.js`: `PUFF_INSET` 0.06, the hitscan pullback 0.06, the
+           z jitter 0.04, the default blast z `+0.4`, the inset
+           `min(0.1, ...)`, `MELEE_REACH_Z` 0.25, and knockback
+           (`0.02` / cap 1.2; player `0.004` / cap 0.35).
+         - `attacks.js` and `defs.js`: default ranges (hitscan 48, melee
+           1.1).
+       - **`projectile.js`.** `STEP` 0.1, `CLEARANCE` 0.05, the burst
+         pullback 0.15, the launch offset `+0.05`, the lob distance 6, and
+         the `+0.1` lob fudge.
+       - **`defs.js` defaults.** Thing radius 0.25 and height 0.8; monster
+         speed 2, radius 0.3 and height 0.85; npc radius 0.28, height 0.85,
+         speed 1.1 and wander 3; item radius 0.3 and height 0.4; decoration
+         radius 0.25 and height 0.8; projectile speed 10, radius 0.12 and
+         height 0.25.
+       - **Lifts.** Default speed 1.5. (Doors open by fraction, so they're
+         unaffected.)
+       - **Lighting (`view.js`).** `DIMINISH` 20 (brightness at 1 unit),
+         the `d < 0.25` clamp, and level `fog`, which is per unit, so it
+         halves.
+       - **Audio.** `NEAR` 1.6 and `FAR` 24.
+       - **Raycasting.** `castRay` and `traceRay3D` default maximum 64, and
+         the renderer's `MAX_STEPS` 160.
+       - **Other engine numbers.** Noise `maxSteps` 26, the npc height clamp
+         `0.82`, and levelcheck `MAX_GAP` 2. Check the automap zoom by eye.
+       - **Content.** The hero (radius, walk and run speed), and every
+         monster, item, decor and projectile radius, height, speed, `z`,
+         range and explode/splash radius. Every level's heights, lift
+         stops, `heightStep` and `fog`.
+       - **Unchanged:** slopes (auto-aim, pitch), screen-space sizes
+         (weapon bob, the HUD), and times.
 2. [ ] **World-space texture mapping.** Today each tile shows a full 64 px
        texture (`render/columns.js`: `u = wx - floor(wx)`, and flats likewise).
        Map textures by world position instead, for walls, floors and
