@@ -89,6 +89,125 @@ Grid limits we accept: no rooms stacked over rooms, and no sloped floors.
 Dark Forces had no slopes either. Walls can be at angles (step 5), but each
 tile holds at most one wall line.
 
+## Phase 1b: Look and feel (the current work)
+
+Why: after the first Star Wars content pass (2026-10-12), Mark's verdict was
+"low quality Star Wars knock-off, not real Star Wars". The textures are low
+quality, the map geometry is blocky, and the enemies look like fake
+characters, not hand-drawn art.
+
+Decided (2026-10-12):
+
+- **Claude does:** the finer grid (A), the real Mission 1 map (B), and
+  better placeholder textures plus an import pipeline (C).
+- **Outsourced later (D):** enemy and weapon sprites (a sprite artist, or 3D
+  models rendered in Blender), probably hero textures, sound effects and
+  music.
+- **Order:** A, then B, then C. The Phase 1 gate (step 9) runs after A, on
+  the converted sandbox.
+
+### A. Finer grid: half-size tiles (do first)
+
+Goal: walls, pillars, trims and steps half as thick as now, so rooms stop
+looking like stacked boxes.
+
+Approach: the engine keeps "1 tile = 1 world unit". Everything measured
+against the tile doubles instead (a world scale of 2): bodies, speeds,
+heights, ranges and texture density. A person becomes about two tiles tall,
+and a corridor about two tiles wide. This leaves the geometry code (DDA,
+renderer, collision) alone.
+
+1. [ ] **Audit.** List every tile-scale number in the engine and content,
+       and record the list here. Collect the engine ones into named
+       constants in `src/engine/config.js` where sensible.
+2. [ ] **World-space texture mapping.** Today each tile shows a full 64 px
+       texture (`render/columns.js`: `u = wx - floor(wx)`, and flats likewise).
+       Map textures by world position instead, for walls, floors and
+       ceilings, step faces, angled walls and door panels. Make
+       `TEXELS_PER_UNIT` 32, so a 64 px texture spans 2 tiles (the same real
+       size as today). Sprites use the same constant, so they come out the
+       right size.
+3. [ ] **Scale everything else ×2:**
+       - **Player:** the hero body (height, eye, crouch, step, airStep,
+         radius), walk and run speed, jump speed and gravity (both ×2: the
+         jump is twice as high, with the same airtime), fall-damage speeds,
+         view bob.
+       - **Enemies and combat:** monster radius, height, speed,
+         `stepHeight`, `z` and `flySpeed`; projectile speed and radius;
+         attack, melee, sight and use ranges; splash and explode radii.
+       - **Engine constants:** `PICKUP_BELOW_FEET`, `MELEE_REACH_Z`,
+         `CLEARANCE`, `MISSILE_DROP` and `PUFF_INSET`; `castRay` maximum
+         distances; the nav `WALKER` profile; levelcheck `MAX_GAP` (2 → 4
+         tiles).
+       - **World and presentation:** lift and door speeds, fog and light
+         falloff per tile (halve), audio falloff distances, noise steps
+         (26 → 52), automap zoom.
+4. [ ] **Doors.** A doorway must now be 2+ tiles wide. Group adjacent door
+       tiles of one glyph into one door that opens together, the way lifts
+       group their tiles.
+5. [ ] **Converter tool.** `tools/upscale-map.mjs` doubles an ASCII level:
+       each glyph becomes 2x2, heights double, and thing positions double.
+       Use it on the sandbox.
+6. [ ] **Tests.** Most use tile positions and heights. Convert their test
+       maps the same way, or rescale their numbers.
+7. [ ] **Performance.** Rays cross about twice as many tiles. Time frames
+       before and after (headless snapshots, and the browser fps counter).
+       Note the result for the phone gate.
+8. [ ] **Docs and check.** Update MODDING.md (heights, sizes), and check it
+       in a real browser.
+
+### B. Mission 1: the Canyon Garrison map (after A)
+
+Build Phase 4's mission as a designed level, not a feature test. The
+objectives and briefing (Phase 2) aren't in yet, so for now it ends at an
+exit switch, with keycards.
+
+Design rules (what makes it feel like Dark Forces):
+- tall spaces, and catwalks over drops
+- overlooks where snipers watch you
+- angled walls everywhere
+- varied ceiling heights, pools of light and dark corners
+- a landmark in every area
+- detail built as geometry: pillars, trims, consoles and window frames
+- no long box corridors
+
+1. [ ] Sketch first: write the area list (sizes, floor and ceiling heights,
+       connections, landmarks) and an ASCII overview in `docs/mission1.md`.
+2. [ ] Build it at the fine grid as `src/content/levels/m1.js`. It becomes
+       the episode's level, and the sandbox goes back to being a test map
+       outside the episode.
+3. [ ] Lighting pass: light levels, flicker and light strips.
+4. [ ] Enemies, items, skill variants and 2-3 secrets.
+5. [ ] Validator, map viewer and screenshot review, then playtest.
+
+### C. Better placeholder textures, and an import pipeline (after B)
+
+1. [ ] Better generators: greebles, shadows baked into recesses, wear, colour
+       variation, and more variants (6+ wall panels, trims, floor plates,
+       lights). Decide on 128 px wall textures.
+2. [ ] `tools/import-texture.mjs` for outside art: resize, snap to the
+       palette, check the tiling, and write it into `assets/textures/`.
+
+### D. To outsource (later; decide approach and budget with Mark)
+
+- Enemy sprites, ideally from 8 angles with full animation sets. Either a
+  sprite artist, or 3D models rendered by a Blender script Claude writes.
+  This is closest to how Dark Forces did it.
+- First-person weapon sprites.
+- Hero textures: an artist, a licensed texture pack, or AI-generated images
+  cleaned up.
+- Recorded sound effects, and music (a composer or orchestral samples). The
+  films' own sounds and music stay out.
+
+### E. Leftovers from the first Star Wars pass
+
+- [ ] HUD: the ARMS panel still shows slots 2-7, and the face panel is
+      empty. Part of the Phase 2 HUD rework.
+- [ ] The finale reuses the title and intermission pictures.
+- [ ] MODDING.md and the README still describe Raccoon Alex content.
+- [ ] The smoke test's screenshots 01-04 come out as a blank page with a
+      broken-image icon, though its checks pass.
+
 ## Phase 2: Dark Forces systems
 
 - [ ] A mission briefing screen (scrolling text over a picture) before each
@@ -378,4 +497,8 @@ update the smoke test.
     - MODDING.md and the README still describe Alex content.
     - The smoke test's first four screenshots come out as a blank page with
       a broken-image icon. The checks still pass; not investigated yet.
+- 2026-10-12: Mark reviewed the first pass. The verdict was "knock-off", not
+  "real Star Wars". Planned Phase 1b (look and feel): the finer grid, then
+  the Mission 1 map, then better placeholder textures. Enemy art, sound
+  and music to be outsourced later. Starting Phase 1b step A1.
 
