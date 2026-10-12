@@ -223,7 +223,7 @@ export function defineMonster(def) {
     shootable: true,
     health: 20,
     speed: 4,
-    radius: 0.6,
+    radius: 0.5, // fits one tile width, like the player
     height: 1.7,
     painChance: 0.5,
     reactionTime: 0.4,
@@ -261,7 +261,7 @@ export function defineNpc(def) {
   return baseThing(def, 'npc', {
     solid: true,
     shootable: false,
-    radius: 0.56,
+    radius: 0.5,
     height: 1.7,
     speed: 2.2,
     wander: 6,

@@ -52,9 +52,9 @@ function playLiftSound(world, lift, id) {
 /** Does a box of half-size r at (x, y) touch any of the lift's tiles? */
 function onLift(map, lift, x, y, r) {
   const x0 = Math.floor(x - r);
-  const x1 = Math.floor(x + r);
+  const x1 = Math.max(x0, Math.ceil(x + r) - 1); // (a box exactly touching an edge stays out)
   const y0 = Math.floor(y - r);
-  const y1 = Math.floor(y + r);
+  const y1 = Math.max(y0, Math.ceil(y + r) - 1);
   for (let ty = y0; ty <= y1; ty++) {
     for (let tx = x0; tx <= x1; tx++) {
       if (map.inBounds(tx, ty) && map.liftIndex[ty * map.w + tx] === lift.index) return true;

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { buildLevel } from '../src/engine/world/level.js';
 import { castRay } from '../src/engine/world/physics.js';
 import { Slant, DIAGONALS } from '../src/engine/world/slants.js';
-import { makeWorld, mockInput, room, run, registry } from './helpers.js';
+import { makeWorld, mockInput, room, coarse, run, registry } from './helpers.js';
 
 const FLOOR = { floor: 'imp-floor', ceiling: 'imp-ceiling', light: 160 };
 
@@ -28,11 +28,10 @@ test('a ray meets a 45 degree wall where the geometry says', () => {
 });
 
 // A 5x5 room whose north-east corner is chamfered.
-const chamfer = room(
-  ['#######', '#....n#', '#.....#', '#.....#', '#.....#', '#.....#', '#######'],
-  ['', '', '', '', '', ' ^'],
-  { legend: { '.': FLOOR, n: { ...FLOOR, wall: 'imp-panel', diagonal: 'NE' } } },
-);
+const chamferTiles = ['#######', '#....n#', '#.....#', '#.....#', '#.....#', '#.....#', '#######'];
+const chamferThings = ['', '', '', '', '', ' ^'];
+const chamferExtra = { legend: { '.': FLOOR, n: { ...FLOOR, wall: 'imp-panel', diagonal: 'NE' } } };
+const chamfer = room(chamferTiles, chamferThings, chamferExtra);
 
 test('angled-wall tiles parse as open floor with a slant, and bad lines are errors', () => {
   const b = buildLevel(registry, chamfer);
@@ -63,24 +62,26 @@ test('rays stop at angled walls from the front and from behind', () => {
 });
 
 test('the player stops at a chamfered corner and slides along it', () => {
-  const w = makeWorld(chamfer);
+  // The same room upscaled to the real grid, so the player (radius 0.5) fits:
+  // the corner's angled wall now runs through tiles (10, 2) and (11, 3).
+  const w = makeWorld(coarse(chamferTiles, chamferThings, chamferExtra));
   const pt = w.player;
-  const s = w.map.slantAt(5, 1);
+  const s = w.map.slantAt(10, 2);
   // Walk diagonally straight into the corner.
-  pt.x = 3.5;
-  pt.y = 3.5;
+  pt.x = 7;
+  pt.y = 7;
   pt.angle = -Math.PI / 4;
   const input = mockInput();
   input.hold('forward');
   run(w, input, 2);
   assert.ok(-s.side(pt.x, pt.y) >= pt.radius - 1e-3, `kept clear of the line (gap ${(-s.side(pt.x, pt.y)).toFixed(3)})`);
   // Walk straight north up the east side: the wall turns you west along it.
-  pt.x = 5.6;
-  pt.y = 4.5;
+  pt.x = 11.2;
+  pt.y = 9;
   pt.angle = -Math.PI / 2;
   run(w, input, 2);
-  assert.ok(pt.y < 2.6, `got up into the corner (y=${pt.y.toFixed(2)})`);
-  assert.ok(pt.x < 5.5, `slid west along the wall (x=${pt.x.toFixed(2)})`);
+  assert.ok(pt.y < 5.2, `got up into the corner (y=${pt.y.toFixed(2)})`);
+  assert.ok(pt.x < 11, `slid west along the wall (x=${pt.x.toFixed(2)})`);
   assert.ok(-s.side(pt.x, pt.y) >= pt.radius - 1e-3, 'still clear of the line');
 });
 

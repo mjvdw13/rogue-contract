@@ -9,7 +9,7 @@ export default defineMonster({
   sheet: { src: 'assets/sprites/monsters/stormtrooper.png', frameWidth: 64, frameHeight: 64 },
   health: 30,
   speed: 4.4,
-  radius: 0.56,
+  radius: 0.5, // like the player: a body fits one tile width, so it can stand on one stair
   height: 1.76,
   painChance: 0.5,
   reactionTime: 0.5,

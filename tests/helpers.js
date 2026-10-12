@@ -6,6 +6,7 @@ import { defineLevel } from '../src/engine/defs.js';
 import { World } from '../src/engine/world/world.js';
 import { Rng } from '../src/engine/core/rng.js';
 import friendlies, { bubbles } from './fixtures/friendlies.js';
+import { upscaleLevel } from '../tools/lib/upscale.mjs';
 
 export const registry = new Registry(content);
 
@@ -55,3 +56,16 @@ export function run(world, input, seconds, each) {
 export function room(tiles, things, extra = {}) {
   return defineLevel({ id: 'test', name: 'TEST', tiles, things, ...extra });
 }
+
+/**
+ * A test room drawn on the old coarse grid (one character per metre) and
+ * upscaled 2x to the real grid: every tile becomes 2x2 and legend heights
+ * double. A thing drawn at coarse tile (x, y) stands at (2x + 1.5, 2y + 1.5),
+ * which is `fine(x + 0.5)`. `list` positions just double.
+ */
+export function coarse(tiles, things, extra = {}) {
+  return upscaleLevel(registry, room(tiles, things, extra), 2);
+}
+
+/** Where a coarse-grid tile-centre coordinate (like 1.5) ends up on the fine grid. */
+export const fine = (p) => p * 2 + 0.5;

@@ -36,6 +36,8 @@ const PICKUP_BELOW_FEET = 0.3;
 const FLOOR_DAMAGE_INTERVAL = 0.9;
 /** Gravity for everything but the player (who has its own in the hero's body). */
 const GRAVITY = 28;
+/** How far a walking body may hang over the edge of a drop it won't step off. */
+const OVERHANG = 0.15;
 /** While a lift moves, flow fields are refreshed this often (seconds). */
 const NAV_REFRESH = 0.25;
 
@@ -168,6 +170,7 @@ export class World {
     } else if (!t.setAnim('idle')) {
       t.setAnim('walk');
     }
+    if (t.solid) this.unstick(t);
     if (def.kind === 'monster') t.timer = this.rng.range(0, 0.3);
     if (def.kind === 'npc') initNpc(this, t);
     if (def.kind === 'decoration' && def.hanging) t.z = this.map.ceilAt(x, y) - (t.sheet ? (t.sheet.fh / 64) * (def.scale ?? 1) : t.height);
@@ -175,6 +178,27 @@ export class World {
     this.things.push(t);
     def.hooks?.onSpawn?.(this, t);
     return t;
+  }
+
+  /**
+   * Things wider than half a tile, placed at a tile centre beside a wall,
+   * would start with their body in the wall and be stuck there. Move them to
+   * the nearest spot that's clear (searching outward a little at a time).
+   */
+  unstick(t) {
+    if (!blockedByMap(this.map, t.x, t.y, t.radius)) return;
+    for (let d = 0.05; d <= 1; d += 0.05) {
+      for (let k = 0; k < 8; k++) {
+        const a = (k / 8) * Math.PI * 2;
+        const x = t.x + Math.cos(a) * d;
+        const y = t.y + Math.sin(a) * d;
+        if (!blockedByMap(this.map, x, y, t.radius)) {
+          t.x = x;
+          t.y = y;
+          return;
+        }
+      }
+    }
   }
 
   remove(t) {
@@ -218,9 +242,12 @@ export class World {
     const ceil = map.ceilAt(x, y, t.radius);
     if (floor - t.z > this.stepHeight(t)) return false;
     if (walk && !t.player && !t.def.flying) {
-      const straddle = floor - map.lowFloorAt(x, y, t.radius);
+      // A body may hang a little over an edge (OVERHANG), so it needn't be
+      // exactly centred on a one-tile-wide step to stand on it.
+      const r = Math.max(0, t.radius - OVERHANG);
+      const straddle = map.floorAt(x, y, r) - map.lowFloorAt(x, y, r);
       // (Already straddling one, say after a push, it may still move to straddle less.)
-      const now = map.floorAt(t.x, t.y, t.radius) - map.lowFloorAt(t.x, t.y, t.radius);
+      const now = map.floorAt(t.x, t.y, r) - map.lowFloorAt(t.x, t.y, r);
       if (straddle > this.dropHeight(t) + 1e-6 && straddle > now - 1e-6) return false;
     }
     if (ceil - Math.max(floor, t.z) < t.height) return false;

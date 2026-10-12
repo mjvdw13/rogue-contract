@@ -141,9 +141,9 @@ export class TileMap {
   floorAt(x, y, r = 0) {
     let best = -Infinity;
     const x0 = Math.floor(x - r);
-    const x1 = Math.floor(x + r);
+    const x1 = Math.max(x0, Math.ceil(x + r) - 1); // (a box exactly touching an edge stays out)
     const y0 = Math.floor(y - r);
-    const y1 = Math.floor(y + r);
+    const y1 = Math.max(y0, Math.ceil(y + r) - 1);
     for (let ty = y0; ty <= y1; ty++) {
       for (let tx = x0; tx <= x1; tx++) {
         if (!this.inBounds(tx, ty)) continue;
@@ -158,8 +158,8 @@ export class TileMap {
   /** Lowest floor under a box of half-size r centred at (x, y), ignoring solid tiles. */
   lowFloorAt(x, y, r = 0) {
     let best = Infinity;
-    for (let ty = Math.floor(y - r); ty <= Math.floor(y + r); ty++) {
-      for (let tx = Math.floor(x - r); tx <= Math.floor(x + r); tx++) {
+    for (let ty = Math.floor(y - r); ty <= Math.max(Math.floor(y - r), Math.ceil(y + r) - 1); ty++) {
+      for (let tx = Math.floor(x - r); tx <= Math.max(Math.floor(x - r), Math.ceil(x + r) - 1); tx++) {
         if (!this.inBounds(tx, ty)) continue;
         const i = ty * this.w + tx;
         if (this.flags[i] & F_SOLID) continue;
@@ -173,9 +173,9 @@ export class TileMap {
   ceilAt(x, y, r = 0) {
     let best = Infinity;
     const x0 = Math.floor(x - r);
-    const x1 = Math.floor(x + r);
+    const x1 = Math.max(x0, Math.ceil(x + r) - 1); // (a box exactly touching an edge stays out)
     const y0 = Math.floor(y - r);
-    const y1 = Math.floor(y + r);
+    const y1 = Math.max(y0, Math.ceil(y + r) - 1);
     for (let ty = y0; ty <= y1; ty++) {
       for (let tx = x0; tx <= x1; tx++) {
         if (!this.inBounds(tx, ty)) continue;

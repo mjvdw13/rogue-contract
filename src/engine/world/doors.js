@@ -1,20 +1,26 @@
 /** Door behaviour: opening, waiting, closing, re-opening when blocked. */
 
-/** Start opening a door. Returns true if it started moving. */
+/** The tiles of a door that move together (a wide doorway is several door tiles). */
+const tilesOf = (door) => door.group ?? [door];
+
+/** Something standing in any tile of the door? */
+const occupied = (world, door) => tilesOf(door).some((d) => world.tileOccupied(d.x, d.y));
+
+/** Start opening a door (all its tiles). Returns true if it started moving. */
 export function openDoor(world, door) {
   if (door.state === 'opening' || door.state === 'open') {
-    if (door.state === 'open') door.timer = door.wait;
+    if (door.state === 'open') for (const d of tilesOf(door)) d.timer = d.wait;
     return false;
   }
-  door.state = 'opening';
+  for (const d of tilesOf(door)) d.state = 'opening';
   world.playSoundAt(door.sounds.open ?? 'door-open', door.x + 0.5, door.y + 0.5);
   return true;
 }
 
 export function closeDoor(world, door) {
   if (door.state === 'closed' || door.state === 'closing') return false;
-  if (world.tileOccupied(door.x, door.y)) return false;
-  door.state = 'closing';
+  if (occupied(world, door)) return false;
+  for (const d of tilesOf(door)) d.state = 'closing';
   world.playSoundAt(door.sounds.close ?? 'door-close', door.x + 0.5, door.y + 0.5);
   return true;
 }
@@ -35,13 +41,13 @@ export function updateDoors(world, dt) {
         if (d.stayOpen) break;
         d.timer -= dt;
         if (d.timer <= 0) {
-          if (world.tileOccupied(d.x, d.y)) d.timer = 0.5;
+          if (occupied(world, d)) d.timer = 0.5;
           else closeDoor(world, d);
         }
         break;
       case 'closing':
-        if (world.tileOccupied(d.x, d.y)) {
-          d.state = 'opening';
+        if (occupied(world, d)) {
+          for (const t of tilesOf(d)) t.state = 'opening';
           world.playSoundAt(d.sounds.open ?? 'door-open', d.x + 0.5, d.y + 0.5);
           break;
         }

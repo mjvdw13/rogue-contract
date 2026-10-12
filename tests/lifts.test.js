@@ -57,13 +57,14 @@ test('a cycling lift runs on its own', () => {
 });
 
 test('a lift backs off instead of crushing the player against the ceiling', () => {
-  const w = makeWorld(liftRoom(null, { legend: { L: { ...TALL, ceilZ: 1.5, tag: 'cab', lift: { stops: [0, 1], speed: 2, on: ['use'] } } } }));
+  // The cab's ceiling is 3 up: riding to 2 would squeeze a 1.7-tall player.
+  const w = makeWorld(liftRoom(null, { legend: { L: { ...TALL, ceilZ: 3, tag: 'cab', lift: { stops: [0, 2], speed: 2, on: ['use'] } } } }));
   const lift = w.map.lifts[0];
   w.player.x = 2.5;
   runActions(w, [{ action: 'lift', tag: 'cab' }]);
   let highest = 0;
   run(w, mockInput(), 2, () => (highest = Math.max(highest, lift.z)));
-  assert.ok(highest + w.player.height <= 1.5 + 1e-6, `never squeezed the player (peak ${highest.toFixed(3)})`);
+  assert.ok(highest + w.player.height <= 3 + 1e-6, `never squeezed the player (peak ${highest.toFixed(3)})`);
   assert.equal(lift.z, 0, 'went back down');
 });
 
@@ -81,13 +82,13 @@ test('an elevator cab that moves its ceiling too', () => {
 
 test('rising doors open to the lowest ceiling beside them and let the player through', () => {
   const level = room(['#####', '#.D,#', '#####'], ['', ' >'], {
-    legend: { '.': { ...TALL, ceilZ: 1.5 }, ',': TALL, D: { door: 'imp-door', style: 'rise' } },
+    legend: { '.': { ...TALL, ceilZ: 3 }, ',': TALL, D: { door: 'imp-door', style: 'rise' } },
   });
   const w = makeWorld(level);
   const door = w.map.doors[0];
   const i = w.map.index(2, 1);
   assert.equal(door.style, 'rise');
-  assert.equal(door.openZ, 1.5, 'the lower neighbour sets the opening');
+  assert.equal(door.openZ, 3, 'the lower neighbour sets the opening');
   assert.equal(w.map.ceilZ[i], 0, 'closed: the ceiling sits on the floor');
   const input = mockInput();
   input.hold('forward');
@@ -96,5 +97,5 @@ test('rising doors open to the lowest ceiling beside them and let the player thr
   input.tap('use');
   run(w, input, 1.5);
   assert.ok(w.player.x > 3, 'walked through once it rose');
-  assert.equal(w.map.ceilZ[i], 1.5);
+  assert.equal(w.map.ceilZ[i], 3);
 });

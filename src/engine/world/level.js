@@ -194,11 +194,41 @@ export function buildLevel(registry, level, opts = {}) {
     }
   }
 
-  // Door orientation: the panel spans the gap between the two walls beside it.
+  // Doorways are usually several tiles wide: neighbouring door tiles drawn
+  // with the same glyph form one door (`group`) that opens and closes together.
   for (const d of map.doors) {
-    const solid = (x, y) => !map.inBounds(x, y) || (map.flags[map.index(x, y)] & F_SOLID) !== 0;
-    if (solid(d.x, d.y - 1) && solid(d.x, d.y + 1)) d.axis = 'x';
-    else if (solid(d.x - 1, d.y) && solid(d.x + 1, d.y)) d.axis = 'y';
+    if (d.group) continue;
+    const group = [];
+    const stack = [d];
+    d.group = group;
+    while (stack.length) {
+      const c = stack.pop();
+      group.push(c);
+      for (const [nx, ny] of [[c.x + 1, c.y], [c.x - 1, c.y], [c.x, c.y + 1], [c.x, c.y - 1]]) {
+        const n = map.doorAt(nx, ny);
+        if (n && !n.group && glyphAt[map.index(nx, ny)] === glyphAt[map.index(d.x, d.y)]) {
+          n.group = group;
+          stack.push(n);
+        }
+      }
+    }
+  }
+
+  // Door orientation: the panel spans the gap between the two walls beside the
+  // doorway (looking across the door's other tiles).
+  const isDoorOf = (d, x, y) => d.group.includes(map.doorAt(x, y));
+  const wallPast = (d, dx, dy) => {
+    let x = d.x + dx;
+    let y = d.y + dy;
+    while (map.inBounds(x, y) && isDoorOf(d, x, y)) {
+      x += dx;
+      y += dy;
+    }
+    return !map.inBounds(x, y) || (map.flags[map.index(x, y)] & F_SOLID) !== 0;
+  };
+  for (const d of map.doors) {
+    if (wallPast(d, 0, -1) && wallPast(d, 0, 1)) d.axis = 'x';
+    else if (wallPast(d, -1, 0) && wallPast(d, 1, 0)) d.axis = 'y';
     else errors.push(`Door at (${d.x}, ${d.y}) needs walls on two opposite sides`);
   }
 
@@ -208,8 +238,9 @@ export function buildLevel(registry, level, opts = {}) {
   // else to the lowest ceiling beside them (so there's no lintel).
   for (const d of map.doors) {
     const i = map.index(d.x, d.y);
+    // (Other door tiles don't count: their ceilings come down as they close.)
     const around = [[d.x + 1, d.y], [d.x - 1, d.y], [d.x, d.y + 1], [d.x, d.y - 1]]
-      .filter(([nx, ny]) => map.inBounds(nx, ny) && !(map.flags[map.index(nx, ny)] & F_SOLID))
+      .filter(([nx, ny]) => map.inBounds(nx, ny) && !(map.flags[map.index(nx, ny)] & (F_SOLID | F_DOOR)))
       .map(([nx, ny]) => map.index(nx, ny));
     if (map.floorTex[i] < 0) map.floorTex[i] = around.map((n) => map.floorTex[n]).find((t) => t >= 0) ?? -1;
     if (d.style !== 'rise') continue;
