@@ -90,7 +90,7 @@ function startWalk(world, t) {
 /** Move a little, staying inside the NPC's area. Returns false if it couldn't. */
 function step(world, t, dx, dy) {
   const { x, y } = t;
-  if (!world.tryMove(t, dx, dy)) return false;
+  if (!world.tryMove(t, dx, dy, true)) return false;
   if (!t.area.has(world.map.index(Math.floor(t.x), Math.floor(t.y)))) {
     t.x = x;
     t.y = y;

@@ -5,6 +5,7 @@ import { canSeeBody } from '../combat/aim.js';
  * Definition-driven monster AI, in the spirit of Doom's:
  *   idle   -> looks for the player (or wakes on gunfire / being shot)
  *   chase  -> walks the flow field toward its target, attacks when it can
+ *             (flyers also rise and sink toward the target's height)
  *   attack -> plays the attack animation; the 'fire' frame event deals damage
  *   pain   -> flinches
  *   dead   -> death animation, then a corpse
@@ -81,15 +82,19 @@ function moveToward(world, m, dt, t, d, los) {
   const speed = (m.def.speed ?? 2) * (world.skillInfo.monsterSpeed ?? 1);
   let gx;
   let gy;
+  // The route to the player for this body. Head straight for a target in
+  // view, unless the route is a long way round (a ledge or a pit between).
+  const nav = t === world.player ? world.navFor(m) : null;
+  const direct = los && (!nav || (d < 5 && nav.distanceAt(Math.floor(m.x), Math.floor(m.y)) <= d + 2));
   if (m.stuck > 0) {
     m.stuck -= dt;
     gx = m.x + Math.cos(m.wander);
     gy = m.y + Math.sin(m.wander);
-  } else if (los && (d < 5 || t !== world.player)) {
+  } else if (direct) {
     gx = t.x;
     gy = t.y;
-  } else if (t === world.player) {
-    const n = world.nav.next(m.x, m.y);
+  } else if (nav) {
+    const n = nav.next(m.x, m.y);
     if (n) {
       gx = n.x;
       gy = n.y;
@@ -117,12 +122,25 @@ function moveToward(world, m, dt, t, d, los) {
   if (door && !door.passable && !door.lock && !door.secret) world.openDoor(door);
 
   const step = speed * dt;
-  const moved = world.tryMove(m, ca * step, sa * step);
+  const moved = world.tryMove(m, ca * step, sa * step, true);
+  if (m.def.flying) hover(world, m, t, dt, ca, sa);
   if (!moved && m.stuck <= 0) {
     m.stuck = world.rng.range(0.3, 0.7);
     m.wander = a + (world.rng.chance(0.5) ? 1 : -1) * (Math.PI / 2 + world.rng.range(0, 0.8));
   }
   m.angle = a;
+}
+
+/**
+ * Flyers rise or sink to hover their own height (`z`) above the floor their
+ * target stands on, and climb over any raised floor just ahead.
+ */
+function hover(world, m, t, dt, ca, sa) {
+  const reach = m.radius + 0.3;
+  const ahead = world.map.floorAt(m.x + ca * reach, m.y + sa * reach, m.radius);
+  const want = Math.max(t.z, ahead) + (m.def.z ?? 0);
+  const climb = (m.def.flySpeed ?? 1.5) * dt;
+  m.z += Math.max(-climb, Math.min(climb, want - m.z));
 }
 
 function applyMomentum(world, t, dt) {

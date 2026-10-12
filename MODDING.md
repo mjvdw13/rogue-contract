@@ -112,7 +112,9 @@ steps and ledges, and shots into the sky simply vanish. Explosions measure
 
 **Other fields:** `scale` (sprite size), `height`, `mass` (knockback),
 `sightRange`, `splashImmune`, `infighting: false`, `boss: true`,
-`renderStyle: 'fuzz'` (shimmering, partly invisible), `countKill: false`.
+`renderStyle: 'fuzz'` (shimmering, partly invisible), `countKill: false`,
+`stepHeight`, `dropHeight`, `flying: true` with `z` and `flySpeed` (see
+*Heights* under Levels).
 
 **Hooks** run your own code: `onSpawn(world, self)`, `onSight(world, self)`,
 `onThink(world, self, dt)` (return `true` to skip the normal AI that tick),
@@ -342,8 +344,16 @@ to 0.4 are walked up, a jump rises about 0.63, and anything up to about 0.78
 can be jumped onto. The standing body is 0.85 tall, or 0.5 crouched. A space
 must be at least that tall to move through, measured as the lowest ceiling
 minus the highest floor under the player. Falls faster than 9 units per second
-(about a 3-unit drop) hurt. Monsters walk up steps of up to 0.4 (their
-`stepHeight`), and anything that isn't `flying` follows the floor.
+(about a 3-unit drop) hurt.
+
+Monsters walk up steps of up to 0.4 (their `stepHeight`) and won't walk off a
+drop deeper than their `dropHeight` (by default the same as the step), so a
+monster on a ledge stays up there unless stairs lead down. A blast can still
+knock it off, and it falls. Monsters find their way along routes their body
+fits: the step and drop limits, and ceilings at least as high as they are
+tall. A `flying: true` monster ignores floors: it hovers `z` above the floor
+its target stands on (the firefly hovers at 0.35), climbs over ledges in its
+way at `flySpeed` (default 1.5 a second), and falls when it dies.
 
 Door options:
 

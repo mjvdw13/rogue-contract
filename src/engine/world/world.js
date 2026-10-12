@@ -5,7 +5,7 @@ import { castRay, blockedByMap, rayCircle, slantNear } from './physics.js';
 import { updateDoors, openDoor, closeDoor } from './doors.js';
 import { updateLifts, startLift, liftAt } from './lifts.js';
 import { LightEffects } from './lights.js';
-import { FlowField } from './nav.js';
+import { FlowField, WALKER } from './nav.js';
 import { noiseAlert } from './noise.js';
 import { Triggers } from './triggers.js';
 import { runActions } from './actions.js';
@@ -34,6 +34,10 @@ const USE_RANGE = 1.3;
  */
 const PICKUP_BELOW_FEET = 0.15;
 const FLOOR_DAMAGE_INTERVAL = 0.9;
+/** Gravity for everything but the player (who has its own in the hero's body). */
+const GRAVITY = 14;
+/** While a lift moves, flow fields are refreshed this often (seconds). */
+const NAV_REFRESH = 0.25;
 
 /**
  * One running level: the map, every thing in it, and the rules that tie
@@ -74,6 +78,9 @@ export class World {
     this.skyTexture = level.sky && this.assets ? this.assets.textures[this.assets.textureSlot(level.sky)] : null;
     this.lights = new LightEffects(this.map, this.rng);
     this.nav = new FlowField(this.map);
+    /** Flow fields per kind of body (see navFor), the walker's being `nav`. */
+    this.navFields = new Map([[navKey(WALKER), this.nav]]);
+    this.navRefresh = 0;
     this.triggers = new Triggers(this, level.triggers);
 
     this.stats = { kills: 0, totalKills: 0, items: 0, totalItems: 0, secrets: 0, totalSecrets: 0, time: 0 };
@@ -200,14 +207,22 @@ export class World {
   /**
    * Can thing `t` stand at (x, y)? Checks walls, closed doors, floors too high
    * to step onto, ceilings too low to fit under, and solid things at the same
-   * height.
+   * height. A `walk` also won't leave the body straddling a drop deeper than
+   * the thing steps down (Doom's dropoff rule): monsters and friendlies don't
+   * walk off ledges or hang over their edges, but can be knocked off.
    */
-  checkPosition(t, x, y) {
+  checkPosition(t, x, y, walk = false) {
     const map = this.map;
     if (blockedByMap(map, x, y, t.radius)) return false;
     const floor = map.floorAt(x, y, t.radius);
     const ceil = map.ceilAt(x, y, t.radius);
     if (floor - t.z > this.stepHeight(t)) return false;
+    if (walk && !t.player && !t.def.flying) {
+      const straddle = floor - map.lowFloorAt(x, y, t.radius);
+      // (Already straddling one, say after a push, it may still move to straddle less.)
+      const now = map.floorAt(t.x, t.y, t.radius) - map.lowFloorAt(t.x, t.y, t.radius);
+      if (straddle > this.dropHeight(t) + 1e-6 && straddle > now - 1e-6) return false;
+    }
     if (ceil - Math.max(floor, t.z) < t.height) return false;
     if (!t.solid) return true;
     for (const o of this.things) {
@@ -235,24 +250,87 @@ export class World {
       const body = t.player.body;
       return t.player.onGround ? body.stepHeight : body.airStep;
     }
-    return t.def.stepHeight ?? 0.4;
+    return t.def.stepHeight ?? WALKER.step;
   }
 
-  /** Move with wall sliding. Returns true if the thing moved at all. */
-  tryMove(t, dx, dy) {
-    const moved = this._slide(t, dx, dy);
-    // Everything but the player (who has real gravity) follows the floor.
-    if (moved && !t.player && !t.def.flying) t.z = this.map.floorAt(t.x, t.y, t.radius) + (t.def.z ?? 0);
+  /** How far down a monster or friendly will walk off a ledge (Doom: no further than it steps up). */
+  dropHeight(t) {
+    return t.def.dropHeight ?? this.stepHeight(t);
+  }
+
+  /**
+   * Where a walking thing stands at its position: the floor, plus any `z`
+   * offset of its def (a flyer's `z` is its hover height, so not for those).
+   */
+  groundZ(t) {
+    return this.map.floorAt(t.x, t.y, t.radius) + (t.def.flying ? 0 : (t.def.z ?? 0));
+  }
+
+  /**
+   * Move with wall sliding. Returns true if the thing moved at all. `walk`
+   * moves (a monster's own steps) won't go off ledges; pushes can. Walkers
+   * step straight up onto higher floors and fall down to lower ones (see fall).
+   */
+  tryMove(t, dx, dy, walk = false) {
+    const moved = this._slide(t, dx, dy, walk);
+    if (moved && !t.player && !(t.def.flying && !t.dead)) t.z = Math.max(t.z, this.groundZ(t));
     return moved;
   }
 
-  _slide(t, dx, dy) {
+  /**
+   * Gravity for things other than the player: falling to the floor (riding a
+   * lift down included). Live flyers instead stay between the floor and
+   * ceiling; dead ones drop.
+   */
+  fall(t, dt) {
+    if (t.def.hanging) return;
+    if (t.def.flying && !t.dead) {
+      const floor = this.map.floorAt(t.x, t.y, t.radius);
+      const top = this.map.ceilAt(t.x, t.y, t.radius) - t.height;
+      t.z = Math.max(floor, Math.min(Math.max(floor, top), t.z));
+      return;
+    }
+    const ground = this.groundZ(t);
+    if (t.z <= ground) {
+      t.z = ground;
+      t.vz = 0;
+      return;
+    }
+    t.vz -= GRAVITY * dt;
+    t.z += t.vz * dt;
+    if (t.z <= ground) {
+      t.z = ground;
+      t.vz = 0;
+    }
+  }
+
+  /** The flow field toward the player for a monster's kind of body. */
+  navFor(t) {
+    if (t.navField) return t.navField;
+    const profile = {
+      step: this.stepHeight(t),
+      drop: this.dropHeight(t),
+      height: t.height,
+      flying: !!t.def.flying,
+    };
+    const key = navKey(profile);
+    let field = this.navFields.get(key);
+    if (!field) {
+      field = new FlowField(this.map, profile);
+      field.update(Math.floor(this.player.x), Math.floor(this.player.y), true);
+      this.navFields.set(key, field);
+    }
+    t.navField = field;
+    return field;
+  }
+
+  _slide(t, dx, dy, walk = false) {
     const steps = Math.max(1, Math.ceil(Math.max(Math.abs(dx), Math.abs(dy)) / 0.2));
     let moved = false;
     for (let i = 0; i < steps; i++) {
       const sx = dx / steps;
       const sy = dy / steps;
-      if (this.checkPosition(t, t.x + sx, t.y + sy)) {
+      if (this.checkPosition(t, t.x + sx, t.y + sy, walk)) {
         t.x += sx;
         t.y += sy;
         moved = true;
@@ -260,11 +338,11 @@ export class World {
       }
       // (Tiny components, like cos(90 degrees), don't count as a slide.)
       let slid = false;
-      if (Math.abs(sx) > 1e-9 && this.checkPosition(t, t.x + sx, t.y)) {
+      if (Math.abs(sx) > 1e-9 && this.checkPosition(t, t.x + sx, t.y, walk)) {
         t.x += sx;
         slid = true;
       } else if (t.player) t.vx = 0;
-      if (Math.abs(sy) > 1e-9 && this.checkPosition(t, t.x, t.y + sy)) {
+      if (Math.abs(sy) > 1e-9 && this.checkPosition(t, t.x, t.y + sy, walk)) {
         t.y += sy;
         slid = true;
       } else if (t.player) t.vy = 0;
@@ -275,7 +353,7 @@ export class World {
           const s = Math.sin(turn) * Math.SQRT1_2;
           const mx = sx * c - sy * s;
           const my = sx * s + sy * c;
-          if (this.checkPosition(t, t.x + mx, t.y + my)) {
+          if (this.checkPosition(t, t.x + mx, t.y + my, walk)) {
             t.x += mx;
             t.y += my;
             slid = true;
@@ -499,6 +577,7 @@ export class World {
       switch (t.kind) {
         case 'monster':
           monsterThink(this, t, dt);
+          this.fall(t, dt);
           break;
         case 'projectile':
           projectileThink(this, t, dt);
@@ -508,15 +587,21 @@ export class World {
           break;
         case 'npc':
           npcThink(this, t, dt);
+          this.fall(t, dt);
           break;
         default:
           applyMomentum(this, t, dt);
+          this.fall(t, dt);
           t.stepAnim(dt);
           t.def.hooks?.onThink?.(this, t, dt);
       }
     }
     if (list.some((t) => t.removed)) this.things = list.filter((t) => !t.removed);
-    this.nav.update(Math.floor(pt.x), Math.floor(pt.y));
+    // Moving lifts change floor heights, so routes are refreshed while they run.
+    this.navRefresh -= dt;
+    const refresh = this.navRefresh <= 0 && this.map.lifts.some((l) => l.state === 'moving');
+    if (refresh) this.navRefresh = NAV_REFRESH;
+    for (const field of this.navFields.values()) field.update(Math.floor(pt.x), Math.floor(pt.y), refresh);
   }
 
   _playerTile() {
@@ -586,4 +671,8 @@ export class World {
   bestWeapon() {
     return bestWeapon(this.registry, this.player.player);
   }
+}
+
+function navKey(p) {
+  return `${p.flying ? 'fly' : 'walk'}:${p.step}:${p.drop}:${p.height}`;
 }

@@ -155,6 +155,20 @@ export class TileMap {
     return best === -Infinity ? 0 : best;
   }
 
+  /** Lowest floor under a box of half-size r centred at (x, y), ignoring solid tiles. */
+  lowFloorAt(x, y, r = 0) {
+    let best = Infinity;
+    for (let ty = Math.floor(y - r); ty <= Math.floor(y + r); ty++) {
+      for (let tx = Math.floor(x - r); tx <= Math.floor(x + r); tx++) {
+        if (!this.inBounds(tx, ty)) continue;
+        const i = ty * this.w + tx;
+        if (this.flags[i] & F_SOLID) continue;
+        if (this.floorZ[i] < best) best = this.floorZ[i];
+      }
+    }
+    return best === Infinity ? 0 : best;
+  }
+
   /** Lowest ceiling over a box of half-size r centred at (x, y), ignoring solid tiles. */
   ceilAt(x, y, r = 0) {
     let best = Infinity;

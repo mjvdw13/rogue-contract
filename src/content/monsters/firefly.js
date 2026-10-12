@@ -10,6 +10,8 @@ export default defineMonster({
   health: 60,
   speed: 2.4,
   radius: 0.3,
+  flying: true,
+  z: 0.35, // hovers this far above the floor its target stands on
   painChance: 0.7,
   reactionTime: 0.45,
   cooldown: [1.2, 2.6],

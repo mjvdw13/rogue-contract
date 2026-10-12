@@ -76,7 +76,7 @@ The renderer already supports shifting the view up and down
 6. [x] **3D combat.** Shots aim along the camera's pitch with gentle
        vertical auto-aim. Projectiles move in 3D, hit floors, ceilings and
        angled walls. Explosions measure distance in 3D.
-7. [ ] **Enemies.** Monsters follow floor heights, and pathfinding knows
+7. [x] **Enemies.** Monsters follow floor heights, and pathfinding knows
        how high they can climb. Flying enemies hover at their own height.
 8. [ ] **Tools.** The validator checks reachability with step and jump
        heights. The map viewer shades by height and draws angled walls. Add
@@ -295,3 +295,25 @@ update the smoke test.
     flight was checked in headless renders.
   - **Still to do:** step 7 (monsters walk off ledges, and flying monsters
     still snap to the floor).
+- 2026-10-12: Phase 1 step 7 done: enemies and heights.
+  - **Ledges:** walking monsters and friendlies follow Doom's dropoff rule.
+    They won't stand straddling a drop deeper than their `dropHeight`
+    (default: their step height), so they don't walk off ledges or hang over
+    edges. Knockback can still push them off.
+  - **Gravity:** monsters, friendlies, corpses and loose things fall to the
+    floor instead of snapping down. They still step straight up.
+  - **Routes:** the flow field plans per kind of body (step, drop, height,
+    flying). `world.navFor(m)` keeps one field per profile, so a 1.1-tall
+    beetle won't plan through a 0.9 vent that an ant fits. Diagonals don't
+    cut corners across drops. Fields refresh every 0.25 s while a lift
+    moves. Monsters go straight at a visible player only when the route
+    isn't a long way round.
+  - **Flyers:** `flying: true` monsters hover `z` above their target's floor,
+    climb over raised floors ahead at `flySpeed`, and drop when they die. The
+    firefly flies now (`z: 0.35`) as the test flyer.
+  - **Tests:** `tests/enemies.test.js` (5 tests). 89 tests, the validator and
+    the smoke test pass. With 70 awake monsters on e1m3, a tick costs about
+    1.13 ms against 1.02 ms before.
+  - **Not done:** monsters don't ride lifts on purpose, and one that can't
+    reach the player just heads toward them and gets stuck at the ledge
+    face. A sniper on a ledge paces along its edge.

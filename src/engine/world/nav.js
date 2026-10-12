@@ -6,13 +6,20 @@ const DIRS = [
   [1, 1], [1, -1], [-1, 1], [-1, -1],
 ];
 
+/** The body a flow field plans for: walkers by default. */
+export const WALKER = { step: 0.4, drop: 0.4, height: 0.85, flying: false };
+
 /**
  * A breadth-first distance field toward the player. Monsters walk downhill to
- * find their way around walls and through (unlocked) doors.
+ * find their way around walls and through (unlocked) doors. Each field plans
+ * for one kind of body (`profile`): how high it can step up, how far it will
+ * step down, how tall it is, and whether it flies over floors altogether.
  */
 export class FlowField {
-  constructor(map) {
+  /** @param {*} map @param {{step:number, drop:number, height:number, flying:boolean}} [profile] */
+  constructor(map, profile = WALKER) {
     this.map = map;
+    this.profile = profile;
     this.dist = new Int16Array(map.w * map.h).fill(UNREACHABLE);
     this.queue = new Int32Array(map.w * map.h);
     this.origin = -1;
@@ -26,6 +33,24 @@ export class FlowField {
       return (!d.lock && !d.secret) || d.passable;
     }
     return true;
+  }
+
+  /**
+   * Can this body walk (or fly) from tile a into the neighbouring tile b?
+   * Doors count at their open height, since monsters open them.
+   */
+  canStep(a, b) {
+    const map = this.map;
+    const { step, drop, height, flying } = this.profile;
+    let ceil = map.ceilZ[b];
+    if (map.flags[b] & F_DOOR) {
+      const door = map.doors[map.doorIndex[b]];
+      if (door.style === 'rise') ceil = door.openZ;
+    }
+    if (ceil - map.floorZ[b] < height) return false;
+    if (flying) return true;
+    const rise = map.floorZ[b] - map.floorZ[a];
+    return rise <= step + 1e-6 && -rise <= drop + 1e-6;
   }
 
   /** Recompute distances from a tile (cheap: a few thousand tiles). */
@@ -52,7 +77,8 @@ export class FlowField {
         const ny = cy + DIRS[k][1];
         if (nx < 0 || ny < 0 || nx >= w || ny >= map.h) continue;
         const n = ny * w + nx;
-        if (dist[n] <= nd || !this.passable(n)) continue;
+        // The monster walks from n toward c, the way back to the player.
+        if (dist[n] <= nd || !this.passable(n) || !this.canStep(n, c)) continue;
         dist[n] = nd;
         queue[tail++] = n;
       }
@@ -66,13 +92,16 @@ export class FlowField {
 
   /**
    * The neighbouring tile centre to walk toward from (x, y), or null.
-   * Diagonals are only taken when both side tiles are open (no corner cutting).
+   * Diagonals are only taken when both side tiles are open and level enough
+   * to cross (no corner cutting).
    */
   next(x, y) {
     const map = this.map;
     const tx = Math.floor(x);
     const ty = Math.floor(y);
     const here = this.distanceAt(tx, ty);
+    const from = ty * map.w + tx;
+    const open = (i) => this.passable(i) && this.canStep(from, i);
     let best = here;
     let bx = -1;
     let by = -1;
@@ -80,8 +109,13 @@ export class FlowField {
       const nx = tx + dx;
       const ny = ty + dy;
       const d = this.distanceAt(nx, ny);
-      if (d >= best) continue;
-      if (dx && dy && (!this.passable(ty * map.w + nx) || !this.passable(ny * map.w + tx))) continue;
+      const to = ny * map.w + nx;
+      if (d >= best || !open(to)) continue;
+      if (dx && dy) {
+        // No cutting corners: both side tiles must join up with this one and the next.
+        const sides = [ty * map.w + nx, ny * map.w + tx];
+        if (sides.some((i) => !open(i) || !this.canStep(i, to))) continue;
+      }
       best = d;
       bx = nx;
       by = ny;

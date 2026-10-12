@@ -205,8 +205,13 @@ function baseThing(def, kind, defaults) {
 
 /**
  * A monster. Movement speed is in tiles per second; cooldowns in seconds.
+ * Walkers step up to `stepHeight` (default 0.4) and won't walk off drops
+ * deeper than `dropHeight` (default: their step height). `flying` monsters
+ * ignore floors, hovering `z` above the floor their target stands on, and
+ * climb or sink at `flySpeed` (default 1.5 per second).
  * @param {{id:string, name?:string, glyph?:string, sheet:SheetSpec, anims:Record<string,AnimSpec>,
  *   health:number, speed?:number, radius?:number, height?:number, painChance?:number,
+ *   stepHeight?:number, dropHeight?:number, flying?:boolean, flySpeed?:number, z?:number,
  *   attack?:AttackSpec, melee?:AttackSpec, cooldown?:[number,number], reactionTime?:number,
  *   sightRange?:number, drops?:(string|{item:string, chance?:number})[], mass?:number,
  *   splashImmune?:boolean, boss?:boolean, sounds?:Record<string,string>,
