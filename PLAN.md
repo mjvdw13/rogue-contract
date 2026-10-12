@@ -187,7 +187,7 @@ renderer, collision) alone.
        `TEXELS_PER_UNIT` 32, so a 64 px texture spans 2 tiles (the same real
        size as today). Sprites use the same constant, so they come out the
        right size.
-3. [ ] **Scale everything else ×2:**
+3. [x] **Scale everything else ×2:**
        - **Player:** the hero body (height, eye, crouch, step, airStep,
          radius), walk and run speed, jump speed and gravity (both ×2: the
          jump is twice as high, with the same airtime), fall-damage speeds,
@@ -202,18 +202,18 @@ renderer, collision) alone.
        - **World and presentation:** lift and door speeds, fog and light
          falloff per tile (halve), audio falloff distances, noise steps
          (26 → 52), automap zoom.
-4. [ ] **Doors.** A doorway must now be 2+ tiles wide. Group adjacent door
+4. [x] **Doors.** A doorway must now be 2+ tiles wide. Group adjacent door
        tiles of one glyph into one door that opens together, the way lifts
        group their tiles.
-5. [ ] **Converter tool.** `tools/upscale-map.mjs` doubles an ASCII level:
+5. [x] **Converter tool.** `tools/upscale-map.mjs` doubles an ASCII level:
        each glyph becomes 2x2, heights double, and thing positions double.
        Use it on the sandbox.
-6. [ ] **Tests.** Most use tile positions and heights. Convert their test
+6. [x] **Tests.** Most use tile positions and heights. Convert their test
        maps the same way, or rescale their numbers.
-7. [ ] **Performance.** Rays cross about twice as many tiles. Time frames
+7. [x] **Performance.** Rays cross about twice as many tiles. Time frames
        before and after (headless snapshots, and the browser fps counter).
        Note the result for the phone gate.
-8. [ ] **Docs and check.** Update MODDING.md (heights, sizes), and check it
+8. [x] **Docs and check.** Update MODDING.md (heights, sizes), and check it
        in a real browser.
 
 ### B. Mission 1: the Canyon Garrison map (after A)
@@ -581,4 +581,26 @@ update the smoke test.
        coordinates and heights.
     3. A7 (performance) and A8 (docs: MODDING.md heights and sizes, and a
        browser check), then merge into main.
+- 2026-10-12: Phase 1b A (the finer grid) done, merged from `finer-grid`.
+  - **Scale:** the world is measured at twice the old scale. A tile is half
+    a metre. The player is 1.7 tall with radius 0.5, and textures and
+    sprites use 32 texels per tile.
+  - **Doors:** neighbouring door tiles of one glyph form a group that opens
+    and closes together.
+  - **Collision fixes found on the way:**
+    - Things spawned with their body in a wall are nudged clear.
+    - A box that only touches a tile edge no longer counts as being in that
+      tile.
+    - A walking body may hang 0.15 over a drop edge (`OVERHANG`).
+    - Walking humans are radius 0.5, so they fit one tile and can take
+      stairs. At 0.56 they stalled on the stair edges.
+  - **Tests:** the `coarse()` and `fine()` test helpers draw maps the old
+    way and upscale them. `tests/finegrid.test.js` covers the converter,
+    door groups and unsticking. 85 tests, the validator and the smoke test
+    pass.
+  - **Performance:** desktop, headless, average over 5 sandbox views: 1.47
+    ms per frame before, about 1.8 ms after (+25%). Recheck at the phone
+    gate.
+  - **Next:** Phase 1b B, the Mission 1 map. Start with the sketch in
+    `docs/mission1.md`.
 

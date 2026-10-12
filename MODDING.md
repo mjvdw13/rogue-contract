@@ -39,9 +39,11 @@ with JSDoc types, so editors like VS Code autocomplete the fields.
 - **Sprite sheets:** frames of equal size, left to right and wrapping onto new
   rows. Frame 0 is the top-left frame. Things always face the player (there
   are no 8-angle rotations), and the bottom of the frame stands on the floor.
-  64 pixels is one tile, so a 64×64 frame fits a dog-sized bug, and a
-  person-sized coworker is about 50–56 pixels tall.
-- **Textures:** walls and flats are 64×64. An animated texture is a horizontal
+  32 pixels is one tile, so a person about 56 pixels tall stands about 1.75
+  tiles high, and fills a 64×64 frame.
+- **Textures:** walls and flats are 64×64, and span two tiles (32 texels per
+  tile), about the height of a person. Textures are laid out by world
+  position, so they run on across tiles. An animated texture is a horizontal
   strip of 64×64 frames.
 - **The built-in art** comes from code in `tools/art/`. Run `npm run art`, or
   `node tools/art/generate.mjs --only ant --preview`. It uses a small
@@ -308,18 +310,26 @@ Floor options:
 ### Heights
 
 Every floor tile has its own floor and ceiling height, in world units: one
-unit is one tile, or 64 texels of a wall texture. The defaults, `floorZ: 0` and
-`ceilZ: 1`, give the classic flat look.
+unit is one tile, or 32 texels of a wall texture. The grid is fine: a person
+is about two tiles tall and one tile wide, so a corridor is usually 3-4 tiles
+wide and a doorway 2-3. The defaults, `floorZ: 0` and `ceilZ: 2`, give a low,
+flat room.
 
 ```js
-'h': { floor: 'server-floor', ceiling: 'ceiling-light', floorZ: 0.5, ceilZ: 2.5, side: 'tech-panel' },
-'p': { base: 'h', floorZ: -0.75 },               // a pit
-'v': { base: '.', floorZ: 0.25, ceilZ: 1 },      // a crawl space: crouch to get in
+'h': { floor: 'imp-floor', ceiling: 'imp-ceiling-light', floorZ: 1, ceilZ: 5, side: 'imp-panel-dark' },
+'p': { base: 'h', floorZ: -1.5 },                // a pit
+'v': { base: '.', floorZ: 0.5, ceilZ: 2 },       // a crawl space: crouch to get in
 ```
+
+A map drawn for the old coarse grid (one tile per metre) can be converted
+with `node tools/upscale-map.mjs <level-id>`: every tile becomes 2x2, heights
+double, things move with them, and angled walls are split across the new
+tiles. Copy the comments across by hand, and halve the level's own `fog` if it
+set one.
 
 - `floorZ` / `ceilZ`: the heights. A solid wall is drawn from the floor to the
   ceiling of the tile in front of it, so a tall sky courtyard (`ceiling: 'sky',
-  ceilZ: 3`) gets tall walls.
+  ceilZ: 6`) gets tall walls.
 - `side`: the texture on the faces of a raised floor (steps, ledges, platform
   edges). It defaults to the floor texture.
 - `upper`: the texture under a lowered ceiling (the lintel above a door, the
@@ -328,32 +338,36 @@ unit is one tile, or 64 texels of a wall texture. The defaults, `floorZ: 0` and
 
 For stairs and terrain, a level can paint heights over the tiles with
 `floorHeights` and `ceilHeights`. These grids line up with `tiles`. Each
-character is a number of `heightStep`s (default 0.125) above `heightBase`
+character is a number of `heightStep`s (default 0.25) above `heightBase`
 (default 0): `0`-`9`, then `a`-`z` for 10-35. A space or `.` keeps the
 legend's height.
 
 ```js
 floorHeights: [
   '',
-  '         1234',    // four steps of 0.125 up to a 0.5 platform
+  '         1234',    // four steps of 0.25 up to a 1-high platform
 ],
 ```
 
 How the player moves (all overridable in `hero.js` as `body: {...}`): steps up
-to 0.4 are walked up, a jump rises about 0.63, and anything up to about 0.78
-can be jumped onto. The standing body is 0.85 tall, or 0.5 crouched. A space
-must be at least that tall to move through, measured as the lowest ceiling
-minus the highest floor under the player. Falls faster than 9 units per second
-(about a 3-unit drop) hurt.
+to 0.8 are walked up, a jump rises about 1.26, and anything up to about 1.56
+can be jumped onto. The standing body is 1.7 tall and 1 wide (radius 0.5), or
+1 tall crouched. A space must be at least that tall to move through, measured
+as the lowest ceiling minus the highest floor under the player. Falls faster
+than 18 units per second (about a 6-unit drop) hurt.
 
-Monsters walk up steps of up to 0.4 (their `stepHeight`) and won't walk off a
+Monsters walk up steps of up to 0.8 (their `stepHeight`) and won't walk off a
 drop deeper than their `dropHeight` (by default the same as the step), so a
 monster on a ledge stays up there unless stairs lead down. A blast can still
 knock it off, and it falls. Monsters find their way along routes their body
 fits: the step and drop limits, and ceilings at least as high as they are
 tall. A `flying: true` monster ignores floors: it hovers `z` above the floor
-its target stands on (the firefly hovers at 0.35), climbs over ledges in its
-way at `flySpeed` (default 1.5 a second), and falls when it dies.
+its target stands on (the probe droid hovers at 0.9), climbs over ledges in
+its way at `flySpeed` (default 3 a second), and falls when it dies. Give
+walking monsters a radius of 0.5 at most, so they fit on a one-tile step.
+
+Doorways are usually wider than one tile. Neighbouring door tiles drawn with
+the same glyph are one door: they open and close together.
 
 Door options:
 
@@ -396,7 +410,7 @@ other. Give the entry a `wall` texture plus either a 45° preset or a line:
   the tile to its east makes a wall about 26.6° off horizontal across two
   tiles.
 
-The wall texture runs along the line at 64 texels per unit, so it isn't
+The wall texture runs along the line at 32 texels per unit, so it isn't
 stretched. Players and monsters slide along angled walls, and shots, sight
 and projectiles stop at them. Monsters path through these tiles like open
 floor and let collision keep them out of the solid part. Put walls (or more
@@ -490,9 +504,9 @@ Actions:
   can't be found, a sealed-off secret, a thing inside a wall, unknown glyphs,
   doors without walls, or a low ammo budget.
 - Reachability knows heights, using the hero's `body`. The player walks up
-  steps of up to 0.4 and jumps onto ledges of up to about 0.78, less under a
-  low ceiling. Any drop is allowed. Crouching gets through spaces 0.5 high.
-  Lifts reach every stop. A running jump clears a gap of up to two tiles,
+  steps of up to 0.8 and jumps onto ledges of up to about 1.56, less under a
+  low ceiling. Any drop is allowed. Crouching gets through spaces 1 high.
+  Lifts reach every stop. A running jump clears a gap of up to four tiles,
   landing no higher than a step.
 - `npm run validate -- --verbose` also lists unreachable items and one-way
   areas: places the player can drop into but never get back out of to the
