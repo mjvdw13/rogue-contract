@@ -260,4 +260,11 @@ update the smoke test.
   - The storage prefix is now `rogue-contract`, so it doesn't share saved
     settings with Raccoon Alex on the same github.io origin.
   - The local folder is still `C:\Mark\dark-forces-clone`.
+- 2026-10-12: Published.
+  - Public repo: https://github.com/mjvdw13/rogue-contract (remote
+    `origin`; `upstream` still points at the local raccoon-alex).
+  - GitHub Pages serves `main` from the root at
+    https://mjvdw13.github.io/rogue-contract/. The CI workflow runs on every
+    push.
+  - Commits use only the GitHub no-reply identity, never a real email.
 
