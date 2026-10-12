@@ -42,6 +42,8 @@ for (const level of registry.levels.values()) {
       input.hold('fire');
       input.hold('forward');
       let turns = 0;
+      // Monsters go back to sleep if the player dies, so watch the whole run.
+      let woke = false;
       run(w, input, 60, (world, frame) => {
         if (frame % 45 === 0) {
           // Wander: turn now and then, open doors in front, keep shooting.
@@ -49,10 +51,10 @@ for (const level of registry.levels.values()) {
           input.tap('use');
         }
         if (world.player.player.dead) world.player.player.god = true;
+        woke ||= world.things.some((t) => t.kind === 'monster' && t.state !== 'idle');
       });
-      const awake = w.things.filter((t) => t.kind === 'monster' && t.state !== 'idle').length;
       assert.ok(w.time > 59);
-      assert.ok(awake + w.stats.kills > 0, `skill ${skill}: the noise woke something up`);
+      assert.ok(woke, `skill ${skill}: the noise woke something up`);
     }
   });
 }

@@ -181,8 +181,8 @@ export class World {
     return e;
   }
 
-  spawnProjectile(id, owner, angle, spec) {
-    return launchProjectile(this, id, owner, angle, spec);
+  spawnProjectile(id, owner, angle, spec, aim) {
+    return launchProjectile(this, id, owner, angle, spec, aim);
   }
 
   // ------------------------------------------------------------ movement
@@ -305,12 +305,12 @@ export class World {
     if (target?.player) target.health = target.player.health;
   }
 
-  radiusDamage(x, y, radius, amount, inflictor, source) {
-    radiusDamage(this, x, y, radius, amount, inflictor, source);
+  radiusDamage(x, y, radius, amount, inflictor, source, z) {
+    radiusDamage(this, x, y, radius, amount, inflictor, source, z);
   }
 
-  hitscan(shooter, angle, range, amount, spec) {
-    return hitscan(this, shooter, angle, range, amount, spec);
+  hitscan(shooter, angle, range, amount, spec, aim) {
+    return hitscan(this, shooter, angle, range, amount, spec, aim);
   }
 
   meleeTarget(attacker, angle, range, arc) {

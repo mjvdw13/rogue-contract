@@ -45,7 +45,9 @@ export function drawSprites(view, things, map, fb, fbW, colormaps, skip) {
     if (spriteW < 0.5 || spriteH < 0.5) continue;
     const screenX = (W / 2) * (1 + t._tx / depth);
     const left = screenX - spriteW / 2;
-    const bottom = horizon + ((camZ - (t.z ?? 0)) * fy) / depth;
+    // Projectiles hang centred on their z; everything else stands on it.
+    const z = t.kind === 'projectile' ? t.z - (frame.h * scale) / 2 : t.z ?? 0;
+    const bottom = horizon + ((camZ - z) * fy) / depth;
     const top = bottom - spriteH;
 
     let x0 = Math.ceil(left - 0.5);

@@ -119,6 +119,7 @@ export function optionsMenu(game) {
       { label: t(game, 'alwaysRun', 'ALWAYS RUN'), toggle: { get: () => s.alwaysRun, set: set('alwaysRun') } },
       { label: t(game, 'mouseLook', 'MOUSE LOOK'), toggle: { get: () => s.mouseLook, set: set('mouseLook') } },
       { label: t(game, 'invertMouse', 'INVERT LOOK'), toggle: { get: () => s.invertMouseY, set: set('invertMouseY') } },
+      { label: t(game, 'autoAim', 'AUTO AIM'), toggle: { get: () => s.autoAim, set: set('autoAim') } },
       { label: t(game, 'messages', 'MESSAGES'), toggle: { get: () => s.messages, set: set('messages') } },
       { label: t(game, 'showFps', 'SHOW FPS'), toggle: { get: () => s.showFps, set: set('showFps') } },
       {

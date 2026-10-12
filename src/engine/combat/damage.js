@@ -1,6 +1,8 @@
-import { castRay, rayCircle, lineOfSight } from '../world/physics.js';
+import { traceRay3D, rayCylinder, lineOfSight3D } from '../world/physics.js';
+import { aimAttack, aimZ } from './aim.js';
 
-const PUFF_Z = 0.45;
+/** Puffs and blood stay this far inside the floor and ceiling. */
+const PUFF_INSET = 0.06;
 
 /**
  * Apply damage to a thing. `inflictor` is what hit it (projectile, shooter),
@@ -102,7 +104,7 @@ export function kill(world, target, source) {
   }
   if (def.explode) {
     const ex = def.explode;
-    radiusDamage(world, target.x, target.y, ex.radius ?? 2, ex.damage ?? 100, target, source ?? target);
+    radiusDamage(world, target.x, target.y, ex.radius ?? 2, ex.damage ?? 100, target, source ?? target, aimZ(target));
     if (ex.effect) world.spawn(ex.effect, target.x, target.y);
     if (ex.sound) world.playSoundFrom(ex.sound, target);
   }
@@ -111,47 +113,66 @@ export function kill(world, target, source) {
 }
 
 /**
- * Explosion damage: falls off linearly with distance, blocked by walls.
+ * Explosion damage: falls off linearly with the 3D distance from (x, y, z) to
+ * the nearest point of each body, and floors, ledges and walls block it. `z`
+ * defaults to the middle of a standing body above the floor there.
  */
-export function radiusDamage(world, x, y, radius, maxDamage, inflictor, source) {
+export function radiusDamage(world, x, y, radius, maxDamage, inflictor, source, z = world.map.floorAt(x, y) + 0.4) {
   for (const t of [...world.things]) {
     if (!t.shootable || t.dead || t.removed) continue;
     if (t.def.splashImmune) continue;
-    const d = Math.max(0, Math.hypot(t.x - x, t.y - y) - t.radius);
+    const across = Math.max(0, Math.hypot(t.x - x, t.y - y) - t.radius);
+    const vertical = Math.max(0, t.z - z, z - t.z - t.height);
+    const d = Math.hypot(across, vertical);
     if (d >= radius) continue;
-    if (!lineOfSight(world.map, x, y, t.x, t.y)) continue;
+    // Sight to the nearest height on the body, a little inside it so the line
+    // doesn't graze the floor it stands on.
+    const inset = Math.min(0.1, t.height / 4);
+    const tz = Math.max(t.z + inset, Math.min(t.z + t.height - inset, z));
+    if (!lineOfSight3D(world.map, x, y, z, t.x, t.y, tz)) continue;
     const dmg = maxDamage * (1 - d / radius);
     damage(world, t, dmg, inflictor ?? { x, y }, source);
   }
 }
 
-/** Instant bullet trace. Hits the first shootable thing before a wall. */
-export function hitscan(world, shooter, angle, range, amount, spec = {}) {
+/**
+ * Instant bullet trace in 3D, from the attacker's fire height along `aim`'s
+ * slope. Hits the first body before a wall, floor or ceiling, and leaves a
+ * puff (or blood) where it struck. Shots into the sky leave nothing.
+ */
+export function hitscan(world, shooter, angle, range, amount, spec = {}, aim = aimAttack(world, shooter, angle, range)) {
   const dx = Math.cos(angle);
   const dy = Math.sin(angle);
-  const wall = castRay(world.map, shooter.x, shooter.y, dx, dy, range);
+  const { z, slope } = aim;
+  const wall = traceRay3D(world.map, shooter.x, shooter.y, z, dx, dy, slope, range);
   let best = null;
   let bestT = wall.dist;
   for (const t of world.things) {
     if (t === shooter || !t.shootable || t.dead || t.removed) continue;
-    const hit = rayCircle(shooter.x, shooter.y, dx, dy, t.x, t.y, t.radius);
+    const hit = rayCylinder(shooter.x, shooter.y, z, dx, dy, slope, t.x, t.y, t.radius, t.z, t.z + t.height);
     if (hit >= 0 && hit < bestT) {
       bestT = hit;
       best = t;
     }
   }
-  const hx = shooter.x + dx * Math.max(0, bestT - 0.06);
-  const hy = shooter.y + dy * Math.max(0, bestT - 0.06);
-  const z = PUFF_Z + world.rng.signed() * 0.08;
+  const back = Math.max(0, bestT - 0.06);
+  const hx = shooter.x + dx * back;
+  const hy = shooter.y + dy * back;
+  const floor = world.map.floorAt(hx, hy);
+  const ceil = world.map.ceilAt(hx, hy);
+  const hz = Math.max(floor + PUFF_INSET, Math.min(ceil - PUFF_INSET, z + slope * back + world.rng.signed() * 0.04));
   if (best) {
     damage(world, best, amount, shooter, shooter);
     const fx = best.def.bleeds === false ? (spec.puff ?? 'puff') : (best.def.blood ?? 'blood');
-    world.spawnEffect(fx, hx, hy, z);
-  } else if (bestT < range) {
-    world.spawnEffect(spec.puff ?? 'puff', hx, hy, z);
+    world.spawnEffect(fx, hx, hy, hz);
+  } else if (wall.hit && !wall.sky) {
+    world.spawnEffect(spec.puff ?? 'puff', hx, hy, hz);
   }
   return best;
 }
+
+/** How far above or below its own body a melee attack still reaches. */
+const MELEE_REACH_Z = 0.25;
 
 /** Nearest shootable thing within melee reach and in front of the attacker. */
 export function meleeTarget(world, attacker, angle, range, arc = 0.7) {
@@ -164,7 +185,9 @@ export function meleeTarget(world, attacker, angle, range, arc = 0.7) {
     let da = Math.atan2(t.y - attacker.y, t.x - attacker.x) - angle;
     da = Math.atan2(Math.sin(da), Math.cos(da));
     if (Math.abs(da) > arc) continue;
-    if (!lineOfSight(world.map, attacker.x, attacker.y, t.x, t.y)) continue;
+    // Within reach up and down too: bodies overlapping in height, give or take a little.
+    if (t.z > attacker.z + attacker.height + MELEE_REACH_Z || attacker.z > t.z + t.height + MELEE_REACH_Z) continue;
+    if (!lineOfSight3D(world.map, attacker.x, attacker.y, aimZ(attacker), t.x, t.y, aimZ(t))) continue;
     best = t;
     bestD = d;
   }

@@ -39,6 +39,9 @@ export class LevelScene {
           get alwaysRun() {
             return g.settings.alwaysRun;
           },
+          get autoAim() {
+            return g.settings.autoAim;
+          },
           noMonsters: g.debug.noMonsters,
         },
         hooks: {

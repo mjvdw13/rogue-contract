@@ -1,5 +1,5 @@
 import { performAttack } from '../combat/attacks.js';
-import { lineOfSight } from '../world/physics.js';
+import { canSeeBody } from '../combat/aim.js';
 
 /**
  * Definition-driven monster AI, in the spirit of Doom's:
@@ -36,7 +36,7 @@ function canSee(world, m, t) {
   if (!t || t.dead || t.removed) return false;
   if (t.player?.notarget) return false;
   if (m.distanceTo(t) > (m.def.sightRange ?? 40)) return false;
-  return lineOfSight(world.map, m.x, m.y, t.x, t.y);
+  return canSeeBody(world.map, m, t);
 }
 
 function fireAttack(world, m) {
@@ -180,7 +180,7 @@ export function monsterThink(world, m, dt) {
         }
       }
       const d = m.distanceTo(t);
-      const los = lineOfSight(world.map, m.x, m.y, t.x, t.y);
+      const los = canSeeBody(world.map, m, t);
       const spec = chooseAttack(world, m, t, d, los);
       if (spec) {
         startAttack(world, m, spec);

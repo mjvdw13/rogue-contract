@@ -41,4 +41,5 @@ export const DEFAULT_SETTINGS = {
   touchControls: 'auto', // 'auto' | 'on' | 'off'
   invertMouseY: false,
   mouseLook: true,
+  autoAim: true,
 };

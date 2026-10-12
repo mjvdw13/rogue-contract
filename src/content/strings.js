@@ -47,6 +47,7 @@ export default {
     alwaysRun: 'ALWAYS RUN',
     mouseLook: 'MOUSE LOOK',
     invertMouse: 'INVERT LOOK',
+    autoAim: 'AUTO AIM',
     messages: 'MESSAGES',
     showFps: 'SHOW FPS',
     touch: 'TOUCH PAD',

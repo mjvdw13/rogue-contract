@@ -1,4 +1,4 @@
-import { F_SOLID, F_DOOR, F_SLANT } from './tilemap.js';
+import { F_SOLID, F_DOOR, F_SKY, F_SLANT } from './tilemap.js';
 
 /**
  * Cast a ray through the tile grid. Stops at walls, the map edge and the
@@ -69,24 +69,114 @@ export function castRay(map, x, y, dx, dy, maxDist = 64) {
         passedDoor ??= door;
         continue;
       }
-      // Panels run through the tile centre; secret doors sit on the tile face.
-      const t = door.secret ? enter : door.axis === 'x' ? (dx === 0 ? -1 : (mapX + 0.5 - x) / dx) : dy === 0 ? -1 : (mapY + 0.5 - y) / dy;
-      if (t >= 0 && t <= maxDist) {
-        const hx = x + dx * t;
-        const hy = y + dy * t;
-        if (door.secret || (Math.floor(hx) === mapX && Math.floor(hy) === mapY)) {
-          const u = door.axis === 'x' ? hy - mapY : hx - mapX;
-          const open = door.open;
-          const gap = door.style === 'split' ? u > 0.5 - open / 2 && u < 0.5 + open / 2 : u < open;
-          if (!gap) return { dist: t, tx: mapX, ty: mapY, door, passedDoor };
-          passedDoor ??= door;
-        }
-      }
+      const t = doorPanel(door, x, y, dx, dy, mapX, mapY, enter, maxDist);
+      if (t >= 0) return { dist: t, tx: mapX, ty: mapY, door, passedDoor };
+      if (t === -2) passedDoor ??= door;
       continue;
     }
     if (f & F_SOLID) return { dist: enter, tx: mapX, ty: mapY, door: null, passedDoor };
   }
   return { dist: maxDist, tx: mapX, ty: mapY, door: null, passedDoor };
+}
+
+/**
+ * Where a ray meets a sliding or secret door's panel inside tile (mapX, mapY),
+ * which it entered at distance `enter`. Returns the distance if the panel
+ * blocks the ray, -2 if the ray slips through the open gap, or -1 if it
+ * doesn't cross the panel inside this tile.
+ */
+function doorPanel(door, x, y, dx, dy, mapX, mapY, enter, maxDist) {
+  // Panels run through the tile centre; secret doors sit on the tile face.
+  const t = door.secret ? enter : door.axis === 'x' ? (dx === 0 ? -1 : (mapX + 0.5 - x) / dx) : dy === 0 ? -1 : (mapY + 0.5 - y) / dy;
+  if (t < 0 || t > maxDist) return -1;
+  const hx = x + dx * t;
+  const hy = y + dy * t;
+  if (!door.secret && (Math.floor(hx) !== mapX || Math.floor(hy) !== mapY)) return -1;
+  const u = door.axis === 'x' ? hy - mapY : hx - mapX;
+  const open = door.open;
+  const gap = door.style === 'split' ? u > 0.5 - open / 2 && u < 0.5 + open / 2 : u < open;
+  return gap ? -2 : t;
+}
+
+/**
+ * Trace a ray through the height grid in 3D: from (x, y, z) along the unit
+ * horizontal direction (dx, dy), rising `slope` units per unit of horizontal
+ * distance. It stops at walls, door panels, angled walls, the faces of raised
+ * floors and lowered ceilings, and the floor or ceiling itself. Rising doors
+ * are just the tile's ceiling. Distances are horizontal.
+ *
+ * `hit` is 'wall', 'floor', 'ceiling', or null if nothing was hit within
+ * `maxDist`. `sky` is true when the ray went up into the sky.
+ * @returns {{dist:number, z:number, hit:'wall'|'floor'|'ceiling'|null, sky:boolean, tx:number, ty:number}}
+ */
+export function traceRay3D(map, x, y, z, dx, dy, slope, maxDist = 64) {
+  const { flags, floorZ, ceilZ } = map;
+  let mapX = Math.floor(x);
+  let mapY = Math.floor(y);
+  const ddx = dx === 0 ? 1e30 : Math.abs(1 / dx);
+  const ddy = dy === 0 ? 1e30 : Math.abs(1 / dy);
+  const stepX = dx < 0 ? -1 : 1;
+  const stepY = dy < 0 ? -1 : 1;
+  let sdx = (dx < 0 ? x - mapX : mapX + 1 - x) * ddx;
+  let sdy = (dy < 0 ? y - mapY : mapY + 1 - y) * ddy;
+  const result = (dist, hit, sky = false) => ({ dist, z: z + slope * dist, hit, sky, tx: mapX, ty: mapY });
+  if (!map.inBounds(mapX, mapY)) return result(0, 'wall');
+  let enter = 0;
+  // Where the ray reaches height h (never before it entered the current tile).
+  const crossing = (h) => (slope === 0 ? enter : Math.max(enter, (h - z) / slope));
+  for (let i = 0; i < 512; i++) {
+    const idx = mapY * map.w + mapX;
+    const f = flags[idx];
+    const leave = Math.min(sdx, sdy, maxDist);
+    // An angled wall or a door panel standing inside this tile.
+    let block = Infinity;
+    if (f & F_SLANT) {
+      const t = map.slants[map.slantIndex[idx]].ray(x, y, dx, dy);
+      if (t >= enter && t <= leave) block = t;
+    } else if (f & F_DOOR) {
+      const door = map.doors[map.doorIndex[idx]];
+      if (door.style !== 'rise') {
+        const t = doorPanel(door, x, y, dx, dy, mapX, mapY, enter, maxDist);
+        if (t >= 0 && t <= leave) block = t;
+      }
+    }
+    // Does the ray reach this tile's floor or ceiling before it leaves?
+    const end = Math.min(leave, block);
+    const zEnd = z + slope * end;
+    if (zEnd < floorZ[idx]) return result(crossing(floorZ[idx]), 'floor');
+    if (zEnd > ceilZ[idx]) return result(crossing(ceilZ[idx]), 'ceiling', !!(f & F_SKY));
+    if (block < Infinity) return result(block, 'wall');
+    if (leave >= maxDist) return result(maxDist, null);
+
+    if (sdx < sdy) {
+      enter = sdx;
+      sdx += ddx;
+      mapX += stepX;
+    } else {
+      enter = sdy;
+      sdy += ddy;
+      mapY += stepY;
+    }
+    if (!map.inBounds(mapX, mapY)) return result(enter, 'wall');
+    const n = mapY * map.w + mapX;
+    const nf = flags[n];
+    if (nf & F_SOLID) return result(enter, 'wall');
+    if (nf & F_SLANT && map.slants[map.slantIndex[n]].solidAt(x + dx * enter, y + dy * enter)) return result(enter, 'wall');
+    // The face of a raised floor or a lowered ceiling (open sky between two sky tiles).
+    const ze = z + slope * enter;
+    if (ze < floorZ[n]) return result(enter, 'wall');
+    if (ze > ceilZ[n]) return result(enter, 'wall', !!(f & F_SKY && nf & F_SKY));
+  }
+  return result(maxDist, null);
+}
+
+/** Is there a clear 3D line between two points (through the height grid)? */
+export function lineOfSight3D(map, x0, y0, z0, x1, y1, z1) {
+  const dx = x1 - x0;
+  const dy = y1 - y0;
+  const d = Math.hypot(dx, dy);
+  if (d < 1e-6) return true;
+  return traceRay3D(map, x0, y0, z0, dx / d, dy / d, (z1 - z0) / d, d).dist >= d - 1e-4;
 }
 
 /** Is there a clear line between two points? */
@@ -142,4 +232,27 @@ export function rayCircle(ox, oy, dx, dy, cx, cy, r) {
   const perp2 = fx * fx + fy * fy - proj * proj;
   if (perp2 > r * r) return -1;
   return Math.max(0, proj - Math.sqrt(r * r - perp2));
+}
+
+/**
+ * 3D ray vs an upright cylinder (a thing's body): the horizontal distance at
+ * which a ray from (ox, oy, oz) along unit (dx, dy) with `slope` first
+ * touches the cylinder at (cx, cy) between heights `bottom` and `top`, or -1.
+ */
+export function rayCylinder(ox, oy, oz, dx, dy, slope, cx, cy, r, bottom, top) {
+  const fx = cx - ox;
+  const fy = cy - oy;
+  const proj = fx * dx + fy * dy;
+  const perp2 = fx * fx + fy * fy - proj * proj;
+  if (perp2 > r * r) return -1;
+  const half = Math.sqrt(r * r - perp2);
+  let t0 = Math.max(0, proj - half);
+  let t1 = proj + half;
+  if (t1 <= 0) return -1;
+  if (slope === 0) return oz >= bottom && oz <= top ? t0 : -1;
+  const ta = (bottom - oz) / slope;
+  const tb = (top - oz) / slope;
+  t0 = Math.max(t0, Math.min(ta, tb));
+  t1 = Math.min(t1, Math.max(ta, tb));
+  return t0 <= t1 ? t0 : -1;
 }

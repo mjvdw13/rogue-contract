@@ -103,6 +103,13 @@ the floor as the corpse.
 
 Damage is either a `[min, max]` range or a number.
 
+Attacks are 3D. Monsters aim at the middle of their target's body, and shots
+start most of the way up the monster (the player fires from the eye, along
+the view's pitch, with a gentle vertical auto-aim that can be switched off in
+Options). Bullets and projectiles stop at floors, ceilings and the faces of
+steps and ledges, and shots into the sky simply vanish. Explosions measure
+3D distance, so a blast on the floor below a ledge doesn't reach over it.
+
 **Other fields:** `scale` (sprite size), `height`, `mass` (knockback),
 `sightRange`, `splashImmune`, `infighting: false`, `boss: true`,
 `renderStyle: 'fuzz'` (shimmering, partly invisible), `countKill: false`.
@@ -587,8 +594,9 @@ export default {
   ],
   attacks: [
     // { kind: 'triple-exception' } in any monster or weapon
-    defineAttack('triple-exception', (world, attacker, spec, angle) => {
-      for (const d of [-0.2, 0, 0.2]) world.spawnProjectile('exception-fireball', attacker, angle + d, spec);
+    // opts.aim is { z, slope }: where the attack starts and how steeply it climbs.
+    defineAttack('triple-exception', (world, attacker, spec, angle, opts) => {
+      for (const d of [-0.2, 0, 0.2]) world.spawnProjectile('exception-fireball', attacker, angle + d, spec, opts.aim);
       return true;
     }),
   ],

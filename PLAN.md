@@ -73,7 +73,7 @@ The renderer already supports shifting the view up and down
          draw and understand the lines.
        - Textures run along the line at a true 64 texels per unit, so they
          aren't stretched.
-6. [ ] **3D combat.** Shots aim along the camera's pitch with gentle
+6. [x] **3D combat.** Shots aim along the camera's pitch with gentle
        vertical auto-aim. Projectiles move in 3D, hit floors, ceilings and
        angled walls. Explosions measure distance in 3D.
 7. [ ] **Enemies.** Monsters follow floor heights, and pathfinding knows
@@ -268,3 +268,30 @@ update the smoke test.
     push.
   - Commits use only the GitHub no-reply identity, never a real email.
 - 2026-10-12: Renamed the local folder to `C:\Mark\rogue-contract`.
+- 2026-10-12: Phase 1 step 6 done: 3D combat.
+  - **Trace:** `traceRay3D` in `world/physics.js` walks the height grid in
+    3D. It stops at walls, door panels, angled walls, step faces, floors and
+    ceilings. Rising doors are just their tile's ceiling. It also reports
+    when a ray goes into the sky.
+  - **Aim:** `combat/aim.js`. The player fires from the eye along the view
+    pitch. Gentle vertical auto-aim bends a shot by at most 0.12 slope (about
+    7°) onto a monster already in line horizontally. AUTO AIM in Options
+    turns it off. Monsters fire from 60% of their height at the middle of
+    their target. Every attack kind gets `opts.aim = { z, slope }`.
+  - **Hitscans** hit bodies as 3D cylinders. Puffs land where the shot
+    struck, and shots into the sky leave nothing.
+  - **Projectiles** fly with vertical speed. Their z is now the sprite's
+    centre. They burst on floors, ceilings and step faces, and vanish into
+    the sky. Lobs land at the target's height. `defineProjectile`'s `z` is
+    now optional: a start height above the owner's feet.
+  - **Explosions** measure 3D distance to the nearest point of each body,
+    and floors and ledges block them. **Melee** only reaches bodies at
+    about the same height.
+  - **Sight:** monsters see in 3D (from their fire height to the target's
+    middle or head), so a ledge hides you when you stand under its edge.
+  - **Tests:** `tests/combat3d.test.js` (11 tests). The chaos test now checks
+    that something woke during the run, since monsters sleep again if the
+    player dies. 84 tests, the validator and the smoke test pass. Rocket
+    flight was checked in headless renders.
+  - **Still to do:** step 7 (monsters walk off ledges, and flying monsters
+    still snap to the floor).

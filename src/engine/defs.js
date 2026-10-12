@@ -295,7 +295,9 @@ export function defineDecoration(def) {
 }
 
 /**
- * A projectile (fireballs, rockets...). Speed in tiles/second.
+ * A projectile (fireballs, rockets...). Speed in tiles/second. It flies from
+ * its owner's fire height along the shot's slope; `z` instead starts it that
+ * high above the owner's feet. Its z is the middle of the sprite.
  * @param {{id:string, sheet:SheetSpec, anims:{fly:AnimSpec, explode?:AnimSpec}, speed?:number,
  *   damage?:number|number[], radius?:number, splash?:{radius:number, damage:number},
  *   gravity?:number, z?:number, sounds?:{fire?:string, explode?:string}, trail?:string}} def
@@ -306,7 +308,7 @@ export function defineProjectile(def) {
     damage: [5, 20],
     radius: 0.12,
     height: 0.25,
-    z: 0.4,
+    z: null,
     fullbright: true,
     gravity: 0,
     splash: null,
