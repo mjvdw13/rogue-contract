@@ -10,7 +10,7 @@ land, and record new decisions here.
 | Question | Decision |
 |---|---|
 | Engine | **Height grid.** Keep the tile grid, but give each tile its own floor and ceiling height. Add elevators, looking up and down, jump and crouch. Not a flat reskin, and not a full sector/portal engine. |
-| Where | **New sibling repo**, `C:\Markogue-contract` (first created as `dark-forces-clone`), copied from raccoon-alex with its history. Raccoon Alex stays untouched. |
+| Where | **New sibling repo**, `C:\Mark\rogue-contract` (first created as `dark-forces-clone`), copied from raccoon-alex with its history. Raccoon Alex stays untouched. |
 | Story | **Original story in Dark Forces' style.** A new mercenary working for the Rebellion, Imperial bases, mission briefings and objectives, a serious tone. No Kyle Katarn retelling. |
 | Scope | **A one-mission vertical slice first**, then decide whether to build more. |
 | Title | **Rogue Contract** (chosen 2026-10-11). Repo `mjvdw13/rogue-contract`, public, served by GitHub Pages. "Star Wars" and "Dark Forces" stay out of the title. |
@@ -32,7 +32,7 @@ The renderer already supports shifting the view up and down
 
 ## Phase 0: Fork
 
-- [x] Create the repo (now `C:\Markogue-contract`), keeping the raccoon-alex history.
+- [x] Create the repo (now `C:\Mark\rogue-contract`), keeping the raccoon-alex history.
 - [x] Rename the package, title and README, and keep `npm test`,
       `npm run validate` and CI passing.
 - [ ] Replace the Alex content step by step as each Star Wars piece lands,
@@ -267,4 +267,4 @@ update the smoke test.
     https://mjvdw13.github.io/rogue-contract/. The CI workflow runs on every
     push.
   - Commits use only the GitHub no-reply identity, never a real email.
-- 2026-10-12: Renamed the local folder to `C:\Markogue-contract`.
+- 2026-10-12: Renamed the local folder to `C:\Mark\rogue-contract`.
