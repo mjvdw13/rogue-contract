@@ -303,7 +303,9 @@ by the vent. This story adds:
 
 ## Engine work this needs
 
-Most of this builds on code we already have: the friendly NPCs
+The build list, in order and with the code each piece touches, is in
+PLAN.md under Phase 2 ("For the story"). In short: most of this builds on
+code we already have: the friendly NPCs
 (`things/npc.js`: wandering, lines when bumped), monster wake-up
 (`things/monster.js`), model decorations (which already update every tick,
 for `spin`), the single `world.camera()` the renderer draws from, and

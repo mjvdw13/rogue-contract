@@ -712,21 +712,90 @@ Decided:
 
 ### For the story (`docs/story.md`)
 
-- [ ] **The Crow's drop-offs and pickups** (every mission): a `fly` action
-      that moves a model decoration along keyframes, a skippable `cutscene`
-      action (the view from a tagged spot, input locked), and `wait` inside
-      a trigger's action list.
-- [ ] **Mission 1's free roam:** calm monsters (stand or wander, say lines
-      when bumped, don't attack) and a `hostile` action that flips them all
-      at once, also run when the player fires or hits anyone; an
-      `on: 'hostile'` trigger. Patrol routes if there's time.
-- [ ] **The tracking fob** (Mission 1): a weapon slot with no attack whose
-      light blinks and beeps faster near the signal, a `setSignal` action,
-      and taking the fob away.
-- [ ] **Conversations:** NPC lines that move on with each use, story flags
-      (`setFlag`, `if` on triggers) and an `on: 'talk'` trigger.
-- [ ] **Small actions:** `remove` and `place` for characters, and
-      `damage { tag, amount }`.
+About a dozen pieces, all small or medium, and no new rendering technique:
+most extend code that already exists. Order: the Crow pieces first (every
+mission uses them, and they give Mos Eisley's opening), then calm troopers
+and the switch, then conversations, then the fob. Each new action or
+trigger is registered and checked by the validator (`validate.js` rejects
+unknown actions), documented in MODDING.md and covered by tests.
+
+**Every mission: the Moldy Crow's drop-offs and pickups**
+
+1. [ ] **`fly` action** (small): moves a model decoration along timed
+       keyframes (x, y, z, facing, seconds). Collision already reads each
+       thing's current position and height every tick (`world.js`
+       `tryMove`), so a Crow up in the air blocks nothing.
+2. [ ] **`cutscene` action** (small to medium): for a few seconds the view
+       comes from a tagged spot looking at a target, the HUD and weapon are
+       hidden and input is locked; use or fire skips it. An override of
+       `world.camera()`, which the renderer draws from.
+3. [ ] **`wait` in trigger lists** (small): a trigger's actions can pause,
+       for the landing's timing, Jan's lines and Mission 2's "two
+       minutes". Today a trigger runs all its actions at once.
+
+**Mission 1's free roam**
+
+4. [ ] **Calm monsters** (small to medium): a placed monster with `calm`
+       skips the idle "can I see the player?" check (`monster.js`), stands
+       its post or wanders, and says lines when bumped or used, using the
+       friendly characters' reaction (today only `kind === 'npc'` gets
+       bump reactions, `world.js` `tryMove`).
+5. [ ] **The town's switch** (small): a `hostile` action turns every calm
+       monster normal at once, with an `on: 'hostile'` trigger (blast
+       doors, reinforcements, combat music). The player firing runs it too
+       (hook it where a shot makes noise, `weapons.js` `if (def.noise)`), and
+       so does any damage the player deals.
+6. [ ] **Conversations** (small to medium): an `on: 'talk'` trigger raised
+       from `npcReact` (`npc.js`), NPC lines that move on with each use, and
+       story flags (`setFlag`, plus `if` on triggers).
+7. [ ] **The tracking fob** (small to medium): a weapon with no attack (the
+       weapon code assumes every weapon has `fire`), a per-tick weapon hook
+       that blinks its light and beeps faster near the signal, a
+       `setSignal` action (a tag, item or character), and a `takeWeapon`
+       action to remove it at the end. Giving it is an ordinary weapon
+       pickup in the broker's booth.
+8. [ ] **`remove` and `place` actions** (small): Dace is taken in Mission
+       1 and waits at the pad in Mission 3; Mohc leaves.
+9. [ ] Nice to have: **patrol routes** (`patrol: 'street'` walks tiles
+       tagged `street-1`, `street-2`... in order) and **civilians running
+       away** when the town turns.
+
+**Missions 2 and 3**
+
+10. [ ] **`damage { tag, amount }` action** (small): the overload hurts the
+        prototype.
+11. [ ] Optional: **factions**, so Tuskens and troopers fight each other at
+        the farm (monster infighting already sets `m.target`).
+
+**Fixes and tools that go with these**
+
+12. [ ] The level checker blocks the floor under a model's collision lines
+        where it spawns (`tools/lib/levelcheck.mjs`). The Crow spawns in the
+        air above the bay, so skip models placed high or marked as flying.
+13. [ ] The `spawn` action always plays the teleport sound
+        (`actions.js`); stay quiet when `fog: false`, for reinforcements.
+14. [ ] The headless play test runs every level, so it skips opening
+        cutscenes.
+
+**Already above, and these maps lean on them:** briefings and objectives
+(Jan and Kyle's briefings; the exit waits for objectives), and smarter
+enemies around heights (Mission 1's rooftop snipers and the troopers on the
+farm's pit rim would walk at Kyle and stall at the ledge).
+
+**No engine work needed** (checked 2026-10-13):
+
+- Mos Eisley's rooflines: a solid wall is drawn only up to the sky height
+  of the tile in front of it (`columns.js`, the solid `face()` call), so a
+  street whose sky sits just above the roofs shows the buildings with sky
+  behind them. Design rule: where a roof is walkable, the sky over the
+  streets beside it stays above Kyle's eye.
+- Sunken docking bays and the farm's courtyard, flickering firelight
+  (`lightFx`), blast doors (remote-locked doors and `closeDoors`),
+  reinforcements (`spawn`), dust (`spawnEffect`), the checkpoint pass (a
+  renamed keycard), the combat music switch (`music`), and importing 3D
+  models.
+- The real cost is art: the Moldy Crow model, the prototype and townsfolk
+  sprites, adobe textures and a day sky (Phase 3 and Phase 1b D).
 
 ## Phase 3: Content for the slice
 
@@ -1290,3 +1359,10 @@ update the smoke test.
   Canyon Garrison stays a combat mission entered by the vent. Dropped:
   restricted zones, warnings, monster searching, the traced fob and
   throwing it. The story's engine items are listed under Phase 2.
+- 2026-10-13: The story's engine work, checked against the code, is now a
+  numbered list under Phase 2 ("For the story"): the Crow's `fly`,
+  `cutscene` and `wait`; calm monsters and the `hostile` switch;
+  conversations; the tracking fob; `remove`/`place` and `damage`; and the
+  tool fixes that go with them (the level checker and flying models, the
+  spawn sound, skipping cutscenes in tests). Mos Eisley's rooflines need no
+  engine change.
