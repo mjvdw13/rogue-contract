@@ -147,8 +147,10 @@ export class Assets {
     // Slot 0 is the "missing texture" checkerboard.
     this.textures = [new Texture('__missing', this.placeholder())];
     this.textureSlots = new Map();
-    for (const t of reg.textures.values()) {
-      const img = this.images.get(t.src) ?? this.placeholder(64 * (t.frames ?? 1), 64);
+    for (const t0 of reg.textures.values()) {
+      // An override can change the frame count (a still picture over an animated texture).
+      const t = { ...t0, ...this.overrides?.[t0.src] };
+      const img = this.images.get(t0.src) ?? this.placeholder(64 * (t.frames ?? 1), 64);
       const tex = new Texture(t.id, img, t);
       if (!t.sky && (tex.wMask < 0 || tex.hMask < 0)) {
         this.problems.push(`Texture "${t.id}" must be a power-of-two size (is ${tex.w}x${tex.h})`);

@@ -56,5 +56,19 @@ node assets/custom/cut.mjs "<folder with the sheets>"
 Weapon sprites are drawn 1:1, so they have no `scale`; the cutter pads each
 frame so the art lands where Dark Forces put it, given the weapon's `offset`.
 
+## The Dark Forces textures
+
+`textures.mjs` replaces each generated wall, floor, ceiling and sky texture
+with one from the Dark Forces texture pack ("MS-DOS - Star Wars_ Dark Forces
+- Miscellaneous - Textures" zip), writing them to `textures/` and adding
+their entries to `overrides.json`. The picks are in the script's `TEXTURES`
+table. Switches and key doors are composited: Dark Forces wall or door art
+with its small switch or key panel laid on top. Give it the zip's
+`Textures` folder:
+
+```
+node assets/custom/textures.mjs "<the pack's Textures folder>"
+```
+
 Credits: game and art by LucasArts. The enemy sheets were ripped by Crazy
 Ivan, the weapons sheet by Dolphman.

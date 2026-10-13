@@ -1,6 +1,5 @@
-// LOCAL ONLY (git ignores this folder). Cuts the ripped Dark Forces enemy and weapon
-// sheets into the game's monster and weapon frame layouts, and points overrides.json at
-// the results. Never commit the output: it's LucasArts' art.
+// Cuts the ripped Dark Forces enemy and weapon sheets into the game's monster and
+// weapon frame layouts, and points overrides.json at the results. See DISCLAIMER.md.
 //
 //   node assets/custom/cut.mjs "<folder with the ripped sheets>"
 //

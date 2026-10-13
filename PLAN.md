@@ -279,6 +279,16 @@ Design rules (what makes it feel like Dark Forces):
       the smoke test still skips them. An override image that fails to
       load falls back to the committed art. Update the comment in
       `assets.js`, `assets/custom/README.md` and `DISCLAIMER.md`.
+- [x] **Dark Forces textures** (Mark, 2026-10-12, from his texture pack
+      zip). `assets/custom/textures.mjs` copies or composites one DF texture
+      per generated texture into `assets/custom/textures/` and adds the
+      overrides. Switches and key doors are DF wall/door art with DF's
+      small switch and key panels laid on top. Texture overrides can change
+      the frame count (the console is static). Review in screenshots of
+      Mission 1, then tune the picks.
+- [ ] Key doors show their key panel once per 64x64 tile, so a big door
+      shows it four times. Make door textures one panel per door (a
+      128x128 door texture, or draw the panel only once per door).
 
 ### E. Leftovers from the first Star Wars pass
 
@@ -794,3 +804,13 @@ update the smoke test.
   - **Checks:** 91 tests, the validator and the smoke test pass;
     screenshots at 4:3 and 16:9.
   - **Next:** B3, the lighting pass.
+- 2026-10-12: Dark Forces textures, from Mark's texture pack zip (918
+  textures, all power-of-two sizes, at about our texel density).
+  `assets/custom/textures.mjs` maps all 21 generated textures to DF ones
+  (SecBase walls and doors, Generic floors and lights, Talay's night sky)
+  and composites the switches and key doors from DF's small switch and key
+  panels. Texture overrides can now change the frame count (the console is
+  a still picture). The dirt floor (ZPDIRT01) snapped to blood red in our
+  palette, so the canyon floor is SecBase's grey rock (IPSEC1), matching the
+  grey cliffs. Reviewed in screenshots of 13 spots in Mission 1. Found: key
+  panels repeat on big doors (logged in Phase 1b D).

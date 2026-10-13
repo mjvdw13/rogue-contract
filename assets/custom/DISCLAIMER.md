@@ -1,8 +1,8 @@
 # Disclaimer: ripped Dark Forces art
 
 The images in this folder (`stormtrooper.png`, `officer.png`,
-`probe-droid.png`, `fists.png` and `blaster.png`) come from *Star Wars: Dark
-Forces* (LucasArts, 1995). The game and its art belong to Lucasfilm Ltd.
+`probe-droid.png`, `fists.png`, `blaster.png` and everything in `textures/`)
+come from *Star Wars: Dark Forces* (LucasArts, 1995). The game and its art belong to Lucasfilm Ltd.
 They are not part of Rogue Contract and are not covered by its license.
 
 - The owner of this repository owns a copy of Dark Forces. These files are

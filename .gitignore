@@ -15,3 +15,5 @@ assets/custom/*
 !assets/custom/probe-droid.png
 !assets/custom/fists.png
 !assets/custom/blaster.png
+!assets/custom/textures.mjs
+!assets/custom/textures/

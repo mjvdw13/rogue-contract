@@ -26,5 +26,69 @@
     "src": "assets/custom/blaster.png",
     "frameWidth": 118,
     "frameHeight": 129
+  },
+  "assets/textures/imp-panel.png": {
+    "src": "assets/custom/textures/imp-panel.png"
+  },
+  "assets/textures/imp-panel-dark.png": {
+    "src": "assets/custom/textures/imp-panel-dark.png"
+  },
+  "assets/textures/imp-lights.png": {
+    "src": "assets/custom/textures/imp-lights.png"
+  },
+  "assets/textures/imp-stripe.png": {
+    "src": "assets/custom/textures/imp-stripe.png"
+  },
+  "assets/textures/imp-vent.png": {
+    "src": "assets/custom/textures/imp-vent.png"
+  },
+  "assets/textures/imp-computer.png": {
+    "src": "assets/custom/textures/imp-computer.png",
+    "frames": 1
+  },
+  "assets/textures/imp-floor.png": {
+    "src": "assets/custom/textures/imp-floor.png"
+  },
+  "assets/textures/imp-grate.png": {
+    "src": "assets/custom/textures/imp-grate.png"
+  },
+  "assets/textures/imp-ceiling.png": {
+    "src": "assets/custom/textures/imp-ceiling.png"
+  },
+  "assets/textures/imp-ceiling-light.png": {
+    "src": "assets/custom/textures/imp-ceiling-light.png"
+  },
+  "assets/textures/lift-floor.png": {
+    "src": "assets/custom/textures/lift-floor.png"
+  },
+  "assets/textures/imp-door.png": {
+    "src": "assets/custom/textures/imp-door.png"
+  },
+  "assets/textures/imp-door-red.png": {
+    "src": "assets/custom/textures/imp-door-red.png"
+  },
+  "assets/textures/imp-door-blue.png": {
+    "src": "assets/custom/textures/imp-door-blue.png"
+  },
+  "assets/textures/imp-door-yellow.png": {
+    "src": "assets/custom/textures/imp-door-yellow.png"
+  },
+  "assets/textures/imp-jamb.png": {
+    "src": "assets/custom/textures/imp-jamb.png"
+  },
+  "assets/textures/imp-switch.png": {
+    "src": "assets/custom/textures/imp-switch.png"
+  },
+  "assets/textures/imp-switch-on.png": {
+    "src": "assets/custom/textures/imp-switch-on.png"
+  },
+  "assets/textures/canyon-rock.png": {
+    "src": "assets/custom/textures/canyon-rock.png"
+  },
+  "assets/textures/sand.png": {
+    "src": "assets/custom/textures/sand.png"
+  },
+  "assets/textures/sky-night.png": {
+    "src": "assets/custom/textures/sky-night.png"
   }
 }
