@@ -1,19 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import fs from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { Palette, HAZE_ROW, HAZE_STEPS } from '../src/engine/gfx/palette.js';
-import { Surface } from '../src/engine/gfx/surface.js';
-import { quantize } from '../src/engine/gfx/image.js';
-import { Assets } from '../src/engine/assets.js';
-import { Renderer } from '../src/engine/render/renderer.js';
 import { View } from '../src/engine/render/view.js';
-import { World } from '../src/engine/world/world.js';
-import { Rng } from '../src/engine/core/rng.js';
-import { LIGHT_LEVELS, SCREEN_W, VIEW_H } from '../src/engine/config.js';
-import { decodePNG } from '../tools/art/lib/png.js';
-import { registry, room } from './helpers.js';
+import { LIGHT_LEVELS } from '../src/engine/config.js';
+import { headlessRenderer, registry, room } from './helpers.js';
 
 // Distance and haze (PLAN.md Phase 1d step 5): lit spaces read across a
 // room, and outdoors far surfaces fade toward a haze colour, not to black.
@@ -54,20 +44,7 @@ test('haze colormaps fade lit colours toward the haze colour', () => {
 
 // ------------------------------------------------------------ rendering
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const assets = new Assets(registry, palette);
-assets._loadOverrides = async () => {
-  assets.overrides = {};
-};
-assets._loadImage = async (src) => {
-  try {
-    return quantize(decodePNG(fs.readFileSync(path.join(root, src))), palette);
-  } catch {
-    return null;
-  }
-};
-await assets.loadAll();
-const renderer = new Renderer(new Surface(SCREEN_W, VIEW_H), assets, palette);
+const { renderer, shot } = await headlessRenderer();
 
 /** A corridor 60 tiles long, under the sky or not, seen from its west end; the colours of the middle of the far wall. */
 function farWall(sky, haze) {
@@ -77,12 +54,10 @@ function farWall(sky, haze) {
     sky: 'sky-night',
     haze: haze ? { color: HAZE, half: 10 } : undefined,
   });
-  const w = new World({ registry, assets, rng: new Rng(1), settings: { noMonsters: true } }, level, { skill: 3 });
-  renderer.surface.clear(0);
-  renderer.render(w, { x: 1.5, y: 2.5, angle: 0, z: 1 }, { skip: w.player });
+  const px = shot(level, { x: 1.5, y: 2.5, angle: 0, z: 1 });
   const s = renderer.surface;
   const out = [];
-  for (let y = s.h / 2 - 2; y < s.h / 2 + 2; y++) for (let x = s.w / 2 - 2; x < s.w / 2 + 2; x++) out.push(colour(s.px[y * s.w + x]));
+  for (let y = s.h / 2 - 2; y < s.h / 2 + 2; y++) for (let x = s.w / 2 - 2; x < s.w / 2 + 2; x++) out.push(colour(px[y * s.w + x]));
   return out;
 }
 const mean = (cs) => [0, 1, 2].map((k) => cs.reduce((a, c) => a + c[k], 0) / cs.length);

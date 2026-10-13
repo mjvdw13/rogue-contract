@@ -132,6 +132,14 @@ export class TileMap {
     this.srcLight = [new Float32Array(n), new Float32Array(n)];
     /** @type {import('./lightsources.js').LightSource[]} */
     this.sources = [];
+    /**
+     * Wall bands: a tile whose wall (or step faces) change texture with
+     * height has a band set (`bandSets[bandIndex[i]]`): `{ from, to, tex }`
+     * spans, first match winning, its own texture elsewhere.
+     */
+    this.bandIndex = new Int16Array(n).fill(-1);
+    /** @type {{from:number, to:number, tex:number}[][]} */
+    this.bandSets = [];
     this.damage = new Uint8Array(n);
     this.doorIndex = new Int16Array(n).fill(-1);
     this.liftIndex = new Int16Array(n).fill(-1);

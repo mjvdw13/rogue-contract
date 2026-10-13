@@ -69,3 +69,43 @@ export function coarse(tiles, things, extra = {}) {
 
 /** Where a coarse-grid tile-centre coordinate (like 1.5) ends up on the fine grid. */
 export const fine = (p) => p * 2 + 0.5;
+
+/**
+ * A headless renderer with the content's own art (PNGs from disk, no art
+ * overrides), for tests that look at rendered frames. Call once per file.
+ */
+export async function headlessRenderer() {
+  const fs = await import('node:fs');
+  const path = await import('node:path');
+  const { fileURLToPath } = await import('node:url');
+  const { Palette } = await import('../src/engine/gfx/palette.js');
+  const { Surface } = await import('../src/engine/gfx/surface.js');
+  const { quantize } = await import('../src/engine/gfx/image.js');
+  const { Assets } = await import('../src/engine/assets.js');
+  const { Renderer } = await import('../src/engine/render/renderer.js');
+  const { SCREEN_W, VIEW_H } = await import('../src/engine/config.js');
+  const { decodePNG } = await import('../tools/art/lib/png.js');
+  const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+  const palette = new Palette(registry.paletteDef);
+  const assets = new Assets(registry, palette);
+  assets._loadOverrides = async () => {
+    assets.overrides = {};
+  };
+  assets._loadImage = async (src) => {
+    try {
+      return quantize(decodePNG(fs.readFileSync(path.join(root, src))), palette);
+    } catch {
+      return null;
+    }
+  };
+  await assets.loadAll();
+  const renderer = new Renderer(new Surface(SCREEN_W, VIEW_H), assets, palette);
+  /** Render `level` from a camera; the frame's palette indices. */
+  const shot = (level, cam) => {
+    const w = new World({ registry, assets, rng: new Rng(1), settings: { noMonsters: true } }, level, { skill: 3 });
+    renderer.surface.clear(0);
+    renderer.render(w, cam, { skip: w.player });
+    return Uint8Array.from(renderer.surface.px);
+  };
+  return { palette, assets, renderer, shot };
+}

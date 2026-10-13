@@ -92,6 +92,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
   const { flags, wallTex, doorIndex, doors, seen, floorZ, ceilZ, floorTex, ceilTex, sideTex, upperTex, slantIndex, slants } = map;
   const { fences, fenceAt } = map;
   const { slabBot, slabTop, slabTopTex, slabUnderTex, slabSideTex } = map;
+  const { bandIndex, bandSets } = map;
   const hasFences = fences.length > 0;
   const mdepth = view.mdepth;
   const along = [0];
@@ -240,6 +241,20 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
         if (c === TRANSPARENT || t >= mdepth[o]) continue;
         fb[o] = colormaps[faceCm[y & 3] + c];
         mdepth[o] = t;
+      }
+    };
+    /**
+     * Wall bands: over a face from height `faceBot` to `faceTop`, each band's
+     * texture over its heights (last to first, so the first that covers a
+     * height is on top). A band's texture hangs from its top, or from the
+     * face's top if it's open-ended.
+     */
+    const bandFaces = (t, faceTop, faceBot, bands, u, lv, hz) => {
+      for (let j = bands.length - 1; j >= 0; j--) {
+        const band = bands[j];
+        const top = band.to < faceTop ? band.to : faceTop;
+        const bot = band.from > faceBot ? band.from : faceBot;
+        if (top > bot) face(t, rowOf(top, t), rowOf(bot, t), band.to < Infinity ? band.to : faceTop, band.tex, u, lv, hz);
       }
     };
     /** A texture's height in world units (faces hung from their bottom edge use it). */
@@ -605,13 +620,17 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
       const curSlab = (flags[cur] & F_SLAB) !== 0;
       if (solid) {
         seen[next] = 1;
+        // Wall bands: the wall's own texture, then each band's over its heights.
+        const bands = bandIndex[next] >= 0 && tex === wallTex[next] ? bandSets[bandIndex[next]] : null;
         for (let k = 0; k < nw; k++) {
           clipTop = wTop[k];
           clipBot = wBot[k];
           const s = wSt[k];
           const fz = s ? slabTop[cur] : floorZ[cur];
           const cz = !s && curSlab ? slabBot[cur] : ceilZ[cur];
-          face(tExit, rowOf(cz, tExit), rowOf(fz, tExit), cz, tex, u, faceLevel(s, tExit, contrast, out), hz);
+          const lv = faceLevel(s, tExit, contrast, out);
+          face(tExit, rowOf(cz, tExit), rowOf(fz, tExit), cz, tex, u, lv, hz);
+          if (bands) bandFaces(tExit, cz, fz, bands, u, lv, hz);
         }
         end = tExit;
         break;
@@ -622,6 +641,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
       const fN = floorZ[next];
       const cN = ceilZ[next];
       const nextSlab = (f & F_SLAB) !== 0;
+      const nextBands = bandIndex[next] >= 0 ? bandSets[bandIndex[next]] : null;
       const n0 = nw;
       for (let k = 0; k < n0; k++) {
         clipTop = wTop[k];
@@ -632,7 +652,9 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
         if (fN > fC) {
           const a = rowOf(fN, tExit);
           seen[next] = 1;
-          face(tExit, a, rowOf(fC, tExit), fN, sideTex[next], wx, faceLevel(s, tExit, contrast, out), hz);
+          const lv = faceLevel(s, tExit, contrast, out);
+          face(tExit, a, rowOf(fC, tExit), fN, sideTex[next], wx, lv, hz);
+          if (nextBands) bandFaces(tExit, fN, fC, nextBands, wx, lv, hz);
           if (a < clipBot) clipBot = a < clipTop ? clipTop : a;
         }
         if (cN < cC) {
@@ -642,6 +664,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
             seen[next] = 1;
             const lv = faceLevel(s, tExit, contrast, out);
             face(tExit, rowOf(cC, tExit), b, cN + texHeight(upperTex[next]), upperTex[next], wx, lv, hz);
+            if (nextBands) bandFaces(tExit, cC, cN, nextBands, wx, lv, hz);
           }
           if (b > clipTop) clipTop = b > clipBot ? clipBot : b;
         }

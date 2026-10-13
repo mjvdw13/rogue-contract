@@ -20,6 +20,7 @@ function scaleEntry(e, k) {
   for (const key of ['floorZ', 'ceilZ']) if (typeof out[key] === 'number') out[key] *= k;
   if (out.lift) out.lift = { ...out.lift, stops: out.lift.stops?.map((z) => z * k) };
   if (out.slab) out.slab = { ...out.slab, bottom: out.slab.bottom * k, top: out.slab.top * k };
+  if (out.bands) out.bands = [].concat(out.bands).map((b) => ({ ...b, ...(b.from !== undefined && { from: b.from * k }), ...(b.to !== undefined && { to: b.to * k }) }));
   return out;
 }
 

@@ -127,7 +127,9 @@ function render(level) {
         continue;
       }
       if (f & F_SOLID) {
-        const c = textureColor(e.wall).map((v) => v * 0.75);
+        // (A banded wall seen from above: its top band, if one is open-ended upward.)
+        const top = [].concat(e.bands ?? []).find((b) => b?.to === undefined && b?.tex);
+        const c = textureColor(top?.tex ?? e.wall).map((v) => v * 0.75);
         rect(x, y, S, S, c);
         if (f & F_USE) frame(x, y, S, S, map.uses.get(i)?.actions.some((u) => ['exit', 'secretExit', 'finale'].includes(u.action)) ? [40, 255, 60] : [255, 230, 40]);
         continue;

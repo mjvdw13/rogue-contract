@@ -386,6 +386,23 @@ walls, as if corners caught less of it. In a painted level,
 `r` of the centre brighten toward `light`, fading to their own light at the
 rim, and get `extra` (say `{ lightFx: 'glow', lightSync: 'core' }`).
 
+### Wall bands
+
+A wall can change texture with height: Imperial panels with the cliff's
+rock above them, or a trim along the floor.
+
+```js
+'W': { wall: 'imp-panel', bands: [{ from: 8, tex: 'sandstone' }, { to: 0.5, tex: 'imp-stripe' }] },
+```
+
+A band covers from `from` up to `to` (leave one out and it runs on up or
+down); the first band that covers a height wins, and the wall's own texture
+fills the rest. A band's texture hangs from its top (from the face's top if
+it runs on up), so it lines up across walls of different heights. On an
+open tile or a doorway, `bands` change the faces of its raised floor and
+lowered ceiling (a gate's lintel) the same way. The map viewer shows a wall
+by its top band.
+
 ### Light sources
 
 A lamp, a light strip or a floodlight is a light source: it adds light to

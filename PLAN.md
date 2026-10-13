@@ -1749,3 +1749,12 @@ update the smoke test.
   like the light. Mission 1's haze is the sky's dusky purple, halfway at
   20 m. Frame time 2.3 to 2.9 ms (the haze's per-pixel work outdoors).
   165 tests.
+- 2026-10-13: Phase 1d step 6 started, wall bands (engine). A glyph's
+  `bands: [{ from?, to?, tex }]` change its wall's texture with height
+  (first band wins, the wall's texture elsewhere, each hung from its top),
+  and the faces of an open tile's raised floor and lowered ceiling (a
+  gate's lintel). Parsed per glyph (`map.bandSets`), scaled by the
+  upscaler, drawn over the face in the renderer; the map viewer shows a
+  wall's top band. Tests share a headless renderer (`headlessRenderer()`
+  in tests/helpers.js). Next: the garrison's outside walls with the cliff
+  above them in Mission 1. 168 tests.

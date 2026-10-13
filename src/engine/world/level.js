@@ -104,6 +104,36 @@ export function buildLevel(registry, level, opts = {}) {
   };
 
   const badFx = new Set();
+  /**
+   * A glyph's `bands: [{ from?, to?, tex }]`: its wall's texture changes with
+   * height (a band covers from `from` up to `to`, open-ended without one;
+   * the first band that covers a height wins), and so do the faces of its
+   * raised floor and lowered ceiling (a doorway's lintel). One set per glyph.
+   */
+  const bandSets = new Map();
+  const bandSet = (glyph, bands) => {
+    if (bandSets.has(glyph)) return bandSets.get(glyph);
+    const set = [];
+    for (const b of [].concat(bands)) {
+      const where = `Tile glyph "${glyph}"`;
+      if (!b?.tex) {
+        errors.push(`${where}: a wall band needs a "tex"`);
+        continue;
+      }
+      if ((b.from !== undefined && typeof b.from !== 'number') || (b.to !== undefined && typeof b.to !== 'number') || (b.from === undefined && b.to === undefined)) {
+        errors.push(`${where}: a wall band needs a "from" or a "to" height (or both)`);
+        continue;
+      }
+      if (b.from !== undefined && b.to !== undefined && !(b.to > b.from)) {
+        errors.push(`${where}: a wall band's "to" must be above its "from"`);
+        continue;
+      }
+      set.push({ from: b.from ?? -Infinity, to: b.to ?? Infinity, tex: slot(b.tex) });
+    }
+    const k = set.length ? map.bandSets.push(set) - 1 : -1;
+    bandSets.set(glyph, k);
+    return k;
+  };
   /** A legend entry's `fence: { tex, edges, height? }` on tile i. */
   const addFence = (spec, x, y, i) => {
     const where = `Tile (${x}, ${y})`;
@@ -167,6 +197,7 @@ export function buildLevel(registry, level, opts = {}) {
         errors.push(`Tile glyph "${glyph}" has unknown lightFx "${e.lightFx}"`);
       }
       map.lightMin[i] = e.lightMin ?? 0;
+      if (e.bands) map.bandIndex[i] = bandSet(glyph, e.bands);
       const floor = e.floor ?? defaults.floor;
       const ceiling = e.ceiling ?? defaults.ceiling;
       if (floor) map.floorTex[i] = slot(floor);
