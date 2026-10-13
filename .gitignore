@@ -6,3 +6,12 @@ tools/art/out/
 # Photos of real people stay on your own computer (see assets/custom/README.md).
 assets/custom/*
 !assets/custom/README.md
+# Ripped Dark Forces art, kept only while the repo is private (see DISCLAIMER.md).
+!assets/custom/DISCLAIMER.md
+!assets/custom/cut.mjs
+!assets/custom/overrides.json
+!assets/custom/stormtrooper.png
+!assets/custom/officer.png
+!assets/custom/probe-droid.png
+!assets/custom/fists.png
+!assets/custom/blaster.png

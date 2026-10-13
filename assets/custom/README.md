@@ -1,9 +1,13 @@
 # Local art (never published)
 
-Everything in this folder except this README is ignored by git, so it stays
-on your computer. Use it to try out art that must not go on GitHub Pages,
-such as sprites ripped from other games or photos of real people. Don't
-force-add anything from here: once it's on GitHub, it's public.
+Use this folder to try out art that must not go on GitHub Pages, such as
+sprites ripped from other games or photos of real people. New files here are
+ignored by git, so they stay on your computer.
+
+The exception is the Dark Forces art below. It is committed, with `cut.mjs`
+and `overrides.json`, only because this repository is private. Read
+`DISCLAIMER.md`: don't redistribute it, and remove it (with its history)
+before the repository goes public or onto GitHub Pages.
 
 ## Overriding a game asset
 

@@ -13,7 +13,7 @@ land, and record new decisions here.
 | Where | **New sibling repo**, `C:\Mark\rogue-contract` (first created as `dark-forces-clone`), copied from raccoon-alex with its history. Raccoon Alex stays untouched. |
 | Story | **Original story in Dark Forces' style.** A new mercenary working for the Rebellion, Imperial bases, mission briefings and objectives, a serious tone. No Kyle Katarn retelling. |
 | Scope | **A one-mission vertical slice first**, then decide whether to build more. |
-| Title | **Rogue Contract** (chosen 2026-10-11). Repo `mjvdw13/rogue-contract`, public, served by GitHub Pages. "Star Wars" and "Dark Forces" stay out of the title. |
+| Title | **Rogue Contract** (chosen 2026-10-11). Repo `mjvdw13/rogue-contract`, private from 2026-10-12 because it holds ripped Dark Forces art for local testing (see Phase 1b D). GitHub Pages: to decide, since Pages would serve those files. "Star Wars" and "Dark Forces" stay out of the title. |
 | Engine, revisited (2026-10-12) | **Stay on our height-grid engine.** Considered instead: The Force Engine (needs the original Dark Forces files, so it can only host a mod; desktop only), GZDoom (true sectors and slopes, but desktop only) and Godot with TrenchBroom (no grid limits, but a full rebuild). Fill the grid's visual gaps with 3D models (Phase 1b F). |
 | Platforms (2026-10-12) | **Desktop browsers.** Phones are no longer a target: no phone performance gate, and touch controls aren't required. |
 | Rights | A non-commercial fan game. All art, sound and music are generated or original. Nothing ripped from Dark Forces, and no note-for-note John Williams transcriptions. |
@@ -267,8 +267,9 @@ Design rules (what makes it feel like Dark Forces):
 - Recorded sound effects, and music (a composer or orchestral samples). The
   films' own sounds and music stay out.
 - Ripped art (e.g. Dark Forces sprites) can be tried locally only, through
-  `assets/custom/overrides.json`, which git ignores. It is never committed or
-  published. See `assets/custom/README.md`.
+  `assets/custom/overrides.json`. It is never published. The Dark Forces
+  sheets are committed only while the repo is private; see
+  `assets/custom/DISCLAIMER.md`.
 
 ### E. Leftovers from the first Star Wars pass
 
@@ -695,3 +696,7 @@ update the smoke test.
   compared The Force Engine, GZDoom and Godot (see Decisions). We're staying
   on our engine and adding 3D models (Phase 1b F). Phones are dropped as a
   target, and the Phase 1 gate now means a desktop browser.
+- 2026-10-12: The ripped Dark Forces sheets, `cut.mjs` and `overrides.json`
+  are committed in `assets/custom/`, with `DISCLAIMER.md` (Mark owns the
+  game; don't redistribute). Only allowed while the repo is private and not
+  on GitHub Pages. Going public means removing them from history first.

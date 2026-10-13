@@ -1,0 +1,30 @@
+{
+  "assets/sprites/monsters/stormtrooper.png": {
+    "src": "assets/custom/stormtrooper.png",
+    "frameWidth": 46,
+    "frameHeight": 67,
+    "scale": 0.85
+  },
+  "assets/sprites/monsters/officer.png": {
+    "src": "assets/custom/officer.png",
+    "frameWidth": 52,
+    "frameHeight": 78,
+    "scale": 0.85
+  },
+  "assets/sprites/monsters/probe-droid.png": {
+    "src": "assets/custom/probe-droid.png",
+    "frameWidth": 88,
+    "frameHeight": 89,
+    "scale": 0.85
+  },
+  "assets/sprites/weapons/fists.png": {
+    "src": "assets/custom/fists.png",
+    "frameWidth": 280,
+    "frameHeight": 126
+  },
+  "assets/sprites/weapons/blaster.png": {
+    "src": "assets/custom/blaster.png",
+    "frameWidth": 118,
+    "frameHeight": 129
+  }
+}
