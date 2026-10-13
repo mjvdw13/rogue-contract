@@ -5,15 +5,16 @@ const FX = (name, w, h) => ({ src: `assets/sprites/fx/${name}.png`, frameWidth: 
 export const effects = [
   defineEffect({ id: 'puff', sheet: FX('puff', 16, 16), anims: { idle: { frames: [0, 1, 2, 3], fps: 14, fullbright: [0] } }, rise: 0.3 }),
   defineEffect({ id: 'blood', sheet: FX('blood', 16, 16), anims: { idle: { frames: [0, 1, 2], fps: 10 } }, rise: -0.4 }),
-  defineEffect({ id: 'explosion', sheet: FX('explosion', 64, 64), anims: { idle: { frames: [0, 1, 2, 3, 4], fps: 12 } }, fullbright: true }),
+  defineEffect({ id: 'explosion', sheet: FX('explosion', 64, 64), anims: { idle: { frames: [0, 1, 2, 3, 4], fps: 12 } }, fullbright: true, light: { radius: 6, light: 128 } }),
 ];
 
 // Blaster bolts are projectiles: fast enough to feel like a gun, slow enough
-// to see (and, from troopers, to dodge).
+// to see (and, from troopers, to dodge). They light the walls they pass.
 const BOLT = {
   sheet: FX('blaster-bolt', 32, 32),
   anims: { fly: { frames: [0, 1], fps: 12, loop: true }, explode: { frames: [2, 3, 4], fps: 16 } },
   radius: 0.16,
+  light: { radius: 3, light: 64 },
   sounds: { explode: 'bolt-hit' },
 };
 
@@ -26,6 +27,7 @@ export const projectiles = [
     sheet: FX('ion-blast', 32, 32),
     anims: { fly: { frames: [0, 1, 2, 3], fps: 20, loop: true }, explode: { frames: [4, 5, 6], fps: 16 } },
     radius: 0.2,
+    light: { radius: 2.5, light: 48 },
     speed: 22,
     damage: [3, 8],
     sounds: { explode: 'ion-hit' },

@@ -185,10 +185,13 @@ export function defineAmmo(def) {
 }
 
 /**
- * A player weapon.
+ * A player weapon. `light: { radius, light }` is its muzzle flash: it lights
+ * the room round the player on the fire animation's fullbright frames.
+ * (`flashLight` instead brightens the whole view, Doom's way.)
  * @param {{id:string, name:string, slot:number, ammo?:string|null, ammoPerShot?:number,
  *   sheet: SheetSpec, anims: {idle:AnimSpec, fire:AnimSpec}, fire: AttackSpec,
- *   offset?:[number,number], flashLight?:number, noise?:boolean, priority?:number,
+ *   offset?:[number,number], flashLight?:number, light?:{radius:number, light:number},
+ *   noise?:boolean, priority?:number,
  *   accurateFirstShot?:boolean, sounds?:Record<string,string>, bob?:number}} def
  */
 export function defineWeapon(def) {
@@ -214,6 +217,12 @@ export function defineWeapon(def) {
 
 // ---------------------------------------------------------------- things
 
+/**
+ * Every thing may have `light: { radius, light }`: while it shows a fullbright
+ * frame (all the time, if the whole thing is fullbright), it lights the tiles
+ * round it (dynamic light: a bolt in flight, a trooper's muzzle flash, an
+ * explosion). Effects and bursting projectiles fade as their animation plays.
+ */
 function baseThing(def, kind, defaults) {
   requireId(def, kind);
   const merged = {

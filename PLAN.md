@@ -861,7 +861,7 @@ headless Node, DF art). Budget for this phase: stay under about 8 ms.
        and update it each frame. `setLight` reaches sources by tag (the
        overload kills the generator's lamps). Validator, map viewer,
        MODDING.md, tests.
-4. [ ] **Dynamic light.** Projectiles, effects and weapons get `light: {
+4. [x] **Dynamic light.** Projectiles, effects and weapons get `light: {
        radius, light }`: bolts light walls as they pass, muzzle flashes
        (the player's and monsters') and explosions flash the room. Added
        each frame by a small flood fill through open tiles, fading with the
@@ -1723,3 +1723,16 @@ update the smoke test.
   under it) are sources now, in place of painted pools; the overload makes
   the generator's lamps sputter. 27 sources, 12 ms level load, frame time
   unchanged (2.3 ms), 0.05 ms a frame for the overload's flicker. 155 tests.
+- 2026-10-13: Phase 1d step 4, dynamic light. Any thing (and a weapon) can
+  have `light: { radius, light }`: it lights the room while it shows a
+  fullbright frame, so bolts light what they pass all their flight, and
+  monsters' and the blaster's muzzle flashes light it on their fullbright
+  frames; effects and bursting bolts fade with their animation. Each frame
+  `World.dynamicLights()` gathers them and `LightMap.setDynamic()` flood
+  fills each through open tiles within its radius (walls and shut doors
+  stop it; under a slab it lights the storey its height is in), clearing
+  last frame's; only the cells round changed tiles are recomputed. The
+  blaster's whole-view `flashLight` gives way to a local flash (radius 5,
+  +96); troopers flash +80, bolts +64, explosions +128 over 6 tiles. A
+  heavy firefight (20 bolts, 3 explosions) costs 0.2 ms a frame; rendering
+  is unchanged. 161 tests.

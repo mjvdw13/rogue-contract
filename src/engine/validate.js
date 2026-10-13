@@ -63,8 +63,15 @@ export function validateContent(reg) {
     if (m.faces.length > MODEL_BUDGET) warn(`${owner}: ${m.faces.length} faces is over the budget of ${MODEL_BUDGET}`);
   }
 
+  /** A thing's or weapon's `light: { radius, light }` (its glow lights the room). */
+  const checkLight = (owner, l) => {
+    if (l === undefined || l === null) return;
+    if (typeof l !== 'object' || !(l.radius > 0) || typeof l.light !== 'number') err(`${owner}: "light" needs a "radius" above 0 and a "light" (how much it adds)`);
+  };
+
   for (const t of reg.things.values()) {
     const owner = `${t.kind} "${t.id}"`;
+    checkLight(owner, t.light);
     if (t.model) {
       if (!reg.models.has(t.model)) err(`${owner}: unknown model "${t.model}"`);
     } else checkSheet(owner, t.sheet);
@@ -105,6 +112,7 @@ export function validateContent(reg) {
     const owner = `weapon "${w.id}"`;
     checkSheet(owner, w.sheet);
     checkAnims(owner, w.anims);
+    checkLight(owner, w.light);
     if (!w.anims.idle) err(`${owner}: needs an "idle" animation`);
     if (!w.anims.fire) err(`${owner}: needs a "fire" animation`);
     else if (!w.anims.fire.events.includes('fire')) err(`${owner}: its "fire" animation needs a fireAt frame`);

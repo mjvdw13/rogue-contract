@@ -51,6 +51,19 @@ const NAV_REFRESH = 0.25;
  * them together. Rendering, input and audio live outside; the world only
  * calls `services` (audio, hud messages, music) when it needs them.
  */
+/** How far through its animation a thing is (0-1). */
+function animProgress(t) {
+  const a = t.anim;
+  if (!a) return 0;
+  let done = t.animTime;
+  let total = 0;
+  for (let k = 0; k < a.durations.length; k++) {
+    total += a.durations[k];
+    if (k < t.animPos) done += a.durations[k];
+  }
+  return t.animDone ? 1 : total > 0 ? Math.min(1, done / total) : 0;
+}
+
 export class World {
   /**
    * @param {{registry:any, assets?:any, audio?:any, rng:any, settings?:any, hooks?:any}} services
@@ -616,7 +629,6 @@ export class World {
     this.time += dt;
     this.stats.time += dt;
     this.lights.update(dt);
-    this.lightmap.update();
     updateDoors(this, dt);
     updateLifts(this, dt);
 
@@ -656,11 +668,35 @@ export class World {
       }
     }
     if (list.some((t) => t.removed)) this.things = list.filter((t) => !t.removed);
+    this.lightmap.setDynamic(this.dynamicLights());
+    this.lightmap.update();
     // Moving lifts change floor heights, so routes are refreshed while they run.
     this.navRefresh -= dt;
     const refresh = this.navRefresh <= 0 && this.map.lifts.some((l) => l.state === 'moving');
     if (refresh) this.navRefresh = NAV_REFRESH;
     for (const field of this.navFields.values()) field.update(Math.floor(pt.x), Math.floor(pt.y), refresh, this.reach(pt));
+  }
+
+  /**
+   * This frame's dynamic lights: things with a `light` while they glow (a
+   * fullbright frame: a bolt, a muzzle flash, an explosion), effects and
+   * bursting bolts fading as their animation plays, and the player's muzzle
+   * flash.
+   */
+  dynamicLights() {
+    const out = [];
+    for (const t of this.things) {
+      const l = t.def.light;
+      if (!l || !t.fullbright || t.removed) continue;
+      let light = l.light;
+      if (t.kind === 'effect' || (t.kind === 'projectile' && t.animName === 'explode')) light *= 1 - animProgress(t);
+      if (light >= 1) out.push({ x: t.x, y: t.y, z: t.z, radius: l.radius, light });
+    }
+    const pt = this.player;
+    const ws = pt?.player?.weaponState;
+    const wl = ws?.def?.light;
+    if (wl && ws.state === 'fire' && ws.fullbright) out.push({ x: pt.x, y: pt.y, z: pt.z + pt.player.viewHeight, radius: wl.radius, light: wl.light });
+    return out;
   }
 
   _playerTile() {

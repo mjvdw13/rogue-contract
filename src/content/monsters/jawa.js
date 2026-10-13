@@ -19,6 +19,7 @@ export default defineMonster({
   reactionTime: 0.6,
   cooldown: [1.2, 2.6],
   attack: { kind: 'projectile', projectile: 'ion-bolt', spread: 0.12, range: 40, sound: 'ion-fire' },
+  light: { radius: 3.5, light: 64 }, // the muzzle flash, on the attack's fullbright frames
   anims: {
     idle: { frames: [1], fps: 1, loop: true },
     walk: { frames: [0, 1, 2, 3, 4, 5], fps: 10 },

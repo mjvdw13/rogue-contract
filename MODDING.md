@@ -182,7 +182,7 @@ export default defineWeapon({
   ammo: 'tacks',                  // or null for melee
   ammoPerShot: 1,
   priority: 3,                    // auto-switch preference when picking up ammo
-  flashLight: 1,                  // lights up the room when firing (0-2)
+  light: { radius: 5, light: 96 }, // the muzzle flash lights the room round you
   sheet: { src: 'assets/sprites/weapons/hole-punch.png', frameWidth: 128, frameHeight: 96 },
   anims: {
     idle: [0],
@@ -200,6 +200,9 @@ the same number of pixels. The HUD panels in the bottom corners draw over the
 weapon. The fire animation's length sets the rate of fire. `accurateFirstShot: true` makes a single shot perfectly
 accurate when you aren't holding the trigger. New ammo types go in
 `src/content/ammo.js` as `defineAmmo({ id, name, short, max, clip })`.
+`light` is the muzzle flash: on the fire animation's `fullbright` frames it
+lights the room round you (see *Glowing things* below). `flashLight: 1`
+(0-2) instead brightens the whole view, Doom's way.
 
 ## Items
 
@@ -247,6 +250,19 @@ be added with `definePickup` (see *Custom behaviour*).
 - **Effects** such as puffs, blood, bug ichor and explosions use
   `defineEffect({ id, sheet, anims: { idle } })`. An effect disappears when its
   animation ends.
+
+**Glowing things.** Any thing can have `light: { radius, light }`: while it
+shows a fullbright frame (all the time, if the whole thing is `fullbright`,
+like a bolt or an explosion) it lights the tiles round it, adding up to
+`light` at its centre and fading out at `radius` tiles. The light spreads
+through open tiles, never through walls or shut doors, and is worked out
+every frame, so a bolt lights the walls it flies past. Effects and bursting
+projectiles fade as their animation plays. On a monster it's the muzzle
+flash, on its attack's `fullbright` frames:
+
+```js
+light: { radius: 3.5, light: 80 }, // a stormtrooper's muzzle flash
+```
 
 ### 3D models
 

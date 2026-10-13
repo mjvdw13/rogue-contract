@@ -8,7 +8,7 @@ export default defineWeapon({
   slot: 2,
   ammo: 'energy',
   priority: 2,
-  flashLight: 1,
+  light: { radius: 5, light: 96 }, // the muzzle flash
   sheet: { src: 'assets/sprites/weapons/blaster.png', frameWidth: 96, frameHeight: 88 },
   offset: [24, 12], // held in the right hand, low, so the middle of the view stays clear
   anims: {
