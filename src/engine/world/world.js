@@ -231,14 +231,26 @@ export class World {
 
   // ------------------------------------------------------------ movement
 
-  /** Highest floor under a box of half-size r at (x, y). */
-  floorAt(x, y, r = 0) {
-    return this.map.floorAt(x, y, r);
+  /**
+   * Highest floor under a box of half-size r at (x, y). Under a slab, the
+   * floor of the storey a body reaching up to `reach` is in (see reach()).
+   */
+  floorAt(x, y, r = 0, reach = Infinity) {
+    return this.map.floorAt(x, y, r, reach);
   }
 
-  /** Lowest ceiling over a box of half-size r at (x, y). */
-  ceilAt(x, y, r = 0) {
-    return this.map.ceilAt(x, y, r);
+  /** Lowest ceiling over a box of half-size r at (x, y) (storeys as in floorAt). */
+  ceilAt(x, y, r = 0, reach = Infinity) {
+    return this.map.ceilAt(x, y, r, reach);
+  }
+
+  /**
+   * How high thing `t` reaches for a floor: its feet plus the step it can
+   * take. A slab whose top is within reach is under it (it's on the upper
+   * storey); a higher one is over it.
+   */
+  reach(t) {
+    return t.z + this.stepHeight(t);
   }
 
   /**
@@ -252,16 +264,17 @@ export class World {
     const map = this.map;
     if (blockedByMap(map, x, y, t.radius)) return false;
     if (t.kind !== 'projectile' && fenceBlocks(map, x, y, t.radius, t.z, t.z + t.height)) return false;
-    const floor = map.floorAt(x, y, t.radius);
-    const ceil = map.ceilAt(x, y, t.radius);
+    const reach = this.reach(t);
+    const floor = map.floorAt(x, y, t.radius, reach);
+    const ceil = map.ceilAt(x, y, t.radius, reach);
     if (floor - t.z > this.stepHeight(t)) return false;
     if (walk && !t.player && !t.def.flying) {
       // A body may hang a little over an edge (OVERHANG), so it needn't be
       // exactly centred on a one-tile-wide step to stand on it.
       const r = Math.max(0, t.radius - OVERHANG);
-      const straddle = map.floorAt(x, y, r) - map.lowFloorAt(x, y, r);
+      const straddle = map.floorAt(x, y, r, reach) - map.lowFloorAt(x, y, r, reach);
       // (Already straddling one, say after a push, it may still move to straddle less.)
-      const now = map.floorAt(t.x, t.y, r) - map.lowFloorAt(t.x, t.y, r);
+      const now = map.floorAt(t.x, t.y, r, reach) - map.lowFloorAt(t.x, t.y, r, reach);
       if (straddle > this.dropHeight(t) + 1e-6 && straddle > now - 1e-6) return false;
     }
     if (ceil - Math.max(floor, t.z) < t.height) return false;
@@ -302,7 +315,7 @@ export class World {
    * offset of its def (a flyer's `z` is its hover height, so not for those).
    */
   groundZ(t) {
-    return this.map.floorAt(t.x, t.y, t.radius) + (t.def.flying ? 0 : (t.def.z ?? 0));
+    return this.map.floorAt(t.x, t.y, t.radius, this.reach(t)) + (t.def.flying ? 0 : (t.def.z ?? 0));
   }
 
   /**
@@ -324,8 +337,9 @@ export class World {
   fall(t, dt) {
     if (t.def.hanging) return;
     if (t.def.flying && !t.dead) {
-      const floor = this.map.floorAt(t.x, t.y, t.radius);
-      const top = this.map.ceilAt(t.x, t.y, t.radius) - t.height;
+      const reach = this.reach(t);
+      const floor = this.map.floorAt(t.x, t.y, t.radius, reach);
+      const top = this.map.ceilAt(t.x, t.y, t.radius, reach) - t.height;
       t.z = Math.max(floor, Math.min(Math.max(floor, top), t.z));
       return;
     }

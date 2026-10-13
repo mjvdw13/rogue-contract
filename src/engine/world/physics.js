@@ -1,4 +1,4 @@
-import { F_SOLID, F_DOOR, F_SKY, F_SLANT } from './tilemap.js';
+import { F_SOLID, F_DOOR, F_SKY, F_SLANT, F_SLAB } from './tilemap.js';
 import { segDist2 } from './slants.js';
 
 /**
@@ -127,14 +127,16 @@ function doorPanel(door, x, y, dx, dy, mapX, mapY, enter, maxDist) {
  * horizontal direction (dx, dy), rising `slope` units per unit of horizontal
  * distance. It stops at walls, door panels (a rising door's only above its
  * bottom edge), angled walls, the faces of raised floors and lowered ceilings,
- * and the floor or ceiling itself. Distances are horizontal.
+ * and the floor or ceiling itself. Under a slab it keeps to its storey: the
+ * slab's top is a floor, its underside a ceiling and its edges walls.
+ * Distances are horizontal.
  *
  * `hit` is 'wall', 'floor', 'ceiling', or null if nothing was hit within
  * `maxDist`. `sky` is true when the ray went up into the sky.
  * @returns {{dist:number, z:number, hit:'wall'|'floor'|'ceiling'|null, sky:boolean, tx:number, ty:number}}
  */
 export function traceRay3D(map, x, y, z, dx, dy, slope, maxDist = 128) {
-  const { flags, floorZ, ceilZ } = map;
+  const { flags, floorZ, ceilZ, slabBot, slabTop } = map;
   let mapX = Math.floor(x);
   let mapY = Math.floor(y);
   const ddx = dx === 0 ? 1e30 : Math.abs(1 / dx);
@@ -146,6 +148,9 @@ export function traceRay3D(map, x, y, z, dx, dy, slope, maxDist = 128) {
   const result = (dist, hit, sky = false) => ({ dist, z: z + slope * dist, hit, sky, tx: mapX, ty: mapY });
   if (!map.inBounds(mapX, mapY)) return result(0, 'wall');
   let enter = 0;
+  // The storey of the current tile the ray is in (1: on its slab).
+  const i0 = mapY * map.w + mapX;
+  let st = flags[i0] & F_SLAB && z >= (slabBot[i0] + slabTop[i0]) / 2 ? 1 : 0;
   // Where the ray reaches height h (never before it entered the current tile).
   const crossing = (h) => (slope === 0 ? enter : Math.max(enter, (h - z) / slope));
   for (let i = 0; i < 1024; i++) {
@@ -168,11 +173,15 @@ export function traceRay3D(map, x, y, z, dx, dy, slope, maxDist = 128) {
         if (t >= enter - EDGE_EPS && t <= leave + EDGE_EPS && z + slope * t > door.bottomZ) block = Math.max(t, enter);
       }
     }
-    // Does the ray reach this tile's floor or ceiling before it leaves?
+    // Does the ray reach this storey's floor or ceiling before it leaves?
     const end = Math.min(leave, block);
     const zEnd = z + slope * end;
-    if (zEnd < floorZ[idx]) return result(crossing(floorZ[idx]), 'floor');
-    if (zEnd > ceilZ[idx]) return result(crossing(ceilZ[idx]), 'ceiling', !!(f & F_SKY));
+    const slab = (f & F_SLAB) !== 0;
+    const fz = slab && st ? slabTop[idx] : floorZ[idx];
+    const cz = slab && !st ? slabBot[idx] : ceilZ[idx];
+    const sky = (f & F_SKY) !== 0 && (!slab || st === 1);
+    if (zEnd < fz) return result(crossing(fz), 'floor');
+    if (zEnd > cz) return result(crossing(cz), 'ceiling', sky);
     if (block < Infinity) return result(block, 'wall');
     if (leave >= maxDist) return result(maxDist, null);
 
@@ -190,10 +199,15 @@ export function traceRay3D(map, x, y, z, dx, dy, slope, maxDist = 128) {
     const nf = flags[n];
     if (nf & F_SOLID) return result(enter, 'wall');
     if (nf & F_SLANT && map.slants[map.slantIndex[n]].solidAt(x + dx * enter, y + dy * enter)) return result(enter, 'wall');
-    // The face of a raised floor or a lowered ceiling (open sky between two sky tiles).
+    // The face of a raised floor or a lowered ceiling (open sky between two
+    // sky tiles), or a slab's edge; else on into the storey at that height.
     const ze = z + slope * enter;
     if (ze < floorZ[n]) return result(enter, 'wall');
-    if (ze > ceilZ[n]) return result(enter, 'wall', !!(f & F_SKY && nf & F_SKY));
+    if (ze > ceilZ[n]) return result(enter, 'wall', sky && (nf & F_SKY) !== 0);
+    if (nf & F_SLAB) {
+      if (ze > slabBot[n] && ze < slabTop[n]) return result(enter, 'wall');
+      st = ze >= slabTop[n] ? 1 : 0;
+    } else st = 0;
   }
   return result(maxDist, null);
 }

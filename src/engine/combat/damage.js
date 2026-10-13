@@ -163,9 +163,10 @@ export function hitscan(world, shooter, angle, range, amount, spec = {}, aim = a
   const back = Math.max(0, bestT - 0.12);
   const hx = shooter.x + dx * back;
   const hy = shooter.y + dy * back;
-  const floor = world.map.floorAt(hx, hy);
-  const ceil = world.map.ceilAt(hx, hy);
-  const hz = Math.max(floor + PUFF_INSET, Math.min(ceil - PUFF_INSET, z + slope * back + world.rng.signed() * 0.08));
+  const at = z + slope * back;
+  const floor = world.map.floorAt(hx, hy, 0, at);
+  const ceil = world.map.ceilAt(hx, hy, 0, at);
+  const hz = Math.max(floor + PUFF_INSET, Math.min(ceil - PUFF_INSET, at + world.rng.signed() * 0.08));
   if (best) {
     damage(world, best, amount, shooter, shooter);
     const fx = best.def.bleeds === false ? (spec.puff ?? 'puff') : (best.def.blood ?? 'blood');

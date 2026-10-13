@@ -110,7 +110,7 @@ export function updateLifts(world, dt) {
     }
     // Going up: don't crush anyone against the ceiling. Go back where it came from.
     if (dz > 0 && lift.moves !== 'both') {
-      const blocked = riders.some((t) => t.solid && z + t.height > map.ceilAt(t.x, t.y, t.radius) + 1e-4);
+      const blocked = riders.some((t) => t.solid && z + t.height > map.ceilAt(t.x, t.y, t.radius, t.z + 0.8) + 1e-4);
       if (blocked) {
         lift.target = lift.stop;
         if (lift.stops[lift.stop] >= lift.z) {
@@ -121,7 +121,7 @@ export function updateLifts(world, dt) {
       }
     }
     setLiftZ(map, lift, z);
-    for (const t of riders) t.z = Math.max(t.z + dz, map.floorAt(t.x, t.y, t.radius));
+    for (const t of riders) t.z = Math.max(t.z + dz, map.floorAt(t.x, t.y, t.radius, t.z + dz + 0.8));
 
     if (z === goal) {
       lift.stop = lift.target;

@@ -2,7 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { buildLevel } from '../src/engine/world/level.js';
 import { F_SLAB } from '../src/engine/world/tilemap.js';
-import { registry, room } from './helpers.js';
+import { traceRay3D, lineOfSight3D } from '../src/engine/world/physics.js';
+import { registry, room, makeWorld, mockInput, run } from './helpers.js';
 
 // Two storeys per tile (PLAN.md Phase 1c): a tile's `slab` is a solid layer
 // inside its open space, with a storey under it and one on top.
@@ -71,4 +72,126 @@ test('a rising door beside a slab tile opens to the storey it leads onto', () =>
   const door = b.map.doorAt(3, 1);
   assert.ok(door);
   assert.equal(door.openZ, 3, 'the bridge underside, not the hall ceiling above it');
+});
+
+// ------------------------------------------------------------ movement and combat
+
+// A corridor three tiles wide, running east, under an open sky, with a span
+// of slab tiles (`=`) across it. The player starts at its west end.
+function corridor(bridgeCols, slab, { startZ } = {}) {
+  const legend = {
+    '.': { floor: 'imp-floor', ceiling: 'sky', light: 160, ceilZ: 8 },
+    '=': { floor: 'imp-floor', ceiling: 'sky', light: 160, ceilZ: 8, slab },
+  };
+  const row = (x) => (x >= bridgeCols[0] && x < bridgeCols[1] ? '=' : '.');
+  const inner = Array.from({ length: 10 }, (_, k) => row(k + 1)).join('');
+  return room(['#'.repeat(12), `#${inner}#`, `#${inner}#`, `#${inner}#`, '#'.repeat(12)], [], {
+    legend,
+    list: [{ type: 'player', x: 1.5, y: 2.5, angle: 0, z: startZ }],
+  });
+}
+const SLAB = { bottom: 3, top: 3.5 };
+
+test('the player walks under a bridge, on the floor', () => {
+  const w = makeWorld(corridor([4, 8], SLAB));
+  const input = mockInput();
+  input.hold('forward');
+  let highest = 0;
+  run(w, input, 1.5, () => (highest = Math.max(highest, w.player.z)));
+  assert.ok(w.player.x > 9, `walked through (x=${w.player.x.toFixed(2)})`);
+  assert.equal(highest, 0, 'never left the floor');
+});
+
+test('the player walks along a bridge, then drops off its end', () => {
+  const w = makeWorld(corridor([1, 6], SLAB, { startZ: 3.5 }), { noMonsters: true });
+  assert.equal(w.player.z, 3.5, 'the start z puts the player on top');
+  const input = mockInput();
+  input.hold('forward');
+  let onTop = true;
+  run(w, input, 2, () => {
+    if (w.player.x < 6 - w.player.radius && w.player.z !== 3.5) onTop = false;
+  });
+  assert.ok(onTop, 'stayed on top while over it');
+  assert.ok(w.player.x > 8);
+  assert.equal(w.player.z, 0, 'fell to the floor past its end');
+});
+
+test('a low slab: too low to walk under, but a jump gets onto it', () => {
+  const low = { bottom: 1, top: 1.25 };
+  const walker = makeWorld(corridor([5, 11], low));
+  const input = mockInput();
+  input.hold('forward');
+  run(walker, input, 1.5);
+  assert.ok(walker.player.x < 5, `stopped at its edge (x=${walker.player.x.toFixed(2)})`);
+  assert.equal(walker.player.z, 0);
+
+  const jumper = makeWorld(corridor([5, 11], low));
+  const j = mockInput();
+  j.hold('forward');
+  run(jumper, j, 0.25);
+  j.tap('jump');
+  run(jumper, j, 1.5);
+  assert.ok(jumper.player.x > 6, 'jumped up onto it');
+  assert.equal(jumper.player.z, 1.25);
+});
+
+test('jumping under a slab bumps your head on its underside', () => {
+  const w = makeWorld(corridor([1, 11], { bottom: 2, top: 2.5 }));
+  const input = mockInput();
+  input.tap('jump');
+  let highest = 0;
+  run(w, input, 1, () => (highest = Math.max(highest, w.player.z)));
+  assert.ok(highest > 0.2, 'left the floor');
+  assert.ok(highest <= 2 - w.player.height + 1e-6, `head stopped at the underside (z=${highest.toFixed(3)})`);
+});
+
+test('3D rays: slab undersides are ceilings (not sky), tops are floors, edges walls', () => {
+  const w = makeWorld(corridor([4, 8], SLAB));
+  const m = w.map;
+  const up = traceRay3D(m, 5.5, 2.5, 1, 1, 0, 10);
+  assert.equal(up.hit, 'ceiling');
+  assert.equal(up.sky, false, 'the underside, though the sky is above the bridge');
+  assert.ok(Math.abs(up.z - 3) < 1e-6);
+  const down = traceRay3D(m, 5.5, 2.5, 5, 1, 0, -10);
+  assert.equal(down.hit, 'floor');
+  assert.ok(Math.abs(down.z - 3.5) < 1e-6);
+  const edge = traceRay3D(m, 1.5, 2.5, 3.2, 1, 0, 0);
+  assert.equal(edge.hit, 'wall');
+  assert.ok(Math.abs(edge.dist - 2.5) < 1e-6, 'stopped at the edge (x=4)');
+  const under = traceRay3D(m, 1.5, 2.5, 1, 1, 0, 0);
+  assert.ok(under.dist > 9, 'passed underneath to the far wall');
+  const over = traceRay3D(m, 1.5, 2.5, 5, 1, 0, 0);
+  assert.ok(over.dist > 9, 'and over the top');
+  const sky = traceRay3D(m, 1.5, 2.5, 1, 1, 0, 3);
+  assert.equal(sky.sky, true, 'beside the bridge, still into the sky');
+  assert.equal(lineOfSight3D(m, 5.5, 2.5, 1.5, 6, 2.5, 4.5), false, 'no sight through it');
+});
+
+test('projectiles fly under a slab, and burst on its edge', () => {
+  const fly = (z) => {
+    const w = makeWorld(corridor([4, 8], SLAB), { noMonsters: true });
+    const p = w.spawnProjectile('blaster-bolt', w.player, 0, {}, { z, slope: 0 });
+    p.z = z;
+    let x = p.x;
+    run(w, mockInput(), 1, () => {
+      if (!p.removed && p.state !== 'exploding') x = p.x;
+    });
+    return x;
+  };
+  assert.ok(fly(1) > 9, 'under it, on to the far wall');
+  assert.ok(fly(3.25) < 4.1, 'into its edge');
+  assert.ok(fly(5) > 9, 'over it');
+});
+
+test('things are placed under a slab unless their z puts them on it, and drops land where the body fell', () => {
+  const w = makeWorld(corridor([4, 8], SLAB), { noMonsters: true });
+  assert.equal(w.spawn('med-kit', 5.5, 2.5).z, 0);
+  assert.equal(w.spawn('med-kit', 5.5, 2.5, 0, 3.5).z, 3.5);
+  const officer = w.spawn('officer', 6.5, 2.5, 0, 3.5);
+  assert.equal(officer.z, 3.5);
+  officer.drops = [{ item: 'keycard-red', chance: 1 }];
+  w.damage(officer, 1000, null, w.player);
+  const key = w.things.find((t) => t.def.id === 'keycard-red');
+  assert.ok(key, 'dropped its keycard');
+  assert.equal(key.z, 3.5, 'on the bridge, not under it');
 });

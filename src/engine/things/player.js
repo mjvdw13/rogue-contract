@@ -148,7 +148,7 @@ export function playerThink(world, pt, input, dt, settings = {}) {
   const body = p.body;
   const wantCrouch = input.isDown('crouch');
   if (wantCrouch) p.crouching = true;
-  else if (p.crouching && world.ceilAt(pt.x, pt.y, pt.radius) - pt.z >= body.height) p.crouching = false;
+  else if (p.crouching && world.ceilAt(pt.x, pt.y, pt.radius, world.reach(pt)) - pt.z >= body.height) p.crouching = false;
   pt.height = p.crouching ? body.crouchHeight : body.height;
   const eye = p.crouching ? body.crouchEyeHeight : body.eyeHeight;
   if (p.viewHeight < eye) p.viewHeight = Math.min(eye, p.viewHeight + dt * 5);
@@ -216,8 +216,10 @@ export function clampPitch(v) {
 function verticalMove(world, pt, dt) {
   const p = pt.player;
   const body = p.body;
-  const floor = p.noclip ? world.floorAt(pt.x, pt.y, 0) : world.floorAt(pt.x, pt.y, pt.radius);
-  const ceil = world.ceilAt(pt.x, pt.y, pt.radius);
+  // (Under a slab, the storey within reach: its top is a floor, else its underside a ceiling.)
+  const reach = world.reach(pt);
+  const floor = world.floorAt(pt.x, pt.y, p.noclip ? 0 : pt.radius, reach);
+  const ceil = world.ceilAt(pt.x, pt.y, pt.radius, reach);
   if (pt.z < floor) {
     // Walked up a step: ease the eye up after it. (Lifts move smoothly, so
     // small rises are just followed.)

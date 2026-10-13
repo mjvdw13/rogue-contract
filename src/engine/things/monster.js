@@ -137,7 +137,7 @@ function moveToward(world, m, dt, t, d, los) {
  */
 function hover(world, m, t, dt, ca, sa) {
   const reach = m.radius + 0.6;
-  const ahead = world.map.floorAt(m.x + ca * reach, m.y + sa * reach, m.radius);
+  const ahead = world.map.floorAt(m.x + ca * reach, m.y + sa * reach, m.radius, world.reach(m));
   const want = Math.max(t.z, ahead) + (m.def.z ?? 0);
   const climb = (m.def.flySpeed ?? 3) * dt;
   m.z += Math.max(-climb, Math.min(climb, want - m.z));

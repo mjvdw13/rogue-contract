@@ -1,6 +1,6 @@
 /** Projectiles (fireballs, rockets, lobbed trash) and short-lived effects. */
 
-import { F_SKY } from '../world/tilemap.js';
+import { F_SKY, F_SLAB } from '../world/tilemap.js';
 import { aimAttack, missileZ } from '../combat/aim.js';
 import { blocksShots, overlap } from './shape.js';
 
@@ -8,10 +8,13 @@ const STEP = 0.2;
 /** A projectile's z is its centre; it bursts this close to a floor or ceiling. */
 const CLEARANCE = 0.1;
 
-function skyAt(map, x, y) {
+/** Is the ceiling at (x, y) sky, for something at height z (under a slab it's the slab)? */
+function skyAt(map, x, y, z) {
   const tx = Math.floor(x);
   const ty = Math.floor(y);
-  return map.inBounds(tx, ty) && (map.flags[ty * map.w + tx] & F_SKY) !== 0;
+  if (!map.inBounds(tx, ty)) return false;
+  const i = ty * map.w + tx;
+  return (map.flags[i] & F_SKY) !== 0 && !(map.flags[i] & F_SLAB && map.storeyAt(i, z) === 0);
 }
 
 /** Burst, damaging what's around. `pull` backs it out of the wall it flew into. */
@@ -58,15 +61,16 @@ export function projectileThink(world, p, dt) {
       explode(world, p, null);
       return;
     }
-    const floor = map.floorAt(nx, ny);
-    const ceil = map.ceilAt(nx, ny);
+    // (Under a slab, the storey it's flying in: by its height before this step.)
+    const floor = map.floorAt(nx, ny, 0, p.z);
+    const ceil = map.ceilAt(nx, ny, 0, p.z);
     if (nz - CLEARANCE < floor || nz + CLEARANCE > ceil) {
       // Already outside them where it was: it flew into the face of a step or
       // ledge. Otherwise it came down on the floor or up into the ceiling.
       const face = p.z - CLEARANCE < floor || p.z + CLEARANCE > ceil;
       const up = nz + CLEARANCE > ceil;
       // Into the sky (or an open sky face between two sky tiles): gone without a burst, as in Doom.
-      if (up && skyAt(map, nx, ny) && (!face || skyAt(map, p.x, p.y))) {
+      if (up && skyAt(map, nx, ny, p.z) && (!face || skyAt(map, p.x, p.y, p.z))) {
         world.remove(p);
         return;
       }
@@ -127,8 +131,8 @@ export function launchProjectile(world, id, owner, angle, spec = {}, aim = aimAt
   const z = spec.z ?? def.z;
   p.z = z != null ? owner.z + z : missileZ(owner, aim);
   // Keep it inside the room it was fired in.
-  const floor = world.map.floorAt(p.x, p.y);
-  const ceil = world.map.ceilAt(p.x, p.y);
+  const floor = world.map.floorAt(p.x, p.y, 0, p.z);
+  const ceil = world.map.ceilAt(p.x, p.y, 0, p.z);
   p.z = Math.max(floor + CLEARANCE, Math.min(ceil - CLEARANCE, p.z));
   if (def.gravity) {
     // Lob so it lands near the target (or 12 tiles ahead, plus the aim).
