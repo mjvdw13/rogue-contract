@@ -8,7 +8,7 @@ export default defineMonster({
   id: 'sandtrooper',
   name: 'Sandtrooper',
   glyph: 's',
-  sheet: { src: 'assets/sprites/monsters/sandtrooper.png', frameWidth: 58, frameHeight: 68 },
+  sheet: { src: 'assets/sprites/monsters/sandtrooper.png', frameWidth: 66, frameHeight: 68 },
   scale: 0.85,
   health: 45,
   speed: 4,

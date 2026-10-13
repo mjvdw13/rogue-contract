@@ -957,3 +957,16 @@ update the smoke test.
   in Mission 1's gorge (the third from skill 3), one in the sandbox.
   Screenshots beside the stormtrooper and sandtrooper. 103 tests, the
   validator and the smoke test pass.
+- 2026-10-12: The sandtrooper restyled to match the Dark Forces stormtrooper
+  (Mark: it looked too realistic beside it, lacking definition and
+  blockiness). Measured on a walk frame, the DF trooper has a much wider
+  tonal range (brightness spread 75 vs 44, darkest/brightest twentieths
+  17/232 vs 41/185), more hard steps between pixels (28% vs 15%), dark
+  contours (68 vs 101), fewer colours (38 vs 73) and a stockier build.
+  `sheetcut.py` gained an optional style stage (`DARK_FORCES`): widen 15%,
+  median-smooth the source's dirt texture, sharpen, an S-curve contrast
+  stretch, light from the right, darkened contours, and snapping to only
+  the armour's ramps (gray, beige, concrete, orange). Now: spread 61, 10/206
+  (the armour is beige, not white), hard steps 23%, contours 59, 50
+  colours. Frames are 66x68. The Jawa (already in a pixel-art style) is
+  unchanged.

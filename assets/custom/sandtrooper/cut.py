@@ -16,7 +16,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent))
-from sheetcut import ROOT, assemble, components, cut_poses, key, load, save  # noqa: E402
+from sheetcut import DARK_FORCES, ROOT, assemble, components, cut_poses, key, load, save  # noqa: E402
 
 SOURCE = HERE / 'sheet.jpg'
 OUT = ROOT / 'assets/sprites/monsters/sandtrooper.png'
@@ -72,10 +72,14 @@ def main():
 
     def flash(i, frame, box):
         if i == FIRE_FRAME:
-            scale = frame.shape[1] / (box[2] - box[0])
-            muzzle_flash(frame, int((MUZZLE[0] - box[0]) * scale) + 2, int((MUZZLE[1] - box[1]) * scale))
+            sx = frame.shape[1] / (box[2] - box[0])
+            sy = frame.shape[0] / (box[3] - box[1])
+            muzzle_flash(frame, int((MUZZLE[0] - box[0]) * sx) + 2, int((MUZZLE[1] - box[1]) * sy))
 
-    save(assemble(frames, SCALE, draw=flash), OUT, len(frames))
+    # Restyled to match the Dark Forces stormtrooper it fights beside
+    # (sheetcut.DARK_FORCES), in the armour's few ramps.
+    sheet = assemble(frames, SCALE, draw=flash, style=DARK_FORCES, ramps=['gray', 'beige', 'concrete', 'orange'])
+    save(sheet, OUT, len(frames))
 
 
 if __name__ == '__main__':

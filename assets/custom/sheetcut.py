@@ -15,7 +15,7 @@ import sys
 from pathlib import Path
 
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageFilter
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -25,14 +25,15 @@ def load(path):
 
 
 def palette():
-    """The game's palette: its colours, and where the fullbright (glowing) ones start."""
+    """The game's palette: its lit colours (index 0 is black, 255 transparent),
+    its glowing (fullbright) ones, and the lit colours of each named ramp."""
     url = (ROOT / 'src/content/palette.js').as_uri()
     js = f"import p from '{url}'; console.log(JSON.stringify(p))"
     pal = json.loads(subprocess.run(['node', '--input-type=module', '-e', js], capture_output=True, text=True, check=True).stdout)
     colours = np.array(pal['colors'], float)
     start = pal['fullbrightStart']
-    # Lit colours (index 0 is black, 255 transparent), and the glows.
-    return colours[1:start], colours[start:255]
+    ramps = {name: colours[i:i + n] for name, (i, n) in pal['ramps'].items() if i < start}
+    return colours[1:start], colours[start:255], ramps
 
 
 def key(rgb, backdrop):
@@ -211,34 +212,91 @@ def resample(arr, box, size, pad=64):
     return np.asarray(Image.fromarray(padded).resize(size, Image.LANCZOS, box=box))
 
 
-def assemble(frames, scale, glow=None, draw=None):
+LUMA = np.array([0.3, 0.59, 0.11])
+
+# The Dark Forces sprites' look (see dark_forces() below), as measured on the
+# stormtrooper: a wide tonal range (brightness spread 75 of 255, its darkest
+# and brightest twentieths at 17 and 232), hard steps between flat areas,
+# dark contours, few colour ramps, side lighting and a stocky build.
+DARK_FORCES = dict(widen=1.15, median=5, contrast=0.9, gamma=1.0, sharpen=1.0, side=(0.6, 1.2), outline=0.55, threshold=0.45)
+
+
+def blur3(a):
+    """A 3x3 binomial blur."""
+    p = np.pad(a, 1, mode='edge')
+    h = (p[:, :-2] + 2 * p[:, 1:-1] + p[:, 2:]) / 4
+    return (h[:-2] + 2 * h[1:-1] + h[2:]) / 4
+
+
+def dark_forces(rgb, opaque, style, tones):
+    """Pushes a scaled-down frame toward the Dark Forces sprites' look:
+    sharpened, its brightness stretched over the sheet's `tones` (3rd and
+    97th percentiles) with an S-curve (`contrast`) and a `gamma` that deepens
+    the shadows, lit from one side (`side`: brightness at the body's left and
+    right edges), and its contour darkened (`outline`)."""
+    lo, hi = tones
+    lum = rgb @ LUMA
+    sharp = lum + style['sharpen'] * (lum - blur3(lum))
+    t = np.clip((sharp - lo) / (hi - lo), 0, 1)
+    k = style['contrast']
+    t = (1 - k) * t + k * t * t * (3 - 2 * t)
+    target = 255 * ((8 + 240 * t) / 255) ** style['gamma']
+    rgb = rgb * (target / np.maximum(lum, 1))[..., None]
+    cols = np.nonzero(opaque.any(0))[0]
+    if len(cols):
+        left, right = style['side']
+        x = np.clip((np.arange(rgb.shape[1]) - cols.min()) / max(1, cols.max() - cols.min()), 0, 1)
+        rgb = rgb * (left + (right - left) * x)[None, :, None]
+    pad = np.pad(opaque, 1)
+    edge = opaque & ~(pad[:-2, 1:-1] & pad[2:, 1:-1] & pad[1:-1, :-2] & pad[1:-1, 2:])
+    rgb[edge] *= style['outline']
+    return np.clip(rgb, 0, 255)
+
+
+def assemble(frames, scale, glow=None, draw=None, style=None, ramps=None):
     """Scales the poses down into one strip of equal frames: each keeps its
     body centred and its base on the bottom row. Colours snap to the
-    palette's lit colours, except where `glow` (a sheet-sized mask of
-    glowing pixels, like eyes or a muzzle flash) covers most of a pixel:
-    those snap to the fullbright colours. `draw(i, frame, box)` may paint on
+    palette's lit colours (only those of `ramps`, a list of ramp names, when
+    given), except where `glow` (a sheet-sized mask of glowing pixels, like
+    eyes or a muzzle flash) covers most of a pixel: those snap to the
+    fullbright colours. `style` (like DARK_FORCES) restyles the frames:
+    `widen` stretches them across, `median` smooths the source's fine
+    texture first, `threshold` is how covered a pixel must be to be opaque,
+    and the rest goes to dark_forces(). `draw(i, frame, box)` may paint on
     frame i (an RGBA array; `box` is its area on the sheet)."""
-    lit, glows = palette()
+    lit, glows, ramp_colours = palette()
+    if ramps:
+        lit = np.concatenate([ramp_colours[r] for r in ramps])
+    sx = scale * (style['widen'] if style else 1)
+    threshold = style['threshold'] if style else 0.5
     reach, height = 0, 0
     for f in frames:
         ys, xs = np.nonzero(f['mask'])
         reach = max(reach, f['centre'] - xs.min(), xs.max() + 1 - f['centre'])
         height = max(height, f['base'] + 1 - ys.min())
-    fw = int(np.ceil(2 * reach * scale)) + 2 & ~1
+    fw = int(np.ceil(2 * reach * sx)) + 2 & ~1
     fh = int(np.ceil(height * scale)) + 1
+    if style:
+        tones = np.percentile(np.concatenate([f['rgb'][f['mask']] for f in frames]) @ LUMA, [3, 97])
     sheet = np.zeros((fh, fw * len(frames), 4), np.uint8)
     for i, f in enumerate(frames):
-        box = (f['centre'] - fw / 2 / scale, f['base'] + 1 - fh / scale, f['centre'] + fw / 2 / scale, f['base'] + 1)
+        box = (f['centre'] - fw / 2 / sx, f['base'] + 1 - fh / scale, f['centre'] + fw / 2 / sx, f['base'] + 1)
+        src = f['rgb']
+        if style and style.get('median'):
+            src = np.asarray(Image.fromarray(np.clip(src, 0, 255).astype(np.uint8)).filter(ImageFilter.MedianFilter(style['median']))).astype(float)
         a = resample(f['alpha'], box, (fw, fh))
-        rgb = np.stack([resample(f['rgb'][..., c] * f['alpha'], box, (fw, fh)) for c in range(3)], -1)
+        rgb = np.stack([resample(src[..., c] * f['alpha'], box, (fw, fh)) for c in range(3)], -1)
         rgb = np.clip(rgb / np.maximum(a, 1e-3)[..., None], 0, 255)
+        opaque = a >= threshold
+        if style:
+            rgb = dark_forces(rgb, opaque, style, tones)
         frame = np.zeros((fh, fw, 4), np.uint8)
         frame[..., :3] = snap(rgb, lit)
         if glow is not None:
             g = resample(glow * f['mask'], box, (fw, fh)) >= 0.35
             if g.any():
                 frame[g, :3] = snap(rgb[g][None], glows)[0]
-        frame[..., 3] = np.where(a >= 0.5, 255, 0)
+        frame[..., 3] = np.where(opaque, 255, 0)
         if draw:
             draw(i, frame, box)
         sheet[:, i * fw:(i + 1) * fw] = frame

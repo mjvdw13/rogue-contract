@@ -77,8 +77,10 @@ its cut sheet is committed straight to
 `assets/sprites/monsters/sandtrooper.png`, with no override. `cut.py` keys
 out the blue backdrop, splits poses whose rifle barrels run into the next
 pose (the barrel tips are measured by hand in its `GROUPS` table), scales
-them down to the Dark Forces sprites' pixel size and snaps them to the
-palette. Only the front-facing poses are used. It needs Python 3 with
+them down to the Dark Forces sprites' pixel size, restyles them to match
+the Dark Forces stormtrooper (`sheetcut.DARK_FORCES`: a stocky build,
+smoothed texture, strong contrast with deep shadows, side lighting, dark
+contours, a few colour ramps) and snaps them to the palette. Only the front-facing poses are used. It needs Python 3 with
 Pillow and numpy:
 
 ```
