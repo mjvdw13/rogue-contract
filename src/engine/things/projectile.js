@@ -2,6 +2,7 @@
 
 import { F_SKY } from '../world/tilemap.js';
 import { aimAttack, missileZ } from '../combat/aim.js';
+import { blocksShots, overlap } from './shape.js';
 
 const STEP = 0.2;
 /** A projectile's z is its centre; it bursts this close to a floor or ceiling. */
@@ -78,11 +79,15 @@ export function projectileThink(world, p, dt) {
       return;
     }
     for (const t of world.things) {
-      if (t === p || t === p.owner || !t.shootable || t.dead || t.removed) continue;
-      const r = t.radius + p.radius;
-      const dx = t.x - nx;
-      const dy = t.y - ny;
-      if (dx * dx + dy * dy > r * r) continue;
+      if (t === p || t === p.owner || t.dead || t.removed) continue;
+      if (!t.shootable) {
+        // Solid model scenery: a burst against it, no damage.
+        if (!blocksShots(t) || overlap(t, nx, ny, p.radius) <= 0) continue;
+        if (nz < t.z - p.radius || nz > t.z + t.height + p.radius) continue;
+        explode(world, p, null, true);
+        return;
+      }
+      if (t.model ? overlap(t, nx, ny, p.radius) <= 0 : (t.x - nx) ** 2 + (t.y - ny) ** 2 > (t.radius + p.radius) ** 2) continue;
       if (nz < t.z - p.radius || nz > t.z + t.height + p.radius) continue;
       const owner = p.owner;
       // Monsters are immune to their own species' projectiles (as in Doom).

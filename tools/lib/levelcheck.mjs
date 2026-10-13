@@ -5,6 +5,7 @@
 import { buildLevel } from '../../src/engine/world/level.js';
 import { F_SOLID, F_DOOR, F_EXIT, F_USE, F_SECRET } from '../../src/engine/world/tilemap.js';
 import { BODY } from '../../src/engine/things/player.js';
+import { footprint } from '../../src/engine/things/shape.js';
 
 const EXIT_ACTIONS = ['exit', 'secretExit', 'finale'];
 const actionsOf = (list) => [].concat(list ?? []).map((a) => (typeof a === 'string' ? { action: a } : a));
@@ -12,6 +13,12 @@ const DIRS = [[1, 0], [-1, 0], [0, 1], [0, -1]];
 const EPS = 1e-6;
 /** Widest gap (in tiles) a running jump is counted on to clear. */
 const MAX_GAP = 4;
+
+/** World-space collision lines of a model decoration spawn, or null. */
+export function modelFootprint(reg, def, spawn) {
+  const lines = def?.model ? reg.models.get(def.model)?.lines : null;
+  return lines?.length ? footprint(lines, spawn.x, spawn.y, spawn.angle ?? 0, def.scale ?? 1) : null;
+}
 
 /**
  * What the player's body can do, from the hero's `body` settings: walk up
@@ -100,7 +107,19 @@ export function analyseLevel(reg, level, skill = 3) {
     const i = Math.floor(s.y) * W + Math.floor(s.x);
     if (!byTile.has(i)) byTile.set(i, []);
     byTile.get(i).push({ ...s, def });
-    if (def?.kind === 'decoration' && def.solid && !def.health) blocked[i] = 1;
+    if (def?.kind === 'decoration' && def.solid && !def.health) {
+      blocked[i] = 1;
+      // A big model blocks every tile its collision lines cross.
+      const seg = modelFootprint(reg, def, s);
+      for (let j = 0; seg && j < seg.length; j += 4) {
+        const n = Math.ceil(Math.hypot(seg[j + 2] - seg[j], seg[j + 3] - seg[j + 1]) / 0.05);
+        for (let q = 0; q <= n; q++) {
+          const x = Math.floor(seg[j] + ((seg[j + 2] - seg[j]) * q) / n);
+          const y = Math.floor(seg[j + 1] + ((seg[j + 3] - seg[j + 1]) * q) / n);
+          if (map.inBounds(x, y)) blocked[y * W + x] = 1;
+        }
+      }
+    }
   }
 
   const keys = new Set();
@@ -261,7 +280,8 @@ export function analyseLevel(reg, level, skill = 3) {
       else if (kind === 'item') counts.items++;
       else if (kind === 'decoration') counts.decorations++;
       counts.byType[t.type] = (counts.byType[t.type] ?? 0) + 1;
-      if (map.flags[i] & F_SOLID) problems.push(`${t.type} at (${i % W}, ${(i / W) | 0}) is inside a wall`);
+      // (A model that isn't solid may be centred in a wall: a ring round a column.)
+      if (map.flags[i] & F_SOLID && !(t.def?.model && !t.def.solid)) problems.push(`${t.type} at (${i % W}, ${(i / W) | 0}) is inside a wall`);
       else if (!reached[i] && kind === 'item') notes.push(`${t.type} at (${i % W}, ${(i / W) | 0}) is unreachable`);
       if (kind === 'item' && t.def.pickup?.key && !reached[i]) problems.push(`key ${t.type} at (${i % W}, ${(i / W) | 0}) is unreachable`);
     }

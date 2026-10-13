@@ -291,6 +291,7 @@ export function buildLevel(registry, level, opts = {}) {
       angle: contentAngle(spec.angle ?? 270),
       ambush: !!spec.ambush,
       tag: spec.tag ?? null,
+      z: spec.z ?? null,
     });
   };
 

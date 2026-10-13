@@ -10,6 +10,7 @@ import { noiseAlert } from './noise.js';
 import { Triggers } from './triggers.js';
 import { runActions } from './actions.js';
 import { Thing } from '../things/thing.js';
+import { overlap } from '../things/shape.js';
 import { PlayerState, playerThink, playerCamera } from '../things/player.js';
 import { monsterThink, wakeMonster, monsterPain, applyMomentum } from '../things/monster.js';
 import { projectileThink, launchProjectile, effectThink } from '../things/projectile.js';
@@ -120,6 +121,7 @@ export class World {
       if (!t) continue;
       t.ambush = s.ambush;
       t.tag = s.tag;
+      if (s.z !== null && s.z !== undefined) t.z = s.z;
       if (t.kind === 'monster' && t.def.countKill) this.stats.totalKills++;
       if (t.kind === 'item' && t.def.countItem) this.stats.totalItems++;
     }
@@ -165,6 +167,7 @@ export class World {
     }
     const t = new Thing(def, x, y, angle);
     t.sheet = this.assets?.sheetFor(def) ?? null;
+    t.model = this.assets?.modelFor(def) ?? null;
     if (def.kind === 'projectile') {
       if (!t.setAnim('fly')) t.setAnim('idle');
     } else if (!t.setAnim('idle')) {
@@ -256,13 +259,11 @@ export class World {
       if (o === t || !o.solid || o.removed) continue;
       if (t.kind === 'projectile' || o.kind === 'projectile') continue;
       if (o.z >= t.z + t.height || t.z >= o.z + o.height) continue;
-      const r = o.radius + t.radius;
-      const dx = o.x - x;
-      const dy = o.y - y;
-      if (dx * dx + dy * dy < r * r) {
+      // (Model scenery with `lines` collides as those walls, others as cylinders.)
+      const depth = overlap(o, x, y, t.radius);
+      if (depth > 0) {
         // Allow moving apart if already overlapping.
-        const before = (o.x - t.x) ** 2 + (o.y - t.y) ** 2;
-        if (dx * dx + dy * dy < before) {
+        if (depth > overlap(o, t.x, t.y, t.radius)) {
           if (t === this.player && o.kind === 'npc') this.playerBumped = o;
           return false;
         }
@@ -617,6 +618,7 @@ export class World {
           this.fall(t, dt);
           break;
         default:
+          if (t.def.spin) t.angle += t.def.spin * dt;
           applyMomentum(this, t, dt);
           this.fall(t, dt);
           t.stepAnim(dt);

@@ -11,7 +11,8 @@
 // A space is solid nothingness outside the map.
 //
 // THING entries (the `things` grid) map a glyph to a thing id, or to
-// { type, skill: [..], ambush: true, angle: 'N' }. Every monster/item/
+// { type, skill: [..], ambush: true, angle: 'N', z: 2 } (z: a height to place
+// it at, instead of on the floor). Every monster/item/
 // decoration also has its own `glyph` (see src/content/monsters etc.).
 // Player starts: ^ (facing north/up)  > (east)  v (south)  < (west).
 

@@ -5,6 +5,7 @@ import strings from './strings.js';
 import config from './config.js';
 import hero from './hero.js';
 import textures from './textures.js';
+import models from './models/index.js';
 import { fonts, images, sheets } from './ui.js';
 import ammo from './ammo.js';
 import weapons from './weapons/index.js';
@@ -25,6 +26,7 @@ export default {
   config,
   hero,
   textures,
+  models,
   fonts,
   images,
   sheets,

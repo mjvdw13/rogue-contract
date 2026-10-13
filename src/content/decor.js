@@ -14,6 +14,11 @@ export default [
     solid: true,
     radius: 0.6,
   }),
+  // 3D models (src/content/models).
+  defineDecoration({ id: 'terminal', model: 'terminal', solid: true, radius: 0.55, height: 1.1 }),
+  defineDecoration({ id: 'reactor-ring', model: 'reactor-ring', spin: 0.5 }),
+  defineDecoration({ id: 'coolant-tank', model: 'coolant-tank', solid: true, radius: 1, height: 3.6 }),
+  defineDecoration({ id: 'shuttle', model: 'shuttle', solid: true, height: 3.5 }),
   defineDecoration({ id: 'ceiling-lamp', glyph: 'l', sheet: S('ceiling-lamp', 48, 16), hanging: true, fullbright: true }),
   defineDecoration({
     id: 'fuel-barrel',

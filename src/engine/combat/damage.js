@@ -1,5 +1,6 @@
 import { traceRay3D, rayCylinder, lineOfSight3D } from '../world/physics.js';
 import { aimAttack, aimZ } from './aim.js';
+import { blocksShots, rayShape } from '../things/shape.js';
 
 /** Puffs and blood stay this far inside the floor and ceiling. */
 const PUFF_INSET = 0.12;
@@ -138,7 +139,8 @@ export function radiusDamage(world, x, y, radius, maxDamage, inflictor, source, 
 /**
  * Instant bullet trace in 3D, from the attacker's fire height along `aim`'s
  * slope. Hits the first body before a wall, floor or ceiling, and leaves a
- * puff (or blood) where it struck. Shots into the sky leave nothing.
+ * puff (or blood) where it struck. Solid model scenery stops it with a puff.
+ * Shots into the sky leave nothing.
  */
 export function hitscan(world, shooter, angle, range, amount, spec = {}, aim = aimAttack(world, shooter, angle, range)) {
   const dx = Math.cos(angle);
@@ -146,13 +148,16 @@ export function hitscan(world, shooter, angle, range, amount, spec = {}, aim = a
   const { z, slope } = aim;
   const wall = traceRay3D(world.map, shooter.x, shooter.y, z, dx, dy, slope, range);
   let best = null;
+  let blocked = false;
   let bestT = wall.dist;
   for (const t of world.things) {
-    if (t === shooter || !t.shootable || t.dead || t.removed) continue;
-    const hit = rayCylinder(shooter.x, shooter.y, z, dx, dy, slope, t.x, t.y, t.radius, t.z, t.z + t.height);
+    if (t === shooter || t.dead || t.removed) continue;
+    if (!t.shootable && !blocksShots(t)) continue;
+    const hit = t.model ? rayShape(t, shooter.x, shooter.y, z, dx, dy, slope) : rayCylinder(shooter.x, shooter.y, z, dx, dy, slope, t.x, t.y, t.radius, t.z, t.z + t.height);
     if (hit >= 0 && hit < bestT) {
       bestT = hit;
-      best = t;
+      best = t.shootable ? t : null;
+      blocked = !t.shootable;
     }
   }
   const back = Math.max(0, bestT - 0.12);
@@ -165,7 +170,7 @@ export function hitscan(world, shooter, angle, range, amount, spec = {}, aim = a
     damage(world, best, amount, shooter, shooter);
     const fx = best.def.bleeds === false ? (spec.puff ?? 'puff') : (best.def.blood ?? 'blood');
     world.spawnEffect(fx, hx, hy, hz);
-  } else if (wall.hit && !wall.sky) {
+  } else if (blocked || (wall.hit && !wall.sky)) {
     world.spawnEffect(spec.puff ?? 'puff', hx, hy, hz);
   }
   return best;

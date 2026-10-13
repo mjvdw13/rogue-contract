@@ -6,6 +6,8 @@ import { BUILTIN_PICKUPS } from './things/pickups.js';
 
 const PICKUP_MODIFIERS = ['maxHealth', 'armorClass', 'maxArmor', 'duration', 'always'];
 const TRIGGER_EVENTS = ['start', 'enter', 'use', 'killed', 'pickup'];
+/** Faces per model before the validator warns (render cost). */
+const MODEL_BUDGET = 400;
 
 /**
  * Check a content registry for mistakes: missing references, broken levels,
@@ -53,9 +55,19 @@ export function validateContent(reg) {
 
   for (const t of reg.textures.values()) if (!t.src) err(`Texture "${t.id}": missing src`);
 
+  for (const m of reg.models?.values() ?? []) {
+    const owner = `model "${m.id}"`;
+    for (const id of new Set(m.faces.map((f) => f.tex).filter(Boolean))) {
+      if (!reg.textures.has(id)) err(`${owner}: unknown texture "${id}"`);
+    }
+    if (m.faces.length > MODEL_BUDGET) warn(`${owner}: ${m.faces.length} faces is over the budget of ${MODEL_BUDGET}`);
+  }
+
   for (const t of reg.things.values()) {
     const owner = `${t.kind} "${t.id}"`;
-    checkSheet(owner, t.sheet);
+    if (t.model) {
+      if (!reg.models.has(t.model)) err(`${owner}: unknown model "${t.model}"`);
+    } else checkSheet(owner, t.sheet);
     checkAnims(owner, t.anims);
     for (const s of Object.values(t.sounds ?? {})) checkSound(owner, s);
     if (t.kind === 'monster') {

@@ -114,6 +114,8 @@ Decided (2026-10-12):
   before B3.
 - **Added (2026-10-12):** H, the corner HUD and a lower weapon, moved up
   from Phase 2. Done now, before B3.
+- **Changed (2026-10-12):** Mark wants engine work next rather than more
+  of Mission 1, so F (3D models) goes before B3-B5 and C.
 
 ### A. Finer grid: half-size tiles (do first)
 
@@ -305,44 +307,74 @@ Design rules (what makes it feel like Dark Forces):
       texels per unit (`world.js`: `sheet.fh / 64`). Since the finer grid
       it is 32, so ceiling lamps hang half their height into the ceiling.
 
-### F. 3D models, like Dark Forces' 3DO objects (after C)
+### F. 3D models, like Dark Forces' 3DO objects (the current work, from 2026-10-12)
 
 Goal: low-poly models drawn in true 3D inside the grid world (consoles,
 crates, pipes, a reactor, a parked ship, mouse droids), clipped by walls and
 ledges the same way sprites are. They hide the blockiness the grid can't
-avoid.
+avoid. Mark chose this as the next engine work (2026-10-12), ahead of
+multi-angle sprites, smarter enemies and dynamic lighting.
 
-1. [ ] **Renderer** (`render/models.js`):
-       - Move vertices into camera space and project them with the sprite
-         formula (`horizon + (camZ - z) * fy / depth`).
-       - Clip triangles at the near plane, and drop faces pointing away from
-         the camera.
-       - Fill triangles column by column. Each pixel is checked against
-         `zbuf` and the ledge windows (`segDist` / `segTop` / `segBot`) at
-         its own depth.
-       - Faces are flat-coloured or textured, through the palette and
-         colormaps. A fixed light direction shades each face, on top of the
-         tile's light.
-2. [ ] **Sorting with sprites.** Models and sprites share one far-to-near
-       order. Add a depth buffer covering only the models' pixels, so a
-       sprite beside a model is hidden correctly.
-3. [ ] **Model format and pipeline.** `tools/import-model.mjs` turns a
-       Blender OBJ export into a model file: vertices, faces, UVs, a texture
-       or a palette colour per face. Simple models can also be generated in
-       code, the way `npm run art` makes textures. Set a triangle budget per
-       model (a few hundred).
-4. [ ] **Game integration.**
-       - A decoration placed in a level, with `model`, facing angle, scale
-         and an optional spin.
-       - Collision is the thing's cylinder for small models. Big ones (a
-         ship) get a list of wall lines, reusing the angled-wall collision.
-       - Shots and explosions hit the collision shape.
-5. [ ] **Tools.** The map viewer draws the footprint. The validator checks
-       model names, and that no model blocks the route.
-6. [ ] **Tests and a showcase.** Snapshot tests of models in the sandbox
-       (behind a ledge, beside a sprite, cut by the near plane). Then place
-       a few in Mission 1: consoles, the generator and a ship on the pad.
-       Time frames before and after.
+Decided (2026-10-12):
+- **Model format:** `defineModel({ id, vertices, faces, lines? })` in a new
+  `models` list in the content pack. Vertices are `[x, y, z]` in world units
+  (tiles), the origin at the floor under the thing's centre; at angle 0 the
+  model's axes are the world's (x east, y south, z up). Each face is a
+  convex polygon `{ v: [i, j, k, ...], color, tex?, uv?, glow?, twoSided? }`,
+  wound so the right-hand normal `(v1-v0) x (v2-v0)` points outward. `color`
+  is `[ramp, 0..1]` or an RGB triple (snapped to the palette's lit colours
+  at load); `tex` with per-vertex `uv` (in texture repeats) maps a texture.
+- **Sorting with sprites: a depth buffer, not a shared far-to-near order.**
+  Models draw after the walls and before the sprites, writing their depth
+  per pixel; sprite pixels behind a model pixel are skipped. Models need no
+  sorting among themselves either. The buffer is only cleared and checked
+  in frames where a model drew.
+- **Lighting:** the tile light at the model's position with the usual
+  distance fade, plus a fixed light direction shading each face (up to a
+  few colormap levels darker). `glow` faces are fullbright.
+- **Generated models in code**, with a small builder (boxes, prisms,
+  cylinders, with automatic winding), as content files in
+  `src/content/models/`. `tools/import-model.mjs` converts a Blender OBJ
+  (with its MTL colours) into the same format.
+
+1. [x] **Renderer** (`render/models.js`):
+       - Move vertices into camera space with the sprite transform.
+       - Drop faces pointing away from the camera (world-space normal test,
+         unless `twoSided`). Clip polygons at the near plane.
+       - Fill polygons column by column, interpolating 1/depth (and u/depth,
+         v/depth) along edges, so textures are perspective-correct.
+       - Each pixel is checked against `zbuf` and the ledge windows
+         (`segDist` / `segTop` / `segBot`) at its own depth.
+2. [x] **Depth buffer with sprites** (`view.mdepth`), as decided above.
+3. [x] **Model format and pipeline.** `defineModel`, registry and asset
+       loading (colours to palette indices, texture slots), the builder,
+       and `tools/import-model.mjs` for OBJ + MTL. Triangle budget: a few
+       hundred per model.
+4. [x] **Game integration.**
+       - A decoration with `model`, placed with a facing angle; `scale` and
+         an optional `spin` (radians per second).
+       - Collision is the thing's cylinder for small models. Big ones list
+         `lines` (wall segments in model space): circle-against-segment
+         collision for movement.
+       - Solid models stop hitscan shots and projectiles (a puff, no
+         damage), using the cylinder or the lines.
+5. [x] **Tools.** The map viewer draws model footprints. The validator
+       checks model ids and texture names, and warns when a solid model
+       blocks the route.
+6. [x] **Tests and a showcase.** Unit tests for clipping and culling;
+       headless snapshot checks (a model behind a ledge, beside a sprite,
+       cut by the near plane). Then place a few in Mission 1: consoles, the
+       generator and a ship on the pad. Time frames before and after.
+
+Follow-ups found on the way:
+- [ ] Monsters see and aim through models (line of sight only knows the
+      map). Fine for low scenery; a ship or a tank should block sight.
+- [ ] Pathfinding doesn't know about models: a monster can walk into a
+      tank and stall, as with sprite crates today.
+- [ ] Builder textures restart on each face of a cylinder (each face is
+      projected on its own); wrap them round instead.
+- [ ] Better showcase art: the shuttle is a placeholder shape. Models made
+      in Blender (or by a modeller) are the real thing.
 
 Later, if wanted: walkable model surfaces (a bridge you can cross or walk
 under). That changes physics and pathfinding, which assume one floor per
@@ -865,3 +897,27 @@ update the smoke test.
   Mission 1 are now sandtroopers, plus one in the sandbox. Screenshots
   beside the Dark Forces stormtrooper: same height and pixel size. 91
   tests, the validator and the smoke test pass.
+- 2026-10-12: Phase 1b F: 3D models (Mark chose this as the next engine
+  work, ahead of more of Mission 1).
+  - **Renderer** (`render/models.js`): camera-space transform, back-face
+    culling, near-plane clipping, column-by-column filling with
+    perspective-correct textures, per-pixel checks against walls, ledge
+    windows and a model depth buffer that sprites test too. Faces are
+    shaded by a fixed light (wrapping round, so cylinders read as round).
+  - **Format:** `defineModel` (flat colours, or textures with `uv` in
+    repeats or `uvw` in world units at the walls' scale; `glow`,
+    `twoSided`, collision `lines`), `ModelBuilder` (boxes, prisms, lofts,
+    cylinders) and `tools/import-model.mjs` for Blender OBJ + MTL.
+  - **Game:** decorations with `model`, `spin` and a placement `z`; solid
+    models collide as cylinders or as their lines, and stop hitscan shots
+    and projectiles.
+  - **Tools:** the validator checks model ids, textures and the face budget;
+    the level checker blocks tiles under model lines; the map viewer draws
+    them.
+  - **Showcase in Mission 1:** terminals in maintenance and the vault, two
+    turning containment rings round the generator column, four coolant
+    tanks on the shaft floor, and a shuttle on the landing pad (the pad's
+    stormtrooper moved south of the exit).
+  - **Speed:** models add 0.06-0.2 ms a frame in Mission 1, and 0.74 ms
+    with the shuttle filling a 560-wide view (Node, headless).
+  - **Checks:** 103 tests (12 new), the validator and the smoke test pass.

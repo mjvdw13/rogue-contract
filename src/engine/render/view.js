@@ -44,6 +44,9 @@ export class View {
     this.segBot = new Int16Array(this.W * this.SEG);
     this.segCount = new Uint8Array(this.W);
     this.skyU = new Int32Array(this.W);
+    /** Per pixel, the depth of the nearest model pixel (render/models.js); valid when `modelsDrawn`. */
+    this.mdepth = new Float32Array(this.W * this.H);
+    this.modelsDrawn = false;
   }
 
   /**

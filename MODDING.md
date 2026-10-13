@@ -245,6 +245,41 @@ be added with `definePickup` (see *Custom behaviour*).
   `defineEffect({ id, sheet, anims: { idle } })`. An effect disappears when its
   animation ends.
 
+### 3D models
+
+Low-poly models are drawn in true 3D, like Dark Forces' 3DO objects:
+clipped by walls and ledges, and hiding sprites behind them. A model is
+defined with `defineModel` (see `src/engine/defs.js`) and listed in
+`src/content/models/index.js`; a decoration places it:
+
+```js
+defineDecoration({ id: 'terminal', model: 'terminal', solid: true, radius: 0.55, height: 1.1 })
+defineDecoration({ id: 'reactor-ring', model: 'reactor-ring', spin: 0.5 }) // radians per second
+```
+
+- **Units and axes:** world units (a tile is 1, the player 1.76 tall), the
+  origin on the floor under the thing; at angle 0 the model faces east (+x),
+  y is south, z up. The level's `angle` turns it, `scale` sizes it, and a
+  thing's `z` places it at a height instead of on the floor.
+- **Faces** are convex polygons wound so the right-hand normal points out.
+  Each has a `color` (`[ramp, 0..1]` or `[r, g, b]`) or a `tex` with `uv`
+  (texture repeats) or `uvw` (world units, at the walls' scale). `glow`
+  makes a face fullbright (animated textures keep animating), and `twoSided`
+  draws it from behind too. Faces are shaded by a fixed light from above.
+- **Building in code:** `ModelBuilder` in `src/content/models/lib/build.js`
+  makes boxes, prisms, lofts (tapered prisms) and cylinders along any axis,
+  winds their faces, and projects textures upright at the walls' scale.
+- **From Blender:** export OBJ (Y up, -Z forward) with materials, then
+  `node tools/import-model.mjs ship.obj --glow Lights`. A material whose
+  texture file is named after a game texture uses it; others use their
+  colour. Keep models to a few hundred triangles (the validator warns over
+  400).
+- **Collision:** a solid model collides as its cylinder (`radius`,
+  `height`), or as its `lines` (wall segments in model space) when it has
+  them, for long shapes like a ship. Solid models stop shots and
+  projectiles. The level checker treats the tiles under the lines as
+  blocked, and the map viewer draws them in pink.
+
 ## Levels
 
 A level is an ASCII map. Copy `src/content/levels/e1m1.js`, rename it, add it to

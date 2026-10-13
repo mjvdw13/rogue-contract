@@ -13,6 +13,7 @@ export class Registry {
     this.errors = [];
 
     this.textures = new Map();
+    this.models = new Map();
     this.sheets = new Map();
     this.images = new Map();
     this.fonts = new Map();
@@ -29,6 +30,7 @@ export class Registry {
     this.pickups = new Map();
 
     this._addAll(pack.textures, this.textures, 'texture');
+    this._addAll(pack.models, this.models, 'model');
     this._addAll(pack.sheets, this.sheets, 'sheet');
     this._addAll(pack.images, this.images, 'image');
     this._addAll(pack.fonts, this.fonts, 'font');

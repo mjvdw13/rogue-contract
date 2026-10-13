@@ -13,7 +13,8 @@
 // the colour of their key; switches
 // have a yellow border; secret tiles are dotted purple; damaging floors are
 // striped green. Monsters are red squares, coworkers green, items yellow,
-// keys and weapons bright, decorations grey, the start is a white arrow.
+// keys and weapons bright, decorations grey, 3D models pink (their collision
+// lines, or their body's square), the start is a white arrow.
 // Areas the player can never reach are cross-hatched.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -22,7 +23,7 @@ import content from '../src/content/index.js';
 import { Registry } from '../src/engine/registry.js';
 import { F_SOLID, F_DOOR, F_SKY, F_SECRET, F_DAMAGE, F_EXIT, F_USE, F_VOID, F_SLANT } from '../src/engine/world/tilemap.js';
 import { decodePNG, encodePNG } from './art/lib/png.js';
-import { analyseLevel, bodyLimits } from './lib/levelcheck.mjs';
+import { analyseLevel, bodyLimits, modelFootprint } from './lib/levelcheck.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -173,6 +174,18 @@ function render(level) {
     } else if (def?.kind === 'npc') {
       rect(x - k, y - k, k * 2, k * 2, [40, 230, 90]);
       frame(x - k - 1, y - k - 1, k * 2 + 2, k * 2 + 2, [0, 0, 0]);
+    } else if (def?.model) {
+      // 3D models: their collision lines, or their cylinder's square.
+      const seg = modelFootprint(reg, def, s);
+      if (seg) {
+        for (let j = 0; j < seg.length; j += 4) {
+          const n = Math.ceil(Math.hypot(seg[j + 2] - seg[j], seg[j + 3] - seg[j + 1]) * S);
+          for (let q = 0; q <= n; q++) put(Math.floor((seg[j] + ((seg[j + 2] - seg[j]) * q) / n) * S), Math.floor((seg[j + 1] + ((seg[j + 3] - seg[j + 1]) * q) / n) * S), [255, 140, 220]);
+        }
+      } else {
+        const r = Math.max(1, Math.round((def.radius ?? 0.5) * S));
+        frame(x - r, y - r, r * 2, r * 2, [255, 140, 220]);
+      }
     } else if (def?.kind === 'decoration') {
       rect(x - 1, y - 1, 2, 2, [150, 150, 150]);
     }

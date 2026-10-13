@@ -115,6 +115,41 @@ export function defineTexture(def) {
   return { frames: 1, fps: 4, sky: false, ...def, type: 'texture' };
 }
 
+/**
+ * A low-poly 3D model, drawn in true 3D by render/models.js (like Dark Forces'
+ * 3DO objects). Place it with a decoration whose `model` is this id.
+ *
+ * Vertices are [x, y, z] in world units, the origin on the floor under the
+ * thing's centre. At angle 0 the model's axes are the world's: x east, y south,
+ * z up. Each face is a convex polygon of vertex indices, wound so that the
+ * right-hand normal (v1 - v0) x (v2 - v0) points out of the model. A face has
+ * a `color` ([ramp, 0..1] or [r, g, b], snapped to the palette's lit colours)
+ * or a `tex` (texture id) with one coordinate per vertex: `uv` in texture
+ * repeats (as OBJ files have them), or `uvw` in world units, mapped at the
+ * walls' 32 texels per unit whatever the texture's size. `glow` faces are
+ * fullbright (an animated texture keeps animating); `twoSided` faces are
+ * drawn from behind too.
+ *
+ * `lines` ([x0, y0, x1, y1] in model space) are optional wall segments for
+ * collision; without them a solid model collides as its thing's cylinder.
+ * @param {{id:string, vertices:number[][], faces:{v:number[], color?:any[], tex?:string,
+ *   uv?:number[][], uvw?:number[][], glow?:boolean, twoSided?:boolean}[], lines?:number[][]}} def
+ */
+export function defineModel(def) {
+  requireId(def, 'Model');
+  const n = def.vertices?.length ?? 0;
+  if (!n) throw new Error(`Model "${def.id}": needs "vertices"`);
+  if (!def.faces?.length) throw new Error(`Model "${def.id}": needs "faces"`);
+  def.faces.forEach((f, i) => {
+    if (!Array.isArray(f.v) || f.v.length < 3 || f.v.some((k) => !(k >= 0 && k < n))) {
+      throw new Error(`Model "${def.id}": face ${i} needs 3 or more vertex indices below ${n}`);
+    }
+    if (f.tex && (f.uv ?? f.uvw)?.length !== f.v.length) throw new Error(`Model "${def.id}": face ${i} needs one uv (or uvw) per vertex`);
+    if (!f.tex && !f.color) throw new Error(`Model "${def.id}": face ${i} needs a color or a tex`);
+  });
+  return { lines: [], ...def, type: 'model' };
+}
+
 /** A sprite sheet shared by several things. @param {{id:string} & SheetSpec} def */
 export function defineSheet(def) {
   requireId(def, 'Sheet');

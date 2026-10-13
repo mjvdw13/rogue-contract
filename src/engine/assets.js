@@ -1,6 +1,7 @@
 import { IndexedImage, quantize, loadImageElement, readPixels } from './gfx/image.js';
 import { Sheet } from './gfx/sheet.js';
 import { BitmapFont } from './gfx/font.js';
+import { Model } from './gfx/model.js';
 
 /** A wall/flat/sky texture ready for the renderer. Animated textures cycle frames. */
 export class Texture {
@@ -58,6 +59,7 @@ export class Assets {
     this.sheets = new Map(); // id -> Sheet
     this.fonts = new Map(); // id -> BitmapFont
     this.ui = new Map(); // id -> IndexedImage
+    this.models = new Map(); // id -> Model
     this.problems = [];
     this.animated = [];
   }
@@ -166,6 +168,7 @@ export class Assets {
       sheet.scale = o.scale ?? 1;
       this.sheets.set(s.id, sheet);
     }
+    for (const m of reg.models?.values() ?? []) this.models.set(m.id, new Model(m, this.palette, (id) => this.textureSlot(id), this.textures));
     this._buildFonts();
     for (const i of reg.images.values()) {
       this.ui.set(i.id, this.images.get(i.src) ?? this.placeholder(32, 32));
@@ -180,6 +183,11 @@ export class Assets {
       return 0;
     }
     return slot;
+  }
+
+  /** The prepared 3D model for a thing definition's `model` id, or null. */
+  modelFor(def) {
+    return (def?.model && this.models.get(def.model)) || null;
   }
 
   /** Sprite sheet for a thing/weapon definition's `sheet` reference. */

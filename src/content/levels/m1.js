@@ -172,6 +172,7 @@ const list = [
   at('stormtrooper', 36.5, 16.5, { angle: 270, ambush: true }),
   at('supply-crate', 28.5, 16), at('supply-crate', 30, 16),
   at('console', 39.5, 15.5),
+  at('terminal', 34, 14.6, { angle: 270 }), at('terminal', 35.4, 14.6, { angle: 270 }),
   at('energy-pack', 28.5, 24.5),
   at('power-cell', 40.5, 24.5),
   // The barracks.
@@ -186,10 +187,15 @@ const list = [
   at('keycard-red', 70.5, 6),
   at('console', 63.5, 6),
   // The vault.
+  at('terminal', 85, 16.4, { angle: 90 }), at('terminal', 85, 17.6, { angle: 270 }),
   at('energy-pack', 85, 13.5),
   at('power-cell', 80.5, 21.5), at('power-cell', 89.5, 21.5),
   at('shield-unit', 96, 16),
-  // The generator.
+  // The generator: containment rings turning round the column above the
+  // catwalk, and coolant tanks on the shaft floor.
+  at('reactor-ring', 90, 44, { z: 9, angle: 0 }), at('reactor-ring', 90, 44, { z: 13, angle: 45 }),
+  at('coolant-tank', 78.5, 32.5), at('coolant-tank', 78.5, 36),
+  at('coolant-tank', 101.5, 55.5), at('coolant-tank', 101.5, 52),
   at('probe-droid', 90, 34.5),
   at('stormtrooper', 80.5, 27.5, { angle: 270 }),
   at('stormtrooper', 106.5, 50.5, { angle: 180 }),
@@ -197,8 +203,9 @@ const list = [
   at('fuel-barrel', 98.5, 44.5), at('fuel-barrel', 99.5, 46.5),
   at('med-kit', 97.5, 56.5),
   at('energy-pack', 73.5, 40.5),
-  // The landing pad.
-  at('stormtrooper', 123.5, 38.5, { angle: 180 }),
+  // The landing pad, with the pickup shuttle north of the marked spot.
+  at('shuttle', 123.5, 38.5, { angle: 270 }),
+  at('stormtrooper', 123.5, 49.5, { angle: 180 }),
   at('sandtrooper', 123.5, 54.5, { angle: 180 }),
 ];
 
