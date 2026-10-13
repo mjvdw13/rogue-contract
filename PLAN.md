@@ -16,7 +16,7 @@ land, and record new decisions here.
 | Title | **Rogue Contract** (chosen 2026-10-11). Repo `mjvdw13/rogue-contract`, public, served by GitHub Pages. It also holds ripped Dark Forces art for local testing (Mark's decision, 2026-10-12; see Phase 1b D). "Star Wars" and "Dark Forces" stay out of the title. |
 | Engine, revisited (2026-10-12) | **Stay on our height-grid engine.** Considered instead: The Force Engine (needs the original Dark Forces files, so it can only host a mod; desktop only), GZDoom (true sectors and slopes, but desktop only) and Godot with TrenchBroom (no grid limits, but a full rebuild). Fill the grid's visual gaps with 3D models (Phase 1b F). |
 | Platforms (2026-10-12) | **Desktop browsers.** Phones are no longer a target: no phone performance gate, and touch controls aren't required. |
-| Story, revisited (2026-10-13) | **Bad Paper, a prequel to Dark Forces** (`docs/story.md`), set a few months before Dark Forces' first mission. A licensed bounty hunter on Tatooine takes a contract that turns on them: the Canyon Garrison is an early field test of Mohc's Dark Trooper project, and its prototype is Phase 3's mini-boss. Calm missions, where enemies leave you alone until an alarm, alternate with combat. The tracking fob is a mechanic. **The hero is Kyle Katarn** (Mark, 2026-10-13, replacing the earlier "no Kyle Katarn retelling"), and Jan Ors drops him off and picks him up in the Moldy Crow in every mission; the first mission opens with the Crow landing in a Mos Eisley docking bay. |
+| Story, revisited (2026-10-13) | **Bad Paper, a prequel to Dark Forces** (`docs/story.md`), set a few months before Dark Forces' first mission. Kyle takes a Guild bounty on Tatooine as cover for the Alliance, and the contract turns on him: the Canyon Garrison is an early field test of Mohc's Dark Trooper project, and its prototype is Phase 3's mini-boss. **Only Mission 1 (Mos Eisley) is free roam:** calm troopers and the tracking fob, until Kyle finds his target and the shooting starts. From there it's straight run-and-gun, and later missions have no stealth or tracker. **The hero is Kyle Katarn** (Mark, 2026-10-13, replacing the earlier "no Kyle Katarn retelling"), and Jan Ors drops him off and picks him up in the Moldy Crow in every mission; the first mission opens with the Crow landing in a Mos Eisley docking bay. |
 | Rights | A non-commercial fan game. All art, sound and music are generated or original. Nothing ripped from Dark Forces, and no note-for-note John Williams transcriptions. Exception (Mark's decision, 2026-10-12): the ripped Dark Forces enemy and weapon sheets in `assets/custom/` are used, on the hosted site too (see Phase 1b D). |
 
 ## Starting point
@@ -710,6 +710,24 @@ Decided:
 - [ ] Stretch goal: enemies drawn from 8 angles, rendered from the clay
       models.
 
+### For the story (`docs/story.md`)
+
+- [ ] **The Crow's drop-offs and pickups** (every mission): a `fly` action
+      that moves a model decoration along keyframes, a skippable `cutscene`
+      action (the view from a tagged spot, input locked), and `wait` inside
+      a trigger's action list.
+- [ ] **Mission 1's free roam:** calm monsters (stand or wander, say lines
+      when bumped, don't attack) and a `hostile` action that flips them all
+      at once, also run when the player fires or hits anyone; an
+      `on: 'hostile'` trigger. Patrol routes if there's time.
+- [ ] **The tracking fob** (Mission 1): a weapon slot with no attack whose
+      light blinks and beeps faster near the signal, a `setSignal` action,
+      and taking the fob away.
+- [ ] **Conversations:** NPC lines that move on with each use, story flags
+      (`setFlag`, `if` on triggers) and an `on: 'talk'` trigger.
+- [ ] **Small actions:** `remove` and `place` for characters, and
+      `damage { tag, amount }`.
+
 ## Phase 3: Content for the slice
 
 - [ ] **Palette:** Imperial greys and gloss blacks, desert ochre, and
@@ -728,8 +746,11 @@ Decided:
 
 ## Phase 4: Mission 1 (the vertical slice)
 
-The player is an original mercenary hired by the Rebellion, who infiltrates an
-Imperial garrison in a desert canyon:
+In the story (`docs/story.md`, 2026-10-13) this map is Mission 3, the Canyon
+Garrison, and the hero is Kyle Katarn; Mos Eisley is the new Mission 1.
+Which one is the slice is still open.
+
+The player infiltrates an Imperial garrison in a desert canyon:
 
 1. Start in an outdoor canyon with ledges and snipers.
 2. Get in through a crouch vent.
@@ -1260,3 +1281,12 @@ update the smoke test.
   with a pickup, played in the level: Mission 1 opens on a camera at Docking
   Bay 87's rim as the Crow comes down. The finale hands over to Danuta. New
   engine items: flying models, a scripted camera, and delays in triggers.
+- 2026-10-13: Free roam only in Mission 1 (Mark). `docs/story.md`
+  updated: Mos Eisley is a loop. Kyle walks east through a calm town with
+  the tracking fob, finds Dace in a derelict docking bay, and the shooting
+  starts. The town turns hostile all at once, and he fights back west to
+  the Crow in Docking Bay 87. Dace is taken there, so the Homestead becomes
+  a straight combat mission (recovering his hidden recordings), and the
+  Canyon Garrison stays a combat mission entered by the vent. Dropped:
+  restricted zones, warnings, monster searching, the traced fob and
+  throwing it. The story's engine items are listed under Phase 2.
