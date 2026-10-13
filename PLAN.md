@@ -16,7 +16,7 @@ land, and record new decisions here.
 | Title | **Rogue Contract** (chosen 2026-10-11). Repo `mjvdw13/rogue-contract`, public, served by GitHub Pages. It also holds ripped Dark Forces art for local testing (Mark's decision, 2026-10-12; see Phase 1b D). "Star Wars" and "Dark Forces" stay out of the title. |
 | Engine, revisited (2026-10-12) | **Stay on our height-grid engine.** Considered instead: The Force Engine (needs the original Dark Forces files, so it can only host a mod; desktop only), GZDoom (true sectors and slopes, but desktop only) and Godot with TrenchBroom (no grid limits, but a full rebuild). Fill the grid's visual gaps with 3D models (Phase 1b F). |
 | Platforms (2026-10-12) | **Desktop browsers.** Phones are no longer a target: no phone performance gate, and touch controls aren't required. |
-| Rights | A non-commercial fan game. All art, sound and music are generated or original. Nothing ripped from Dark Forces, and no note-for-note John Williams transcriptions. |
+| Rights | A non-commercial fan game. All art, sound and music are generated or original. Nothing ripped from Dark Forces, and no note-for-note John Williams transcriptions. Exception (Mark's decision, 2026-10-12): the ripped Dark Forces enemy and weapon sheets in `assets/custom/` are used, on the hosted site too (see Phase 1b D). |
 
 ## Starting point
 
@@ -268,10 +268,15 @@ Design rules (what makes it feel like Dark Forces):
   cleaned up.
 - Recorded sound effects, and music (a composer or orchestral samples). The
   films' own sounds and music stay out.
-- Ripped art (e.g. Dark Forces sprites) can be tried locally only, through
-  `assets/custom/overrides.json`. The public game never loads it. The Dark
-  Forces sheets are committed in the public repo with
-  `assets/custom/DISCLAIMER.md` (Mark's decision, 2026-10-12).
+- Ripped art (e.g. Dark Forces sprites) goes in through
+  `assets/custom/overrides.json`. The Dark Forces sheets are committed in
+  the public repo with `assets/custom/DISCLAIMER.md` (Mark's decision,
+  2026-10-12).
+- [x] **The hosted site uses the Dark Forces art** (Mark's decision,
+      2026-10-12). Overrides are read everywhere, not only on localhost;
+      the smoke test still skips them. An override image that fails to
+      load falls back to the committed art. Update the comment in
+      `assets.js`, `assets/custom/README.md` and `DISCLAIMER.md`.
 
 ### E. Leftovers from the first Star Wars pass
 
@@ -745,3 +750,10 @@ update the smoke test.
   - **Found:** the options menu was already too tall for the screen (added
     to E).
   - **Next:** B3, the lighting pass.
+- 2026-10-12: The hosted site now uses the Dark Forces art (Mark's
+  decision). Overrides were only read on localhost, so the pushed sheets
+  never showed on GitHub Pages. Now `overrides.json` is read everywhere
+  except under test automation. An override image that fails to load falls
+  back to the committed art. Checked under the `/rogue-contract/` subpath
+  with the automation flag hidden: all five overrides load, and a blocked
+  stormtrooper sheet falls back. 91 tests and the smoke test pass.

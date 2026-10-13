@@ -1,19 +1,24 @@
-# Local art (only loaded on your own computer)
+# Custom art
 
-Use this folder to try out art the public game must not use, such as sprites
+Use this folder to try out art from outside the generators, such as sprites
 ripped from other games or photos of real people. New files here are ignored
 by git, so they stay on your computer.
 
 The exception is the Dark Forces art below, committed with `cut.mjs` and
-`overrides.json`. Read `DISCLAIMER.md`: it is for local testing only, and
+`overrides.json`. The hosted game uses it too. Read `DISCLAIMER.md`: it
 must not be redistributed.
 
 ## Overriding a game asset
 
-`assets/custom/overrides.json` maps a committed asset to a local replacement.
-When the game runs on `localhost` or `127.0.0.1`, it loads the replacement
-instead and logs `Local art override: ...` in the console. The public site
-and the automated smoke test never read this file.
+`assets/custom/overrides.json` maps a committed asset to a replacement. The
+game loads the replacement instead and logs `Art override: ...` in the
+console, locally and on the hosted site. The automated smoke test never
+reads this file.
+
+`overrides.json` is committed, so an entry pointing at a file that is only
+on your computer (an ignored file) can't load on the hosted site. The game
+then falls back to the committed art, with a warning in the console. Keep
+private entries out of the committed file.
 
 ```json
 {

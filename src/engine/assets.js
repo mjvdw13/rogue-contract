@@ -78,22 +78,21 @@ export class Assets {
   }
 
   /**
-   * Local art overrides: `assets/custom/overrides.json` (ignored by git) maps
-   * an asset path to a replacement, `{ src, frameWidth?, frameHeight?, scale? }`,
-   * for trying out art that must never be published. Only read on localhost,
-   * and not under test automation, so the public site never asks for it.
+   * Art overrides: `assets/custom/overrides.json` maps an asset path to a
+   * replacement, `{ src, frameWidth?, frameHeight?, scale? }`. The committed
+   * file swaps in the Dark Forces sheets, on the hosted site too. Skipped
+   * under test automation, so tests see the generated art.
    */
   async _loadOverrides() {
     this.overrides = {};
-    const local = ['localhost', '127.0.0.1'].includes(globalThis.location?.hostname);
-    if (!local || globalThis.navigator?.webdriver) return;
+    if (globalThis.navigator?.webdriver) return;
     try {
       const res = await fetch('assets/custom/overrides.json', { cache: 'no-store' });
       if (res.ok) this.overrides = await res.json();
     } catch {
       // No overrides.
     }
-    for (const [from, to] of Object.entries(this.overrides)) console.info(`Local art override: ${from} -> ${to.src}`);
+    for (const [from, to] of Object.entries(this.overrides)) console.info(`Art override: ${from} -> ${to.src}`);
   }
 
   /** Load everything. `onProgress(done, total)` drives the loading bar. */
@@ -113,7 +112,13 @@ export class Assets {
     const workers = Array.from({ length: 8 }, async () => {
       while (queue.length) {
         const src = queue.shift();
-        this.images.set(src, await this._loadImage(this.overrides[src]?.src ?? src));
+        let img = null;
+        if (this.overrides[src]) {
+          // A missing override (say, a file only on someone's own computer) falls back to the committed art.
+          img = await this._loadImage(this.overrides[src].src);
+          if (!img) delete this.overrides[src];
+        }
+        this.images.set(src, img ?? (await this._loadImage(src)));
         done++;
         onProgress(done, total);
       }

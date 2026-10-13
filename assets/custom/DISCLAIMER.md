@@ -6,11 +6,9 @@ Forces* (LucasArts, 1995). The game and its art belong to Lucasfilm Ltd.
 They are not part of Rogue Contract and are not covered by its license.
 
 - The owner of this repository owns a copy of Dark Forces. These files are
-  kept here only for the owner's own local testing, through `overrides.json` (see
-  `README.md`).
-- **Do not redistribute them.** Don't copy them out of this repository, ship
-  them in a build, or publish them anywhere.
-- The public game never loads them: the overrides are only read on
-  `localhost`, and never under test automation.
+  used through `overrides.json` (see `README.md`), in local testing and on
+  the owner's hosted copy of the game (the owner's decision, 2026-10-12).
+- **Do not redistribute them.** Don't copy them out of this repository or
+  publish them anywhere else.
 
 The enemy sheets were ripped by Crazy Ivan, the weapons sheet by Dolphman.
