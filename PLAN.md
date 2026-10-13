@@ -771,6 +771,175 @@ slabs that stop sound, triggers for one storey only.
       bridges are grate slabs over one open shaft floor, and a rock arch
       spans the gorge with a sniper on top.
 
+## Phase 1d: Detail and immersion (from 2026-10-13)
+
+Mark (2026-10-13): spend time on Mission 1 to really push its detail and
+immersion, and fix the engine wherever it holds the level back.
+
+### What holds it back (survey, 2026-10-13)
+
+From screenshots of every area with the Dark Forces art, and the code:
+
+- **Light is per tile, and steep.** A pool of light is a square of tiles
+  with hard edges. Distance darkening (`view.js`: 4 light units per
+  colormap level, `DIMINISH` 40, fog 0.15) turns anything 10 m away
+  nearly black in a space lit at 144, so the generator chamber and the
+  canyon read as black voids. Nothing gives light: bolts, muzzle flashes
+  and explosions light nothing.
+- **The canyon is a box.** Every rock wall rises straight to the sky
+  height (12 m), so the sky is a sliver and the cliffs have no skyline.
+  The floor is SecBase's grey rock (DF's dirt snapped to blood red in our
+  palette), and distance fades to black instead of night haze.
+- **One texture per wall tile, floor to ceiling.** The garrison's face
+  can't have a base course with rock above it, and big walls (the reactor
+  column, the canyon, the shaft) repeat one texture 10 m up. No decals:
+  no signs, insignia, hazard stripes or scorch marks.
+- **Rooms are boxes.** Flat ceilings, bare floors, no trim, few props
+  (crates and consoles as sprites, four models).
+- **Silent and still.** No ambient sound (reactor hum, wind, machinery),
+  no particles (steam, sparks, dust), no translucency (glass, shafts of
+  light, holograms).
+- **The palette is Raccoon Alex's.** Snapping the DF art to it costs 11.6
+  RGB on average (31 on the ceiling light, 22 on the jambs); it's thin on
+  dark blue-greys, so dim SecBase walls go grey-black, and it has no sand.
+- **Props confuse monsters.** Pathfinding and sight ignore 3D models, so a
+  furnished room would trap and blind them.
+- Smaller: grates and rock shimmer at a distance (no mipmaps); the model
+  builder restarts a cylinder's texture on each face.
+
+Frame time now: 4.3 ms on average at 16:9 (16 views of Mission 1,
+headless Node, DF art). Budget for this phase: stay under about 8 ms.
+
+### Decided (2026-10-13)
+
+- **Engine first, then the level area by area**, each engine feature
+  proven in the level as it lands. Screenshots before and after every
+  area.
+- **Smooth, placed light.** Light is kept at tile corners (a light map)
+  and interpolated across floors, walls and things, with ordered
+  dithering between colormap levels. Levels place **light sources**
+  (lamps, strips, floodlights: position, radius, strength, effect), baked
+  in with falloff and shadows from walls. A tile's `light` stays as its
+  area's ambient light, so maps without sources look as before, only
+  smoother.
+- **Dynamic light:** bolts, muzzle flashes and explosions light their
+  surroundings, through open tiles only.
+- **A palette fitted to the art** (Phase 3's palette item, brought
+  forward): ramps measured from the DF textures and sprites, with more
+  blue-greys and dark tones and a desert range, keeping the ramp names
+  the generated art and models use.
+- New art is generated (`tools/art`), or cut and recoloured from the DF
+  textures already in `assets/custom/textures/` (the pack itself is on
+  Mark's machine).
+- The pickup ship on the pad becomes the **Moldy Crow** (Jan picks Kyle
+  up, `docs/story.md`): a new low-poly model.
+
+### Engine
+
+1. [ ] **Palette fitted to the art.** Measure the colours of the DF
+       textures, sprites and generated art; set the ramps' key colours and
+       sizes from them (more `steel`, `navy` and near-black, a `sand` and
+       `rock` range; fewer flesh, toxic and purple entries). Report the
+       snapping error before and after, regenerate the art, check that
+       dark colormap levels keep blue-greys blue. A sandy canyon floor
+       (the DF rock recoloured, and a generated one).
+2. [ ] **Light map.** `world/lightmap.js` keeps light at tile corners per
+       storey (the lower storey under slabs has its own), averaged over the
+       open tiles round each corner, so light doesn't leak through walls;
+       an optional darkening where walls meet (baked ambient occlusion).
+       The renderer reads it: floors and ceilings per pixel, walls, step
+       faces, slab edges, doors and angled walls along their length,
+       sprites, models and the weapon at their position. Light levels are
+       dithered (4x4 ordered) between colormap levels. Light effects keep
+       working; a group can be synced by name, with each tile keeping its
+       own range, so a whole pool pulses as one. Painter helpers for round
+       pools.
+3. [ ] **Light sources.** Level `lights: [{ x, y, z?, radius, light, fx?,
+       min?, tag? }]`, baked into the corners within `radius` that can see
+       the source (line of sight over the grid; walls and doors block),
+       with a smooth falloff. Animated sources keep their part per corner
+       and update it each frame. `setLight` reaches sources by tag (the
+       overload kills the generator's lamps). Validator, map viewer,
+       MODDING.md, tests.
+4. [ ] **Dynamic light.** Projectiles, effects and weapons get `light: {
+       radius, light }`: bolts light walls as they pass, muzzle flashes
+       (the player's and monsters') and explosions flash the room. Added
+       each frame by a small flood fill through open tiles, fading with the
+       animation.
+5. [ ] **Distance and haze.** Retune the distance darkening so lit spaces
+       read across a room, and add an outdoor haze: under the sky, surfaces
+       fade toward a level's `haze` colour (colormaps blending to a
+       colour) instead of to black.
+6. [ ] **Wall bands.** A wall tile can change texture with height:
+       `bands: [{ from: 8, tex: 'canyon-rock' }, { to: 0.5, tex: 'imp-trim'
+       }]`. The garrison's face with rock above, skirting trims, the
+       reactor column's bands. Validator, map viewer, tests.
+7. [ ] **Decals.** Level `decals: [{ x, y, z, face, tex, glow? }]`: a
+       see-through texture on a wall face or a step face (signs, the
+       Imperial crest, hazard stripes, pipes, vents, panels). Blaster
+       bolts leave scorch marks on walls (the last 48 kept).
+8. [ ] **Translucency.** Blend tables (half and additive) built from the
+       palette; sprites, effects and fences can be translucent or additive:
+       steam, glass, shafts of light, holograms, force fields.
+9. [ ] **Emitters.** A decoration that spawns effects at a rate, with
+       spread, velocity and gravity: steam vents, sparks from a broken
+       panel, blowing dust, motes over the reactor. New FX art.
+10. [ ] **Ambient sound.** Looping positional sounds placed in a level,
+        muffled where there's no line of sight, from looping synth sounds
+        (seamless ends); occasional random one-shots (a distant cry, comm
+        chatter). Reactor hum, wind, machinery, server racks, steam.
+11. [ ] **Scrolling textures:** `scroll: [u, v]` per texture: energy in
+        the reactor core, data on screens, the pad's guide lights.
+12. [ ] **Models in pathfinding and sight.** Solid models block the flow
+        field's tiles and monster sight (low ones only below their top);
+        the builder wraps cylinder textures round.
+13. [ ] Stretch: **mipmaps** for floors and walls in the distance (no
+        shimmer on grates and rock).
+
+### Mission 1
+
+14. [ ] **The canyon.** A skyline: the cliffs step back in rock ledges
+        (raised floors under the sky, heights from noise) up to about 20,
+        so their rims are jagged against the sky. Rock strata by height
+        (two or three rock textures), a sandy floor with gravel channels,
+        boulders (small angled pillars and rock models), an overhang.
+        Imperial perimeter: floodlight towers (models and light sources),
+        a sensor mast with a blinking light, barricades and crates by the
+        gate. Moonlight, haze, wind, blowing dust.
+15. [ ] **The garrison's face.** A base wall with the cliff above it
+        (bands), a concrete overhang over the gate strip with lights under
+        it (a slab), the gate in a deep frame with hazard stripes, the
+        vent mouth as a grilled duct, a lit control window above the gate.
+16. [ ] **The vent and maintenance.** Shafts of light through the vent's
+        grate, a fan at its end. Pipes along the walls and ceiling (models
+        and a duct slab), machinery, a workbench, steam from a valve, the
+        broken light sparking, hum.
+17. [ ] **The barracks.** The corridor with pilasters, ceiling beams and
+        recessed light panels (sources), signs and the crest; bunk beds and
+        lockers in the bunk room; a desk, chair and a holotable with a
+        translucent hologram in the office, and a window out of it.
+18. [ ] **The data vault.** Rows of blinking server racks (models) making
+        aisles to fight through, a raised dais with the data terminal,
+        floor light strips, cold mist, server hum.
+19. [ ] **The generator** (the showpiece). The column in bands (plinth,
+        a glowing core with scrolling energy, light rings), conduits from
+        the walls into it, struts under the catwalks, banded shaft walls
+        with vents and signs, hanging lamps; steam and sparks; a deep
+        hum. The overload: a klaxon, red strobes, the lamps die, bursts of
+        sparks and steam.
+20. [ ] **The way out.** A deep chasm (lift L3 from the bottom), the gantry
+        with a floodlight, the pad open to a view east down the canyon
+        (the map grows east), landing lights, the Moldy Crow.
+21. [ ] **Tune and check.** Light and sound mix, frame time, cover and
+        enemy positions round the new props, the per-skill check; tests,
+        the validator, the map viewer, the smoke test, MODDING.md and
+        `docs/mission1.md`.
+
+Order: 1-5 (the look), 6-7 with 14-15 (outside), 8-11 with 19 (the
+generator), 12 with 16-18 (the interiors), then 20, 21 and 13. Each step
+is committed with screenshots checked, and tests, the validator and the
+smoke test passing.
+
 ## Phase 2: Dark Forces systems
 
 - [ ] A mission briefing screen (scrolling text over a picture) before each
@@ -1500,3 +1669,14 @@ update the smoke test.
   skills 2-5 (monsters now 14/19/23/30/31). Reviewed in snapshots; the
   validator finds the exit, every item and no one-way areas on every skill.
   `docs/mission1.md` updated.
+- 2026-10-13: Planned Phase 1d, detail and immersion (Mark: push Mission
+  1's detail and immersion, and fix the engine where it holds the level
+  back). A survey of every area found per-tile, steep lighting (black
+  voids at a distance, nothing lights up), a boxed-in canyon with no
+  skyline, one texture per wall tile and no decals, bare box rooms, no
+  ambient sound, particles or translucency, a palette that fits the DF art
+  poorly, and pathfinding and sight that ignore models. The plan: a fitted
+  palette, a light map with placed and dynamic lights, haze, wall bands,
+  decals, translucency, emitters, ambient sound, scrolling textures and
+  models in pathfinding, then the level area by area, ending with the
+  Moldy Crow on an open landing pad.
