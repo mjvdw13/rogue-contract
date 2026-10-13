@@ -1236,3 +1236,10 @@ update the smoke test.
   bowl's (useless at full health) is gone, and the vent has a power cell.
   The 3 secrets each count once. `docs/mission1.md` has the per-skill table.
   126 tests (2 new), the validator and the smoke test pass.
+- 2026-10-13: Story and map ideas drafted in `docs/story.md`, not decided
+  yet. Two storylines that start on Tatooine: Dead Drop (a Rebel contract,
+  closest to Dark Forces) and Bad Paper (a bounty contract that turns on the
+  hunter, closest to *The Mandalorian*). Both put a calm Mos Eisley mission
+  before the Canyon Garrison. Two map sketches (Mos Eisley, a moisture-farm
+  homestead), and the engine work calm missions need (calm enemies and an
+  alarm, patrols, holstering, conversations).
