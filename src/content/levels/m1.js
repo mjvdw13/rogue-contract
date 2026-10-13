@@ -217,60 +217,81 @@ p.rect(122, 43, 126, 47, sand(8, { floor: 'lift-floor', side: 'imp-panel-dark', 
 
 // ---------------------------------------------------------------- things
 const at = (type, x, y, extra = {}) => ({ type, x, y, ...extra });
+// Skills (docs/mission1.md has the table): 1-2 thin out the fights and add
+// med kits; 4-5 add a trooper or two to most areas.
+const EASY = [1, 2];
+const NOT_EASIEST = [2, 3, 4, 5];
+const NORMAL_UP = [3, 4, 5];
+const HARD = [4, 5];
 const list = [
   at('player', 14.5, 90.5, { angle: 90 }),
-  // The canyon.
+  // The canyon: snipers on both ledges, two gate guards, a probe droid
+  // round the spire, and a band of Jawas scavenging in the gorge.
   at('stormtrooper', 22, 50.5, { angle: 0 }), // sniper, ledge A
   at('stormtrooper', 59.5, 48.5, { angle: 180 }), // sniper, ledge B
   at('sandtrooper', 40.5, 42, { angle: 270 }),
-  at('sandtrooper', 56.5, 42, { angle: 270 }),
-  at('probe-droid', 44.5, 56.5, { skill: [3, 4, 5] }),
-  // A band of Jawas scavenging in the gorge.
+  at('sandtrooper', 56.5, 42, { angle: 270, skill: NOT_EASIEST }),
+  at('sandtrooper', 30.5, 52.5, { angle: 270, skill: HARD }), // under ledge A
+  at('probe-droid', 44.5, 56.5, { skill: NORMAL_UP }),
   at('jawa', 24, 76, { angle: 270 }), at('jawa', 30, 72, { angle: 225 }),
-  at('jawa', 28, 62, { angle: 270, skill: [3, 4, 5] }),
+  at('jawa', 28, 62, { angle: 270, skill: NORMAL_UP }),
+  at('jawa', 18.5, 66.5, { angle: 315, skill: HARD }),
   at('power-cell', 24.5, 68.5),
-  at('med-kit', 26.5, 82.5, { skill: [1, 2] }),
-  at('energy-pack', 59.5, 45.5),
-  at('shield-unit', 3.5, 82),
-  // Maintenance.
+  at('med-kit', 29.5, 42.5, { skill: [1, 2, 3] }), // after the gate guards, by the vent
+  at('energy-pack', 59.5, 45.5), // secret: ledge B
+  at('shield-unit', 3.5, 82), // secret: the rock alcove
+  // The vent: a power cell where light falls through the grate.
+  at('power-cell', 33, 32.5),
+  // Maintenance: an ambush by the lift (two on the hard skills).
   at('stormtrooper', 36.5, 16.5, { angle: 270, ambush: true }),
+  at('stormtrooper', 27.5, 20.5, { angle: 0, ambush: true, skill: HARD }),
   at('supply-crate', 28.5, 16), at('supply-crate', 30, 16),
   at('console', 39.5, 15.5),
   at('terminal', 34, 14.6, { angle: 270 }), at('terminal', 35.4, 14.6, { angle: 270 }),
   at('energy-pack', 28.5, 24.5),
   at('power-cell', 40.5, 24.5),
-  // The barracks.
+  // The barracks: the officer carries the red keycard.
   at('stormtrooper', 68.5, 18, { angle: 180 }),
+  at('stormtrooper', 74.5, 18, { angle: 180, skill: NORMAL_UP }), // by the red door
   at('ceiling-lamp', 54, 18), at('ceiling-lamp', 70, 18),
   at('stormtrooper', 51.5, 7.5, { angle: 270 }),
-  at('stormtrooper', 57.5, 10.5, { angle: 270 }),
-  at('stormtrooper', 54.5, 6.5, { angle: 270, skill: [4, 5] }),
+  at('stormtrooper', 57.5, 10.5, { angle: 270, skill: NOT_EASIEST }),
+  at('stormtrooper', 54.5, 6.5, { angle: 270, skill: HARD }),
   at('supply-crate', 50.5, 11.5), at('supply-crate', 56, 12),
   at('med-kit', 58.5, 6),
-  at('officer', 66.5, 8.5, { angle: 270 }),
-  at('keycard-red', 70.5, 6),
+  at('officer', 66.5, 8.5, { angle: 270, drops: ['keycard-red'] }),
+  at('med-kit', 70.5, 6, { skill: EASY }),
   at('console', 63.5, 6),
-  // The vault.
+  // The vault: guards against the far computer banks, lit by the screens'
+  // glow, facing the red door.
+  at('stormtrooper', 91.4, 14.5, { angle: 180 }),
+  at('stormtrooper', 91.4, 20.5, { angle: 180, skill: NORMAL_UP }),
+  at('officer', 83.5, 22.5, { angle: 90, skill: HARD }),
   at('terminal', 85, 16.4, { angle: 90 }), at('terminal', 85, 17.6, { angle: 270 }),
   at('energy-pack', 85, 13.5),
   at('power-cell', 80.5, 21.5), at('power-cell', 89.5, 21.5),
-  at('shield-unit', 96, 16),
+  at('shield-unit', 96, 16), // secret: the niche
   // The generator: containment rings turning round the column above the
   // catwalk, and coolant tanks on the shaft floor.
   at('reactor-ring', 90, 44, { z: 9, angle: 0 }), at('reactor-ring', 90, 44, { z: 13, angle: 45 }),
   at('coolant-tank', 78.5, 32.5), at('coolant-tank', 78.5, 36),
   at('coolant-tank', 101.5, 55.5), at('coolant-tank', 101.5, 52),
   at('probe-droid', 90, 34.5),
+  at('probe-droid', 80.5, 40.5, { skill: [5] }), // down in the west half
   at('stormtrooper', 80.5, 27.5, { angle: 270 }),
-  at('stormtrooper', 106.5, 50.5, { angle: 180 }),
+  at('stormtrooper', 106.5, 50.5, { angle: 180, skill: NOT_EASIEST }),
+  at('stormtrooper', 96.5, 60.5, { angle: 90, skill: HARD }),
   at('stormtrooper', 80.5, 48.5, { angle: 0 }),
   at('fuel-barrel', 98.5, 44.5), at('fuel-barrel', 99.5, 46.5),
   at('med-kit', 97.5, 56.5),
   at('energy-pack', 73.5, 40.5),
+  // The gantry: a med kit before the last fight.
+  at('med-kit', 115.5, 44, { skill: [1, 2, 3] }),
   // The landing pad, with the pickup shuttle north of the marked spot.
   at('shuttle', 123.5, 38.5, { angle: 270 }),
   at('stormtrooper', 123.5, 49.5, { angle: 180 }),
-  at('sandtrooper', 123.5, 54.5, { angle: 180 }),
+  at('sandtrooper', 123.5, 54.5, { angle: 180, skill: NOT_EASIEST }),
+  at('stormtrooper', 125, 52.5, { angle: 180, skill: HARD }),
 ];
 
 export default defineLevel({

@@ -39,6 +39,8 @@ export class Thing extends Animated {
     this.reaction = 0;
     this.ambush = false;
     this.tag = null;
+    /** Extra drops placed with this thing in the level, on top of its type's. */
+    this.drops = null;
     this.owner = null;
     this.dropped = false;
     this.player = null;

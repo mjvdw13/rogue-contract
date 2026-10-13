@@ -98,3 +98,20 @@ test('effects (puffs, blood, explosions) play once and disappear', () => {
   run(w, mockInput(), 1);
   for (const e of fx) assert.ok(e.removed, `${e.def.id} is gone`);
 });
+
+test('a monster placed with its own drops drops them on top of its type\'s', () => {
+  const level = room(['#########', '#.......#', '#########'], [''], {
+    list: [{ type: 'player', x: 1.5, y: 1.5, angle: 0 }, { type: 'officer', x: 6.5, y: 1.5, drops: ['keycard-red'] }],
+  });
+  const w = makeWorld(level);
+  const officer = w.things.find((t) => t.def.id === 'officer');
+  w.damage(officer, 1000, w.player, w.player);
+  run(w, mockInput(), 0.5);
+  const key = w.things.find((t) => t.def.id === 'keycard-red');
+  assert.ok(key, 'the officer drops the red keycard');
+  assert.ok(key.dropped);
+  assert.ok(Math.hypot(key.x - 6.5, key.y - 1.5) < 0.5, 'at the body');
+  // Other officers keep only their type's drops.
+  const other = w.spawn('officer', 4.5, 1.5);
+  assert.equal(other.drops, null);
+});

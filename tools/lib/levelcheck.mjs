@@ -206,10 +206,13 @@ export function analyseLevel(reg, level, skill = 3) {
     for (const [i, list] of byTile) {
       if (!reached[i]) continue;
       for (const t of list) {
-        const key = t.def?.pickup?.key;
-        if (key && !keys.has(key)) {
-          keys.add(key);
-          changed = true;
+        // A key lying there, or one a monster there always drops when killed.
+        const carried = (t.drops ?? []).filter((d) => d.chance >= 1).map((d) => reg.things.get(d.item)?.pickup?.key);
+        for (const key of [t.def?.pickup?.key, ...carried]) {
+          if (key && !keys.has(key)) {
+            keys.add(key);
+            changed = true;
+          }
         }
       }
     }
@@ -358,7 +361,7 @@ export function ammoBudget(reg, analysis) {
     const i = Math.floor(s.y) * map.w + Math.floor(s.x);
     if (def.kind === 'monster') {
       health += def.health ?? 0;
-      for (const d of def.drops ?? []) addAmmo(reg.things.get(d.item)?.pickup?.ammo);
+      for (const d of [...(def.drops ?? []), ...(s.drops ?? [])]) addAmmo(reg.things.get(d.item)?.pickup?.ammo);
     } else if (def.kind === 'item' && analysis.reached[i]) {
       addAmmo(def.pickup?.ammo);
     }

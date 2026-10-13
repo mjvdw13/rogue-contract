@@ -57,3 +57,14 @@ test('a pit with stairs out of it is not one-way', () => {
   const legend = { a: at(-0.5), b: at(-1), p: at(-1.5) };
   assert.deepEqual(reach('..abpp', legend).oneWay, []);
 });
+
+test('a key a reachable monster always drops opens its door', () => {
+  const level = (drops) =>
+    room(['#######', '#..3..#', '#######'], [''], {
+      list: [{ type: 'player', x: 1.5, y: 1.5, angle: 0 }, { type: 'officer', x: 2.5, y: 1.5, drops }],
+    });
+  const past = (a) => a.reached[a.built.map.w + 5];
+  assert.ok(past(analyseLevel(registry, level(['keycard-red']))), 'the officer carries the key');
+  assert.ok(!past(analyseLevel(registry, level(undefined))), 'no key: the door stays shut');
+  assert.ok(!past(analyseLevel(registry, level([{ item: 'keycard-red', chance: 0.5 }]))), 'a key it only might drop does not count');
+});

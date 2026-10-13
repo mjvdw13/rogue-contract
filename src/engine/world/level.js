@@ -347,6 +347,8 @@ export function buildLevel(registry, level, opts = {}) {
       angle: contentAngle(spec.angle ?? 270),
       ambush: !!spec.ambush,
       tag: spec.tag ?? null,
+      // Extra drops for this one monster (on top of its type's): a keycard an officer carries.
+      drops: spec.drops ? spec.drops.map((d) => (typeof d === 'string' ? { item: d, chance: 1 } : { chance: 1, ...d })) : null,
       z: spec.z ?? null,
     });
   };

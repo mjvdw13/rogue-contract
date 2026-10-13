@@ -150,6 +150,12 @@ export function validateContent(reg) {
           continue;
         }
         if (def.kind === 'item' && def.pickup?.key) keysPlaced.add(def.pickup.key);
+        for (const d of sp.drops ?? []) {
+          const item = reg.things.get(d.item);
+          if (!item) {
+            if (skill === 3) err(`${owner}: a ${sp.type} drops unknown item "${d.item}"`);
+          } else if (item.pickup?.key && d.chance >= 1) keysPlaced.add(item.pickup.key);
+        }
       }
     }
     if (!built) continue;

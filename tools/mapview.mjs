@@ -12,7 +12,8 @@
 // spaces too low to stand in (crouch only) a cyan one. Doors are brown, or
 // the colour of their key; switches
 // have a yellow border; secret tiles are dotted purple; damaging floors are
-// striped green. Monsters are red squares, coworkers green, items yellow,
+// striped green. Monsters are red squares (a black-ringed key-coloured dot: it
+// drops that key), coworkers green, items yellow,
 // keys and weapons bright, decorations grey, 3D models pink (their collision
 // lines, or their body's square), the start is a white arrow. Fences are pale
 // blue lines on their edges (dashed for a low railing).
@@ -184,6 +185,12 @@ function render(level) {
       const big = (def.radius ?? 0.3) > 0.45 ? 2 : 1;
       rect(x - k * big, y - k * big, k * 2 * big, k * 2 * big, [230, 30, 30]);
       if (s.ambush) frame(x - k * big - 1, y - k * big - 1, k * 2 * big + 2, k * 2 * big + 2, [0, 0, 0]);
+      // A key it carries: a dot of the key's colour in the middle.
+      const carried = (s.drops ?? []).map((d) => KEY_COLORS[reg.things.get(d.item)?.pickup?.key]).find(Boolean);
+      if (carried) {
+        rect(x - k, y - k, k * 2, k * 2, [0, 0, 0]);
+        rect(x - k + 1, y - k + 1, k * 2 - 2, k * 2 - 2, carried);
+      }
     } else if (def?.kind === 'item') {
       const keyCol = def.pickup?.key ? KEY_COLORS[def.pickup.key] : null;
       const weapon = def.pickup?.weapon;

@@ -544,6 +544,11 @@ thingLegend: {
 },
 ```
 
+A monster can carry extra drops of its own, on top of its type's `drops`:
+`{ type: 'officer', drops: ['keycard-red'] }` drops the red keycard where
+it dies. The validator and the reachability check count a key that a
+reachable monster always drops (chance 1) as placed.
+
 You can also place things precisely with
 `list: [{ type: 'donut', x: 3.5, y: 7.25 }]`.
 

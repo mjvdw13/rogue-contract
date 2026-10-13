@@ -41,9 +41,9 @@ switch (opens the escape hatch) → back up → escape hatch → gantry stairs
 | 7 | Lift L1 shaft | 42..46, 16..20 | lift 0 → 6 / 12 | Opens west at 0 and east at 6. |
 | 8 | Barracks corridor | 46..77, 16..20 | 6 / 10 | Light strips, hanging lamps. A trooper. |
 | 9 | Bunk room | 48..60, 4..15 | 6 / 10 | Door 53..55 x 15..16. Troopers, crates for bunks, a med kit. |
-| 10 | Officer's office | 62..72, 4..15 | 6 / 9 | Door 65..67 x 15..16. An officer, the **red keycard**, a console. A barred window (69..71 x 15..16, over a sill at 7) looks in from the corridor. |
+| 10 | Officer's office | 62..72, 4..15 | 6 / 9 | Door 65..67 x 15..16. An officer carrying the **red keycard** (dropped when killed), a console. A barred window (69..71 x 15..16, over a sill at 7) looks in from the corridor. |
 | 11 | Red door | 77..78, 17..19 | 6 | Into the vault. |
-| 12 | Data vault | 78..92, 10..25 | 6 / 9 | Dark (light 96), computer-bank walls, chamfered corners, ammo. Secret niche (92..96, 14..18) behind a computer-bank door: a shield. South door 84..86 x 25..26 onto the generator catwalk. |
+| 12 | Data vault | 78..92, 10..25 | 6 / 9 | Dark (light 96), computer-bank walls, chamfered corners, ammo, guards against the far banks. Secret niche (92..96, 14..18) behind a computer-bank door: a shield. South door 84..86 x 25..26 onto the generator catwalk. |
 | 13 | Generator chamber | 72..108, 26..62 | -6 / 18 | Catwalk ring at 6 (3 wide). Central reactor column (86..94, 40..48) with chamfered corners. North and south bridges (88..92) join the ring to the column; they reach down to the floor, splitting the bottom into west and east halves. Lifts L2 (75..79, 55..59, west) and L2b (101..105, 29..33, east) run -6 ↔ 6. The overload switch is on the column's south face at the bottom: it opens `escape`, dims the chamber and shows a message. Railings (0.75 tall) along the ring's inner edge and both sides of the bridges, open where the lifts and bridges join. Probe droid, troopers, fuel barrels at the bottom. |
 | 14 | Escape hatch | 108..109, 43..45 | 6 | Remote-locked door, tag `escape`, with a landing outside (109..110, 42..46). |
 | 15 | Gantry | 110..118, 42..46 | 6 → 8 / sky | Stairs up 0.5 per tile to 8. |
@@ -84,12 +84,27 @@ contrast comes from bright pools (184-224).
 3. Ledge B in the bowl. It's reachable but tucked away, so it's marked secret
    (energy pack, and a view down on the gate).
 
-## Enemies by skill
+## Enemies and items by skill
 
-Snipers on both ledges, two gate guards, a probe droid in the bowl (skill
-3+), the maintenance ambush trooper, barracks troopers (one more on skill
-4-5), the officer, and on the generator a probe droid, two catwalk troopers
-and one at the bottom. Two pad troopers guard the end.
+Skills 1-2 thin the fights and add med kits; 4-5 add a trooper or two to
+most areas (skill 5 also makes monsters faster and doubles ammo pickups, set
+in the engine). Totals: 14 monsters on skill 1, 18 on 2, 22 on 3, 29 on 4
+and 30 on 5.
+
+| Area | Every skill | 2+ | 3+ | 4+ (5 only) |
+|------|-------------|----|----|-------------|
+| Canyon | snipers on ledges A and B, a gate sandtrooper, 2 Jawas | a 2nd gate sandtrooper | the probe droid, a 3rd Jawa | a sandtrooper under ledge A, a 4th Jawa |
+| Maintenance | the ambush trooper by the lift | | | a 2nd ambush trooper on the west side |
+| Barracks | a corridor trooper, a bunk-room trooper, the officer (red keycard) | a 2nd bunk-room trooper | a trooper by the red door | a 3rd bunk-room trooper |
+| Vault | a guard by the far banks | | a 2nd guard | an officer by the south door |
+| Generator | the probe droid, a catwalk trooper (north-west), one at the bottom | an east catwalk trooper | | a south catwalk trooper (a 2nd probe droid down in the west half) |
+| Landing pad | a stormtrooper | a sandtrooper | | a 2nd stormtrooper |
+
+Items: power cells, energy packs and med kits along the route (the bunk room
+and the generator floor have med kits on every skill). Extra med kits by the
+vent mouth after the gate guards and on the gantry before the pad (skills
+1-3), and in the office (skills 1-2). The vent has a power cell where the
+light falls through.
 
 ## Later (after Phase 2)
 

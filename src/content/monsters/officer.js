@@ -1,7 +1,7 @@
 import { defineMonster } from '../../engine/defs.js';
 
 // An Imperial officer: no armour, a sidearm, and usually the one carrying the
-// keycards (place a keycard by them in the level).
+// keycards (place them with `drops: ['keycard-red']` in the level).
 export default defineMonster({
   id: 'officer',
   name: 'Imperial Officer',

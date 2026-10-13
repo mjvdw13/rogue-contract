@@ -124,6 +124,7 @@ export class World {
       if (!t) continue;
       t.ambush = s.ambush;
       t.tag = s.tag;
+      t.drops = s.drops;
       if (s.z !== null && s.z !== undefined) t.z = s.z;
       if (t.kind === 'monster' && t.def.countKill) this.stats.totalKills++;
       if (t.kind === 'item' && t.def.countItem) this.stats.totalItems++;

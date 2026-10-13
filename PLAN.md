@@ -276,22 +276,22 @@ Design rules (what makes it feel like Dark Forces):
              pulsing.
        - [x] Screenshots of every area before and after; tests, validator,
              smoke test.
-4. [ ] Enemies, items, skill variants and 2-3 secrets (from 2026-10-13).
+4. [x] Enemies, items, skill variants and 2-3 secrets (done 2026-10-13).
        A first placement went in with the map: 20 monsters, 13 items and
        3 secrets, with only 4 things varying by skill and an empty vault.
        This pass makes the skills real and fills the gaps:
-       - [ ] Engine: a placed monster can carry its own `drops` (added to
+       - [x] Engine: a placed monster can carry its own `drops` (added to
              its type's), so the officer drops the red keycard, as Dark
              Forces' officers do. The validator and reachability check
              count keys dropped by reachable monsters. Tests, MODDING.md.
-       - [ ] Enemies by skill: fewer on 1-2, extra on 4-5 (bowl, gorge,
+       - [x] Enemies by skill: fewer on 1-2, extra on 4-5 (bowl, gorge,
              maintenance, barracks, generator, pad). Guards for the vault
              (empty today).
-       - [ ] Items by skill: med kits where fights end (the bowl's strip,
+       - [x] Items by skill: med kits where fights end (the bowl's strip,
              the gantry) on 1-3, the start bowl's useless med kit moved, a
              power cell in the vent.
-       - [ ] Secrets: check all 3 count once each and are reachable.
-       - [ ] A per-skill table in `docs/mission1.md`; the validator's
+       - [x] Secrets: check all 3 count once each and are reachable.
+       - [x] A per-skill table in `docs/mission1.md`; the validator's
              counts, map viewer at skills 1, 3 and 5, tests, smoke test.
 5. [ ] Validator, map viewer and screenshot review, then playtest.
 
@@ -1220,3 +1220,19 @@ update the smoke test.
   (its light strip); the gate and the sandbox's 2-deep door use the whole
   IDJAMPNL as `imp-gate-jamb`. docs/mission1.md and MODDING.md updated. 124
   tests, the validator and the smoke test pass.
+- 2026-10-13: Phase 1b B4, Mission 1's enemies, items and skills. A monster
+  placed in a level can carry its own `drops` (on top of its type's), so the
+  officer now drops the red keycard, as Dark Forces' officers do; the
+  validator, the reachability check and the ammo budget count drops a
+  placed monster always makes, and the map viewer marks a carried key with a
+  ringed dot. Mission 1 now has 14/18/22/29/30 monsters on skills 1-5 (was
+  17/17/19/20/20): skills 1-2 drop a gate guard, a bunk-room trooper, a
+  catwalk trooper and the pad's sandtrooper; 4-5 add a sandtrooper under
+  ledge A, a Jawa, a second maintenance ambusher, a bunk-room trooper, a
+  vault officer, a south catwalk trooper and a pad trooper (skill 5 a second
+  probe droid). The vault, empty before, has guards against its far banks,
+  lit by the screens' glow. Med kits moved to where fights end: by the vent
+  mouth and on the gantry (skills 1-3) and in the office (1-2); the start
+  bowl's (useless at full health) is gone, and the vent has a power cell.
+  The 3 secrets each count once. `docs/mission1.md` has the per-skill table.
+  126 tests (2 new), the validator and the smoke test pass.

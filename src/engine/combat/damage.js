@@ -97,7 +97,7 @@ export function kill(world, target, source) {
   }
   world.playSoundFrom(gib ? (def.sounds.gib ?? def.sounds.death) : def.sounds.death, target);
   if (def.kind === 'monster' && def.countKill) world.stats.kills++;
-  for (const drop of def.drops ?? []) {
+  for (const drop of [...(def.drops ?? []), ...(target.drops ?? [])]) {
     if (world.rng.chance(drop.chance ?? 1)) {
       const it = world.spawn(drop.item, target.x + world.rng.signed() * 0.15, target.y + world.rng.signed() * 0.15);
       if (it) it.dropped = true;
