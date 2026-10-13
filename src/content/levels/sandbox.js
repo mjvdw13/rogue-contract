@@ -228,6 +228,6 @@ export default defineLevel({
     '',
     '',
     '',
-    '           a           9',
+    '           a           9      s',
   ],
 });

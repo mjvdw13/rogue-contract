@@ -414,6 +414,45 @@ right corners only, like Dark Forces. Moved up from Phase 2.
 5. [x] **Checks.** Tests, validator, smoke test; screenshots at 4:3 and
        16:9, with the generated and the Dark Forces weapons.
 
+### I. A sandtrooper enemy (2026-10-12)
+
+Mark gave an AI-generated asset sheet (sandtrooper with a T-21 repeating
+blaster: front, side and back walks, aiming, hit reactions and two death
+falls, on a blue backdrop, as a 1264x848 JPEG). Make it a new enemy.
+
+Decided: the engine draws one view per frame (no rotations), so only the
+front-facing poses are used. The art is drawn at the Dark Forces sprites'
+density (about 37 px per unit, `scale: 0.85`), so a sandtrooper matches the
+Dark Forces stormtrooper beside it. The sheet is our own art, not a rip, so
+the cut sheet is committed straight into `assets/sprites/monsters/` (no
+override); the source and the cutter live in `assets/custom/sandtrooper/`.
+
+1. [x] **Cutter** (`assets/custom/sandtrooper/cut.py`, Python with Pillow
+       and numpy, as JPEG decoding is needed): key out the blue with soft
+       edges and remove the blue spill, then cut the frames. Figures whose
+       rifle barrels run into the next figure are split along the barrel:
+       the barrel goes to its owner, and the gap it leaves in the neighbour
+       is filled from the surrounding pixels. Scale down with the alpha
+       premultiplied, keep the body centred and the feet on the bottom row,
+       and snap to the palette's lit colours (so armour highlights don't
+       glow in the dark).
+2. [x] **Frames:** walk (the six front-view cycle frames), aim and fire
+       (the front "aiming" poses; fire gets a red muzzle flash in
+       fullbright colours), pain (the first "taking damage" pose), death
+       (the four-frame fall onto the back, captioned "aiming" on the
+       sheet: all four poses stand apart, unlike the "faller" row).
+3. [x] **Monster** `src/content/monsters/sandtrooper.js`: tougher and
+       faster-firing than the stormtrooper (the T-21 is a repeating
+       rifle): bursts of three bolts, 45 health (30 for a stormtrooper).
+       Glyph `s`.
+4. [x] **Placement:** a few in Mission 1's canyon (sandtroopers belong
+       outdoors) and one in the sandbox.
+5. [x] **Checks:** tests, the validator and the smoke test; screenshots
+       of sandtroopers in game (walking, firing, dying).
+6. [ ] Later, if wanted: the side and back views (walk cycles at four
+       angles are on the sheet), once enemies are drawn from several
+       angles (Phase 2 stretch goal).
+
 ## Phase 2: Dark Forces systems
 
 - [ ] A mission briefing screen (scrolling text over a picture) before each
@@ -814,3 +853,15 @@ update the smoke test.
   palette, so the canyon floor is SecBase's grey rock (IPSEC1), matching the
   grey cliffs. Reviewed in screenshots of 13 spots in Mission 1. Found: key
   panels repeat on big doors (logged in Phase 1b D).
+- 2026-10-12: Phase 1b I: a sandtrooper enemy, from Mark's AI-generated
+  asset sheet. `assets/custom/sandtrooper/cut.py` (Python, Pillow) keys out
+  the blue backdrop with soft edges, unmixes the blue fringe, splits the
+  walk and hit-reaction rows where each rifle's barrel crosses the next
+  pose (barrel tips measured by hand; the hole in the neighbour is filled
+  from around it), scales to the Dark Forces sprites' density (13 frames
+  of 58x68, `scale: 0.85`) and snaps to the palette's lit colours. The
+  fire frame gets a red muzzle flash. The monster fires 3-bolt bursts and
+  has 45 health. Two canyon stormtroopers and one on the landing pad in
+  Mission 1 are now sandtroopers, plus one in the sandbox. Screenshots
+  beside the Dark Forces stormtrooper: same height and pixel size. 91
+  tests, the validator and the smoke test pass.

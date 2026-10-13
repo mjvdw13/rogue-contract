@@ -161,8 +161,8 @@ const list = [
   // The canyon.
   at('stormtrooper', 22, 50.5, { angle: 0 }), // sniper, ledge A
   at('stormtrooper', 59.5, 48.5, { angle: 180 }), // sniper, ledge B
-  at('stormtrooper', 40.5, 42, { angle: 270 }),
-  at('stormtrooper', 56.5, 42, { angle: 270 }),
+  at('sandtrooper', 40.5, 42, { angle: 270 }),
+  at('sandtrooper', 56.5, 42, { angle: 270 }),
   at('probe-droid', 44.5, 56.5, { skill: [3, 4, 5] }),
   at('power-cell', 24.5, 68.5),
   at('med-kit', 26.5, 82.5, { skill: [1, 2] }),
@@ -199,7 +199,7 @@ const list = [
   at('energy-pack', 73.5, 40.5),
   // The landing pad.
   at('stormtrooper', 123.5, 38.5, { angle: 180 }),
-  at('stormtrooper', 123.5, 54.5, { angle: 180 }),
+  at('sandtrooper', 123.5, 54.5, { angle: 180 }),
 ];
 
 export default defineLevel({

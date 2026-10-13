@@ -17,3 +17,5 @@ assets/custom/*
 !assets/custom/blaster.png
 !assets/custom/textures.mjs
 !assets/custom/textures/
+# The sandtrooper asset sheet (our own AI-generated art) and its cutter.
+!assets/custom/sandtrooper/

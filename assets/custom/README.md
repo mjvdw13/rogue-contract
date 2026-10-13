@@ -70,5 +70,20 @@ with its small switch or key panel laid on top. Give it the zip's
 node assets/custom/textures.mjs "<the pack's Textures folder>"
 ```
 
+## The sandtrooper
+
+`sandtrooper/sheet.jpg` is an AI-generated asset sheet (not ripped art), so
+its cut sheet is committed straight to
+`assets/sprites/monsters/sandtrooper.png`, with no override. `cut.py` keys
+out the blue backdrop, splits poses whose rifle barrels run into the next
+pose (the barrel tips are measured by hand in its `GROUPS` table), scales
+them down to the Dark Forces sprites' pixel size and snaps them to the
+palette. Only the front-facing poses are used. It needs Python 3 with
+Pillow and numpy:
+
+```
+python assets/custom/sandtrooper/cut.py --preview preview.png
+```
+
 Credits: game and art by LucasArts. The enemy sheets were ripped by Crazy
 Ivan, the weapons sheet by Dolphman.

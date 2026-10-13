@@ -61,10 +61,10 @@ for (const level of registry.levels.values()) {
   });
 }
 
-test('the garrison is held by stormtroopers, an officer and a probe droid', () => {
+test('the garrison is held by stormtroopers, sandtroopers, an officer and a probe droid', () => {
   const w = makeWorld('sandbox');
   const ids = w.things.filter((t) => t.kind === 'monster').map((t) => t.def.id);
-  for (const id of ['stormtrooper', 'officer', 'probe-droid']) assert.ok(ids.includes(id), `has a ${id}`);
+  for (const id of ['stormtrooper', 'sandtrooper', 'officer', 'probe-droid']) assert.ok(ids.includes(id), `has a ${id}`);
   assert.ok(w.things.every((t) => t.kind !== 'npc'), 'no friendlies (yet)');
 });
 
