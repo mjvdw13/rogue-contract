@@ -1,25 +1,23 @@
-import { VIEW_W, VIEW_H } from '../config.js';
+import { VIEW_W, VIEW_H, SCREEN_H } from '../config.js';
 import { FaceController } from './face.js';
 import { F_SOLID, F_DOOR, F_USE, F_EXIT, F_VOID } from '../world/tilemap.js';
 
-/** Status-bar panel layout (x, width); matches assets/ui/statusbar.png. */
-export const PANELS = {
-  ammo: [2, 44],
-  health: [48, 56],
-  arms: [106, 34],
-  face: [142, 36],
-  armor: [180, 56],
-  keys: [238, 12],
-  tally: [252, 66],
+/**
+ * Corner HUD layout: each panel's size and its readout insets [x, y, w, h].
+ * Matches assets/ui/hud-left.png and hud-right.png (tools/art/ui/hud.js).
+ */
+export const CORNERS = {
+  left: { w: 112, h: 32, slots: { shield: [3, 3, 52, 27], health: [57, 3, 52, 27] } },
+  right: { w: 72, h: 32, slots: { ammo: [17, 3, 52, 27], keys: [3, 3, 12, 27] } },
 };
 
-/** A plain column of the status bar (inside the ammo panel), repeated out to the edges on widescreen. */
-const BAR_FILL_COL = 24;
+/** How far up from the bottom the automap's level name and other prompts must stay to clear the corner panels. */
+export const HUD_CLEAR = CORNERS.left.h + 4;
 
 const MESSAGE_TIME = 4;
 
 /**
- * Doom-style status bar, pickup messages and the automap.
+ * Dark Forces-style corner readouts, pickup messages and the automap.
  */
 export class Hud {
   /** @param {*} game */
@@ -61,81 +59,40 @@ export class Hud {
     font.draw(this.game.surface, text, right, y, { align: 'right', remap });
   }
 
-  drawStatusBar(world) {
+  /** Readouts in the bottom corners of the screen (the real corners on widescreen): shield and health left, ammo and keys right. */
+  drawHud(world) {
     const g = this.game;
     const s = g.surface;
     const reg = g.registry;
-    const Y = VIEW_H;
-    const bar = g.assets.image('statusbar');
-    if (bar) {
-      s.blit(bar, 0, Y);
-      // On widescreen, continue the bar's frame to the edges with one of its plain columns.
-      for (let x = s.left; x < 0; x++) s.blit(bar, x, Y, { sx: BAR_FILL_COL, sw: 1 });
-      for (let x = bar.width; x < s.w - s.ox; x++) s.blit(bar, x, Y, { sx: BAR_FILL_COL, sw: 1 });
-    } else s.fillRect(s.left, Y, s.w, 32, g.palette.ramp('steel', 0.25));
     const p = world.player.player;
     const hud = g.font('hud');
     const tiny = g.font('tiny');
     const labelTint = this._tint('steel');
     const labels = reg.strings.hud ?? {};
+    const L = { x: s.left, y: SCREEN_H - CORNERS.left.h };
+    const R = { x: s.w - s.ox - CORNERS.right.w, y: SCREEN_H - CORNERS.right.h };
+    const leftImg = g.assets.image('hud-left');
+    const rightImg = g.assets.image('hud-right');
+    if (leftImg) s.blit(leftImg, L.x, L.y);
+    if (rightImg) s.blit(rightImg, R.x, R.y);
 
-    const panel = (name) => PANELS[name];
-    const label = (name, text) => {
-      const [x, w] = panel(name);
-      tiny?.draw(s, text, x + Math.floor(w / 2), Y + 23, { align: 'center', remap: labelTint });
+    const readout = (at, [x, y, w], value, label) => {
+      if (hud && value !== null) this._number(hud, value, at.x + x + w - 2, at.y + y + 2);
+      tiny?.draw(s, label, at.x + x + Math.floor(w / 2), at.y + y + 20, { align: 'center', remap: labelTint });
     };
-
-    // Ammo for the current weapon.
+    const slotsL = CORNERS.left.slots;
+    const slotsR = CORNERS.right.slots;
+    readout(L, slotsL.shield, `${Math.max(0, Math.round(p.armor))}%`, labels.armor ?? 'SHIELD');
+    readout(L, slotsL.health, `${Math.max(0, Math.ceil(p.health))}%`, labels.health ?? 'HEALTH');
     const w = reg.weapons.get(p.weapon);
-    if (w?.ammo && hud) this._number(hud, p.ammo[w.ammo] ?? 0, panel('ammo')[0] + panel('ammo')[1] - 2, Y + 5);
-    label('ammo', labels.ammo ?? 'AMMO');
+    readout(R, slotsR.ammo, w?.ammo ? (p.ammo[w.ammo] ?? 0) : null, labels.ammo ?? 'AMMO');
 
-    // Health.
-    if (hud) this._number(hud, `${Math.max(0, Math.ceil(p.health))}%`, panel('health')[0] + panel('health')[1] - 2, Y + 5);
-    label('health', labels.health ?? 'HEALTH');
-
-    // Arms: weapon slots 2..7.
-    const [ax] = panel('arms');
-    const owned = new Set([...p.weapons].map((id) => reg.weapons.get(id)?.slot));
-    for (let slot = 2; slot <= 7; slot++) {
-      const i = slot - 2;
-      const x = ax + 7 + (i % 3) * 9;
-      const y = Y + 6 + Math.floor(i / 3) * 8;
-      tiny?.draw(s, String(slot), x, y, { remap: owned.has(slot) ? this._tint('glow-yellow') : this._tint('steel') });
-    }
-    label('arms', labels.arms ?? 'ARMS');
-
-    // Face.
-    const [fx, fw] = panel('face');
-    if (this.faceSheet) {
-      const frame = this.faceSheet.frame(this.face.frame);
-      s.blit(frame, fx + Math.floor((fw - frame.w) / 2), Y + 2);
-    }
-
-    // Armour.
-    if (hud) this._number(hud, `${Math.max(0, Math.round(p.armor))}%`, panel('armor')[0] + panel('armor')[1] - 2, Y + 5);
-    label('armor', labels.armor ?? 'ARMOR');
-
-    // Keys.
+    // Keycards, stacked in the outer slot.
     const icons = g.assets.sheets.get('hud-icons');
-    const [kx] = panel('keys');
+    const [kx, ky] = slotsR.keys;
     (reg.config.keys ?? []).forEach((k, i) => {
-      if (p.keys.has(k.id) && icons) s.blit(icons.frame(k.icon ?? i), kx + 2, Y + 3 + i * 9);
+      if (p.keys.has(k.id) && icons) s.blit(icons.frame(k.icon ?? i), R.x + kx + 2, R.y + ky + i * 9);
     });
-
-    // Ammo tally.
-    const [tx, tw] = panel('tally');
-    let row = 0;
-    for (const a of reg.ammo.values()) {
-      const y = Y + 5 + row * 6;
-      const have = p.ammo[a.id] ?? 0;
-      const remap = this._tint('glow-yellow');
-      tiny?.draw(s, a.short ?? a.id.slice(0, 4).toUpperCase(), tx + 3, y, { remap: labelTint });
-      tiny?.draw(s, String(have), tx + 41, y, { align: 'right', remap });
-      tiny?.draw(s, '/', tx + 45, y, { remap: labelTint });
-      tiny?.draw(s, String(p.maxAmmo[a.id] ?? a.max), tx + tw - 3, y, { align: 'right', remap });
-      if (++row >= 4) break;
-    }
   }
 
   drawMessages() {
@@ -254,7 +211,7 @@ export class Hud {
       const remap = this._tint('beige');
       const st = world.stats;
       const name = `${world.level.mapLabel ?? world.level.id.toUpperCase()}: ${world.level.name}`;
-      font.draw(s, name, 3, VIEW_H - 10, { remap, shadow: 0 });
+      font.draw(s, name, 3, VIEW_H - HUD_CLEAR - 9, { remap, shadow: 0 });
       const lab = g.registry.strings.automap ?? {};
       font.draw(s, `${lab.kills ?? 'K'} ${st.kills}/${st.totalKills}`, 3, 3, { remap, shadow: 0 });
       font.draw(s, `${lab.items ?? 'I'} ${st.items}/${st.totalItems}`, 3, 12, { remap, shadow: 0 });

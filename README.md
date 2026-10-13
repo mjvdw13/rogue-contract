@@ -152,8 +152,9 @@ GitHub Actions runs the tests, the validator and the smoke test on every push.
 
 ## How it works
 
-- A 320×200 framebuffer of palette indices (a 320×168 view plus a 32-pixel
-  status bar), drawn with a grid raycaster. It has textured floors and
+- A 320×200 framebuffer of palette indices, drawn with a grid raycaster. The
+  view fills the screen; shield, health, ammo and keys sit in small panels in
+  the bottom corners, as in Dark Forces. It has textured floors and
   ceilings, skies, sliding doors and Doom-style light falloff through 32
   colormaps.
 - Every PNG is snapped to one 256-colour palette when it loads. The last 31

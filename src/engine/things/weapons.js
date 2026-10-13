@@ -185,7 +185,7 @@ export function weaponSprites(world, pt) {
       sheet,
       frame: ws.frame,
       x: (def.offset?.[0] ?? 0) + bx,
-      y: (def.offset?.[1] ?? 0) + ws.y + by + 2,
+      y: (def.offset?.[1] ?? 0) + (world.registry?.config.weaponDrop ?? 0) + ws.y + by + 2,
       fullbright: ws.fullbright,
     },
   ];

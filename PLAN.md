@@ -112,6 +112,8 @@ Decided (2026-10-12):
 - **Added (2026-10-12):** F, 3D models, after C.
 - **Added (2026-10-12):** G, widescreen, moved up from Phase 2. Done now,
   before B3.
+- **Added (2026-10-12):** H, the corner HUD and a lower weapon, moved up
+  from Phase 2. Done now, before B3.
 
 ### A. Finer grid: half-size tiles (do first)
 
@@ -280,8 +282,8 @@ Design rules (what makes it feel like Dark Forces):
 
 ### E. Leftovers from the first Star Wars pass
 
-- [ ] HUD: the ARMS panel still shows slots 2-7, and the face panel is
-      empty. Part of the Phase 2 HUD rework.
+- [x] HUD: the ARMS panel still shows slots 2-7, and the face panel is
+      empty. Both go with the corner HUD (H).
 - [ ] The finale reuses the title and intermission pictures.
 - [ ] MODDING.md and the README still describe Raccoon Alex content.
 - [ ] The smoke test's screenshots 01-04 come out as a blank page with a
@@ -353,8 +355,8 @@ What it should do:
   centre moves or changes size.
 - The HUD, menus and full-screen pictures (title, intermission, finale) stay
   laid out for the centre 320 columns, so nothing important is cut off on
-  4:3. Their backgrounds extend to the edges. The bottom status bar's frame
-  continues to the edges until the Phase 2 HUD overlay replaces it.
+  4:3. Their backgrounds extend to the edges. (The bottom status bar has
+  since been replaced by the corner HUD, H.)
 - An options toggle keeps the old 4:3 frame for anyone who wants it.
 - The generated title and intermission pictures are painted 560x200, so
   they fill even a 21:9 screen. A 320-wide picture (from a mod) is mirrored
@@ -381,6 +383,27 @@ How:
        title, menus, level, automap, intermission and finale in a browser at
        4:3, 16:9 and 21:9, and time frames at 16:9 (about 33% more columns).
 
+### H. Corner HUD and a lower weapon (done 2026-10-12)
+
+Mark (2026-10-12): the weapon is far too high and hides the action. Move it
+down, and replace the bottom status bar with readouts in the bottom left and
+right corners only, like Dark Forces. Moved up from Phase 2.
+
+1. [x] **Full-height view.** The 3D view fills all 200 rows (`VIEW_H` =
+       `SCREEN_H`); the status bar art and its panel layout go.
+2. [x] **Corner panels.** Left: SHIELD and HEALTH. Right: the current
+       weapon's ammo and the keycards. Small generated panel art
+       (`hud-left.png`, `hud-right.png`) with the big HUD digits. On
+       widescreen they sit at the real screen corners. The ARMS, face and
+       ammo-tally panels are dropped.
+3. [x] **Lower weapon.** Weapons now sit on the screen's bottom edge (32
+       px lower than above the bar). `weaponDrop` in the content config
+       lowers every weapon further: 24 px, picked from screenshots.
+4. [x] **Fix-ups.** The automap's level name and the respawn prompt move
+       clear of the corner panels; check menus over the game.
+5. [x] **Checks.** Tests, validator, smoke test; screenshots at 4:3 and
+       16:9, with the generated and the Dark Forces weapons.
+
 ## Phase 2: Dark Forces systems
 
 - [ ] A mission briefing screen (scrolling text over a picture) before each
@@ -388,9 +411,8 @@ How:
 - [ ] Mission objectives. The exit only works once they're done.
 - [ ] A PDA screen with the map and an objectives checklist.
 - [ ] Lives and checkpoints instead of saves, with extra-life pickups.
-- [ ] HUD overlay: a full-screen view instead of the bottom status bar, with
-      shield and health readouts in the corners, plus ammo and lives. On
-      widescreen (Phase 1b G) the readouts can sit at the screen edges.
+- [ ] Lives on the HUD, once lives exist (the corner HUD itself is Phase 1b
+      H).
 - [ ] Visible blaster bolts for both enemies and the player: slow and
       dodgeable, with inaccurate stormtroopers.
 - [ ] **TODO: smarter enemies around heights** (left over from Phase 1
@@ -757,3 +779,18 @@ update the smoke test.
   back to the committed art. Checked under the `/rogue-contract/` subpath
   with the automation flag hidden: all five overrides load, and a blocked
   stormtrooper sheet falls back. 91 tests and the smoke test pass.
+- 2026-10-12: Phase 1b H: the corner HUD and a lower weapon (Mark: the
+  weapon hid the action).
+  - **HUD:** the status bar is gone and the 3D view fills all 200 rows.
+    Two generated panels sit in the bottom corners (the real screen
+    corners on widescreen): SHIELD and HEALTH on the left, the weapon's
+    ammo and the keycards on the right. ARMS, the empty face panel and the
+    ammo tally are dropped.
+  - **Weapon:** it now stands on the screen's bottom edge (32 px lower),
+    plus `weaponDrop: 24` in `content/config.js` for every weapon: 56 px
+    lower in all. Checked with the generated and the Dark Forces art.
+  - **Fix-ups:** the automap's level name and the respawn prompt sit above
+    the panels.
+  - **Checks:** 91 tests, the validator and the smoke test pass;
+    screenshots at 4:3 and 16:9.
+  - **Next:** B3, the lighting pass.

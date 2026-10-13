@@ -7,10 +7,10 @@
  */
 export const SCREEN_W = 320;
 export const SCREEN_H = 200;
-export const STATUS_H = 32;
 /** The 4:3 view width; the 3D view's focal length is set for this width. */
 export const VIEW_W = SCREEN_W;
-export const VIEW_H = SCREEN_H - STATUS_H;
+/** The 3D view fills the screen's height; the HUD sits over its bottom corners. */
+export const VIEW_H = SCREEN_H;
 
 /** 320x200 is displayed at 4:3, so every pixel is 1.2x taller than it is wide. */
 export const PIXEL_ASPECT = 1.2;

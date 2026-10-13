@@ -1,6 +1,7 @@
 import { World } from '../world/world.js';
 import { clampPitch } from '../things/player.js';
 import { VIEW_H } from '../config.js';
+import { HUD_CLEAR } from '../ui/hud.js';
 import { PAL_NORMAL, PAL_RED_START, NUM_RED, PAL_BONUS_START, NUM_BONUS, PAL_HAZARD, PAL_NIGHTVISION } from '../gfx/palette.js';
 
 /** Gameplay: one level in progress. */
@@ -97,11 +98,11 @@ export class LevelScene {
     const w = this.world;
     if (g.hud.automap) g.hud.drawAutomap(w);
     else g.renderer.render(w, w.camera(), { psprites: w.psprites(), skip: w.player });
-    g.hud.drawStatusBar(w);
+    g.hud.drawHud(w);
     g.hud.drawMessages();
     const p = w.player.player;
     if (p.dead && w.time - p.deathTime > 1.2 && Math.floor(w.time * 2) % 2 === 0) {
-      g.hud.drawCentered(g.registry.strings.respawnPrompt ?? 'PRESS USE TO TRY AGAIN', VIEW_H - 24, 'glow-yellow');
+      g.hud.drawCentered(g.registry.strings.respawnPrompt ?? 'PRESS USE TO TRY AGAIN', VIEW_H - HUD_CLEAR - 12, 'glow-yellow');
     }
   }
 

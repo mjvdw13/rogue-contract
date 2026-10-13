@@ -1,18 +1,15 @@
-// Status bar background, HUD icons, menu cursor and favicon. (The face panel
-// is left empty for now; the HUD gets reworked in Phase 2.)
+// The corner HUD panels, HUD icons, menu cursor and favicon.
 import { PixelCanvas, mix } from '../lib/canvas.js';
 import { C, G } from '../lib/pal.js';
 import { fbm, hash2, seedFrom, rng } from '../lib/noise.js';
 
-/** Panel layout shared with src/engine/ui/hud.js (x, width). */
-export const PANELS = {
-  ammo: [2, 44],
-  health: [48, 56],
-  arms: [106, 34],
-  face: [142, 36],
-  armor: [180, 56],
-  keys: [238, 12],
-  tally: [252, 66],
+/**
+ * Corner HUD layout, shared with src/engine/ui/hud.js: each panel's size, the
+ * corner cut off its inner top edge, and its readout insets [x, y, w, h].
+ */
+export const CORNERS = {
+  left: { w: 112, h: 32, cut: 10, slots: { shield: [3, 3, 52, 27], health: [57, 3, 52, 27] } },
+  right: { w: 72, h: 32, cut: 10, slots: { ammo: [17, 3, 52, 27], keys: [3, 3, 12, 27] } },
 };
 
 function inset(c, x, y, w, h, fill) {
@@ -23,36 +20,44 @@ function inset(c, x, y, w, h, fill) {
   c.rect(x + w - 1, y, 1, h, C('steel', 0.45));
 }
 
-function statusBar() {
-  const W = 320;
-  const H = 32;
+/**
+ * A worn steel plate for one bottom corner, with its inner top corner cut at
+ * 45 degrees. `side` is 'left' or 'right' (which screen corner it sits in).
+ */
+function cornerPanel(side) {
+  const { w: W, h: H, cut, slots } = CORNERS[side];
   const c = new PixelCanvas(W, H);
-  const seed = seedFrom('statusbar');
+  const seed = seedFrom(`hud-${side}`);
   const n = fbm(seed, 64, { cells: 4, octaves: 4 });
   const r = rng(seed);
+  // Distance in from the cut edge (negative = cut away).
+  const inner = (x, y) => (side === 'left' ? W - 1 - x : x) + y - cut;
   c.each((x, y) => {
+    if (inner(x, y) < 0) return null;
     const t = 0.24 + n(x % 64, y + (x >> 6) * 7) * 0.12 + (hash2(x, y, seed) - 0.5) * 0.04;
     return C('steel', t);
   });
   // Scratches.
-  for (let i = 0; i < 40; i++) {
+  for (let i = 0; i < 14; i++) {
     const x = r.int(0, W - 1);
     const y = r.int(0, H - 1);
-    const len = r.int(2, 7);
-    for (let k = 0; k < len; k++) c.set(x + k, y + (k >> 2), C('steel', 0.55));
+    const len = r.int(2, 6);
+    for (let k = 0; k < len; k++) if (c.opaque(x + k, y + (k >> 2))) c.set(x + k, y + (k >> 2), C('steel', 0.55));
   }
-  c.rect(0, 0, W, 1, C('steel', 0.6));
-  c.rect(0, 1, W, 1, C('steel', 0.45));
-  c.rect(0, H - 1, W, 1, C('gray', 0.04));
-  for (const [x, w] of Object.values(PANELS)) {
-    const fill = C('gray', 0.07);
-    inset(c, x, 3, w, 27, fill);
-  }
-  // Rivets.
-  for (const x of [1, 46, 104, 140, 178, 236, 250, 318]) {
-    c.set(x, 4, C('steel', 0.8));
-    c.set(x, 27, C('steel', 0.8));
-  }
+  // Bevel: light along the top and the cut, dark at the outer edge.
+  c.each((x, y, col) => {
+    if (!col) return undefined;
+    const d = inner(x, y);
+    if (y === 0 || d === 0) return C('steel', 0.6);
+    if (y === 1 || d === 1) return C('steel', 0.45);
+    if ((side === 'left' && x === 0) || (side === 'right' && x === W - 1)) return C('gray', 0.04);
+    return undefined;
+  });
+  for (const [x, y, w, h] of Object.values(slots)) inset(c, x, y, w, h, C('gray', 0.07));
+  // Rivets in the outer corners.
+  const ox = side === 'left' ? 1 : W - 2;
+  c.set(ox, 4, C('steel', 0.8));
+  c.set(ox, H - 4, C('steel', 0.8));
   return c;
 }
 
@@ -109,7 +114,8 @@ function favicon() {
 }
 
 export default [
-  { name: 'statusbar', out: 'assets/ui/statusbar.png', draw: statusBar },
+  { name: 'hud-left', out: 'assets/ui/hud-left.png', draw: () => cornerPanel('left') },
+  { name: 'hud-right', out: 'assets/ui/hud-right.png', draw: () => cornerPanel('right') },
   { name: 'hud-icons', out: 'assets/ui/hud-icons.png', draw: hudIcons },
   { name: 'cursor', out: 'assets/ui/cursor.png', draw: cursor },
   { name: 'favicon', out: 'assets/ui/favicon.png', draw: favicon },

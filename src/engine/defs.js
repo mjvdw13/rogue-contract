@@ -121,7 +121,7 @@ export function defineSheet(def) {
   return { frameWidth: 0, frameHeight: 0, ...def, type: 'sheet' };
 }
 
-/** A standalone UI image (title screen, status bar...). */
+/** A standalone UI image (title screen, HUD panels...). */
 export function defineImage(def) {
   requireId(def, 'Image');
   return { ...def, type: 'image' };

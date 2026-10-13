@@ -10,7 +10,8 @@ export const fonts = [
 
 export const images = [
   defineImage({ id: 'title', src: 'assets/ui/title.png' }),
-  defineImage({ id: 'statusbar', src: 'assets/ui/statusbar.png' }),
+  defineImage({ id: 'hud-left', src: 'assets/ui/hud-left.png' }),
+  defineImage({ id: 'hud-right', src: 'assets/ui/hud-right.png' }),
   defineImage({ id: 'intermission', src: 'assets/ui/intermission.png' }),
 ];
 

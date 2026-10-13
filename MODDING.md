@@ -190,9 +190,11 @@ export default defineWeapon({
 });
 ```
 
-View sprites are drawn at the bottom centre of the view, which is 320×168
-pixels at 4:3 (wider on widescreen; the centre stays put). Use `offset: [x, y]` to nudge yours. The fire animation's length sets
-the rate of fire. `accurateFirstShot: true` makes a single shot perfectly
+View sprites are drawn at the bottom centre of the screen, which is 320×200
+pixels at 4:3 (wider on widescreen; the centre stays put). Use `offset: [x, y]`
+to nudge yours. `weaponDrop` in `src/content/config.js` lowers every weapon by
+the same number of pixels. The HUD panels in the bottom corners draw over the
+weapon. The fire animation's length sets the rate of fire. `accurateFirstShot: true` makes a single shot perfectly
 accurate when you aren't holding the trigger. New ammo types go in
 `src/content/ammo.js` as `defineAmmo({ id, name, short, max, clip })`.
 

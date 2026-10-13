@@ -9,6 +9,8 @@ export default {
     { id: 'red', name: 'RED KEYCARD', icon: 2, ramp: 'blood' },
   ],
   colors: { message: 'beige' },
+  /** Pixels every first-person weapon sits below its own offset, so it hides less of the view. */
+  weaponDrop: 24,
   titleMusic: 'title',
   intermissionMusic: 'intermission',
 };
