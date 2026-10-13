@@ -164,6 +164,9 @@ const list = [
   at('sandtrooper', 40.5, 42, { angle: 270 }),
   at('sandtrooper', 56.5, 42, { angle: 270 }),
   at('probe-droid', 44.5, 56.5, { skill: [3, 4, 5] }),
+  // A band of Jawas scavenging in the gorge.
+  at('jawa', 24, 76, { angle: 270 }), at('jawa', 30, 72, { angle: 225 }),
+  at('jawa', 28, 62, { angle: 270, skill: [3, 4, 5] }),
   at('power-cell', 24.5, 68.5),
   at('med-kit', 26.5, 82.5, { skill: [1, 2] }),
   at('energy-pack', 59.5, 45.5),

@@ -20,4 +20,6 @@ const BOLT = {
 export const projectiles = [
   defineProjectile({ id: 'blaster-bolt', ...BOLT, speed: 60, damage: [10, 20] }),
   defineProjectile({ id: 'trooper-bolt', ...BOLT, speed: 28, damage: [5, 12] }),
+  // A Jawa's ion blaster: slower and weaker.
+  defineProjectile({ id: 'ion-bolt', ...BOLT, speed: 22, damage: [3, 8] }),
 ];

@@ -126,6 +126,14 @@ export default [
   }),
   defineSound({ id: 'trooper-pain', synth: groan(240, 170, 0.22, 0.5, { lowpass: 1400, distortion: 0.5 }), pitchVariance: 0.1 }),
   defineSound({ id: 'trooper-death', synth: groan(260, 90, 0.6, 0.6, { lowpass: 1200, distortion: 0.5 }), pitchVariance: 0.08 }),
+  // Jawas: quick, high chattering, and squeaks.
+  defineSound({
+    id: 'jawa-sight',
+    synth: { wave: 'square', duty: 0.4, freq: 820, freqEnd: 1150, duration: 0.06, release: 0.04, lowpass: 3000, volume: 0.3, repeat: { count: 5, interval: 0.075, pitch: 1.12, decay: 0.92 } },
+    pitchVariance: 0.12,
+  }),
+  defineSound({ id: 'jawa-pain', synth: groan(620, 430, 0.14, 0.45, { lowpass: 2600 }), pitchVariance: 0.12 }),
+  defineSound({ id: 'jawa-death', synth: groan(700, 220, 0.5, 0.5, { lowpass: 2400, vibrato: { rate: 14, depth: 2 } }), pitchVariance: 0.1 }),
   // The probe droid: electronic warbles.
   defineSound({
     id: 'droid-sight',

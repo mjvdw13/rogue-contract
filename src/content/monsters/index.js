@@ -3,7 +3,8 @@
 // becomes usable in level maps.
 import stormtrooper from './stormtrooper.js';
 import sandtrooper from './sandtrooper.js';
+import jawa from './jawa.js';
 import officer from './officer.js';
 import probeDroid from './probe-droid.js';
 
-export default [stormtrooper, sandtrooper, officer, probeDroid];
+export default [stormtrooper, sandtrooper, jawa, officer, probeDroid];

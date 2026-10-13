@@ -85,5 +85,20 @@ Pillow and numpy:
 python assets/custom/sandtrooper/cut.py --preview preview.png
 ```
 
+## The Jawa
+
+`jawa/sheet.png` is a Jawa sprite sheet (painted pixel-art poses on a blue
+backdrop); `jawa/cut.py` cuts it the same way into
+`assets/sprites/monsters/jawa.png`. Every pose stands apart, so nothing
+needs splitting. Jawas are 1.25 units tall, up to a trooper's chest. The eyes
+and the muzzle flash snap to fullbright colours, so they glow in the dark:
+
+```
+python assets/custom/jawa/cut.py --preview preview.png
+```
+
+Both cutters share their steps (keying, scaling, the palette) through
+`sheetcut.py`.
+
 Credits: game and art by LucasArts. The enemy sheets were ripped by Crazy
 Ivan, the weapons sheet by Dolphman.

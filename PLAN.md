@@ -485,6 +485,32 @@ override); the source and the cutter live in `assets/custom/sandtrooper/`.
        angles are on the sheet), once enemies are drawn from several
        angles (Phase 2 stretch goal).
 
+### J. A Jawa (2026-10-12)
+
+Mark gave a Jawa sprite sheet (1619x971 PNG, painted pixel-art style on a
+blue backdrop: front, side and back walks, aiming and firing with a muzzle
+flash, a hit-and-fall death and a slump death). Jawas are small: first
+half an adult's height; Mark then asked for them up to a stormtrooper's
+chest (1.25 units).
+
+Decided: a hostile enemy (the sheet has aiming and firing poses): small
+(1.25 tall, radius 0.3), weak and quick, firing slow ion bolts. Drawn at
+the same pixel density as the other enemies, so a standing Jawa is about
+47 px tall. Front-facing poses only, as for the sandtrooper. Its eyes and
+muzzle flash keep their glow (snapped to fullbright colours).
+
+1. [x] Move the sandtrooper cutter's shared steps into
+       `assets/custom/sheetcut.py`; the sandtrooper's output must not
+       change.
+2. [x] `assets/custom/jawa/cut.py`: walk (front cycle, 6), aim and fire
+       (the crouched pose with the flash), pain (the hunch), death (hit,
+       falling, lying, dead). Every frame's feet (or body, lying down) on
+       the bottom row.
+3. [x] Monster `jawa`, an `ion-bolt` projectile, high chattering sounds,
+       glyph `j`.
+4. [x] A few in Mission 1's canyon, one in the sandbox; tests, validator,
+       smoke test, screenshots beside a stormtrooper.
+
 ## Phase 2: Dark Forces systems
 
 - [ ] A mission briefing screen (scrolling text over a picture) before each
@@ -921,3 +947,13 @@ update the smoke test.
   - **Speed:** models add 0.06-0.2 ms a frame in Mission 1, and 0.74 ms
     with the shuttle filling a 560-wide view (Node, headless).
   - **Checks:** 103 tests (12 new), the validator and the smoke test pass.
+- 2026-10-12: Phase 1b J: a Jawa enemy, from Mark's Jawa sprite sheet. The
+  sandtrooper cutter's shared steps moved to `assets/custom/sheetcut.py`
+  (the sandtrooper sheet comes out pixel-identical); `assets/custom/jawa/
+  cut.py` cuts 13 frames of 50x49 (walk, aim, fire with the flash, pain,
+  a fall-back death). The Jawa is 1.25 tall (up to a trooper's chest; first
+  cut at 0.95, half a trooper, which Mark found too short), 12 health,
+  quick, and fires slow `ion-bolt`s; its eyes and muzzle flash glow. Three
+  in Mission 1's gorge (the third from skill 3), one in the sandbox.
+  Screenshots beside the stormtrooper and sandtrooper. 103 tests, the
+  validator and the smoke test pass.

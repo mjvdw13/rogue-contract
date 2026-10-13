@@ -17,5 +17,8 @@ assets/custom/*
 !assets/custom/blaster.png
 !assets/custom/textures.mjs
 !assets/custom/textures/
-# The sandtrooper asset sheet (our own AI-generated art) and its cutter.
+# Character sheets that aren't rips (the sandtrooper and the Jawa), their
+# cutters and the cutters' shared steps.
 !assets/custom/sandtrooper/
+!assets/custom/jawa/
+!assets/custom/sheetcut.py
