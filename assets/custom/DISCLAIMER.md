@@ -10,8 +10,6 @@ They are not part of Rogue Contract and are not covered by its license.
   `README.md`).
 - **Do not redistribute them.** Don't copy them out of this repository, ship
   them in a build, or publish them anywhere.
-- This repository is private for that reason. If it is ever made public, or
-  served on GitHub Pages, remove these files and their history first.
 - The public game never loads them: the overrides are only read on
   `localhost`, and never under test automation.
 
