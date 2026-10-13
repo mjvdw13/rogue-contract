@@ -9,21 +9,12 @@ const MAX_BRIGHTEN = 24;
  * weapon renderers.
  */
 export class View {
-  constructor() {
-    this.W = VIEW_W;
+  constructor(width = VIEW_W) {
     this.H = VIEW_H;
-    this.planeLen = Math.tan((FOV_DEG * Math.PI) / 360);
-    this.fx = this.W / 2 / this.planeLen; // horizontal focal length (px)
-    this.fy = this.fx / PIXEL_ASPECT; // vertical focal length (px), corrected for 4:3 display
-    this.zbuf = new Float32Array(this.W);
     /** Per column, the uncovered window of rows after each tile the ray crossed (for sprite clipping). */
     this.SEG = 48;
-    this.segDist = new Float32Array(this.W * this.SEG);
-    this.segTop = new Int16Array(this.W * this.SEG);
-    this.segBot = new Int16Array(this.W * this.SEG);
-    this.segCount = new Uint8Array(this.W);
+    this.resize(width);
     this.lightStart = new Float32Array(256);
-    this.skyU = new Int32Array(this.W);
     this.x = 0;
     this.y = 0;
     this.angle = 0;
@@ -35,6 +26,24 @@ export class View {
     this.horizon = this.H / 2;
     this.fog = 0.125;
     this.fixedColormap = -1;
+  }
+
+  /**
+   * Set the view width and size the per-column buffers. The focal length
+   * stays at the 4:3 view's, so a wider view only adds field of view at the
+   * edges (90 degrees across 320 columns, about 106 across 426).
+   */
+  resize(width) {
+    this.W = width;
+    this.fx = VIEW_W / 2 / Math.tan((FOV_DEG * Math.PI) / 360); // horizontal focal length (px)
+    this.fy = this.fx / PIXEL_ASPECT; // vertical focal length (px), corrected for 4:3 display
+    this.planeLen = this.W / 2 / this.fx;
+    this.zbuf = new Float32Array(this.W);
+    this.segDist = new Float32Array(this.W * this.SEG);
+    this.segTop = new Int16Array(this.W * this.SEG);
+    this.segBot = new Int16Array(this.W * this.SEG);
+    this.segCount = new Uint8Array(this.W);
+    this.skyU = new Int32Array(this.W);
   }
 
   /**

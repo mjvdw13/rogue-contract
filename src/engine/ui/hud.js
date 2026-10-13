@@ -1,4 +1,4 @@
-import { VIEW_W, VIEW_H, SCREEN_W } from '../config.js';
+import { VIEW_W, VIEW_H } from '../config.js';
 import { FaceController } from './face.js';
 import { F_SOLID, F_DOOR, F_USE, F_EXIT, F_VOID } from '../world/tilemap.js';
 
@@ -12,6 +12,9 @@ export const PANELS = {
   keys: [238, 12],
   tally: [252, 66],
 };
+
+/** A plain column of the status bar (inside the ammo panel), repeated out to the edges on widescreen. */
+const BAR_FILL_COL = 24;
 
 const MESSAGE_TIME = 4;
 
@@ -64,8 +67,12 @@ export class Hud {
     const reg = g.registry;
     const Y = VIEW_H;
     const bar = g.assets.image('statusbar');
-    if (bar) s.blit(bar, 0, Y);
-    else s.fillRect(0, Y, SCREEN_W, 32, g.palette.ramp('steel', 0.25));
+    if (bar) {
+      s.blit(bar, 0, Y);
+      // On widescreen, continue the bar's frame to the edges with one of its plain columns.
+      for (let x = s.left; x < 0; x++) s.blit(bar, x, Y, { sx: BAR_FILL_COL, sw: 1 });
+      for (let x = bar.width; x < s.w - s.ox; x++) s.blit(bar, x, Y, { sx: BAR_FILL_COL, sw: 1 });
+    } else s.fillRect(s.left, Y, s.w, 32, g.palette.ramp('steel', 0.25));
     const p = world.player.player;
     const hud = g.font('hud');
     const tiny = g.font('tiny');
@@ -156,7 +163,10 @@ export class Hud {
     const map = world.map;
     const pt = world.player;
     const p = pt.player;
-    s.fillRect(0, 0, VIEW_W, VIEW_H, 0);
+    // The map covers the whole view, past the centre 320 columns on widescreen.
+    const mapL = s.left;
+    const mapR = s.w - s.ox;
+    s.fillRect(mapL, 0, s.w, VIEW_H, 0);
     const scale = this.mapScale;
     const cx = VIEW_W / 2;
     const cy = VIEW_H / 2;
@@ -171,14 +181,14 @@ export class Hud {
       const k = (g.registry.config.keys ?? []).find((kk) => kk.id === lock);
       return k?.ramp ? pal.ramp(k.ramp, 0.8) : cDoor;
     };
-    const tilesX = Math.ceil(VIEW_W / scale / 2) + 2;
+    const tilesX = Math.ceil(s.w / scale / 2) + 2;
     const tilesY = Math.ceil(VIEW_H / scale / 2) + 2;
     const x0 = Math.max(0, Math.floor(pt.x) - tilesX);
     const x1 = Math.min(map.w - 1, Math.floor(pt.x) + tilesX);
     const y0 = Math.max(0, Math.floor(pt.y) - tilesY);
     const y1 = Math.min(map.h - 1, Math.floor(pt.y) + tilesY);
     const clipLine = (ax, ay, bx, by, c) => {
-      if (Math.max(ax, bx) < 0 || Math.min(ax, bx) >= VIEW_W || Math.max(ay, by) < 0 || Math.min(ay, by) >= VIEW_H) return;
+      if (Math.max(ax, bx) < mapL || Math.min(ax, bx) >= mapR || Math.max(ay, by) < 0 || Math.min(ay, by) >= VIEW_H) return;
       const old = s.h;
       s.h = VIEW_H;
       s.line(ax, ay, bx, by, c);

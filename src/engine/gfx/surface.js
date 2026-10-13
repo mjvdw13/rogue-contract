@@ -3,12 +3,29 @@ import { TRANSPARENT } from '../config.js';
 /**
  * An 8-bit palette-indexed drawing surface (the framebuffer and any scratch
  * buffers). All UI drawing happens at 1:1 pixel scale.
+ *
+ * `ox` is the draw origin: every drawing method shifts x by it. On a
+ * widescreen framebuffer it centres the 320-column layout, so UI code keeps
+ * using 0..320 and reaches the full width with x from -ox to w - ox.
  */
 export class Surface {
   constructor(w, h) {
     this.w = w;
     this.h = h;
+    this.ox = 0;
     this.px = new Uint8Array(w * h);
+  }
+
+  /** Reallocate at a new width and centre a layout of `layoutW` columns in it. */
+  resize(w, layoutW = w) {
+    this.w = w;
+    this.ox = (w - layoutW) >> 1;
+    this.px = new Uint8Array(w * this.h);
+  }
+
+  /** Left edge of the whole surface, in layout coordinates. */
+  get left() {
+    return -this.ox;
   }
 
   clear(color = 0) {
@@ -16,12 +33,13 @@ export class Surface {
   }
 
   pixel(x, y, c) {
-    x |= 0;
+    x = (x + this.ox) | 0;
     y |= 0;
     if (x >= 0 && y >= 0 && x < this.w && y < this.h) this.px[y * this.w + x] = c;
   }
 
   fillRect(x, y, w, h, c) {
+    x += this.ox;
     const x0 = Math.max(0, x | 0);
     const y0 = Math.max(0, y | 0);
     const x1 = Math.min(this.w, (x + w) | 0);
@@ -39,6 +57,7 @@ export class Surface {
 
   /** Recolour a region through a 256-entry remap table (e.g. a darkening colormap). */
   shadeRect(x, y, w, h, remap) {
+    x += this.ox;
     const x0 = Math.max(0, x | 0);
     const y0 = Math.max(0, y | 0);
     const x1 = Math.min(this.w, (x + w) | 0);
@@ -92,7 +111,7 @@ export class Surface {
     const sh = opts.sh ?? srcH;
     const remap = opts.remap;
     const flip = opts.flipX;
-    dx |= 0;
+    dx = (dx + this.ox) | 0;
     dy |= 0;
     const W = this.w;
     const px = this.px;
@@ -108,6 +127,23 @@ export class Surface {
         px[ty * W + tx] = remap ? remap[c] : c;
       }
     }
+  }
+
+  /**
+   * Draw a full-screen picture centred on the layout. Pictures wider than
+   * the layout (the generated ones are 560 wide) fill a widescreen surface
+   * and are cropped on a narrower one. Where a picture is too narrow, it is
+   * mirrored outward to fill the sides, through `edgeRemap` (a darkening
+   * colormap) so the real picture stays the focus.
+   */
+  blitBackdrop(img, edgeRemap) {
+    const w = img.width ?? img.w;
+    const x0 = (this.w - 2 * this.ox - w) >> 1;
+    this.blit(img, x0, 0);
+    const side = Math.min(x0 + this.ox, w);
+    if (side <= 0) return;
+    this.blit(img, x0 - side, 0, { sx: 0, sw: side, flipX: true, remap: edgeRemap });
+    this.blit(img, x0 + w, 0, { sx: w - side, sw: side, flipX: true, remap: edgeRemap });
   }
 
   /** Copy every pixel of another same-sized surface. */

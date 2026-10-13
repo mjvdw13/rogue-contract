@@ -110,6 +110,8 @@ Decided (2026-10-12):
 - **Order:** A, then B, then C. The Phase 1 gate (step 9) runs after A, on
   the converted sandbox.
 - **Added (2026-10-12):** F, 3D models, after C.
+- **Added (2026-10-12):** G, widescreen, moved up from Phase 2. Done now,
+  before B3.
 
 ### A. Finer grid: half-size tiles (do first)
 
@@ -279,6 +281,9 @@ Design rules (what makes it feel like Dark Forces):
 - [ ] MODDING.md and the README still describe Raccoon Alex content.
 - [ ] The smoke test's screenshots 01-04 come out as a blank page with a
       broken-image icon, though its checks pass.
+- [ ] The options menu doesn't fit: its 11 big-font rows need about 210
+      px, so SHOW FPS is cut off at the bottom and the rows touch. Use the
+      small font, or split it into sub-menus (video, controls).
 - [ ] Hanging decorations and effect sprites still size themselves at 64
       texels per unit (`world.js`: `sheet.fh / 64`). Since the finer grid
       it is 32, so ceiling lamps hang half their height into the ceiling.
@@ -326,6 +331,51 @@ Later, if wanted: walkable model surfaces (a bridge you can cross or walk
 under). That changes physics and pathfinding, which assume one floor per
 tile, so it's a separate, larger job.
 
+### G. Widescreen: fill the whole screen (done 2026-10-12)
+
+Today the game draws a fixed 320x200 frame shown at 4:3, with black bars on
+wider screens (`gfx/present.js` `resize()`). Moved up from Phase 2
+(2026-10-12).
+
+What it should do:
+- Keep today's 4:3 view as the guaranteed centre: the same vertical view and
+  the same 90 degree field of view in the middle 320 columns. On a wider
+  screen, draw more world at the left and right edges instead of bars.
+- The framebuffer stays 200 px tall, and its width follows the window: 320
+  at 4:3, about 427 at 16:9, wider on ultrawides. Cap it at 21:9 (560), and
+  use bars past that. Screens narrower than 4:3 keep bars top and bottom.
+- The horizontal field of view grows with the width, so nothing in the
+  centre moves or changes size.
+- The HUD, menus and full-screen pictures (title, intermission, finale) stay
+  laid out for the centre 320 columns, so nothing important is cut off on
+  4:3. Their backgrounds extend to the edges. The bottom status bar's frame
+  continues to the edges until the Phase 2 HUD overlay replaces it.
+- An options toggle keeps the old 4:3 frame for anyone who wants it.
+- The generated title and intermission pictures are painted 560x200, so
+  they fill even a 21:9 screen. A 320-wide picture (from a mod) is mirrored
+  and darkened at the sides instead.
+
+How:
+1. [x] **Runtime width.** `SCREEN_W` stays 320 and now means the 4:3
+       layout width; the framebuffer's width is `surface.w`. The presenter picks the frame width from the
+       window and reallocates its buffers and texture; the game resizes the
+       framebuffer, the melt wipe and the view to match.
+2. [x] **Renderer.** `View` sizes its per-column buffers (`zbuf`, the
+       sprite clip windows, sky columns) to the width, and widens
+       `planeLen` so the focal length stays at 320's. The weapon sprite
+       stays centred.
+3. [x] **2D layout.** `Surface` gets a draw origin (`ox`): all 2D drawing
+       is offset so UI code keeps working in centre-320 coordinates.
+       Full-width parts (screen shading, the automap, backgrounds, the
+       status bar's sides, the FPS counter) are drawn across the whole
+       width on purpose. Mouse clicks on menus map through the same origin.
+4. [x] **Options.** A widescreen on/off toggle in the options menu, and
+       `?wide=0` in the URL.
+5. [x] **Tests and checks.** Unit tests for the width rule and for the
+       centre view staying the same; the smoke test adds a 16:9 run. Check
+       title, menus, level, automap, intermission and finale in a browser at
+       4:3, 16:9 and 21:9, and time frames at 16:9 (about 33% more columns).
+
 ## Phase 2: Dark Forces systems
 
 - [ ] A mission briefing screen (scrolling text over a picture) before each
@@ -334,33 +384,8 @@ tile, so it's a separate, larger job.
 - [ ] A PDA screen with the map and an objectives checklist.
 - [ ] Lives and checkpoints instead of saves, with extra-life pickups.
 - [ ] HUD overlay: a full-screen view instead of the bottom status bar, with
-      shield and health readouts in the corners, plus ammo and lives.
-- [ ] **TODO: fill the whole screen (widescreen).** Today the game draws a
-      fixed 320×200 frame shown at 4:3, with black bars on wider screens
-      (`gfx/present.js` `resize()`).
-      - Keep today's 4:3 view as the guaranteed centre: the same vertical
-        view, the same 90° field of view in the middle 320 columns. On a
-        wider screen, draw more world at the left and right edges instead of
-        bars.
-      - The framebuffer stays 200 px tall, and its width follows the window:
-        320 at 4:3, about 427 at 16:9, wider on ultrawides. Cap it around
-        21:9, and use bars past that.
-      - The horizontal field of view grows with the width, so nothing in the
-        centre moves or changes size.
-      - This means making `SCREEN_W` / `VIEW_W` (about 47 uses) a runtime
-        value. The per-column buffers (`zbuf`, the sprite clip windows, sky
-        columns), the renderer, the weapon sprite, the CRT shader and the
-        touch layout all follow.
-      - The HUD, menus and full-screen pictures (title, briefing,
-        intermission) stay laid out for the centre 320 columns, so nothing
-        important is cut off on 4:3. Their backgrounds extend or tile to the
-        edges.
-      - Taller-than-4:3 screens keep their bars (we already ask phones to
-        turn sideways).
-      - The cost grows with the width: about 33% more columns at 16:9.
-        Re-check the Phase 1 performance target.
-      - Do it together with the HUD overlay above, since both rework the
-        screen layout.
+      shield and health readouts in the corners, plus ammo and lives. On
+      widescreen (Phase 1b G) the readouts can sit at the screen edges.
 - [ ] Visible blaster bolts for both enemies and the player: slow and
       dodgeable, with inaccurate stormtroopers.
 - [ ] **TODO: smarter enemies around heights** (left over from Phase 1
@@ -699,3 +724,24 @@ update the smoke test.
 - 2026-10-12: The ripped Dark Forces sheets, `cut.mjs` and `overrides.json`
   are committed in `assets/custom/`, with `DISCLAIMER.md` (Mark owns the
   game; don't redistribute). The repo stays public: Mark's decision.
+- 2026-10-12: Phase 1b G: widescreen, moved up from Phase 2 and done.
+  - **How:** the presenter picks the frame width from the window's shape
+    (`screenWidth()` in `config.js`: 320 at 4:3, 426 at 16:9, capped at 560
+    for 21:9). The game resizes the framebuffer and the melt wipe to match,
+    and the view resizes its column buffers. The focal length stays at
+    320's, so the centre 320 columns are exactly the old 4:3 view.
+  - **2D layout:** `Surface.ox` is a draw origin that centres the
+    320-column layout, so the HUD, menus and pictures needed few changes.
+    Shading, the automap and the status bar's frame span the full width.
+  - **Art:** the title and intermission pictures are generated at 560x200.
+  - **Options:** a WIDESCREEN toggle and `?wide=0`. The TOUCH PAD row is
+    gone (phones aren't a target), so the menu has its old 11 rows.
+  - **Checks:** `tests/widescreen.test.js` (4 tests), and a 16:9 / 21:9 /
+    4:3 pass in the smoke test. 91 tests, the validator and the smoke test
+    pass. Screenshots of the title, menus, level, automap, intermission and
+    finale at 4:3 and 16:9 look right.
+  - **Speed:** in headless Chromium, the 3D view takes 2.8-3.4 ms at 320
+    columns and 4.2 ms at 426, well inside a 60 fps frame.
+  - **Found:** the options menu was already too tall for the screen (added
+    to E).
+  - **Next:** B3, the lighting pass.

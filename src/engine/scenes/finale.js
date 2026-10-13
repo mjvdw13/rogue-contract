@@ -1,4 +1,4 @@
-import { SCREEN_W, SCREEN_H } from '../config.js';
+import { SCREEN_W, SCREEN_H, BACKDROP_EDGE } from '../config.js';
 
 const CHARS_PER_SECOND = 14;
 
@@ -50,7 +50,7 @@ export class FinaleScene {
     s.clear(0);
     if (this.stage === 'text') {
       const bg = g.assets.image(this.finale.background ?? 'finale-bg');
-      if (bg) s.blit(bg, 0, 0);
+      if (bg) s.blitBackdrop(bg, pal.colormap(BACKDROP_EDGE));
       const font = g.font('small');
       let budget = Math.floor(this.time * CHARS_PER_SECOND);
       const remap = pal.tint('gray', 'beige');
@@ -62,7 +62,7 @@ export class FinaleScene {
       });
     } else {
       const img = g.assets.image(this.finale.endImage ?? 'finale-end');
-      if (img) s.blit(img, 0, 0);
+      if (img) s.blitBackdrop(img, pal.colormap(BACKDROP_EDGE));
       const gold = g.font('gold') ?? g.font('big');
       if (this.finale.endText !== '') {
         gold?.draw(s, this.finale.endText ?? 'THE END', SCREEN_W / 2, SCREEN_H - 30, { align: 'center' });

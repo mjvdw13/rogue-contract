@@ -116,24 +116,14 @@ export function optionsMenu(game) {
           ],
         },
       },
+      { label: t(game, 'widescreen', 'WIDESCREEN'), toggle: { get: () => s.widescreen, set: set('widescreen') } },
       { label: t(game, 'alwaysRun', 'ALWAYS RUN'), toggle: { get: () => s.alwaysRun, set: set('alwaysRun') } },
       { label: t(game, 'mouseLook', 'MOUSE LOOK'), toggle: { get: () => s.mouseLook, set: set('mouseLook') } },
       { label: t(game, 'invertMouse', 'INVERT LOOK'), toggle: { get: () => s.invertMouseY, set: set('invertMouseY') } },
       { label: t(game, 'autoAim', 'AUTO AIM'), toggle: { get: () => s.autoAim, set: set('autoAim') } },
       { label: t(game, 'messages', 'MESSAGES'), toggle: { get: () => s.messages, set: set('messages') } },
       { label: t(game, 'showFps', 'SHOW FPS'), toggle: { get: () => s.showFps, set: set('showFps') } },
-      {
-        label: t(game, 'touch', 'TOUCH'),
-        choice: {
-          get: () => s.touchControls,
-          set: set('touchControls'),
-          options: [
-            { value: 'auto', label: 'AUTO' },
-            { value: 'on', label: 'ON' },
-            { value: 'off', label: 'OFF' },
-          ],
-        },
-      },
+      // No TOUCH row: phones aren't a target, and touch controls still turn on by themselves (settings.touchControls 'auto').
     ],
   };
 }

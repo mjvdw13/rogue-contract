@@ -4,6 +4,7 @@
 //   1. loads the title screen and starts a new game through the menus,
 //   2. walks, shoots and opens the automap,
 //   3. warps through every level with ?map=,
+//   4. checks widescreen: the frame width follows the window (16:9, 21:9, 4:3),
 // failing on any page error or console error. Screenshots go to .smoke/.
 //
 //   npm run smoke
@@ -65,8 +66,8 @@ const browser = await chromium.launch({ args: ['--autoplay-policy=no-user-gestur
 const problems = [];
 let step = 0;
 
-async function page(url) {
-  const p = await browser.newPage({ viewport: { width: 960, height: 720 } });
+async function page(url, viewport = { width: 960, height: 720 }) {
+  const p = await browser.newPage({ viewport });
   p.on('pageerror', (e) => problems.push(`${url}: ${e.message}`));
   p.on('console', (m) => {
     if (m.type() === 'error') problems.push(`${url}: console: ${m.text()}`);
@@ -128,6 +129,40 @@ for (const level of new Registry(content).levels.values()) {
   check(info.scene === 'LevelScene' && info.id === level.id, `?map=${level.id} loads ${level.name}`);
   await shot(p, level.id);
   await p.close();
+}
+
+// 4. Widescreen: the frame widens with the window, and the HUD and menus stay centred.
+{
+  const p = await page('index.html?mute', { width: 1280, height: 720 });
+  await p.waitForTimeout(500);
+  const width = () => p.evaluate(() => window.game.surface.w);
+  check((await width()) === 426, `a 16:9 window gets a 426-column frame (got ${await width()})`);
+  await shot(p, 'wide-title');
+  await p.keyboard.press('Enter'); // main menu
+  await p.waitForTimeout(300);
+  await shot(p, 'wide-menu');
+  await p.close();
+
+  const q = await page('index.html?map=m1&mute&nomonsters', { width: 1280, height: 720 });
+  await q.waitForFunction(() => window.game.scene.constructor.name === 'LevelScene', null, { timeout: 20000 }).catch(() => {});
+  await q.waitForTimeout(1500);
+  await shot(q, 'wide-playing');
+  await q.keyboard.press('Tab');
+  await q.waitForTimeout(300);
+  await shot(q, 'wide-automap');
+  await q.keyboard.press('Tab');
+  await q.setViewportSize({ width: 1680, height: 720 });
+  await q.waitForTimeout(300);
+  check((await q.evaluate(() => window.game.surface.w)) === 560, 'a 21:9 window gets the widest frame, 560 columns');
+  await shot(q, 'ultrawide-playing');
+  await q.setViewportSize({ width: 960, height: 720 });
+  await q.waitForTimeout(300);
+  check((await q.evaluate(() => window.game.surface.w)) === 320, 'back at 4:3 the frame is 320 columns again');
+  await q.close();
+
+  const r = await page('index.html?mute&wide=0', { width: 1280, height: 720 });
+  check((await r.evaluate(() => window.game.surface.w)) === 320, '?wide=0 keeps the 4:3 frame');
+  await r.close();
 }
 
 await browser.close();

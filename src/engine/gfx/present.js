@@ -1,4 +1,4 @@
-import { SCREEN_W, SCREEN_H } from '../config.js';
+import { SCREEN_W, SCREEN_H, PIXEL_ASPECT, screenWidth } from '../config.js';
 
 const VERT = `
 attribute vec2 a_pos;
@@ -76,18 +76,21 @@ export const CRT_MODES = {
 
 /**
  * Turns the 8-bit framebuffer into pixels on screen: palette lookup, then
- * either a WebGL CRT pass or a plain nearest-neighbour 2D canvas. Keeps the
- * canvas at the largest 4:3 rectangle that fits the window.
+ * either a WebGL CRT pass or a plain nearest-neighbour 2D canvas.
+ *
+ * It also picks the framebuffer width. With `wide` on, the width follows the
+ * window (see screenWidth), so a 16:9 window gets a 426-column frame instead
+ * of black bars. The game reads `w` each frame and resizes to match.
  */
 export class Presenter {
-  constructor(canvas, { width = SCREEN_W, height = SCREEN_H, aspect = 4 / 3, preferGL = true } = {}) {
+  constructor(canvas, { height = SCREEN_H, preferGL = true, wide = true } = {}) {
     this.canvas = canvas;
-    this.w = width;
+    this.w = SCREEN_W;
     this.h = height;
-    this.aspect = aspect;
+    this.wide = wide;
     this.mode = 'subtle';
     this.gl = null;
-    this.rgba = new Uint32Array(width * height);
+    this.rgba = new Uint32Array(this.w * height);
     this.bytes = new Uint8Array(this.rgba.buffer);
     if (preferGL) {
       try {
@@ -110,6 +113,33 @@ export class Presenter {
 
   setMode(mode) {
     this.mode = CRT_MODES[mode] ? mode : 'off';
+  }
+
+  /** Widescreen on or off; off keeps the 320-column 4:3 frame. */
+  setWide(wide) {
+    if (this.wide === !!wide) return;
+    this.wide = !!wide;
+    this.resize();
+  }
+
+  /** Display aspect of the current framebuffer (4:3 at 320 columns). */
+  get aspect() {
+    return this.w / (this.h * PIXEL_ASPECT);
+  }
+
+  /** Reallocate the pixel buffers and texture for a new framebuffer width. */
+  _setWidth(w) {
+    if (w === this.w) return;
+    this.w = w;
+    if (this.gl) {
+      const gl = this.gl;
+      this.rgba = new Uint32Array(w * this.h);
+      this.bytes = new Uint8Array(this.rgba.buffer);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, w, this.h, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.bytes);
+      gl.uniform2f(this.uniforms.src, w, this.h);
+    } else {
+      this._init2D();
+    }
   }
 
   _init2D() {
@@ -178,10 +208,11 @@ export class Presenter {
     this.gl = gl;
   }
 
-  /** Fit the canvas to the largest 4:3 box in the window. */
+  /** Pick the framebuffer width for the window, then fit the canvas to the largest box of that aspect. */
   resize() {
     const vw = window.visualViewport?.width ?? window.innerWidth;
     const vh = window.visualViewport?.height ?? window.innerHeight;
+    this._setWidth(this.wide ? screenWidth(vw / Math.max(1, vh)) : SCREEN_W);
     let cw = vw;
     let ch = vw / this.aspect;
     if (ch > vh) {

@@ -112,13 +112,19 @@ export class MenuSystem {
     }
   }
 
+  /** A client (CSS pixel) position in layout coordinates (the centre 320 columns). */
+  _toLayout(x, y) {
+    const pt = this.game.presenter.toScreen(x, y);
+    pt.x -= this.game.surface.ox;
+    return pt;
+  }
+
   update(dt, input) {
     this.time += dt;
-    const presenter = this.game.presenter;
     if (this.confirm) {
       const c = this.confirm;
       const click = input.clicks[0];
-      if (input.wasPressed('yes') || (click && presenter.toScreen(click.x, click.y).x < SCREEN_W / 2)) {
+      if (input.wasPressed('yes') || (click && this._toLayout(click.x, click.y).x < SCREEN_W / 2)) {
         this.confirm = null;
         this.game.audio.play('menu-select');
         c.onYes?.();
@@ -142,12 +148,12 @@ export class MenuSystem {
     // Mouse / touch.
     if (input.pointer?.moved) {
       input.pointer.moved = false;
-      const pt = presenter.toScreen(input.pointer.x, input.pointer.y);
+      const pt = this._toLayout(input.pointer.x, input.pointer.y);
       const hit = this.itemRects.find((r) => pt.y >= r.y && pt.y < r.y + r.h);
       if (hit && hit.index !== top.index && this._enabled(top.items[hit.index])) top.index = hit.index;
     }
     for (const click of input.clicks) {
-      const pt = presenter.toScreen(click.x, click.y);
+      const pt = this._toLayout(click.x, click.y);
       const hit = this.itemRects.find((r) => pt.y >= r.y && pt.y < r.y + r.h && pt.x >= r.x - 20 && pt.x < r.x + r.w + 20);
       if (hit) {
         top.index = hit.index;
@@ -164,7 +170,7 @@ export class MenuSystem {
     const g = this.game;
     const s = g.surface;
     const pal = g.palette;
-    if (overGame) s.shadeRect(0, 0, SCREEN_W, VIEW_H, pal.colormap(22));
+    if (overGame) s.shadeRect(s.left, 0, s.w, VIEW_H, pal.colormap(22));
     if (this.confirm) {
       this._drawConfirm();
       return;
@@ -250,7 +256,7 @@ export class MenuSystem {
     const lines = small.wrap(this.confirm.text, 250);
     const h = lines.length * 10 + 24;
     const y = Math.round(SCREEN_H / 2 - h / 2);
-    s.shadeRect(0, 0, SCREEN_W, SCREEN_H, pal.colormap(26));
+    s.shadeRect(s.left, 0, s.w, SCREEN_H, pal.colormap(26));
     s.fillRect(24, y, SCREEN_W - 48, h, pal.ramp('gray', 0.05));
     s.rect(24, y, SCREEN_W - 48, h, pal.ramp('blood', 0.6));
     lines.forEach((line, i) => {

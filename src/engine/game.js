@@ -56,8 +56,9 @@ export class Game {
     this.settings = this.storage.load('settings', DEFAULT_SETTINGS);
     if (params.has('fps')) this.settings.showFps = true;
     if (params.has('crt')) this.settings.crt = params.get('crt');
+    if (params.has('wide')) this.settings.widescreen = params.get('wide') !== '0';
     this.progress = this.storage.load('progress', {});
-    this.presenter = new Presenter(canvas, { preferGL: params.get('gl') !== '0' });
+    this.presenter = new Presenter(canvas, { preferGL: params.get('gl') !== '0', wide: this.settings.widescreen });
     this.input = new Input(canvas);
     this.input.onPointerLockChange = (locked) => {
       if (!locked && this.scene?.wantsPointerLock && !this.menu.active) this.pause();
@@ -165,6 +166,7 @@ export class Game {
   }
 
   render(dt) {
+    if (this.presenter.w !== this.surface.w) this._resizeScreen(this.presenter.w);
     const s = this.surface;
     const scene = this.scene;
     if (scene?.frame && !this.menu.active) scene.frame(dt, this.input);
@@ -175,13 +177,19 @@ export class Game {
     this.wipe.draw(s.px);
     if (this.settings.showFps) {
       const f = this.font('small');
-      f?.draw(s, `${this.loop.fps} FPS`, SCREEN_W - 3, 3, { align: 'right', remap: this.palette.tint('gray', 'glow-green'), shadow: 0 });
+      f?.draw(s, `${this.loop.fps} FPS`, s.w - s.ox - 3, 3, { align: 'right', remap: this.palette.tint('gray', 'glow-green'), shadow: 0 });
     }
     const pal = this.menu.active ? PAL_NORMAL : (scene?.paletteIndex?.() ?? PAL_NORMAL);
     this.presenter.present(s.px, this.palette.palettes[pal], this.time);
     const inGame = scene instanceof LevelScene && !this.menu.active;
     this.touch.setVisible(inGame && this.touchActive);
     this.canvas.classList.toggle('in-game', inGame && this.input.pointerLocked);
+  }
+
+  /** Follow the presenter to a new framebuffer width (the window's shape changed). */
+  _resizeScreen(w) {
+    this.surface.resize(w, SCREEN_W);
+    this.wipe = new MeltWipe(w, SCREEN_H);
   }
 
   /** Switch scenes with Doom's screen melt. */
@@ -201,6 +209,7 @@ export class Game {
 
   applySettings(save = true) {
     this.presenter.setMode(this.settings.crt);
+    this.presenter.setWide(this.settings.widescreen);
     this.audio.setVolumes(this.settings);
     if (save) this.storage.save('settings', this.settings);
   }

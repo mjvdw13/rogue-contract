@@ -1,13 +1,17 @@
-// Full-screen pictures (320x200): the title screen and the intermission
-// backdrop (also used behind the finale text). Painted procedurally, then
-// dithered into the palette.
+// Full-screen pictures: the title screen and the intermission backdrop (also
+// used behind the finale text). Painted procedurally, then dithered into the
+// palette. They are 560x200 (21:9): the centre 320 columns are the 4:3
+// picture, and the sides only show on widescreen, so keep text and anything
+// important inside the centre.
 import { PixelCanvas, mix, darken, lighten } from '../lib/canvas.js';
 import { C, G } from '../lib/pal.js';
 import { fbm, hash2, rng, seedFrom, valueNoise } from '../lib/noise.js';
 import { smallGlyphs } from './fonts.js';
 
-const W = 320;
+const W = 560;
 const H = 200;
+/** Left edge of the centre 320 columns. */
+const OX = (W - 320) / 2;
 const U = (name) => `assets/ui/${name}.png`;
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -310,10 +314,11 @@ function title() {
   const c = new PixelCanvas(W, H);
   const seed = seedFrom('title');
   space(c, seed, 170);
-  planet(c, 250, 92, 46, C('navy', 0.1), C('orange', 0.55));
-  planet(c, 62, 70, 9, C('gray', 0.1), C('beige', 0.7));
+  planet(c, OX + 250, 92, 46, C('navy', 0.1), C('orange', 0.55));
+  planet(c, OX + 62, 70, 9, C('gray', 0.1), C('beige', 0.7));
+  planet(c, 34, 128, 5, C('gray', 0.08), C('steel', 0.6));
   mesas(c, seed + 1, { top: 156 });
-  garrison(c, 170, 172);
+  garrison(c, OX + 170, 172);
   mesas(c, seed + 2, { top: 176, col: C('rust', 0.05) });
   const logo = chromeLogo('ROGUE CONTRACT', 3, { seed: 9, stops: STEEL, side: [C('gray', 0.04), C('steel', 0.3)], grime: false });
   c.blit(logo, Math.round((W - logo.w) / 2), 8);
@@ -326,7 +331,7 @@ function intermission() {
   const c = new PixelCanvas(W, H);
   const seed = seedFrom('intermission');
   space(c, seed);
-  planet(c, 280, 170, 70, C('navy', 0.06), C('rust', 0.4));
+  planet(c, OX + 280, 170, 70, C('navy', 0.06), C('rust', 0.4));
   for (let x = 0; x < W; x += 20) for (let y = 0; y < H; y++) if (y % 2 === 0) blend(c, x, y, G('cyan', 0), 0.25);
   for (let y = 0; y < H; y += 20) for (let x = 0; x < W; x++) if (x % 2 === 0) blend(c, x, y, G('cyan', 0), 0.25);
   return c;

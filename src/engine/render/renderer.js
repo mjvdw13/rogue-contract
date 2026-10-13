@@ -27,6 +27,7 @@ export class Renderer {
     const s = this.surface;
     const textures = this.assets.textures;
     const cms = this.palette.colormaps;
+    if (view.W !== s.w) view.resize(s.w);
     view.setup(cam, scene.fog ?? 0.25);
     drawWorld(view, scene.map, textures, scene.skyTexture ?? null, s.px, s.w, cms);
     drawSprites(view, scene.things, scene.map, s.px, s.w, cms, extras.skip);

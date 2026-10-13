@@ -1,4 +1,4 @@
-import { SCREEN_W } from '../config.js';
+import { SCREEN_W, BACKDROP_EDGE } from '../config.js';
 
 function clock(seconds) {
   const s = Math.floor(seconds);
@@ -86,7 +86,7 @@ export class IntermissionScene {
     const pal = g.palette;
     s.clear(0);
     const bg = g.assets.image('intermission');
-    if (bg) s.blit(bg, 0, 0);
+    if (bg) s.blitBackdrop(bg, pal.colormap(BACKDROP_EDGE));
     const big = g.font('big');
     const gold = g.font('gold') ?? big;
     const small = g.font('small');

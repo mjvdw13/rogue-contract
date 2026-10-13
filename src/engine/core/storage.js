@@ -35,6 +35,7 @@ export const DEFAULT_SETTINGS = {
   musicVolume: 6, // 0..10
   sfxVolume: 8, // 0..10
   crt: 'subtle', // 'off' | 'subtle' | 'full'
+  widescreen: true, // fill wide windows instead of bars at the sides
   alwaysRun: true,
   showFps: false,
   messages: true,

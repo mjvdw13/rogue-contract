@@ -191,7 +191,7 @@ export default defineWeapon({
 ```
 
 View sprites are drawn at the bottom centre of the view, which is 320×168
-pixels. Use `offset: [x, y]` to nudge yours. The fire animation's length sets
+pixels at 4:3 (wider on widescreen; the centre stays put). Use `offset: [x, y]` to nudge yours. The fire animation's length sets
 the rate of fire. `accurateFirstShot: true` makes a single shot perfectly
 accurate when you aren't holding the trigger. New ammo types go in
 `src/content/ammo.js` as `defineAmmo({ id, name, short, max, clip })`.
@@ -532,7 +532,10 @@ Tips from the built-in maps:
 If there is more than one episode, the menu asks which one to play.
 
 `map: { spots: { e1m1: [82, 34], ... } }` places each level on the
-intermission picture (`assets/ui/intermission.png`, 320×200). Between levels,
+intermission picture (`assets/ui/intermission.png`). Spots are in the
+picture's centre 320×200, which is all a 4:3 screen shows. Full-screen
+pictures can be 560×200 so they also fill a 21:9 screen; a 320-wide picture is
+mirrored and darkened at the sides instead. Between levels,
 finished levels are crossed out and a blinking "YOU ARE HERE" marks the next
 one.
 

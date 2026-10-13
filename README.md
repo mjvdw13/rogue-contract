@@ -158,9 +158,13 @@ GitHub Actions runs the tests, the validator and the smoke test on every push.
   colormaps.
 - Every PNG is snapped to one 256-colour palette when it loads. The last 31
   colours are fullbright, so eyes, fire and screens glow in the dark.
-- The picture is scaled to 4:3 with nearest-neighbour sampling, through an
-  optional WebGL CRT shader (scanlines, curvature, grain). A plain canvas is
-  used if WebGL isn't available.
+- On a widescreen window the framebuffer grows wider instead of showing
+  black bars: 426×200 at 16:9, up to 560×200 at 21:9. The centre 320
+  columns stay exactly the 4:3 view, and the HUD and menus stay in them.
+- The picture is scaled with nearest-neighbour sampling (each pixel 1.2x
+  taller than wide, as on a 4:3 VGA screen), through an optional WebGL CRT
+  shader (scanlines, curvature, grain). A plain canvas is used if WebGL
+  isn't available.
 - Monsters follow a flow field toward the player. Gunfire wakes up every
   monster within earshot. Monsters that hit each other start fighting.
 - Coworkers are friendly NPCs: solid but not shootable, so every attack passes
