@@ -648,6 +648,8 @@ Decided:
 4. [x] Tests (panel position, a body in the recess, shots under a half-open
        door, texture once per door), MODDING.md, screenshots before and
        after, validator and smoke test.
+5. [x] Faster doors (Mark: "This is Star Wars!"): open and close in under
+       0.3 s instead of about 0.6, with shorter, snappier whoosh sounds.
 
 ## Phase 2: Dark Forces systems
 
@@ -1171,3 +1173,8 @@ update the smoke test.
   4x4 blast door. `snapshot.mjs --doors <open>` sets every door's state for
   review. 124 tests (6 new in `doors.test.js`), the validator and the smoke
   test pass.
+- 2026-10-13: Faster doors (Mark: "This is Star Wars!"). The default door
+  speed is 3.5 (was 1.6): a door opens or closes in 0.29 s, and you can walk
+  through after 0.24 s. The door sounds are shorter to match: a 0.3 s whoosh
+  open, and a whoosh and thump closing. MODDING.md gives the default. 124
+  tests and the validator pass.

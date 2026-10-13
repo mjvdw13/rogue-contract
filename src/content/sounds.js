@@ -64,11 +64,11 @@ export default [
   // --------------------------------------------------------- world
   defineSound({
     id: 'door-open',
-    synth: { ...hiss(0.6, 0.5), layers: [{ wave: 'saw', freq: 70, freqEnd: 110, duration: 0.55, attack: 0.03, release: 0.2, lowpass: 600, volume: 0.35, vibrato: { rate: 30, depth: 0.5 } }] },
+    synth: { ...hiss(0.32, 0.55), layers: [{ wave: 'saw', freq: 70, freqEnd: 130, duration: 0.28, attack: 0.01, release: 0.12, lowpass: 700, volume: 0.35, vibrato: { rate: 30, depth: 0.5 } }] },
   }),
   defineSound({
     id: 'door-close',
-    synth: { ...hiss(0.5, 0.45), layers: [{ wave: 'saw', freq: 110, freqEnd: 70, duration: 0.45, attack: 0.03, release: 0.1, lowpass: 600, volume: 0.35 }, { ...thump(90, 40, 0.2, 0.8), delay: 0.45 }] },
+    synth: { ...hiss(0.28, 0.5), layers: [{ wave: 'saw', freq: 130, freqEnd: 70, duration: 0.26, attack: 0.01, release: 0.08, lowpass: 700, volume: 0.35 }, { ...thump(90, 40, 0.2, 0.8), delay: 0.27 }] },
   }),
   defineSound({
     id: 'lift-start',

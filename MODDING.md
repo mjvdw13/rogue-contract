@@ -438,7 +438,9 @@ Door options:
   wall's texture), stays open, and hides from the automap and from monsters
   until it's found.
 - `lock: 'remote'`: only triggers can open the door.
-- `wait`, `speed`, `tag` and `sounds` are also available.
+- `speed`: how much of the door opens (or closes) per second, default 3.5:
+  under 0.3 seconds, Star Wars-fast.
+- `wait`, `tag` and `sounds` are also available.
 
 Doors need walls on two opposite sides. A space is solid nothingness: keep
 every floor tile enclosed by walls (the validator checks this).

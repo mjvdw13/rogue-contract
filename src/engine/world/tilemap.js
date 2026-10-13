@@ -50,7 +50,7 @@ export class Door {
     this.secret = !!spec.secret;
     this.stayOpen = !!spec.stayOpen;
     this.tag = spec.tag ?? null;
-    this.speed = spec.speed ?? 1.6; // fraction per second
+    this.speed = spec.speed ?? 3.5; // fraction per second (Star Wars doors snap open)
     this.wait = spec.wait ?? 4;
     this.sounds = spec.sounds ?? {};
     this.open = 0;
