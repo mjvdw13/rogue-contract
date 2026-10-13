@@ -140,6 +140,15 @@ export class TileMap {
     this.bandIndex = new Int16Array(n).fill(-1);
     /** @type {{from:number, to:number, tex:number}[][]} */
     this.bandSets = [];
+    /**
+     * Decals (see decals.js): all of them, the ones on each tile edge
+     * (tile * 4 + face), and how many each edge has. Laid out by the
+     * renderer when `decalsDirty`.
+     */
+    this.decals = [];
+    this.edgeDecals = new Map();
+    this.decalEdge = new Uint8Array(n * 4);
+    this.decalsDirty = false;
     this.damage = new Uint8Array(n);
     this.doorIndex = new Int16Array(n).fill(-1);
     this.liftIndex = new Int16Array(n).fill(-1);

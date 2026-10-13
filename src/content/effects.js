@@ -15,6 +15,7 @@ const BOLT = {
   anims: { fly: { frames: [0, 1], fps: 12, loop: true }, explode: { frames: [2, 3, 4], fps: 16 } },
   radius: 0.16,
   light: { radius: 3, light: 64 },
+  scorch: 'decal-scorch',
   sounds: { explode: 'bolt-hit' },
 };
 

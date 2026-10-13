@@ -46,6 +46,8 @@ const lift = (stops, ceilZ, extra = {}) => ({
 const p = new Painter(W, H, rock);
 /** Light sources (lamps and light strips), added area by area. */
 const lamps = [];
+/** Decals (signs, the crest, hazard stripes, vents) on wall faces, area by area. */
+const decals = [];
 
 // ---------------------------------------------------------------- the canyon
 // 1. Start bowl, with a secret alcove behind a rock door in its west wall.
@@ -91,6 +93,12 @@ p.rect(52, 39, 56, 40, lights);
 // Floodlights in the strips, throwing pools of light on the sand, and a
 // weaker light over the gate between them.
 lamps.push({ x: 42, y: 40.3, radius: 6, light: 96 }, { x: 54, y: 40.3, radius: 6, light: 96 }, { x: 48, y: 40.3, radius: 5, light: 40 });
+// The Empire's crest over the gate, and hazard stripes along its lintel.
+decals.push(
+  { x: 48, y: 40, z: 6.1, face: 'S', tex: 'decal-crest', scale: 1.5 },
+  { x: 47, y: 40, z: 4.25, face: 'S', tex: 'decal-hazard' },
+  { x: 49, y: 40, z: 4.25, face: 'S', tex: 'decal-hazard' },
+);
 
 // 5. The crawl vent through the face (crouch: 1.2 clear).
 p.rect(32, 26, 34, 40, {
@@ -105,6 +113,8 @@ p.rect(32, 18, 36, 22, room(0, 5, { floor: 'imp-grate', ceiling: 'imp-ceiling-li
 p.rect(38, 22, 40, 24, room(0, 5, { floor: 'imp-grate', ceiling: 'imp-ceiling-light', light: 176, lightFx: 'flicker', lightMin: 96 }));
 p.light(26, 14, 29, 17, 120);
 p.light(26, 23, 29, 26, 120);
+// Vents high on the north wall.
+decals.push({ x: 37.5, y: 14, z: 4.2, face: 'S', tex: 'decal-vent' }, { x: 40.5, y: 14, z: 4.2, face: 'S', tex: 'decal-vent' });
 p.chamfer(26, 14, 42, 26, 2, darkPanel, ['NW', 'SW']);
 // A storage cage round the crates in the north-west.
 p.fence(28, 14, 29, 17, 'W', cage).fence(30, 14, 31, 17, 'E', cage).fence(28, 16, 31, 17, 'S', cage);
@@ -122,6 +132,8 @@ for (const x of [48, 62, 72]) {
   lamps.push({ x: x + 1, y: 16.3, radius: 3, light: 48 }, { x: x + 1, y: 19.7, radius: 3, light: 48 });
 }
 for (const x of [53, 69]) lamps.push({ x: x + 1, y: 18, radius: 4, light: 48 });
+// Sector signs on the walls.
+decals.push({ x: 56, y: 16, z: 8.4, face: 'S', tex: 'decal-sign' }, { x: 67, y: 20, z: 8.4, face: 'N', tex: 'decal-sign' });
 
 // 9. The bunk room.
 p.rect(48, 4, 60, 15, room(6, 10, { light: 128 }));
@@ -199,7 +211,9 @@ for (const [y0, y1] of [[29, 40], [48, 59]]) p.fence(88, y0, 89, y1, 'W', railin
 // Lifts L2 (south-west) and L2b (north-east) run between the floor and the ring.
 p.rect(75, 55, 79, 59, lift([-6, 6], 18, { tag: 'generator' }));
 p.rect(101, 29, 105, 33, lift([-6, 6], 18, { tag: 'generator' }));
-// The overload switch on the column's east face, at the bottom.
+// The overload switch on the column's east face, at the bottom, under
+// hazard stripes.
+decals.push({ x: 94, y: 44, z: -3.6, face: 'E', tex: 'decal-hazard' });
 p.rect(93, 43, 94, 45, {
   wall: 'imp-switch',
   switchTo: 'imp-switch-on',
@@ -346,6 +360,7 @@ export default defineLevel({
   par: 300,
   ...p.build(),
   lights: lamps,
+  decals,
   things: [],
   list,
 });

@@ -1,6 +1,6 @@
 /** Projectiles (fireballs, rockets, lobbed trash) and short-lived effects. */
 
-import { F_SKY, F_SLAB } from '../world/tilemap.js';
+import { F_SKY, F_SLAB, F_SOLID } from '../world/tilemap.js';
 import { aimAttack, missileZ } from '../combat/aim.js';
 import { blocksShots, overlap } from './shape.js';
 
@@ -15,6 +15,32 @@ function skyAt(map, x, y, z) {
   if (!map.inBounds(tx, ty)) return false;
   const i = ty * map.w + tx;
   return (map.flags[i] & F_SKY) !== 0 && !(map.flags[i] & F_SLAB && map.storeyAt(i, z) === 0);
+}
+
+/**
+ * The tile edge a step from (x0, y0) to (x1, y1) crosses first: the face
+ * it meets (0-3: N E S W, the way that face looks), where, and how far
+ * along the step (0-1); null if it stays in one tile.
+ */
+function crossedFace(x0, y0, x1, y1) {
+  const tx0 = Math.floor(x0);
+  const ty0 = Math.floor(y0);
+  const tx1 = Math.floor(x1);
+  const ty1 = Math.floor(y1);
+  const ex = tx1 > tx0 ? tx0 + 1 : tx0;
+  const ey = ty1 > ty0 ? ty0 + 1 : ty0;
+  const sx = tx1 !== tx0 ? (ex - x0) / (x1 - x0) : Infinity;
+  const sy = ty1 !== ty0 ? (ey - y0) / (y1 - y0) : Infinity;
+  if (sx === Infinity && sy === Infinity) return null;
+  if (sx <= sy) return { face: tx1 > tx0 ? 3 : 1, x: ex, y: y0 + (y1 - y0) * sx, s: sx };
+  return { face: ty1 > ty0 ? 0 : 2, x: x0 + (x1 - x0) * sy, y: ey, s: sy };
+}
+
+/** A scorch mark where a projectile met a wall or step face on its way to (nx, ny, nz). */
+function scorch(world, p, nx, ny, nz) {
+  if (!p.def.scorch) return;
+  const hit = crossedFace(p.x, p.y, nx, ny);
+  if (hit) world.scorch(p.def.scorch, hit.x, hit.y, p.z + (nz - p.z) * hit.s, hit.face);
 }
 
 /** Burst, damaging what's around. `pull` backs it out of the wall it flew into. */
@@ -58,6 +84,8 @@ export function projectileThink(world, p, dt) {
     const ny = p.y + p.vy * sdt;
     const nz = p.z + p.vz * sdt;
     if (map.solidPoint(nx, ny) || (map.doors.length && map.panelCrossed(p.x, p.y, nx, ny, nz))) {
+      // (A solid wall's face; not an angled wall's, which stands inside its tile.)
+      if (map.flags[Math.floor(ny) * map.w + Math.floor(nx)] & F_SOLID) scorch(world, p, nx, ny, nz);
       explode(world, p, null);
       return;
     }
@@ -78,7 +106,7 @@ export function projectileThink(world, p, dt) {
         p.x = nx;
         p.y = ny;
         p.z = up ? ceil - CLEARANCE : floor + CLEARANCE;
-      }
+      } else scorch(world, p, nx, ny, nz);
       explode(world, p, null, face);
       return;
     }

@@ -2,6 +2,7 @@ import { TileMap, Door, F_SOLID, F_DOOR, F_SKY, F_SECRET, F_DAMAGE, F_EXIT, F_US
 import { buildLifts } from './lifts.js';
 import { Slant, slantLine } from './slants.js';
 import { addSources } from './lightsources.js';
+import { makeDecal, addDecal } from './decals.js';
 
 /** Glyphs in the `things` layer that place the player start, with facing. */
 export const PLAYER_START_GLYPHS = { '^': 90, '>': 0, v: 270, '<': 180 };
@@ -407,6 +408,12 @@ export function buildLevel(registry, level, opts = {}) {
   }
   // Light sources, baked now (with the doors shut), in groups like the tiles.
   errors.push(...addSources(map, level.lights, groupOf));
+  // Decals on wall and step faces.
+  (level.decals ?? []).forEach((spec, k) => {
+    const d = makeDecal(map, spec, slot);
+    if (typeof d === 'string') errors.push(`Decal ${k + 1}${spec.tex ? ` ("${spec.tex}")` : ''} ${d}`);
+    else addDecal(map, d);
+  });
   map.lightGroupCount = groups;
 
   // Things overlay.

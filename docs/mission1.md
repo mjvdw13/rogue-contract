@@ -35,7 +35,7 @@ switch (opens the escape hatch) → back up → escape hatch → gantry stairs
 | 1 | Start bowl | 6..30, 76..96 | 0 / sky 24 | Start (14.5, 90.5) facing north. Secret alcove behind a rock door in the west wall (2..6, 80..84): a shield unit. |
 | 2 | Gorge | 14..34, 60..76 | 0 / sky | Winds north-east, with angled rock walls. A natural rock arch spans it (14..34, 64..67): a slab from 4 to 5 that you walk under, with a sniper on top (skills 2+) facing the start bowl. There's no way up. |
 | 3 | The bowl | 20..60, 44..60 | 0 / sky | Landmark: a rock spire (chamfered 6x6 block at 35..41, 49..55). Sniper ledge A (west, 20..24, floor 5) can't be reached. Ledge B (east, 56..60, floor 5) is reached by rock steps at its south end. |
-| 4 | Garrison face | 26..70, 36..40 | wall | Imperial wall facing the canyon, 4 m tall with the cliff's rock above it (wall bands), with a locked main gate (44..52) between light strips. The vent mouth is at 32..34. |
+| 4 | Garrison face | 26..70, 36..40 | wall | Imperial wall facing the canyon, 4 m tall with the cliff's rock above it (wall bands), with a locked main gate (44..52) between light strips, the Empire's crest over it and hazard stripes along its lintel (decals). The vent mouth is at 32..34. |
 | 5 | Vent | 32..34, 26..40 | 0.5 / 1.7 | Crouch only (1.2 clear). |
 | 6 | Maintenance | 26..42, 14..26 | 0 / 5 | Dim, grate floor, with a lit panel in the middle. Crates in a storage cage (a see-through fence), a console, an ambush trooper. |
 | 7 | Lift L1 shaft | 42..46, 16..20 | lift 0 → 6 / 12 | Opens west at 0 and east at 6. |

@@ -874,7 +874,7 @@ headless Node, DF art). Budget for this phase: stay under about 8 ms.
        `bands: [{ from: 8, tex: 'canyon-rock' }, { to: 0.5, tex: 'imp-trim'
        }]`. The garrison's face with rock above, skirting trims, the
        reactor column's bands. Validator, map viewer, tests.
-7. [ ] **Decals.** Level `decals: [{ x, y, z, face, tex, glow? }]`: a
+7. [x] **Decals.** Level `decals: [{ x, y, z, face, tex, glow? }]`: a
        see-through texture on a wall face or a step face (signs, the
        Imperial crest, hazard stripes, pipes, vents, panels). Blaster
        bolts leave scorch marks on walls (the last 48 kept).
@@ -1764,3 +1764,15 @@ update the smoke test.
   would show indoors, so the gantry's end wall, which is also the
   generator's, stays panel until steps 19-20). Trims and the reactor
   column's bands come with steps 17 and 19.
+- 2026-10-13: Phase 1d step 7, decals. A level's `decals: [{ x, y, z,
+  face, tex, scale?, glow?, flip? }]` put see-through pictures on wall
+  faces, step faces and lintels: laid out by the renderer once their
+  textures' sizes are known, on the tile edges they cover
+  (`world/decals.js`), and drawn over each face they're on, clipped to it,
+  in its light and haze. Projectiles with `scorch` leave scorch marks where
+  they burst on walls or step faces (the last 48). New art
+  (`tools/art/textures/decals.js`): scorch, the Empire's crest, hazard
+  stripes, a sector sign, a vent. Mission 1: the crest over the gate with
+  hazard stripes along its lintel, signs in the barracks corridor, vents in
+  maintenance, stripes over the overload switch. The rest of the dressing
+  comes with steps 15-19. 172 tests.

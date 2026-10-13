@@ -2,6 +2,7 @@ import { F_SOLID, F_DOOR, F_SKY, F_SLANT, F_SLAB } from '../world/tilemap.js';
 import { DIMINISH, MAX_BRIGHTEN, LIGHT_BLACK, HAZE_RES, HAZE_LEN } from './view.js';
 import { HAZE_ROW } from '../gfx/palette.js';
 import { LightMap } from '../world/lightmap.js';
+import { layoutDecals } from '../world/decals.js';
 import { TEXELS_PER_UNIT as TPU, TRANSPARENT } from '../config.js';
 
 const MAX_STEPS = 320;
@@ -69,6 +70,9 @@ const wSt = new Uint8Array(MAX_WIN);
  * colormaps go on with haze tables (gfx/palette.js `hazeColormaps`), and the
  * haze step is dithered too.
  *
+ * Decals (world/decals.js) are drawn over the wall and step faces they're
+ * on, clipped to each face.
+ *
  * Fences (see-through walls on tile edges) don't stop the ray: each one it
  * crosses is noted with the rows still open at that point, and once the
  * column's solid surfaces are drawn its fences are drawn far to near,
@@ -93,6 +97,9 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
   const { fences, fenceAt } = map;
   const { slabBot, slabTop, slabTopTex, slabUnderTex, slabSideTex } = map;
   const { bandIndex, bandSets } = map;
+  if (map.decalsDirty) layoutDecals(map, textures);
+  const { edgeDecals, decalEdge } = map;
+  const hasDecals = map.decals.length > 0;
   const hasFences = fences.length > 0;
   const mdepth = view.mdepth;
   const along = [0];
@@ -255,6 +262,42 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
         const top = band.to < faceTop ? band.to : faceTop;
         const bot = band.from > faceBot ? band.from : faceBot;
         if (top > bot) face(t, rowOf(top, t), rowOf(bot, t), band.to < Infinity ? band.to : faceTop, band.tex, u, lv, hz);
+      }
+    };
+    /**
+     * Decals on a face from height `faceBot` to `faceTop` the ray meets at
+     * distance t, at `pos` along the edge (mirrored when seen from the side that
+     * reads backward), in the face's light (or unlit if they glow).
+     */
+    const decalFaces = (t, faceTop, faceBot, list, pos, mirrored, lv, hz) => {
+      for (let j = 0; j < list.length; j++) {
+        const d = list[j];
+        if (pos < d.a0 || pos >= d.a1) continue;
+        const top = d.z1 < faceTop ? d.z1 : faceTop;
+        const bot = d.z0 > faceBot ? d.z0 : faceBot;
+        if (top <= bot) continue;
+        let a = rowOf(top, t);
+        let b = rowOf(bot, t);
+        if (a < clipTop) a = clipTop;
+        if (b > clipBot) b = clipBot;
+        if (b <= a) continue;
+        const tex = textures[d.tex];
+        const th = tex.h;
+        let tx = (((mirrored !== d.flip ? d.a1 - pos : pos - d.a0) / (d.a1 - d.a0)) * tex.w) | 0;
+        if (tx >= tex.w) tx = tex.w - 1;
+        const col = tex.curCM;
+        const colBase = tx * th;
+        setFaceCm(d.glow ? 0 : lv, d.glow ? 0 : hz);
+        const scale = th / (d.z1 - d.z0);
+        const stepV = (t / fy) * scale;
+        let v = (d.z1 - camZ + ((a + 0.5 - horizon) * t) / fy) * scale;
+        for (let y = a, o = a * fbW + x; y < b; y++, o += fbW, v += stepV) {
+          let k = v | 0;
+          if (k >= th) k = th - 1;
+          else if (k < 0) k = 0;
+          const c = col[colBase + k];
+          if (c !== TRANSPARENT) fb[o] = colormaps[faceCm[y & 3] + c];
+        }
       }
     };
     /** A texture's height in world units (faces hung from their bottom edge use it). */
@@ -555,8 +598,12 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
       const hz = faceHaze(tExit, out);
       // Position along the wall in world units (mirrored on two sides so
       // textures read left to right from every direction).
-      let wx = side === 0 ? py + tExit * rdy : px + tExit * rdx;
-      if (side === 0 ? rdx < 0 : rdy > 0) wx = -wx;
+      const edgePos = side === 0 ? py + tExit * rdy : px + tExit * rdx;
+      const mirrored = side === 0 ? rdx < 0 : rdy > 0;
+      const wx = mirrored ? -edgePos : edgePos;
+      // Decals on the face of the next tile toward this one.
+      const dEdge = hasDecals ? next * 4 + (side === 0 ? (stepX > 0 ? 3 : 1) : stepY > 0 ? 0 : 2) : -1;
+      const decals = dEdge >= 0 && decalEdge[dEdge] ? edgeDecals.get(dEdge) : null;
 
       let solid = (f & F_SOLID) !== 0;
       let tex = wallTex[next];
@@ -631,6 +678,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
           const lv = faceLevel(s, tExit, contrast, out);
           face(tExit, rowOf(cz, tExit), rowOf(fz, tExit), cz, tex, u, lv, hz);
           if (bands) bandFaces(tExit, cz, fz, bands, u, lv, hz);
+          if (decals) decalFaces(tExit, cz, fz, decals, edgePos, mirrored, lv, hz);
         }
         end = tExit;
         break;
@@ -655,6 +703,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
           const lv = faceLevel(s, tExit, contrast, out);
           face(tExit, a, rowOf(fC, tExit), fN, sideTex[next], wx, lv, hz);
           if (nextBands) bandFaces(tExit, fN, fC, nextBands, wx, lv, hz);
+          if (decals) decalFaces(tExit, fN, fC, decals, edgePos, mirrored, lv, hz);
           if (a < clipBot) clipBot = a < clipTop ? clipTop : a;
         }
         if (cN < cC) {
@@ -665,6 +714,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
             const lv = faceLevel(s, tExit, contrast, out);
             face(tExit, rowOf(cC, tExit), b, cN + texHeight(upperTex[next]), upperTex[next], wx, lv, hz);
             if (nextBands) bandFaces(tExit, cC, cN, nextBands, wx, lv, hz);
+            if (decals) decalFaces(tExit, cC, cN, decals, edgePos, mirrored, lv, hz);
           }
           if (b > clipTop) clipTop = b > clipBot ? clipBot : b;
         }

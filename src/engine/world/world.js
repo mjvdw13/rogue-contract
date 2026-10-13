@@ -1,5 +1,6 @@
 import { buildLevel } from './level.js';
-import { F_SECRET, F_DAMAGE, F_EXIT, F_USE } from './tilemap.js';
+import { F_SECRET, F_DAMAGE, F_EXIT, F_USE, EDGES } from './tilemap.js';
+import { makeDecal, addDecal, removeDecal } from './decals.js';
 import { initNpc, npcThink, npcReact } from '../things/npc.js';
 import { castRay, blockedByMap, fenceBlocks, rayCircle, slantNear } from './physics.js';
 import { updateDoors, openDoor, closeDoor } from './doors.js';
@@ -51,6 +52,9 @@ const NAV_REFRESH = 0.25;
  * them together. Rendering, input and audio live outside; the world only
  * calls `services` (audio, hud messages, music) when it needs them.
  */
+/** Scorch marks kept (the oldest goes when another is made). */
+const MAX_SCORCH = 48;
+
 /** How far through its animation a thing is (0-1). */
 function animProgress(t) {
   const a = t.anim;
@@ -83,6 +87,8 @@ export class World {
     this.skillInfo = SKILLS[skill] ?? SKILLS[3];
     this.time = 0;
     this.things = [];
+    /** Scorch marks, oldest first. */
+    this.scorches = [];
     this.exitRequested = null;
     this.restartRequested = false;
     this.lastNoise = -1;
@@ -677,6 +683,19 @@ export class World {
     const refresh = this.navRefresh <= 0 && this.map.lifts.some((l) => l.state === 'moving');
     if (refresh) this.navRefresh = NAV_REFRESH;
     for (const field of this.navFields.values()) field.update(Math.floor(pt.x), Math.floor(pt.y), refresh, this.reach(pt));
+  }
+
+  /**
+   * A scorch mark (decal texture `tex`) on the face (0-3: N E S W) at (x, y)
+   * a projectile burst on, `z` high. The last MAX_SCORCH stay.
+   */
+  scorch(tex, x, y, z, face) {
+    const slot = this.assets ? this.assets.textureSlot(tex) : 0;
+    const d = makeDecal(this.map, { x, y, z, face: EDGES[face], tex, flip: this.rng.int(0, 1) === 1 }, () => slot);
+    if (typeof d === 'string') return;
+    addDecal(this.map, d);
+    this.scorches.push(d);
+    if (this.scorches.length > MAX_SCORCH) removeDecal(this.map, this.scorches.shift());
   }
 
   /**

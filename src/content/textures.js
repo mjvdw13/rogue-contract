@@ -25,6 +25,10 @@ const DESERT = ['sandstone', 'sandstone-dark', 'sandstone-pale', 'desert-sand', 
 // See-through fences (railings, bars, grates): any size, with holes.
 const FENCES = ['imp-railing', 'imp-bars', 'imp-cage'];
 
+// Decals on wall faces (tools/art/textures/decals.js): signs, the crest,
+// hazard stripes, a vent, and the scorch blaster bolts leave.
+const DECALS = ['decal-scorch', 'decal-crest', 'decal-hazard', 'decal-sign', 'decal-vent'];
+
 const ANIMATED = {
   'imp-computer': { frames: 3, fps: 3 },
 };
@@ -34,5 +38,6 @@ export default [
   ...DESERT.map((id) => defineTexture({ id, src: `assets/textures/${id}.png`, fullbright: false })),
   ...Object.entries(ANIMATED).map(([id, a]) => defineTexture({ id, src: `assets/textures/${id}.png`, ...a })),
   ...FENCES.map((id) => defineTexture({ id, src: `assets/textures/${id}.png`, fence: true })),
+  ...DECALS.map((id) => defineTexture({ id, src: `assets/textures/${id}.png`, decal: true })),
   defineTexture({ id: 'sky-night', src: 'assets/textures/sky-night.png', sky: true }),
 ];

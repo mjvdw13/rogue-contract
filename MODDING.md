@@ -403,6 +403,34 @@ open tile or a doorway, `bands` change the faces of its raised floor and
 lowered ceiling (a gate's lintel) the same way. The map viewer shows a wall
 by its top band.
 
+### Decals
+
+Signs, crests, hazard stripes and vents go on wall faces as decals: see-through
+pictures over the wall (or a step's face, or a doorway's lintel). A level
+lists them in `decals`:
+
+```js
+decals: [
+  // The crest over the gate: on the face looking south along the edge at y 40.
+  { x: 48, y: 40, z: 6, face: 'S', tex: 'decal-crest', scale: 1.5 },
+  { x: 56, y: 16, z: 8.4, face: 'S', tex: 'decal-sign' },
+],
+```
+
+- `face`: the way the face looks, `'N'`, `'E'`, `'S'` or `'W'`. It's the face
+  along the tile edge nearest (`x`, `y`): `face: 'S'` at `y: 40` is the south
+  face of the walls in row 39, seen from row 40.
+- `x` or `y` along the edge is the decal's middle, and `z` the height of its
+  middle.
+- Its size is its texture's (32 texels a tile, so a 64x64 picture is 2 tiles,
+  a metre) times `scale`. Transparent texels show the wall.
+- `glow: true` ignores the light (a lit screen); `flip: true` mirrors it.
+
+Decal textures are defined with `decal: true` (`src/content/textures.js`) and
+drawn by `tools/art/textures/decals.js`. A projectile with `scorch:
+'decal-scorch'` leaves a scorch mark where it bursts on a wall; the last 48
+stay. The map viewer marks decals with a white tick.
+
 ### Light sources
 
 A lamp, a light strip or a floodlight is a light source: it adds light to

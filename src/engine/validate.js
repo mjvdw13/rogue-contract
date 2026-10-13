@@ -97,6 +97,7 @@ export function validateContent(reg) {
       checkSound(owner, t.sound);
     }
     if (t.kind === 'projectile' && !t.anims.fly && !t.anims.idle) err(`${owner}: needs a "fly" animation`);
+    if (t.scorch && !reg.textures.has(t.scorch)) err(`${owner}: unknown scorch texture "${t.scorch}"`);
     if (t.kind === 'npc') {
       if (!t.anims.idle) err(`${owner}: needs an "idle" animation`);
       if ((t.wander ?? 0) > 0 && !t.anims.walk) warn(`${owner}: wanders but has no "walk" animation (it will stand still)`);
