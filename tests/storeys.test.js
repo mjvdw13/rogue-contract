@@ -2,7 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { buildLevel } from '../src/engine/world/level.js';
 import { F_SLAB } from '../src/engine/world/tilemap.js';
-import { traceRay3D, lineOfSight3D } from '../src/engine/world/physics.js';
+import { traceRay3D, lineOfSight3D, fenceBlocks } from '../src/engine/world/physics.js';
+import { FlowField, UNREACHABLE } from '../src/engine/world/nav.js';
+import { analyseLevel } from '../tools/lib/levelcheck.mjs';
 import { registry, room, makeWorld, mockInput, run } from './helpers.js';
 
 // Two storeys per tile (PLAN.md Phase 1c): a tile's `slab` is a solid layer
@@ -194,4 +196,72 @@ test('things are placed under a slab unless their z puts them on it, and drops l
   const key = w.things.find((t) => t.def.id === 'keycard-red');
   assert.ok(key, 'dropped its keycard');
   assert.equal(key.z, 3.5, 'on the bridge, not under it');
+});
+
+// ------------------------------------------------------------ pathfinding
+
+test('the flow field plans over storeys: on top of a bridge and under it are different places', () => {
+  // A platform (h) as high as the bridge's top, the bridge (=), then the floor.
+  const level = room(['##########', '#hh====..#', '##########'], ['', ' >'], {
+    legend: {
+      '.': { floor: 'imp-floor', ceiling: 'imp-ceiling', light: 160, ceilZ: 8 },
+      h: { floor: 'imp-floor', ceiling: 'imp-ceiling', light: 160, floorZ: 3.5, ceilZ: 8 },
+      '=': { floor: 'imp-floor', ceiling: 'imp-ceiling', light: 160, ceilZ: 8, slab: SLAB },
+    },
+  });
+  const { map } = buildLevel(registry, level);
+  const nav = new FlowField(map);
+  const top = (x) => nav.dist[nav.node(map.index(x, 1), 1)];
+  const under = (x) => nav.dist[nav.node(map.index(x, 1), 0)];
+  // The player on the platform: the bridge's top leads there, its underside doesn't.
+  nav.update(1, 1, true, 4.3);
+  assert.equal(top(3), 2);
+  assert.equal(top(6), 5);
+  assert.equal(under(4), UNREACHABLE, 'no way up from under the bridge');
+  assert.equal(nav.distanceAt(5, 1, 4.3), 4, 'a body reaching the top is on it');
+  assert.equal(nav.distanceAt(5, 1, 0.8), UNREACHABLE, 'a body on the floor is under it');
+  // The player on the floor past the bridge: the other way round.
+  nav.update(8, 1, true, 0.8);
+  assert.equal(under(3), 5);
+  assert.equal(top(3), UNREACHABLE, 'no way down off the top (too far to drop)');
+  assert.ok(nav.next(3.5, 1.5, 0.8).tx === 4, 'from under it, on under it');
+  // A flyer goes wherever it fits.
+  const fly = new FlowField(map, { step: 0, drop: 0, height: 0.85, flying: true });
+  fly.update(8, 1, true, 0.8);
+  assert.notEqual(fly.dist[fly.node(map.index(4, 1), 1)], UNREACHABLE);
+  assert.notEqual(fly.dist[fly.node(map.index(4, 1), 0)], UNREACHABLE);
+});
+
+test('a railing along a bridge stops bodies on top, not those walking under it', () => {
+  // The bridge runs east-west along row 2, railed on its north edge.
+  const hall = { floor: 'imp-floor', ceiling: 'imp-ceiling', light: 160, ceilZ: 8 };
+  const level = room(['######', '#....#', '#====#', '#....#', '######'], ['', ' >'], {
+    legend: { '.': hall, '=': { ...hall, slab: SLAB, fence: { tex: 'imp-railing', edges: 'N', height: 0.75 } } },
+  });
+  const { map } = buildLevel(registry, level);
+  const nav = new FlowField(map);
+  nav.update(2, 1, true, 0.8);
+  assert.notEqual(nav.dist[map.index(2, 3)], UNREACHABLE, 'under the bridge, past the railing overhead');
+  assert.equal(fenceBlocks(map, 2.5, 2.1, 0.3, 0, 1.7), false, 'a body under it passes');
+  assert.equal(fenceBlocks(map, 2.5, 2.1, 0.3, 3.5, 5.2), true, 'a body on top is stopped');
+});
+
+// ------------------------------------------------------------ tools
+
+test('the level checker reaches each storey on its own', () => {
+  const hall = { floor: 'imp-floor', ceiling: 'imp-ceiling', light: 160, ceilZ: 8 };
+  // The bridge (=) is 3.5 up; with stairs (1-7, half a unit each) it can be climbed.
+  const level = (stairs) =>
+    room(['###############', `#..${stairs}====#`, '###############'], ['', ' >'], {
+      legend: { '.': hall, '=': { ...hall, slab: SLAB }, ...Object.fromEntries([1, 2, 3, 4, 5, 6, 7].map((k) => [String(k), { ...hall, floorZ: k / 2 }])) },
+      list: [
+        { type: 'med-kit', x: 11.5, y: 1.5 },
+        { type: 'shield-unit', x: 11.5, y: 1.5, z: 3.5 },
+      ],
+    });
+  const unreachable = (a) => a.notes.filter((n) => n.includes('unreachable')).map((n) => n.split(' ')[0]);
+  const flat = analyseLevel(registry, level('.......'));
+  assert.deepEqual(unreachable(flat), ['shield-unit'], 'on the bridge, out of reach; under it, fine');
+  const climb = analyseLevel(registry, level('1234567'));
+  assert.deepEqual(unreachable(climb), ['med-kit'], 'up the stairs onto the bridge, but the stairs fill the corridor: nothing leads under it');
 });

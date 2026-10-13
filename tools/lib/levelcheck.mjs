@@ -4,7 +4,7 @@
 // drop from, crouch under and jump across, and where lifts carry it. Fences
 // are never crossed (not even by jumping a low railing).
 import { buildLevel } from '../../src/engine/world/level.js';
-import { F_SOLID, F_DOOR, F_EXIT, F_USE, F_SECRET } from '../../src/engine/world/tilemap.js';
+import { F_SOLID, F_DOOR, F_EXIT, F_USE, F_SECRET, F_SLAB } from '../../src/engine/world/tilemap.js';
 import { BODY } from '../../src/engine/things/player.js';
 import { footprint } from '../../src/engine/things/shape.js';
 
@@ -39,8 +39,9 @@ export function bodyLimits(reg) {
 
 /**
  * The floors a player can stand at in each tile, as [floor, ceiling] pairs:
- * one for most tiles, one per stop on a lift, nothing in a solid tile.
- * Rising doors count as open.
+ * one for most tiles, one per stop on a lift, two under and on a slab (the
+ * storey's index is its spot's), nothing in a solid tile. Rising doors count
+ * as open.
  */
 function standingSpots(map) {
   const spots = [];
@@ -54,6 +55,13 @@ function standingSpots(map) {
     if (lift) {
       const room = lift.headroom[lift.tiles.indexOf(i)];
       spots.push(lift.stops.map((z) => [z, lift.moves === 'both' ? z + room : map.ceilZ[i]]));
+      continue;
+    }
+    if (f & F_SLAB) {
+      spots.push([
+        [map.floorZ[i], map.slabBot[i]],
+        [map.slabTop[i], map.ceilZ[i]],
+      ]);
       continue;
     }
     let ceil = map.ceilZ[i];
@@ -102,6 +110,7 @@ export function analyseLevel(reg, level, skill = 3) {
 
   // Solid, indestructible decorations block their tile for walking purposes.
   const blocked = new Uint8Array(W * map.h);
+  const slabBlocked = new Uint8Array(W * map.h);
   const byTile = new Map();
   for (const s of spawns) {
     const def = reg.things.get(s.type);
@@ -109,7 +118,9 @@ export function analyseLevel(reg, level, skill = 3) {
     if (!byTile.has(i)) byTile.set(i, []);
     byTile.get(i).push({ ...s, def });
     if (def?.kind === 'decoration' && def.solid && !def.health) {
-      blocked[i] = 1;
+      // (Under or on a slab, only its own storey.)
+      if (map.flags[i] & F_SLAB) slabBlocked[i] |= 1 << map.storeyAt(i, (s.z ?? -Infinity) + 0.5);
+      else blocked[i] = 1;
       // A big model blocks every tile its collision lines cross.
       const seg = modelFootprint(reg, def, s);
       for (let j = 0; seg && j < seg.length; j += 4) {
@@ -144,7 +155,19 @@ export function analyseLevel(reg, level, skill = 3) {
   for (let i = 0; i < W * map.h; i++) base[i + 1] = base[i] + spots[i].length;
   const visited = new Uint8Array(base[W * map.h]);
   const start = Math.floor(playerStart.y) * W + Math.floor(playerStart.x);
-  const startSpot = Math.max(0, spots[start].findIndex(([z]) => Math.abs(z - map.floorZ[start]) < EPS));
+  const startFloor = map.storeyFloor(start, map.storeyAt(start, (playerStart.z ?? -Infinity) + 0.5));
+  const startSpot = Math.max(0, spots[start].findIndex(([z]) => Math.abs(z - startFloor) < EPS));
+  /**
+   * Does a fence on the edge between tiles a and b stop a body crossing at
+   * floor height z? Always, between tiles without slabs; beside a slab only
+   * where it stands at the body's height (not a railing on a bridge overhead).
+   */
+  const fenceStops = (a, b, z) => {
+    const f = map.fenceBetween(a, b);
+    if (!f) return false;
+    if (!((map.flags[a] | map.flags[b]) & F_SLAB)) return true;
+    return map.fenceBottom(f) < z + body.stand - EPS && map.fenceTop(f) > z + EPS;
+  };
   // Every spot you can move to from spot k of tile c: call go(tile, spot).
   const moves = (c, k, go) => {
     const [fa, ca] = spots[c][k];
@@ -159,10 +182,11 @@ export function analyseLevel(reg, level, skill = 3) {
       const ny = cy + dy;
       if (nx < 0 || ny < 0 || nx >= W || ny >= map.h) continue;
       const n = ny * W + nx;
-      if (!passable(n) || map.fenceBetween(c, n)) continue;
+      if (!passable(n)) continue;
       spots[n].forEach(([fb, cb], s) => {
         // (Tiles of one lift move together.)
         if (lift >= 0 && map.liftIndex[n] === lift && s !== k) return;
+        if (slabBlocked[n] & (1 << s) || fenceStops(c, n, Math.max(fa, fb))) return;
         if (canCross(body, fa, ca, fb, cb)) go(n, s);
       });
       // ...or a running jump over a gap of up to MAX_GAP tiles (no higher
@@ -174,16 +198,26 @@ export function analyseLevel(reg, level, skill = 3) {
         const lx = cx + dx * (gap + 1);
         const ly = cy + dy * (gap + 1);
         if (!passable(mid) || map.flags[mid] & F_DOOR) break;
-        if (map.fenceBetween(mid - dy * W - dx, mid)) break;
-        if (spots[mid].some(([fm, cm]) => fm > fa + EPS || cm - fa < body.stand - EPS)) break;
+        if (fenceStops(mid - dy * W - dx, mid, fa)) break;
+        // Over a slab tile, one of its storeys has to be clear at the jump's height.
+        const clear = ([fm, cm]) => fm <= fa + EPS && cm - fa >= body.stand - EPS;
+        if (map.flags[mid] & F_SLAB ? !spots[mid].some(clear) : !spots[mid].every(clear)) break;
         if (lx < 0 || ly < 0 || lx >= W || ly >= map.h) break;
         const land = ly * W + lx;
-        if (!passable(land) || map.fenceBetween(mid, land)) break;
+        if (!passable(land) || fenceStops(mid, land, fa)) break;
         spots[land].forEach(([fb, cb], s) => {
+          if (slabBlocked[land] & (1 << s)) return;
           if (fb - fa <= body.step + EPS && canCross(body, fa, ca, fb, cb)) go(land, s);
         });
       }
     }
+  };
+
+  /** Is a placed thing reached: its tile, in its storey (under a slab unless its z is on it)? */
+  const thingReached = (t) => {
+    const i = Math.floor(t.y) * W + Math.floor(t.x);
+    if (!(map.flags[i] & F_SLAB)) return reached[i] === 1;
+    return visited[base[i] + map.storeyAt(i, (t.z ?? -Infinity) + 0.5)] === 1;
   };
 
   let changed = true;
@@ -206,6 +240,7 @@ export function analyseLevel(reg, level, skill = 3) {
     for (const [i, list] of byTile) {
       if (!reached[i]) continue;
       for (const t of list) {
+        if (!thingReached(t)) continue;
         // A key lying there, or one a monster there always drops when killed.
         const carried = (t.drops ?? []).filter((d) => d.chance >= 1).map((d) => reg.things.get(d.item)?.pickup?.key);
         for (const key of [t.def?.pickup?.key, ...carried]) {
@@ -271,7 +306,7 @@ export function analyseLevel(reg, level, skill = 3) {
     if ((t.on === 'enter' || t.on === 'use') && map.tilesWithTag(t.tag).some((i) => reached[i] || near(i))) exit = true;
     if (t.on === 'killed' || t.on === 'pickup') {
       const targets = spawns.filter((s) => (t.thing ? s.type === t.thing : s.tag === t.tag));
-      if (targets.some((s) => reached[Math.floor(s.y) * W + Math.floor(s.x)])) exit = true;
+      if (targets.some(thingReached)) exit = true;
     }
   }
   if (!exit) problems.push('the exit cannot be reached from the start');
@@ -287,8 +322,8 @@ export function analyseLevel(reg, level, skill = 3) {
       counts.byType[t.type] = (counts.byType[t.type] ?? 0) + 1;
       // (A model that isn't solid may be centred in a wall: a ring round a column.)
       if (map.flags[i] & F_SOLID && !(t.def?.model && !t.def.solid)) problems.push(`${t.type} at (${i % W}, ${(i / W) | 0}) is inside a wall`);
-      else if (!reached[i] && kind === 'item') notes.push(`${t.type} at (${i % W}, ${(i / W) | 0}) is unreachable`);
-      if (kind === 'item' && t.def.pickup?.key && !reached[i]) problems.push(`key ${t.type} at (${i % W}, ${(i / W) | 0}) is unreachable`);
+      else if (!thingReached(t) && kind === 'item') notes.push(`${t.type} at (${i % W}, ${(i / W) | 0}) is unreachable`);
+      if (kind === 'item' && t.def.pickup?.key && !thingReached(t)) problems.push(`key ${t.type} at (${i % W}, ${(i / W) | 0}) is unreachable`);
     }
   }
   for (const d of map.doors) {
@@ -319,7 +354,7 @@ export function analyseLevel(reg, level, skill = 3) {
     if (!ok) problems.push(`secret area near (${i % W}, ${(i / W) | 0}) can't be reached`);
   }
   counts.secrets = secrets;
-  return { built, reached, keys, exit, problems, notes, oneWay, counts };
+  return { built, reached, thingReached, keys, exit, problems, notes, oneWay, counts };
 }
 
 const avg = (d) => (Array.isArray(d) ? (d[0] + d[1]) / 2 : d ?? 0);
@@ -358,11 +393,10 @@ export function ammoBudget(reg, analysis) {
   for (const s of spawns) {
     const def = reg.things.get(s.type);
     if (!def) continue;
-    const i = Math.floor(s.y) * map.w + Math.floor(s.x);
     if (def.kind === 'monster') {
       health += def.health ?? 0;
       for (const d of [...(def.drops ?? []), ...(s.drops ?? [])]) addAmmo(reg.things.get(d.item)?.pickup?.ammo);
-    } else if (def.kind === 'item' && analysis.reached[i]) {
+    } else if (def.kind === 'item' && (analysis.thingReached ? analysis.thingReached(s) : analysis.reached[Math.floor(s.y) * map.w + Math.floor(s.x)])) {
       addAmmo(def.pickup?.ammo);
     }
   }

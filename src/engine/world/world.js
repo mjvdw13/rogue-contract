@@ -130,7 +130,7 @@ export class World {
       if (t.kind === 'monster' && t.def.countKill) this.stats.totalKills++;
       if (t.kind === 'item' && t.def.countItem) this.stats.totalItems++;
     }
-    this.nav.update(Math.floor(start.x), Math.floor(start.y), true);
+    this.nav.update(Math.floor(start.x), Math.floor(start.y), true, this.reach(this.player));
     this.triggers.start();
   }
 
@@ -370,7 +370,7 @@ export class World {
     let field = this.navFields.get(key);
     if (!field) {
       field = new FlowField(this.map, profile);
-      field.update(Math.floor(this.player.x), Math.floor(this.player.y), true);
+      field.update(Math.floor(this.player.x), Math.floor(this.player.y), true, this.reach(this.player));
       this.navFields.set(key, field);
     }
     t.navField = field;
@@ -655,7 +655,7 @@ export class World {
     this.navRefresh -= dt;
     const refresh = this.navRefresh <= 0 && this.map.lifts.some((l) => l.state === 'moving');
     if (refresh) this.navRefresh = NAV_REFRESH;
-    for (const field of this.navFields.values()) field.update(Math.floor(pt.x), Math.floor(pt.y), refresh);
+    for (const field of this.navFields.values()) field.update(Math.floor(pt.x), Math.floor(pt.y), refresh, this.reach(pt));
   }
 
   _playerTile() {

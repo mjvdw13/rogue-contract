@@ -85,7 +85,8 @@ function moveToward(world, m, dt, t, d, los) {
   // The route to the player for this body. Head straight for a target in
   // view, unless the route is a long way round (a ledge or a pit between).
   const nav = t === world.player ? world.navFor(m) : null;
-  const direct = los && (!nav || (d < 10 && nav.distanceAt(Math.floor(m.x), Math.floor(m.y)) <= d + 4));
+  const reach = world.reach(m);
+  const direct = los && (!nav || (d < 10 && nav.distanceAt(Math.floor(m.x), Math.floor(m.y), reach) <= d + 4));
   if (m.stuck > 0) {
     m.stuck -= dt;
     gx = m.x + Math.cos(m.wander);
@@ -94,7 +95,7 @@ function moveToward(world, m, dt, t, d, los) {
     gx = t.x;
     gy = t.y;
   } else if (nav) {
-    const n = nav.next(m.x, m.y);
+    const n = nav.next(m.x, m.y, reach);
     if (n) {
       gx = n.x;
       gy = n.y;
