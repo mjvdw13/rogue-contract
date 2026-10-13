@@ -854,7 +854,7 @@ headless Node, DF art). Budget for this phase: stay under about 8 ms.
        working; a group can be synced by name, with each tile keeping its
        own range, so a whole pool pulses as one. Painter helpers for round
        pools.
-3. [ ] **Light sources.** Level `lights: [{ x, y, z?, radius, light, fx?,
+3. [x] **Light sources.** Level `lights: [{ x, y, z?, radius, light, fx?,
        min?, tag? }]`, baked into the corners within `radius` that can see
        the source (line of sight over the grid; walls and doors block),
        with a smooth falloff. Animated sources keep their part per corner
@@ -1708,3 +1708,18 @@ update the smoke test.
   across the map. `Painter.pool()` paints round pools. Tried `occlusion: 24`
   on Mission 1: its dim rooms went black at the walls, so it stays off.
   Mission 1's frame time: 2.0 to 2.3 ms (headless, DF art). 149 tests.
+- 2026-10-13: Phase 1d step 3, light sources. A level's `lights` are baked
+  at load (`world/lightsources.js`) into a per-storey `srcLight` the light
+  map adds to each tile: each reaches the tile centres it can see within
+  its radius (2D line of sight; walls, angled walls and shut doors block),
+  fading as (1 - (d/r)^2)^2. Under a slab it lights the storey its `z` is
+  in. Sources with an `fx` join the light-effect groups (`sync` keeps time
+  with a `lightSync`), applying the change in their strength to their
+  tiles; `setLight` reaches sources by tag. Bad sources are level errors,
+  and a `setLight` tag may name only sources. The map viewer draws them.
+  Sampled at tile centres (not corners, as planned), like the light map.
+  Mission 1: the gate floodlights, the barracks corridor's strips and
+  lamps, and the generator's wall strips (a lamp over each catwalk and one
+  under it) are sources now, in place of painted pools; the overload makes
+  the generator's lamps sputter. 27 sources, 12 ms level load, frame time
+  unchanged (2.3 ms), 0.05 ms a frame for the overload's flicker. 155 tests.

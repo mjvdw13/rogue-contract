@@ -18,7 +18,8 @@
 // lines, or their body's square), the start is a white arrow. Fences are pale
 // blue lines on their edges (dashed for a low railing). A tile with a slab
 // (two storeys) shows the slab's top, as seen from above, in a dotted white
-// frame: there's a storey under it.
+// frame: there's a storey under it. Light sources are orange-ringed white
+// dots (their light shows in the floor round them).
 // Areas the player can never reach are cross-hatched.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -131,7 +132,7 @@ function render(level) {
         if (f & F_USE) frame(x, y, S, S, map.uses.get(i)?.actions.some((u) => ['exit', 'secretExit', 'finale'].includes(u.action)) ? [40, 255, 60] : [255, 230, 40]);
         continue;
       }
-      const light = map.baseLight[i] / 255;
+      const light = map.storeyLight(i, 1) / 255;
       const lit = (0.35 + light * 0.75) * shade(topFloor(i));
       const top = f & F_SLAB ? (e.slab?.floor ?? e.floor) : e.floor;
       let c = (top ? textureColor(top) : [90, 90, 90]).map((v) => v * lit);
@@ -226,6 +227,12 @@ function render(level) {
     } else if (def?.kind === 'decoration') {
       rect(x - 1, y - 1, 2, 2, [150, 150, 150]);
     }
+  }
+  for (const src of map.sources) {
+    const x = Math.floor(src.x * S);
+    const y = Math.floor(src.y * S);
+    frame(x - 2, y - 2, 5, 5, [255, 150, 30]);
+    rect(x - 1, y - 1, 3, 3, [255, 255, 230]);
   }
   if (playerStart) {
     const x = playerStart.x * S;

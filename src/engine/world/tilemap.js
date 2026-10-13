@@ -124,6 +124,14 @@ export class TileMap {
     this.slabUnderTex = new Int16Array(n).fill(-1);
     this.slabSideTex = new Int16Array(n).fill(-1);
     this.belowLight = new Int16Array(n);
+    /**
+     * Light added by placed light sources (see lightsources.js), one array
+     * per storey (the lower storey, or the only one, then the top of a slab),
+     * and the sources themselves.
+     */
+    this.srcLight = [new Float32Array(n), new Float32Array(n)];
+    /** @type {import('./lightsources.js').LightSource[]} */
+    this.sources = [];
     this.damage = new Uint8Array(n);
     this.doorIndex = new Int16Array(n).fill(-1);
     this.liftIndex = new Int16Array(n).fill(-1);
@@ -272,8 +280,7 @@ export class TileMap {
 
   /** The light of storey s of tile i. */
   storeyLight(i, s) {
-    if (s || !(this.flags[i] & F_SLAB)) return this.light[i];
-    const l = this.light[i] + this.belowLight[i];
+    const l = (s || !(this.flags[i] & F_SLAB) ? this.light[i] : this.light[i] + this.belowLight[i]) + this.srcLight[s ? 1 : 0][i];
     return l < 0 ? 0 : l > 255 ? 255 : l;
   }
 
@@ -343,5 +350,9 @@ export class TileMap {
 
   tilesWithTag(name) {
     return this.tags.get(name) ?? [];
+  }
+
+  sourcesWithTag(name) {
+    return this.sources.filter((s) => s.tag === name);
   }
 }

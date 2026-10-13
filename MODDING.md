@@ -350,16 +350,53 @@ Floor options:
 - `lightSync`: a name. Tiles with the same name and effect change together,
   wherever they are, each between its own `light` and `lightMin`: a graded
   pool pulses as one.
+- `damage`: hurts every second while standing on it (waders protect).
+- `secret: true`: entering a connected group of these counts as one secret.
+- `exit: true`: stepping here ends the level.
+- `tag`: a name that triggers and actions can refer to.
 
 A level's `occlusion` (light units, 0 by default) darkens the light toward
 walls, as if corners caught less of it. In a painted level,
 `p.pool(cx, cy, r, light, extra)` paints a round pool of light: tiles within
 `r` of the centre brighten toward `light`, fading to their own light at the
 rim, and get `extra` (say `{ lightFx: 'glow', lightSync: 'core' }`).
-- `damage`: hurts every second while standing on it (waders protect).
-- `secret: true`: entering a connected group of these counts as one secret.
-- `exit: true`: stepping here ends the level.
-- `tag`: a name that triggers and actions can refer to.
+
+### Light sources
+
+A lamp, a light strip or a floodlight is a light source: it adds light to
+the floor, walls and things round it, and walls cast its shadows. A level
+lists them in `lights`:
+
+```js
+lights: [
+  // A ceiling lamp: 96 more light under it, fading out 5 tiles away.
+  { x: 20.5, y: 14.5, radius: 5, light: 96 },
+  // A warning beacon, pulsing with the tiles that have `lightSync: 'alarm'`.
+  { x: 31, y: 8, radius: 4, light: 120, fx: 'glow', min: 20, sync: 'alarm' },
+  // A lamp on a catwalk (a slab whose top is at 3): it lights the top.
+  { x: 12.5, y: 6.5, z: 4, radius: 4, light: 80, tag: 'gen-lamps' },
+],
+```
+
+- `x`, `y`: where it is (tiles; 20.5 is the middle of tile 20).
+- `radius`: how far its light reaches (tiles). It's brightest at its centre
+  and fades smoothly to nothing at the radius.
+- `light`: how much light it adds at its centre (light units; tiles have
+  0–255, and the total stops at 255).
+- `z`: its height. Where a slab is, it lights the storey it's in: on the
+  slab, or (without a `z`) under it. Elsewhere there's one storey to light.
+- `fx`, `min`, `sync`: an effect like a tile's (`'flicker'`, `'glow'` ...),
+  swinging between `light` and `min` (0 by default: fully off). With a
+  `sync` name it keeps time with the tiles of that `lightSync` and the other
+  sources with that `sync`.
+- `tag`: `setLight` with the tag sets its `light` (and effect), so a
+  trigger can switch it off: `{ action: 'setLight', tag: 'gen-lamps', light: 0 }`.
+
+It lights the tiles whose centres it can see. Walls, angled walls and doors
+block it (doors are shut when it's worked out, so it stays in its room). A
+light source shows as a ringed white dot in `tools/mapview.mjs`, and its light
+in the floor round it. Light sources cost nothing to draw; one with an effect
+costs a little each time it changes.
 
 ### Heights
 
@@ -645,7 +682,8 @@ Actions:
 - `setLight` `{ tag, light, lightFx?, lightMin? }`: without `lightFx`,
   tiles keep their effect and its range. With it (`'none'` for still), all
   the tagged tiles change together with the new effect, from `light` down to
-  `lightMin`.
+  `lightMin`. Light sources with the tag get `light` as their strength (and
+  `lightFx` and `lightMin` as their effect).
 - `lift` `{ tag, to }`: starts the lifts with the tag (to stop index `to`, or
   the next stop)
 - `teleport` `{ tag, angle }`: moves the player to the first tile with the tag

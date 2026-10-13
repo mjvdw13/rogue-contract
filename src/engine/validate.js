@@ -194,7 +194,8 @@ export function validateContent(reg) {
       for (const a of [].concat(list ?? [])) {
         const name = typeof a === 'string' ? a : a.action;
         if (!BUILTIN_ACTION_NAMES.includes(name) && !reg.actions.has(name)) err(`${owner}: ${where} uses unknown action "${name}"`);
-        if (a.tag && !map.tags.has(a.tag)) err(`${owner}: ${where} refers to tag "${a.tag}" which no tile has`);
+        const lit = name === 'setLight' && map.sourcesWithTag(a.tag).length;
+        if (a.tag && !map.tags.has(a.tag) && !lit) err(`${owner}: ${where} refers to tag "${a.tag}" which no tile${name === 'setLight' ? ' or light' : ''} has`);
         if (a.thing && !reg.things.has(a.thing)) err(`${owner}: ${where} spawns unknown thing "${a.thing}"`);
         if (a.action === 'music' && a.id && !reg.songs.has(a.id)) warn(`${owner}: ${where} plays unknown song "${a.id}"`);
         if (a.action === 'setLight' && a.lightFx !== undefined && LIGHT_FX[a.lightFx] === undefined) err(`${owner}: ${where} sets unknown lightFx "${a.lightFx}"`);

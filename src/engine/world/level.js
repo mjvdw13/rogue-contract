@@ -1,6 +1,7 @@
 import { TileMap, Door, F_SOLID, F_DOOR, F_SKY, F_SECRET, F_DAMAGE, F_EXIT, F_USE, F_VOID, F_SLANT, F_SLAB, LIGHT_FX, EDGES, EDGE_DX, EDGE_DY, OPPOSITE } from './tilemap.js';
 import { buildLifts } from './lifts.js';
 import { Slant, slantLine } from './slants.js';
+import { addSources } from './lightsources.js';
 
 /** Glyphs in the `things` layer that place the player start, with facing. */
 export const PLAYER_START_GLYPHS = { '^': 90, '>': 0, v: 270, '<': 180 };
@@ -342,13 +343,18 @@ export function buildLevel(registry, level, opts = {}) {
   // wherever they are, each keeping its own light and range.
   let groups = 0;
   const synced = new Map();
+  /** The group of a light effect with a sync name (a new one without). */
+  const groupOf = (sync, fx) => {
+    if (!sync) return groups++;
+    const key = `${sync}|${fx}`;
+    if (!synced.has(key)) synced.set(key, groups++);
+    return synced.get(key);
+  };
   for (let i = 0; i < w * h; i++) {
     if (!map.lightFx[i] || map.lightGroup[i] >= 0) continue;
     const sync = legend[glyphAt[i]]?.lightSync;
     if (sync) {
-      const key = `${sync}|${map.lightFx[i]}`;
-      if (!synced.has(key)) synced.set(key, groups++);
-      map.lightGroup[i] = synced.get(key);
+      map.lightGroup[i] = groupOf(sync, map.lightFx[i]);
       continue;
     }
     const g = groups++;
@@ -368,6 +374,8 @@ export function buildLevel(registry, level, opts = {}) {
       }
     }
   }
+  // Light sources, baked now (with the doors shut), in groups like the tiles.
+  errors.push(...addSources(map, level.lights, groupOf));
   map.lightGroupCount = groups;
 
   // Things overlay.

@@ -7,7 +7,8 @@ import { F_SOLID, F_SLAB } from './tilemap.js';
  * Light doesn't leak through walls: where one of the four samples is a wall,
  * it takes the average of the open ones beside it (less `occlusion`, which
  * darkens the light toward walls). There's one set of samples per storey: the
- * lower storey under a slab has its own light.
+ * lower storey under a slab has its own light. Light sources (lightsources.js)
+ * add to the tiles round them.
  *
  * Each cell (the square between four tile centres) keeps its four samples, so
  * a lookup is a single bilinear blend. When tiles change light (light effects,
@@ -40,8 +41,7 @@ export class LightMap {
     const i = ty * map.w + tx;
     const f = map.flags[i];
     if (f & F_SOLID) return -1;
-    if (s || !(f & F_SLAB)) return map.light[i];
-    const l = map.light[i] + map.belowLight[i];
+    const l = (s || !(f & F_SLAB) ? map.light[i] : map.light[i] + map.belowLight[i]) + map.srcLight[s][i];
     return l < 0 ? 0 : l > 255 ? 255 : l;
   }
 

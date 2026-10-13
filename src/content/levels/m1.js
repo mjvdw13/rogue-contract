@@ -44,6 +44,8 @@ const lift = (stops, ceilZ, extra = {}) => ({
 });
 
 const p = new Painter(W, H, rock);
+/** Light sources (lamps and light strips), added area by area. */
+const lamps = [];
 
 // ---------------------------------------------------------------- the canyon
 // 1. Start bowl, with a secret alcove behind a rock door in its west wall.
@@ -86,10 +88,9 @@ p.rect(70, 24, 112, 66, panel);
 p.rect(46, 36, 50, 40, door(0, { door: 'imp-gate', jamb: 'imp-gate-jamb', ceilZ: 4, lock: 'remote', tag: 'maingate', ...tallSide }));
 p.rect(40, 39, 44, 40, lights);
 p.rect(52, 39, 56, 40, lights);
-// Floodlight pools under the strips, and the lit gate between them.
-p.light(39, 40, 45, 42, 200);
-p.light(51, 40, 57, 42, 200);
-p.light(45, 40, 51, 42, 168);
+// Floodlights in the strips, throwing pools of light on the sand, and a
+// weaker light over the gate between them.
+lamps.push({ x: 42, y: 40.3, radius: 6, light: 96 }, { x: 54, y: 40.3, radius: 6, light: 96 }, { x: 48, y: 40.3, radius: 5, light: 40 });
 
 // 5. The crawl vent through the face (crouch: 1.2 clear).
 p.rect(32, 26, 34, 40, {
@@ -118,10 +119,9 @@ for (const x of [50, 58, 66]) p.rect(x, 17, x + 2, 19, room(6, 10, { ceiling: 'i
 for (const x of [48, 62, 72]) {
   p.rect(x, 15, x + 2, 16, lights);
   p.rect(x, 20, x + 2, 21, lights);
-  p.light(x, 16, x + 2, 17, 184);
-  p.light(x, 19, x + 2, 20, 184);
+  lamps.push({ x: x + 1, y: 16.3, radius: 3, light: 48 }, { x: x + 1, y: 19.7, radius: 3, light: 48 });
 }
-for (const x of [53, 69]) p.light(x, 17, x + 2, 19, 184);
+for (const x of [53, 69]) lamps.push({ x: x + 1, y: 18, radius: 4, light: 48 });
 
 // 9. The bunk room.
 p.rect(48, 4, 60, 15, room(6, 10, { light: 128 }));
@@ -165,8 +165,6 @@ p.rect(84, 25, 86, 26, door(6, { upper: 'imp-computer' }));
 // round the column and to the walls.
 const genFloor = room(-6, 18, { floor: 'imp-grate', light: 128, tag: 'generator' });
 const grate = { bottom: 5.5, top: 6, floor: 'imp-grate', ceiling: 'imp-grate', side: 'imp-stripe', light: 120 };
-/** Relight the floor under the catwalks in a box (their lower storey). */
-const lightUnder = (x0, y0, x1, y1, light) => p.rect(x0, y0, x1, y1, (x, y, old) => (old.slab ? { ...old, slab: { ...old.slab, light } } : old));
 const catwalk = { ...genFloor, light: 152, slab: grate };
 p.rect(72, 26, 108, 62, genFloor);
 p.rect(72, 26, 108, 29, catwalk);
@@ -176,14 +174,19 @@ p.rect(105, 26, 108, 62, catwalk);
 p.pillar(86, 40, 94, 48, 2, lights, genFloor);
 // The column lights the shaft floor round it with a slow pulse.
 p.light(84, 38, 96, 50, 200, { lightFx: 'glow', lightMin: 136 });
-// Light strips on the chamber walls, lighting the catwalk in front of them
-// and pools on the floor under it.
+// Light strips on the chamber walls, lighting the catwalk in front of them,
+// and lamps under it lighting the floor below. The overload breaks them.
+/** A light strip on the wall over (x0, y0)-(x1, y1), and its two lamps at (lx, ly): one over the catwalk, one under it. */
+const strip = (x0, y0, x1, y1, lx, ly) => {
+  p.rect(x0, y0, x1, y1, lights);
+  lamps.push({ x: lx, y: ly, z: 7, radius: 4, light: 48, tag: 'gen-lamps' }, { x: lx, y: ly, radius: 4, light: 56, tag: 'gen-lamps' });
+};
 for (const y of [33, 51]) {
-  p.rect(71, y, 72, y + 3, lights).light(72, y, 75, y + 3, 184);
-  p.rect(108, y, 109, y + 3, lights).light(105, y, 108, y + 3, 184);
+  strip(71, y, 72, y + 3, 72.3, y + 1.5);
+  strip(108, y, 109, y + 3, 107.7, y + 1.5);
 }
-for (const x of [96, 102]) p.rect(x, 25, x + 3, 26, lights).light(x, 26, x + 3, 29, 184);
-for (const x of [80, 96]) p.rect(x, 62, x + 3, 63, lights).light(x, 59, x + 3, 62, 184);
+for (const x of [96, 102]) strip(x, 25, x + 3, 26, x + 1.5, 26.3);
+for (const x of [80, 96]) strip(x, 62, x + 3, 63, x + 1.5, 61.7);
 p.rect(88, 29, 92, 40, catwalk);
 p.rect(88, 48, 92, 59, catwalk);
 // Railings along the catwalk ring's inner edge and both sides of the
@@ -193,13 +196,6 @@ p.fence(105, 33, 106, 59, 'W', railing);
 p.fence(75, 28, 88, 29, 'S', railing).fence(92, 28, 101, 29, 'S', railing);
 p.fence(79, 59, 88, 60, 'N', railing).fence(92, 59, 105, 60, 'N', railing);
 for (const [y0, y1] of [[29, 40], [48, 59]]) p.fence(88, y0, 89, y1, 'W', railing).fence(91, y0, 92, y1, 'E', railing);
-// Pools of light on the floor under the catwalk, below the wall strips.
-for (const y of [33, 51]) {
-  lightUnder(72, y, 75, y + 3, 168);
-  lightUnder(105, y, 108, y + 3, 168);
-}
-for (const x of [96, 102]) lightUnder(x, 26, x + 3, 29, 168);
-for (const x of [80, 96]) lightUnder(x, 59, x + 3, 62, 168);
 // Lifts L2 (south-west) and L2b (north-east) run between the floor and the ring.
 p.rect(75, 55, 79, 59, lift([-6, 6], 18, { tag: 'generator' }));
 p.rect(101, 29, 105, 33, lift([-6, 6], 18, { tag: 'generator' }));
@@ -210,6 +206,7 @@ p.rect(93, 43, 94, 45, {
   use: [
     { action: 'openDoors', tag: 'escape' },
     { action: 'setLight', tag: 'generator', light: 136, lightFx: 'flicker', lightMin: 72 },
+    { action: 'setLight', tag: 'gen-lamps', light: 32, lightFx: 'flicker', lightMin: 0 },
     { action: 'message', text: 'GENERATOR OVERLOADED. THE ESCAPE HATCH IS OPEN.' },
   ],
 });
@@ -323,6 +320,7 @@ export default defineLevel({
   sky: 'sky-night',
   par: 300,
   ...p.build(),
+  lights: lamps,
   things: [],
   list,
 });

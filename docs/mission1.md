@@ -60,24 +60,27 @@ contrast comes from bright pools (184-224).
 - **Canyon:** moonlight at 144 (152 in the start bowl), the narrow gorge at
   136, the spire's shadow and the ledges a little darker, the strip along
   the garrison face in shadow (120). The rock arch is moonlit on top (152)
-  and casts its shadow under it (112). Floodlight pools (200) under the
-  gate's light strips, the gate itself at 168. The rock alcove is dark
-  (112).
+  and casts its shadow under it (112). Floodlights in the gate's light
+  strips (light sources, +96 fading out over 3 m) throw pools on the sand
+  and the wall, with a weaker light over the gate (+40). The rock alcove
+  is dark (112).
 - **Vent:** 112, with light falling through a grate halfway (144).
 - **Maintenance:** 128, a bright panel in the middle (192), dark west
   corners (120), and a broken ceiling light flickering in the south-east.
 - **Barracks:** the corridor at 144 with pools under the ceiling panels
-  (208), the light strips and the hanging lamps (184). The bunk room at 128
+  (208), and light sources at the light strips and the hanging lamps
+  (+48). The bunk room at 128
   with a ceiling light in the middle and dark north corners; the office at
   144 with a light over the desk.
 - **Vault:** 112, with the screens' glow pulsing (104-152) along the
   computer banks. The niche 120.
 - **Generator:** the shaft floor dark (128), darker under the catwalks
   (120), a slow pulse (136-200) round the reactor column, catwalks at 152
-  with light strips on the chamber walls lighting the catwalk in front of
-  them (184) and pools on the floor below it (168). The overload switch
-  drops the whole chamber to a dim flicker (136, dipping to 72; under the
-  catwalks as much darker as before).
+  with light strips on the chamber walls: each has a lamp over the catwalk
+  (+48) and one under it lighting the floor below (+56), tagged
+  `gen-lamps`. The overload switch drops the whole chamber to a dim
+  flicker (136, dipping to 72; under the catwalks as much darker as
+  before), and the lamps sputter (+32 or off).
 - **The way out:** the chasm dark (104), the pad floodlit (184), and the
   pickup spot pulsing (168-224).
 
