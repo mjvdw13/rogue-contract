@@ -276,7 +276,23 @@ Design rules (what makes it feel like Dark Forces):
              pulsing.
        - [x] Screenshots of every area before and after; tests, validator,
              smoke test.
-4. [ ] Enemies, items, skill variants and 2-3 secrets.
+4. [ ] Enemies, items, skill variants and 2-3 secrets (from 2026-10-13).
+       A first placement went in with the map: 20 monsters, 13 items and
+       3 secrets, with only 4 things varying by skill and an empty vault.
+       This pass makes the skills real and fills the gaps:
+       - [ ] Engine: a placed monster can carry its own `drops` (added to
+             its type's), so the officer drops the red keycard, as Dark
+             Forces' officers do. The validator and reachability check
+             count keys dropped by reachable monsters. Tests, MODDING.md.
+       - [ ] Enemies by skill: fewer on 1-2, extra on 4-5 (bowl, gorge,
+             maintenance, barracks, generator, pad). Guards for the vault
+             (empty today).
+       - [ ] Items by skill: med kits where fights end (the bowl's strip,
+             the gantry) on 1-3, the start bowl's useless med kit moved, a
+             power cell in the vent.
+       - [ ] Secrets: check all 3 count once each and are reachable.
+       - [ ] A per-skill table in `docs/mission1.md`; the validator's
+             counts, map viewer at skills 1, 3 and 5, tests, smoke test.
 5. [ ] Validator, map viewer and screenshot review, then playtest.
 
 ### C. Better placeholder textures, and an import pipeline (after B)
