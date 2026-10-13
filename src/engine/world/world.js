@@ -5,6 +5,7 @@ import { castRay, blockedByMap, fenceBlocks, rayCircle, slantNear } from './phys
 import { updateDoors, openDoor, closeDoor } from './doors.js';
 import { updateLifts, startLift, liftAt } from './lifts.js';
 import { LightEffects } from './lights.js';
+import { LightMap } from './lightmap.js';
 import { FlowField, WALKER } from './nav.js';
 import { noiseAlert } from './noise.js';
 import { Triggers } from './triggers.js';
@@ -82,7 +83,10 @@ export class World {
     this.map = built.map;
     this.fog = level.fog ?? 0.15;
     this.skyTexture = level.sky && this.assets ? this.assets.textures[this.assets.textureSlot(level.sky)] : null;
-    this.lights = new LightEffects(this.map, this.rng);
+    /** Smooth light, interpolated between tile centres (the renderer reads `map.lightmap`). */
+    this.lightmap = new LightMap(this.map, { occlusion: level.occlusion ?? 0 });
+    this.map.lightmap = this.lightmap;
+    this.lights = new LightEffects(this.map, this.rng, this.lightmap);
     this.nav = new FlowField(this.map);
     /** Flow fields per kind of body (see navFor), the walker's being `nav`. */
     this.navFields = new Map([[navKey(WALKER), this.nav]]);
@@ -612,6 +616,7 @@ export class World {
     this.time += dt;
     this.stats.time += dt;
     this.lights.update(dt);
+    this.lightmap.update();
     updateDoors(this, dt);
     updateLifts(this, dt);
 

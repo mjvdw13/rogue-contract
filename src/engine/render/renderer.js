@@ -38,7 +38,7 @@ export class Renderer {
       const map = scene.map;
       const tx = Math.floor(cam.x);
       const ty = Math.floor(cam.y);
-      const light = map.inBounds(tx, ty) ? map.light[ty * map.w + tx] : 160;
+      const light = map.inBounds(tx, ty) && map.lightmap ? map.lightmap.sample(cam.x, cam.y, map.storeyAt(ty * map.w + tx, cam.z)) : 160;
       drawPsprites(view, extras.psprites, s, cms, view.level(light, 1.2));
     }
   }

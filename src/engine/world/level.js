@@ -337,10 +337,20 @@ export function buildLevel(registry, level, opts = {}) {
 
   buildLifts(map, glyphAt, legend);
 
-  // Tiles sharing a glyph and light effect flicker together, like a Doom sector.
+  // Tiles sharing a glyph and light effect flicker together, like a Doom
+  // sector. Tiles with the same `lightSync` name (and effect) do too,
+  // wherever they are, each keeping its own light and range.
   let groups = 0;
+  const synced = new Map();
   for (let i = 0; i < w * h; i++) {
     if (!map.lightFx[i] || map.lightGroup[i] >= 0) continue;
+    const sync = legend[glyphAt[i]]?.lightSync;
+    if (sync) {
+      const key = `${sync}|${map.lightFx[i]}`;
+      if (!synced.has(key)) synced.set(key, groups++);
+      map.lightGroup[i] = synced.get(key);
+      continue;
+    }
     const g = groups++;
     const stack = [i];
     map.lightGroup[i] = g;

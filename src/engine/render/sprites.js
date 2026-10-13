@@ -62,8 +62,9 @@ export function drawSprites(view, things, map, fb, fbW, colormaps, skip) {
     if (view.fixedColormap >= 0) lv = view.fixedColormap;
     else if (t.fullbright) lv = 0;
     else {
+      // The smooth light where it stands, in its storey.
       const tile = map.inBounds(t.x | 0, t.y | 0) ? (t.y | 0) * map.w + (t.x | 0) : -1;
-      lv = view.level(tile >= 0 ? map.storeyLight(tile, map.storeyAt(tile, (t.z ?? 0) + 0.5)) : 128, depth);
+      lv = view.level(tile >= 0 && map.lightmap ? map.lightmap.sample(t.x, t.y, map.storeyAt(tile, (t.z ?? 0) + 0.5)) : 128, depth);
     }
     const cm = lv * 256;
     const fuzz = t.def?.renderStyle === 'fuzz';

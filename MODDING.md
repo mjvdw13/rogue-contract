@@ -339,13 +339,23 @@ more or override them in `legend`. A glyph means one of these:
 
 Floor options:
 
-- `light`: 0–255. 120 is dark, 160 is normal, 200 and up is bright.
+- `light`: 0–255. 120 is dark, 160 is normal, 200 and up is bright. Light
+  is smooth: a tile's light is its centre's, and in between it blends from
+  tile to tile (never through a wall), dithered between shades. So a pool of
+  light fades into the floor round it, and lights the walls beside it.
 - `lightFx`: `'flicker'`, `'strobe'`, `'blink'`, `'glow'` or `'fire'`.
   Neighbouring tiles that share a glyph flicker together.
 - `lightMin`: the low end of the effect (16–255). By default it is 96 below
   `light`; a pulse that barely dims, say, is `light: 152, lightMin: 120`.
-  Walls take the light of the tile in front of them, so a pool of light on
-  the floor also lights the wall behind it.
+- `lightSync`: a name. Tiles with the same name and effect change together,
+  wherever they are, each between its own `light` and `lightMin`: a graded
+  pool pulses as one.
+
+A level's `occlusion` (light units, 0 by default) darkens the light toward
+walls, as if corners caught less of it. In a painted level,
+`p.pool(cx, cy, r, light, extra)` paints a round pool of light: tiles within
+`r` of the centre brighten toward `light`, fading to their own light at the
+rim, and get `extra` (say `{ lightFx: 'glow', lightSync: 'core' }`).
 - `damage`: hurts every second while standing on it (waders protect).
 - `secret: true`: entering a connected group of these counts as one secret.
 - `exit: true`: stepping here ends the level.

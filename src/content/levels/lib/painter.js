@@ -58,6 +58,25 @@ export class Painter {
   }
 
   /**
+   * A round pool of light centred on (cx, cy) (in tiles, so 20.5 is a tile's
+   * middle): open tiles within `r` brighten toward `light` at the middle,
+   * fading smoothly to their own light at the rim (in steps of 8, to keep the
+   * glyphs few). Tiles it brightens also get `extra`: say a `lightFx` with a
+   * `lightSync` name, so the whole pool pulses as one.
+   */
+  pool(cx, cy, r, light, extra = {}) {
+    return this.rect(Math.floor(cx - r), Math.floor(cy - r), Math.ceil(cx + r), Math.ceil(cy + r), (x, y, old) => {
+      if ((old.wall && !old.diagonal) || old.door) return old;
+      const d = Math.hypot(x + 0.5 - cx, y + 0.5 - cy);
+      if (d >= r) return old;
+      const base = old.light ?? 160;
+      const t = 1 - d / r;
+      const l = Math.round((base + (light - base) * t * t * (3 - 2 * t)) / 8) * 8;
+      return l > base ? { ...old, light: Math.min(255, l), ...extra } : old;
+    });
+  }
+
+  /**
    * Put a fence (`{ tex, height? }`: a railing, bars, a grate) on the `edges`
    * ('N', 'NE'...) of every open tile in a box. Edges a tile already fences
    * are kept; a tile holds one fence texture.

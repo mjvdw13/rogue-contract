@@ -93,7 +93,7 @@ export function drawModels(view, things, map, textures, fb, fbW, colormaps, skip
     }
 
     const tile = map.inBounds(t.x | 0, t.y | 0) ? (t.y | 0) * map.w + (t.x | 0) : -1;
-    const light = tile >= 0 ? map.storeyLight(tile, map.storeyAt(tile, (t.z ?? 0) + 0.5)) : 128;
+    const light = tile >= 0 && map.lightmap ? map.lightmap.sample(t.x, t.y, map.storeyAt(tile, (t.z ?? 0) + 0.5)) : 128;
     const fixed = view.fixedColormap;
 
     for (const f of model.faces) {

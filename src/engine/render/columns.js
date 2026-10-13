@@ -1,5 +1,6 @@
 import { F_SOLID, F_DOOR, F_SKY, F_SLANT, F_SLAB } from '../world/tilemap.js';
 import { DIMINISH } from './view.js';
+import { LightMap } from '../world/lightmap.js';
 import { TEXELS_PER_UNIT as TPU, TRANSPARENT } from '../config.js';
 
 const MAX_STEPS = 320;
@@ -14,7 +15,18 @@ const fenceB = new Int16Array(MAX_FENCES);
 const fenceSlot = new Int16Array(MAX_FENCES);
 const fenceU = new Float32Array(MAX_FENCES);
 const fenceTop = new Float32Array(MAX_FENCES);
-const fenceLv = new Int8Array(MAX_FENCES);
+const fenceLv = new Float32Array(MAX_FENCES);
+/**
+ * Ordered (4x4 Bayer) dithering between colormap levels, so smooth light
+ * doesn't band: a level's fraction picks the brighter or darker colormap per
+ * pixel in a fixed pattern. Thresholds are centred on 0, so on average a
+ * pixel is as bright as plain rounding down made it.
+ */
+const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
+/** This column's four thresholds (one per row, repeating every 4 rows). */
+const thr = new Float32Array(4);
+/** A face's colormap (times 256) for each of the four rows. */
+const faceCm = new Int32Array(4);
 /** Open windows of rows one column can keep (slabs split them). */
 const MAX_WIN = 8;
 const wTop = new Int16Array(MAX_WIN);
@@ -47,6 +59,10 @@ const wSt = new Uint8Array(MAX_WIN);
  * can be clipped by ledges and overhangs nearer than them. view.zbuf holds the
  * distance at which the column ended.
  *
+ * Light is smooth (see world/lightmap.js): floors and ceilings take it
+ * interpolated along the ray's stretch through each tile, faces where the
+ * ray meets them, and every pixel is dithered between colormap levels.
+ *
  * Fences (see-through walls on tile edges) don't stop the ray: each one it
  * crosses is noted with the rows still open at that point, and once the
  * column's solid surfaces are drawn its fences are drawn far to near,
@@ -63,17 +79,20 @@ const wSt = new Uint8Array(MAX_WIN);
  */
 export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
   const { W, H, x: px, y: py, dirX, dirY, planeX, planeY, fy, camZ, horizon, zbuf, fog } = view;
-  const { segDist, segTop, segBot, segFirst, segCount, lightStart } = view;
+  const { segDist, segTop, segBot, segFirst, segCount } = view;
   const SEG = view.SEG;
   const mw = map.w;
   const mh = map.h;
-  const { flags, wallTex, doorIndex, doors, light, seen, floorZ, ceilZ, floorTex, ceilTex, sideTex, upperTex, slantIndex, slants } = map;
+  const { flags, wallTex, doorIndex, doors, seen, floorZ, ceilZ, floorTex, ceilTex, sideTex, upperTex, slantIndex, slants } = map;
   const { fences, fenceAt } = map;
-  const { slabBot, slabTop, slabTopTex, slabUnderTex, slabSideTex, belowLight } = map;
+  const { slabBot, slabTop, slabTopTex, slabUnderTex, slabSideTex } = map;
   const hasFences = fences.length > 0;
   const mdepth = view.mdepth;
   const along = [0];
   const fixed = view.fixedColormap;
+  const extra = view.extraLight;
+  const lm = map.lightmap ?? (map.lightmap = new LightMap(map));
+  lm.update();
 
   // Sky: horizontal texel per column from the view angle; the texture spans 180 degrees.
   let skyOffset = 0;
@@ -87,17 +106,28 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
     skyOffset = sky.h - 6 - Math.round(horizon);
   }
 
-  /** Colormap level for a floor/ceiling pixel at a distance under a tile light. */
-  const flatLevel = (l, dist) => {
+  /** Colormap level for floor/ceiling pixel row y at a distance under light l (dithered). */
+  const flatLevel = (l, dist, y) => {
     if (fixed >= 0) return fixed;
     let b = DIMINISH / (dist < 0.25 ? 0.25 : dist);
     if (b > 24) b = 24;
-    const lv = (lightStart[l] - b + dist * fog) | 0;
+    const lv = ((240 - l) * 0.25 - extra - b + dist * fog + thr[y & 3]) | 0;
     return lv < 0 ? 0 : lv > 31 ? 31 : lv;
+  };
+
+  /** A face's colormap per row phase, for its fractional level lv (dithered with this column's thresholds). */
+  const setFaceCm = (lv) => {
+    for (let k = 0; k < 4; k++) {
+      let l = fixed >= 0 ? fixed : (lv + thr[k]) | 0;
+      if (l < 0) l = 0;
+      else if (l > 31) l = 31;
+      faceCm[k] = l * 256;
+    }
   };
 
   for (let x = 0; x < W; x++) {
     const camX = (2 * (x + 0.5)) / W - 1;
+    for (let k = 0; k < 4; k++) thr[k] = (BAYER[(x & 3) + k * 4] + 0.5) / 16 - 0.5;
     const rdx = dirX + planeX * camX;
     const rdy = dirY + planeY * camX;
     let mapX = Math.floor(px);
@@ -156,14 +186,14 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
       if (tx < 0) tx += tex.w;
       const col = tex.curCM;
       const colBase = tx * th;
-      const cm = lv * 256;
+      setFaceCm(lv);
       const stepV = (TPU * t) / fy;
       let v = (anchor - camZ) * TPU + (a + 0.5 - horizon) * stepV + V_BIAS * th;
       const hMask = tex.hMask;
       if (hMask >= 0) {
-        for (let y = a; y < b; y++, o += fbW, v += stepV) fb[o] = colormaps[cm + col[colBase + ((v | 0) & hMask)]];
+        for (let y = a; y < b; y++, o += fbW, v += stepV) fb[o] = colormaps[faceCm[y & 3] + col[colBase + ((v | 0) & hMask)]];
       } else {
-        for (let y = a; y < b; y++, o += fbW, v += stepV) fb[o] = colormaps[cm + col[colBase + ((v | 0) % th)]];
+        for (let y = a; y < b; y++, o += fbW, v += stepV) fb[o] = colormaps[faceCm[y & 3] + col[colBase + ((v | 0) % th)]];
       }
     };
     // A fence face: like `face`, already clipped, with holes, writing the depth buffer.
@@ -174,36 +204,32 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
       if (tx < 0) tx += tex.w;
       const col = tex.curCM;
       const colBase = tx * th;
-      const cm = lv * 256;
+      setFaceCm(lv);
       const stepV = (TPU * t) / fy;
       let v = (anchor - camZ) * TPU + (a + 0.5 - horizon) * stepV + V_BIAS * th;
       let o = a * fbW + x;
       for (let y = a; y < b; y++, o += fbW, v += stepV) {
         const c = col[colBase + ((v | 0) % th)];
         if (c === TRANSPARENT || t >= mdepth[o]) continue;
-        fb[o] = colormaps[cm + c];
+        fb[o] = colormaps[faceCm[y & 3] + c];
         mdepth[o] = t;
       }
     };
     /** A texture's height in world units (faces hung from their bottom edge use it). */
     const texHeight = (slot) => (slot >= 0 ? textures[slot].h / TPU : 1);
-    /** The light of storey s of a slab tile (the lower storey has its own). */
-    const slabLight = (i, s) => {
-      if (s) return light[i];
-      const l = light[i] + belowLight[i];
-      return l < 0 ? 0 : l > 255 ? 255 : l;
-    };
-    const faceLevel = (tile, s, t, contrast) => {
-      let lv = view.level(flags[tile] & F_SLAB ? slabLight(tile, s) : light[tile], t) + (fixed >= 0 ? 0 : contrast);
-      if (lv < 0) lv = 0;
-      else if (lv > 31 && fixed < 0) lv = 31;
-      return lv;
-    };
+    /**
+     * The (fractional) colormap level of a face the ray meets at distance t,
+     * in storey s: the smooth light there, and the faces' fake contrast.
+     */
+    const faceLevel = (s, t, contrast) => (fixed >= 0 ? fixed : view.levelF(lm.sample(px + rdx * t, py + rdy * t, s), t) + contrast);
     // Floor and ceiling of storey s of tile `i` between distances t0 and t1
-    // (under a slab, the slab's underside is the ceiling; on it, its top the floor).
+    // (under a slab, the slab's underside is the ceiling; on it, its top the
+    // floor). The light runs smoothly from where the ray enters to where it
+    // leaves: l0 at t0, changing by dl per unit of distance.
     const flats = (i, s, t0, t1) => {
       const slab = (flags[i] & F_SLAB) !== 0;
-      const l = slab ? slabLight(i, s) : light[i];
+      const l0 = lm.sample(px + rdx * t0, py + rdy * t0, s);
+      const dl = t1 > t0 ? (lm.sample(px + rdx * t1, py + rdy * t1, s) - l0) / (t1 - t0) : 0;
       const fz = slab && s ? slabTop[i] : floorZ[i];
       if (camZ > fz) {
         const k = (camZ - fz) * fy;
@@ -226,7 +252,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
               const dist = k / (y + 0.5 - horizon);
               const tx = ((px + rdx * dist) * TPU) & wm;
               const ty = ((py + rdy * dist) * TPU) & hm;
-              fb[o] = colormaps[flatLevel(l, dist) * 256 + pix[ty * tw + tx]];
+              fb[o] = colormaps[flatLevel(l0 + (dist - t0) * dl, dist, y) * 256 + pix[ty * tw + tx]];
             }
           }
         }
@@ -267,7 +293,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
                 const dist = k / (horizon - y - 0.5);
                 const tx = ((px + rdx * dist) * TPU) & wm;
                 const ty = ((py + rdy * dist) * TPU) & hm;
-                fb[o] = colormaps[flatLevel(l, dist) * 256 + pix[ty * tw + tx]];
+                fb[o] = colormaps[flatLevel(l0 + (dist - t0) * dl, dist, y) * 256 + pix[ty * tw + tx]];
               }
             }
           }
@@ -355,7 +381,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
           seen[cur] = 1;
           // Texture runs right-to-left from the second point (as seen from the open side).
           const u = (1 - along[0]) * sl.len;
-          const lv = faceLevel(cur, 0, t, 0);
+          const lv = faceLevel(0, t, 0);
           for (let k = 0; k < nw; k++) {
             clipTop = wTop[k];
             clipBot = wBot[k];
@@ -387,7 +413,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
               const tw = door.tex >= 0 ? textures[door.tex].w / TPU : width;
               const u = (flip ? door.span1 - along : along - door.span0) - (width - tw) / 2;
               const b = rowOf(bz, t);
-              const lv = faceLevel(cur, 0, t, door.axis === 'x' ? 1 : -1);
+              const lv = faceLevel(0, t, door.axis === 'x' ? 1 : -1);
               for (let k = 0; k < nw; k++) {
                 clipTop = wTop[k];
                 clipBot = wBot[k];
@@ -426,7 +452,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
             }
             if (blocked) {
               seen[cur] = 1;
-              const lv = faceLevel(cur, 0, t, door.axis === 'x' ? 1 : -1);
+              const lv = faceLevel(0, t, door.axis === 'x' ? 1 : -1);
               for (let k = 0; k < nw; k++) {
                 clipTop = wTop[k];
                 clipBot = wBot[k];
@@ -478,7 +504,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
           const bottom = map.fenceBottom(fe);
           const ra = rowOf(top, tExit);
           const rb = rowOf(bottom, tExit);
-          const lv = faceLevel(cur, flags[cur] & F_SLAB && slabTop[cur] <= bottom + 0.5 ? 1 : 0, tExit, contrast);
+          const lv = faceLevel(flags[cur] & F_SLAB && slabTop[cur] <= bottom + 0.5 ? 1 : 0, tExit, contrast);
           for (let k = 0; k < nw; k++) {
             let a = ra;
             let b = rb;
@@ -532,7 +558,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
           const s = wSt[k];
           const fz = s ? slabTop[cur] : floorZ[cur];
           const cz = !s && curSlab ? slabBot[cur] : ceilZ[cur];
-          face(tExit, rowOf(cz, tExit), rowOf(fz, tExit), cz, tex, u, faceLevel(cur, s, tExit, contrast));
+          face(tExit, rowOf(cz, tExit), rowOf(fz, tExit), cz, tex, u, faceLevel(s, tExit, contrast));
         }
         end = tExit;
         break;
@@ -553,7 +579,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
         if (fN > fC) {
           const a = rowOf(fN, tExit);
           seen[next] = 1;
-          face(tExit, a, rowOf(fC, tExit), fN, sideTex[next], wx, faceLevel(cur, s, tExit, contrast));
+          face(tExit, a, rowOf(fC, tExit), fN, sideTex[next], wx, faceLevel(s, tExit, contrast));
           if (a < clipBot) clipBot = a < clipTop ? clipTop : a;
         }
         if (cN < cC) {
@@ -561,7 +587,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
           if (flags[cur] & F_SKY && (s || !curSlab) && f & F_SKY) skyFill(rowOf(cC, tExit), b);
           else {
             seen[next] = 1;
-            const lv = faceLevel(cur, s, tExit, contrast);
+            const lv = faceLevel(s, tExit, contrast);
             face(tExit, rowOf(cC, tExit), b, cN + texHeight(upperTex[next]), upperTex[next], wx, lv);
           }
           if (b > clipTop) clipTop = b > clipBot ? clipBot : b;
@@ -571,7 +597,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
           const b = rowOf(slabBot[next] > fC ? slabBot[next] : fC, tExit);
           if (b > clipTop && a < clipBot) {
             seen[next] = 1;
-            face(tExit, a, b, slabTop[next], slabSideTex[next], wx, faceLevel(cur, s, tExit, contrast));
+            face(tExit, a, b, slabTop[next], slabSideTex[next], wx, faceLevel(s, tExit, contrast));
             // Above the edge stays open in this window, and below it in a new one.
             const bot = clipBot;
             if (a < clipBot) clipBot = a < clipTop ? clipTop : a;

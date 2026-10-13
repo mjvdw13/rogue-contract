@@ -843,7 +843,7 @@ headless Node, DF art). Budget for this phase: stay under about 8 ms.
        snapping error before and after, regenerate the art, check that
        dark colormap levels keep blue-greys blue. A sandy canyon floor
        (the DF rock recoloured, and a generated one).
-2. [ ] **Light map.** `world/lightmap.js` keeps light at tile corners per
+2. [x] **Light map.** `world/lightmap.js` keeps light at tile corners per
        storey (the lower storey under slabs has its own), averaged over the
        open tiles round each corner, so light doesn't leak through walls;
        an optional darkening where walls meet (baked ambient occlusion).
@@ -1693,3 +1693,18 @@ update the smoke test.
   colours only. The officer's rip turns from khaki to Imperial olive
   (`assets/custom/recolour.mjs`, run by `cut.mjs`). SecBase reads as its
   steel blue-grey instead of saturated blue, and stays blue in shadow.
+- 2026-10-13: Phase 1d step 2, smooth light. `world/lightmap.js` samples
+  light at tile centres (not corners, which flattened Mission 1's small
+  pools: a lone 200 tile among 144s would have peaked at 158) and
+  interpolates between them; a sample in a wall takes the average of the
+  open ones beside it, so light never leaks through a wall, less a level's
+  `occlusion`. One set per storey. Cells keep their four samples, and only
+  cells round changed tiles are recomputed. The renderer interpolates light
+  along each ray's stretch through a tile for floors and ceilings, samples
+  it where the ray meets walls, step faces, slab edges, doors, angled walls
+  and fences, and at sprites, models and the weapon, with 4x4 ordered
+  dithering between colormap levels (centred, so as bright on average as
+  before). Light effects keep a range per tile; `lightSync` names a group
+  across the map. `Painter.pool()` paints round pools. Tried `occlusion: 24`
+  on Mission 1: its dim rooms went black at the walls, so it stays off.
+  Mission 1's frame time: 2.0 to 2.3 ms (headless, DF art). 149 tests.

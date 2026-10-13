@@ -29,6 +29,7 @@ export class View {
     this.camZ = 0.5;
     this.horizon = this.H / 2;
     this.fog = 0.125;
+    this.extraLight = 0;
     this.fixedColormap = -1;
   }
 
@@ -77,16 +78,22 @@ export class View {
     this.fog = fog;
     this.fixedColormap = cam.fixedColormap ?? -1;
     const extra = (cam.extraLight ?? 0) * 4;
+    this.extraLight = extra;
     for (let l = 0; l < 256; l++) this.lightStart[l] = (240 - l) / 4 - extra;
   }
 
-  /** Colormap level (0 = bright .. 31 = dark) for a tile light value seen at a distance. */
+  /** Colormap level (0 = bright .. 31 = dark) for a light value (0-255, may be fractional) seen at a distance. */
   level(light, dist) {
     if (this.fixedColormap >= 0) return this.fixedColormap;
+    const l = this.levelF(light, dist) | 0;
+    return l < 0 ? 0 : l >= LIGHT_LEVELS ? LIGHT_LEVELS - 1 : l;
+  }
+
+  /** The colormap level before rounding and clamping, for dithering between levels. */
+  levelF(light, dist) {
     const d = dist < 0.5 ? 0.5 : dist;
     let b = DIMINISH / d;
     if (b > MAX_BRIGHTEN) b = MAX_BRIGHTEN;
-    const l = (this.lightStart[light] - b + d * this.fog) | 0;
-    return l < 0 ? 0 : l >= LIGHT_LEVELS ? LIGHT_LEVELS - 1 : l;
+    return (240 - light) / 4 - this.extraLight - b + d * this.fog;
   }
 }
