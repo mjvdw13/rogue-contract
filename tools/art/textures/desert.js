@@ -61,5 +61,5 @@ export default [
   { name: 'sandstone-dark', out: T('sandstone-dark'), draw: sandstone('sandstone-dark', C('rust', 0.1), C('rust', 0.62)) },
   { name: 'sandstone-pale', out: T('sandstone-pale'), draw: sandstone('sandstone-pale', C('sand', 0.3), C('sand', 0.95)) },
   { name: 'desert-sand', out: T('desert-sand'), draw: ground('desert-sand', C('sand', 0.62), false) },
-  { name: 'desert-gravel', out: T('desert-gravel'), draw: ground('desert-gravel', C('sand', 0.4), true) },
+  { name: 'desert-gravel', out: T('desert-gravel'), draw: ground('desert-gravel', C('sand', 0.5), true) },
 ];

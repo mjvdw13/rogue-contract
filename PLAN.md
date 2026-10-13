@@ -1776,3 +1776,15 @@ update the smoke test.
   hazard stripes along its lintel, signs in the barracks corridor, vents in
   maintenance, stripes over the overload switch. The rest of the dressing
   comes with steps 15-19. 172 tests.
+- 2026-10-13: Phase 1d step 14 started, the canyon's skyline. The rock
+  within 3 tiles of the canyon (and of its angled corners) steps back in
+  ledges out of reach: 8, 12 and 16 above the floor in front, plus noise,
+  up to 22, so the rims are jagged against the sky. Each ledge's sky
+  ceiling sits just above the highest rock behind it (the Doom sky trick),
+  so the view stops at the skyline and sight lines and bolts can't pass
+  over a ridge; rays stay short (frame time unchanged, 2.9 ms). The
+  garrison and doors keep a wall of rock round them. Rock strata by height
+  (wall bands: dark below 2.5, pale above 14) on every rock face, gravel
+  channels across the sand (the gravel lightened to read as gravel, not
+  stains), and angled corners capped at the skyline (one whose back faced
+  open ground, where the gorge was painted over a corner, is floor now).

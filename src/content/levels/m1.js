@@ -54,7 +54,7 @@ const decals = [];
 p.rect(6, 76, 30, 96, sand(0, { light: 152 }));
 p.chamfer(6, 76, 30, 96, 4, rock, ['SW', 'SE', 'NW']);
 p.rect(2, 80, 5, 84, sand(0, { secret: true, light: 112 }));
-p.rect(5, 80, 6, 84, { door: 'sandstone', secret: true, floor: 'desert-sand', ceiling: 'sky', floorZ: 0, ceilZ: SKY, light: 112 });
+p.rect(5, 80, 6, 84, { door: 'sandstone', secret: true, floor: 'desert-sand', ceiling: 'sky', floorZ: 0, ceilZ: 8, light: 112 });
 
 // 2. The gorge, winding north-east: narrow, so the moon barely reaches in.
 p.rect(14, 60, 34, 76, sand(0, { light: 136 }));
@@ -243,6 +243,113 @@ p.rect(118, 56, 121, 60, lift([-2, 8], SKY, { ceiling: 'sky', light: 104 }));
 // pulses) ends the mission.
 p.rect(121, 34, 126, 60, sand(8, { floor: 'imp-floor', side: 'imp-panel-dark', light: 184 }));
 p.rect(122, 43, 126, 47, sand(8, { floor: 'lift-floor', side: 'imp-panel-dark', light: 224, lightFx: 'glow', lightMin: 168, exit: true }));
+
+// ---------------------------------------------------------------- the skyline
+// The canyon's rock steps back from its floor in ledges (raised rock under
+// the sky, out of reach), rising by ring to about 20 with noise, so the rims
+// are jagged against the sky. Each ledge's sky ceiling sits just above the
+// highest rock behind it, so the view (and sight and bolts) stop at the
+// skyline instead of passing over a ridge. Not next to the garrison, which
+// keeps a wall of rock round it, nor at the map's edge.
+/** Smooth value noise in 0-1 over cells of `size` tiles. */
+const noise = (x, y, size, seed) => {
+  const h = (i, j) => {
+    let v = Math.imul(i * 374761393 + j * 668265263 + seed * 1442695041, 1274126177);
+    v = Math.imul(v ^ (v >>> 13), 1103515245);
+    return ((v ^ (v >>> 16)) >>> 0) / 4294967296;
+  };
+  const fx = x / size;
+  const fy = y / size;
+  const i = Math.floor(fx);
+  const j = Math.floor(fy);
+  const u = (fx - i) * (fx - i) * (3 - 2 * (fx - i));
+  const v = (fy - j) * (fy - j) * (3 - 2 * (fy - j));
+  const a = h(i, j) + (h(i + 1, j) - h(i, j)) * u;
+  const b = h(i, j + 1) + (h(i + 1, j + 1) - h(i, j + 1)) * u;
+  return a + (b - a) * v;
+};
+const isRock = (c) => c?.wall === 'sandstone' && !c.diagonal;
+const isAir = (c) => c && !c.wall && !c.door && c.ceiling === 'sky';
+// An angled rock corner whose solid side faces open ground (where one area
+// was painted over another's corner) would show its back: it's floor.
+for (let y = 1; y < H - 1; y++) {
+  for (let x = 1; x < W - 1; x++) {
+    const c = p.get(x, y);
+    if (c.wall !== 'sandstone' || !c.diagonal) continue;
+    const back = [...c.diagonal].map((e) => p.get(x + (e === 'E' ? 1 : e === 'W' ? -1 : 0), y + (e === 'S' ? 1 : e === 'N' ? -1 : 0)));
+    if (back.some(isAir)) {
+      const { wall, diagonal, ...floor } = c;
+      p.set(x, y, floor);
+    }
+  }
+}
+const indoorNear = (x, y) => {
+  // (Doors keep the walls they slide between.)
+  if ([p.get(x + 1, y), p.get(x - 1, y), p.get(x, y + 1), p.get(x, y - 1)].some((n) => n?.door)) return true;
+  for (let dy = -1; dy <= 1; dy++) {
+    for (let dx = -1; dx <= 1; dx++) {
+      const n = p.get(x + dx, y + dy);
+      if (n && ((n.wall && n.wall !== 'sandstone') || (n.door && n.door !== 'sandstone') || (!n.wall && n.ceiling !== 'sky'))) return true;
+    }
+  }
+  return false;
+};
+const LEDGE_RISE = [0, 8, 12, 16];
+const ring = new Map(); // tile -> { d, base, h }
+let front = [];
+// (From the canyon's open tiles, and its angled rock corners, which have floor on one side.)
+for (let y = 1; y < H - 1; y++) {
+  for (let x = 1; x < W - 1; x++) {
+    const c = p.get(x, y);
+    if (isAir(c) || (c.wall === 'sandstone' && c.diagonal)) front.push([x, y, c.floorZ ?? 0]);
+  }
+}
+for (let d = 1; d < LEDGE_RISE.length; d++) {
+  const next = [];
+  for (const [x, y, base] of front) {
+    for (const [nx, ny] of [[x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]]) {
+      const k = ny * W + nx;
+      if (nx < 1 || ny < 1 || nx >= W - 1 || ny >= H - 1 || ring.has(k) || !isRock(p.get(nx, ny)) || indoorNear(nx, ny)) continue;
+      const h = Math.min(SKY - 2, base + LEDGE_RISE[d] + noise(nx, ny, 3, 7) * 4 + noise(nx, ny, 9, 8) * 2);
+      ring.set(k, { x: nx, y: ny, d, base, h, top: h });
+      next.push([nx, ny, base]);
+    }
+  }
+  front = next;
+}
+// Each ledge's ceiling: the highest rock from it outward.
+const ledges = [...ring.values()].sort((a, b) => b.d - a.d);
+for (const t of ledges) {
+  for (const [nx, ny] of [[t.x + 1, t.y], [t.x - 1, t.y], [t.x, t.y + 1], [t.x, t.y - 1]]) {
+    const n = ring.get(ny * W + nx);
+    if (n && n.d > t.d) t.top = Math.max(t.top, n.top);
+  }
+}
+for (const t of ledges) {
+  p.set(t.x, t.y, {
+    floor: 'desert-gravel', ceiling: 'sky', floorZ: Math.round(t.h * 4) / 4, ceilZ: Math.round(t.top * 4) / 4 + 0.25, side: 'sandstone', light: 144,
+  });
+}
+// Angled rock corners stop at the skyline beside them, not at the sky.
+for (let y = 1; y < H - 1; y++) {
+  for (let x = 1; x < W - 1; x++) {
+    const c = p.get(x, y);
+    if (c.wall !== 'sandstone' || !c.diagonal) continue;
+    let top = -Infinity;
+    for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) top = Math.max(top, ring.get((y + dy) * W + x + dx)?.top ?? -Infinity);
+    if (top > -Infinity) p.set(x, y, { ...c, ceilZ: Math.round(top * 4) / 4 + 0.25 });
+  }
+}
+// Rock strata by height: a dark base, pale up high. Gravel in channels
+// across the sand.
+const strata = [{ to: 2.5, tex: 'sandstone-dark' }, { from: 14, tex: 'sandstone-pale' }];
+for (let y = 0; y < H; y++) {
+  for (let x = 0; x < W; x++) {
+    const c = p.get(x, y);
+    if (c.wall === 'sandstone' || (!c.wall && c.side === 'sandstone')) p.set(x, y, { ...c, bands: strata });
+    if (!c.wall && c.floor === 'desert-sand' && Math.abs(noise(x, y, 6, 21) - 0.5) < 0.045) p.set(x, y, { ...p.get(x, y), floor: 'desert-gravel' });
+  }
+}
 
 // ---------------------------------------------------------------- the cliff
 // The garrison is dug into the cliff: outside, its walls stand 4 m above the

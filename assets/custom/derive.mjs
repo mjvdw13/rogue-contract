@@ -28,7 +28,7 @@ export const DERIVED = [
   { out: 'sandstone-pale', from: 'canyon-rock', gradient: [[40, 32, 24], [96, 80, 62], [150, 130, 102], [196, 178, 146], [232, 220, 196]], keep: 0.4, contrast: 0.95 },
   // The canyon floor: sand, and darker gravel in the washes.
   { out: 'desert-sand', from: 'sand', gradient: [[52, 38, 26], [104, 80, 56], [148, 118, 84], [182, 152, 112], [206, 180, 140]], keep: 0.2, contrast: 0.55 },
-  { out: 'desert-gravel', from: 'sand', gradient: [[22, 16, 12], [58, 44, 32], [96, 76, 56], [132, 108, 80], [164, 140, 108]], keep: 0.2, contrast: 1.25 },
+  { out: 'desert-gravel', from: 'sand', gradient: [[40, 30, 22], [86, 68, 48], [124, 100, 72], [158, 130, 96], [190, 164, 126]], keep: 0.2, contrast: 1.15 },
 ];
 
 /** Colour at position t (0..1) along a gradient of key colours. */
