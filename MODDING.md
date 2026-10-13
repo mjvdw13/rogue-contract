@@ -314,7 +314,8 @@ export default defineLevel({
   music: 'office',
   sky: 'sky-city',
   par: 120,                  // seconds, shown on the tally screen
-  fog: 0.3,                  // extra darkness with distance
+  fog: 0.05,                 // extra darkness with distance (the default)
+  haze: { color: [32, 24, 64], half: 40 }, // outdoors, fade to this colour
   tiles: [
     '###########',
     '#....#....#',
@@ -334,6 +335,14 @@ export default defineLevel({
   triggers: [],
 });
 ```
+
+Surfaces get darker with distance: nearby ones brighten (like Doom), and
+`fog` darkens far ones a little more (colormap levels per tile). A space lit
+at 144 reads at 10 m; one at 104 stays dark. With `haze`, surfaces under the
+sky (seen from a sky tile) fade toward the haze colour with distance
+instead, halfway there at `half` tiles (40 by default): a night canyon
+fades into purple air rather than black. Pick a colour like the sky's near
+the horizon. Indoors, haze changes nothing.
 
 ### Tiles
 

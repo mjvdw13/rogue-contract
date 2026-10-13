@@ -221,6 +221,11 @@ export function validateContent(reg) {
     for (const u of map.uses.values()) checkActions('a switch', u.actions);
     if (level.music && !reg.songs.has(level.music)) warn(`${owner}: unknown music "${level.music}"`);
     if (level.sky && !reg.textures.has(level.sky)) err(`${owner}: unknown sky texture "${level.sky}"`);
+    if (level.haze) {
+      const c = level.haze.color;
+      if (!Array.isArray(c) || c.length !== 3 || !c.every((v) => typeof v === 'number' && v >= 0 && v <= 255)) err(`${owner}: haze needs a "color" of three numbers 0-255, like [40, 36, 64]`);
+      if (level.haze.half !== undefined && !(level.haze.half > 0)) err(`${owner}: haze "half" (the distance in tiles at which it's halfway) must be above 0`);
+    }
     for (const id of [level.next, level.secretNext]) if (id && !reg.levels.has(id)) err(`${owner}: next level "${id}" does not exist`);
   }
 

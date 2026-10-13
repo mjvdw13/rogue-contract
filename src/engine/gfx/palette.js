@@ -13,6 +13,12 @@ export const NUM_PALETTES = 15;
 
 /** Extra colormap (after the light levels) used by invulnerability: inverted grayscale. */
 export const COLORMAP_INVERSE = LIGHT_LEVELS;
+/**
+ * Haze (see `hazeColormaps`): steps 1 to HAZE_STEPS - 1 of fading toward a
+ * colour, each a set of LIGHT_LEVELS colormaps, from row HAZE_ROW on.
+ */
+export const HAZE_STEPS = 16;
+export const HAZE_ROW = LIGHT_LEVELS + 1;
 
 const BONUS_COLOR = [215, 186, 69];
 
@@ -133,6 +139,51 @@ export class Palette {
     }
     this._tints.set(key, remap);
     return remap;
+  }
+
+  /**
+   * The colormaps followed by haze tables for `color` ([r, g, b]): for haze
+   * step k (1 to HAZE_STEPS - 1) and light level l, row HAZE_ROW + (k - 1) *
+   * LIGHT_LEVELS + l maps each colour lit at level l (fullbright colours
+   * unlit) k / (HAZE_STEPS - 1) of the way to the haze colour. The last one
+   * built is kept.
+   */
+  hazeColormaps(color) {
+    const key = color.join(',');
+    if (this._haze?.key === key) return this._haze.maps;
+    const steps = HAZE_STEPS - 1;
+    const maps = new Uint8Array((HAZE_ROW + steps * LIGHT_LEVELS) * 256);
+    maps.set(this.colormaps);
+    const rgb = this.rgb;
+    const [hr, hg, hb] = color;
+    // (Blends converge on the haze colour, so many repeat.)
+    const cache = new Map();
+    const nearest = (r, g, b) => {
+      const key = (Math.round(r) << 16) | (Math.round(g) << 8) | Math.round(b);
+      let c = cache.get(key);
+      if (c === undefined) {
+        c = this.nearest(r, g, b, true);
+        cache.set(key, c);
+      }
+      return c;
+    };
+    for (let k = 1; k <= steps; k++) {
+      const a = k / steps;
+      for (let level = 0; level < LIGHT_LEVELS; level++) {
+        const f = Math.pow(1 - level / LIGHT_LEVELS, 1.2);
+        const row = (HAZE_ROW + (k - 1) * LIGHT_LEVELS + level) * 256;
+        for (let i = 0; i < 256; i++) {
+          if (i === TRANSPARENT) {
+            maps[row + i] = i;
+            continue;
+          }
+          const g = i >= this.fullbrightStart ? 1 : f;
+          maps[row + i] = nearest(lerp(rgb[i * 3] * g, hr, a), lerp(rgb[i * 3 + 1] * g, hg, a), lerp(rgb[i * 3 + 2] * g, hb, a));
+        }
+      }
+    }
+    this._haze = { key, maps };
+    return maps;
   }
 
   _buildColormaps() {

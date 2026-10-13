@@ -1,4 +1,5 @@
 import { TEXELS_PER_UNIT, TRANSPARENT } from '../config.js';
+import { F_SKY } from '../world/tilemap.js';
 
 const visible = [];
 let fuzzPos = 0;
@@ -64,7 +65,8 @@ export function drawSprites(view, things, map, fb, fbW, colormaps, skip) {
     else {
       // The smooth light where it stands, in its storey.
       const tile = map.inBounds(t.x | 0, t.y | 0) ? (t.y | 0) * map.w + (t.x | 0) : -1;
-      lv = view.level(tile >= 0 && map.lightmap ? map.lightmap.sample(t.x, t.y, map.storeyAt(tile, (t.z ?? 0) + 0.5)) : 128, depth);
+      // (Outdoors in haze, fading toward the haze colour.)
+      lv = view.row(tile >= 0 && map.lightmap ? map.lightmap.sample(t.x, t.y, map.storeyAt(tile, (t.z ?? 0) + 0.5)) : 128, depth, tile >= 0 && (map.flags[tile] & F_SKY) !== 0);
     }
     const cm = lv * 256;
     const fuzz = t.def?.renderStyle === 'fuzz';

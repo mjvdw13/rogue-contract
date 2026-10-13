@@ -318,6 +318,9 @@ export default defineLevel({
   name: 'THE CANYON GARRISON',
   music: 'garrison',
   sky: 'sky-night',
+  // Outdoors, the canyon fades into the night's purple haze (the colour of
+  // the sky low down), halfway at 20 m.
+  haze: { color: [32, 24, 64], half: 40 },
   par: 300,
   ...p.build(),
   lights: lamps,

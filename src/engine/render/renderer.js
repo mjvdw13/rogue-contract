@@ -19,7 +19,7 @@ export class Renderer {
   }
 
   /**
-   * @param {{map:any, things:any[], skyTexture:any, fog:number}} scene
+   * @param {{map:any, things:any[], skyTexture:any, fog:number, haze?:{color:number[], half:number}|null}} scene
    * @param {{x:number,y:number,angle:number,z?:number,extraLight?:number,fixedColormap?:number}} cam
    * @param {{psprites?:any[], skip?:any}} [extras]
    */
@@ -27,9 +27,9 @@ export class Renderer {
     const view = this.view;
     const s = this.surface;
     const textures = this.assets.textures;
-    const cms = this.palette.colormaps;
+    const cms = scene.haze ? this.palette.hazeColormaps(scene.haze.color) : this.palette.colormaps;
     if (view.W !== s.w) view.resize(s.w);
-    view.setup(cam, scene.fog ?? 0.25);
+    view.setup(cam, scene.fog ?? 0.25, scene.haze ?? null);
     view.depthValid = false;
     drawWorld(view, scene.map, textures, scene.skyTexture ?? null, s.px, s.w, cms);
     view.depthValid = drawModels(view, scene.things, scene.map, textures, s.px, s.w, cms, extras.skip);

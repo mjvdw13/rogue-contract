@@ -94,7 +94,9 @@ export class World {
     const built = buildLevel(this.registry, level, { skill, textureSlot: slot });
     this.buildErrors = built.errors;
     this.map = built.map;
-    this.fog = level.fog ?? 0.15;
+    this.fog = level.fog ?? 0.05;
+    /** Outdoors, surfaces fade toward this colour with distance (halfway at `half` tiles) instead of darkening. */
+    this.haze = level.haze ? { color: level.haze.color, half: level.haze.half ?? 40 } : null;
     this.skyTexture = level.sky && this.assets ? this.assets.textures[this.assets.textureSlot(level.sky)] : null;
     /** Smooth light, interpolated between tile centres (the renderer reads `map.lightmap`). */
     this.lightmap = new LightMap(this.map, { occlusion: level.occlusion ?? 0 });

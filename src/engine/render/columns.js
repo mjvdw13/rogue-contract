@@ -1,5 +1,6 @@
 import { F_SOLID, F_DOOR, F_SKY, F_SLANT, F_SLAB } from '../world/tilemap.js';
-import { DIMINISH } from './view.js';
+import { DIMINISH, MAX_BRIGHTEN, LIGHT_BLACK, HAZE_RES, HAZE_LEN } from './view.js';
+import { HAZE_ROW } from '../gfx/palette.js';
 import { LightMap } from '../world/lightmap.js';
 import { TEXELS_PER_UNIT as TPU, TRANSPARENT } from '../config.js';
 
@@ -16,6 +17,7 @@ const fenceSlot = new Int16Array(MAX_FENCES);
 const fenceU = new Float32Array(MAX_FENCES);
 const fenceTop = new Float32Array(MAX_FENCES);
 const fenceLv = new Float32Array(MAX_FENCES);
+const fenceHz = new Float32Array(MAX_FENCES);
 /**
  * Ordered (4x4 Bayer) dithering between colormap levels, so smooth light
  * doesn't band: a level's fraction picks the brighter or darker colormap per
@@ -25,7 +27,7 @@ const fenceLv = new Float32Array(MAX_FENCES);
 const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
 /** This column's four thresholds (one per row, repeating every 4 rows). */
 const thr = new Float32Array(4);
-/** A face's colormap (times 256) for each of the four rows. */
+/** A face's colormap row (times 256) for each of the four rows. */
 const faceCm = new Int32Array(4);
 /** Open windows of rows one column can keep (slabs split them). */
 const MAX_WIN = 8;
@@ -62,6 +64,10 @@ const wSt = new Uint8Array(MAX_WIN);
  * Light is smooth (see world/lightmap.js): floors and ceilings take it
  * interpolated along the ray's stretch through each tile, faces where the
  * ray meets them, and every pixel is dithered between colormap levels.
+ * Outdoors (seen from a sky tile) in a level with haze, surfaces fade toward
+ * the haze colour with distance instead of darkening with fog: the
+ * colormaps go on with haze tables (gfx/palette.js `hazeColormaps`), and the
+ * haze step is dithered too.
  *
  * Fences (see-through walls on tile edges) don't stop the ray: each one it
  * crosses is noted with the rows still open at that point, and once the
@@ -93,6 +99,8 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
   const extra = view.extraLight;
   const lm = map.lightmap ?? (map.lightmap = new LightMap(map));
   lm.update();
+  const hazeOn = view.hazeOn;
+  const hazeTab = view.hazeTab;
 
   // Sky: horizontal texel per column from the view angle; the texture spans 180 degrees.
   let skyOffset = 0;
@@ -110,17 +118,36 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
   const flatLevel = (l, dist, y) => {
     if (fixed >= 0) return fixed;
     let b = DIMINISH / (dist < 0.25 ? 0.25 : dist);
-    if (b > 24) b = 24;
-    const lv = ((240 - l) * 0.25 - extra - b + dist * fog + thr[y & 3]) | 0;
+    if (b > MAX_BRIGHTEN) b = MAX_BRIGHTEN;
+    const lv = ((LIGHT_BLACK - l) * 0.25 - extra - b + dist * fog + thr[y & 3]) | 0;
     return lv < 0 ? 0 : lv > 31 ? 31 : lv;
   };
+  /** Like flatLevel, outdoors in haze: the level without the fog, in its haze step's tables. */
+  const flatRowHaze = (l, dist, y) => {
+    let b = DIMINISH / (dist < 0.25 ? 0.25 : dist);
+    if (b > MAX_BRIGHTEN) b = MAX_BRIGHTEN;
+    const d = thr[y & 3];
+    let lv = ((LIGHT_BLACK - l) * 0.25 - extra - b + d) | 0;
+    if (lv < 0) lv = 0;
+    else if (lv > 31) lv = 31;
+    const k = (dist * HAZE_RES) | 0;
+    const h = (hazeTab[k < HAZE_LEN ? k : HAZE_LEN - 1] + d + 0.5) | 0;
+    return h ? HAZE_ROW + (h - 1) * 32 + lv : lv;
+  };
 
-  /** A face's colormap per row phase, for its fractional level lv (dithered with this column's thresholds). */
-  const setFaceCm = (lv) => {
+  /**
+   * A face's colormap per row phase, for its fractional level lv and haze
+   * step hz (0 indoors), dithered with this column's thresholds.
+   */
+  const setFaceCm = (lv, hz) => {
     for (let k = 0; k < 4; k++) {
       let l = fixed >= 0 ? fixed : (lv + thr[k]) | 0;
       if (l < 0) l = 0;
       else if (l > 31) l = 31;
+      if (hz > 0) {
+        const h = (hz + thr[k] + 0.5) | 0;
+        if (h) l += HAZE_ROW + (h - 1) * 32;
+      }
       faceCm[k] = l * 256;
     }
   };
@@ -171,7 +198,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
     // Textures are mapped in world units (TEXELS_PER_UNIT texels per unit), so
     // they run on across tiles: `u` is the position along the wall in world
     // units, and the texture's top row sits at height `anchor`.
-    const face = (t, a, b, anchor, slot, u, lv) => {
+    const face = (t, a, b, anchor, slot, u, lv, hz) => {
       if (a < clipTop) a = clipTop;
       if (b > clipBot) b = clipBot;
       if (b <= a) return;
@@ -186,7 +213,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
       if (tx < 0) tx += tex.w;
       const col = tex.curCM;
       const colBase = tx * th;
-      setFaceCm(lv);
+      setFaceCm(lv, hz);
       const stepV = (TPU * t) / fy;
       let v = (anchor - camZ) * TPU + (a + 0.5 - horizon) * stepV + V_BIAS * th;
       const hMask = tex.hMask;
@@ -197,14 +224,14 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
       }
     };
     // A fence face: like `face`, already clipped, with holes, writing the depth buffer.
-    const fenceFace = (t, a, b, anchor, slot, u, lv) => {
+    const fenceFace = (t, a, b, anchor, slot, u, lv, hz) => {
       const tex = textures[slot];
       const th = tex.h;
       let tx = Math.floor(u * TPU) % tex.w;
       if (tx < 0) tx += tex.w;
       const col = tex.curCM;
       const colBase = tx * th;
-      setFaceCm(lv);
+      setFaceCm(lv, hz);
       const stepV = (TPU * t) / fy;
       let v = (anchor - camZ) * TPU + (a + 0.5 - horizon) * stepV + V_BIAS * th;
       let o = a * fbW + x;
@@ -220,14 +247,18 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
     /**
      * The (fractional) colormap level of a face the ray meets at distance t,
      * in storey s: the smooth light there, and the faces' fake contrast.
+     * Outdoors in haze (`out`), without the fog.
      */
-    const faceLevel = (s, t, contrast) => (fixed >= 0 ? fixed : view.levelF(lm.sample(px + rdx * t, py + rdy * t, s), t) + contrast);
+    const faceLevel = (s, t, contrast, out) => (fixed >= 0 ? fixed : view.levelF(lm.sample(px + rdx * t, py + rdy * t, s), t) + contrast - (out ? t * fog : 0));
+    /** A face's haze step at distance t (0 indoors). */
+    const faceHaze = (t, out) => (out ? view.hazeF(t) : 0);
     // Floor and ceiling of storey s of tile `i` between distances t0 and t1
     // (under a slab, the slab's underside is the ceiling; on it, its top the
     // floor). The light runs smoothly from where the ray enters to where it
     // leaves: l0 at t0, changing by dl per unit of distance.
     const flats = (i, s, t0, t1) => {
       const slab = (flags[i] & F_SLAB) !== 0;
+      const hazy = hazeOn && (flags[i] & F_SKY) !== 0;
       const l0 = lm.sample(px + rdx * t0, py + rdy * t0, s);
       const dl = t1 > t0 ? (lm.sample(px + rdx * t1, py + rdy * t1, s) - l0) / (t1 - t0) : 0;
       const fz = slab && s ? slabTop[i] : floorZ[i];
@@ -248,11 +279,20 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
             const wm = tex.wMask;
             const hm = tex.hMask;
             const pix = tex.cur;
-            for (let y = a, o = a * fbW + x; y < b; y++, o += fbW) {
-              const dist = k / (y + 0.5 - horizon);
-              const tx = ((px + rdx * dist) * TPU) & wm;
-              const ty = ((py + rdy * dist) * TPU) & hm;
-              fb[o] = colormaps[flatLevel(l0 + (dist - t0) * dl, dist, y) * 256 + pix[ty * tw + tx]];
+            if (hazy) {
+              for (let y = a, o = a * fbW + x; y < b; y++, o += fbW) {
+                const dist = k / (y + 0.5 - horizon);
+                const tx = ((px + rdx * dist) * TPU) & wm;
+                const ty = ((py + rdy * dist) * TPU) & hm;
+                fb[o] = colormaps[flatRowHaze(l0 + (dist - t0) * dl, dist, y) * 256 + pix[ty * tw + tx]];
+              }
+            } else {
+              for (let y = a, o = a * fbW + x; y < b; y++, o += fbW) {
+                const dist = k / (y + 0.5 - horizon);
+                const tx = ((px + rdx * dist) * TPU) & wm;
+                const ty = ((py + rdy * dist) * TPU) & hm;
+                fb[o] = colormaps[flatLevel(l0 + (dist - t0) * dl, dist, y) * 256 + pix[ty * tw + tx]];
+              }
             }
           }
         }
@@ -289,11 +329,20 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
               const wm = tex.wMask;
               const hm = tex.hMask;
               const pix = tex.cur;
-              for (let y = a, o = a * fbW + x; y < b; y++, o += fbW) {
-                const dist = k / (horizon - y - 0.5);
-                const tx = ((px + rdx * dist) * TPU) & wm;
-                const ty = ((py + rdy * dist) * TPU) & hm;
-                fb[o] = colormaps[flatLevel(l0 + (dist - t0) * dl, dist, y) * 256 + pix[ty * tw + tx]];
+              if (hazy) {
+                for (let y = a, o = a * fbW + x; y < b; y++, o += fbW) {
+                  const dist = k / (horizon - y - 0.5);
+                  const tx = ((px + rdx * dist) * TPU) & wm;
+                  const ty = ((py + rdy * dist) * TPU) & hm;
+                  fb[o] = colormaps[flatRowHaze(l0 + (dist - t0) * dl, dist, y) * 256 + pix[ty * tw + tx]];
+                }
+              } else {
+                for (let y = a, o = a * fbW + x; y < b; y++, o += fbW) {
+                  const dist = k / (horizon - y - 0.5);
+                  const tx = ((px + rdx * dist) * TPU) & wm;
+                  const ty = ((py + rdy * dist) * TPU) & hm;
+                  fb[o] = colormaps[flatLevel(l0 + (dist - t0) * dl, dist, y) * 256 + pix[ty * tw + tx]];
+                }
               }
             }
           }
@@ -371,6 +420,8 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
         side = 1;
       }
       if (tExit < 1e-4) tExit = 1e-4;
+      // Outdoors in haze: faces seen from this tile fade toward the haze colour.
+      const out = hazeOn && (flags[cur] & F_SKY) !== 0;
 
       // An angled wall in the current tile stops the ray where it crosses the line.
       // (Angled-wall and door tiles have no slab: their windows are all in storey 0.)
@@ -381,12 +432,12 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
           seen[cur] = 1;
           // Texture runs right-to-left from the second point (as seen from the open side).
           const u = (1 - along[0]) * sl.len;
-          const lv = faceLevel(0, t, 0);
+          const lv = faceLevel(0, t, 0, out);
           for (let k = 0; k < nw; k++) {
             clipTop = wTop[k];
             clipBot = wBot[k];
             flats(cur, 0, tEnter, t);
-            face(t, rowOf(ceilZ[cur], t), rowOf(floorZ[cur], t), ceilZ[cur], sl.tex, u, lv);
+            face(t, rowOf(ceilZ[cur], t), rowOf(floorZ[cur], t), ceilZ[cur], sl.tex, u, lv, faceHaze(t, out));
           }
           end = t;
           break;
@@ -413,12 +464,12 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
               const tw = door.tex >= 0 ? textures[door.tex].w / TPU : width;
               const u = (flip ? door.span1 - along : along - door.span0) - (width - tw) / 2;
               const b = rowOf(bz, t);
-              const lv = faceLevel(0, t, door.axis === 'x' ? 1 : -1);
+              const lv = faceLevel(0, t, door.axis === 'x' ? 1 : -1, out);
               for (let k = 0; k < nw; k++) {
                 clipTop = wTop[k];
                 clipBot = wBot[k];
                 flats(cur, 0, tEnter, t);
-                face(t, rowOf(ceilZ[cur], t), b, bz + texHeight(door.tex), door.tex, u, lv);
+                face(t, rowOf(ceilZ[cur], t), b, bz + texHeight(door.tex), door.tex, u, lv, faceHaze(t, out));
                 if (b > clipTop) clipTop = b > clipBot ? clipBot : b;
                 wTop[k] = clipTop;
                 wBot[k] = clipBot;
@@ -452,12 +503,12 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
             }
             if (blocked) {
               seen[cur] = 1;
-              const lv = faceLevel(0, t, door.axis === 'x' ? 1 : -1);
+              const lv = faceLevel(0, t, door.axis === 'x' ? 1 : -1, out);
               for (let k = 0; k < nw; k++) {
                 clipTop = wTop[k];
                 clipBot = wBot[k];
                 flats(cur, 0, tEnter, t);
-                face(t, rowOf(ceilZ[cur], t), rowOf(floorZ[cur], t), ceilZ[cur], door.tex, du + (door.axis === 'x' ? cy : cx), lv);
+                face(t, rowOf(ceilZ[cur], t), rowOf(floorZ[cur], t), ceilZ[cur], door.tex, du + (door.axis === 'x' ? cy : cx), lv, faceHaze(t, out));
               }
               end = t;
               break;
@@ -478,7 +529,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
         for (let k = 0; k < nw; k++) {
           clipTop = wTop[k];
           clipBot = wBot[k];
-          face(tExit, clipTop, clipBot, 0, -1, 0, 0);
+          face(tExit, clipTop, clipBot, 0, -1, 0, 0, 0);
         }
         end = tExit;
         break;
@@ -486,6 +537,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
       const next = mapY * mw + mapX;
       const f = flags[next];
       const contrast = side === 0 ? 1 : -1;
+      const hz = faceHaze(tExit, out);
       // Position along the wall in world units (mirrored on two sides so
       // textures read left to right from every direction).
       let wx = side === 0 ? py + tExit * rdy : px + tExit * rdx;
@@ -504,7 +556,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
           const bottom = map.fenceBottom(fe);
           const ra = rowOf(top, tExit);
           const rb = rowOf(bottom, tExit);
-          const lv = faceLevel(flags[cur] & F_SLAB && slabTop[cur] <= bottom + 0.5 ? 1 : 0, tExit, contrast);
+          const lv = faceLevel(flags[cur] & F_SLAB && slabTop[cur] <= bottom + 0.5 ? 1 : 0, tExit, contrast, out);
           for (let k = 0; k < nw; k++) {
             let a = ra;
             let b = rb;
@@ -519,6 +571,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
               fenceU[nf] = wx;
               fenceTop[nf] = top;
               fenceLv[nf] = lv;
+              fenceHz[nf] = hz;
               nf++;
               seen[cur] = 1;
               seen[next] = 1;
@@ -558,7 +611,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
           const s = wSt[k];
           const fz = s ? slabTop[cur] : floorZ[cur];
           const cz = !s && curSlab ? slabBot[cur] : ceilZ[cur];
-          face(tExit, rowOf(cz, tExit), rowOf(fz, tExit), cz, tex, u, faceLevel(s, tExit, contrast));
+          face(tExit, rowOf(cz, tExit), rowOf(fz, tExit), cz, tex, u, faceLevel(s, tExit, contrast, out), hz);
         }
         end = tExit;
         break;
@@ -579,7 +632,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
         if (fN > fC) {
           const a = rowOf(fN, tExit);
           seen[next] = 1;
-          face(tExit, a, rowOf(fC, tExit), fN, sideTex[next], wx, faceLevel(s, tExit, contrast));
+          face(tExit, a, rowOf(fC, tExit), fN, sideTex[next], wx, faceLevel(s, tExit, contrast, out), hz);
           if (a < clipBot) clipBot = a < clipTop ? clipTop : a;
         }
         if (cN < cC) {
@@ -587,8 +640,8 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
           if (flags[cur] & F_SKY && (s || !curSlab) && f & F_SKY) skyFill(rowOf(cC, tExit), b);
           else {
             seen[next] = 1;
-            const lv = faceLevel(s, tExit, contrast);
-            face(tExit, rowOf(cC, tExit), b, cN + texHeight(upperTex[next]), upperTex[next], wx, lv);
+            const lv = faceLevel(s, tExit, contrast, out);
+            face(tExit, rowOf(cC, tExit), b, cN + texHeight(upperTex[next]), upperTex[next], wx, lv, hz);
           }
           if (b > clipTop) clipTop = b > clipBot ? clipBot : b;
         }
@@ -597,7 +650,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
           const b = rowOf(slabBot[next] > fC ? slabBot[next] : fC, tExit);
           if (b > clipTop && a < clipBot) {
             seen[next] = 1;
-            face(tExit, a, b, slabTop[next], slabSideTex[next], wx, faceLevel(s, tExit, contrast));
+            face(tExit, a, b, slabTop[next], slabSideTex[next], wx, faceLevel(s, tExit, contrast, out), hz);
             // Above the edge stays open in this window, and below it in a new one.
             const bot = clipBot;
             if (a < clipBot) clipBot = a < clipTop ? clipTop : a;
@@ -611,7 +664,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
                 // (Out of windows, which takes a pile of slabs: leave those rows black.)
                 const keep = clipBot;
                 clipBot = bot;
-                face(tExit, b, bot, 0, -1, 0, 0);
+                face(tExit, b, bot, 0, -1, 0, 0, 0);
                 clipBot = keep;
               }
             }
@@ -652,7 +705,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
         mdepth.fill(Infinity);
         view.depthValid = true;
       }
-      for (let k = nf - 1; k >= 0; k--) fenceFace(fenceT[k], fenceA[k], fenceB[k], fenceTop[k], fenceSlot[k], fenceU[k], fenceLv[k]);
+      for (let k = nf - 1; k >= 0; k--) fenceFace(fenceT[k], fenceA[k], fenceB[k], fenceTop[k], fenceSlot[k], fenceU[k], fenceLv[k], fenceHz[k]);
     }
   }
 }

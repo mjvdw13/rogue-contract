@@ -63,7 +63,9 @@ contrast comes from bright pools (184-224).
   and casts its shadow under it (112). Floodlights in the gate's light
   strips (light sources, +96 fading out over 3 m) throw pools on the sand
   and the wall, with a weaker light over the gate (+40). The rock alcove
-  is dark (112).
+  is dark (112). Far off, the canyon fades into the night's purple haze
+  (`haze: { color: [32, 24, 64], half: 40 }`, halfway at 20 m) instead of
+  going black.
 - **Vent:** 112, with light falling through a grate halfway (144).
 - **Maintenance:** 128, a bright panel in the middle (192), dark west
   corners (120), and a broken ceiling light flickering in the south-east.

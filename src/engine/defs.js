@@ -406,10 +406,13 @@ export function defineSong(def) {
  * `things` is an optional overlay grid of the same size for monsters/items/
  * player starts (space or '.' = nothing). Glyphs come from the shared legend
  * (content/levels/legend.js) and can be overridden per level via `legend` and
- * `thingLegend`.
+ * `thingLegend`. `fog` darkens surfaces with distance (colormap levels per
+ * tile); outdoors (under the sky), `haze: { color: [r, g, b], half }` fades
+ * them toward a colour instead, halfway there at `half` tiles.
  * @param {{id:string, name:string, tiles:string[], things?:string[], legend?:object,
  *   thingLegend?:object, list?:object[], triggers?:object[], music?:string, sky?:string,
- *   fog?:number, par?:number, next?:string, secretNext?:string, defaults?:object}} def
+ *   fog?:number, haze?:{color:number[], half?:number}, par?:number, next?:string,
+ *   secretNext?:string, defaults?:object}} def
  */
 export function defineLevel(def) {
   requireId(def, 'Level');
@@ -421,7 +424,7 @@ export function defineLevel(def) {
     thingLegend: {},
     list: [],
     triggers: [],
-    fog: 0.15,
+    fog: 0.05,
     par: 0,
     defaults: {},
     ...def,

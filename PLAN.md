@@ -866,7 +866,7 @@ headless Node, DF art). Budget for this phase: stay under about 8 ms.
        (the player's and monsters') and explosions flash the room. Added
        each frame by a small flood fill through open tiles, fading with the
        animation.
-5. [ ] **Distance and haze.** Retune the distance darkening so lit spaces
+5. [x] **Distance and haze.** Retune the distance darkening so lit spaces
        read across a room, and add an outdoor haze: under the sky, surfaces
        fade toward a level's `haze` colour (colormaps blending to a
        colour) instead of to black.
@@ -1736,3 +1736,16 @@ update the smoke test.
   +96); troopers flash +80, bolts +64, explosions +128 over 6 tiles. A
   heavy firefight (20 bolts, 3 explosions) costs 0.2 ms a frame; rendering
   is unchanged. 161 tests.
+- 2026-10-13: Phase 1d step 5, distance and haze. The distance curve is
+  gentler: `DIMINISH` 40 to 24, the level at a light 7 lower
+  (`LIGHT_BLACK` 212 for 240) and the default fog 0.15 to 0.05, so a space
+  lit at 144 is level 5 at 1 m (as before), 11 at 2 m and 17 at 10 m (was
+  25, near black): the gorge, the chamber's far walls and the vault's banks
+  read now, and 104 still reads dark. A level's `haze: { color, half }`
+  makes surfaces seen from sky tiles (and sprites and models standing in
+  them) fade toward the colour instead of fogging darker: the palette
+  builds haze tables after the colormaps (15 steps of 32 levels, 75 ms,
+  kept per colour), and the renderer picks the step by distance, dithered
+  like the light. Mission 1's haze is the sky's dusky purple, halfway at
+  20 m. Frame time 2.3 to 2.9 ms (the haze's per-pixel work outdoors).
+  165 tests.

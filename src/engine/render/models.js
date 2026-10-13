@@ -1,4 +1,5 @@
 import { TRANSPARENT } from '../config.js';
+import { F_SKY } from '../world/tilemap.js';
 
 /** Nearest depth drawn; polygons are clipped here. */
 export const NEAR = 0.05;
@@ -94,6 +95,7 @@ export function drawModels(view, things, map, textures, fb, fbW, colormaps, skip
 
     const tile = map.inBounds(t.x | 0, t.y | 0) ? (t.y | 0) * map.w + (t.x | 0) : -1;
     const light = tile >= 0 && map.lightmap ? map.lightmap.sample(t.x, t.y, map.storeyAt(tile, (t.z ?? 0) + 0.5)) : 128;
+    const outdoor = tile >= 0 && (map.flags[tile] & F_SKY) !== 0;
     const fixed = view.fixedColormap;
 
     for (const f of model.faces) {
@@ -277,8 +279,7 @@ export function drawModels(view, things, map, textures, fb, fbW, colormaps, skip
           if (fixed >= 0) lv = fixed;
           else if (glow) lv = 0;
           else {
-            lv = view.level(light, depth) + shade;
-            if (lv > 31) lv = 31;
+            lv = view.row(light, depth, outdoor, shade);
           }
           mdepth[o] = depth;
           fb[o] = colormaps[lv * 256 + ci];
