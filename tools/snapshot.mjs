@@ -7,6 +7,7 @@
 //   node tools/snapshot.mjs sandbox --pitch 30 --z 0.2    look up 30 px, raise the eye 0.2 above the floor
 //   node tools/snapshot.mjs sandbox --out shot.png --scale 3 --nomonsters
 //   node tools/snapshot.mjs m1 --custom                   with the art overrides (the Dark Forces art)
+//   node tools/snapshot.mjs m1 --doors 0.5                every door half open
 //
 // The default output is tools/art/out/snapshots/<level>.png.
 import fs from 'node:fs';
@@ -55,12 +56,13 @@ export async function headless({ custom = false } = {}) {
 }
 
 /** Render one frame of `levelId` from a camera. Returns RGBA pixels of the view. */
-export function snapshot(ctx, levelId, { at, pitch = 0, z, skill = 3, noMonsters = false } = {}) {
+export function snapshot(ctx, levelId, { at, pitch = 0, z, skill = 3, noMonsters = false, doors } = {}) {
   const { registry, palette, assets, surface, renderer } = ctx;
   const level = registry.levels.get(levelId);
   if (!level) throw new Error(`Unknown level "${levelId}"`);
   const world = new World({ registry, assets, rng: new Rng(1), settings: { noMonsters } }, level, { skill });
   const pt = world.player;
+  if (doors !== undefined) for (const d of world.map.doors) d.open = doors;
   if (at) {
     pt.x = at[0];
     pt.y = at[1];
@@ -106,7 +108,7 @@ export function upscale(img, scale, aspect = true) {
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const args = process.argv.slice(2);
   const opt = (name, def) => (args.includes(name) ? args[args.indexOf(name) + 1] : def);
-  const valued = new Set(['--at', '--pitch', '--z', '--out', '--scale', '--skill']);
+  const valued = new Set(['--at', '--pitch', '--z', '--out', '--scale', '--skill', '--doors']);
   const levelId = args.find((a, i) => !a.startsWith('--') && !valued.has(args[i - 1])) ?? 'sandbox';
   const at = opt('--at') ? opt('--at').split(',').map(Number) : undefined;
   const ctx = await headless({ custom: args.includes('--custom') });
@@ -116,6 +118,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     z: opt('--z') !== undefined ? Number(opt('--z')) : undefined,
     skill: Number(opt('--skill', 3)),
     noMonsters: args.includes('--nomonsters'),
+    doors: opt('--doors') !== undefined ? Number(opt('--doors')) : undefined,
   });
   const out = path.resolve(opt('--out', path.join(root, 'tools/art/out/snapshots', `${levelId}.png`)));
   fs.mkdirSync(path.dirname(out), { recursive: true });

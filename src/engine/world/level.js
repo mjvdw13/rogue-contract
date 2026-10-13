@@ -232,8 +232,14 @@ export function buildLevel(registry, level, opts = {}) {
     }
   });
 
-  // Doorways are usually several tiles wide: neighbouring door tiles drawn
-  // with the same glyph form one door (`group`) that opens and closes together.
+  // Doorways are usually several tiles wide: neighbouring door tiles of the
+  // same door (the same door texture, style, lock and tag) form one door
+  // (`group`) that opens and closes together. Their other fields may differ,
+  // say a different lintel (`upper`) on each side.
+  const doorKey = (i) => {
+    const e = legend[glyphAt[i]];
+    return [e.door, e.style, e.lock, e.tag, e.secret, e.jamb].join('|');
+  };
   for (const d of map.doors) {
     if (d.group) continue;
     const group = [];
@@ -244,7 +250,7 @@ export function buildLevel(registry, level, opts = {}) {
       group.push(c);
       for (const [nx, ny] of [[c.x + 1, c.y], [c.x - 1, c.y], [c.x, c.y + 1], [c.x, c.y - 1]]) {
         const n = map.doorAt(nx, ny);
-        if (n && !n.group && glyphAt[map.index(nx, ny)] === glyphAt[map.index(d.x, d.y)]) {
+        if (n && !n.group && doorKey(map.index(nx, ny)) === doorKey(map.index(d.x, d.y))) {
           n.group = group;
           stack.push(n);
         }
@@ -269,11 +275,22 @@ export function buildLevel(registry, level, opts = {}) {
     else if (wallPast(d, -1, 0) && wallPast(d, 1, 0)) d.axis = 'y';
     else errors.push(`Door at (${d.x}, ${d.y}) needs walls on two opposite sides`);
   }
+  // Where each panel stands. Sliding and split doors: through their tile's
+  // centre. Rising doors: across the middle of the doorway's depth, so they
+  // sit back from both faces. `span` is the doorway's extent across.
+  for (const d of map.doors) {
+    const along = (t) => (d.axis === 'x' ? t.x : t.y);
+    const across = (t) => (d.axis === 'x' ? t.y : t.x);
+    d.plane = d.style === 'rise' ? (Math.min(...d.group.map(along)) + Math.max(...d.group.map(along)) + 1) / 2 : along(d) + 0.5;
+    d.span0 = Math.min(...d.group.map(across));
+    d.span1 = Math.max(...d.group.map(across)) + 1;
+  }
 
-  // Door tiles without their own floor texture borrow a neighbour's. Rising
-  // doors start closed: their ceiling sits on the floor, and the renderer
-  // draws the door texture on the face under it. They open to their own ceilZ if the legend gave one,
-  // else to the lowest ceiling beside them (so there's no lintel).
+  // Door tiles without their own floor texture borrow a neighbour's. A rising
+  // door's tiles are the recess it stands in: their ceiling is the top of the
+  // opening, the door's own ceilZ if the legend gave one, else the lowest
+  // ceiling beside them (so there's no lintel). The lintel face above the
+  // opening is the tile's `upper` texture.
   for (const d of map.doors) {
     const i = map.index(d.x, d.y);
     // (Other door tiles don't count: their ceilings come down as they close.)
@@ -281,12 +298,13 @@ export function buildLevel(registry, level, opts = {}) {
       .filter(([nx, ny]) => map.inBounds(nx, ny) && !(map.flags[map.index(nx, ny)] & (F_SOLID | F_DOOR)))
       .map(([nx, ny]) => map.index(nx, ny));
     if (map.floorTex[i] < 0) map.floorTex[i] = around.map((n) => map.floorTex[n]).find((t) => t >= 0) ?? -1;
+    d.floorZ = map.floorZ[i];
     if (d.style !== 'rise') continue;
     d.openZ = !explicitCeil[i] && around.length ? Math.min(...around.map((n) => map.ceilZ[n])) : map.ceilZ[i];
-    if (map.ceilTex[i] < 0) map.ceilTex[i] = d.tex;
+    if (map.ceilTex[i] < 0) map.ceilTex[i] = d.jamb >= 0 ? d.jamb : d.tex;
     // The lintel above the opening (when a neighbour's ceiling is higher).
     if (map.upperTex[i] < 0) map.upperTex[i] = d.jamb >= 0 ? d.jamb : d.tex;
-    map.ceilZ[i] = map.floorZ[i];
+    map.ceilZ[i] = d.openZ;
   }
 
   buildLifts(map, glyphAt, legend);

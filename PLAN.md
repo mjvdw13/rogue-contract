@@ -313,8 +313,8 @@ Design rules (what makes it feel like Dark Forces):
       small switch and key panels laid on top. Texture overrides can change
       the frame count (the console is static). Review in screenshots of
       Mission 1, then tune the picks.
-- [ ] Key doors show their key panel once per 64x64 tile, so a big door
-      shows it four times. Make door textures one panel per door (a
+- [x] Key doors show their key panel once per 64x64 tile, so a big door
+      shows it four times (fixed by Phase 1b L: door art is fitted to the door). Make door textures one panel per door (a
       128x128 door texture, or draw the panel only once per door).
 
 ### E. Leftovers from the first Star Wars pass
@@ -589,6 +589,65 @@ Found on the way:
       sheets: the first one replaces each def's inline `sheet` with a
       `{ ref }` in the shared content objects. Only tools that build two
       registries hit it; copy the defs instead of changing them.
+
+### L. Doors you can find (done 2026-10-13)
+
+Mark: doors are hard to find (a door tile looks like any other wall), and
+they're too thick (the whole doorway, a full tile or two, rises as one
+block). He liked the older doors, which sat inset into the wall. Use the
+proper door textures from the texture pack.
+
+Research:
+- **The older doors** (before `698b326`, Raccoon Alex's Wolfenstein kind)
+  were a thin panel through the middle of the door tile, so they sat half a
+  tile back from the wall face, with jamb texture on the doorway's sides.
+- **Dark Forces doors** are a thin door sector set back in the doorway.
+  The frame doesn't move: the sides are jamb textures (light strips and a
+  small control panel), and the wall continues above the door as a lintel.
+  The door texture moves up with the door's ceiling, so it slides up into
+  the lintel. A DF door texture is one whole door: `IDDOOR1` (SecBase's grey
+  X-braced door) is 64x64, which at our 32 texels per unit is 2 wide by 2
+  tall (the player is 1.7). Today's 3-4 wide, 4-6 tall M1 doors tile it 2x2
+  and more, so a door reads as wall panelling.
+- **The films:** Imperial doors are thin slabs that drop or rise like a
+  guillotine (or slide sideways), set in a deep frame.
+- **The pack's door art:** doors `IDDOOR1` (= `ZDIMPER1`), `ZDIMPER4/5`
+  (the big dark door with the red ring), `IDBLKDOR` (a round blast door,
+  128x128), `ZDBIGDR1-4`; jambs `IDJAMPNL` (32x64: a blue light strip and a
+  control panel, exactly one tile wide), `IDJAMLCY`, `ZDJAML2Y`; the lintel
+  strip `IDJAMLCX` (a horizontal row of blue lights).
+
+Decided:
+- **Rising doors become a thin panel set back in the doorway.** The door
+  tiles are an open recess (floor, a lowered ceiling at the door's top, the
+  jamb texture on its sides). The panel stands across the middle of the
+  doorway's depth (in a 2-deep M1 doorway that's 1 tile back from each
+  face) and rises into the lintel, its texture moving with its bottom edge.
+  The room's wall above the opening is the lintel face (`upper`).
+- **One door texture per door.** The panel's texture is anchored to the
+  doorway (centred across it, bottom edge up), not to world position, so a
+  door shows its art once, and key panels show once (closes the Phase 1b D
+  item).
+- **Collision, sight and shots use the panel**, not the whole tile: you can
+  step into the recess, shots and projectiles stop at the panel (3D shots
+  pass under a half-open door), and a door won't close on a body in its
+  panel's way. Slide, split and secret doors are unchanged.
+- **Mission 1's doors resized to the art:** standard doors 2 wide, 2 tall
+  (`IDDOOR1`), with a lit lintel and jambs; the main gate a 4x4 blast door
+  (`IDBLKDOR`).
+
+1. [x] Engine: the panel plane and span per door group, the renderer's
+       panel (partly open: it draws the panel and narrows the window, and
+       the ray goes on below it), `castRay` / `traceRay3D` / body collision /
+       projectiles against the panel, closing checks bodies at the panel.
+2. [x] Textures: `imp-lintel` (new), `imp-gate` (new), `imp-jamb` and the
+       doors; generated placeholders and the DF overrides (`IDJAMPNL`,
+       `IDJAMLCX` strip, `IDBLKDOR`).
+3. [x] Mission 1 and the sandbox: doors 2 wide and 2 tall with lintels, the
+       gate 4x4.
+4. [x] Tests (panel position, a body in the recess, shots under a half-open
+       door, texture once per door), MODDING.md, screenshots before and
+       after, validator and smoke test.
 
 ## Phase 2: Dark Forces systems
 
@@ -1090,3 +1149,25 @@ update the smoke test.
   office, a cage round the maintenance crates. The fence pass adds about
   0.6 ms a frame in railing-heavy generator views (560 wide, Node). 118
   tests (10 new), the validator and the smoke test pass.
+- 2026-10-13: Phase 1b L, doors you can find (Mark: doors were hard to find
+  and too thick; he liked the older inset doors). Rising doors are now a thin
+  panel standing across the middle of the doorway's depth, which slides up
+  into the top of the opening (Dark Forces' door sector, the films' guillotine
+  doors). The doorway is an open recess as tall as the opening, with lit jambs
+  on its sides and the lintel above. The renderer draws the panel set back,
+  narrows the column's window to below its bottom edge and carries on under
+  it. Bodies, `castRay`, `traceRay3D` (shots pass under a half-open door) and
+  projectiles stop at the panel, not the tile; a door closes on someone
+  standing in its recess but not on someone in its panel's way. Door art is
+  fitted to the doorway (centred, hung from its bottom edge), so one door
+  texture shows one door and key panels show once. Door tiles group by their
+  door fields, not by glyph, so each side can have its own lintel. Textures
+  (Dark Forces pack): `imp-door` IDDOOR1 (2x2), `imp-jamb` IDJAMPNL (32x64,
+  a light strip and control panel), the new `imp-lintel` (IDJAMLCX's row of
+  lights rolled to the bottom edge) and `imp-gate` (IDBLKDOR, 4x4), with
+  generated placeholders. Wall textures may now be any power-of-two size
+  (validator). Mission 1's doors resized to the art: 2 wide and 2 tall with
+  lit lintels (the plain wall above where a room is tall), the main gate a
+  4x4 blast door. `snapshot.mjs --doors <open>` sets every door's state for
+  review. 124 tests (6 new in `doors.test.js`), the validator and the smoke
+  test pass.

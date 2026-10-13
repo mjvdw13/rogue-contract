@@ -38,6 +38,13 @@ export function castRay(map, x, y, dx, dy, maxDist = 128) {
     const leave = Math.min(sdx, sdy);
     if (t >= 0 && t <= leave && t <= maxDist) return { dist: t, tx: mapX, ty: mapY, door: null, passedDoor, slant: start };
   }
+  // A rising door's panel ahead in the starting tile (standing in its recess).
+  const startDoor = map.doorAt(mapX, mapY);
+  if (startDoor?.style === 'rise') {
+    const t = risePanel(startDoor, x, y, dx, dy, 0, Math.min(sdx, sdy), maxDist);
+    if (t >= 0) return { dist: t, tx: mapX, ty: mapY, door: startDoor, passedDoor };
+    if (t === -2) passedDoor = startDoor;
+  }
   for (let i = 0; i < 512; i++) {
     let enter;
     if (sdx < sdy) {
@@ -65,9 +72,10 @@ export function castRay(map, x, y, dx, dy, maxDist = 128) {
     if (f & F_DOOR) {
       const door = map.doors[map.doorIndex[idx]];
       if (door.style === 'rise') {
-        // A rising door fills its tile; it stops rays until it's mostly open.
-        if (door.open < 0.6) return { dist: enter, tx: mapX, ty: mapY, door, passedDoor };
-        passedDoor ??= door;
+        // A rising door's panel stops rays until it's mostly open.
+        const t = risePanel(door, x, y, dx, dy, enter, Math.min(sdx, sdy), maxDist);
+        if (t >= 0) return { dist: t, tx: mapX, ty: mapY, door, passedDoor };
+        if (t === -2) passedDoor ??= door;
         continue;
       }
       const t = doorPanel(door, x, y, dx, dy, mapX, mapY, enter, maxDist);
@@ -78,6 +86,21 @@ export function castRay(map, x, y, dx, dy, maxDist = 128) {
     if (f & F_SOLID) return { dist: enter, tx: mapX, ty: mapY, door: null, passedDoor };
   }
   return { dist: maxDist, tx: mapX, ty: mapY, door: null, passedDoor };
+}
+
+/** Slack for a rising door's panel on a tile edge (a ray may meet it on either side). */
+const EDGE_EPS = 1e-7;
+
+/**
+ * Where a ray meets a rising door's panel between distances `enter` and
+ * `leave` (the stretch inside one of its tiles). Returns the distance if the
+ * panel blocks the ray (it does until mostly open), -2 if the ray passes the
+ * open door, or -1 if it doesn't reach the panel here.
+ */
+function risePanel(door, x, y, dx, dy, enter, leave, maxDist) {
+  const t = door.planeHit(x, y, dx, dy);
+  if (t < 0 || t < enter - EDGE_EPS || t > leave + EDGE_EPS || t > maxDist) return -1;
+  return door.open < 0.6 ? t : -2;
 }
 
 /**
@@ -102,9 +125,9 @@ function doorPanel(door, x, y, dx, dy, mapX, mapY, enter, maxDist) {
 /**
  * Trace a ray through the height grid in 3D: from (x, y, z) along the unit
  * horizontal direction (dx, dy), rising `slope` units per unit of horizontal
- * distance. It stops at walls, door panels, angled walls, the faces of raised
- * floors and lowered ceilings, and the floor or ceiling itself. Rising doors
- * are just the tile's ceiling. Distances are horizontal.
+ * distance. It stops at walls, door panels (a rising door's only above its
+ * bottom edge), angled walls, the faces of raised floors and lowered ceilings,
+ * and the floor or ceiling itself. Distances are horizontal.
  *
  * `hit` is 'wall', 'floor', 'ceiling', or null if nothing was hit within
  * `maxDist`. `sky` is true when the ray went up into the sky.
@@ -139,6 +162,10 @@ export function traceRay3D(map, x, y, z, dx, dy, slope, maxDist = 128) {
       if (door.style !== 'rise') {
         const t = doorPanel(door, x, y, dx, dy, mapX, mapY, enter, maxDist);
         if (t >= 0 && t <= leave) block = t;
+      } else {
+        // A rising door's panel, above its bottom edge (shots pass under a half-open door).
+        const t = door.planeHit(x, y, dx, dy);
+        if (t >= enter - EDGE_EPS && t <= leave + EDGE_EPS && z + slope * t > door.bottomZ) block = Math.max(t, enter);
       }
     }
     // Does the ray reach this tile's floor or ceiling before it leaves?
@@ -190,8 +217,9 @@ export function lineOfSight(map, x0, y0, x1, y1) {
 }
 
 /**
- * Does a box of half-size r centred at (x, y) overlap any blocking tile, or a
- * circle of radius r overlap the solid side of an angled wall?
+ * Does a box of half-size r centred at (x, y) overlap any blocking tile or the
+ * closed panel of a rising door, or a circle of radius r overlap the solid side
+ * of an angled wall?
  */
 export function blockedByMap(map, x, y, r) {
   const x0 = Math.floor(x - r);
@@ -201,6 +229,7 @@ export function blockedByMap(map, x, y, r) {
   for (let ty = y0; ty <= y1; ty++) {
     for (let tx = x0; tx <= x1; tx++) {
       if (map.blocks(tx, ty)) return true;
+      if (map.flags[ty * map.w + tx] & F_DOOR && map.panelBlocks(tx, ty, x, y, r)) return true;
       if (map.flags[ty * map.w + tx] & F_SLANT && map.slants[map.slantIndex[ty * map.w + tx]].touchesCircle(x, y, r)) return true;
     }
   }

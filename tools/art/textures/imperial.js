@@ -1,6 +1,7 @@
 // Imperial garrison and desert canyon textures: grey wall panels, gloss
 // black trim, light strips, computer banks, vents and grates, doors and
-// switches, canyon rock and sand. All 64x64 and seamless.
+// switches, canyon rock and sand. 64x64 and seamless, except the doorway's
+// jamb (32x64, one tile wide) and the main gate (128x128, one whole door).
 import {
   texture, noiseFill, mottle, speckle, stain, scratches, grimeGradient, bevel, rivet,
   C, mix, darken, lighten, hash2, fbm, PixelCanvas,
@@ -268,33 +269,92 @@ function sand() {
 
 // ------------------------------------------------------------------ doors and switches
 
-/** A blast door: two grey halves with horizontal ribs, and a coloured light strip for locks. */
+/**
+ * A door, 2 units square (one whole door, as Dark Forces' IDDOOR1): a grey
+ * slab in a dark frame, braced with an X round a hub, and a coloured key
+ * panel on the hub for locked doors.
+ */
 function impDoor(name, light) {
   return () => {
     const { c, seed, r } = texture(name);
-    const base = GREY(0.5);
-    panelFill(c, seed, GREY(0.44), GREY(0.54));
-    for (let y = 6; y < 64; y += 10) seamH(c, y, base);
-    c.rect(31, 0, 2, 64, C('gray', 0.08));
-    bevel(c, 4, 22, 24, 20, GREY(0.4), { depth: 1 });
-    bevel(c, 36, 22, 24, 20, GREY(0.4), { depth: 1 });
-    if (light) {
-      c.rect(8, 30, 16, 3, light);
-      c.rect(40, 30, 16, 3, light);
+    const base = GREY(0.48);
+    panelFill(c, seed, GREY(0.42), GREY(0.52));
+    // The X brace, then the frame over its ends.
+    for (let k = -2; k <= 2; k++) {
+      c.line(3, 3 + k, 60, 60 + k, GREY(k === -2 ? 0.62 : k === 2 ? 0.26 : 0.38));
+      c.line(60, 3 + k, 3, 60 + k, GREY(k === -2 ? 0.62 : k === 2 ? 0.26 : 0.38));
     }
+    c.frame(0, 0, 64, 64, C('gray', 0.1));
+    c.frame(1, 1, 62, 62, GREY(0.3));
+    c.frame(2, 2, 60, 60, GREY(0.6));
+    seamH(c, 31, base);
+    // The hub, and the key panel on it.
+    bevel(c, 24, 24, 16, 16, GREY(0.3), { depth: 2 });
+    c.rect(28, 28, 8, 8, light ?? C('gray', 0.12));
+    if (light) c.rect(29, 29, 3, 2, lighten(light, 0.3));
     scratches(c, r, 6, darken(base, 0.25), { maxLen: 5, vertical: true });
     grimeGradient(c, { bottom: 0.2, top: 0.05 });
     return c;
   };
 }
 
-/** The door frame: heavy dark metal with a thin light line. */
+/** A doorway's side (jamb), one tile wide: dark metal round a blue light strip and a control panel. */
 function impJamb() {
-  const { c, seed } = texture('imp-jamb');
-  panelFill(c, seed, C('gray', 0.14), C('gray', 0.22));
-  c.rect(28, 0, 8, 64, C('gray', 0.1));
-  c.rect(31, 0, 2, 64, G('red', 0));
-  for (let y = 4; y < 64; y += 12) c.rect(0, y, 64, 1, C('gray', 0.08));
+  const { c, seed } = texture('imp-jamb', 32, 64);
+  panelFill(c, seed, C('gray', 0.16), C('gray', 0.24));
+  c.rect(10, 0, 12, 64, C('gray', 0.08));
+  for (let y = 2; y < 64; y += 8) {
+    if (y >= 26 && y < 42) continue;
+    c.rect(12, y, 8, 4, G('cyan', 0.75));
+    c.rect(13, y + 1, 6, 2, G('cyan', 1));
+  }
+  // The control panel: red and green lights.
+  bevel(c, 11, 28, 10, 12, C('gray', 0.3), { depth: 1 });
+  c.rect(13, 30, 2, 2, G('red', 1));
+  c.rect(17, 30, 2, 2, G('green', 0.9));
+  c.rect(13, 35, 6, 3, C('gray', 0.12));
+  seamV(c, 0, 0, 64, C('gray', 0.2));
+  seamV(c, 30, 0, 64, C('gray', 0.2));
+  return c;
+}
+
+/** The wall above a doorway: panelling over a row of blue lights along the opening's top. */
+function impLintel() {
+  const { c, seed } = texture('imp-lintel');
+  const base = GREY(0.34);
+  panelFill(c, seed, GREY(0.3), GREY(0.38));
+  for (let y = 10; y < 48; y += 12) seamH(c, y, base);
+  c.rect(0, 50, 64, 14, C('gray', 0.1));
+  for (let x = 2; x < 64; x += 11) {
+    c.rect(x, 53, 7, 7, C('gray', 0.22));
+    c.rect(x + 2, 54, 3, 5, G('cyan', 1));
+  }
+  c.rect(0, 63, 64, 1, C('gray', 0.05));
+  return c;
+}
+
+/** The garrison's main gate, 4 units square: a round blast door in a heavy frame. */
+function impGate() {
+  const { c, seed, r } = texture('imp-gate', 128, 128);
+  const base = GREY(0.46);
+  panelFill(c, seed, GREY(0.4), GREY(0.5));
+  c.rect(0, 0, 128, 18, C('gray', 0.18));
+  for (let x = 4; x < 128; x += 16) c.rect(x, 6, 8, 4, G('cyan', 0.6));
+  c.frame(0, 18, 128, 110, C('gray', 0.1));
+  c.circle(64, 72, 46, GREY(0.3));
+  c.ring(64, 72, 46, 3, GREY(0.62));
+  c.circle(64, 72, 38, GREY(0.44));
+  for (let k = 0; k < 8; k++) {
+    const a = (k / 8) * Math.PI * 2;
+    c.line(64 + Math.cos(a) * 14, 72 + Math.sin(a) * 14, 64 + Math.cos(a) * 38, 72 + Math.sin(a) * 38, GREY(0.28));
+  }
+  c.circle(64, 72, 14, GREY(0.32));
+  c.ring(64, 72, 14, 2, GREY(0.6));
+  c.rect(52, 70, 24, 4, C('gray', 0.12));
+  c.circle(64, 30, 4, G('red', 1));
+  seamH(c, 120, base);
+  scratches(c, r, 14, darken(base, 0.25), { maxLen: 7, vertical: true });
+  grimeGradient(c, { bottom: 0.25, top: 0.05 });
   return c;
 }
 
@@ -423,6 +483,8 @@ export default [
   { name: 'imp-door-blue', out: T('imp-door-blue'), draw: impDoor('imp-door-blue', G('cyan', 0.7)) },
   { name: 'imp-door-yellow', out: T('imp-door-yellow'), draw: impDoor('imp-door-yellow', G('amber', 1)) },
   { name: 'imp-jamb', out: T('imp-jamb'), draw: impJamb },
+  { name: 'imp-lintel', out: T('imp-lintel'), draw: impLintel },
+  { name: 'imp-gate', out: T('imp-gate'), draw: impGate },
   { name: 'imp-switch', out: T('imp-switch'), draw: impSwitch(false) },
   { name: 'imp-switch-on', out: T('imp-switch-on'), draw: impSwitch(true) },
   { name: 'sky-night', out: T('sky-night'), draw: skyNight },

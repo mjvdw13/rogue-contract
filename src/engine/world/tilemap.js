@@ -21,11 +21,14 @@ export const OPPOSITE = [2, 3, 0, 1];
 export const LIGHT_FX = { none: 0, flicker: 1, strobe: 2, glow: 3, fire: 4, blink: 5 };
 
 /**
- * A door living in one tile. Sliding and split doors are a thin panel through
- * the tile centre: `axis: 'x'` means the plane is at constant x (you walk
- * through it along the x axis); `'y'` means constant y. Rising doors
- * (`style: 'rise'`, Dark Forces' kind) fill the tile: its ceiling rises from
- * the floor to `openZ`.
+ * A door living in one tile. Every door is a thin panel standing in the plane
+ * `plane`: `axis: 'x'` means the plane is at constant x (you walk through it
+ * along the x axis); `'y'` means constant y. Sliding and split doors run
+ * through the tile centre. Rising doors (`style: 'rise'`, Dark Forces' kind)
+ * stand across the middle of the whole doorway's depth, set back from both
+ * faces; the door tiles are an open recess with their ceiling at `openZ`, and
+ * the panel rises from the floor into it. `span0`..`span1` is the doorway's
+ * extent across (the other axis), so a rising door's texture fits the door.
  */
 export class Door {
   constructor(spec) {
@@ -37,6 +40,12 @@ export class Door {
     this.style = spec.style ?? 'slide'; // 'slide' | 'split' | 'rise'
     /** For rising doors: the ceiling height when fully open (set by the level builder). */
     this.openZ = spec.openZ ?? 2;
+    /** Floor height of the doorway (set by the level builder). */
+    this.floorZ = spec.floorZ ?? 0;
+    /** Where the panel stands, and the doorway's extent across (set by the level builder). */
+    this.plane = spec.plane ?? (this.axis === 'x' ? this.x : this.y) + 0.5;
+    this.span0 = spec.span0 ?? (this.axis === 'x' ? this.y : this.x);
+    this.span1 = spec.span1 ?? this.span0 + 1;
     this.lock = spec.lock ?? null; // key id, 'remote' (triggers only) or null
     this.secret = !!spec.secret;
     this.stayOpen = !!spec.stayOpen;
@@ -51,6 +60,27 @@ export class Door {
 
   get passable() {
     return this.open >= 0.85;
+  }
+
+  /** A rising door's bottom edge (it rises from the floor to openZ). */
+  get bottomZ() {
+    return this.floorZ + this.open * (this.openZ - this.floorZ);
+  }
+
+  /**
+   * Where a ray from (x, y) along (dx, dy) meets the panel's plane, or -1 if it
+   * runs parallel or the plane is behind it.
+   */
+  planeHit(x, y, dx, dy) {
+    const d = this.axis === 'x' ? dx : dy;
+    if (d === 0) return -1;
+    const t = (this.plane - (this.axis === 'x' ? x : y)) / d;
+    return t >= 0 ? t : -1;
+  }
+
+  /** Does a body of radius r at (x, y) reach across the panel's plane? */
+  touchesPanel(x, y, r) {
+    return Math.abs((this.axis === 'x' ? x : y) - this.plane) < r;
   }
 }
 
@@ -117,13 +147,41 @@ export class TileMap {
     return d >= 0 ? this.doors[d] : null;
   }
 
-  /** True if the tile blocks movement (walls, void, closed doors, outside the map). */
+  /**
+   * True if the tile blocks movement (walls, void, closed doors, outside the
+   * map). A rising door's tiles are an open recess: only its panel blocks
+   * (see `panelBlocks`).
+   */
   blocks(x, y) {
     if (x < 0 || y < 0 || x >= this.w || y >= this.h) return true;
     const i = y * this.w + x;
     const f = this.flags[i];
     if (f & F_SOLID) return true;
-    if (f & F_DOOR) return !this.doors[this.doorIndex[i]].passable;
+    if (f & F_DOOR) {
+      const d = this.doors[this.doorIndex[i]];
+      return d.style !== 'rise' && !d.passable;
+    }
+    return false;
+  }
+
+  /** Does the closed part of a rising door's panel in tile (x, y) stop a body of radius r at (px, py)? */
+  panelBlocks(x, y, px, py, r) {
+    const d = this.doorAt(x, y);
+    return !!d && d.style === 'rise' && !d.passable && d.touchesPanel(px, py, r);
+  }
+
+  /**
+   * Does a point moving from (x0, y0) to (x1, y1) at height z cross the closed
+   * part of a rising door's panel (projectiles)?
+   */
+  panelCrossed(x0, y0, x1, y1, z) {
+    for (const [px, py] of [[x0, y0], [x1, y1]]) {
+      const d = this.doorAt(Math.floor(px), Math.floor(py));
+      if (!d || d.style !== 'rise' || z < d.bottomZ) continue;
+      const a = (d.axis === 'x' ? x0 : y0) - d.plane;
+      const b = (d.axis === 'x' ? x1 : y1) - d.plane;
+      if ((a < 0 && b >= 0) || (a > 0 && b <= 0)) return true;
+    }
     return false;
   }
 

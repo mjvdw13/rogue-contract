@@ -25,7 +25,8 @@ const fenceLv = new Int8Array(MAX_FENCES);
  * open tile it fills the window with that tile's floor and ceiling. Where the
  * ray crosses into a tile with a higher floor or a lower ceiling it draws that
  * step face. It stops at a solid wall, at a closed part of a door panel, or
- * when the window closes.
+ * when the window closes. A rising door's panel covers the window down to its
+ * bottom edge, and the ray goes on under it.
  *
  * The window after each tile is recorded per column (view.segDist / segTop /
  * segBot) so sprites can be clipped by ledges and overhangs nearer than them.
@@ -115,6 +116,8 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
     let tEnter = 0;
     let end = 1e6;
     let nf = 0;
+    /** The rising door whose panel this column has met (a panel on a tile edge is met from both tiles). */
+    let panelDone = null;
 
     // Fill rows [a, b) of this column with a textured vertical face at distance t.
     // Textures are mapped in world units (TEXELS_PER_UNIT texels per unit), so
@@ -312,10 +315,37 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
       }
 
       // A door panel in the current tile can stop the ray partway through it.
-      if (flags[cur] & F_DOOR && step > 0) {
+      if (flags[cur] & F_DOOR) {
         const door = doors[doorIndex[cur]];
-        // Rising doors are drawn as the tile's lowered ceiling, not as a panel.
-        if (!door.secret && door.style !== 'rise') {
+        if (door.style === 'rise') {
+          // A rising door's panel stands back in its doorway (perhaps on the
+          // edge between two of its tiles: drawn once). Below its bottom edge
+          // the ray carries on under it.
+          const t = door.axis === 'x' ? (rdx !== 0 ? (door.plane - px) / rdx : -1) : rdy !== 0 ? (door.plane - py) / rdy : -1;
+          if (door.group !== panelDone && t > 1e-4 && t >= tEnter - 1e-6 && t <= tExit + 1e-6) {
+            panelDone = door.group;
+            const bz = door.bottomZ;
+            if (bz < ceilZ[cur]) {
+              flats(cur, tEnter, t);
+              seen[cur] = 1;
+              // One door texture across the doorway, centred, reading left to right from both sides.
+              const along = door.axis === 'x' ? py + rdy * t : px + rdx * t;
+              const flip = door.axis === 'x' ? rdx < 0 : rdy > 0;
+              const width = door.span1 - door.span0;
+              const tw = door.tex >= 0 ? textures[door.tex].w / TPU : width;
+              const u = (flip ? door.span1 - along : along - door.span0) - (width - tw) / 2;
+              const b = rowOf(bz, t);
+              face(t, rowOf(ceilZ[cur], t), b, bz + texHeight(door.tex), door.tex, u, faceLevel(cur, t, door.axis === 'x' ? 1 : -1));
+              if (b > clipTop) clipTop = b > clipBot ? clipBot : b;
+              record(t);
+              if (clipTop >= clipBot) {
+                end = t;
+                break;
+              }
+              tEnter = t;
+            }
+          }
+        } else if (!door.secret && step > 0) {
           const cx = cur % mw;
           const cy = (cur / mw) | 0;
           let t = -1;
@@ -435,17 +465,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
         else {
           seen[next] = 1;
           const lv = faceLevel(cur, tExit, contrast);
-          const top = rowOf(cC, tExit);
-          const door = f & F_DOOR ? doors[doorIndex[next]] : null;
-          if (door?.style === 'rise') {
-            // The lintel above the opening keeps the tile's upper texture; only
-            // the moving part below openZ is the door, anchored to its bottom edge.
-            const split = cC > door.openZ ? rowOf(door.openZ, tExit) : top;
-            if (split > top) face(tExit, top, split, cC, upperTex[next], wx, lv);
-            face(tExit, split, b, cN + texHeight(door.tex), door.tex, wx, lv);
-          } else {
-            face(tExit, top, b, cN + texHeight(upperTex[next]), upperTex[next], wx, lv);
-          }
+          face(tExit, rowOf(cC, tExit), b, cN + texHeight(upperTex[next]), upperTex[next], wx, lv);
         }
         if (b > clipTop) clipTop = b > clipBot ? clipBot : b;
       }

@@ -41,10 +41,12 @@ with JSDoc types, so editors like VS Code autocomplete the fields.
   are no 8-angle rotations), and the bottom of the frame stands on the floor.
   32 pixels is one tile, so a person about 56 pixels tall stands about 1.75
   tiles high, and fills a 64×64 frame.
-- **Textures:** walls and flats are 64×64, and span two tiles (32 texels per
-  tile), about the height of a person. Textures are laid out by world
-  position, so they run on across tiles. An animated texture is a horizontal
-  strip of 64×64 frames.
+- **Textures:** walls and flats are usually 64×64, and span two tiles (32
+  texels per tile), about the height of a person. Any power-of-two size from
+  16 to 256 works (a door's art is one whole door). Textures are laid out by
+  world position, so they run on across tiles; a rising door's art is laid
+  out on the door instead. An animated texture is a horizontal strip of
+  frames.
 - **The built-in art** comes from code in `tools/art/`. Run `npm run art`, or
   `node tools/art/generate.mjs --only ant --preview`. It uses a small
   software "clay" renderer (`tools/art/lib/model.js`), and a rig for
@@ -407,18 +409,28 @@ its target stands on (the probe droid hovers at 0.9), climbs over ledges in
 its way at `flySpeed` (default 3 a second), and falls when it dies. Give
 walking monsters a radius of 0.5 at most, so they fit on a one-tile step.
 
-Doorways are usually wider than one tile. Neighbouring door tiles drawn with
-the same glyph are one door: they open and close together.
+Doorways are usually wider than one tile. Neighbouring door tiles of the
+same door (the same `door` texture, `style`, `lock` and `tag`) are one door:
+they open and close together. Their other fields may differ, say a different
+`upper` on each side.
 
 Door options:
 
-- `jamb`: the texture of the walls beside the door.
+- `jamb`: the texture of the walls beside the door (a rising door's recess).
 - `style`: how it opens.
-  - `'rise'` (the shared doors): Dark Forces-style, the door slides up into
-    the ceiling. It opens to the lowest ceiling beside it, or to its own
-    `ceilZ` if you give one. If a neighbouring room's ceiling is higher, the
-    wall above the opening uses the door tile's `upper` texture (default: the
-    jamb).
+  - `'rise'` (the shared doors): Dark Forces-style. The doorway is an open
+    recess, and the door is a thin panel standing across the middle of its
+    depth (in a doorway 2 tiles deep, 1 tile back from each face), which
+    slides up into the top of the opening. You can step into the recess;
+    the panel stops bodies, sight and shots, and a half-open door lets shots
+    pass under it. The opening is as tall as its own `ceilZ` if you give
+    one, else the lowest ceiling beside it. Where a room's ceiling is
+    higher, the wall above the opening is the door tile's `upper` texture
+    (the lintel; default: the jamb). The door's art is fitted to the doorway,
+    centred and hung from its bottom edge, so a texture the doorway's size
+    shows once (the shared `imp-door` is 2×2, `imp-gate` 4×4). The shared
+    `imp-jamb` (32 wide, one tile) and `imp-lintel` (lights along its bottom
+    edge, for a lintel 1-2 tall) frame it.
   - `'slide'` (the default): a panel through the middle of the tile slides
     sideways.
   - `'split'`: an elevator-style panel that opens from the middle.
@@ -613,7 +625,7 @@ one.
 
 ## Textures
 
-Put a 64×64 PNG in `assets/textures/` and add its name to the `STATIC` list in
+Put a 64×64 PNG (or any power-of-two size from 16 to 256) in `assets/textures/` and add its name to the `STATIC` list in
 `src/content/textures.js`. For an animated texture, add it to `ANIMATED` with
 `{ frames, fps }`. Sky textures (`sky: true`) are wide panoramas. Fence
 textures (`fence: true`, the `FENCES` list) may be any size and use

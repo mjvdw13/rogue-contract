@@ -29,10 +29,10 @@ export default {
     R: { wall: 'canyon-rock' },
 
     // ---- Doors (they rise into the ceiling, Dark Forces-style; use them with E)
-    D: { door: 'imp-door', jamb: 'imp-jamb', style: 'rise' },
-    1: { door: 'imp-door-blue', jamb: 'imp-jamb', lock: 'blue', style: 'rise' },
-    2: { door: 'imp-door-yellow', jamb: 'imp-jamb', lock: 'yellow', style: 'rise' },
-    3: { door: 'imp-door-red', jamb: 'imp-jamb', lock: 'red', style: 'rise' },
+    D: { door: 'imp-door', jamb: 'imp-jamb', upper: 'imp-lintel', style: 'rise' },
+    1: { door: 'imp-door-blue', jamb: 'imp-jamb', upper: 'imp-lintel', lock: 'blue', style: 'rise' },
+    2: { door: 'imp-door-yellow', jamb: 'imp-jamb', upper: 'imp-lintel', lock: 'yellow', style: 'rise' },
+    3: { door: 'imp-door-red', jamb: 'imp-jamb', upper: 'imp-lintel', lock: 'red', style: 'rise' },
 
     // ---- Switches
     X: { wall: 'imp-switch', use: 'exit', switchTo: 'imp-switch-on' },

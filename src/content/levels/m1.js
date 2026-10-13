@@ -26,10 +26,17 @@ const sand = (floorZ = 0, extra = {}) => ({ floor: 'sand', ceiling: 'sky', floor
 const room = (floorZ, ceilZ, extra = {}) => ({
   floor: 'imp-floor', ceiling: 'imp-ceiling', floorZ, ceilZ, light: 160, side: 'imp-panel-dark', upper: 'imp-panel', ...extra,
 });
-/** A rising door (a doorway, opening to `ceilZ`). */
-const door = (floorZ, ceilZ, extra = {}) => ({
-  door: 'imp-door', jamb: 'imp-jamb', style: 'rise', floor: 'imp-floor', ceiling: 'imp-ceiling', floorZ, ceilZ, light: 160, ...extra,
+/**
+ * A rising door: a doorway 2 tiles deep, its panel set back in the middle,
+ * lit jambs on its sides and a lit lintel over the opening. The door art is
+ * one 2x2 door (Dark Forces' IDDOOR1), so doorways are 2 wide and 2 tall.
+ */
+const door = (floorZ, extra = {}) => ({
+  door: 'imp-door', jamb: 'imp-jamb', style: 'rise', floor: 'imp-floor', ceiling: 'imp-ceiling', upper: 'imp-lintel',
+  floorZ, ceilZ: floorZ + 2, light: 160, ...extra,
 });
+/** The wall above a door on a side where the room is too tall for the lit lintel (it would repeat up the wall). */
+const tallSide = { upper: 'imp-panel' };
 /** A lift platform between `stops`. */
 const lift = (stops, ceilZ, extra = {}) => ({
   floor: 'lift-floor', ceiling: 'imp-ceiling', floorZ: stops[0], ceilZ, light: 160, side: 'imp-stripe', lift: { stops, wait: 3 }, ...extra,
@@ -69,8 +76,8 @@ p.rect(26, 40, 70, 44, sand(0, { light: 120 }));
 p.rect(24, 2, 112, 40, panel);
 p.rect(70, 24, 112, 66, panel);
 
-// 4. The face: a locked main gate between light strips.
-p.rect(44, 36, 52, 40, door(0, 6, { lock: 'remote', tag: 'maingate' }));
+// 4. The face: a locked main gate (one 4x4 blast door) between light strips.
+p.rect(46, 36, 50, 40, door(0, { door: 'imp-gate', ceilZ: 4, lock: 'remote', tag: 'maingate', ...tallSide }));
 p.rect(40, 39, 44, 40, lights);
 p.rect(52, 39, 56, 40, lights);
 // Floodlight pools under the strips, and the lit gate between them.
@@ -116,20 +123,20 @@ p.rect(53, 8, 55, 10, room(6, 10, { ceiling: 'imp-ceiling-light', light: 184 }))
 p.light(48, 4, 51, 7, 120);
 p.light(57, 4, 60, 7, 120);
 p.chamfer(48, 4, 60, 14, 2, darkPanel, ['NW', 'NE']);
-p.rect(52, 14, 55, 16, door(6, 10));
+p.rect(53, 14, 55, 16, door(6));
 
 // 10. The officer's office.
 p.rect(62, 4, 72, 14, room(6, 9, { light: 144 }));
 p.rect(63, 5, 66, 8, room(6, 9, { ceiling: 'imp-ceiling-light', light: 192 })); // over the desk
 p.chamfer(62, 4, 72, 14, 2, darkPanel, ['NE']);
-p.rect(65, 14, 68, 16, door(6, 9));
+p.rect(65, 14, 67, 16, door(6));
 // A barred window from the corridor into the office, over a sill.
 p.rect(69, 14, 71, 16, room(7, 8.5, { light: 144, side: 'imp-panel', upper: 'imp-panel' }));
 p.fence(69, 15, 71, 16, 'S', bars);
 
 // 11. The red door, and 12. the data vault behind it: dark, walled in computer banks.
 p.rect(76, 8, 94, 26, computer);
-p.rect(76, 16, 78, 20, door(6, 9, { door: 'imp-door-red', lock: 'red' }));
+p.rect(76, 17, 78, 19, door(6, { door: 'imp-door-red', lock: 'red' }));
 // The screens' glow pulses along the banks.
 p.rect(78, 10, 92, 24, room(6, 9, { light: 112 }));
 const screens = { lightFx: 'glow', lightMin: 104 };
@@ -142,7 +149,8 @@ p.chamfer(78, 10, 92, 24, 2, darkPanel);
 p.rect(92, 14, 94, 18, { door: 'imp-computer', secret: true, floor: 'imp-floor', ceiling: 'imp-ceiling', floorZ: 6, ceilZ: 9, light: 112 });
 p.rect(94, 13, 98, 19, room(6, 9, { light: 120, secret: true }));
 // The south door onto the generator catwalk.
-p.rect(83, 24, 87, 26, door(6, 9));
+p.rect(84, 24, 86, 26, door(6));
+p.rect(84, 25, 86, 26, door(6, { upper: 'imp-computer' })); // (the generator side: the banks' wall)
 
 // 13. The generator chamber: a deep shaft, a catwalk ring, and the reactor column.
 const genFloor = room(-6, 18, { floor: 'imp-grate', light: 112, tag: 'generator' });
@@ -187,7 +195,7 @@ p.rect(93, 43, 94, 45, {
 });
 
 // 14. The escape hatch in the east wall, opened by the overload switch.
-p.rect(108, 42, 110, 46, door(6, 10, { lock: 'remote', tag: 'escape' }));
+p.rect(108, 43, 110, 45, door(6, { lock: 'remote', tag: 'escape', ...tallSide }));
 
 // ---------------------------------------------------------------- the way out
 // 15. The gantry: stairs up to 8, out under the sky.

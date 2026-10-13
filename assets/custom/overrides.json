@@ -99,5 +99,11 @@
   },
   "assets/textures/imp-cage.png": {
     "src": "assets/custom/textures/imp-cage.png"
+  },
+  "assets/textures/imp-lintel.png": {
+    "src": "assets/custom/textures/imp-lintel.png"
+  },
+  "assets/textures/imp-gate.png": {
+    "src": "assets/custom/textures/imp-gate.png"
   }
 }

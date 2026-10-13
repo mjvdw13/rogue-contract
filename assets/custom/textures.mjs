@@ -76,6 +76,14 @@ function resizeRows(img, h) {
   return { w: img.w, h, data };
 }
 
+/** Roll the rows down by `dy` (wrapping), so a band lands where it's wanted. */
+function rollRows(img, dy) {
+  const data = new Uint8Array(img.data.length);
+  const row = img.w * 4;
+  for (let y = 0; y < img.h; y++) data.set(img.data.subarray(y * row, (y + 1) * row), ((y + dy) % img.h) * row);
+  return { w: img.w, h: img.h, data };
+}
+
 // Game texture id -> a DF texture name, or a function building the image.
 // `frames: 1` replaces an animated generated texture with a still one.
 // `seeThrough: true` keeps the transparent pixels (fences); other walls are made solid.
@@ -98,7 +106,12 @@ const TEXTURES = {
   'imp-door-red': () => centred(load('IDDOOR1'), load('ZASWIT01_0')),
   'imp-door-blue': () => centred(load('IDDOOR1'), load('ZASWIT01_1')),
   'imp-door-yellow': () => centred(load('IDDOOR1'), redToYellow(load('ZASWIT01_0'))),
-  'imp-jamb': 'IDJAMLCY',
+  // A doorway's sides: a light strip and a control panel, one tile wide.
+  'imp-jamb': 'IDJAMPNL',
+  // Over a doorway: IDJAMLCX's row of lights (rows 20-41) rolled down to the opening's top.
+  'imp-lintel': () => rollRows(load('IDJAMLCX'), 22),
+  // The main gate: a round blast door, one 4x4 door.
+  'imp-gate': 'IDBLKDOR',
   'imp-switch': () => centred(crop(load('IWSECB2'), 64), load('ZASWIT06_0')),
   'imp-switch-on': () => centred(crop(load('IWSECB2'), 64), load('ZASWIT06_1')),
   // The canyon outside

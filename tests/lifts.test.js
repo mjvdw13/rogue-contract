@@ -89,13 +89,14 @@ test('rising doors open to the lowest ceiling beside them and let the player thr
   const i = w.map.index(2, 1);
   assert.equal(door.style, 'rise');
   assert.equal(door.openZ, 3, 'the lower neighbour sets the opening');
-  assert.equal(w.map.ceilZ[i], 0, 'closed: the ceiling sits on the floor');
+  assert.equal(w.map.ceilZ[i], 3, 'the doorway is a recess as tall as the opening');
+  assert.equal(door.bottomZ, 0, 'closed: the panel stands on the floor');
   const input = mockInput();
   input.hold('forward');
   run(w, input, 0.5);
-  assert.ok(w.player.x < 2, 'a closed door blocks');
+  assert.ok(w.player.x < 2.5 - w.player.radius + 1e-6, 'a closed door blocks at its panel');
   input.tap('use');
   run(w, input, 1.5);
   assert.ok(w.player.x > 3, 'walked through once it rose');
-  assert.equal(w.map.ceilZ[i], 3);
+  assert.equal(door.bottomZ, 3);
 });

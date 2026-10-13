@@ -42,8 +42,11 @@ const pngSize = (src, owner) => {
 for (const t of reg.textures.values()) {
   const size = pngSize(t.src, `texture "${t.id}"`);
   if (!size || t.sky || t.fence) continue;
-  if (size.height !== 64 || size.width !== 64 * (t.frames ?? 1)) {
-    errors.push(`texture "${t.id}": expected ${64 * (t.frames ?? 1)}x64 pixels, got ${size.width}x${size.height}`);
+  // Any power-of-two size from 16 to 256 (64x64 is the usual; a door's art is one whole door).
+  const fw = size.width / (t.frames ?? 1);
+  const ok = (n) => Number.isInteger(n) && n >= 16 && n <= 256 && (n & (n - 1)) === 0;
+  if (!ok(fw) || !ok(size.height)) {
+    errors.push(`texture "${t.id}": frames must be power-of-two sizes from 16 to 256 (like 64x64), got ${size.width}x${size.height}${t.frames ? ` in ${t.frames} frames` : ''}`);
   }
 }
 for (const s of reg.sheets.values()) {

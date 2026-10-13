@@ -29,11 +29,11 @@ test('closed doors block at their middle, open ones let rays through', () => {
   assert.equal(through.passedDoor, m.doors[0]);
 });
 
-test('rising doors block at the tile face until mostly open', () => {
+test('rising doors block at their panel, set back in the doorway, until mostly open', () => {
   const m = buildLevel(registry, { ...level, legend: { ...level.legend, D: { door: 'imp-door', style: 'rise' } } }, {}).map;
   const hit = castRay(m, 4.5, 1.5, 0, 1);
   assert.equal(hit.door, m.doors[0]);
-  assert.ok(Math.abs(hit.dist - 1.5) < 1e-9, 'face at y = 3');
+  assert.ok(Math.abs(hit.dist - 2) < 1e-9, 'panel in the middle of the doorway, y = 3.5');
   m.doors[0].open = 0.7;
   const through = castRay(m, 4.5, 1.5, 0, 1);
   assert.equal(through.door, null);

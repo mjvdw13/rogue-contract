@@ -57,7 +57,7 @@ test('the sky swallows rays, and a closed rising door stops them', () => {
   const door = corridor('.D..', { D: { door: 'imp-door', style: 'rise' } });
   const shut = traceRay3D(buildLevel(registry, door).map, 3.5, 3.5, 1, 1, 0, 0, 40);
   assert.equal(shut.hit, 'wall');
-  assert.ok(Math.abs(shut.dist - 2.5) < 1e-9, 'stops at the door');
+  assert.ok(Math.abs(shut.dist - 3.5) < 1e-9, 'stops at the panel, in the middle of the 2-deep doorway');
 });
 
 test('ray vs body: over its head misses, through it hits', () => {

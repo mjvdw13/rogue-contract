@@ -54,7 +54,7 @@ export function projectileThink(world, p, dt) {
     const nx = p.x + p.vx * sdt;
     const ny = p.y + p.vy * sdt;
     const nz = p.z + p.vz * sdt;
-    if (map.solidPoint(nx, ny)) {
+    if (map.solidPoint(nx, ny) || (map.doors.length && map.panelCrossed(p.x, p.y, nx, ny, nz))) {
       explode(world, p, null);
       return;
     }

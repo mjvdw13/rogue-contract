@@ -3,8 +3,20 @@
 /** The tiles of a door that move together (a wide doorway is several door tiles). */
 const tilesOf = (door) => door.group ?? [door];
 
-/** Something standing in any tile of the door? */
-const occupied = (world, door) => tilesOf(door).some((d) => world.tileOccupied(d.x, d.y));
+/**
+ * Something in the door's way? A rising door's tiles are a recess you can
+ * stand in, so only a body reaching across its panel counts.
+ */
+function occupied(world, door) {
+  if (door.style !== 'rise') return tilesOf(door).some((d) => world.tileOccupied(d.x, d.y));
+  const lo = door.span0;
+  const hi = door.span1;
+  return world.things.some((t) => {
+    if (!t.solid || t.removed || !door.touchesPanel(t.x, t.y, t.radius)) return false;
+    const c = door.axis === 'x' ? t.y : t.x;
+    return c + t.radius > lo && c - t.radius < hi;
+  });
+}
 
 /** Start opening a door (all its tiles). Returns true if it started moving. */
 export function openDoor(world, door) {
@@ -59,11 +71,6 @@ export function updateDoors(world, dt) {
         break;
       default:
         break;
-    }
-    if (d.style === 'rise') {
-      // The door is the tile's ceiling: it rises from the floor to openZ.
-      const i = d.y * map.w + d.x;
-      map.ceilZ[i] = map.floorZ[i] + d.open * (d.openZ - map.floorZ[i]);
     }
   }
 }
