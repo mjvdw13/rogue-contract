@@ -17,6 +17,7 @@ land, and record new decisions here.
 | Engine, revisited (2026-10-12) | **Stay on our height-grid engine.** Considered instead: The Force Engine (needs the original Dark Forces files, so it can only host a mod; desktop only), GZDoom (true sectors and slopes, but desktop only) and Godot with TrenchBroom (no grid limits, but a full rebuild). Fill the grid's visual gaps with 3D models (Phase 1b F). |
 | Platforms (2026-10-12) | **Desktop browsers.** Phones are no longer a target: no phone performance gate, and touch controls aren't required. |
 | Story, revisited (2026-10-13) | **Bad Paper, a prequel to Dark Forces** (`docs/story.md`), set a few months before Dark Forces' first mission. Kyle takes a Guild bounty on Tatooine as cover for the Alliance, and the contract turns on him: the Canyon Garrison is an early field test of Mohc's Dark Trooper project, and its prototype is Phase 3's mini-boss. **Only Mission 1 (Mos Eisley) is free roam:** calm troopers and the tracking fob, until Kyle finds his target and the shooting starts. From there it's straight run-and-gun, and later missions have no stealth or tracker. **The hero is Kyle Katarn** (Mark, 2026-10-13, replacing the earlier "no Kyle Katarn retelling"), and Jan Ors drops him off and picks him up in the Moldy Crow in every mission; the first mission opens with the Crow landing in a Mos Eisley docking bay. |
+| Stacked spaces (2026-10-13) | **Two storeys per tile** (Phase 1c), before the story's maps. Mark wants to walk under other parts of the map. A tile can hold one solid slab, with a storey under it and one on top, like GZDoom's 3D floors. Considered instead: walkable 3D models (bridges only, no rooms under rooms) and overlapping layers joined by portals (Dark Forces' and Build's way: much bigger, for little more). |
 | Rights | A non-commercial fan game. All art, sound and music are generated or original. Nothing ripped from Dark Forces, and no note-for-note John Williams transcriptions. Exception (Mark's decision, 2026-10-12): the ripped Dark Forces enemy and weapon sheets in `assets/custom/` are used, on the hosted site too (see Phase 1b D). |
 
 ## Starting point
@@ -94,7 +95,7 @@ tile holds at most one wall line. 3D models (Phase 1b F) can add shapes the
 grid can't (curves, ship hulls, machinery), but only as decoration: nobody
 walks on or under them.
 
-## Phase 1b: Look and feel (the current work)
+## Phase 1b: Look and feel
 
 Why: after the first Star Wars content pass (2026-10-12), Mark's verdict was
 "low quality Star Wars knock-off, not real Star Wars". The textures are low
@@ -684,6 +685,86 @@ Decided:
              full IDJAMPNL as `imp-gate-jamb`.
        - [x] Screenshots, tests, the validator and smoke test.
 
+## Phase 1c: Two storeys per tile (the current work, from 2026-10-13)
+
+Mark (2026-10-13): we want to walk underneath other parts of the map. Today
+every tile has one floor and one ceiling, so there are no bridges you can
+walk under, no rooms under walkable ground and no upper floors over open
+space. This comes before the story's maps (`docs/story.md`), which are
+designed around it: the generator chamber's bridges no longer need to reach
+down and split its floor, the homestead's rooms can lie under the ground
+round its courtyard, and Mos Eisley's streets can have arches and upper
+floors.
+
+Decided (2026-10-13):
+- **One slab per tile.** A legend entry's `slab: { bottom, top, floor,
+  ceiling, side, light }` puts a solid layer from `bottom` to `top` inside
+  the tile's open space. That gives a lower storey (the tile's floor up to
+  the slab's underside) and an upper storey (the slab's top up to the
+  tile's ceiling or sky). `floor` is the texture on the slab's top,
+  `ceiling` its underside, `side` its edges, and `light` the lower storey's
+  light (the tile's `light` lights the upper one).
+- **Each storey can have its own walls.** An upper-storey wall over open
+  space below is a tile whose ceiling stops at the slab; a lower-storey wall
+  under an open upper floor is a raised floor. Both exist already, so rooms
+  can stand on rooms with different layouts.
+- **Which storey a body is in:** the upper one when the slab's top is
+  within its step reach (its `z` plus how high it can step), else the lower
+  one. `floorAt`, `ceilAt` and `lowFloorAt` take that reach; without one
+  they answer for the upper storey. Projectiles and 3D rays use their own
+  height.
+- **Renderer:** each screen column keeps a short list of open row windows
+  (up to 8) instead of one. Every window is in one storey of the tile the
+  ray is crossing, and behaves like today's single window inside it. A
+  slab's edge seen from the side covers the middle of a window and splits
+  it. Each tile boundary records the column's whole set of windows (a
+  batch), and sprites and models clip against the last batch nearer than
+  them.
+- **Maps without slabs render exactly as before:** pixel-identical
+  snapshots of Mission 1 and the sandbox, before and after.
+- **Placement:** things and the player start stand in the lower storey
+  unless their `z` puts them on the slab.
+- **First-version limits** (the validator rejects them): no slab in a door,
+  lift or angled-wall tile; one slab per tile. A fence in a slab tile stands
+  on the slab (a railing along a bridge). Sound travels through slabs.
+
+1. [ ] **Data and level format:** `F_SLAB` and per-tile slab arrays in
+       `TileMap` (bottom, top, textures, the lower storey's light offset),
+       the legend's `slab` in `level.js`, validator errors (a slab outside
+       the tile's open space, too thin, or in a door, lift or angled-wall
+       tile), the painter and the upscaler (heights double).
+2. [ ] **Renderer** (`render/columns.js`): open windows per column; each
+       window's storey (its floor and ceiling, the slab's top and underside
+       textures, the lower storey's light); the faces at each boundary per
+       window, including slab edges that split a window; rising doors,
+       angled walls and fences per window. Sprites and models clip against
+       the window batches (`sprites.js`, `models.js`). Check: pixel-identical
+       snapshots of today's maps, and frame times.
+3. [ ] **Sandbox showcase:** a bridge across a hall and a walkway over a
+       room. Snapshots from the side, from underneath, from on top and from
+       above.
+4. [ ] **Movement and combat:** reach-aware `floorAt` / `ceilAt` /
+       `lowFloorAt`; the player, monsters, gravity, flyers, lift riders,
+       crouching; `traceRay3D` (slab tops, undersides and edges), projectiles,
+       explosions, bullet puffs; fences on slabs; things placed with `z`; the
+       player start's `z`.
+5. [ ] **Next to slabs:** a rising door beside a slab tile opens to the
+       right storey's ceiling; sprites and models under a slab take the
+       lower storey's light.
+6. [ ] **Pathfinding** (`world/nav.js`): the flow field over (tile,
+       storey), so monsters cross bridges and walk under them.
+7. [ ] **Tools:** the level checker's standing spots per storey
+       (`tools/lib/levelcheck.mjs`), the map viewer and the automap (the
+       upper storey drawn over the lower), `snapshot.mjs`.
+8. [ ] **Tests and docs:** renderer, physics, combat, pathfinding and
+       checker tests; MODDING.md.
+9. [ ] **Gate:** the sandbox's bridge runs near 60 fps in a desktop
+       browser; all tests, the validator and the smoke test pass.
+
+Later, if wanted: doors and lifts inside slab tiles, more than two storeys,
+slabs that stop sound, triggers for one storey only. Then use it in Mission
+1: generator bridges that leave the floor whole.
+
 ## Phase 2: Dark Forces systems
 
 - [ ] A mission briefing screen (scrolling text over a picture) before each
@@ -713,7 +794,7 @@ Decided:
 ### For the story (`docs/story.md`)
 
 About a dozen pieces, all small or medium, and no new rendering technique:
-most extend code that already exists. Order: the Crow pieces first (every
+most extend code that already exists. After Phase 1c (two storeys). Order: the Crow pieces first (every
 mission uses them, and they give Mos Eisley's opening), then calm troopers
 and the switch, then conversations, then the fob. Each new action or
 trigger is registered and checked by the validator (`validate.js` rejects
@@ -1366,3 +1447,7 @@ update the smoke test.
   tool fixes that go with them (the level checker and flying models, the
   spawn sound, skipping cutscenes in tests). Mos Eisley's rooflines need no
   engine change.
+- 2026-10-13: Planned Phase 1c, two storeys per tile (Mark: we want to walk
+  under other parts of the map), ahead of the story's engine work. A tile
+  can hold one solid slab; the renderer keeps several open windows per
+  column; bodies pick a storey by their step reach. Starting on it.
