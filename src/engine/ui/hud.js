@@ -1,6 +1,6 @@
 import { VIEW_W, VIEW_H, SCREEN_H } from '../config.js';
 import { FaceController } from './face.js';
-import { F_SOLID, F_DOOR, F_USE, F_EXIT, F_VOID } from '../world/tilemap.js';
+import { F_SOLID, F_DOOR, F_USE, F_EXIT, F_VOID, F_SLAB } from '../world/tilemap.js';
 
 /**
  * Corner HUD layout: each panel's size and its readout insets [x, y, w, h].
@@ -135,6 +135,7 @@ export class Hud {
     const cSwitch = pal.ramp('toxic', 0.9);
     const cExit = pal.ramp('glow-green', 1);
     const cFence = pal.ramp('gray', 0.6);
+    const cSlab = pal.ramp('gray', 0.45);
     const keyColor = (lock) => {
       const k = (g.registry.config.keys ?? []).find((kk) => kk.id === lock);
       return k?.ramp ? pal.ramp(k.ramp, 0.8) : cDoor;
@@ -177,6 +178,15 @@ export class Hud {
           if (f & F_EXIT && seen) s.fillRect(sx(x + 0.3), sy(y + 0.3), Math.max(1, scale * 0.4), Math.max(1, scale * 0.4), cExit);
           const sl = map.slantAt(x, y);
           if (sl) clipLine(sx(sl.ax), sy(sl.ay), sx(sl.bx), sy(sl.by), seen ? cWall : cHidden);
+          // A slab's edges where it meets open floor without one (a bridge's sides).
+          if (f & F_SLAB) {
+            const c = seen ? cSlab : cHidden;
+            const bare = (nx, ny) => map.inBounds(nx, ny) && !(map.flags[ny * map.w + nx] & (F_SOLID | F_SLAB));
+            if (bare(x, y - 1)) clipLine(sx(x), sy(y), sx(x + 1), sy(y), c);
+            if (bare(x, y + 1)) clipLine(sx(x), sy(y + 1), sx(x + 1), sy(y + 1), c);
+            if (bare(x - 1, y)) clipLine(sx(x), sy(y), sx(x), sy(y + 1), c);
+            if (bare(x + 1, y)) clipLine(sx(x + 1), sy(y), sx(x + 1), sy(y + 1), c);
+          }
           // Fences on this tile's edges (each is drawn from both tiles beside it).
           for (let edge = 0; edge < 4; edge++) {
             if (map.fenceAt[i * 4 + edge] < 0) continue;

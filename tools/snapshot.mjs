@@ -8,6 +8,7 @@
 //   node tools/snapshot.mjs sandbox --out shot.png --scale 3 --nomonsters
 //   node tools/snapshot.mjs m1 --custom                   with the art overrides (the Dark Forces art)
 //   node tools/snapshot.mjs m1 --doors 0.5                every door half open
+//   node tools/snapshot.mjs sandbox --at 33.5,8.5,90 --top  on top of a slab (under it by default)
 //
 // The default output is tools/art/out/snapshots/<level>.png.
 import fs from 'node:fs';
@@ -56,7 +57,7 @@ export async function headless({ custom = false } = {}) {
 }
 
 /** Render one frame of `levelId` from a camera. Returns RGBA pixels of the view. */
-export function snapshot(ctx, levelId, { at, pitch = 0, z, skill = 3, noMonsters = false, doors } = {}) {
+export function snapshot(ctx, levelId, { at, pitch = 0, z, skill = 3, noMonsters = false, doors, top = false } = {}) {
   const { registry, palette, assets, surface, renderer } = ctx;
   const level = registry.levels.get(levelId);
   if (!level) throw new Error(`Unknown level "${levelId}"`);
@@ -67,7 +68,8 @@ export function snapshot(ctx, levelId, { at, pitch = 0, z, skill = 3, noMonsters
     pt.x = at[0];
     pt.y = at[1];
     if (at[2] !== undefined) pt.angle = contentAngle(at[2]);
-    if (world.floorAt) pt.z = world.floorAt(pt.x, pt.y, pt.radius);
+    // (Under a slab, unless `top` stands on it.)
+    if (world.floorAt) pt.z = world.floorAt(pt.x, pt.y, pt.radius, top ? Infinity : -Infinity);
   }
   const cam = { ...world.camera(), horizonOffset: pitch };
   if (z !== undefined) cam.z = (pt.z ?? 0) + z;
@@ -119,6 +121,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     skill: Number(opt('--skill', 3)),
     noMonsters: args.includes('--nomonsters'),
     doors: opt('--doors') !== undefined ? Number(opt('--doors')) : undefined,
+    top: args.includes('--top'),
   });
   const out = path.resolve(opt('--out', path.join(root, 'tools/art/out/snapshots', `${levelId}.png`)));
   fs.mkdirSync(path.dirname(out), { recursive: true });

@@ -501,6 +501,53 @@ draws fences as pale lines (dashed when low).
 In a painted level, `p.fence(x0, y0, x1, y1, 'E', { tex, height })` puts a
 fence on that edge of every open tile in the box.
 
+### Two storeys: slabs
+
+A floor tile can hold a slab: a solid layer partway up its open space. That
+gives the tile two storeys, one under the slab and one on top, so you can
+walk under a bridge, dig a room under a courtyard, or put a walkway over a
+hall:
+
+```js
+// A bridge across a tall hall: walk under it on the floor, or along its top.
+'=': { base: 'h', slab: { bottom: 3, top: 3.5, floor: 'imp-grate', side: 'imp-stripe', ceiling: 'imp-panel-dark', light: 120 } },
+// The same with a railing along its north side (it stands on the slab).
+'n': { base: '=', fence: { tex: 'imp-railing', edges: 'N', height: 0.75 } },
+```
+
+- `bottom` / `top`: the slab's underside and top. The lower storey runs from
+  the tile's floor up to `bottom`, the upper one from `top` up to the
+  tile's ceiling (or sky). Both must have some height.
+- `floor`: the texture on the slab's top. It defaults to the tile's floor.
+- `ceiling`: its underside. It defaults to the tile's ceiling (or its
+  `floor`, under a sky).
+- `side`: its edges, seen where the slab ends. It defaults to the tile's
+  `side`.
+- `light`: the lower storey's light. The tile's own `light` lights the upper
+  one.
+
+Each storey can have its own walls, with the heights you already have. A
+wall on the upper storey standing over open space below is a tile whose
+ceiling stops at the slab's underside (`ceilZ: 3`, no slab); a wall on the
+lower storey under an open upper floor is a raised floor up to the slab's
+top (`floorZ: 3.5`). So rooms can stand on rooms with different layouts.
+
+The player and monsters are in the upper storey when the slab's top is
+within their step (or a jump's reach), else in the lower one: you can't
+walk into a slab's edge, you bump your head on its underside, and you drop
+off the end of a bridge. Shots, projectiles, sight and explosions keep to
+their storey too. A fence on a slab tile stands on the slab, so a railing
+along a bridge stops bodies on top and lets them walk underneath.
+Monsters plan routes over and under bridges.
+
+Things are placed in the lower storey unless their `z` puts them on the
+slab: `{ type: 'stormtrooper', x: 20.5, y: 12, z: 3.5 }` stands on the
+bridge, and so can the player start. A monster's drops land on the storey
+it died on.
+
+Not yet: a slab in a door, lift or angled-wall tile (the validator says
+so), more than one slab per tile, and slabs that stop sound.
+
 ### Lifts
 
 Give a floor glyph a `lift` and its tiles become a lift (an elevator, in Dark
@@ -550,7 +597,8 @@ it dies. The validator and the reachability check count a key that a
 reachable monster always drops (chance 1) as placed.
 
 You can also place things precisely with
-`list: [{ type: 'donut', x: 3.5, y: 7.25 }]`.
+`list: [{ type: 'donut', x: 3.5, y: 7.25 }]`. A `z` there puts a thing (or
+the player start) on top of a slab rather than under it.
 
 ### Triggers and actions
 
@@ -609,7 +657,11 @@ Actions:
   and unreachable floor cross-hatched. Floors are shaded by height (higher is
   brighter), with a black edge where a ledge is too high to walk up and a grey
   one at a step. Lifts have an orange frame, and crouch-only spaces a cyan
-  one. Add `--skill 5` to see nightmare placement.
+  one. A slab tile shows the slab's top in a dotted white frame. Add
+  `--skill 5` to see nightmare placement.
+- The reachability check treats each storey of a slab tile as its own place:
+  an item on a bridge you can't climb onto is unreachable, even if you can
+  walk under it.
 
 Tips from the built-in maps:
 

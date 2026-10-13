@@ -275,11 +275,11 @@ the prototype's shape in the dark across the vaporator field. The objective
 says run. Kyle calls the Crow, and JAN: "Two minutes!" Hold the pickup spot
 until she lands.
 
-**A grid check first:** the engine can't put rooms under ground you can
-walk on. So the rooms round the courtyard sit behind its walls with nothing
-walkable over them, and from the surface the far side of the pit looks like
-the homestead's raised outer wall. Try the courtyard in the sandbox before
-building the map.
+**Rooms under the ground:** with two storeys per tile (PLAN.md Phase 1c,
+done), the rooms round the courtyard can lie under walkable ground: their
+tiles have a slab whose top is the surface. Their doorways into the
+courtyard need a door in a slab tile, which isn't supported yet, so give
+the doorways open arches or add that first.
 
 ## Map C: The Canyon Garrison (Mission 3, changes to the existing map)
 

@@ -1,10 +1,22 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { buildLevel } from '../src/engine/world/level.js';
 import { F_SLAB } from '../src/engine/world/tilemap.js';
 import { traceRay3D, lineOfSight3D, fenceBlocks } from '../src/engine/world/physics.js';
 import { FlowField, UNREACHABLE } from '../src/engine/world/nav.js';
 import { analyseLevel } from '../tools/lib/levelcheck.mjs';
+import { World } from '../src/engine/world/world.js';
+import { Rng } from '../src/engine/core/rng.js';
+import { Palette } from '../src/engine/gfx/palette.js';
+import { Surface } from '../src/engine/gfx/surface.js';
+import { quantize } from '../src/engine/gfx/image.js';
+import { Assets } from '../src/engine/assets.js';
+import { Renderer } from '../src/engine/render/renderer.js';
+import { SCREEN_W, VIEW_H } from '../src/engine/config.js';
+import { decodePNG } from '../tools/art/lib/png.js';
 import { registry, room, makeWorld, mockInput, run } from './helpers.js';
 
 // Two storeys per tile (PLAN.md Phase 1c): a tile's `slab` is a solid layer
@@ -264,4 +276,60 @@ test('the level checker reaches each storey on its own', () => {
   assert.deepEqual(unreachable(flat), ['shield-unit'], 'on the bridge, out of reach; under it, fine');
   const climb = analyseLevel(registry, level('1234567'));
   assert.deepEqual(unreachable(climb), ['med-kit'], 'up the stairs onto the bridge, but the stairs fill the corridor: nothing leads under it');
+});
+
+// ------------------------------------------------------------ rendering
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const palette = new Palette(registry.paletteDef);
+const assets = new Assets(registry, palette);
+assets._loadOverrides = async () => {
+  assets.overrides = {};
+};
+assets._loadImage = async (src) => {
+  try {
+    return quantize(decodePNG(fs.readFileSync(path.join(root, src))), palette);
+  } catch {
+    return null;
+  }
+};
+await assets.loadAll();
+const renderer = new Renderer(new Surface(SCREEN_W, VIEW_H), assets, palette);
+
+/**
+ * The open-sky corridor looking east from (1.5, 2.5), eye 1 up, with a
+ * bridge (slab 2 to 2.5) across columns 6-8, or none; troopers at
+ * [x, z] spots.
+ */
+function shot(bridge, troopers = []) {
+  const level = corridor(bridge ? [6, 9] : [0, 0], { bottom: 2, top: 2.5 });
+  level.list.push(...troopers.map(([x, z]) => ({ type: 'stormtrooper', x, y: 2.5, angle: 180, z })));
+  const w = new World({ registry, assets, rng: new Rng(1), settings: {} }, level, { skill: 3 });
+  const pt = w.player;
+  renderer.surface.clear(0);
+  renderer.render(w, { x: 1.5, y: 2.5, angle: 0, z: 1 }, { skip: pt });
+  return Uint8Array.from(renderer.surface.px);
+}
+const changedRows = (a, b) => {
+  const rows = [];
+  for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) rows.push(Math.floor(i / renderer.surface.w));
+  return rows;
+};
+
+test('a bridge seen from the side covers only its edge and underside: the view above and below goes on', () => {
+  const rows = changedRows(shot(false), shot(true));
+  assert.ok(rows.length > 500, 'the bridge shows');
+  // Its near edge runs from row 56 (2.5 up at 4.5 away) to 70, its underside down to 82 (2 up at 7.5).
+  assert.ok(Math.min(...rows) >= 55 && Math.max(...rows) <= 83, `rows ${Math.min(...rows)}-${Math.max(...rows)}`);
+});
+
+test('sprites on a bridge hide behind its edge; under it they show', () => {
+  const bridge = shot(true);
+  const onTop = changedRows(bridge, shot(true, [[7.5, 2.5]]));
+  assert.ok(onTop.length > 20, 'the trooper on top shows');
+  assert.ok(Math.max(...onTop) < 57, `only above the edge (down to row ${Math.max(...onTop)})`);
+  const under = changedRows(bridge, shot(true, [[7.5, 0]]));
+  assert.ok(under.length > 50, 'the trooper underneath shows');
+  // (At its distance, 6, the underside is at row 78; it covers the underside's farther part.)
+  assert.ok(Math.min(...under) >= 78, `below the underside (from row ${Math.min(...under)})`);
 });

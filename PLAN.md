@@ -685,7 +685,7 @@ Decided:
              full IDJAMPNL as `imp-gate-jamb`.
        - [x] Screenshots, tests, the validator and smoke test.
 
-## Phase 1c: Two storeys per tile (the current work, from 2026-10-13)
+## Phase 1c: Two storeys per tile (done 2026-10-13)
 
 Mark (2026-10-13): we want to walk underneath other parts of the map. Today
 every tile has one floor and one ceiling, so there are no bridges you can
@@ -728,38 +728,41 @@ Decided (2026-10-13):
   lift or angled-wall tile; one slab per tile. A fence in a slab tile stands
   on the slab (a railing along a bridge). Sound travels through slabs.
 
-1. [ ] **Data and level format:** `F_SLAB` and per-tile slab arrays in
+1. [x] **Data and level format:** `F_SLAB` and per-tile slab arrays in
        `TileMap` (bottom, top, textures, the lower storey's light offset),
        the legend's `slab` in `level.js`, validator errors (a slab outside
        the tile's open space, too thin, or in a door, lift or angled-wall
        tile), the painter and the upscaler (heights double).
-2. [ ] **Renderer** (`render/columns.js`): open windows per column; each
+2. [x] **Renderer** (`render/columns.js`): open windows per column; each
        window's storey (its floor and ceiling, the slab's top and underside
        textures, the lower storey's light); the faces at each boundary per
        window, including slab edges that split a window; rising doors,
        angled walls and fences per window. Sprites and models clip against
        the window batches (`sprites.js`, `models.js`). Check: pixel-identical
        snapshots of today's maps, and frame times.
-3. [ ] **Sandbox showcase:** a bridge across a hall and a walkway over a
-       room. Snapshots from the side, from underneath, from on top and from
+3. [x] **Sandbox showcase:** a bridge across a hall and a walkway over a
+       room. (Built: a bridge across the hall's pit, a bunker under the
+       sniper ledge, and a railed walkway out over the courtyard.) Snapshots from the side, from underneath, from on top and from
        above.
-4. [ ] **Movement and combat:** reach-aware `floorAt` / `ceilAt` /
+4. [x] **Movement and combat:** reach-aware `floorAt` / `ceilAt` /
        `lowFloorAt`; the player, monsters, gravity, flyers, lift riders,
        crouching; `traceRay3D` (slab tops, undersides and edges), projectiles,
        explosions, bullet puffs; fences on slabs; things placed with `z`; the
        player start's `z`.
-5. [ ] **Next to slabs:** a rising door beside a slab tile opens to the
+5. [x] **Next to slabs:** a rising door beside a slab tile opens to the
        right storey's ceiling; sprites and models under a slab take the
        lower storey's light.
-6. [ ] **Pathfinding** (`world/nav.js`): the flow field over (tile,
+6. [x] **Pathfinding** (`world/nav.js`): the flow field over (tile,
        storey), so monsters cross bridges and walk under them.
-7. [ ] **Tools:** the level checker's standing spots per storey
+7. [x] **Tools:** the level checker's standing spots per storey
        (`tools/lib/levelcheck.mjs`), the map viewer and the automap (the
        upper storey drawn over the lower), `snapshot.mjs`.
-8. [ ] **Tests and docs:** renderer, physics, combat, pathfinding and
+8. [x] **Tests and docs:** renderer, physics, combat, pathfinding and
        checker tests; MODDING.md.
-9. [ ] **Gate:** the sandbox's bridge runs near 60 fps in a desktop
-       browser; all tests, the validator and the smoke test pass.
+9. [x] **Gate:** the sandbox's bridge runs near 60 fps in a desktop
+       browser; all tests, the validator and the smoke test pass. (In
+       headless Chromium at 16:9, slab views take 1.7-3.6 ms a frame;
+       still to see on Mark's desktop.)
 
 Later, if wanted: doors and lifts inside slab tiles, more than two storeys,
 slabs that stop sound, triggers for one storey only. Then use it in Mission
@@ -1451,3 +1454,33 @@ update the smoke test.
   under other parts of the map), ahead of the story's engine work. A tile
   can hold one solid slab; the renderer keeps several open windows per
   column; bodies pick a storey by their step reach. Starting on it.
+- 2026-10-13: Phase 1c done: two storeys per tile.
+  - **Data:** a legend `slab: { bottom, top, floor, ceiling, side, light }`
+    (`F_SLAB`, per-tile slab arrays). `floorAt` / `ceilAt` / `lowFloorAt`
+    take a `reach` and answer for the storey a body reaches (its feet plus
+    its step: `world.reach`).
+  - **Renderer:** up to 8 open row windows per column, each in one storey;
+    a slab's edge splits a window. Each boundary records a batch of windows
+    (`view.segFirst`), which sprites and models clip against. Maps without
+    slabs render pixel-identically (640 seeded views of Mission 1 and the
+    sandbox, both art sets); their frame time is up about 10% headless.
+  - **Movement and combat:** walking, gravity, jumps and head bumps,
+    crouching, flyers, lift riders, projectiles, bullet puffs and
+    `traceRay3D` (shots, sight, explosions) keep to their storey. Things
+    spawn under a slab unless their `z` reaches it (drops land where the
+    body fell). A rising door beside a slab opens to the right storey;
+    sprites and models under a slab take its light.
+  - **Pathfinding:** the flow field's nodes are (tile, storey); where a slab
+    is involved, a step needs the two storeys to overlap by the body's
+    height. Railings on a bridge don't stop monsters walking underneath.
+  - **Tools:** the level checker gives slab tiles two standing spots and
+    checks things in their own storey; the map viewer shows a slab's top
+    in a dotted frame; the automap draws a slab's edges; `snapshot.mjs
+    --top` stands on a slab.
+  - **Sandbox:** a bridge across the pit, a bunker under the sniper ledge, a
+    railed walkway over the courtyard.
+  - **Checks:** 140 tests (14 in `tests/storeys.test.js`), the validator and
+    the smoke test pass; MODDING.md has a "Two storeys" section.
+  - **Later:** doors and lifts in slab tiles, more storeys, slabs that stop
+    sound, triggers per storey; Mission 1's generator bridges can now leave
+    the floor whole.

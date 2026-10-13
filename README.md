@@ -3,7 +3,7 @@
 > **Work in progress: a Dark Forces-style Star Wars fan game for the
 > browser.** It's built on the Raccoon Alex engine, extended with floor and
 > ceiling heights, jumping, crouching, looking up and down, rising doors,
-> lifts and angled walls. See [PLAN.md](PLAN.md) for the roadmap.
+> lifts, angled walls and two storeys (bridges you can walk under). See [PLAN.md](PLAN.md) for the roadmap.
 >
 > The Star Wars content hasn't landed yet: the art, levels and text below are
 > still Raccoon Alex's, and they get replaced phase by phase. Try the

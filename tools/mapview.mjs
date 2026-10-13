@@ -16,14 +16,16 @@
 // drops that key), coworkers green, items yellow,
 // keys and weapons bright, decorations grey, 3D models pink (their collision
 // lines, or their body's square), the start is a white arrow. Fences are pale
-// blue lines on their edges (dashed for a low railing).
+// blue lines on their edges (dashed for a low railing). A tile with a slab
+// (two storeys) shows the slab's top, as seen from above, in a dotted white
+// frame: there's a storey under it.
 // Areas the player can never reach are cross-hatched.
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import content from '../src/content/index.js';
 import { Registry } from '../src/engine/registry.js';
-import { F_SOLID, F_DOOR, F_SKY, F_SECRET, F_DAMAGE, F_EXIT, F_USE, F_VOID, F_SLANT } from '../src/engine/world/tilemap.js';
+import { F_SOLID, F_DOOR, F_SKY, F_SECRET, F_DAMAGE, F_EXIT, F_USE, F_VOID, F_SLANT, F_SLAB } from '../src/engine/world/tilemap.js';
 import { decodePNG, encodePNG } from './art/lib/png.js';
 import { analyseLevel, bodyLimits, modelFootprint } from './lib/levelcheck.mjs';
 
@@ -94,12 +96,14 @@ function render(level) {
   };
   // Height shading: the level's lowest floor is dimmest, its highest brightest.
   const body = bodyLimits(reg);
+  // The floor seen from above: a slab's top, else the tile's floor.
+  const topFloor = (i) => (map.flags[i] & F_SLAB ? map.slabTop[i] : map.floorZ[i]);
   let low = Infinity;
   let high = -Infinity;
   for (let i = 0; i < map.w * map.h; i++) {
     if (map.flags[i] & F_SOLID) continue;
     low = Math.min(low, map.floorZ[i]);
-    high = Math.max(high, map.floorZ[i]);
+    high = Math.max(high, topFloor(i));
   }
   const shade = (z) => (high > low ? 0.6 + (0.7 * (z - low)) / (high - low) : 1);
   for (let ty = 0; ty < map.h; ty++) {
@@ -128,8 +132,9 @@ function render(level) {
         continue;
       }
       const light = map.baseLight[i] / 255;
-      const lit = (0.35 + light * 0.75) * shade(map.floorZ[i]);
-      let c = (e.floor ? textureColor(e.floor) : [90, 90, 90]).map((v) => v * lit);
+      const lit = (0.35 + light * 0.75) * shade(topFloor(i));
+      const top = f & F_SLAB ? (e.slab?.floor ?? e.floor) : e.floor;
+      let c = (top ? textureColor(top) : [90, 90, 90]).map((v) => v * lit);
       if (f & F_SKY) c = [c[0] * 0.7 + 10, c[1] * 0.7 + 20, c[2] * 0.7 + 60];
       rect(x, y, S, S, c);
       if (f & F_SLANT) {
@@ -143,14 +148,20 @@ function render(level) {
         const nx = tx + dx;
         const ny = ty + dy;
         if (!map.inBounds(nx, ny) || map.flags[ny * map.w + nx] & F_SOLID) continue;
-        const rise = map.floorZ[ny * map.w + nx] - map.floorZ[i];
+        const rise = topFloor(ny * map.w + nx) - topFloor(i);
         if (rise <= 1e-6) continue;
         const ec = rise > body.step + 1e-6 ? [0, 0, 0] : [110, 110, 110];
         if (dx) rect(dx > 0 ? x + S - 1 : x, y, 1, S, ec);
         else rect(x, dy > 0 ? y + S - 1 : y, S, 1, ec);
       }
       if (map.liftIndex[i] >= 0) frame(x + 1, y + 1, S - 2, S - 2, [255, 150, 30]);
-      else if (map.ceilZ[i] - map.floorZ[i] < body.stand - 1e-6) frame(x + 1, y + 1, S - 2, S - 2, [60, 220, 255]);
+      else if (map.ceilZ[i] - topFloor(i) < body.stand - 1e-6) frame(x + 1, y + 1, S - 2, S - 2, [60, 220, 255]);
+      if (f & F_SLAB) for (let q = 1; q < S - 1; q += 2) {
+        put(x + q, y + 1, [255, 255, 255]);
+        put(x + q, y + S - 2, [255, 255, 255]);
+        put(x + 1, y + q, [255, 255, 255]);
+        put(x + S - 2, y + q, [255, 255, 255]);
+      }
       if (f & F_DAMAGE) for (let k = 0; k < S; k += 3) rect(x, y + k, S, 1, [60, 220, 60]);
       if (f & F_SECRET) for (let yy = 1; yy < S; yy += 3) for (let xx = 1; xx < S; xx += 3) put(x + xx, y + yy, [200, 90, 255]);
       if (f & F_EXIT) frame(x, y, S, S, [40, 255, 60]);
