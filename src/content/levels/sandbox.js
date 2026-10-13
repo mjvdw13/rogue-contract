@@ -19,6 +19,10 @@ import { defineLevel } from '../../engine/defs.js';
 // end up to the sniper ledge. Angled walls: chamfered corners everywhere, a
 // shallow computer bank in the start room, a diamond pillar and a triangular
 // block in the courtyard. The exit switch is on the start room's west wall.
+// Two storeys (slabs): a bridge across the pit at the hall's floor, which you
+// can walk under down in the pit; a bunker dug under the west end of the
+// sniper ledge (an energy pack inside); and a walkway with railings running
+// north from the ledge out over the courtyard.
 export default defineLevel({
   id: 'sandbox',
   mapLabel: 'M1',
@@ -133,6 +137,21 @@ export default defineLevel({
     },
     J: { wall: 'canyon-rock' },
     M: { floor: 'sand', ceiling: 'sky', light: 176, ceilZ: 6, side: 'canyon-rock' },
+    // Two storeys: a bridge across the pit at the hall's floor (walk under it
+    // down in the pit), a bunker dug under the sniper ledge, and a walkway
+    // with railings out from the ledge over the courtyard.
+    b: { base: 'p', light: 184, slab: { bottom: 0.5, top: 1, floor: 'imp-floor', side: 'imp-stripe', ceiling: 'imp-panel-dark', light: 120 } },
+    U: { base: 'y', slab: { bottom: 2, top: 2.5, floor: 'sand', side: 'canyon-rock', ceiling: 'canyon-rock', light: 120 } },
+    Y: {
+      base: 'y',
+      slab: { bottom: 2, top: 2.5, floor: 'imp-grate', side: 'imp-stripe', ceiling: 'imp-grate', light: 152 },
+      fence: { tex: 'imp-railing', edges: 'W', height: 0.75 },
+    },
+    Z: {
+      base: 'y',
+      slab: { bottom: 2, top: 2.5, floor: 'imp-grate', side: 'imp-stripe', ceiling: 'imp-grate', light: 152 },
+      fence: { tex: 'imp-railing', edges: 'E', height: 0.75 },
+    },
   },
   thingLegend: { '9': { type: 'stormtrooper', angle: 'S' } },
   tiles: [
@@ -144,8 +163,8 @@ export default defineLevel({
     'OO................OOOOOOOOhhhhhhpppphhhhhhhhhhOO',
     'OO................sssssssshhhhhhpppphhhhhhhhhhOO',
     'OO................sssssssshhhhhhpppphhhhhhhhhhOO',
-    'XX................sssssssshhhhhhpppphhhhhhhhhhOO',
-    'XX................sssssssshhhhhhpppphhhhhhhhhhOO',
+    'XX................sssssssshhhhhhbbbbhhhhhhhhhhOO',
+    'XX................sssssssshhhhhhbbbbhhhhhhhhhhOO',
     'OO................sssssssshhhhhhpppphhhhhhhhhhOO',
     'OO................sssssssshhhhhhpppphhhhhhhhhhOO',
     'OO................OOOOOOOOhhhhhhpppphhhhhhhhhhOO',
@@ -166,14 +185,14 @@ export default defineLevel({
     'QQyyyyyyyyyyyyyyyyyyM97MyyyyyyyyyyyyyyyyyyyyyyQQ',
     'QQyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy9JyyyyyyyyyyQQ',
     'QQyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyM9yyyyyyyyyyQQ',
-    'QQyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyQQ',
-    'QQyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyQQ',
-    'QQyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyQQ',
-    'QQyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyQQ',
-    'QQ4MyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyeeeeQQ',
-    'QQJ4yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyeeeeQQ',
-    'QQLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLQQ',
-    'QQLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLQQ',
+    'QQyyyyyyyyyyyyYZyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyQQ',
+    'QQyyyyyyyyyyyyYZyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyQQ',
+    'QQyyyyyyyyyyyyYZyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyQQ',
+    'QQyyyyyyyyyyyyYZyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyQQ',
+    'QQ4MyyyyyyyyyyYZyyyyyyyyyyyyyyyyyyyyyyyyyyeeeeQQ',
+    'QQJ4yyyyyyyyyyYZyyyyyyyyyyyyyyyyyyyyyyyyyyeeeeQQ',
+    'QQLLUUUUUULLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLQQ',
+    'QQLLUUUUUULLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLQQ',
     'QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ',
     'QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ',
   ],
@@ -229,6 +248,6 @@ export default defineLevel({
     '',
     '',
     '',
-    '           a           9      s   j',
+    '       C   a           9      s   j',
   ],
 });

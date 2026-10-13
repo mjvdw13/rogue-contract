@@ -237,7 +237,7 @@ export class TileMap {
   }
 
   fenceTop(f) {
-    return f.height ? this.floorZ[f.tile] + f.height : this.ceilZ[f.tile];
+    return f.height ? this.fenceBottom(f) + f.height : this.ceilZ[f.tile];
   }
 
   /** True if the tile blocks sight/bullets. Doors block until mostly open. */
