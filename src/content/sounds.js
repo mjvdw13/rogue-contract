@@ -37,6 +37,18 @@ export default [
     },
     pitchVariance: 0.08,
   }),
+  // The Jawas' ion blaster: a buzzing electric zap, and a crackle where it hits.
+  defineSound({
+    id: 'ion-fire',
+    synth: {
+      wave: 'square', duty: 0.3, freq: 520, freqEnd: 180, duration: 0.3, attack: 0.002, release: 0.22, lowpass: [5000, 900], volume: 0.4,
+      vibrato: { rate: 70, depth: 5 },
+      layers: [{ ...burst(0.25, [7000, 2500], 0.3, 6), highpass: 1500 }],
+      bits: 6,
+    },
+    pitchVariance: 0.08,
+  }),
+  defineSound({ id: 'ion-hit', synth: { ...burst(0.05, [8000, 3000], 0.45, 8), highpass: 1200, repeat: { count: 4, interval: 0.035, decay: 0.75, pitch: 1.2 }, bits: 6 }, pitchVariance: 0.1 }),
   defineSound({ id: 'bolt-hit', synth: { ...burst(0.12, [6000, 900], 0.55, 2), layers: [thump(220, 90, 0.08, 0.4)] }, pitchVariance: 0.1 }),
   defineSound({
     id: 'explode',

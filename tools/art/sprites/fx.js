@@ -1,5 +1,5 @@
-// Effects and projectiles: blaster puffs, blood, explosions and blaster
-// bolts. Fire is drawn with noisy fullbright gradients.
+// Effects and projectiles: blaster puffs, blood, explosions, blaster bolts
+// and the Jawas' ion blasts. Fire is drawn with noisy fullbright gradients.
 import { PixelCanvas } from '../lib/canvas.js';
 import { C, G } from '../lib/pal.js';
 import { sheet } from '../lib/sprite.js';
@@ -111,11 +111,63 @@ function blasterBolt(glow) {
   return sheet(frames);
 }
 
+/**
+ * A jagged electric arc from (x, y) heading `angle`, `len` pixels long: each
+ * step jinks sideways at random. Hot (white) near the start, cooling to
+ * `cool` at the tip.
+ */
+function arc(c, r, x, y, angle, len, hot, cool) {
+  let px = x;
+  let py = y;
+  let a = angle;
+  for (let s = 0; s < len; s++) {
+    a += r.range(-0.9, 0.9);
+    px += Math.cos(a);
+    py += Math.sin(a);
+    c.set(px, py, s < len * 0.4 ? hot : cool);
+  }
+}
+
+/**
+ * An ion blast: a crackling cloud of electricity. In flight (frames 0-3,
+ * looped fast) a flickering blue-white core with jagged arcs that change
+ * every frame; where it hits (frames 4-6) the arcs leap outwards and fade.
+ * 32x32, all fullbright.
+ */
+function ionBlast() {
+  const CLOUD = [[255, 255, 255], G('cyan', 1), G('cyan', 0.67), G('cyan', 0.33)];
+  const frames = [];
+  for (let f = 0; f < 4; f++) {
+    const c = new PixelCanvas(32, 32);
+    const r = rng(90 + f);
+    fireBlob(c, 16, 16, 4.2 + (f % 2) * 0.6, 100 + f, CLOUD, { holes: 0.12 });
+    for (let k = 0; k < 4; k++) {
+      const a = r.range(0, Math.PI * 2);
+      arc(c, r, 16 + Math.cos(a) * 2, 16 + Math.sin(a) * 2, a, 5 + r.int(0, 5), G('tube', 1), G('cyan', 0.67));
+    }
+    c.set(16, 16, [255, 255, 255]);
+    c.set(15, 16, [255, 255, 255]);
+    frames.push(c);
+  }
+  for (let f = 0; f < 3; f++) {
+    const c = new PixelCanvas(32, 32);
+    const r = rng(120 + f);
+    if (f < 2) fireBlob(c, 16, 16, 5 - f * 2, 130 + f, CLOUD.slice(f), { holes: 0.4 });
+    for (let k = 0; k < 6 - f; k++) {
+      const len = 8 + f * 3 + r.int(0, 4);
+      arc(c, r, 16, 16, r.range(0, Math.PI * 2), len, f < 2 ? G('tube', 1) : G('cyan', 0.67), f < 2 ? G('cyan', 0.67) : G('cyan', 0));
+    }
+    frames.push(c);
+  }
+  return sheet(frames);
+}
+
 export default [
   { name: 'puff', out: F('puff'), draw: puff },
   { name: 'blood', out: F('blood'), draw: () => blood('blood') },
   { name: 'explosion', out: F('explosion'), draw: () => sheet(explosion(64, FIRE, 31, 5)) },
   { name: 'blaster-bolt', out: F('blaster-bolt'), draw: () => blasterBolt('red') },
+  { name: 'ion-blast', out: F('ion-blast'), draw: ionBlast },
 ];
 
 export { fireBlob, smoke, FIRE };

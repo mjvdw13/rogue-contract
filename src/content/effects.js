@@ -20,6 +20,14 @@ const BOLT = {
 export const projectiles = [
   defineProjectile({ id: 'blaster-bolt', ...BOLT, speed: 60, damage: [10, 20] }),
   defineProjectile({ id: 'trooper-bolt', ...BOLT, speed: 28, damage: [5, 12] }),
-  // A Jawa's ion blaster: slower and weaker.
-  defineProjectile({ id: 'ion-bolt', ...BOLT, speed: 22, damage: [3, 8] }),
+  // A Jawa's ion blaster: a slow, weak, crackling cloud of blue electricity.
+  defineProjectile({
+    id: 'ion-bolt',
+    sheet: FX('ion-blast', 32, 32),
+    anims: { fly: { frames: [0, 1, 2, 3], fps: 20, loop: true }, explode: { frames: [4, 5, 6], fps: 16 } },
+    radius: 0.2,
+    speed: 22,
+    damage: [3, 8],
+    sounds: { explode: 'ion-hit' },
+  }),
 ];

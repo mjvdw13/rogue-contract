@@ -1,9 +1,9 @@
 import { defineMonster } from '../../engine/defs.js';
 
-// A Jawa: a small hooded scavenger, up to a trooper's chest, with an
-// ion blaster. Weak and quick, it chatters, flinches easily and fires slow
-// bolts. The art is cut from a sprite sheet by assets/custom/jawa/cut.py, at
-// the Dark Forces sprites' pixel size (hence the scale).
+// A Jawa: a small hooded scavenger, up to a trooper's chest, with an ion
+// blaster. Weak and quick, it chatters, flinches easily and fires slow blue
+// ion blasts. The art is cut from a sprite sheet by assets/custom/jawa/cut.py,
+// at the Dark Forces sprites' pixel size (hence the scale).
 export default defineMonster({
   id: 'jawa',
   name: 'Jawa',
@@ -18,7 +18,7 @@ export default defineMonster({
   painChance: 0.8,
   reactionTime: 0.6,
   cooldown: [1.2, 2.6],
-  attack: { kind: 'projectile', projectile: 'ion-bolt', spread: 0.12, range: 40, sound: 'blaster-enemy' },
+  attack: { kind: 'projectile', projectile: 'ion-bolt', spread: 0.12, range: 40, sound: 'ion-fire' },
   anims: {
     idle: { frames: [1], fps: 1, loop: true },
     walk: { frames: [0, 1, 2, 3, 4, 5], fps: 10 },

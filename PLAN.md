@@ -970,3 +970,9 @@ update the smoke test.
   (the armour is beige, not white), hard steps 23%, contours 59, 50
   colours. Frames are 66x68. The Jawa (already in a pixel-art style) is
   unchanged.
+- 2026-10-12: Jawa ion blasts (Mark: blue, a cloud of electricity zapping
+  through the air). A generated `ion-blast` sprite (`tools/art/sprites/
+  fx.js`): a flickering blue-white cloud with jagged arcs that change every
+  frame (4 frames at 20 fps), then a burst of arcs leaping out where it
+  hits (3 frames), all fullbright. Its own sounds: `ion-fire`, a buzzing
+  bit-crushed zap, and `ion-hit`, a quick crackle.
