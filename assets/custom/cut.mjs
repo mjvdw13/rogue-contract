@@ -8,6 +8,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { decodePNG, encodePNG } from '../../tools/art/lib/png.js';
+import { RECOLOUR, recolour } from './recolour.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const dir = process.argv[2];
@@ -100,6 +101,7 @@ function cut({ file, asset, frames }) {
       }
     }
   });
+  if (RECOLOUR[asset]) recolour(out, RECOLOUR[asset]);
   fs.writeFileSync(path.join(here, `${asset}.png`), encodePNG(FW * n, FH, out));
   console.log(`${asset}.png: ${n} frames of ${FW}x${FH}`);
   return { src: `assets/custom/${asset}.png`, frameWidth: FW, frameHeight: FH, scale: SCALE };
@@ -156,6 +158,7 @@ function cutWeapon({ asset, anchor, padLeft, padBottom, frames }) {
       }
     }
   });
+  if (RECOLOUR[asset]) recolour(out, RECOLOUR[asset]);
   fs.writeFileSync(path.join(here, `${asset}.png`), encodePNG(FW * n, FH, out));
   console.log(`${asset}.png: ${n} frames of ${FW}x${FH}`);
   return { src: `assets/custom/${asset}.png`, frameWidth: FW, frameHeight: FH };

@@ -17,6 +17,9 @@ assets/custom/*
 !assets/custom/blaster.png
 !assets/custom/textures.mjs
 !assets/custom/textures/
+# (Recolouring the cut sheets, and deriving more textures from the DF ones.)
+!assets/custom/recolour.mjs
+!assets/custom/derive.mjs
 # Character sheets that aren't rips (the sandtrooper and the Jawa), their
 # cutters and the cutters' shared steps.
 !assets/custom/sandtrooper/

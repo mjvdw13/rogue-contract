@@ -107,6 +107,8 @@ export class Assets {
     for (const f of reg.fonts.values()) srcs.add(f.src);
     for (const i of reg.images.values()) srcs.add(i.src);
     const list = [...srcs].filter(Boolean);
+    // Textures that never glow (`fullbright: false`: rock, sand) snap to lit colours only.
+    const litOnly = new Set([...reg.textures.values()].filter((t) => t.fullbright === false).map((t) => t.src));
     let done = 0;
     const total = list.length;
     onProgress(0, total);
@@ -117,10 +119,10 @@ export class Assets {
         let img = null;
         if (this.overrides[src]) {
           // A missing override (say, a file only on someone's own computer) falls back to the committed art.
-          img = await this._loadImage(this.overrides[src].src);
+          img = await this._loadImage(this.overrides[src].src, { litOnly: litOnly.has(src) });
           if (!img) delete this.overrides[src];
         }
-        this.images.set(src, img ?? (await this._loadImage(src)));
+        this.images.set(src, img ?? (await this._loadImage(src, { litOnly: litOnly.has(src) })));
         done++;
         onProgress(done, total);
       }

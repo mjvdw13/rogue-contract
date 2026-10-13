@@ -836,7 +836,7 @@ headless Node, DF art). Budget for this phase: stay under about 8 ms.
 
 ### Engine
 
-1. [ ] **Palette fitted to the art.** Measure the colours of the DF
+1. [x] **Palette fitted to the art.** Measure the colours of the DF
        textures, sprites and generated art; set the ramps' key colours and
        sizes from them (more `steel`, `navy` and near-black, a `sand` and
        `rock` range; fewer flesh, toxic and purple entries). Report the
@@ -1680,3 +1680,16 @@ update the smoke test.
   decals, translucency, emitters, ambient sound, scrolling textures and
   models in pathfinding, then the level area by area, ending with the
   Moldy Crow on an open landing pad.
+- 2026-10-13: Phase 1d step 1, a palette fitted to the art. New ramps
+  measured from the DF textures and sprites (more `steel` blue-greys and
+  near-blacks, `navy`, a `sand` range for the desert, fewer flesh, toxic
+  and purple entries) and fitted colours placed by `tools/fit-palette.mjs`
+  where the lit art is worst covered. The average snapping error once lit
+  fell from 11.6 to 4.4 RGB (DF textures 4.3, sprites 5.1, generated art
+  3.5). The generated art is regenerated. The canyon is Tatooine's now:
+  sandstone cliffs in three strata and a sand floor with gravel, generated
+  (`tools/art/textures/desert.js`) and derived from the DF rock by
+  `assets/custom/derive.mjs`; textures with `fullbright: false` snap to lit
+  colours only. The officer's rip turns from khaki to Imperial olive
+  (`assets/custom/recolour.mjs`, run by `cut.mjs`). SecBase reads as its
+  steel blue-grey instead of saturated blue, and stays blue in shadow.

@@ -10,7 +10,7 @@ const H = 100;
 const SKY = 24;
 
 // ---- Cells
-const rock = { wall: 'canyon-rock' };
+const rock = { wall: 'sandstone' };
 const panel = { wall: 'imp-panel' };
 const darkPanel = { wall: 'imp-panel-dark' };
 const lights = { wall: 'imp-lights' };
@@ -21,7 +21,7 @@ const bars = { tex: 'imp-bars' };
 const cage = { tex: 'imp-cage' };
 
 /** Open desert under the night sky, in moonlight. */
-const sand = (floorZ = 0, extra = {}) => ({ floor: 'sand', ceiling: 'sky', floorZ, ceilZ: SKY, light: 144, side: 'canyon-rock', ...extra });
+const sand = (floorZ = 0, extra = {}) => ({ floor: 'desert-sand', ceiling: 'sky', floorZ, ceilZ: SKY, light: 144, side: 'sandstone', ...extra });
 /** An Imperial room. */
 const room = (floorZ, ceilZ, extra = {}) => ({
   floor: 'imp-floor', ceiling: 'imp-ceiling', floorZ, ceilZ, light: 160, side: 'imp-panel-dark', upper: 'imp-panel', ...extra,
@@ -50,7 +50,7 @@ const p = new Painter(W, H, rock);
 p.rect(6, 76, 30, 96, sand(0, { light: 152 }));
 p.chamfer(6, 76, 30, 96, 4, rock, ['SW', 'SE', 'NW']);
 p.rect(2, 80, 5, 84, sand(0, { secret: true, light: 112 }));
-p.rect(5, 80, 6, 84, { door: 'canyon-rock', secret: true, floor: 'sand', ceiling: 'sky', floorZ: 0, ceilZ: SKY, light: 112 });
+p.rect(5, 80, 6, 84, { door: 'sandstone', secret: true, floor: 'desert-sand', ceiling: 'sky', floorZ: 0, ceilZ: SKY, light: 112 });
 
 // 2. The gorge, winding north-east: narrow, so the moon barely reaches in.
 p.rect(14, 60, 34, 76, sand(0, { light: 136 }));
@@ -60,7 +60,7 @@ p.chamfer(30, 70, 38, 76, 3, rock, ['NE', 'SE']);
 // The rock arch: a natural stone bridge across the gorge, 2 m up (a slab:
 // you walk under it), moonlit on top, in its own shadow underneath. A sniper
 // on top watches the way in from the start bowl; there's no way up.
-const arch = { bottom: 4, top: 5, floor: 'sand', ceiling: 'canyon-rock', side: 'canyon-rock', light: 112 };
+const arch = { bottom: 4, top: 5, floor: 'desert-sand', ceiling: 'sandstone-dark', side: 'sandstone', light: 112 };
 p.rect(14, 64, 34, 67, (x, y, old) => (old.wall ? old : { ...old, light: 152, slab: arch }));
 
 // 3. The bowl under the garrison: a rock spire in the middle, sniper ledges.

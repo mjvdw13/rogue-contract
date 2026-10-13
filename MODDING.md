@@ -35,7 +35,8 @@ with JSDoc types, so editors like VS Code autocomplete the fields.
   the 256-colour palette in `src/content/palette.js`. Art from any source ends
   up with the same gritty look. The 31 glow colours at the end of the palette
   are *fullbright*: they ignore lighting, so use them for eyes, flames, screens
-  and LEDs.
+  and LEDs. A texture defined with `fullbright: false` (rock, sand) only
+  snaps to the lit colours, so no stray pixel of it glows.
 - **Sprite sheets:** frames of equal size, left to right and wrapping onto new
   rows. Frame 0 is the top-left frame. Things always face the player (there
   are no 8-angle rotations), and the bottom of the frame stands on the floor.
@@ -691,7 +692,9 @@ Put a 64×64 PNG (or any power-of-two size from 16 to 256) in `assets/textures/`
 `{ frames, fps }`. Sky textures (`sky: true`) are wide panoramas. Fence
 textures (`fence: true`, the `FENCES` list) may be any size and use
 transparent pixels for their holes; at 32 texels per unit, a 64×24 railing
-is 2 units wide and 0.75 tall.
+is 2 units wide and 0.75 tall. Textures that should never glow (the
+`DESERT` list: sandstone, sand, gravel) are defined with `fullbright:
+false`.
 
 ## Sounds
 
@@ -761,8 +764,11 @@ an audio file: `defineSong({ id, src: 'assets/music/theme.ogg' })`.
   face (see `assets/custom/README.md` for using a photo).
 - `src/content/config.js` sets the key colours and names, the title and
   intermission music, and where the photo portrait goes on the title screen.
-- `src/content/palette.js` holds the colour ramps. Change one and run
-  `npm run art` to re-theme everything.
+- `src/content/palette.js` holds the colour ramps and the fitted colours
+  after them. Change one and run `npm run art` to re-theme everything.
+  `node tools/fit-palette.mjs` scores how well the palette fits the art
+  (the average colour error once lit), and `--fit 40` fits 40 free colours
+  where the art needs them most.
 
 ## Custom behaviour
 

@@ -18,6 +18,10 @@ const STATIC = [
   'canyon-rock', 'sand',
 ];
 
+// Tatooine's sandstone strata, sand and gravel (tools/art/textures/desert.js).
+// Rock never glows: its colours snap to lit ones only.
+const DESERT = ['sandstone', 'sandstone-dark', 'sandstone-pale', 'desert-sand', 'desert-gravel'];
+
 // See-through fences (railings, bars, grates): any size, with holes.
 const FENCES = ['imp-railing', 'imp-bars', 'imp-cage'];
 
@@ -27,6 +31,7 @@ const ANIMATED = {
 
 export default [
   ...STATIC.map((id) => defineTexture({ id, src: `assets/textures/${id}.png` })),
+  ...DESERT.map((id) => defineTexture({ id, src: `assets/textures/${id}.png`, fullbright: false })),
   ...Object.entries(ANIMATED).map(([id, a]) => defineTexture({ id, src: `assets/textures/${id}.png`, ...a })),
   ...FENCES.map((id) => defineTexture({ id, src: `assets/textures/${id}.png`, fence: true })),
   defineTexture({ id: 'sky-night', src: 'assets/textures/sky-night.png', sky: true }),

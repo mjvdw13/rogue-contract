@@ -1,9 +1,12 @@
 /**
- * The ROGUE CONTRACT palette: 256 colours (inherited from Raccoon Alex; the
- * Imperial greys, desert ochres and blaster glows all fit in its ramps).
+ * The ROGUE CONTRACT palette: 256 colours, fitted to the art (Phase 1d): ramps
+ * for the Imperial blue-greys, the night sky, the desert and the enemies,
+ * and free colours placed by tools/fit-palette.mjs where the lit art needs
+ * them most.
  *
  * - Index 0 is black.
- * - Indices 1..223 are colour ramps (dark → light). Lighting darkens these.
+ * - Indices 1..223 are colour ramps (dark → light), then the fitted
+ *   colours. Lighting darkens these.
  * - Indices 224..254 are FULLBRIGHT: they glow in the dark and ignore
  *   lighting (blaster bolts, LEDs, fire, screens, light strips). Use them in art
  *   for anything that should shine.
@@ -14,23 +17,29 @@
  * (npm run art) to re-theme the whole game.
  */
 
-const RAMPS = [
+export const RAMPS = [
   // name, count, key colours dark → light
-  ['gray', 23, [10, 10, 12], [62, 62, 64], [128, 128, 126], [232, 230, 222]],
-  ['concrete', 16, [22, 20, 17], [78, 72, 62], [146, 136, 118], [206, 196, 174]],
-  ['rust', 24, [20, 10, 6], [70, 32, 16], [134, 64, 28], [180, 104, 52], [214, 156, 96]],
-  ['skin', 16, [44, 24, 16], [110, 62, 42], [180, 118, 86], [238, 196, 160]],
-  ['blood', 16, [26, 0, 0], [90, 6, 4], [160, 16, 10], [220, 48, 32]],
-  ['orange', 12, [44, 16, 0], [130, 54, 8], [210, 110, 24], [255, 176, 72]],
-  ['yellow', 12, [40, 34, 8], [120, 100, 30], [190, 170, 70], [242, 224, 130]],
-  ['olive', 16, [12, 16, 6], [44, 52, 22], [96, 108, 52], [158, 172, 96]],
-  ['toxic', 12, [4, 18, 6], [16, 70, 20], [50, 140, 40], [120, 210, 80]],
-  ['teal', 12, [4, 16, 18], [16, 58, 62], [44, 116, 118], [110, 190, 188]],
-  ['steel', 20, [6, 8, 18], [30, 38, 64], [76, 92, 130], [130, 150, 186], [190, 206, 232]],
-  ['purple', 12, [12, 6, 22], [48, 24, 72], [100, 60, 140], [170, 124, 204]],
-  ['flesh', 12, [26, 6, 14], [92, 30, 46], [168, 74, 96], [232, 140, 160]],
-  ['beige', 12, [42, 38, 28], [104, 94, 72], [172, 160, 128], [236, 226, 198]],
-  ['navy', 8, [4, 6, 16], [12, 18, 40], [26, 34, 68], [44, 56, 96]],
+  ['gray', 20, [8, 8, 9], [36, 36, 37], [64, 64, 64], [100, 100, 99], [140, 139, 137], [182, 180, 176], [232, 230, 224]],
+  // SecBase's blue-greys: the walls, floors and ceilings.
+  ['steel', 28, [9, 10, 14], [26, 29, 37], [45, 49, 61], [64, 70, 86], [84, 91, 111], [108, 114, 134], [144, 150, 168], [198, 206, 222]],
+  ['navy', 8, [2, 2, 10], [5, 3, 28], [12, 7, 50], [24, 15, 74], [40, 30, 102]],
+  ['purple', 6, [36, 18, 86], [60, 34, 116], [86, 56, 146], [132, 104, 192]],
+  ['concrete', 8, [22, 20, 17], [62, 58, 51], [110, 104, 93], [162, 154, 140], [206, 196, 174]],
+  // The desert: sand, sandstone and dust.
+  ['sand', 12, [28, 20, 12], [62, 46, 28], [104, 80, 52], [150, 120, 82], [196, 168, 124], [232, 214, 176]],
+  // Jawa robes, leather, rust.
+  ['rust', 12, [22, 12, 6], [63, 37, 11], [104, 61, 26], [148, 88, 43], [207, 127, 76], [232, 176, 128]],
+  ['skin', 6, [44, 24, 16], [110, 62, 42], [180, 118, 86], [238, 196, 160]],
+  ['blood', 8, [26, 0, 0], [90, 6, 4], [150, 20, 12], [220, 48, 32]],
+  ['orange', 6, [44, 16, 0], [130, 54, 8], [210, 110, 24], [255, 176, 72]],
+  ['yellow', 6, [40, 34, 8], [120, 100, 30], [190, 170, 70], [242, 224, 130]],
+  // Officers' uniforms.
+  ['olive', 8, [16, 16, 10], [44, 46, 30], [70, 70, 50], [104, 104, 78], [150, 150, 118]],
+  ['toxic', 4, [4, 18, 6], [16, 70, 20], [50, 140, 40], [120, 210, 80]],
+  ['teal', 4, [4, 16, 18], [16, 58, 62], [44, 116, 118], [110, 190, 188]],
+  ['flesh', 3, [26, 6, 14], [92, 30, 46], [168, 74, 96], [232, 140, 160]],
+  // Sandtrooper armour.
+  ['beige', 8, [42, 38, 28], [104, 94, 72], [172, 160, 128], [236, 226, 198]],
 ];
 
 /** Glowing colours, indices 224..254, in groups ordered dark → light. */
@@ -47,6 +56,27 @@ const GLOW_GROUPS = [
   ['glow-pale', [255, 255, 170]],
 ];
 
+/**
+ * Free colours, placed where the ramps cover the art worst once it's lit:
+ * fitted by `node tools/fit-palette.mjs --fit 76` (rerun it after the ramps
+ * or the art change much). Sorted dark to light.
+ */
+const FITTED = [
+  [16, 18, 22], [0, 14, 105], [21, 23, 28], [23, 23, 23], [25, 28, 34], [12, 37, 48],
+  [31, 31, 31], [0, 26, 149], [0, 24, 216], [39, 39, 39], [48, 48, 48], [44, 48, 59],
+  [8, 63, 98], [23, 63, 78], [176, 0, 0], [40, 59, 78], [56, 56, 56], [0, 62, 178],
+  [211, 0, 0], [52, 68, 78], [65, 65, 65], [11, 84, 127], [0, 75, 215], [37, 84, 110],
+  [252, 0, 0], [26, 96, 111], [77, 77, 76], [210, 20, 20], [55, 86, 109], [0, 88, 252],
+  [13, 104, 156], [110, 81, 17], [89, 89, 89], [73, 96, 110], [48, 109, 143], [91, 102, 110],
+  [34, 125, 145], [100, 100, 100], [17, 128, 187], [146, 96, 14], [146, 91, 65], [71, 117, 143],
+  [255, 47, 25], [142, 116, 0], [113, 112, 112], [59, 136, 178], [96, 125, 145], [20, 150, 220],
+  [123, 123, 123], [0, 209, 0], [42, 156, 181], [88, 145, 177], [137, 137, 136], [178, 142, 0],
+  [72, 164, 215], [146, 146, 146], [119, 156, 178], [51, 187, 217], [106, 174, 215], [160, 160, 160],
+  [147, 167, 181], [212, 170, 0], [84, 192, 252], [60, 220, 255], [178, 178, 178], [143, 189, 215],
+  [255, 171, 25], [124, 204, 252], [189, 189, 189], [178, 199, 217], [252, 207, 0], [207, 207, 207],
+  [168, 222, 252], [170, 255, 140], [210, 235, 253], [253, 253, 253],
+];
+
 function interpolate(keys, count) {
   const out = [];
   for (let i = 0; i < count; i++) {
@@ -60,14 +90,26 @@ function interpolate(keys, count) {
   return out;
 }
 
-function build() {
+/** The ramps' colours, in palette order from index 1. */
+export function rampColors() {
+  return RAMPS.flatMap(([, count, ...keys]) => interpolate(keys, count));
+}
+
+/** The palette: black, the ramps, then `fitted` (free colours) up to 223, the glow colours and transparent. */
+export function buildPalette(fitted = FITTED) {
   const colors = [[0, 0, 0]];
   const ramps = {};
   for (const [name, count, ...keys] of RAMPS) {
     ramps[name] = [colors.length, count];
     colors.push(...interpolate(keys, count));
   }
-  if (colors.length !== 224) throw new Error(`Palette ramps must fill indices 0..223 (got ${colors.length})`);
+  if (fitted.length) {
+    ramps.fitted = [colors.length, fitted.length];
+    colors.push(...fitted);
+  }
+  if (colors.length > 224) throw new Error(`Palette ramps and fitted colours must fit in indices 0..223 (got ${colors.length})`);
+  // (Short of colours while the free ones are being fitted: black fills the gap.)
+  while (colors.length < 224) colors.push([0, 0, 0]);
   const fullbrightStart = colors.length;
   for (const [name, ...group] of GLOW_GROUPS) {
     ramps[name] = [colors.length, group.length];
@@ -78,7 +120,7 @@ function build() {
   return { colors, ramps, fullbrightStart };
 }
 
-const built = build();
+const built = buildPalette();
 
 export default {
   colors: built.colors,

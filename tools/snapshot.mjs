@@ -43,9 +43,9 @@ export async function headless({ custom = false } = {}) {
   assets._loadOverrides = async () => {
     assets.overrides = custom ? JSON.parse(fs.readFileSync(path.join(root, 'assets/custom/overrides.json'), 'utf8')) : {};
   };
-  assets._loadImage = async (src) => {
+  assets._loadImage = async (src, opts = {}) => {
     try {
-      return quantize(decodePNG(fs.readFileSync(path.join(root, src))), palette);
+      return quantize(decodePNG(fs.readFileSync(path.join(root, src))), palette, opts);
     } catch {
       return null;
     }

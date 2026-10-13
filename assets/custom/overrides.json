@@ -108,5 +108,20 @@
   },
   "assets/textures/imp-gate-jamb.png": {
     "src": "assets/custom/textures/imp-gate-jamb.png"
+  },
+  "assets/textures/sandstone.png": {
+    "src": "assets/custom/textures/sandstone.png"
+  },
+  "assets/textures/sandstone-dark.png": {
+    "src": "assets/custom/textures/sandstone-dark.png"
+  },
+  "assets/textures/sandstone-pale.png": {
+    "src": "assets/custom/textures/sandstone-pale.png"
+  },
+  "assets/textures/desert-sand.png": {
+    "src": "assets/custom/textures/desert-sand.png"
+  },
+  "assets/textures/desert-gravel.png": {
+    "src": "assets/custom/textures/desert-gravel.png"
   }
 }
