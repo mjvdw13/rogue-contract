@@ -3,6 +3,7 @@ import { DIMINISH, MAX_BRIGHTEN, LIGHT_BLACK, HAZE_RES, HAZE_LEN } from './view.
 import { HAZE_ROW } from '../gfx/palette.js';
 import { LightMap } from '../world/lightmap.js';
 import { layoutDecals } from '../world/decals.js';
+import { drawBackdropColumn } from './backdrop.js';
 import { TEXELS_PER_UNIT as TPU, TRANSPARENT } from '../config.js';
 
 const MAX_STEPS = 320;
@@ -73,6 +74,9 @@ const wSt = new Uint8Array(MAX_WIN);
  * Decals (world/decals.js) are drawn over the wall and step faces they're
  * on, clipped to each face.
  *
+ * Where the sky shows, a level's backdrop (render/backdrop.js) is drawn in
+ * its place, a column at a time when it first shows.
+ *
  * Fences (see-through walls on tile edges) don't stop the ray: each one it
  * crosses is noted with the rows still open at that point, and once the
  * column's solid surfaces are drawn its fences are drawn far to near,
@@ -86,8 +90,9 @@ const wSt = new Uint8Array(MAX_WIN);
  * @param {Uint8Array} fb framebuffer (palette indices)
  * @param {number} fbW framebuffer width
  * @param {Uint8Array} colormaps
+ * @param {import('../world/backdrop.js').Backdrop|null} [backdrop] terrain drawn where the sky shows
  */
-export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
+export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop = null) {
   const { W, H, x: px, y: py, dirX, dirY, planeX, planeY, fy, camZ, horizon, zbuf, fog } = view;
   const { segDist, segTop, segBot, segFirst, segCount } = view;
   const SEG = view.SEG;
@@ -109,6 +114,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
   lm.update();
   const hazeOn = view.hazeOn;
   const hazeTab = view.hazeTab;
+  const bdBuf = view.bdBuf;
 
   // Sky: horizontal texel per column from the view angle; the texture spans 180 degrees.
   let skyOffset = 0;
@@ -188,6 +194,12 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
       sdy = (mapY + 1 - py) * ddy;
     }
     const skyCol = sky ? view.skyU[x] : 0;
+    // The backdrop's column, drawn the first time this column shows sky.
+    let bdDone = false;
+    const skyBackdrop = () => {
+      drawBackdropColumn(view, backdrop, textures, colormaps, bdBuf, fbW, x, rdx, rdy, thr);
+      bdDone = true;
+    };
 
     // The window being worked on (loaded from and stored back to wTop / wBot).
     let clipTop = 0;
@@ -365,7 +377,12 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
         if (b > clipBot) b = clipBot;
         if (b > a) {
           if (flags[i] & F_SKY && (s || !slab)) {
+            if (backdrop && !bdDone) skyBackdrop();
             for (let y = a, o = a * fbW + x; y < b; y++, o += fbW) {
+              if (backdrop && bdBuf[o] !== TRANSPARENT) {
+                fb[o] = bdBuf[o];
+                continue;
+              }
               if (!sky) {
                 fb[o] = 0;
                 continue;
@@ -435,7 +452,12 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
     const skyFill = (a, b) => {
       if (a < clipTop) a = clipTop;
       if (b > clipBot) b = clipBot;
+      if (backdrop && !bdDone && b > a) skyBackdrop();
       for (let y = a, o = a * fbW + x; y < b; y++, o += fbW) {
+        if (backdrop && bdBuf[o] !== TRANSPARENT) {
+          fb[o] = bdBuf[o];
+          continue;
+        }
         if (!sky) {
           fb[o] = 0;
           continue;

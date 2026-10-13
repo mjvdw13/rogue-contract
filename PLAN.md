@@ -828,6 +828,11 @@ headless Node, DF art). Budget for this phase: stay under about 8 ms.
   forward): ramps measured from the DF textures and sprites, with more
   blue-greys and dark tones and a desert range, keeping the ramp names
   the generated art and models use.
+- **A semi-3D skyline** (Mark, 2026-10-13: the stepped ledges looked like
+  "pieces of paper", and he didn't like the rock strata bands): the
+  canyon's walls end in a low rim, and a backdrop (a coarse height grid
+  past the edge of play, drawn voxel-style where the sky shows) climbs
+  from the rim in smooth, moonlit slopes and ridges. No strata.
 - New art is generated (`tools/art`), or cut and recoloured from the DF
   textures already in `assets/custom/textures/` (the pack itself is on
   Mark's machine).
@@ -1788,3 +1793,18 @@ update the smoke test.
   channels across the sand (the gravel lightened to read as gravel, not
   stains), and angled corners capped at the skyline (one whose back faced
   open ground, where the gorge was painted over a corner, is floor now).
+- 2026-10-13: the skyline again, after Mark's look: the ledges read as
+  "pieces of paper" (from the floor you only ever see their faces, a tile
+  apart, each with a sharp top), and the strata bands looked bad. Now the
+  canyon's walls end at one low rim (4.5 to 6 m, smooth along the canyon,
+  climbing to meet the taller cliff round the garrison), and a **backdrop**
+  takes over above it: `world/backdrop.js` keeps a height grid past the
+  edge of play and `render/backdrop.js` draws it voxel-space style (each
+  column marches its ray over the grid near to far, filling spans), only
+  for columns that show sky and only on sky pixels, with the faces'
+  texture by height, moon shading by slope, light levels and haze like
+  the rest. `canyonBackdrop()` builds Mission 1's: low over the open sky,
+  climbing from the rim in smooth slopes and ridges (no terraces), with
+  valleys between the far ridges, 96 tiles past the map. No strata.
+  Frame time 3.0 to 3.4 ms; Mission 1's module takes 0.1 s to build it.
+  176 tests.

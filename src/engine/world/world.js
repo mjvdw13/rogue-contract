@@ -1,6 +1,7 @@
 import { buildLevel } from './level.js';
 import { F_SECRET, F_DAMAGE, F_EXIT, F_USE, EDGES } from './tilemap.js';
 import { makeDecal, addDecal, removeDecal } from './decals.js';
+import { Backdrop } from './backdrop.js';
 import { initNpc, npcThink, npcReact } from '../things/npc.js';
 import { castRay, blockedByMap, fenceBlocks, rayCircle, slantNear } from './physics.js';
 import { updateDoors, openDoor, closeDoor } from './doors.js';
@@ -103,6 +104,8 @@ export class World {
     this.fog = level.fog ?? 0.05;
     /** Outdoors, surfaces fade toward this colour with distance (halfway at `half` tiles) instead of darkening. */
     this.haze = level.haze ? { color: level.haze.color, half: level.haze.half ?? 40 } : null;
+    /** Terrain past the edge of play, drawn where the sky shows (world/backdrop.js). */
+    this.backdrop = level.backdrop ? new Backdrop(level.backdrop, (id) => (this.assets ? this.assets.textureSlot(id) : 0)) : null;
     this.skyTexture = level.sky && this.assets ? this.assets.textures[this.assets.textureSlot(level.sky)] : null;
     /** Smooth light, interpolated between tile centres (the renderer reads `map.lightmap`). */
     this.lightmap = new LightMap(this.map, { occlusion: level.occlusion ?? 0 });

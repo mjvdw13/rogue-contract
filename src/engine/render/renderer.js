@@ -19,7 +19,8 @@ export class Renderer {
   }
 
   /**
-   * @param {{map:any, things:any[], skyTexture:any, fog:number, haze?:{color:number[], half:number}|null}} scene
+   * @param {{map:any, things:any[], skyTexture:any, fog:number, haze?:{color:number[], half:number}|null,
+   *   backdrop?:import('../world/backdrop.js').Backdrop|null}} scene
    * @param {{x:number,y:number,angle:number,z?:number,extraLight?:number,fixedColormap?:number}} cam
    * @param {{psprites?:any[], skip?:any}} [extras]
    */
@@ -31,7 +32,7 @@ export class Renderer {
     if (view.W !== s.w) view.resize(s.w);
     view.setup(cam, scene.fog ?? 0.25, scene.haze ?? null);
     view.depthValid = false;
-    drawWorld(view, scene.map, textures, scene.skyTexture ?? null, s.px, s.w, cms);
+    drawWorld(view, scene.map, textures, scene.skyTexture ?? null, s.px, s.w, cms, scene.backdrop ?? null);
     view.depthValid = drawModels(view, scene.things, scene.map, textures, s.px, s.w, cms, extras.skip);
     drawSprites(view, scene.things, scene.map, s.px, s.w, cms, extras.skip);
     if (extras.psprites?.length) {

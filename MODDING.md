@@ -431,6 +431,33 @@ drawn by `tools/art/textures/decals.js`. A projectile with `scorch:
 'decal-scorch'` leaves a scorch mark where it bursts on a wall; the last 48
 stay. The map viewer marks decals with a white tick.
 
+### Backdrop: terrain past the edge of play
+
+A level under the sky can have a backdrop: rock (cliffs, slopes, mesas)
+beyond where anyone can go, drawn wherever the sky would show, in real
+perspective. It's a coarse height grid, so the skyline has depth: slopes
+going back, ridges behind ridges, fading into the haze as you move.
+Nothing stands on it, hits it or sees through it; it only replaces sky.
+
+```js
+backdrop: { x: -96, y: -96, cell: 1, w: 320, h: 292, heights, tex: 'sandstone', light: 168 },
+```
+
+`x`, `y` are its corner in tiles, `w` x `h` its size in cells of `cell`
+tiles, and `heights` the (w + 1) x (h + 1) corner heights, row by row. Its
+faces take `tex` (or `bands` of textures by height, as for walls). It's lit
+by `light`, shaded by its slopes against the `moon` direction (default from
+the north-west, high up), and drawn out to `far` tiles (256). Keep it low
+over the playable area: it's drawn behind the level's walls, so a peak in
+the middle of a canyon would show above the canyon's rims.
+
+`canyonBackdrop(p, { rim, tex, light })` (`src/content/levels/lib/backdrop.js`)
+makes one for a painted level: low over its open sky, starting at the
+canyon's rim (`rim(x, y, floor)` gives its height) and climbing away in
+smooth slopes and ridges, out to 96 tiles past the map. Mission 1 ends its
+canyon walls in a low rim of rock (one tile out of reach, with its sky just
+above it so the view ends there) and lets the backdrop take over above it.
+
 ### Light sources
 
 A lamp, a light strip or a floodlight is a light source: it adds light to

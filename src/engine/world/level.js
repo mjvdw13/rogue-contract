@@ -3,6 +3,7 @@ import { buildLifts } from './lifts.js';
 import { Slant, slantLine } from './slants.js';
 import { addSources } from './lightsources.js';
 import { makeDecal, addDecal } from './decals.js';
+import { checkBackdrop } from './backdrop.js';
 
 /** Glyphs in the `things` layer that place the player start, with facing. */
 export const PLAYER_START_GLYPHS = { '^': 90, '>': 0, v: 270, '<': 180 };
@@ -408,6 +409,7 @@ export function buildLevel(registry, level, opts = {}) {
   }
   // Light sources, baked now (with the doors shut), in groups like the tiles.
   errors.push(...addSources(map, level.lights, groupOf));
+  errors.push(...checkBackdrop(level.backdrop));
   // Decals on wall and step faces.
   (level.decals ?? []).forEach((spec, k) => {
     const d = makeDecal(map, spec, slot);
