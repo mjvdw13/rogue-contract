@@ -39,6 +39,8 @@ export class Sheet {
     this.image = image;
     this.fw = frameWidth || image.width;
     this.fh = frameHeight || image.height;
+    /** Drawn size multiplier, for art drawn at a different pixel scale (see Assets overrides). */
+    this.scale = 1;
     this.cols = Math.max(1, Math.floor(image.width / this.fw));
     this.rows = Math.max(1, Math.floor(image.height / this.fh));
     this.frames = [];

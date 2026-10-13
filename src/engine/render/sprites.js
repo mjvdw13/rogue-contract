@@ -39,7 +39,7 @@ export function drawSprites(view, things, map, fb, fbW, colormaps, skip) {
   for (const t of visible) {
     const frame = t.sheet.frame(t.frame);
     const depth = t._depth;
-    const scale = (t.def?.scale ?? 1) / TEXELS_PER_UNIT;
+    const scale = ((t.def?.scale ?? 1) * (t.sheet.scale ?? 1)) / TEXELS_PER_UNIT;
     const spriteW = (frame.w * scale * fx) / depth;
     const spriteH = (frame.h * scale * fy) / depth;
     if (spriteW < 0.5 || spriteH < 0.5) continue;

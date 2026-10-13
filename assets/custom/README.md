@@ -1,52 +1,52 @@
-# Custom art: real faces
+# Local art (never published)
 
-No photos of real people are kept in this repository. Alex's status-bar
-face, title ID badge and Employee of the Month poster are hand-drawn pixel art
-in `tools/art/ui/face.js`, peeking out of his raccoon costume's hood, and the
-coworkers (Dale, Vera, Gus, Terry and Benny) are hand-drawn in
-`tools/art/sprites/people/`.
+Everything in this folder except this README is ignored by git, so it stays
+on your computer. Use it to try out art that must not go on GitHub Pages,
+such as sprites ripped from other games or photos of real people. Don't
+force-add anything from here: once it's on GitHub, it's public.
 
-The game can still build Alex's face from a photo at runtime instead: it
-crops and shrinks it, crunches it into the 80s palette, and paints on darker
-eye bags, a raccoon mask, bruises and blood as health drops. Turning left or
-right and the god-mode and dead faces come from the same photo.
+## Overriding a game asset
 
-> **Heads up:** photos saved in this folder are ignored by git (see
-> `.gitignore`), so they stay on your computer. Everything that is committed
-> is public once it's on GitHub Pages: don't force-add someone's photo.
+`assets/custom/overrides.json` maps a committed asset to a local replacement.
+When the game runs on `localhost` or `127.0.0.1`, it loads the replacement
+instead and logs `Local art override: ...` in the console. The public site
+and the automated smoke test never read this file.
 
-To use a different photo of Alex, follow these steps.
-
-## Steps
-
-1. Save the photo here, for example `assets/custom/alex.jpg` (JPG or PNG).
-2. Preview it: open `index.html?photo=assets/custom/alex.jpg`.
-3. Make it permanent in `src/content/hero.js`:
-
-```js
-face: {
-  sheet: { src: 'assets/ui/face.png', frameWidth: 24, frameHeight: 30 },
-  photo: 'assets/custom/alex.jpg',
-},
+```json
+{
+  "assets/sprites/monsters/stormtrooper.png": {
+    "src": "assets/custom/stormtrooper.png",
+    "frameWidth": 48,
+    "frameHeight": 68,
+    "scale": 0.85
+  }
+}
 ```
 
-## Which photo works best
+- `src` is the replacement image.
+- `frameWidth` and `frameHeight` are optional, for a sprite sheet cut at a
+  different frame size. Frames must keep the original's order (see the
+  monster's `anims`).
+- `scale` is optional, for art drawn at a different pixel size. The game
+  draws 32 pixels per tile, so a sheet whose 1.76-tall trooper is 66 pixels
+  tall needs `0.85`.
 
-- Head and shoulders, facing the camera, eyes open.
-- Roughly 4:5 (portrait). The face is shrunk to 24×30 pixels for the status
-  bar and 72×90 for the title, so tight framing beats detail.
-- Plain backgrounds read best after the colour crunch.
+Delete `overrides.json`, or an entry in it, to go back to the committed art.
 
-## Fine-tuning (optional)
+## The Dark Forces enemies and weapons
 
-If the bags or the mask land in the wrong place, tell the game where things
-are. All of these go next to `photo` in `hero.js`:
+`cut.mjs` cuts the ripped Dark Forces stormtrooper, Imperial officer and
+probe droid sheets into the game's 12-frame monster layout, and the weapons
+sheet into the fists and the blaster (the Bryar pistol). It adds their
+entries to `overrides.json`. Give it the folder the sheets are in (their
+file names are listed in the script):
 
-```js
-crop: [120, 40, 400, 500],              // x, y, width, height in photo pixels (keep it ~4:5)
-eyes: [[0.36, 0.44], [0.64, 0.44]],     // eye centres inside the crop, 0..1 across and down
-mouth: [0.5, 0.77],                     // mouth centre inside the crop, 0..1
+```
+node assets/custom/cut.mjs "<folder with the sheets>"
 ```
 
-Without `crop`, the largest centred 4:5 area is used. `eyes` and `mouth`
-default to typical passport-photo positions.
+Weapon sprites are drawn 1:1, so they have no `scale`; the cutter pads each
+frame so the art lands where Dark Forces put it, given the weapon's `offset`.
+
+Credits: game and art by LucasArts. The enemy sheets were ripped by Crazy
+Ivan, the weapons sheet by Dolphman.

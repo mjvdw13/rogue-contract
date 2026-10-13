@@ -77,9 +77,29 @@ export class Assets {
     }
   }
 
+  /**
+   * Local art overrides: `assets/custom/overrides.json` (ignored by git) maps
+   * an asset path to a replacement, `{ src, frameWidth?, frameHeight?, scale? }`,
+   * for trying out art that must never be published. Only read on localhost,
+   * and not under test automation, so the public site never asks for it.
+   */
+  async _loadOverrides() {
+    this.overrides = {};
+    const local = ['localhost', '127.0.0.1'].includes(globalThis.location?.hostname);
+    if (!local || globalThis.navigator?.webdriver) return;
+    try {
+      const res = await fetch('assets/custom/overrides.json', { cache: 'no-store' });
+      if (res.ok) this.overrides = await res.json();
+    } catch {
+      // No overrides.
+    }
+    for (const [from, to] of Object.entries(this.overrides)) console.info(`Local art override: ${from} -> ${to.src}`);
+  }
+
   /** Load everything. `onProgress(done, total)` drives the loading bar. */
   async loadAll(onProgress = () => {}) {
     const reg = this.registry;
+    await this._loadOverrides();
     const srcs = new Set();
     for (const t of reg.textures.values()) srcs.add(t.src);
     for (const s of reg.sheets.values()) if (s.src) srcs.add(s.src);
@@ -93,7 +113,7 @@ export class Assets {
     const workers = Array.from({ length: 8 }, async () => {
       while (queue.length) {
         const src = queue.shift();
-        this.images.set(src, await this._loadImage(src));
+        this.images.set(src, await this._loadImage(this.overrides[src]?.src ?? src));
         done++;
         onProgress(done, total);
       }
@@ -133,8 +153,11 @@ export class Assets {
       if (tex.frames.length > 1) this.animated.push(tex);
     }
     for (const s of reg.sheets.values()) {
-      const img = this.images.get(s.src) ?? this.placeholder(s.frameWidth || 32, s.frameHeight || 32);
-      this.sheets.set(s.id, new Sheet(img, s.frameWidth || img.height, s.frameHeight || img.height));
+      const o = { ...s, ...this.overrides?.[s.src] };
+      const img = this.images.get(s.src) ?? this.placeholder(o.frameWidth || 32, o.frameHeight || 32);
+      const sheet = new Sheet(img, o.frameWidth || img.height, o.frameHeight || img.height);
+      sheet.scale = o.scale ?? 1;
+      this.sheets.set(s.id, sheet);
     }
     this._buildFonts();
     for (const i of reg.images.values()) {

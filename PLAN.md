@@ -14,6 +14,8 @@ land, and record new decisions here.
 | Story | **Original story in Dark Forces' style.** A new mercenary working for the Rebellion, Imperial bases, mission briefings and objectives, a serious tone. No Kyle Katarn retelling. |
 | Scope | **A one-mission vertical slice first**, then decide whether to build more. |
 | Title | **Rogue Contract** (chosen 2026-10-11). Repo `mjvdw13/rogue-contract`, public, served by GitHub Pages. "Star Wars" and "Dark Forces" stay out of the title. |
+| Engine, revisited (2026-10-12) | **Stay on our height-grid engine.** Considered instead: The Force Engine (needs the original Dark Forces files, so it can only host a mod; desktop only), GZDoom (true sectors and slopes, but desktop only) and Godot with TrenchBroom (no grid limits, but a full rebuild). Fill the grid's visual gaps with 3D models (Phase 1b F). |
+| Platforms (2026-10-12) | **Desktop browsers.** Phones are no longer a target: no phone performance gate, and touch controls aren't required. |
 | Rights | A non-commercial fan game. All art, sound and music are generated or original. Nothing ripped from Dark Forces, and no note-for-note John Williams transcriptions. |
 
 ## Starting point
@@ -82,12 +84,14 @@ The renderer already supports shifting the view up and down
        heights. The map viewer shades by height and draws angled walls. Add
        tests.
 9. [ ] **Gate:** a sandbox map with stairs, a pit, a lift, a vent, a jump gap,
-       a sniper on a ledge and chamfered corners. It must run near 60 fps on a
-       phone.
+       a sniper on a ledge and chamfered corners. It must run near 60 fps in a
+       desktop browser. (It was a phone target until 2026-10-12.)
 
 Grid limits we accept: no rooms stacked over rooms, and no sloped floors.
 Dark Forces had no slopes either. Walls can be at angles (step 5), but each
-tile holds at most one wall line.
+tile holds at most one wall line. 3D models (Phase 1b F) can add shapes the
+grid can't (curves, ship hulls, machinery), but only as decoration: nobody
+walks on or under them.
 
 ## Phase 1b: Look and feel (the current work)
 
@@ -105,6 +109,7 @@ Decided (2026-10-12):
   music.
 - **Order:** A, then B, then C. The Phase 1 gate (step 9) runs after A, on
   the converted sandbox.
+- **Added (2026-10-12):** F, 3D models, after C.
 
 ### A. Finer grid: half-size tiles (do first)
 
@@ -261,6 +266,9 @@ Design rules (what makes it feel like Dark Forces):
   cleaned up.
 - Recorded sound effects, and music (a composer or orchestral samples). The
   films' own sounds and music stay out.
+- Ripped art (e.g. Dark Forces sprites) can be tried locally only, through
+  `assets/custom/overrides.json`, which git ignores. It is never committed or
+  published. See `assets/custom/README.md`.
 
 ### E. Leftovers from the first Star Wars pass
 
@@ -270,6 +278,52 @@ Design rules (what makes it feel like Dark Forces):
 - [ ] MODDING.md and the README still describe Raccoon Alex content.
 - [ ] The smoke test's screenshots 01-04 come out as a blank page with a
       broken-image icon, though its checks pass.
+- [ ] Hanging decorations and effect sprites still size themselves at 64
+      texels per unit (`world.js`: `sheet.fh / 64`). Since the finer grid
+      it is 32, so ceiling lamps hang half their height into the ceiling.
+
+### F. 3D models, like Dark Forces' 3DO objects (after C)
+
+Goal: low-poly models drawn in true 3D inside the grid world (consoles,
+crates, pipes, a reactor, a parked ship, mouse droids), clipped by walls and
+ledges the same way sprites are. They hide the blockiness the grid can't
+avoid.
+
+1. [ ] **Renderer** (`render/models.js`):
+       - Move vertices into camera space and project them with the sprite
+         formula (`horizon + (camZ - z) * fy / depth`).
+       - Clip triangles at the near plane, and drop faces pointing away from
+         the camera.
+       - Fill triangles column by column. Each pixel is checked against
+         `zbuf` and the ledge windows (`segDist` / `segTop` / `segBot`) at
+         its own depth.
+       - Faces are flat-coloured or textured, through the palette and
+         colormaps. A fixed light direction shades each face, on top of the
+         tile's light.
+2. [ ] **Sorting with sprites.** Models and sprites share one far-to-near
+       order. Add a depth buffer covering only the models' pixels, so a
+       sprite beside a model is hidden correctly.
+3. [ ] **Model format and pipeline.** `tools/import-model.mjs` turns a
+       Blender OBJ export into a model file: vertices, faces, UVs, a texture
+       or a palette colour per face. Simple models can also be generated in
+       code, the way `npm run art` makes textures. Set a triangle budget per
+       model (a few hundred).
+4. [ ] **Game integration.**
+       - A decoration placed in a level, with `model`, facing angle, scale
+         and an optional spin.
+       - Collision is the thing's cylinder for small models. Big ones (a
+         ship) get a list of wall lines, reusing the angled-wall collision.
+       - Shots and explosions hit the collision shape.
+5. [ ] **Tools.** The map viewer draws the footprint. The validator checks
+       model names, and that no model blocks the route.
+6. [ ] **Tests and a showcase.** Snapshot tests of models in the sandbox
+       (behind a ledge, beside a sprite, cut by the near plane). Then place
+       a few in Mission 1: consoles, the generator and a ship on the pad.
+       Time frames before and after.
+
+Later, if wanted: walkable model surfaces (a bridge you can cross or walk
+under). That changes physics and pathfinding, which assume one floor per
+tile, so it's a separate, larger job.
 
 ## Phase 2: Dark Forces systems
 
@@ -303,7 +357,7 @@ Design rules (what makes it feel like Dark Forces):
       - Taller-than-4:3 screens keep their bars (we already ask phones to
         turn sideways).
       - The cost grows with the width: about 33% more columns at 16:9.
-        Re-check the Phase 1 phone performance target.
+        Re-check the Phase 1 performance target.
       - Do it together with the HUD overlay above, since both rework the
         screen layout.
 - [ ] Visible blaster bolts for both enemies and the player: slow and
@@ -366,8 +420,9 @@ update the smoke test.
 
 - **Renderer speed and sprite clipping** in pure JS. That's why Phase 1 ends
   with a performance check before any content work.
-- **Blocky architecture** from the grid. Angled walls (Phase 1, step 5) help.
-  Otherwise lean on height variety, lighting and texture detail.
+- **Blocky architecture** from the grid. Angled walls (Phase 1, step 5) and
+  3D models (Phase 1b F) help. Otherwise lean on height variety, lighting
+  and texture detail.
 
 ## Progress log
 
@@ -627,4 +682,16 @@ update the smoke test.
     - B3 lighting pass: the generator is still dim, and the canyon is flat.
     - B4 enemy and item tuning: ammo is 15x the budget, far too generous.
     - B5 playtest in a browser.
-
+- 2026-10-12: Local art overrides. `assets/custom/overrides.json` (ignored by
+  git) swaps a committed asset for a local file, optionally with its own frame
+  size and a draw `scale` (sheets now carry `scale`). It is only read on
+  localhost, never under test automation. Mark's ripped Dark Forces
+  stormtrooper, Imperial officer and probe droid sheets are cut locally by
+  `assets/custom/cut.mjs` into the 12-frame monster layout and drawn at scale
+  0.85. The same script cuts the weapons sheet into the fists and the blaster
+  (the Bryar pistol), drawn 1:1 and padded into Dark Forces' screen positions.
+  The public build keeps the procedural enemies and weapons.
+- 2026-10-12: Engine review. Mark worried the grid limits the maps, so we
+  compared The Force Engine, GZDoom and Godot (see Decisions). We're staying
+  on our engine and adding 3D models (Phase 1b F). Phones are dropped as a
+  target, and the Phase 1 gate now means a desktop browser.
