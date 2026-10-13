@@ -41,7 +41,7 @@ const pngSize = (src, owner) => {
 };
 for (const t of reg.textures.values()) {
   const size = pngSize(t.src, `texture "${t.id}"`);
-  if (!size || t.sky) continue;
+  if (!size || t.sky || t.fence) continue;
   if (size.height !== 64 || size.width !== 64 * (t.frames ?? 1)) {
     errors.push(`texture "${t.id}": expected ${64 * (t.frames ?? 1)}x64 pixels, got ${size.width}x${size.height}`);
   }

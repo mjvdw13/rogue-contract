@@ -310,6 +310,53 @@ function impSwitch(on) {
   };
 }
 
+// ------------------------------------------------------------------ see-through (fences)
+// Transparent where nothing is drawn: railings, bars and grates on tile edges.
+
+/** A round steel bar's shade across its width (lit from the upper left). */
+const barShade = (k, n) => C('steel', 0.25 + 0.5 * Math.sin(((k + 0.5) / n) * Math.PI) - (k / n) * 0.15);
+
+/** A catwalk railing, 2 units wide and 0.75 tall: top and bottom rails, posts and a brace. */
+function impRailing() {
+  const c = new PixelCanvas(64, 24);
+  for (let k = 0; k < 4; k++) {
+    c.rect(0, k, 64, 1, barShade(k, 4));
+    c.rect(0, 20 + k, 64, 1, barShade(k, 4));
+  }
+  for (const x0 of [0, 32]) for (let k = 0; k < 3; k++) c.rect(x0 + k, 0, 1, 24, barShade(k, 3));
+  // A diagonal brace in each bay.
+  for (let x = 3; x < 32; x++) {
+    const y = Math.round(4 + ((x - 3) / 28) * 15);
+    for (let k = 0; k < 2; k++) {
+      c.set(x, y + k, C('steel', 0.45 - k * 0.15));
+      c.set(x + 32, y + k, C('steel', 0.45 - k * 0.15));
+    }
+  }
+  return c;
+}
+
+/** Vertical bars: two round bars per 1-unit repeat. */
+function impBars() {
+  const c = new PixelCanvas(32, 64);
+  for (const x0 of [5, 21]) for (let k = 0; k < 5; k++) c.rect(x0 + k, 0, 1, 64, barShade(k, 5));
+  for (const x0 of [5, 21]) for (const y of [14, 46]) c.rect(x0 - 1, y, 7, 2, C('steel', 0.2));
+  return c;
+}
+
+/** A diamond lattice grate, like a lift cage. */
+function impCage() {
+  const c = new PixelCanvas(64, 64);
+  for (let y = 0; y < 64; y++) {
+    for (let x = 0; x < 64; x++) {
+      const a = (x + y) % 16;
+      const b = (x - y + 64) % 16;
+      if (a < 3) c.set(x, y, C('gray', 0.3 + a * 0.08));
+      else if (b < 3) c.set(x, y, C('gray', 0.22 + b * 0.06));
+    }
+  }
+  return c;
+}
+
 // ------------------------------------------------------------------ sky
 
 /** Night over the canyon: stars, a pale ringed planet and a jagged mesa skyline. 512x128. */
@@ -379,4 +426,7 @@ export default [
   { name: 'imp-switch', out: T('imp-switch'), draw: impSwitch(false) },
   { name: 'imp-switch-on', out: T('imp-switch-on'), draw: impSwitch(true) },
   { name: 'sky-night', out: T('sky-night'), draw: skyNight },
+  { name: 'imp-railing', out: T('imp-railing'), draw: impRailing },
+  { name: 'imp-bars', out: T('imp-bars'), draw: impBars },
+  { name: 'imp-cage', out: T('imp-cage'), draw: impCage },
 ];

@@ -134,6 +134,7 @@ export class Hud {
     const cDoor = pal.ramp('yellow', 0.8);
     const cSwitch = pal.ramp('toxic', 0.9);
     const cExit = pal.ramp('glow-green', 1);
+    const cFence = pal.ramp('gray', 0.6);
     const keyColor = (lock) => {
       const k = (g.registry.config.keys ?? []).find((kk) => kk.id === lock);
       return k?.ramp ? pal.ramp(k.ramp, 0.8) : cDoor;
@@ -176,6 +177,15 @@ export class Hud {
           if (f & F_EXIT && seen) s.fillRect(sx(x + 0.3), sy(y + 0.3), Math.max(1, scale * 0.4), Math.max(1, scale * 0.4), cExit);
           const sl = map.slantAt(x, y);
           if (sl) clipLine(sx(sl.ax), sy(sl.ay), sx(sl.bx), sy(sl.by), seen ? cWall : cHidden);
+          // Fences on this tile's edges (each is drawn from both tiles beside it).
+          for (let edge = 0; edge < 4; edge++) {
+            if (map.fenceAt[i * 4 + edge] < 0) continue;
+            const c = seen ? cFence : cHidden;
+            if (edge === 0) clipLine(sx(x), sy(y), sx(x + 1), sy(y), c);
+            else if (edge === 1) clipLine(sx(x + 1), sy(y), sx(x + 1), sy(y + 1), c);
+            else if (edge === 2) clipLine(sx(x), sy(y + 1), sx(x + 1), sy(y + 1), c);
+            else clipLine(sx(x), sy(y), sx(x), sy(y + 1), c);
+          }
           continue;
         }
         const c = !seen ? cHidden : f & F_USE ? cSwitch : cWall;

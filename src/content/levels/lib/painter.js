@@ -58,6 +58,19 @@ export class Painter {
   }
 
   /**
+   * Put a fence (`{ tex, height? }`: a railing, bars, a grate) on the `edges`
+   * ('N', 'NE'...) of every open tile in a box. Edges a tile already fences
+   * are kept; a tile holds one fence texture.
+   */
+  fence(x0, y0, x1, y1, edges, fence) {
+    return this.rect(x0, y0, x1, y1, (x, y, old) => {
+      if ((old.wall && !old.diagonal) || old.door) return old;
+      const have = old.fence?.edges ?? '';
+      return { ...old, fence: { ...fence, edges: [...'NESW'].filter((c) => have.includes(c) || edges.includes(c)).join('') } };
+    });
+  }
+
+  /**
    * Cut the corners of an open box with 45° angled walls, `n` tiles deep:
    * tiles on the diagonal get an angled wall of `wall` (keeping their floor),
    * and tiles beyond it become solid. `corners` picks which (default all).

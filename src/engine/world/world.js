@@ -1,7 +1,7 @@
 import { buildLevel } from './level.js';
 import { F_SECRET, F_DAMAGE, F_EXIT, F_USE } from './tilemap.js';
 import { initNpc, npcThink, npcReact } from '../things/npc.js';
-import { castRay, blockedByMap, rayCircle, slantNear } from './physics.js';
+import { castRay, blockedByMap, fenceBlocks, rayCircle, slantNear } from './physics.js';
 import { updateDoors, openDoor, closeDoor } from './doors.js';
 import { updateLifts, startLift, liftAt } from './lifts.js';
 import { LightEffects } from './lights.js';
@@ -244,6 +244,7 @@ export class World {
   checkPosition(t, x, y, walk = false) {
     const map = this.map;
     if (blockedByMap(map, x, y, t.radius)) return false;
+    if (t.kind !== 'projectile' && fenceBlocks(map, x, y, t.radius, t.z, t.z + t.height)) return false;
     const floor = map.floorAt(x, y, t.radius);
     const ceil = map.ceilAt(x, y, t.radius);
     if (floor - t.z > this.stepHeight(t)) return false;

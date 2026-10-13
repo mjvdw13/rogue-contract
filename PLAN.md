@@ -536,6 +536,60 @@ muzzle flash keep their glow (snapped to fullbright colours).
 4. [x] A few in Mission 1's canyon, one in the sandbox; tests, validator,
        smoke test, screenshots beside a stormtrooper.
 
+### K. See-through walls: railings, bars and grates (done 2026-10-12)
+
+Mark chose this as the next engine work: Dark Forces' transparent mid
+textures. The texture pack has about 30 textures with real transparency
+(bars `ZWBARS`, the girder truss `ZMGRATE1`, the lattice `ICDELEV`, gates,
+window frames, holo glass, blast holes). Its force field (`IFORCFLD`) is
+opaque, so force fields need blending and come later.
+
+Decided (2026-10-12):
+- **Fences sit on tile edges.** A legend entry gets
+  `fence: { tex, edges: 'NE', height? }`: the tile's north and east edges
+  carry the texture. With `height` the fence stands that high on the
+  tile's floor (a railing); without it, it runs floor to ceiling (bars). It
+  rides a lift with its tile.
+- **Rendering:** when a column's ray crosses a fenced edge it records the
+  fence (distance, texture position, light, the rows still open) and keeps
+  going. After the column's solid surfaces it draws its fences far to near,
+  skipping transparent texels. Fence pixels write the per-pixel depth
+  buffer the models use (`mdepth`), so sprites and models behind a bar are
+  hidden and ones in front draw over it.
+- **What they stop:** bodies (circle against the edge, only below the
+  fence's top, so you can jump over a low railing). Sight, hitscan shots
+  and projectiles pass through. Monster pathfinding won't cross a fenced
+  edge (flyers cross low ones); the validator's reachability doesn't
+  either.
+
+1. [x] Engine: legend parsing and per-edge storage (mirrored on the
+       neighbour), the renderer's fence pass and the shared depth buffer,
+       collision, pathfinding.
+2. [x] Tools: the validator (bad edges, a fence against a wall), the
+       reachability check, the map viewer and automap draw fences, the
+       upscaler splits them.
+3. [x] Textures: generated placeholders with transparency (`imp-railing`,
+       `imp-bars`, `imp-cage`), and the Dark Forces ones as overrides
+       (`ZMGRATE1` squashed to a 0.75-tall railing, `ZWBARS`, `ICDELEV`).
+4. [x] Mission 1: railings round the generator's catwalk ring and along its
+       bridges, a barred window from the barracks corridor into the
+       officer's office, a storage cage round the maintenance crates.
+5. [x] Tests (rendering, depth against sprites, collision, jumping a low
+       railing, pathfinding, shots passing), MODDING.md, screenshots, the
+       validator and smoke test.
+
+Later: see-through doors (a barred gate that rises), force fields (a
+blended or stippled texture that blocks or hurts), decals on solid walls,
+and fences in the middle of a tile or at an angle. More of the pack's
+see-through textures (gates, window frames, holo glass, blast holes) can
+go in as fence textures when a level wants them.
+
+Found on the way:
+- [ ] A second `Registry` built from the same content pack finds no sprite
+      sheets: the first one replaces each def's inline `sheet` with a
+      `{ ref }` in the shared content objects. Only tools that build two
+      registries hit it; copy the defs instead of changing them.
+
 ## Phase 2: Dark Forces systems
 
 - [ ] A mission briefing screen (scrolling text over a picture) before each
@@ -1018,3 +1072,21 @@ update the smoke test.
   the ceiling lamps hang from the ceiling instead of half inside it.
   `snapshot.mjs --custom` renders with the Dark Forces art. 108 tests (5
   new), the validator and the smoke test pass.
+- 2026-10-12: Phase 1b K, see-through walls (Dark Forces' transparent mid
+  textures). A legend `fence: { tex, edges, height? }` puts a railing, bars
+  or a grate on tile edges, stored on both tiles beside the edge. The
+  column renderer notes each fence its ray crosses (with the rows still
+  open there), keeps going, and draws them far to near after the column's
+  solid surfaces, skipping transparent texels and writing the depth buffer
+  the models use, so sprites and models behind bars show only through the
+  holes. Bodies are stopped below the fence's top (a low railing can be
+  jumped); sight, shots and projectiles pass. Pathfinding and the
+  validator's reachability don't cross fences (flyers go over low ones);
+  the map viewer, automap and upscaler know them. Textures: `imp-railing`
+  (DF `ZMGRATE1` truss squashed to 0.75 tall), `imp-bars` (`ZWBARS`),
+  `imp-cage` (`ICDELEV`), with generated placeholders; fence textures may be
+  any size. Mission 1: railings round the generator's catwalk ring and its
+  bridges, a barred window from the barracks corridor into the officer's
+  office, a cage round the maintenance crates. The fence pass adds about
+  0.6 ms a frame in railing-heavy generator views (560 wide, Node). 118
+  tests (10 new), the validator and the smoke test pass.

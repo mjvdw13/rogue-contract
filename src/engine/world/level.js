@@ -1,4 +1,4 @@
-import { TileMap, Door, F_SOLID, F_DOOR, F_SKY, F_SECRET, F_DAMAGE, F_EXIT, F_USE, F_VOID, F_SLANT, LIGHT_FX } from './tilemap.js';
+import { TileMap, Door, F_SOLID, F_DOOR, F_SKY, F_SECRET, F_DAMAGE, F_EXIT, F_USE, F_VOID, F_SLANT, LIGHT_FX, EDGES, EDGE_DX, EDGE_DY, OPPOSITE } from './tilemap.js';
 import { buildLifts } from './lifts.js';
 import { Slant, slantLine } from './slants.js';
 
@@ -103,6 +103,20 @@ export function buildLevel(registry, level, opts = {}) {
   };
 
   const badFx = new Set();
+  /** A legend entry's `fence: { tex, edges, height? }` on tile i. */
+  const addFence = (spec, x, y, i) => {
+    const where = `Tile (${x}, ${y})`;
+    if (map.flags[i] & (F_SOLID | F_DOOR)) return errors.push(`${where}: a fence needs an open tile, not a wall or door`);
+    const edges = String(spec.edges ?? '').toUpperCase();
+    if (!edges || [...edges].some((c, k) => !EDGES.includes(c) || edges.indexOf(c) !== k)) {
+      return errors.push(`${where}: fence "edges" must be letters from NESW, like 'N' or 'NE' (got "${spec.edges}")`);
+    }
+    if (!spec.tex) return errors.push(`${where}: a fence needs a "tex"`);
+    if (spec.height !== undefined && !(spec.height > 0)) return errors.push(`${where}: fence "height" must be above 0`);
+    const k = map.fences.length;
+    map.fences.push({ tex: slot(spec.tex), height: spec.height ?? 0, tile: i });
+    for (const c of edges) map.fenceAt[i * 4 + EDGES.indexOf(c)] = k;
+  };
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
       const glyph = rows[y][x] ?? ' ';
@@ -197,8 +211,26 @@ export function buildLevel(registry, level, opts = {}) {
         map.tag[i] = t;
         map.tags.get(e.tag).push(i);
       }
+      if (e.fence) addFence(e.fence, x, y, i);
     }
   }
+
+  // Fences are seen and collided with from both sides: mirror each onto the neighbour.
+  map.fences.forEach((f, k) => {
+    const x = f.tile % w;
+    const y = (f.tile / w) | 0;
+    for (let edge = 0; edge < 4; edge++) {
+      if (map.fenceAt[f.tile * 4 + edge] !== k) continue;
+      const nx = x + EDGE_DX[edge];
+      const ny = y + EDGE_DY[edge];
+      const n = ny * w + nx;
+      if (!map.inBounds(nx, ny) || map.flags[n] & (F_SOLID | F_VOID)) {
+        errors.push(`Tile (${x}, ${y}): its fence on the ${EDGES[edge]} edge stands against a wall`);
+        continue;
+      }
+      if (map.fenceAt[n * 4 + OPPOSITE[edge]] < 0) map.fenceAt[n * 4 + OPPOSITE[edge]] = k;
+    }
+  });
 
   // Doorways are usually several tiles wide: neighbouring door tiles drawn
   // with the same glyph form one door (`group`) that opens and closes together.

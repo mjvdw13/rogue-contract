@@ -30,8 +30,9 @@ export class Renderer {
     const cms = this.palette.colormaps;
     if (view.W !== s.w) view.resize(s.w);
     view.setup(cam, scene.fog ?? 0.25);
+    view.depthValid = false;
     drawWorld(view, scene.map, textures, scene.skyTexture ?? null, s.px, s.w, cms);
-    view.modelsDrawn = drawModels(view, scene.things, scene.map, textures, s.px, s.w, cms, extras.skip);
+    view.depthValid = drawModels(view, scene.things, scene.map, textures, s.px, s.w, cms, extras.skip);
     drawSprites(view, scene.things, scene.map, s.px, s.w, cms, extras.skip);
     if (extras.psprites?.length) {
       const map = scene.map;

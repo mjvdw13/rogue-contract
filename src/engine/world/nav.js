@@ -42,6 +42,9 @@ export class FlowField {
   canStep(a, b) {
     const map = this.map;
     const { step, drop, height, flying } = this.profile;
+    // Fences (railings, bars) block the edge; flyers go over low ones.
+    const fence = map.fences.length ? map.fenceBetween(a, b) : null;
+    if (fence && !(flying && fence.height)) return false;
     let ceil = map.ceilZ[b];
     if (map.flags[b] & F_DOOR) {
       const door = map.doors[map.doorIndex[b]];

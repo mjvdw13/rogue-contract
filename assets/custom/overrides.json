@@ -90,5 +90,14 @@
   },
   "assets/textures/sky-night.png": {
     "src": "assets/custom/textures/sky-night.png"
+  },
+  "assets/textures/imp-railing.png": {
+    "src": "assets/custom/textures/imp-railing.png"
+  },
+  "assets/textures/imp-bars.png": {
+    "src": "assets/custom/textures/imp-bars.png"
+  },
+  "assets/textures/imp-cage.png": {
+    "src": "assets/custom/textures/imp-cage.png"
   }
 }

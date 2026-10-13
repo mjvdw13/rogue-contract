@@ -10,6 +10,13 @@ export const F_VOID = 128;
 /** The tile holds an angled wall (see slants.js): part solid, part open. */
 export const F_SLANT = 256;
 
+/** Tile edges, in the order of `TileMap.fenceAt`: north, east, south, west. */
+export const EDGES = 'NESW';
+/** The neighbour across each edge, and the edge that faces back. */
+export const EDGE_DX = [0, 1, 0, -1];
+export const EDGE_DY = [-1, 0, 1, 0];
+export const OPPOSITE = [2, 3, 0, 1];
+
 /** Light effects a tile can have (Doom sector light specials). */
 export const LIGHT_FX = { none: 0, flicker: 1, strobe: 2, glow: 3, fire: 4, blink: 5 };
 
@@ -77,6 +84,13 @@ export class TileMap {
     this.slants = [];
     /** @type {import('./lifts.js').Lift[]} */
     this.lifts = [];
+    /**
+     * See-through walls on tile edges (railings, bars, grates): `fenceAt[i * 4 + edge]`
+     * is an index into `fences`, set on both tiles beside the edge, or -1.
+     * @type {{tex:number, height:number, tile:number}[]}
+     */
+    this.fences = [];
+    this.fenceAt = new Int16Array(n * 4).fill(-1);
     this.tag = new Int16Array(n).fill(-1);
     this.seen = new Uint8Array(n);
     /** @type {Door[]} */
@@ -127,6 +141,24 @@ export class TileMap {
     if (this.blocks(tx, ty)) return true;
     const s = this.slantAt(tx, ty);
     return s ? s.solidAt(x, y) : false;
+  }
+
+  /** The fence on the edge between neighbouring tiles a and b, or null. */
+  fenceBetween(a, b) {
+    const d = b - a;
+    const edge = d === -this.w ? 0 : d === 1 ? 1 : d === this.w ? 2 : d === -1 ? 3 : -1;
+    if (edge < 0) return null;
+    const k = this.fenceAt[a * 4 + edge];
+    return k >= 0 ? this.fences[k] : null;
+  }
+
+  /** A fence's bottom and top: it stands on its tile's floor, `height` high or up to the ceiling. */
+  fenceBottom(f) {
+    return this.floorZ[f.tile];
+  }
+
+  fenceTop(f) {
+    return f.height ? this.floorZ[f.tile] + f.height : this.ceilZ[f.tile];
   }
 
   /** True if the tile blocks sight/bullets. Doors block until mostly open. */

@@ -15,6 +15,10 @@ const panel = { wall: 'imp-panel' };
 const darkPanel = { wall: 'imp-panel-dark' };
 const lights = { wall: 'imp-lights' };
 const computer = { wall: 'imp-computer' };
+// See-through fences on tile edges.
+const railing = { tex: 'imp-railing', height: 0.75 };
+const bars = { tex: 'imp-bars' };
+const cage = { tex: 'imp-cage' };
 
 /** Open desert under the night sky, in moonlight. */
 const sand = (floorZ = 0, extra = {}) => ({ floor: 'sand', ceiling: 'sky', floorZ, ceilZ: SKY, light: 144, side: 'canyon-rock', ...extra });
@@ -88,6 +92,8 @@ p.rect(38, 22, 40, 24, room(0, 5, { floor: 'imp-grate', ceiling: 'imp-ceiling-li
 p.light(26, 14, 29, 17, 120);
 p.light(26, 23, 29, 26, 120);
 p.chamfer(26, 14, 42, 26, 2, darkPanel, ['NW', 'SW']);
+// A storage cage round the crates in the north-west.
+p.fence(28, 14, 29, 17, 'W', cage).fence(30, 14, 31, 17, 'E', cage).fence(28, 16, 31, 17, 'S', cage);
 
 // 7. Lift L1: from maintenance (0) up to the barracks (6).
 p.rect(42, 16, 46, 20, lift([0, 6], 12));
@@ -117,6 +123,9 @@ p.rect(62, 4, 72, 14, room(6, 9, { light: 144 }));
 p.rect(63, 5, 66, 8, room(6, 9, { ceiling: 'imp-ceiling-light', light: 192 })); // over the desk
 p.chamfer(62, 4, 72, 14, 2, darkPanel, ['NE']);
 p.rect(65, 14, 68, 16, door(6, 9));
+// A barred window from the corridor into the office, over a sill.
+p.rect(69, 14, 71, 16, room(7, 8.5, { light: 144, side: 'imp-panel', upper: 'imp-panel' }));
+p.fence(69, 15, 71, 16, 'S', bars);
 
 // 11. The red door, and 12. the data vault behind it: dark, walled in computer banks.
 p.rect(76, 8, 94, 26, computer);
@@ -155,6 +164,13 @@ for (const x of [96, 102]) p.rect(x, 25, x + 3, 26, lights).light(x, 26, x + 3, 
 for (const x of [80, 96]) p.rect(x, 62, x + 3, 63, lights).light(x, 59, x + 3, 62, 184);
 p.rect(88, 29, 92, 40, catwalk);
 p.rect(88, 48, 92, 59, catwalk);
+// Railings along the catwalk ring's inner edge and both sides of the
+// bridges, open where the lifts and bridges join the ring.
+p.fence(74, 29, 75, 55, 'E', railing);
+p.fence(105, 33, 106, 59, 'W', railing);
+p.fence(75, 28, 88, 29, 'S', railing).fence(92, 28, 101, 29, 'S', railing);
+p.fence(79, 59, 88, 60, 'N', railing).fence(92, 59, 105, 60, 'N', railing);
+for (const [y0, y1] of [[29, 40], [48, 59]]) p.fence(88, y0, 89, y1, 'W', railing).fence(91, y0, 92, y1, 'E', railing);
 // The bridges reach down to the floor, so the bottom is two halves (west and
 // east of the column). Lifts L2 and L2b join each half to the catwalk ring.
 p.rect(75, 55, 79, 59, lift([-6, 6], 18, { tag: 'generator' }));

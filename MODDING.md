@@ -457,6 +457,34 @@ and projectiles stop at them. Monsters path through these tiles like open
 floor and let collision keep them out of the solid part. Put walls (or more
 angled tiles) against the solid side; it renders as wall if you can see it.
 
+### Fences: railings, bars and grates
+
+A floor tile can carry a see-through wall on any of its edges, like Dark
+Forces' transparent walls. Transparent pixels in the texture are holes you
+see and shoot through:
+
+```js
+'r': { base: '.', fence: { tex: 'imp-railing', edges: 'E', height: 0.75 } },  // a railing on the east edge
+'b': { base: '.', fence: { tex: 'imp-bars', edges: 'NS' } },                  // bars, floor to ceiling
+```
+
+- `tex`: a fence texture (see Textures).
+- `edges`: which edges of the tile, any of `N`, `E`, `S` and `W`. The tile
+  beyond the edge must be open floor too (not a wall).
+- `height`: how high the fence stands on the tile's floor. Without it, it
+  runs from the floor to the ceiling. The texture hangs from the fence's top
+  and repeats down. A fence on a lift rides with it.
+
+Bodies can't pass a fence below its top, so you can jump over a low railing
+but not through bars. Sight, shots and projectiles go through (the holes and
+the bars alike). Monsters don't path across a fenced edge, except flyers over
+a low one, and the validator's reachability check never crosses one. Sprites
+and 3D models behind a fence show only through its holes. The map viewer
+draws fences as pale lines (dashed when low).
+
+In a painted level, `p.fence(x0, y0, x1, y1, 'E', { tex, height })` puts a
+fence on that edge of every open tile in the box.
+
 ### Lifts
 
 Give a floor glyph a `lift` and its tiles become a lift (an elevator, in Dark
@@ -587,7 +615,10 @@ one.
 
 Put a 64×64 PNG in `assets/textures/` and add its name to the `STATIC` list in
 `src/content/textures.js`. For an animated texture, add it to `ANIMATED` with
-`{ frames, fps }`. Sky textures (`sky: true`) are wide panoramas.
+`{ frames, fps }`. Sky textures (`sky: true`) are wide panoramas. Fence
+textures (`fence: true`, the `FENCES` list) may be any size and use
+transparent pixels for their holes; at 32 texels per unit, a 64×24 railing
+is 2 units wide and 0.75 tall.
 
 ## Sounds
 

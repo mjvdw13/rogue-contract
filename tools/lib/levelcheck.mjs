@@ -1,7 +1,8 @@
 // Static level analysis for the dev tools: reachability from the player start
 // (collecting keys as it goes), exits, secrets and per-skill thing counts.
 // Reachability knows heights: what the hero's body can walk up, jump onto,
-// drop from, crouch under and jump across, and where lifts carry it.
+// drop from, crouch under and jump across, and where lifts carry it. Fences
+// are never crossed (not even by jumping a low railing).
 import { buildLevel } from '../../src/engine/world/level.js';
 import { F_SOLID, F_DOOR, F_EXIT, F_USE, F_SECRET } from '../../src/engine/world/tilemap.js';
 import { BODY } from '../../src/engine/things/player.js';
@@ -158,7 +159,7 @@ export function analyseLevel(reg, level, skill = 3) {
       const ny = cy + dy;
       if (nx < 0 || ny < 0 || nx >= W || ny >= map.h) continue;
       const n = ny * W + nx;
-      if (!passable(n)) continue;
+      if (!passable(n) || map.fenceBetween(c, n)) continue;
       spots[n].forEach(([fb, cb], s) => {
         // (Tiles of one lift move together.)
         if (lift >= 0 && map.liftIndex[n] === lift && s !== k) return;
@@ -173,10 +174,11 @@ export function analyseLevel(reg, level, skill = 3) {
         const lx = cx + dx * (gap + 1);
         const ly = cy + dy * (gap + 1);
         if (!passable(mid) || map.flags[mid] & F_DOOR) break;
+        if (map.fenceBetween(mid - dy * W - dx, mid)) break;
         if (spots[mid].some(([fm, cm]) => fm > fa + EPS || cm - fa < body.stand - EPS)) break;
         if (lx < 0 || ly < 0 || lx >= W || ly >= map.h) break;
         const land = ly * W + lx;
-        if (!passable(land)) break;
+        if (!passable(land) || map.fenceBetween(mid, land)) break;
         spots[land].forEach(([fb, cb], s) => {
           if (fb - fa <= body.step + EPS && canCross(body, fa, ca, fb, cb)) go(land, s);
         });

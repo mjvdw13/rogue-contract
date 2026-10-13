@@ -107,8 +107,9 @@ export function normalizeAttack(spec) {
 /**
  * A wall/floor/ceiling/sky texture. Walls and flats must be power-of-two sized
  * (64x64 recommended). Animated textures are horizontal strips of `frames`
- * square frames.
- * @param {{id:string, src:string, frames?:number, fps?:number, sky?:boolean}} def
+ * square frames. `fence: true` marks a see-through texture for fences
+ * (transparent pixels are holes); it may be any size, as it is never a floor.
+ * @param {{id:string, src:string, frames?:number, fps?:number, sky?:boolean, fence?:boolean}} def
  */
 export function defineTexture(def) {
   requireId(def, 'Texture');

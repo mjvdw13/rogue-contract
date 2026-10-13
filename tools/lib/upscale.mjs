@@ -5,7 +5,8 @@
 //
 // Angled walls are split properly: each sub-tile the wall line crosses gets
 // its own (shorter) line, sub-tiles on the solid side become plain wall, and
-// the rest become open floor. Those need new legend glyphs, which are added.
+// the rest become open floor. Fences stay on the sub-tiles along their edges.
+// Those need new legend glyphs, which are added.
 //
 // Not converted: a level's own `fog` is per tile, so halve it by hand.
 import { resolveLegend } from '../../src/engine/world/level.js';
@@ -89,6 +90,15 @@ export function upscaleLevel(registry, level, k = 2) {
     return glyphFor(floor);
   };
 
+  /** The sub-tile glyph at (sx, sy) inside a fenced tile `g`: only edges on the block's outside stay. */
+  const fencePart = (g, e, sx, sy) => {
+    const at = { N: sy === 0, S: sy === k - 1, W: sx === 0, E: sx === k - 1 };
+    const edges = [...String(e.fence.edges ?? '').toUpperCase()].filter((c) => at[c]).join('');
+    const { fence, ...rest } = scaleEntry(e, k);
+    if (!edges) return glyphFor(rest);
+    return glyphFor({ ...rest, fence: { ...fence, edges, ...(fence.height ? { height: fence.height * k } : {}) } });
+  };
+
   const tiles = [];
   level.tiles.forEach((row) => {
     for (let sy = 0; sy < k; sy++) {
@@ -96,7 +106,7 @@ export function upscaleLevel(registry, level, k = 2) {
       [...row].forEach((g) => {
         const e = resolved[g];
         const slanted = e && e.wall && (e.diagonal !== undefined || e.line !== undefined);
-        for (let sx = 0; sx < k; sx++) out += slanted ? slantPart(g, e, sx, sy) : g;
+        for (let sx = 0; sx < k; sx++) out += slanted ? slantPart(g, e, sx, sy) : e?.fence ? fencePart(g, e, sx, sy) : g;
       });
       tiles.push(out);
     }

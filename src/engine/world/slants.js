@@ -86,7 +86,8 @@ export class Slant {
   }
 }
 
-function segDist2(px, py, x0, y0, x1, y1) {
+/** Squared distance from a point to the segment (x0, y0)-(x1, y1). */
+export function segDist2(px, py, x0, y0, x1, y1) {
   const ex = x1 - x0;
   const ey = y1 - y0;
   const l2 = ex * ex + ey * ey;

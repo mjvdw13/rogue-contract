@@ -44,9 +44,13 @@ export class View {
     this.segBot = new Int16Array(this.W * this.SEG);
     this.segCount = new Uint8Array(this.W);
     this.skyU = new Int32Array(this.W);
-    /** Per pixel, the depth of the nearest model pixel (render/models.js); valid when `modelsDrawn`. */
+    /**
+     * Per pixel, the depth of the nearest fence or model pixel (render/columns.js,
+     * render/models.js), which sprites and models test against. Only cleared and
+     * valid (`depthValid`) in frames where a fence or model drew.
+     */
     this.mdepth = new Float32Array(this.W * this.H);
-    this.modelsDrawn = false;
+    this.depthValid = false;
   }
 
   /**

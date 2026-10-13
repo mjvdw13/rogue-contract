@@ -1,14 +1,23 @@
 import { F_SOLID, F_DOOR, F_SKY, F_SLANT } from '../world/tilemap.js';
 import { DIMINISH } from './view.js';
-import { TEXELS_PER_UNIT as TPU } from '../config.js';
+import { TEXELS_PER_UNIT as TPU, TRANSPARENT } from '../config.js';
 
 const MAX_STEPS = 320;
 const TAU = Math.PI * 2;
 /** Added to texture coordinates so they stay positive before masking. */
 const V_BIAS = 1 << 16;
+/** Fences one column can show (the nearest are kept). */
+const MAX_FENCES = 32;
+const fenceT = new Float32Array(MAX_FENCES);
+const fenceA = new Int16Array(MAX_FENCES);
+const fenceB = new Int16Array(MAX_FENCES);
+const fenceSlot = new Int16Array(MAX_FENCES);
+const fenceU = new Float32Array(MAX_FENCES);
+const fenceTop = new Float32Array(MAX_FENCES);
+const fenceLv = new Int8Array(MAX_FENCES);
 
 /**
- * Draw walls, floors, ceilings and sky, one screen column at a time.
+ * Draw walls, floors, ceilings, sky and fences, one screen column at a time.
  *
  * Every tile has its own floor and ceiling height ("Doom on a grid"). Each
  * column casts a ray front to back through the tile grid while keeping a
@@ -21,6 +30,12 @@ const V_BIAS = 1 << 16;
  * The window after each tile is recorded per column (view.segDist / segTop /
  * segBot) so sprites can be clipped by ledges and overhangs nearer than them.
  * view.zbuf holds the distance at which the column ended.
+ *
+ * Fences (see-through walls on tile edges) don't stop the ray: each one it
+ * crosses is noted with the rows still open at that point, and once the
+ * column's solid surfaces are drawn its fences are drawn far to near,
+ * skipping transparent texels. Their pixels go into the depth buffer
+ * (view.mdepth, set `depthValid`) so models and sprites behind them hide.
  *
  * @param {import('./view.js').View} view
  * @param {import('../world/tilemap.js').TileMap} map
@@ -37,6 +52,9 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
   const mw = map.w;
   const mh = map.h;
   const { flags, wallTex, doorIndex, doors, light, seen, floorZ, ceilZ, floorTex, ceilTex, sideTex, upperTex, slantIndex, slants } = map;
+  const { fences, fenceAt } = map;
+  const hasFences = fences.length > 0;
+  const mdepth = view.mdepth;
   const along = [0];
   const fixed = view.fixedColormap;
 
@@ -96,6 +114,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
     let cur = mapX >= 0 && mapY >= 0 && mapX < mw && mapY < mh ? mapY * mw + mapX : -1;
     let tEnter = 0;
     let end = 1e6;
+    let nf = 0;
 
     // Fill rows [a, b) of this column with a textured vertical face at distance t.
     // Textures are mapped in world units (TEXELS_PER_UNIT texels per unit), so
@@ -124,6 +143,25 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
         for (let y = a; y < b; y++, o += fbW, v += stepV) fb[o] = colormaps[cm + col[colBase + ((v | 0) & hMask)]];
       } else {
         for (let y = a; y < b; y++, o += fbW, v += stepV) fb[o] = colormaps[cm + col[colBase + ((v | 0) % th)]];
+      }
+    };
+    // A fence face: like `face`, already clipped, with holes, writing the depth buffer.
+    const fenceFace = (t, a, b, anchor, slot, u, lv) => {
+      const tex = textures[slot];
+      const th = tex.h;
+      let tx = Math.floor(u * TPU) % tex.w;
+      if (tx < 0) tx += tex.w;
+      const col = tex.curCM;
+      const colBase = tx * th;
+      const cm = lv * 256;
+      const stepV = (TPU * t) / fy;
+      let v = (anchor - camZ) * TPU + (a + 0.5 - horizon) * stepV + V_BIAS * th;
+      let o = a * fbW + x;
+      for (let y = a; y < b; y++, o += fbW, v += stepV) {
+        const c = col[colBase + ((v | 0) % th)];
+        if (c === TRANSPARENT || t >= mdepth[o]) continue;
+        fb[o] = colormaps[cm + c];
+        mdepth[o] = t;
       }
     };
     /** A texture's height in world units (faces hung from their bottom edge use it). */
@@ -324,6 +362,32 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
       let solid = (f & F_SOLID) !== 0;
       let tex = wallTex[next];
       let u = wx;
+
+      // A fence on this edge: note it, with the rows open here, and carry on.
+      if (hasFences && !solid) {
+        const k = fenceAt[cur * 4 + (side === 0 ? (stepX > 0 ? 1 : 3) : stepY > 0 ? 2 : 0)];
+        if (k >= 0) {
+          const fe = fences[k];
+          const top = map.fenceTop(fe);
+          let a = rowOf(top, tExit);
+          let b = rowOf(floorZ[fe.tile], tExit);
+          if (a < clipTop) a = clipTop;
+          if (b > clipBot) b = clipBot;
+          if (b > a && fe.tex >= 0) {
+            if (nf === MAX_FENCES) nf--;
+            fenceT[nf] = tExit;
+            fenceA[nf] = a;
+            fenceB[nf] = b;
+            fenceSlot[nf] = fe.tex;
+            fenceU[nf] = wx;
+            fenceTop[nf] = top;
+            fenceLv[nf] = faceLevel(cur, tExit, contrast);
+            nf++;
+            seen[cur] = 1;
+            seen[next] = 1;
+          }
+        }
+      }
       if (f & F_DOOR) {
         const door = doors[doorIndex[next]];
         if (door.secret) {
@@ -396,5 +460,12 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
 
     zbuf[x] = end;
     segCount[x] = nseg;
+    if (nf) {
+      if (!view.depthValid) {
+        mdepth.fill(Infinity);
+        view.depthValid = true;
+      }
+      for (let k = nf - 1; k >= 0; k--) fenceFace(fenceT[k], fenceA[k], fenceB[k], fenceTop[k], fenceSlot[k], fenceU[k], fenceLv[k]);
+    }
   }
 }

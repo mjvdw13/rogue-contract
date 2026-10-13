@@ -66,8 +66,19 @@ function redToYellow(img) {
 
 const centred = (base, top) => stamp(base, top, (base.w - top.w) >> 1, (base.h - top.h) >> 1);
 
+/** Squash or stretch to `h` rows (nearest row), keeping the width. */
+function resizeRows(img, h) {
+  const data = new Uint8Array(img.w * h * 4);
+  for (let y = 0; y < h; y++) {
+    const sy = Math.min(img.h - 1, Math.floor(((y + 0.5) * img.h) / h));
+    data.set(img.data.subarray(sy * img.w * 4, (sy + 1) * img.w * 4), y * img.w * 4);
+  }
+  return { w: img.w, h, data };
+}
+
 // Game texture id -> a DF texture name, or a function building the image.
 // `frames: 1` replaces an animated generated texture with a still one.
+// `seeThrough: true` keeps the transparent pixels (fences); other walls are made solid.
 const TEXTURES = {
   // Imperial walls
   'imp-panel': 'IWSECB2',
@@ -94,6 +105,10 @@ const TEXTURES = {
   'canyon-rock': 'ZWCLIFMD',
   sand: 'IPSEC1',
   'sky-night': 'CESUNSET',
+  // See-through fences: the girder truss squashed to a 0.75-tall railing, bars and a lattice.
+  'imp-railing': { build: () => resizeRows(load('ZMGRATE1'), 24), seeThrough: true },
+  'imp-bars': { from: 'ZWBARS', seeThrough: true },
+  'imp-cage': { from: 'ICDELEV', seeThrough: true },
 };
 
 const outDir = path.join(here, 'textures');
@@ -102,11 +117,12 @@ const overridesFile = path.join(here, 'overrides.json');
 const overrides = fs.existsSync(overridesFile) ? JSON.parse(fs.readFileSync(overridesFile, 'utf8')) : {};
 for (const [id, pick] of Object.entries(TEXTURES)) {
   const spec = typeof pick === 'object' ? pick : { from: pick };
-  const img = typeof pick === 'function' ? pick() : load(spec.from);
-  for (let i = 3; i < img.data.length; i += 4) img.data[i] = 255; // walls are solid
+  const build = typeof pick === 'function' ? pick : spec.build;
+  const img = build ? build() : load(spec.from);
+  if (!spec.seeThrough) for (let i = 3; i < img.data.length; i += 4) img.data[i] = 255; // walls are solid
   fs.writeFileSync(path.join(outDir, `${id}.png`), encodePNG(img.w, img.h, img.data));
   overrides[`assets/textures/${id}.png`] = { src: `assets/custom/textures/${id}.png`, ...(spec.frames ? { frames: spec.frames } : {}) };
-  console.log(`${id}: ${typeof pick === 'function' ? 'composited' : spec.from} (${img.w}x${img.h})`);
+  console.log(`${id}: ${build ? 'composited' : spec.from} (${img.w}x${img.h})`);
 }
 fs.writeFileSync(overridesFile, JSON.stringify(overrides, null, 2) + '\n');
 console.log('updated overrides.json');

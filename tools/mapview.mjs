@@ -14,7 +14,8 @@
 // have a yellow border; secret tiles are dotted purple; damaging floors are
 // striped green. Monsters are red squares, coworkers green, items yellow,
 // keys and weapons bright, decorations grey, 3D models pink (their collision
-// lines, or their body's square), the start is a white arrow.
+// lines, or their body's square), the start is a white arrow. Fences are pale
+// blue lines on their edges (dashed for a low railing).
 // Areas the player can never reach are cross-hatched.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -154,6 +155,24 @@ function render(level) {
       if (f & F_EXIT) frame(x, y, S, S, [40, 255, 60]);
       if (map.tag[i] >= 0) put(x, y, [0, 255, 255]);
       if (!a.reached[i]) for (let k = 0; k < S; k++) put(x + k, y + k, [255, 0, 0]);
+    }
+  }
+  // Fences on tile edges: solid lines for full height, dashed for railings.
+  for (let i = 0; i < map.w * map.h; i++) {
+    for (let edge = 0; edge < 4; edge++) {
+      const k = map.fenceAt[i * 4 + edge];
+      if (k < 0) continue;
+      const x = (i % map.w) * S;
+      const y = Math.floor(i / map.w) * S;
+      const low = map.fences[k].height > 0;
+      for (let q = 0; q < S; q++) {
+        if (low && q % 3 === 2) continue;
+        const c = [190, 215, 240];
+        if (edge === 0) put(x + q, y, c);
+        else if (edge === 1) put(x + S - 1, y + q, c);
+        else if (edge === 2) put(x + q, y + S - 1, c);
+        else put(x, y + q, c);
+      }
     }
   }
   for (const s of spawns) {

@@ -45,14 +45,14 @@ const svz = new Float64Array(MAX_POLY);
  * @param {Array<any>} things
  * @param {import('../world/tilemap.js').TileMap} map
  * @param {import('../assets.js').Texture[]} textures
- * @returns {boolean} whether any model pixel may have been drawn
+ * @returns {boolean} whether the depth buffer is in use (a fence or model may have drawn)
  */
 export function drawModels(view, things, map, textures, fb, fbW, colormaps, skip) {
   const { W, H, x: px, y: py, dirX, dirY, planeX, planeY, fy, camZ, horizon, zbuf, mdepth } = view;
   const { segDist, segTop, segBot, segCount, SEG } = view;
   const invDet = 1 / (planeX * dirY - dirX * planeY);
   const halfW = W / 2;
-  let cleared = false;
+  let cleared = view.depthValid;
 
   for (const t of things) {
     const model = t.model;

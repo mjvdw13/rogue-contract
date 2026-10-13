@@ -6,8 +6,8 @@ const FUZZ = [1, -1, 1, -1, 1, 1, -1, 1, 1, -1, 1, 1, 1, -1, 1, 1, 1, -1, -1, -1
 
 /**
  * Draw billboard sprites for every visible thing, far to near, clipped
- * against the wall depth buffer, the ledge windows and any model pixels
- * (view.mdepth, when a model drew this frame).
+ * against the wall depth buffer, the ledge windows and any fence or model
+ * pixels (view.mdepth, when one drew this frame).
  *
  * A thing is drawable when it has `sheet` (a Sheet), `frame` (index) and
  * position x/y/z. Optional: `fullbright` (current frame glows), `flipX`,
@@ -20,7 +20,7 @@ const FUZZ = [1, -1, 1, -1, 1, 1, -1, 1, 1, -1, 1, 1, 1, -1, 1, 1, 1, -1, -1, -1
 export function drawSprites(view, things, map, fb, fbW, colormaps, skip) {
   const { W, H, x: px, y: py, dirX, dirY, planeX, planeY, fx, fy, camZ, horizon, zbuf } = view;
   const { segDist, segTop, segBot, segCount, SEG } = view;
-  const mdepth = view.modelsDrawn ? view.mdepth : null;
+  const mdepth = view.depthValid ? view.mdepth : null;
   const invDet = 1 / (planeX * dirY - dirX * planeY);
   visible.length = 0;
   for (const t of things) {

@@ -1,4 +1,5 @@
 import { F_SOLID, F_DOOR, F_SKY, F_SLANT } from './tilemap.js';
+import { segDist2 } from './slants.js';
 
 /**
  * Cast a ray through the tile grid. Stops at walls, the map edge and the
@@ -201,6 +202,35 @@ export function blockedByMap(map, x, y, r) {
     for (let tx = x0; tx <= x1; tx++) {
       if (map.blocks(tx, ty)) return true;
       if (map.flags[ty * map.w + tx] & F_SLANT && map.slants[map.slantIndex[ty * map.w + tx]].touchesCircle(x, y, r)) return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Does a body of radius r at (x, y), between heights `bottom` and `top`,
+ * touch a fence (a railing, bars)? Only the part below the fence's top
+ * counts, so a body above a low railing passes over it.
+ */
+export function fenceBlocks(map, x, y, r, bottom, top) {
+  if (!map.fences.length) return false;
+  const r2 = r * r;
+  for (let ty = Math.floor(y - r); ty <= Math.floor(y + r); ty++) {
+    for (let tx = Math.floor(x - r); tx <= Math.floor(x + r); tx++) {
+      if (!map.inBounds(tx, ty)) continue;
+      const base = (ty * map.w + tx) * 4;
+      for (let edge = 0; edge < 4; edge++) {
+        const k = map.fenceAt[base + edge];
+        if (k < 0) continue;
+        const f = map.fences[k];
+        if (bottom >= map.fenceTop(f) - 1e-6 || top <= map.fenceBottom(f)) continue;
+        // The edge as a segment: N, E, S, W.
+        const ax = edge === 1 ? tx + 1 : tx;
+        const ay = edge === 2 ? ty + 1 : ty;
+        const bx = edge === 3 ? tx : tx + 1;
+        const by = edge === 0 ? ty : ty + 1;
+        if (segDist2(x, y, ax, ay, bx, by) < r2 - 1e-9) return true;
+      }
     }
   }
   return false;
