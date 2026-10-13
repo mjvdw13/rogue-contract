@@ -49,7 +49,7 @@ const svz = new Float64Array(MAX_POLY);
  */
 export function drawModels(view, things, map, textures, fb, fbW, colormaps, skip) {
   const { W, H, x: px, y: py, dirX, dirY, planeX, planeY, fy, camZ, horizon, zbuf, mdepth } = view;
-  const { segDist, segTop, segBot, segCount, SEG } = view;
+  const { segDist, segTop, segBot, segFirst, segCount, SEG } = view;
   const invDet = 1 / (planeX * dirY - dirX * planeY);
   const halfW = W / 2;
   let cleared = view.depthValid;
@@ -93,7 +93,7 @@ export function drawModels(view, things, map, textures, fb, fbW, colormaps, skip
     }
 
     const tile = map.inBounds(t.x | 0, t.y | 0) ? (t.y | 0) * map.w + (t.x | 0) : -1;
-    const light = tile >= 0 ? map.light[tile] : 128;
+    const light = tile >= 0 ? map.storeyLight(tile, map.storeyAt(tile, (t.z ?? 0) + 0.5)) : 128;
     const fixed = view.fixedColormap;
 
     for (const f of model.faces) {
@@ -260,7 +260,12 @@ export function drawModels(view, things, map, textures, fb, fbW, colormaps, skip
           if (depth >= mdepth[o]) continue;
           while (seg < ns && segDist[sb + seg] < depth) seg++;
           while (seg > 0 && segDist[sb + seg - 1] >= depth) seg--;
-          if (seg > 0 && (y < segTop[sb + seg - 1] || y >= segBot[sb + seg - 1])) continue;
+          if (seg > 0) {
+            // Inside one of the windows of the last batch nearer than the pixel?
+            let k = seg - 1;
+            while (!(y >= segTop[sb + k] && y < segBot[sb + k]) && !segFirst[sb + k]) k--;
+            if (!(y >= segTop[sb + k] && y < segBot[sb + k])) continue;
+          }
           let ci;
           if (pix) {
             const u = (uA + dU * along) * depth;

@@ -1,4 +1,4 @@
-import { F_SOLID, F_DOOR, F_SKY, F_SLANT } from '../world/tilemap.js';
+import { F_SOLID, F_DOOR, F_SKY, F_SLANT, F_SLAB } from '../world/tilemap.js';
 import { DIMINISH } from './view.js';
 import { TEXELS_PER_UNIT as TPU, TRANSPARENT } from '../config.js';
 
@@ -15,6 +15,12 @@ const fenceSlot = new Int16Array(MAX_FENCES);
 const fenceU = new Float32Array(MAX_FENCES);
 const fenceTop = new Float32Array(MAX_FENCES);
 const fenceLv = new Int8Array(MAX_FENCES);
+/** Open windows of rows one column can keep (slabs split them). */
+const MAX_WIN = 8;
+const wTop = new Int16Array(MAX_WIN);
+const wBot = new Int16Array(MAX_WIN);
+/** The storey of the current tile each window looks into (1: on its slab). */
+const wSt = new Uint8Array(MAX_WIN);
 
 /**
  * Draw walls, floors, ceilings, sky and fences, one screen column at a time.
@@ -28,9 +34,18 @@ const fenceLv = new Int8Array(MAX_FENCES);
  * when the window closes. A rising door's panel covers the window down to its
  * bottom edge, and the ray goes on under it.
  *
- * The window after each tile is recorded per column (view.segDist / segTop /
- * segBot) so sprites can be clipped by ledges and overhangs nearer than them.
- * view.zbuf holds the distance at which the column ended.
+ * Slabs (two storeys in one tile) need more than one window: a bridge seen
+ * from the side covers the middle of the column, with open rows above and
+ * below it. So the column keeps a short list of windows. Each looks into one
+ * storey of the tile the ray is in and behaves like the single window above
+ * inside it: the storey's floor and ceiling (the slab's top or underside)
+ * narrow it, and faces at the next boundary narrow it, or split it where a
+ * slab's edge covers its middle. The column ends when every window is closed.
+ *
+ * The windows after each tile are recorded per column (view.segDist / segTop /
+ * segBot, a batch per boundary starting where view.segFirst is set) so sprites
+ * can be clipped by ledges and overhangs nearer than them. view.zbuf holds the
+ * distance at which the column ended.
  *
  * Fences (see-through walls on tile edges) don't stop the ray: each one it
  * crosses is noted with the rows still open at that point, and once the
@@ -48,12 +63,13 @@ const fenceLv = new Int8Array(MAX_FENCES);
  */
 export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
   const { W, H, x: px, y: py, dirX, dirY, planeX, planeY, fy, camZ, horizon, zbuf, fog } = view;
-  const { segDist, segTop, segBot, segCount, lightStart } = view;
+  const { segDist, segTop, segBot, segFirst, segCount, lightStart } = view;
   const SEG = view.SEG;
   const mw = map.w;
   const mh = map.h;
   const { flags, wallTex, doorIndex, doors, light, seen, floorZ, ceilZ, floorTex, ceilTex, sideTex, upperTex, slantIndex, slants } = map;
   const { fences, fenceAt } = map;
+  const { slabBot, slabTop, slabTopTex, slabUnderTex, slabSideTex, belowLight } = map;
   const hasFences = fences.length > 0;
   const mdepth = view.mdepth;
   const along = [0];
@@ -108,8 +124,10 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
     }
     const skyCol = sky ? view.skyU[x] : 0;
 
+    // The window being worked on (loaded from and stored back to wTop / wBot).
     let clipTop = 0;
     let clipBot = H;
+    let nw = 0;
     let nseg = 0;
     const segBase = x * SEG;
     let cur = mapX >= 0 && mapY >= 0 && mapX < mw && mapY < mh ? mapY * mw + mapX : -1;
@@ -169,23 +187,31 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
     };
     /** A texture's height in world units (faces hung from their bottom edge use it). */
     const texHeight = (slot) => (slot >= 0 ? textures[slot].h / TPU : 1);
-    const faceLevel = (tile, t, contrast) => {
-      let lv = view.level(light[tile], t) + (fixed >= 0 ? 0 : contrast);
+    /** The light of storey s of a slab tile (the lower storey has its own). */
+    const slabLight = (i, s) => {
+      if (s) return light[i];
+      const l = light[i] + belowLight[i];
+      return l < 0 ? 0 : l > 255 ? 255 : l;
+    };
+    const faceLevel = (tile, s, t, contrast) => {
+      let lv = view.level(flags[tile] & F_SLAB ? slabLight(tile, s) : light[tile], t) + (fixed >= 0 ? 0 : contrast);
       if (lv < 0) lv = 0;
       else if (lv > 31 && fixed < 0) lv = 31;
       return lv;
     };
-    // Floor and ceiling of tile `i` between distances t0 and t1.
-    const flats = (i, t0, t1) => {
-      const l = light[i];
-      const fz = floorZ[i];
+    // Floor and ceiling of storey s of tile `i` between distances t0 and t1
+    // (under a slab, the slab's underside is the ceiling; on it, its top the floor).
+    const flats = (i, s, t0, t1) => {
+      const slab = (flags[i] & F_SLAB) !== 0;
+      const l = slab ? slabLight(i, s) : light[i];
+      const fz = slab && s ? slabTop[i] : floorZ[i];
       if (camZ > fz) {
         const k = (camZ - fz) * fy;
         let a = Math.ceil(horizon + k / t1 - 0.5);
         let b = t0 > 0 ? Math.ceil(horizon + k / t0 - 0.5) : clipBot;
         if (a < clipTop) a = clipTop;
         if (b > clipBot) b = clipBot;
-        const slot = floorTex[i];
+        const slot = s ? slabTopTex[i] : floorTex[i];
         if (b > a) {
           if (slot < 0) {
             for (let y = a, o = a * fbW + x; y < b; y++, o += fbW) fb[o] = 0;
@@ -206,7 +232,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
         }
         if (a < clipBot) clipBot = a < clipTop ? clipTop : a;
       }
-      const cz = ceilZ[i];
+      const cz = !s && slab ? slabBot[i] : ceilZ[i];
       if (cz > camZ) {
         const k = (cz - camZ) * fy;
         let a = t0 > 0 ? Math.ceil(horizon - k / t0 - 0.5) : clipTop;
@@ -214,7 +240,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
         if (a < clipTop) a = clipTop;
         if (b > clipBot) b = clipBot;
         if (b > a) {
-          if (flags[i] & F_SKY) {
+          if (flags[i] & F_SKY && (s || !slab)) {
             for (let y = a, o = a * fbW + x; y < b; y++, o += fbW) {
               if (!sky) {
                 fb[o] = 0;
@@ -227,7 +253,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
               fb[o] = fixed >= 0 ? colormaps[fixed * 256 + c] : c;
             }
           } else {
-            const slot = ceilTex[i];
+            const slot = !s && slab ? slabUnderTex[i] : ceilTex[i];
             if (slot < 0) {
               for (let y = a, o = a * fbW + x; y < b; y++, o += fbW) fb[o] = 0;
             } else {
@@ -249,13 +275,28 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
         if (b > clipTop) clipTop = b > clipBot ? clipBot : b;
       }
     };
+    // Record the open windows at distance t, as one batch (if it fits).
     const record = (t) => {
-      if (nseg < SEG) {
+      if (nseg + nw > SEG) return;
+      for (let k = 0; k < nw; k++) {
         segDist[segBase + nseg] = t;
-        segTop[segBase + nseg] = clipTop;
-        segBot[segBase + nseg] = clipBot;
+        segTop[segBase + nseg] = wTop[k];
+        segBot[segBase + nseg] = wBot[k];
+        segFirst[segBase + nseg] = k === 0 ? 1 : 0;
         nseg++;
       }
+    };
+    // Drop closed windows.
+    const compact = () => {
+      let n = 0;
+      for (let k = 0; k < nw; k++) {
+        if (wBot[k] <= wTop[k]) continue;
+        wTop[n] = wTop[k];
+        wBot[n] = wBot[k];
+        wSt[n] = wSt[k];
+        n++;
+      }
+      nw = n;
     };
     // The sky "wall" between two sky tiles of different heights.
     const skyFill = (a, b) => {
@@ -282,6 +323,12 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
       continue;
     }
 
+    // One window to start with, in the camera's storey of its tile.
+    nw = 1;
+    wTop[0] = 0;
+    wBot[0] = H;
+    wSt[0] = flags[cur] & F_SLAB && camZ >= (slabBot[cur] + slabTop[cur]) / 2 ? 1 : 0;
+
     for (let step = 0; step < MAX_STEPS; step++) {
       // Distance at which the ray leaves the current tile, and which side it crosses.
       let side;
@@ -300,15 +347,21 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
       if (tExit < 1e-4) tExit = 1e-4;
 
       // An angled wall in the current tile stops the ray where it crosses the line.
+      // (Angled-wall and door tiles have no slab: their windows are all in storey 0.)
       if (flags[cur] & F_SLANT) {
         const sl = slants[slantIndex[cur]];
         const t = sl.ray(px, py, rdx, rdy, along);
         if (t >= tEnter - 1e-6 && t <= tExit + 1e-6) {
-          flats(cur, tEnter, t);
           seen[cur] = 1;
           // Texture runs right-to-left from the second point (as seen from the open side).
           const u = (1 - along[0]) * sl.len;
-          face(t, rowOf(ceilZ[cur], t), rowOf(floorZ[cur], t), ceilZ[cur], sl.tex, u, faceLevel(cur, t, 0));
+          const lv = faceLevel(cur, 0, t, 0);
+          for (let k = 0; k < nw; k++) {
+            clipTop = wTop[k];
+            clipBot = wBot[k];
+            flats(cur, 0, tEnter, t);
+            face(t, rowOf(ceilZ[cur], t), rowOf(floorZ[cur], t), ceilZ[cur], sl.tex, u, lv);
+          }
           end = t;
           break;
         }
@@ -326,7 +379,6 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
             panelDone = door.group;
             const bz = door.bottomZ;
             if (bz < ceilZ[cur]) {
-              flats(cur, tEnter, t);
               seen[cur] = 1;
               // One door texture across the doorway, centred, reading left to right from both sides.
               const along = door.axis === 'x' ? py + rdy * t : px + rdx * t;
@@ -335,10 +387,19 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
               const tw = door.tex >= 0 ? textures[door.tex].w / TPU : width;
               const u = (flip ? door.span1 - along : along - door.span0) - (width - tw) / 2;
               const b = rowOf(bz, t);
-              face(t, rowOf(ceilZ[cur], t), b, bz + texHeight(door.tex), door.tex, u, faceLevel(cur, t, door.axis === 'x' ? 1 : -1));
-              if (b > clipTop) clipTop = b > clipBot ? clipBot : b;
+              const lv = faceLevel(cur, 0, t, door.axis === 'x' ? 1 : -1);
+              for (let k = 0; k < nw; k++) {
+                clipTop = wTop[k];
+                clipBot = wBot[k];
+                flats(cur, 0, tEnter, t);
+                face(t, rowOf(ceilZ[cur], t), b, bz + texHeight(door.tex), door.tex, u, lv);
+                if (b > clipTop) clipTop = b > clipBot ? clipBot : b;
+                wTop[k] = clipTop;
+                wBot[k] = clipBot;
+              }
               record(t);
-              if (clipTop >= clipBot) {
+              compact();
+              if (!nw) {
                 end = t;
                 break;
               }
@@ -364,9 +425,14 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
               if (blocked) du -= door.open;
             }
             if (blocked) {
-              flats(cur, tEnter, t);
               seen[cur] = 1;
-              face(t, rowOf(ceilZ[cur], t), rowOf(floorZ[cur], t), ceilZ[cur], door.tex, du + (door.axis === 'x' ? cy : cx), faceLevel(cur, t, door.axis === 'x' ? 1 : -1));
+              const lv = faceLevel(cur, 0, t, door.axis === 'x' ? 1 : -1);
+              for (let k = 0; k < nw; k++) {
+                clipTop = wTop[k];
+                clipBot = wBot[k];
+                flats(cur, 0, tEnter, t);
+                face(t, rowOf(ceilZ[cur], t), rowOf(floorZ[cur], t), ceilZ[cur], door.tex, du + (door.axis === 'x' ? cy : cx), lv);
+              }
               end = t;
               break;
             }
@@ -374,10 +440,20 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
         }
       }
 
-      flats(cur, tEnter, tExit);
+      for (let k = 0; k < nw; k++) {
+        clipTop = wTop[k];
+        clipBot = wBot[k];
+        flats(cur, wSt[k], tEnter, tExit);
+        wTop[k] = clipTop;
+        wBot[k] = clipBot;
+      }
 
       if (mapX < 0 || mapY < 0 || mapX >= mw || mapY >= mh) {
-        face(tExit, clipTop, clipBot, 0, -1, 0, 0);
+        for (let k = 0; k < nw; k++) {
+          clipTop = wTop[k];
+          clipBot = wBot[k];
+          face(tExit, clipTop, clipBot, 0, -1, 0, 0);
+        }
         end = tExit;
         break;
       }
@@ -395,26 +471,32 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
 
       // A fence on this edge: note it, with the rows open here, and carry on.
       if (hasFences && !solid) {
-        const k = fenceAt[cur * 4 + (side === 0 ? (stepX > 0 ? 1 : 3) : stepY > 0 ? 2 : 0)];
-        if (k >= 0) {
-          const fe = fences[k];
+        const fk = fenceAt[cur * 4 + (side === 0 ? (stepX > 0 ? 1 : 3) : stepY > 0 ? 2 : 0)];
+        if (fk >= 0) {
+          const fe = fences[fk];
           const top = map.fenceTop(fe);
-          let a = rowOf(top, tExit);
-          let b = rowOf(floorZ[fe.tile], tExit);
-          if (a < clipTop) a = clipTop;
-          if (b > clipBot) b = clipBot;
-          if (b > a && fe.tex >= 0) {
-            if (nf === MAX_FENCES) nf--;
-            fenceT[nf] = tExit;
-            fenceA[nf] = a;
-            fenceB[nf] = b;
-            fenceSlot[nf] = fe.tex;
-            fenceU[nf] = wx;
-            fenceTop[nf] = top;
-            fenceLv[nf] = faceLevel(cur, tExit, contrast);
-            nf++;
-            seen[cur] = 1;
-            seen[next] = 1;
+          const bottom = map.fenceBottom(fe);
+          const ra = rowOf(top, tExit);
+          const rb = rowOf(bottom, tExit);
+          const lv = faceLevel(cur, flags[cur] & F_SLAB && slabTop[cur] <= bottom + 0.5 ? 1 : 0, tExit, contrast);
+          for (let k = 0; k < nw; k++) {
+            let a = ra;
+            let b = rb;
+            if (a < wTop[k]) a = wTop[k];
+            if (b > wBot[k]) b = wBot[k];
+            if (b > a && fe.tex >= 0) {
+              if (nf === MAX_FENCES) nf--;
+              fenceT[nf] = tExit;
+              fenceA[nf] = a;
+              fenceB[nf] = b;
+              fenceSlot[nf] = fe.tex;
+              fenceU[nf] = wx;
+              fenceTop[nf] = top;
+              fenceLv[nf] = lv;
+              nf++;
+              seen[cur] = 1;
+              seen[next] = 1;
+            }
           }
         }
       }
@@ -441,38 +523,97 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps) {
         if (jamb >= 0) tex = jamb;
       }
 
+      const curSlab = (flags[cur] & F_SLAB) !== 0;
       if (solid) {
         seen[next] = 1;
-        face(tExit, rowOf(ceilZ[cur], tExit), rowOf(floorZ[cur], tExit), ceilZ[cur], tex, u, faceLevel(cur, tExit, contrast));
+        for (let k = 0; k < nw; k++) {
+          clipTop = wTop[k];
+          clipBot = wBot[k];
+          const s = wSt[k];
+          const fz = s ? slabTop[cur] : floorZ[cur];
+          const cz = !s && curSlab ? slabBot[cur] : ceilZ[cur];
+          face(tExit, rowOf(cz, tExit), rowOf(fz, tExit), cz, tex, u, faceLevel(cur, s, tExit, contrast));
+        }
         end = tExit;
         break;
       }
 
-      // Step faces into the next open tile.
+      // Step faces into the next open tile, in each window: a raised floor, a
+      // lowered ceiling, and the edge of a slab, which may split the window.
       const fN = floorZ[next];
       const cN = ceilZ[next];
-      const fC = floorZ[cur];
-      const cC = ceilZ[cur];
-      if (fN > fC) {
-        const a = rowOf(fN, tExit);
-        seen[next] = 1;
-        face(tExit, a, rowOf(fC, tExit), fN, sideTex[next], wx, faceLevel(cur, tExit, contrast));
-        if (a < clipBot) clipBot = a < clipTop ? clipTop : a;
-      }
-      if (cN < cC) {
-        const b = rowOf(cN, tExit);
-        if (flags[cur] & F_SKY && flags[next] & F_SKY) skyFill(rowOf(cC, tExit), b);
-        else {
+      const nextSlab = (f & F_SLAB) !== 0;
+      const n0 = nw;
+      for (let k = 0; k < n0; k++) {
+        clipTop = wTop[k];
+        clipBot = wBot[k];
+        const s = wSt[k];
+        const fC = s ? slabTop[cur] : floorZ[cur];
+        const cC = !s && curSlab ? slabBot[cur] : ceilZ[cur];
+        if (fN > fC) {
+          const a = rowOf(fN, tExit);
           seen[next] = 1;
-          const lv = faceLevel(cur, tExit, contrast);
-          face(tExit, rowOf(cC, tExit), b, cN + texHeight(upperTex[next]), upperTex[next], wx, lv);
+          face(tExit, a, rowOf(fC, tExit), fN, sideTex[next], wx, faceLevel(cur, s, tExit, contrast));
+          if (a < clipBot) clipBot = a < clipTop ? clipTop : a;
         }
-        if (b > clipTop) clipTop = b > clipBot ? clipBot : b;
+        if (cN < cC) {
+          const b = rowOf(cN, tExit);
+          if (flags[cur] & F_SKY && (s || !curSlab) && f & F_SKY) skyFill(rowOf(cC, tExit), b);
+          else {
+            seen[next] = 1;
+            const lv = faceLevel(cur, s, tExit, contrast);
+            face(tExit, rowOf(cC, tExit), b, cN + texHeight(upperTex[next]), upperTex[next], wx, lv);
+          }
+          if (b > clipTop) clipTop = b > clipBot ? clipBot : b;
+        }
+        if (nextSlab && clipTop < clipBot && slabBot[next] < cC && slabTop[next] > fC) {
+          const a = rowOf(slabTop[next] < cC ? slabTop[next] : cC, tExit);
+          const b = rowOf(slabBot[next] > fC ? slabBot[next] : fC, tExit);
+          if (b > clipTop && a < clipBot) {
+            seen[next] = 1;
+            face(tExit, a, b, slabTop[next], slabSideTex[next], wx, faceLevel(cur, s, tExit, contrast));
+            // Above the edge stays open in this window, and below it in a new one.
+            const bot = clipBot;
+            if (a < clipBot) clipBot = a < clipTop ? clipTop : a;
+            if (b < bot) {
+              if (nw < MAX_WIN) {
+                wTop[nw] = b > clipTop ? b : clipTop;
+                wBot[nw] = bot;
+                wSt[nw] = s;
+                nw++;
+              } else {
+                // (Out of windows, which takes a pile of slabs: leave those rows black.)
+                const keep = clipBot;
+                clipBot = bot;
+                face(tExit, b, bot, 0, -1, 0, 0);
+                clipBot = keep;
+              }
+            }
+          }
+        }
+        wTop[k] = clipTop;
+        wBot[k] = clipBot;
       }
-      record(tExit);
-      if (clipTop >= clipBot) {
+      if (nw === 1) {
+        // (The usual case, without slabs: one window.)
+        if (nseg < SEG) {
+          segDist[segBase + nseg] = tExit;
+          segTop[segBase + nseg] = wTop[0];
+          segBot[segBase + nseg] = wBot[0];
+          segFirst[segBase + nseg] = 1;
+          nseg++;
+        }
+      } else record(tExit);
+      if (nw === 1 ? wBot[0] <= wTop[0] : (compact(), !nw)) {
         end = tExit;
         break;
+      }
+      // Which storey of the next tile each window looks into (by its middle row's height here).
+      if (nextSlab) {
+        const mid = (slabBot[next] + slabTop[next]) / 2;
+        for (let k = 0; k < nw; k++) wSt[k] = camZ - (((wTop[k] + wBot[k]) / 2 - horizon) * tExit) / fy >= mid ? 1 : 0;
+      } else if (curSlab) {
+        for (let k = 0; k < nw; k++) wSt[k] = 0;
       }
       cur = next;
       tEnter = tExit;

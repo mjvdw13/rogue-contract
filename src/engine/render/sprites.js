@@ -19,7 +19,7 @@ const FUZZ = [1, -1, 1, -1, 1, 1, -1, 1, 1, -1, 1, 1, 1, -1, 1, 1, 1, -1, -1, -1
  */
 export function drawSprites(view, things, map, fb, fbW, colormaps, skip) {
   const { W, H, x: px, y: py, dirX, dirY, planeX, planeY, fx, fy, camZ, horizon, zbuf } = view;
-  const { segDist, segTop, segBot, segCount, SEG } = view;
+  const { segDist, segTop, segBot, segFirst, segCount, SEG } = view;
   const mdepth = view.depthValid ? view.mdepth : null;
   const invDet = 1 / (planeX * dirY - dirX * planeY);
   visible.length = 0;
@@ -63,7 +63,7 @@ export function drawSprites(view, things, map, fb, fbW, colormaps, skip) {
     else if (t.fullbright) lv = 0;
     else {
       const tile = map.inBounds(t.x | 0, t.y | 0) ? (t.y | 0) * map.w + (t.x | 0) : -1;
-      lv = view.level(tile >= 0 ? map.light[tile] : 128, depth);
+      lv = view.level(tile >= 0 ? map.storeyLight(tile, map.storeyAt(tile, (t.z ?? 0) + 0.5)) : 128, depth);
     }
     const cm = lv * 256;
     const fuzz = t.def?.renderStyle === 'fuzz';
@@ -74,38 +74,42 @@ export function drawSprites(view, things, map, fb, fbW, colormaps, skip) {
 
     for (let x = x0; x < x1; x++) {
       if (depth >= zbuf[x]) continue;
-      // The rows still uncovered by ledges and overhangs nearer than the sprite.
-      let winTop = 0;
-      let winBot = H;
+      // The rows still uncovered by ledges and overhangs nearer than the
+      // sprite: the last batch of windows recorded nearer than it (or the
+      // whole column), sb + first .. sb + last.
       const sb = x * SEG;
-      for (let k = 0, n = segCount[x]; k < n && segDist[sb + k] < depth; k++) {
-        winTop = segTop[sb + k];
-        winBot = segBot[sb + k];
-      }
-      if (winBot <= winTop) continue;
+      let last = -1;
+      for (let k = 0, n = segCount[x]; k < n && segDist[sb + k] < depth; k++) last = k;
+      let first = last;
+      while (first > 0 && !segFirst[sb + first]) first--;
       let tx = ((x + 0.5 - left) * texScaleX) | 0;
       if (tx >= frame.w) tx = frame.w - 1;
       if (t.flipX) tx = frame.w - 1 - tx;
       const ct = frame.top[tx];
       if (ct < 0) continue;
       const cb = frame.bottom[tx];
-      let y0 = Math.ceil(top + ct / texScaleY - 0.5);
-      let y1 = Math.ceil(top + (cb + 1) / texScaleY - 0.5);
-      if (y0 < winTop) y0 = winTop;
-      if (y1 > winBot) y1 = winBot;
       const base = tx * fh;
-      for (let y = y0; y < y1; y++) {
-        let ty = ((y + 0.5 - top) * texScaleY) | 0;
-        if (ty >= fh) ty = fh - 1;
-        const c = cmData[base + ty];
-        if (c === TRANSPARENT) continue;
-        const o = y * fbW + x;
-        if (mdepth && depth >= mdepth[o]) continue;
-        if (fuzz) {
-          const src = o + FUZZ[fuzzPos++ & 31] * fbW;
-          fb[o] = colormaps[6 * 256 + fb[src < 0 || src >= fb.length ? o : src]];
-        } else {
-          fb[o] = colormaps[cm + c];
+      // (With no batch nearer, `first` and `last` are -1: one pass over the whole column.)
+      for (let k = first; k <= last; k++) {
+        const winTop = k < 0 ? 0 : segTop[sb + k];
+        const winBot = k < 0 ? H : segBot[sb + k];
+        let y0 = Math.ceil(top + ct / texScaleY - 0.5);
+        let y1 = Math.ceil(top + (cb + 1) / texScaleY - 0.5);
+        if (y0 < winTop) y0 = winTop;
+        if (y1 > winBot) y1 = winBot;
+        for (let y = y0; y < y1; y++) {
+          let ty = ((y + 0.5 - top) * texScaleY) | 0;
+          if (ty >= fh) ty = fh - 1;
+          const c = cmData[base + ty];
+          if (c === TRANSPARENT) continue;
+          const o = y * fbW + x;
+          if (mdepth && depth >= mdepth[o]) continue;
+          if (fuzz) {
+            const src = o + FUZZ[fuzzPos++ & 31] * fbW;
+            fb[o] = colormaps[6 * 256 + fb[src < 0 || src >= fb.length ? o : src]];
+          } else {
+            fb[o] = colormaps[cm + c];
+          }
         }
       }
     }

@@ -11,7 +11,11 @@ const MAX_BRIGHTEN = 24;
 export class View {
   constructor(width = VIEW_W) {
     this.H = VIEW_H;
-    /** Per column, the uncovered window of rows after each tile the ray crossed (for sprite clipping). */
+    /**
+     * Per column, the uncovered windows of rows after each tile the ray crossed
+     * (for sprite clipping): one batch per boundary, usually a single window,
+     * more where slabs split the view.
+     */
     this.SEG = 48;
     this.resize(width);
     this.lightStart = new Float32Array(256);
@@ -42,6 +46,8 @@ export class View {
     this.segDist = new Float32Array(this.W * this.SEG);
     this.segTop = new Int16Array(this.W * this.SEG);
     this.segBot = new Int16Array(this.W * this.SEG);
+    /** Set on the first window of each batch. */
+    this.segFirst = new Uint8Array(this.W * this.SEG);
     this.segCount = new Uint8Array(this.W);
     this.skyU = new Int32Array(this.W);
     /**
