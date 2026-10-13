@@ -230,6 +230,28 @@ p.rect(118, 56, 121, 60, lift([-2, 8], SKY, { ceiling: 'sky', light: 104 }));
 p.rect(121, 34, 126, 60, sand(8, { floor: 'imp-floor', side: 'imp-panel-dark', light: 184 }));
 p.rect(122, 43, 126, 47, sand(8, { floor: 'lift-floor', side: 'imp-panel-dark', light: 224, lightFx: 'glow', lightMin: 168, exit: true }));
 
+// ---------------------------------------------------------------- the cliff
+// The garrison is dug into the cliff: outside, its walls stand 4 m above the
+// ground in front of them with the rock face above (wall bands), and so do
+// the faces over its openings (the gate's lintel, above the vent mouth).
+// Not where the rock would show indoors (a room as tall as where it starts).
+const IMPERIAL = new Set(['imp-panel', 'imp-panel-dark', 'imp-lights']);
+const outside = (c) => c && !c.wall && !c.door && c.ceiling === 'sky';
+const cliff = [];
+for (let y = 0; y < H; y++) {
+  for (let x = 0; x < W; x++) {
+    const c = p.get(x, y);
+    if (c.wall ? !IMPERIAL.has(c.wall) : outside(c)) continue;
+    const around = [p.get(x + 1, y), p.get(x - 1, y), p.get(x, y + 1), p.get(x, y - 1)].filter((n) => n && !n.wall);
+    const out = around.filter(outside);
+    if (!out.length) continue;
+    const from = Math.max(...out.map((n) => n.floorZ ?? 0)) + 8;
+    if (around.some((n) => !outside(n) && (n.ceilZ ?? 0) > from)) continue;
+    cliff.push([x, y, { ...c, bands: [{ from, tex: 'sandstone' }] }]);
+  }
+}
+for (const [x, y, c] of cliff) p.set(x, y, c);
+
 // ---------------------------------------------------------------- things
 const at = (type, x, y, extra = {}) => ({ type, x, y, ...extra });
 // Skills (docs/mission1.md has the table): 1-2 thin out the fights and add

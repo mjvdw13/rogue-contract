@@ -870,7 +870,7 @@ headless Node, DF art). Budget for this phase: stay under about 8 ms.
        read across a room, and add an outdoor haze: under the sky, surfaces
        fade toward a level's `haze` colour (colormaps blending to a
        colour) instead of to black.
-6. [ ] **Wall bands.** A wall tile can change texture with height:
+6. [x] **Wall bands.** A wall tile can change texture with height:
        `bands: [{ from: 8, tex: 'canyon-rock' }, { to: 0.5, tex: 'imp-trim'
        }]`. The garrison's face with rock above, skirting trims, the
        reactor column's bands. Validator, map viewer, tests.
@@ -1756,5 +1756,11 @@ update the smoke test.
   gate's lintel). Parsed per glyph (`map.bandSets`), scaled by the
   upscaler, drawn over the face in the renderer; the map viewer shows a
   wall's top band. Tests share a headless renderer (`headlessRenderer()`
-  in tests/helpers.js). Next: the garrison's outside walls with the cliff
-  above them in Mission 1. 168 tests.
+  in tests/helpers.js). 168 tests.
+- 2026-10-13: Phase 1d step 6 done. Mission 1's garrison is dug into the
+  cliff: its outside walls, and the faces over the gate and the vent
+  mouth, stand 4 m (8) above the ground in front of them with the
+  canyon's rock above, worked out from the map (skipped where the rock
+  would show indoors, so the gantry's end wall, which is also the
+  generator's, stays panel until steps 19-20). Trims and the reactor
+  column's bands come with steps 17 and 19.
