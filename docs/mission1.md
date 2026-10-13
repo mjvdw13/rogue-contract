@@ -50,6 +50,33 @@ switch (opens the escape hatch) → back up → escape hatch → gantry stairs
 | 16 | Chasm | 118..121, 34..58 | -2 / sky | The 3-tile jump. Lift L3 (118..121, 54..58) runs back up (-2 ↔ 8) if you fall. |
 | 17 | Landing pad | 121..126, 34..58 | 8 / sky | Troopers. The exit is the marked pickup spot on the pad (122..126, 43..47). |
 
+## Lighting
+
+Light is per tile (0-255; walls take the light of the tile in front of
+them). With the Dark Forces textures, 120 already reads as a dark corner and
+anything under about 110 as black, so dark places stay at 112-128 and the
+contrast comes from bright pools (184-224).
+
+- **Canyon:** moonlight at 144 (152 in the start bowl), the narrow gorge at
+  136, the spire's shadow and the ledges a little darker, the strip along
+  the garrison face in shadow (120). Floodlight pools (200) under the gate's
+  light strips, the gate itself at 168. The rock alcove is dark (112).
+- **Vent:** 112, with light falling through a grate halfway (144).
+- **Maintenance:** 128, a bright panel in the middle (192), dark west
+  corners (120), and a broken ceiling light flickering in the south-east.
+- **Barracks:** the corridor at 144 with pools under the ceiling panels
+  (208), the light strips and the hanging lamps (184). The bunk room at 128
+  with a ceiling light in the middle and dark north corners; the office at
+  144 with a light over the desk.
+- **Vault:** 112, with the screens' glow pulsing (104-152) along the
+  computer banks. The niche 120.
+- **Generator:** the shaft floor dark (112), a slow pulse (136-200) round the
+  reactor column, catwalks at 152 with light strips on the chamber walls
+  lighting the catwalk in front of them (184). The overload switch drops the
+  whole chamber to a dim flicker (136, dipping to 72).
+- **The way out:** the chasm dark (104), the pad floodlit (184), and the
+  pickup spot pulsing (168-224).
+
 ## Secrets (3)
 
 1. The start bowl's rock alcove (shield unit).
@@ -68,5 +95,5 @@ and one at the bottom. Two pad troopers guard the end.
 
 - Objective 1: the data tape in the vault. Objective 2: the generator
   overload. The exit only works once both are done.
-- The generator overload kills the lights, so the headlamp is needed on the
-  way out.
+- The generator overload could kill the lights outright once the headlamp
+  exists (for now it leaves a dim flicker).

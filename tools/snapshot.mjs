@@ -6,6 +6,7 @@
 //   node tools/snapshot.mjs sandbox --at 12.5,7.5,90      x,y,angle (content degrees: 0 east, 90 north)
 //   node tools/snapshot.mjs sandbox --pitch 30 --z 0.2    look up 30 px, raise the eye 0.2 above the floor
 //   node tools/snapshot.mjs sandbox --out shot.png --scale 3 --nomonsters
+//   node tools/snapshot.mjs m1 --custom                   with the art overrides (the Dark Forces art)
 //
 // The default output is tools/art/out/snapshots/<level>.png.
 import fs from 'node:fs';
@@ -27,13 +28,19 @@ import { decodePNG, encodePNG } from './art/lib/png.js';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 /**
- * Build the renderer and assets headlessly (PNGs decoded from disk).
+ * Build the renderer and assets headlessly (PNGs decoded from disk). With
+ * `custom`, the art overrides in assets/custom/overrides.json are used, as
+ * in the browser.
+ * @param {{custom?:boolean}} [opts]
  * @returns {Promise<{registry:any, palette:Palette, assets:Assets, surface:Surface, renderer:Renderer}>}
  */
-export async function headless() {
+export async function headless({ custom = false } = {}) {
   const registry = new Registry(content);
   const palette = new Palette(registry.paletteDef);
   const assets = new Assets(registry, palette);
+  assets._loadOverrides = async () => {
+    assets.overrides = custom ? JSON.parse(fs.readFileSync(path.join(root, 'assets/custom/overrides.json'), 'utf8')) : {};
+  };
   assets._loadImage = async (src) => {
     try {
       return quantize(decodePNG(fs.readFileSync(path.join(root, src))), palette);
@@ -102,7 +109,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   const valued = new Set(['--at', '--pitch', '--z', '--out', '--scale', '--skill']);
   const levelId = args.find((a, i) => !a.startsWith('--') && !valued.has(args[i - 1])) ?? 'sandbox';
   const at = opt('--at') ? opt('--at').split(',').map(Number) : undefined;
-  const ctx = await headless();
+  const ctx = await headless({ custom: args.includes('--custom') });
   const shot = snapshot(ctx, levelId, {
     at,
     pitch: Number(opt('--pitch', 0)),

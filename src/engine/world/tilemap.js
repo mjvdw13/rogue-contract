@@ -66,6 +66,8 @@ export class TileMap {
     this.baseLight = new Uint8Array(n);
     this.light = new Uint8Array(n);
     this.lightFx = new Uint8Array(n);
+    /** The low end of a tile's light effect (0: the default, 96 below its light). */
+    this.lightMin = new Uint8Array(n);
     this.lightGroup = new Int32Array(n).fill(-1);
     this.damage = new Uint8Array(n);
     this.doorIndex = new Int16Array(n).fill(-1);

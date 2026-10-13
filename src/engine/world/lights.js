@@ -1,8 +1,13 @@
 import { LIGHT_FX } from './tilemap.js';
 
+/** The default low end of a light effect: this far below the tile's light. */
+const FX_RANGE = 96;
+const lowEnd = (light, min) => (min ? Math.min(min, light) : Math.max(16, light - FX_RANGE));
+
 /**
  * Animated lighting (Doom's sector light specials). Tiles that share a glyph
- * and effect form a group and change together.
+ * and effect form a group and change together. An effect swings between the
+ * tile's light and its `lightMin` (by default 96 below).
  */
 export class LightEffects {
   constructor(map, rng) {
@@ -16,18 +21,19 @@ export class LightEffects {
       if (!byGroup.has(g)) byGroup.set(g, []);
       byGroup.get(g).push(i);
     }
-    for (const tiles of byGroup.values()) {
-      const base = map.baseLight[tiles[0]];
-      this.groups.push({
-        tiles,
-        fx: map.lightFx[tiles[0]],
-        max: base,
-        min: Math.max(16, base - 96),
-        cur: base,
-        timer: rng.range(0, 1),
-        phase: rng.range(0, Math.PI * 2),
-      });
-    }
+    for (const tiles of byGroup.values()) this._addGroup(tiles, map.lightFx[tiles[0]], map.baseLight[tiles[0]], map.lightMin[tiles[0]]);
+  }
+
+  _addGroup(tiles, fx, light, min) {
+    this.groups.push({
+      tiles,
+      fx,
+      max: light,
+      min: lowEnd(light, min),
+      cur: light,
+      timer: this.rng.range(0, 1),
+      phase: this.rng.range(0, Math.PI * 2),
+    });
   }
 
   update(dt) {
@@ -80,17 +86,35 @@ export class LightEffects {
     }
   }
 
-  /** Change the base light of tiles (trigger action); restarts their groups. */
-  setLight(tiles, light) {
+  /**
+   * Change the base light of tiles (trigger action); restarts their groups,
+   * keeping each group's range. With `fx` ('none', 'flicker', ...), the tiles
+   * leave their groups and change together with the new effect, between
+   * `light` and `min`.
+   */
+  setLight(tiles, light, fx, min = 0) {
+    const map = this.map;
     const set = new Set(tiles);
     for (const i of tiles) {
-      this.map.baseLight[i] = light;
-      this.map.light[i] = light;
+      map.baseLight[i] = light;
+      map.light[i] = light;
+    }
+    if (fx !== undefined) {
+      for (const g of this.groups) g.tiles = g.tiles.filter((i) => !set.has(i));
+      this.groups = this.groups.filter((g) => g.tiles.length);
+      const code = LIGHT_FX[fx] ?? 0;
+      for (const i of tiles) {
+        map.lightFx[i] = code;
+        map.lightMin[i] = min;
+      }
+      if (code && tiles.length) this._addGroup([...tiles], code, light, min);
+      return;
     }
     for (const g of this.groups) {
       if (g.tiles.some((i) => set.has(i))) {
+        const range = g.max - g.min;
         g.max = light;
-        g.min = Math.max(16, light - 96);
+        g.min = Math.max(16, light - range);
         g.cur = light;
       }
     }

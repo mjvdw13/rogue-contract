@@ -102,6 +102,7 @@ export function buildLevel(registry, level, opts = {}) {
     return idx;
   };
 
+  const badFx = new Set();
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
       const glyph = rows[y][x] ?? ' ';
@@ -121,6 +122,11 @@ export function buildLevel(registry, level, opts = {}) {
       map.baseLight[i] = light;
       map.light[i] = light;
       map.lightFx[i] = LIGHT_FX[e.lightFx ?? 'none'] ?? 0;
+      if (e.lightFx && LIGHT_FX[e.lightFx] === undefined && !badFx.has(glyph)) {
+        badFx.add(glyph);
+        errors.push(`Tile glyph "${glyph}" has unknown lightFx "${e.lightFx}"`);
+      }
+      map.lightMin[i] = e.lightMin ?? 0;
       const floor = e.floor ?? defaults.floor;
       const ceiling = e.ceiling ?? defaults.ceiling;
       if (floor) map.floorTex[i] = slot(floor);

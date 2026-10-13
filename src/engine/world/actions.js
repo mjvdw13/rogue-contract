@@ -50,9 +50,9 @@ export const BUILTIN_ACTIONS = {
     }
     world.playSoundAt('teleport', spots[0].x, spots[0].y);
   },
-  /** Set the light level of tagged tiles. */
-  setLight(world, { tag, light }) {
-    world.lights.setLight(world.map.tilesWithTag(tag), light);
+  /** Set the light level of tagged tiles, and optionally their effect (`lightFx`, `lightMin`). */
+  setLight(world, { tag, light, lightFx, lightMin }) {
+    world.lights.setLight(world.map.tilesWithTag(tag), light, lightFx, lightMin);
   },
   /** Move the player to the first tile with the tag. */
   teleport(world, { tag, angle }) {

@@ -250,7 +250,32 @@ Design rules (what makes it feel like Dark Forces):
        2026-10-12). It becomes
        the episode's level, and the sandbox goes back to being a test map
        outside the episode.
-3. [ ] Lighting pass: light levels, flicker and light strips.
+3. [x] Lighting pass: light levels, flicker and light strips (done
+       2026-10-12; the levels are in `docs/mission1.md`). Light is per tile (walls take the light of the tile in
+       front of them), so pools of light and dark corners are painted as
+       tiles.
+       - [x] Fix hanging decorations and effects sizing themselves at 64
+             texels per unit (leftover E): the ceiling lamps sit right.
+       - [x] `snapshot.mjs --custom`: render with the Dark Forces art
+             overrides, read from disk, for reviewing the look.
+       - [x] Engine: `lightMin` in the legend (the low end of a tile's
+             light effect, instead of always 96 below), and `setLight`
+             taking an optional `lightFx`, so the overload can make the
+             generator chamber flicker. Tests, MODDING.md.
+       - [x] Canyon: a night (moonlit) base, a darker gorge and vent,
+             shadow along the garrison face, floodlight pools under the
+             gate's light strips, a dark secret alcove.
+       - [x] Interiors: darker bases with bright pools under ceiling lights
+             and lamps, dark chamfered corners, a broken flickering light
+             in maintenance, monitor glow pulsing along the vault's
+             computer banks.
+       - [x] Generator: a dark shaft bottom, a slow pulse round the reactor
+             column, light strips on the catwalk walls; the overload drops
+             it to a dim flicker.
+       - [x] The way out: a dark chasm, a floodlit pad, the pickup spot
+             pulsing.
+       - [x] Screenshots of every area before and after; tests, validator,
+             smoke test.
 4. [ ] Enemies, items, skill variants and 2-3 secrets.
 5. [ ] Validator, map viewer and screenshot review, then playtest.
 
@@ -303,7 +328,7 @@ Design rules (what makes it feel like Dark Forces):
 - [ ] The options menu doesn't fit: its 11 big-font rows need about 210
       px, so SHOW FPS is cut off at the bottom and the rows touch. Use the
       small font, or split it into sub-menus (video, controls).
-- [ ] Hanging decorations and effect sprites still size themselves at 64
+- [x] Hanging decorations and effect sprites still size themselves at 64
       texels per unit (`world.js`: `sheet.fh / 64`). Since the finer grid
       it is 32, so ceiling lamps hang half their height into the ceiling.
 
@@ -976,3 +1001,20 @@ update the smoke test.
   frame (4 frames at 20 fps), then a burst of arcs leaping out where it
   hits (3 frames), all fullbright. Its own sounds: `ion-fire`, a buzzing
   bit-crushed zap, and `ion-hit`, a quick crackle.
+- 2026-10-12: Phase 1b B3, Mission 1's lighting pass. Light is per tile and
+  walls take the light of the tile in front, so pools and dark corners are
+  painted as tiles (`Painter.light()` relights the open tiles of a box).
+  With the Dark Forces textures 120 already reads dark and under ~110 black,
+  so dark places stay at 112-128 and contrast comes from bright pools: a
+  moonlit canyon (144, was a flat 176 that read as daylight), floodlights
+  under the gate's strips, pools under ceiling panels, strips and lamps,
+  dark corners, a broken flickering light in maintenance, the vault's
+  screens pulsing, a slow pulse round the reactor column, new light strips
+  on the generator walls, and a pulsing pickup spot. Engine: `lightMin` in
+  the legend (the low end of an effect), `setLight` with `lightFx` /
+  `lightMin` (the overload now leaves the chamber in a dim flicker, 136 down
+  to 72, instead of a flat black 72), an unknown `lightFx` is an error.
+  Hanging decorations and effects size themselves at 32 texels per unit, so
+  the ceiling lamps hang from the ceiling instead of half inside it.
+  `snapshot.mjs --custom` renders with the Dark Forces art. 108 tests (5
+  new), the validator and the smoke test pass.

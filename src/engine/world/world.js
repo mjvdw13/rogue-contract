@@ -17,6 +17,7 @@ import { projectileThink, launchProjectile, effectThink } from '../things/projec
 import { tryPickup } from '../things/pickups.js';
 import { damage, radiusDamage, hitscan, meleeTarget } from '../combat/damage.js';
 import { weaponSprites, bestWeapon } from '../things/weapons.js';
+import { TEXELS_PER_UNIT } from '../config.js';
 
 /** Difficulty settings (1 = easiest .. 5 = nightmare). Placement per skill is up to each level. */
 export const SKILLS = {
@@ -39,6 +40,8 @@ const FLOOR_DAMAGE_INTERVAL = 0.9;
 const GRAVITY = 28;
 /** How far a walking body may hang over the edge of a drop it won't step off. */
 const OVERHANG = 0.15;
+/** A sprite frame's height in world units, as the sprite renderer draws it. */
+const spriteHeight = (sheet, def) => (sheet.fh * (def?.scale ?? 1) * (sheet.scale ?? 1)) / TEXELS_PER_UNIT;
 /** While a lift moves, flow fields are refreshed this often (seconds). */
 const NAV_REFRESH = 0.25;
 
@@ -176,7 +179,7 @@ export class World {
     if (t.solid) this.unstick(t);
     if (def.kind === 'monster') t.timer = this.rng.range(0, 0.3);
     if (def.kind === 'npc') initNpc(this, t);
-    if (def.kind === 'decoration' && def.hanging) t.z = this.map.ceilAt(x, y) - (t.sheet ? (t.sheet.fh / 64) * (def.scale ?? 1) : t.height);
+    if (def.kind === 'decoration' && def.hanging) t.z = this.map.ceilAt(x, y) - (t.sheet ? spriteHeight(t.sheet, def) : t.height);
     else if (def.kind !== 'projectile' && def.kind !== 'effect') t.z = this.map.floorAt(x, y) + (def.z ?? 0);
     this.things.push(t);
     def.hooks?.onSpawn?.(this, t);
@@ -211,7 +214,7 @@ export class World {
   spawnEffect(id, x, y, z = 0) {
     if (!id || !this.registry.things.has(id)) return null;
     const e = this.spawn(id, x, y);
-    if (e) e.z = z - (e.sheet ? (e.sheet.fh / 64) * (e.def.scale ?? 1) * 0.5 : 0);
+    if (e) e.z = z - (e.sheet ? spriteHeight(e.sheet, e.def) * 0.5 : 0);
     return e;
   }
 

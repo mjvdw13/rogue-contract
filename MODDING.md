@@ -339,6 +339,10 @@ Floor options:
 - `light`: 0–255. 120 is dark, 160 is normal, 200 and up is bright.
 - `lightFx`: `'flicker'`, `'strobe'`, `'blink'`, `'glow'` or `'fire'`.
   Neighbouring tiles that share a glyph flicker together.
+- `lightMin`: the low end of the effect (16–255). By default it is 96 below
+  `light`; a pulse that barely dims, say, is `light: 152, lightMin: 120`.
+  Walls take the light of the tile in front of them, so a pool of light on
+  the floor also lights the wall behind it.
 - `damage`: hurts every second while standing on it (waders protect).
 - `secret: true`: entering a connected group of these counts as one secret.
 - `exit: true`: stepping here ends the level.
@@ -530,7 +534,10 @@ Actions:
 - `message` `{ text }`, `sound` `{ id }` and `music` `{ id }`
 - `spawn` `{ thing, tag }`: a monster or item appears in teleport fog on every
   tile with the tag
-- `setLight` `{ tag, light }`
+- `setLight` `{ tag, light, lightFx?, lightMin? }`: without `lightFx`,
+  tiles keep their effect and its range. With it (`'none'` for still), all
+  the tagged tiles change together with the new effect, from `light` down to
+  `lightMin`.
 - `lift` `{ tag, to }`: starts the lifts with the tag (to stop index `to`, or
   the next stop)
 - `teleport` `{ tag, angle }`: moves the player to the first tile with the tag

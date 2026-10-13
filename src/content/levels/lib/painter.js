@@ -49,6 +49,15 @@ export class Painter {
   }
 
   /**
+   * Relight the open tiles of a box (a pool of light, a dark corner): they get
+   * `light` and the fields in `extra` (say a `lightFx`). Walls and doors keep
+   * theirs; angled walls are relit, as they stand on a floor.
+   */
+  light(x0, y0, x1, y1, light, extra = {}) {
+    return this.rect(x0, y0, x1, y1, (x, y, old) => ((old.wall && !old.diagonal) || old.door ? old : { ...old, light, ...extra }));
+  }
+
+  /**
    * Cut the corners of an open box with 45° angled walls, `n` tiles deep:
    * tiles on the diagonal get an angled wall of `wall` (keeping their floor),
    * and tiles beyond it become solid. `corners` picks which (default all).

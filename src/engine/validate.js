@@ -1,5 +1,5 @@
 import { buildLevel } from './world/level.js';
-import { F_EXIT, F_SOLID, F_VOID } from './world/tilemap.js';
+import { F_EXIT, F_SOLID, F_VOID, LIGHT_FX } from './world/tilemap.js';
 import { BUILTIN_ACTION_NAMES } from './world/actions.js';
 import { BUILTIN_ATTACKS } from './combat/attacks.js';
 import { BUILTIN_PICKUPS } from './things/pickups.js';
@@ -191,6 +191,7 @@ export function validateContent(reg) {
         if (a.tag && !map.tags.has(a.tag)) err(`${owner}: ${where} refers to tag "${a.tag}" which no tile has`);
         if (a.thing && !reg.things.has(a.thing)) err(`${owner}: ${where} spawns unknown thing "${a.thing}"`);
         if (a.action === 'music' && a.id && !reg.songs.has(a.id)) warn(`${owner}: ${where} plays unknown song "${a.id}"`);
+        if (a.action === 'setLight' && a.lightFx !== undefined && LIGHT_FX[a.lightFx] === undefined) err(`${owner}: ${where} sets unknown lightFx "${a.lightFx}"`);
       }
     };
     (level.triggers ?? []).forEach((t, i) => {
