@@ -16,6 +16,7 @@ land, and record new decisions here.
 | Title | **Rogue Contract** (chosen 2026-10-11). Repo `mjvdw13/rogue-contract`, public, served by GitHub Pages. It also holds ripped Dark Forces art for local testing (Mark's decision, 2026-10-12; see Phase 1b D). "Star Wars" and "Dark Forces" stay out of the title. |
 | Engine, revisited (2026-10-12) | **Stay on our height-grid engine.** Considered instead: The Force Engine (needs the original Dark Forces files, so it can only host a mod; desktop only), GZDoom (true sectors and slopes, but desktop only) and Godot with TrenchBroom (no grid limits, but a full rebuild). Fill the grid's visual gaps with 3D models (Phase 1b F). |
 | Platforms (2026-10-12) | **Desktop browsers.** Phones are no longer a target: no phone performance gate, and touch controls aren't required. |
+| Story, revisited (2026-10-13) | **Bad Paper, a prequel to Dark Forces** (`docs/story.md`), set a few months before Dark Forces' first mission. A licensed bounty hunter on Tatooine takes a contract that turns on them: the Canyon Garrison is an early field test of Mohc's Dark Trooper project, and its prototype is Phase 3's mini-boss. Calm missions, where enemies leave you alone until an alarm, alternate with combat. The tracking fob is a mechanic. Still the original hero, with no Kyle Katarn retelling. |
 | Rights | A non-commercial fan game. All art, sound and music are generated or original. Nothing ripped from Dark Forces, and no note-for-note John Williams transcriptions. Exception (Mark's decision, 2026-10-12): the ripped Dark Forces enemy and weapon sheets in `assets/custom/` are used, on the hosted site too (see Phase 1b D). |
 
 ## Starting point
@@ -715,7 +716,7 @@ Decided:
       glowing red and green bolts.
 - [ ] **Enemies:** Stormtrooper, Imperial Officer (drops keycards),
       Commando, Probe Droid, and an original mini-boss (a prototype assault
-      droid).
+      droid: an early Dark Trooper test, see `docs/story.md`).
 - [ ] **Weapons:** fists, blaster pistol, E-11-style rifle and thermal
       detonators.
 - [ ] **Items:** shield units, med kits, batteries, power cells, red and blue
@@ -1243,3 +1244,11 @@ update the smoke test.
   before the Canyon Garrison. Two map sketches (Mos Eisley, a moisture-farm
   homestead), and the engine work calm missions need (calm enemies and an
   alarm, patrols, holstering, conversations).
+- 2026-10-13: Story chosen: Bad Paper, as a prequel to Dark Forces (see
+  Decisions). `docs/story.md` is rewritten around it: how it ties into Dark
+  Forces (Mohc's prototype, Jan Ors at the end), three missions (Mos Eisley,
+  the Homestead, the Canyon Garrison with a calm front half), the tracking
+  fob as a mechanic (a tool, then the tracer that betrays you, then a decoy
+  to throw), and the engine work: calm enemies and an alarm, the fob,
+  searching, patrols, conversations. Open: Dark Forces cameos, the hero's
+  ending and name, and confirming Mos Eisley first with no-fail alarms.
