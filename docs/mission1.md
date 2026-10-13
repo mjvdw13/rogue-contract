@@ -33,7 +33,7 @@ switch (opens the escape hatch) → back up → escape hatch → gantry stairs
 | # | Area | Box (x0..x1, y0..y1) | Floor / ceiling | Notes |
 |---|------|----------------------|-----------------|-------|
 | 1 | Start bowl | 6..30, 76..96 | 0 / sky 24 | Start (14.5, 90.5) facing north. Secret alcove behind a rock door in the west wall (2..6, 80..84): a shield unit. |
-| 2 | Gorge | 14..34, 60..76 | 0 / sky | Winds north-east, with angled rock walls. |
+| 2 | Gorge | 14..34, 60..76 | 0 / sky | Winds north-east, with angled rock walls. A natural rock arch spans it (14..34, 64..67): a slab from 4 to 5 that you walk under, with a sniper on top (skills 2+) facing the start bowl. There's no way up. |
 | 3 | The bowl | 20..60, 44..60 | 0 / sky | Landmark: a rock spire (chamfered 6x6 block at 35..41, 49..55). Sniper ledge A (west, 20..24, floor 5) can't be reached. Ledge B (east, 56..60, floor 5) is reached by rock steps at its south end. |
 | 4 | Garrison face | 26..70, 36..40 | wall | Imperial wall facing the canyon, with a locked main gate (44..52) between light strips. The vent mouth is at 32..34. |
 | 5 | Vent | 32..34, 26..40 | 0.5 / 1.7 | Crouch only (1.2 clear). |
@@ -44,7 +44,7 @@ switch (opens the escape hatch) → back up → escape hatch → gantry stairs
 | 10 | Officer's office | 62..72, 4..15 | 6 / 9 | Door 65..67 x 15..16. An officer carrying the **red keycard** (dropped when killed), a console. A barred window (69..71 x 15..16, over a sill at 7) looks in from the corridor. |
 | 11 | Red door | 77..78, 17..19 | 6 | Into the vault. |
 | 12 | Data vault | 78..92, 10..25 | 6 / 9 | Dark (light 96), computer-bank walls, chamfered corners, ammo, guards against the far banks. Secret niche (92..96, 14..18) behind a computer-bank door: a shield. South door 84..86 x 25..26 onto the generator catwalk. |
-| 13 | Generator chamber | 72..108, 26..62 | -6 / 18 | Catwalk ring at 6 (3 wide). Central reactor column (86..94, 40..48) with chamfered corners. North and south bridges (88..92) join the ring to the column; they reach down to the floor, splitting the bottom into west and east halves. Lifts L2 (75..79, 55..59, west) and L2b (101..105, 29..33, east) run -6 ↔ 6. The overload switch is on the column's south face at the bottom: it opens `escape`, dims the chamber and shows a message. Railings (0.75 tall) along the ring's inner edge and both sides of the bridges, open where the lifts and bridges join. Probe droid, troopers, fuel barrels at the bottom. |
+| 13 | Generator chamber | 72..108, 26..62 | -6 / 18 | Catwalk ring at 6 (3 wide). Central reactor column (86..94, 40..48) with chamfered corners. North and south bridges (88..92) join the ring to the column. The ring and bridges are grate slabs (5.5 to 6): the shaft floor runs on underneath them, one open space round the column and out to the walls. Lifts L2 (75..79, 55..59, south-west) and L2b (101..105, 29..33, north-east) run -6 ↔ 6. The overload switch is on the column's south face at the bottom: it opens `escape`, dims the chamber and shows a message. Railings (0.75 tall) along the ring's inner edge and both sides of the bridges, open where the lifts and bridges join. Probe droid, troopers, fuel barrels at the bottom. |
 | 14 | Escape hatch | 108..109, 43..45 | 6 | Remote-locked door, tag `escape`, with a landing outside (109..110, 42..46). |
 | 15 | Gantry | 110..118, 42..46 | 6 → 8 / sky | Stairs up 0.5 per tile to 8. |
 | 16 | Chasm | 118..121, 34..58 | -2 / sky | The 3-tile jump. Lift L3 (118..121, 54..58) runs back up (-2 ↔ 8) if you fall. |
@@ -59,8 +59,10 @@ contrast comes from bright pools (184-224).
 
 - **Canyon:** moonlight at 144 (152 in the start bowl), the narrow gorge at
   136, the spire's shadow and the ledges a little darker, the strip along
-  the garrison face in shadow (120). Floodlight pools (200) under the gate's
-  light strips, the gate itself at 168. The rock alcove is dark (112).
+  the garrison face in shadow (120). The rock arch is moonlit on top (152)
+  and casts its shadow under it (112). Floodlight pools (200) under the
+  gate's light strips, the gate itself at 168. The rock alcove is dark
+  (112).
 - **Vent:** 112, with light falling through a grate halfway (144).
 - **Maintenance:** 128, a bright panel in the middle (192), dark west
   corners (120), and a broken ceiling light flickering in the south-east.
@@ -70,10 +72,12 @@ contrast comes from bright pools (184-224).
   144 with a light over the desk.
 - **Vault:** 112, with the screens' glow pulsing (104-152) along the
   computer banks. The niche 120.
-- **Generator:** the shaft floor dark (112), a slow pulse (136-200) round the
-  reactor column, catwalks at 152 with light strips on the chamber walls
-  lighting the catwalk in front of them (184). The overload switch drops the
-  whole chamber to a dim flicker (136, dipping to 72).
+- **Generator:** the shaft floor dark (128), darker under the catwalks
+  (120), a slow pulse (136-200) round the reactor column, catwalks at 152
+  with light strips on the chamber walls lighting the catwalk in front of
+  them (184) and pools on the floor below it (168). The overload switch
+  drops the whole chamber to a dim flicker (136, dipping to 72; under the
+  catwalks as much darker as before).
 - **The way out:** the chasm dark (104), the pad floodlit (184), and the
   pickup spot pulsing (168-224).
 
@@ -88,23 +92,24 @@ contrast comes from bright pools (184-224).
 
 Skills 1-2 thin the fights and add med kits; 4-5 add a trooper or two to
 most areas (skill 5 also makes monsters faster and doubles ammo pickups, set
-in the engine). Totals: 14 monsters on skill 1, 18 on 2, 22 on 3, 29 on 4
-and 30 on 5.
+in the engine). Totals: 14 monsters on skill 1, 19 on 2, 23 on 3, 30 on 4
+and 31 on 5.
 
 | Area | Every skill | 2+ | 3+ | 4+ (5 only) |
 |------|-------------|----|----|-------------|
-| Canyon | snipers on ledges A and B, a gate sandtrooper, 2 Jawas | a 2nd gate sandtrooper | the probe droid, a 3rd Jawa | a sandtrooper under ledge A, a 4th Jawa |
+| Canyon | snipers on ledges A and B, a gate sandtrooper, 2 Jawas | a 2nd gate sandtrooper, a sniper on the rock arch | the probe droid, a 3rd Jawa | a sandtrooper under ledge A, a 4th Jawa |
 | Maintenance | the ambush trooper by the lift | | | a 2nd ambush trooper on the west side |
 | Barracks | a corridor trooper, a bunk-room trooper, the officer (red keycard) | a 2nd bunk-room trooper | a trooper by the red door | a 3rd bunk-room trooper |
 | Vault | a guard by the far banks | | a 2nd guard | an officer by the south door |
-| Generator | the probe droid, a catwalk trooper (north-west), one at the bottom | an east catwalk trooper | | a south catwalk trooper (a 2nd probe droid down in the west half) |
+| Generator | the probe droid (over the north bridge), a catwalk trooper (north-west), one on the floor (west) | an east catwalk trooper | | a south catwalk trooper (a 2nd probe droid down on the floor, west) |
 | Landing pad | a stormtrooper | a sandtrooper | | a 2nd stormtrooper |
 
 Items: power cells, energy packs and med kits along the route (the bunk room
 and the generator floor have med kits on every skill). Extra med kits by the
 vent mouth after the gate guards and on the gantry before the pad (skills
 1-3), and in the office (skills 1-2). The vent has a power cell where the
-light falls through.
+light falls through, and there's one in the dark under the generator's
+catwalk ring (north-west corner).
 
 ## Later (after Phase 2)
 

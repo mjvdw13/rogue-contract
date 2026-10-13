@@ -57,6 +57,11 @@ p.rect(14, 60, 34, 76, sand(0, { light: 136 }));
 p.chamfer(14, 60, 34, 76, 5, rock, ['NW', 'SE']);
 p.rect(30, 70, 38, 76, sand(0, { light: 136 }));
 p.chamfer(30, 70, 38, 76, 3, rock, ['NE', 'SE']);
+// The rock arch: a natural stone bridge across the gorge, 2 m up (a slab:
+// you walk under it), moonlit on top, in its own shadow underneath. A sniper
+// on top watches the way in from the start bowl; there's no way up.
+const arch = { bottom: 4, top: 5, floor: 'sand', ceiling: 'canyon-rock', side: 'canyon-rock', light: 112 };
+p.rect(14, 64, 34, 67, (x, y, old) => (old.wall ? old : { ...old, light: 152, slab: arch }));
 
 // 3. The bowl under the garrison: a rock spire in the middle, sniper ledges.
 p.rect(20, 44, 62, 60, sand());
@@ -154,9 +159,15 @@ p.rect(94, 13, 98, 19, room(6, 9, { light: 120, secret: true }));
 // (Above it on both sides: the computer banks, as the generator side is too tall for the lit lintel.)
 p.rect(84, 25, 86, 26, door(6, { upper: 'imp-computer' }));
 
-// 13. The generator chamber: a deep shaft, a catwalk ring, and the reactor column.
-const genFloor = room(-6, 18, { floor: 'imp-grate', light: 112, tag: 'generator' });
-const catwalk = room(6, 18, { floor: 'imp-grate', light: 152, side: 'imp-stripe', tag: 'generator' });
+// 13. The generator chamber: a deep shaft round the reactor column, with a
+// catwalk ring and two bridges 6 up. The catwalks are grate slabs (two
+// storeys), so the shaft floor runs on underneath them, dark, all the way
+// round the column and to the walls.
+const genFloor = room(-6, 18, { floor: 'imp-grate', light: 128, tag: 'generator' });
+const grate = { bottom: 5.5, top: 6, floor: 'imp-grate', ceiling: 'imp-grate', side: 'imp-stripe', light: 120 };
+/** Relight the floor under the catwalks in a box (their lower storey). */
+const lightUnder = (x0, y0, x1, y1, light) => p.rect(x0, y0, x1, y1, (x, y, old) => (old.slab ? { ...old, slab: { ...old.slab, light } } : old));
+const catwalk = { ...genFloor, light: 152, slab: grate };
 p.rect(72, 26, 108, 62, genFloor);
 p.rect(72, 26, 108, 29, catwalk);
 p.rect(72, 59, 108, 62, catwalk);
@@ -165,7 +176,8 @@ p.rect(105, 26, 108, 62, catwalk);
 p.pillar(86, 40, 94, 48, 2, lights, genFloor);
 // The column lights the shaft floor round it with a slow pulse.
 p.light(84, 38, 96, 50, 200, { lightFx: 'glow', lightMin: 136 });
-// Light strips on the chamber walls, lighting the catwalk in front of them.
+// Light strips on the chamber walls, lighting the catwalk in front of them
+// and pools on the floor under it.
 for (const y of [33, 51]) {
   p.rect(71, y, 72, y + 3, lights).light(72, y, 75, y + 3, 184);
   p.rect(108, y, 109, y + 3, lights).light(105, y, 108, y + 3, 184);
@@ -181,8 +193,14 @@ p.fence(105, 33, 106, 59, 'W', railing);
 p.fence(75, 28, 88, 29, 'S', railing).fence(92, 28, 101, 29, 'S', railing);
 p.fence(79, 59, 88, 60, 'N', railing).fence(92, 59, 105, 60, 'N', railing);
 for (const [y0, y1] of [[29, 40], [48, 59]]) p.fence(88, y0, 89, y1, 'W', railing).fence(91, y0, 92, y1, 'E', railing);
-// The bridges reach down to the floor, so the bottom is two halves (west and
-// east of the column). Lifts L2 and L2b join each half to the catwalk ring.
+// Pools of light on the floor under the catwalk, below the wall strips.
+for (const y of [33, 51]) {
+  lightUnder(72, y, 75, y + 3, 168);
+  lightUnder(105, y, 108, y + 3, 168);
+}
+for (const x of [96, 102]) lightUnder(x, 26, x + 3, 29, 168);
+for (const x of [80, 96]) lightUnder(x, 59, x + 3, 62, 168);
+// Lifts L2 (south-west) and L2b (north-east) run between the floor and the ring.
 p.rect(75, 55, 79, 59, lift([-6, 6], 18, { tag: 'generator' }));
 p.rect(101, 29, 105, 33, lift([-6, 6], 18, { tag: 'generator' }));
 // The overload switch on the column's east face, at the bottom.
@@ -225,8 +243,9 @@ const NORMAL_UP = [3, 4, 5];
 const HARD = [4, 5];
 const list = [
   at('player', 14.5, 90.5, { angle: 90 }),
-  // The canyon: snipers on both ledges, two gate guards, a probe droid
-  // round the spire, and a band of Jawas scavenging in the gorge.
+  // The canyon: snipers on both ledges and the rock arch, two gate guards, a
+  // probe droid round the spire, and a band of Jawas scavenging in the gorge.
+  at('stormtrooper', 24.5, 65.5, { angle: 270, z: 5, skill: NOT_EASIEST }), // sniper, on the arch
   at('stormtrooper', 22, 50.5, { angle: 0 }), // sniper, ledge A
   at('stormtrooper', 59.5, 48.5, { angle: 180 }), // sniper, ledge B
   at('sandtrooper', 40.5, 42, { angle: 270 }),
@@ -272,19 +291,21 @@ const list = [
   at('power-cell', 80.5, 21.5), at('power-cell', 89.5, 21.5),
   at('shield-unit', 96, 16), // secret: the niche
   // The generator: containment rings turning round the column above the
-  // catwalk, and coolant tanks on the shaft floor.
+  // catwalk, and coolant tanks on the shaft floor. Things on the catwalks
+  // stand on them (z 6); the rest are on the shaft floor, under them.
   at('reactor-ring', 90, 44, { z: 9, angle: 0 }), at('reactor-ring', 90, 44, { z: 13, angle: 45 }),
   at('coolant-tank', 78.5, 32.5), at('coolant-tank', 78.5, 36),
   at('coolant-tank', 101.5, 55.5), at('coolant-tank', 101.5, 52),
-  at('probe-droid', 90, 34.5),
+  at('probe-droid', 90, 34.5, { z: 6.9 }), // over the north bridge
   at('probe-droid', 80.5, 40.5, { skill: [5] }), // down in the west half
-  at('stormtrooper', 80.5, 27.5, { angle: 270 }),
-  at('stormtrooper', 106.5, 50.5, { angle: 180, skill: NOT_EASIEST }),
-  at('stormtrooper', 96.5, 60.5, { angle: 90, skill: HARD }),
+  at('stormtrooper', 80.5, 27.5, { angle: 270, z: 6 }),
+  at('stormtrooper', 106.5, 50.5, { angle: 180, z: 6, skill: NOT_EASIEST }),
+  at('stormtrooper', 96.5, 60.5, { angle: 90, z: 6, skill: HARD }),
   at('stormtrooper', 80.5, 48.5, { angle: 0 }),
   at('fuel-barrel', 98.5, 44.5), at('fuel-barrel', 99.5, 46.5),
   at('med-kit', 97.5, 56.5),
-  at('energy-pack', 73.5, 40.5),
+  at('energy-pack', 73.5, 40.5, { z: 6 }),
+  at('power-cell', 73.5, 27.5), // in the dark under the north-west corner of the ring
   // The gantry: a med kit before the last fight.
   at('med-kit', 115.5, 44, { skill: [1, 2, 3] }),
   // The landing pad, with the pickup shuttle north of the marked spot.

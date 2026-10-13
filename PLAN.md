@@ -765,8 +765,11 @@ Decided (2026-10-13):
        still to see on Mark's desktop.)
 
 Later, if wanted: doors and lifts inside slab tiles, more than two storeys,
-slabs that stop sound, triggers for one storey only. Then use it in Mission
-1: generator bridges that leave the floor whole.
+slabs that stop sound, triggers for one storey only.
+
+- [x] **Used in Mission 1** (2026-10-13): the generator's catwalk ring and
+      bridges are grate slabs over one open shaft floor, and a rock arch
+      spans the gorge with a sniper on top.
 
 ## Phase 2: Dark Forces systems
 
@@ -1484,3 +1487,16 @@ update the smoke test.
   - **Later:** doors and lifts in slab tiles, more storeys, slabs that stop
     sound, triggers per storey; Mission 1's generator bridges can now leave
     the floor whole.
+- 2026-10-13: Two storeys in Mission 1 (Mark). The generator chamber's
+  catwalk ring and its two bridges are grate slabs (5.5 to 6) instead of
+  solid columns down to the shaft floor, so the bottom is one open space
+  round the reactor column and out under the catwalks to the walls. Both
+  lifts stay as two ways between the floor and the ring. Things on the
+  catwalks stand on them (`z`). The shaft floor is lit at 128 (was 112, which
+  reads black with the Dark Forces art), 120 under the catwalks with pools
+  of 168 below the wall strips, and a power cell waits in the dark under the
+  north-west corner. A natural rock arch spans the gorge (a slab from 4 to
+  5), moonlit on top and in shadow underneath, with a sniper on top on
+  skills 2-5 (monsters now 14/19/23/30/31). Reviewed in snapshots; the
+  validator finds the exit, every item and no one-way areas on every skill.
+  `docs/mission1.md` updated.
