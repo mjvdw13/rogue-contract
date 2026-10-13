@@ -19,6 +19,7 @@ function scaleEntry(e, k) {
   const out = { ...e };
   for (const key of ['floorZ', 'ceilZ']) if (typeof out[key] === 'number') out[key] *= k;
   if (out.lift) out.lift = { ...out.lift, stops: out.lift.stops?.map((z) => z * k) };
+  if (out.slab) out.slab = { ...out.slab, bottom: out.slab.bottom * k, top: out.slab.top * k };
   return out;
 }
 

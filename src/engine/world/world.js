@@ -112,7 +112,8 @@ export class World {
     };
     this.player = new Thing(this.playerDef, start.x, start.y, start.angle);
     this.player.player = new PlayerState(this.registry, snapshot);
-    this.player.z = this.map.floorAt(start.x, start.y, this.player.radius);
+    // (The lower storey under a slab, unless the start's `z` puts it on top.)
+    this.player.z = this.map.floorAt(start.x, start.y, this.player.radius, (start.z ?? -Infinity) + 0.5);
     this.player.pitch = 0;
     this.player.health = this.player.player.health;
     this.things.push(this.player);
@@ -162,8 +163,12 @@ export class World {
 
   // ------------------------------------------------------------ things
 
-  /** Create a thing of a registered type. Returns null for unknown types. */
-  spawn(type, x, y, angle = 0) {
+  /**
+   * Create a thing of a registered type. Returns null for unknown types. Under
+   * a slab it goes in the lower storey, unless `z` (a height it's dropped
+   * from, say a monster's feet) reaches the slab's top.
+   */
+  spawn(type, x, y, angle = 0, z = null) {
     const def = this.registry.things.get(type);
     if (!def) {
       console.warn(`Unknown thing type "${type}"`);
@@ -180,8 +185,9 @@ export class World {
     if (t.solid) this.unstick(t);
     if (def.kind === 'monster') t.timer = this.rng.range(0, 0.3);
     if (def.kind === 'npc') initNpc(this, t);
-    if (def.kind === 'decoration' && def.hanging) t.z = this.map.ceilAt(x, y) - (t.sheet ? spriteHeight(t.sheet, def) : t.height);
-    else if (def.kind !== 'projectile' && def.kind !== 'effect') t.z = this.map.floorAt(x, y) + (def.z ?? 0);
+    const reach = (z ?? -Infinity) + 0.5;
+    if (def.kind === 'decoration' && def.hanging) t.z = this.map.ceilAt(x, y, 0, reach) - (t.sheet ? spriteHeight(t.sheet, def) : t.height);
+    else if (def.kind !== 'projectile' && def.kind !== 'effect') t.z = this.map.floorAt(x, y, 0, reach) + (def.z ?? 0);
     this.things.push(t);
     def.hooks?.onSpawn?.(this, t);
     return t;

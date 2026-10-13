@@ -9,6 +9,12 @@ export const F_USE = 64;
 export const F_VOID = 128;
 /** The tile holds an angled wall (see slants.js): part solid, part open. */
 export const F_SLANT = 256;
+/**
+ * The tile holds a slab: a solid layer from `slabBot` to `slabTop` inside its
+ * open space. That gives two storeys: the lower one from the floor up to the
+ * slab's underside, and the upper one from the slab's top up to the ceiling.
+ */
+export const F_SLAB = 512;
 
 /** Tile edges, in the order of `TileMap.fenceAt`: north, east, south, west. */
 export const EDGES = 'NESW';
@@ -106,6 +112,18 @@ export class TileMap {
     /** The low end of a tile's light effect (0: the default, 96 below its light). */
     this.lightMin = new Uint8Array(n);
     this.lightGroup = new Int32Array(n).fill(-1);
+    /**
+     * Slabs (`F_SLAB`): the solid layer's bottom and top, the textures on its
+     * top (the upper storey's floor), underside (the lower storey's ceiling)
+     * and edges, and how much lighter or darker the lower storey is than the
+     * tile's light.
+     */
+    this.slabBot = new Float32Array(n);
+    this.slabTop = new Float32Array(n);
+    this.slabTopTex = new Int16Array(n).fill(-1);
+    this.slabUnderTex = new Int16Array(n).fill(-1);
+    this.slabSideTex = new Int16Array(n).fill(-1);
+    this.belowLight = new Int16Array(n);
     this.damage = new Uint8Array(n);
     this.doorIndex = new Int16Array(n).fill(-1);
     this.liftIndex = new Int16Array(n).fill(-1);
@@ -210,9 +228,12 @@ export class TileMap {
     return k >= 0 ? this.fences[k] : null;
   }
 
-  /** A fence's bottom and top: it stands on its tile's floor, `height` high or up to the ceiling. */
+  /**
+   * A fence's bottom and top: it stands on its tile's floor (on the slab, in a
+   * tile with one), `height` high or up to the ceiling.
+   */
   fenceBottom(f) {
-    return this.floorZ[f.tile];
+    return this.flags[f.tile] & F_SLAB ? this.slabTop[f.tile] : this.floorZ[f.tile];
   }
 
   fenceTop(f) {
@@ -229,8 +250,39 @@ export class TileMap {
     return false;
   }
 
-  /** Highest floor under a box of half-size r centred at (x, y), ignoring solid tiles. */
-  floorAt(x, y, r = 0) {
+  /**
+   * The storey of tile i that a body reaching up to height `reach` is in: 1
+   * (on the slab) when the tile has a slab whose top is within reach, else 0.
+   * A body's reach is its feet plus how high it can step; a point's (a
+   * projectile, a ray) is its own height.
+   */
+  storeyAt(i, reach = Infinity) {
+    return this.flags[i] & F_SLAB && this.slabTop[i] <= reach ? 1 : 0;
+  }
+
+  /** The floor of storey s of tile i. */
+  storeyFloor(i, s) {
+    return s ? this.slabTop[i] : this.floorZ[i];
+  }
+
+  /** The ceiling of storey s of tile i. */
+  storeyCeil(i, s) {
+    return !s && this.flags[i] & F_SLAB ? this.slabBot[i] : this.ceilZ[i];
+  }
+
+  /** The light of storey s of tile i. */
+  storeyLight(i, s) {
+    if (s || !(this.flags[i] & F_SLAB)) return this.light[i];
+    const l = this.light[i] + this.belowLight[i];
+    return l < 0 ? 0 : l > 255 ? 255 : l;
+  }
+
+  /**
+   * Highest floor under a box of half-size r centred at (x, y), ignoring solid
+   * tiles. In a tile with a slab, the floor of the storey a body reaching up
+   * to `reach` is in (see storeyAt): the slab's top by default.
+   */
+  floorAt(x, y, r = 0, reach = Infinity) {
     let best = -Infinity;
     const x0 = Math.floor(x - r);
     const x1 = Math.max(x0, Math.ceil(x + r) - 1); // (a box exactly touching an edge stays out)
@@ -240,29 +292,37 @@ export class TileMap {
       for (let tx = x0; tx <= x1; tx++) {
         if (!this.inBounds(tx, ty)) continue;
         const i = ty * this.w + tx;
-        if (this.flags[i] & F_SOLID) continue;
-        if (this.floorZ[i] > best) best = this.floorZ[i];
+        const f = this.flags[i];
+        if (f & F_SOLID) continue;
+        const z = f & F_SLAB && this.slabTop[i] <= reach ? this.slabTop[i] : this.floorZ[i];
+        if (z > best) best = z;
       }
     }
     return best === -Infinity ? 0 : best;
   }
 
-  /** Lowest floor under a box of half-size r centred at (x, y), ignoring solid tiles. */
-  lowFloorAt(x, y, r = 0) {
+  /** Lowest floor under a box of half-size r centred at (x, y), ignoring solid tiles (storeys as in floorAt). */
+  lowFloorAt(x, y, r = 0, reach = Infinity) {
     let best = Infinity;
     for (let ty = Math.floor(y - r); ty <= Math.max(Math.floor(y - r), Math.ceil(y + r) - 1); ty++) {
       for (let tx = Math.floor(x - r); tx <= Math.max(Math.floor(x - r), Math.ceil(x + r) - 1); tx++) {
         if (!this.inBounds(tx, ty)) continue;
         const i = ty * this.w + tx;
-        if (this.flags[i] & F_SOLID) continue;
-        if (this.floorZ[i] < best) best = this.floorZ[i];
+        const f = this.flags[i];
+        if (f & F_SOLID) continue;
+        const z = f & F_SLAB && this.slabTop[i] <= reach ? this.slabTop[i] : this.floorZ[i];
+        if (z < best) best = z;
       }
     }
     return best === Infinity ? 0 : best;
   }
 
-  /** Lowest ceiling over a box of half-size r centred at (x, y), ignoring solid tiles. */
-  ceilAt(x, y, r = 0) {
+  /**
+   * Lowest ceiling over a box of half-size r centred at (x, y), ignoring solid
+   * tiles. In a tile with a slab, the ceiling of the storey a body reaching up
+   * to `reach` is in: the slab's underside for the lower storey.
+   */
+  ceilAt(x, y, r = 0, reach = Infinity) {
     let best = Infinity;
     const x0 = Math.floor(x - r);
     const x1 = Math.max(x0, Math.ceil(x + r) - 1); // (a box exactly touching an edge stays out)
@@ -272,8 +332,10 @@ export class TileMap {
       for (let tx = x0; tx <= x1; tx++) {
         if (!this.inBounds(tx, ty)) continue;
         const i = ty * this.w + tx;
-        if (this.flags[i] & F_SOLID) continue;
-        if (this.ceilZ[i] < best) best = this.ceilZ[i];
+        const f = this.flags[i];
+        if (f & F_SOLID) continue;
+        const z = f & F_SLAB && !(this.slabTop[i] <= reach) ? this.slabBot[i] : this.ceilZ[i];
+        if (z < best) best = z;
       }
     }
     return best === Infinity ? 2 : best;

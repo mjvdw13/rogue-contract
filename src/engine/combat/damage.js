@@ -99,7 +99,7 @@ export function kill(world, target, source) {
   if (def.kind === 'monster' && def.countKill) world.stats.kills++;
   for (const drop of [...(def.drops ?? []), ...(target.drops ?? [])]) {
     if (world.rng.chance(drop.chance ?? 1)) {
-      const it = world.spawn(drop.item, target.x + world.rng.signed() * 0.15, target.y + world.rng.signed() * 0.15);
+      const it = world.spawn(drop.item, target.x + world.rng.signed() * 0.15, target.y + world.rng.signed() * 0.15, 0, target.z);
       if (it) it.dropped = true;
     }
   }

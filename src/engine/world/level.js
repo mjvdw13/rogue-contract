@@ -1,4 +1,4 @@
-import { TileMap, Door, F_SOLID, F_DOOR, F_SKY, F_SECRET, F_DAMAGE, F_EXIT, F_USE, F_VOID, F_SLANT, LIGHT_FX, EDGES, EDGE_DX, EDGE_DY, OPPOSITE } from './tilemap.js';
+import { TileMap, Door, F_SOLID, F_DOOR, F_SKY, F_SECRET, F_DAMAGE, F_EXIT, F_USE, F_VOID, F_SLANT, F_SLAB, LIGHT_FX, EDGES, EDGE_DX, EDGE_DY, OPPOSITE } from './tilemap.js';
 import { buildLifts } from './lifts.js';
 import { Slant, slantLine } from './slants.js';
 
@@ -117,6 +117,31 @@ export function buildLevel(registry, level, opts = {}) {
     map.fences.push({ tex: slot(spec.tex), height: spec.height ?? 0, tile: i });
     for (const c of edges) map.fenceAt[i * 4 + EDGES.indexOf(c)] = k;
   };
+  /**
+   * A legend entry's `slab: { bottom, top, floor?, ceiling?, side?, light? }` on
+   * tile i: a solid layer inside the tile's open space, with a storey under it
+   * and one on top. Its textures default to the tile's floor (top), ceiling
+   * (underside) and side (edges); `light` is the lower storey's light.
+   */
+  const addSlab = (spec, e, x, y, i, tex) => {
+    const where = `Tile (${x}, ${y})`;
+    if (map.flags[i] & (F_SOLID | F_DOOR | F_SLANT) || e.lift) return errors.push(`${where}: a slab needs an open tile, not a wall, door, lift or angled wall`);
+    const { bottom, top } = spec;
+    if (typeof bottom !== 'number' || typeof top !== 'number') return errors.push(`${where}: a slab needs "bottom" and "top" heights`);
+    if (!(top > bottom)) return errors.push(`${where}: a slab's top must be above its bottom`);
+    if (!(bottom > map.floorZ[i])) return errors.push(`${where}: a slab's bottom must be above the floor (${map.floorZ[i]}), or there's no storey under it`);
+    if (!(top < map.ceilZ[i])) return errors.push(`${where}: a slab's top must be below the ceiling (${map.ceilZ[i]}), or there's no storey on it`);
+    map.flags[i] |= F_SLAB;
+    map.slabBot[i] = bottom;
+    map.slabTop[i] = top;
+    const topTex = spec.floor ?? tex.floor;
+    const underTex = spec.ceiling ?? (tex.ceiling === 'sky' ? null : tex.ceiling) ?? topTex;
+    const sideTex = spec.side ?? tex.side ?? topTex;
+    if (topTex) map.slabTopTex[i] = slot(topTex);
+    if (underTex) map.slabUnderTex[i] = slot(underTex);
+    if (sideTex) map.slabSideTex[i] = slot(sideTex);
+    if (spec.light !== undefined) map.belowLight[i] = spec.light - map.baseLight[i];
+  };
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
       const glyph = rows[y][x] ?? ' ';
@@ -212,6 +237,7 @@ export function buildLevel(registry, level, opts = {}) {
         map.tags.get(e.tag).push(i);
       }
       if (e.fence) addFence(e.fence, x, y, i);
+      if (e.slab) addSlab(e.slab, e, x, y, i, { floor, ceiling, side });
     }
   }
 
@@ -300,7 +326,9 @@ export function buildLevel(registry, level, opts = {}) {
     if (map.floorTex[i] < 0) map.floorTex[i] = around.map((n) => map.floorTex[n]).find((t) => t >= 0) ?? -1;
     d.floorZ = map.floorZ[i];
     if (d.style !== 'rise') continue;
-    d.openZ = !explicitCeil[i] && around.length ? Math.min(...around.map((n) => map.ceilZ[n])) : map.ceilZ[i];
+    // (Beside a slab tile, the ceiling of the storey the doorway opens onto.)
+    const ceilBeside = (n) => map.storeyCeil(n, map.storeyAt(n, d.floorZ + 0.5));
+    d.openZ = !explicitCeil[i] && around.length ? Math.min(...around.map(ceilBeside)) : map.ceilZ[i];
     if (map.ceilTex[i] < 0) map.ceilTex[i] = d.jamb >= 0 ? d.jamb : d.tex;
     // The lintel above the opening (when a neighbour's ceiling is higher).
     if (map.upperTex[i] < 0) map.upperTex[i] = d.jamb >= 0 ? d.jamb : d.tex;
@@ -374,7 +402,7 @@ export function buildLevel(registry, level, opts = {}) {
   }
   for (const item of level.list ?? []) {
     if (item.type === 'player') {
-      playerStart = { x: item.x, y: item.y, angle: contentAngle(item.angle ?? 90) };
+      playerStart = { x: item.x, y: item.y, angle: contentAngle(item.angle ?? 90), z: item.z ?? null };
       continue;
     }
     addSpawn(item, item.x, item.y, `in list at (${item.x}, ${item.y})`);
