@@ -428,9 +428,11 @@ Door options:
     higher, the wall above the opening is the door tile's `upper` texture
     (the lintel; default: the jamb). The door's art is fitted to the doorway,
     centred and hung from its bottom edge, so a texture the doorway's size
-    shows once (the shared `imp-door` is 2×2, `imp-gate` 4×4). The shared
-    `imp-jamb` (32 wide, one tile) and `imp-lintel` (lights along its bottom
-    edge, for a lintel 1-2 tall) frame it.
+    shows once (the shared `imp-door` is 2×2, `imp-gate` 4×4). The jambs
+    are half the wall's thickness deep: in a wall 1 tile thick they're half
+    a tile, so use `imp-jamb` (16 wide); in a wall 2 tiles thick use
+    `imp-gate-jamb` (32 wide). `imp-lintel` (lights along its bottom edge,
+    for a lintel 1-2 tall) goes above.
   - `'slide'` (the default): a panel through the middle of the tile slides
     sideways.
   - `'split'`: an elevator-style panel that opens from the middle.

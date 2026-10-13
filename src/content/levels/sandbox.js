@@ -92,7 +92,7 @@ export default defineLevel({
     '>': { base: 'h', wall: 'imp-panel-dark', diagonal: 'SE' },
     D: {
       door: 'imp-door',
-      jamb: 'imp-jamb',
+      jamb: 'imp-gate-jamb', // (a wall 2 tiles thick: jambs a tile deep)
       style: 'rise',
       floor: 'imp-floor',
       ceiling: 'imp-ceiling',

@@ -1,7 +1,8 @@
 // Imperial garrison and desert canyon textures: grey wall panels, gloss
 // black trim, light strips, computer banks, vents and grates, doors and
-// switches, canyon rock and sand. 64x64 and seamless, except the doorway's
-// jamb (32x64, one tile wide) and the main gate (128x128, one whole door).
+// switches, canyon rock and sand. 64x64 and seamless, except the doorways'
+// jambs (16x64 and 32x64: half a tile and a tile deep) and the main gate
+// (128x128, one whole door).
 import {
   texture, noiseFill, mottle, speckle, stain, scratches, grimeGradient, bevel, rivet,
   C, mix, darken, lighten, hash2, fbm, PixelCanvas,
@@ -298,24 +299,33 @@ function impDoor(name, light) {
   };
 }
 
-/** A doorway's side (jamb), one tile wide: dark metal round a blue light strip and a control panel. */
-function impJamb() {
-  const { c, seed } = texture('imp-jamb', 32, 64);
-  panelFill(c, seed, C('gray', 0.16), C('gray', 0.24));
-  c.rect(10, 0, 12, 64, C('gray', 0.08));
-  for (let y = 2; y < 64; y += 8) {
-    if (y >= 26 && y < 42) continue;
-    c.rect(12, y, 8, 4, G('cyan', 0.75));
-    c.rect(13, y + 1, 6, 2, G('cyan', 1));
-  }
-  // The control panel: red and green lights.
-  bevel(c, 11, 28, 10, 12, C('gray', 0.3), { depth: 1 });
-  c.rect(13, 30, 2, 2, G('red', 1));
-  c.rect(17, 30, 2, 2, G('green', 0.9));
-  c.rect(13, 35, 6, 3, C('gray', 0.12));
-  seamV(c, 0, 0, 64, C('gray', 0.2));
-  seamV(c, 30, 0, 64, C('gray', 0.2));
-  return c;
+/**
+ * A doorway's side (jamb): dark metal round a blue light strip and a control
+ * panel. `imp-jamb` is half a tile wide (a door in a wall 1 tile thick);
+ * `imp-gate-jamb` a whole tile, with metal either side of the strip.
+ */
+function impJamb(name, w) {
+  return () => {
+    const { c, seed } = texture(name, w, 64);
+    const x0 = (w - 16) >> 1; // the strip's frame, 16 wide, in the middle
+    panelFill(c, seed, C('gray', 0.16), C('gray', 0.24));
+    c.rect(x0 + 2, 0, 12, 64, C('gray', 0.08));
+    for (let y = 2; y < 64; y += 8) {
+      if (y >= 26 && y < 42) continue;
+      c.rect(x0 + 4, y, 8, 4, G('cyan', 0.75));
+      c.rect(x0 + 5, y + 1, 6, 2, G('cyan', 1));
+    }
+    // The control panel: red and green lights.
+    bevel(c, x0 + 3, 28, 10, 12, C('gray', 0.3), { depth: 1 });
+    c.rect(x0 + 5, 30, 2, 2, G('red', 1));
+    c.rect(x0 + 9, 30, 2, 2, G('green', 0.9));
+    c.rect(x0 + 5, 35, 6, 3, C('gray', 0.12));
+    if (w > 16) {
+      seamV(c, 0, 0, 64, C('gray', 0.2));
+      seamV(c, w - 2, 0, 64, C('gray', 0.2));
+    }
+    return c;
+  };
 }
 
 /** The wall above a doorway: panelling over a row of blue lights along the opening's top. */
@@ -482,7 +492,8 @@ export default [
   { name: 'imp-door-red', out: T('imp-door-red'), draw: impDoor('imp-door-red', G('red', 1)) },
   { name: 'imp-door-blue', out: T('imp-door-blue'), draw: impDoor('imp-door-blue', G('cyan', 0.7)) },
   { name: 'imp-door-yellow', out: T('imp-door-yellow'), draw: impDoor('imp-door-yellow', G('amber', 1)) },
-  { name: 'imp-jamb', out: T('imp-jamb'), draw: impJamb },
+  { name: 'imp-jamb', out: T('imp-jamb'), draw: impJamb('imp-jamb', 16) },
+  { name: 'imp-gate-jamb', out: T('imp-gate-jamb'), draw: impJamb('imp-gate-jamb', 32) },
   { name: 'imp-lintel', out: T('imp-lintel'), draw: impLintel },
   { name: 'imp-gate', out: T('imp-gate'), draw: impGate },
   { name: 'imp-switch', out: T('imp-switch'), draw: impSwitch(false) },

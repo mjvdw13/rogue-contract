@@ -105,5 +105,8 @@
   },
   "assets/textures/imp-gate.png": {
     "src": "assets/custom/textures/imp-gate.png"
+  },
+  "assets/textures/imp-gate-jamb.png": {
+    "src": "assets/custom/textures/imp-gate-jamb.png"
   }
 }

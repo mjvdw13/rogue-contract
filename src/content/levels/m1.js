@@ -27,9 +27,10 @@ const room = (floorZ, ceilZ, extra = {}) => ({
   floor: 'imp-floor', ceiling: 'imp-ceiling', floorZ, ceilZ, light: 160, side: 'imp-panel-dark', upper: 'imp-panel', ...extra,
 });
 /**
- * A rising door: a doorway 2 tiles deep, its panel set back in the middle,
- * lit jambs on its sides and a lit lintel over the opening. The door art is
- * one 2x2 door (Dark Forces' IDDOOR1), so doorways are 2 wide and 2 tall.
+ * A rising door: a doorway through a wall 1 tile thick, its panel in the
+ * middle, lit jambs half a tile deep on its sides and a lit lintel over the
+ * opening. The door art is one 2x2 door (Dark Forces' IDDOOR1), so doorways
+ * are 2 wide and 2 tall.
  */
 const door = (floorZ, extra = {}) => ({
   door: 'imp-door', jamb: 'imp-jamb', style: 'rise', floor: 'imp-floor', ceiling: 'imp-ceiling', upper: 'imp-lintel',
@@ -77,7 +78,7 @@ p.rect(24, 2, 112, 40, panel);
 p.rect(70, 24, 112, 66, panel);
 
 // 4. The face: a locked main gate (one 4x4 blast door) between light strips.
-p.rect(46, 36, 50, 40, door(0, { door: 'imp-gate', ceilZ: 4, lock: 'remote', tag: 'maingate', ...tallSide }));
+p.rect(46, 36, 50, 40, door(0, { door: 'imp-gate', jamb: 'imp-gate-jamb', ceilZ: 4, lock: 'remote', tag: 'maingate', ...tallSide }));
 p.rect(40, 39, 44, 40, lights);
 p.rect(52, 39, 56, 40, lights);
 // Floodlight pools under the strips, and the lit gate between them.
@@ -118,39 +119,40 @@ for (const x of [48, 62, 72]) {
 for (const x of [53, 69]) p.light(x, 17, x + 2, 19, 184);
 
 // 9. The bunk room.
-p.rect(48, 4, 60, 14, room(6, 10, { light: 128 }));
+p.rect(48, 4, 60, 15, room(6, 10, { light: 128 }));
 p.rect(53, 8, 55, 10, room(6, 10, { ceiling: 'imp-ceiling-light', light: 184 }));
 p.light(48, 4, 51, 7, 120);
 p.light(57, 4, 60, 7, 120);
-p.chamfer(48, 4, 60, 14, 2, darkPanel, ['NW', 'NE']);
-p.rect(53, 14, 55, 16, door(6));
+p.chamfer(48, 4, 60, 15, 2, darkPanel, ['NW', 'NE']);
+p.rect(53, 15, 55, 16, door(6));
 
 // 10. The officer's office.
-p.rect(62, 4, 72, 14, room(6, 9, { light: 144 }));
+p.rect(62, 4, 72, 15, room(6, 9, { light: 144 }));
 p.rect(63, 5, 66, 8, room(6, 9, { ceiling: 'imp-ceiling-light', light: 192 })); // over the desk
-p.chamfer(62, 4, 72, 14, 2, darkPanel, ['NE']);
-p.rect(65, 14, 67, 16, door(6));
+p.chamfer(62, 4, 72, 15, 2, darkPanel, ['NE']);
+p.rect(65, 15, 67, 16, door(6));
 // A barred window from the corridor into the office, over a sill.
-p.rect(69, 14, 71, 16, room(7, 8.5, { light: 144, side: 'imp-panel', upper: 'imp-panel' }));
+p.rect(69, 15, 71, 16, room(7, 8.5, { light: 144, side: 'imp-panel', upper: 'imp-panel' }));
 p.fence(69, 15, 71, 16, 'S', bars);
 
 // 11. The red door, and 12. the data vault behind it: dark, walled in computer banks.
 p.rect(76, 8, 94, 26, computer);
-p.rect(76, 17, 78, 19, door(6, { door: 'imp-door-red', lock: 'red' }));
+p.rect(76, 16, 77, 20, room(6, 10, { light: 144 })); // the corridor's end, up to the vault's wall
+p.rect(77, 17, 78, 19, door(6, { door: 'imp-door-red', lock: 'red' }));
 // The screens' glow pulses along the banks.
-p.rect(78, 10, 92, 24, room(6, 9, { light: 112 }));
+p.rect(78, 10, 92, 25, room(6, 9, { light: 112 }));
 const screens = { lightFx: 'glow', lightMin: 104 };
 p.light(78, 10, 92, 11, 152, screens);
-p.light(78, 23, 92, 24, 152, screens);
-p.light(78, 11, 79, 23, 152, screens);
-p.light(91, 11, 92, 23, 152, screens);
-p.chamfer(78, 10, 92, 24, 2, darkPanel);
+p.light(78, 24, 92, 25, 152, screens);
+p.light(78, 11, 79, 24, 152, screens);
+p.light(91, 11, 92, 24, 152, screens);
+p.chamfer(78, 10, 92, 25, 2, darkPanel);
 // The secret niche behind a computer bank.
 p.rect(92, 14, 94, 18, { door: 'imp-computer', secret: true, floor: 'imp-floor', ceiling: 'imp-ceiling', floorZ: 6, ceilZ: 9, light: 112 });
 p.rect(94, 13, 98, 19, room(6, 9, { light: 120, secret: true }));
 // The south door onto the generator catwalk.
-p.rect(84, 24, 86, 26, door(6));
-p.rect(84, 25, 86, 26, door(6, { upper: 'imp-computer' })); // (the generator side: the banks' wall)
+// (Above it on both sides: the computer banks, as the generator side is too tall for the lit lintel.)
+p.rect(84, 25, 86, 26, door(6, { upper: 'imp-computer' }));
 
 // 13. The generator chamber: a deep shaft, a catwalk ring, and the reactor column.
 const genFloor = room(-6, 18, { floor: 'imp-grate', light: 112, tag: 'generator' });
@@ -195,13 +197,14 @@ p.rect(93, 43, 94, 45, {
 });
 
 // 14. The escape hatch in the east wall, opened by the overload switch.
-p.rect(108, 43, 110, 45, door(6, { lock: 'remote', tag: 'escape', ...tallSide }));
+p.rect(108, 43, 109, 45, door(6, { lock: 'remote', tag: 'escape', ...tallSide }));
 
 // ---------------------------------------------------------------- the way out
 // 15. The gantry: stairs up to 8, out under the sky.
 const gantry = (z) => sand(z, { floor: 'imp-grate', side: 'imp-panel-dark', light: 160 });
 p.stairs(110, 42, 114, 46, 'E', 6.5, 0.5, gantry);
 p.rect(114, 42, 118, 46, gantry(8));
+p.rect(109, 42, 110, 46, gantry(6)); // a landing outside the escape hatch
 
 // 16. The chasm (3 tiles), with lift L3 back up if you fall.
 p.rect(118, 34, 121, 60, sand(-2, { light: 104 }));

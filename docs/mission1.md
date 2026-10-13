@@ -39,13 +39,13 @@ switch (opens the escape hatch) → back up → escape hatch → gantry stairs
 | 5 | Vent | 32..34, 26..40 | 0.5 / 1.7 | Crouch only (1.2 clear). |
 | 6 | Maintenance | 26..42, 14..26 | 0 / 5 | Dim, grate floor, with a lit panel in the middle. Crates in a storage cage (a see-through fence), a console, an ambush trooper. |
 | 7 | Lift L1 shaft | 42..46, 16..20 | lift 0 → 6 / 12 | Opens west at 0 and east at 6. |
-| 8 | Barracks corridor | 46..76, 16..20 | 6 / 10 | Light strips, hanging lamps. A trooper. |
-| 9 | Bunk room | 48..60, 4..14 | 6 / 10 | Door 52..55 x 14..16. Troopers, crates for bunks, a med kit. |
-| 10 | Officer's office | 62..72, 4..14 | 6 / 9 | Door 65..68 x 14..16. An officer, the **red keycard**, a console. A barred window (69..71 x 14..16, over a sill at 7) looks in from the corridor. |
-| 11 | Red door | 76..78, 16..20 | 6 | Into the vault. |
-| 12 | Data vault | 78..92, 10..24 | 6 / 9 | Dark (light 96), computer-bank walls, chamfered corners, ammo. Secret niche (92..96, 14..18) behind a computer-bank door: a shield. South door 83..87 x 24..26 onto the generator catwalk. |
+| 8 | Barracks corridor | 46..77, 16..20 | 6 / 10 | Light strips, hanging lamps. A trooper. |
+| 9 | Bunk room | 48..60, 4..15 | 6 / 10 | Door 53..55 x 15..16. Troopers, crates for bunks, a med kit. |
+| 10 | Officer's office | 62..72, 4..15 | 6 / 9 | Door 65..67 x 15..16. An officer, the **red keycard**, a console. A barred window (69..71 x 15..16, over a sill at 7) looks in from the corridor. |
+| 11 | Red door | 77..78, 17..19 | 6 | Into the vault. |
+| 12 | Data vault | 78..92, 10..25 | 6 / 9 | Dark (light 96), computer-bank walls, chamfered corners, ammo. Secret niche (92..96, 14..18) behind a computer-bank door: a shield. South door 84..86 x 25..26 onto the generator catwalk. |
 | 13 | Generator chamber | 72..108, 26..62 | -6 / 18 | Catwalk ring at 6 (3 wide). Central reactor column (86..94, 40..48) with chamfered corners. North and south bridges (88..92) join the ring to the column; they reach down to the floor, splitting the bottom into west and east halves. Lifts L2 (75..79, 55..59, west) and L2b (101..105, 29..33, east) run -6 ↔ 6. The overload switch is on the column's south face at the bottom: it opens `escape`, dims the chamber and shows a message. Railings (0.75 tall) along the ring's inner edge and both sides of the bridges, open where the lifts and bridges join. Probe droid, troopers, fuel barrels at the bottom. |
-| 14 | Escape hatch | 108..110, 42..46 | 6 | Remote-locked door, tag `escape`. |
+| 14 | Escape hatch | 108..109, 43..45 | 6 | Remote-locked door, tag `escape`, with a landing outside (109..110, 42..46). |
 | 15 | Gantry | 110..118, 42..46 | 6 → 8 / sky | Stairs up 0.5 per tile to 8. |
 | 16 | Chasm | 118..121, 34..58 | -2 / sky | The 3-tile jump. Lift L3 (118..121, 54..58) runs back up (-2 ↔ 8) if you fall. |
 | 17 | Landing pad | 121..126, 34..58 | 8 / sky | Troopers. The exit is the marked pickup spot on the pad (122..126, 43..47). |

@@ -650,6 +650,22 @@ Decided:
        after, validator and smoke test.
 5. [x] Faster doors (Mark: "This is Star Wars!"): open and close in under
        0.3 s instead of about 0.6, with shorter, snappier whoosh sounds.
+6. [x] Half-depth jambs (Mark, 2026-10-13): a jamb's depth is half the
+       wall's thickness, so thin the walls at Mission 1's doors to 1 tile
+       (the panel in the middle, jambs half a tile deep). No engine change:
+       1-deep doorways already work. The main gate stays deep.
+       - [x] Bunk room and office grow a row south; the barred window's
+             sill is 1 deep too.
+       - [x] The red door: the corridor runs one tile further east.
+       - [x] The generator door: the vault grows a row south (its screens
+             and chamfers move with it); the door's one tile shows the
+             computer banks above it on both sides.
+       - [x] The escape hatch: a one-tile landing outside it, at the top of
+             the gantry.
+       - [x] Jambs: `imp-jamb` becomes half a tile wide (16 texels, the
+             middle of IDJAMPNL with its light strip); the gate keeps the
+             full IDJAMPNL as `imp-gate-jamb`.
+       - [x] Screenshots, tests, the validator and smoke test.
 
 ## Phase 2: Dark Forces systems
 
@@ -1178,3 +1194,13 @@ update the smoke test.
   through after 0.24 s. The door sounds are shorter to match: a 0.3 s whoosh
   open, and a whoosh and thump closing. MODDING.md gives the default. 124
   tests and the validator pass.
+- 2026-10-13: Half-depth jambs (Mark: make the jambs half as thick). A
+  rising door's jambs are half its wall's thickness deep, so no new grid was
+  needed: Mission 1's walls are 1 tile thick at its doors now (jambs half a
+  tile deep), the main gate's stays 4 deep. The bunk room, office and vault
+  grew a row toward their doors (the barred window's sill is 1 deep too), the
+  corridor runs a tile further to the red door, and the escape hatch has a
+  one-tile landing outside. `imp-jamb` is now IDJAMPNL's middle 16 columns
+  (its light strip); the gate and the sandbox's 2-deep door use the whole
+  IDJAMPNL as `imp-gate-jamb`. docs/mission1.md and MODDING.md updated. 124
+  tests, the validator and the smoke test pass.

@@ -76,6 +76,13 @@ function resizeRows(img, h) {
   return { w: img.w, h, data };
 }
 
+/** Columns x0..x0+w-1 (a narrower piece of a texture). */
+function cropCols(img, x0, w) {
+  const data = new Uint8Array(w * img.h * 4);
+  for (let y = 0; y < img.h; y++) data.set(img.data.subarray((y * img.w + x0) * 4, (y * img.w + x0 + w) * 4), y * w * 4);
+  return { w, h: img.h, data };
+}
+
 /** Roll the rows down by `dy` (wrapping), so a band lands where it's wanted. */
 function rollRows(img, dy) {
   const data = new Uint8Array(img.data.length);
@@ -106,8 +113,11 @@ const TEXTURES = {
   'imp-door-red': () => centred(load('IDDOOR1'), load('ZASWIT01_0')),
   'imp-door-blue': () => centred(load('IDDOOR1'), load('ZASWIT01_1')),
   'imp-door-yellow': () => centred(load('IDDOOR1'), redToYellow(load('ZASWIT01_0'))),
-  // A doorway's sides: a light strip and a control panel, one tile wide.
-  'imp-jamb': 'IDJAMPNL',
+  // A doorway's sides: a light strip and a control panel. Doors in walls 1
+  // tile thick have jambs half a tile deep: IDJAMPNL's middle 16 columns
+  // (the strip and its frame). The gate's are a whole tile.
+  'imp-jamb': () => cropCols(load('IDJAMPNL'), 8, 16),
+  'imp-gate-jamb': 'IDJAMPNL',
   // Over a doorway: IDJAMLCX's row of lights (rows 20-41) rolled down to the opening's top.
   'imp-lintel': () => rollRows(load('IDJAMLCX'), 22),
   // The main gate: a round blast door, one 4x4 door.
