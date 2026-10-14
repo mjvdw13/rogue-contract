@@ -66,6 +66,11 @@ contrast comes from bright pools (184-224).
   is dark (112). Far off, the canyon fades into the night's purple haze
   (`haze: { color: [32, 24, 64], half: 40 }`, halfway at 20 m) instead of
   going black.
+- **Skyline:** the canyon's walls end 4.5 to 6 m up at a rim of rock out
+  of reach (one tile, its sky just above it so the view ends there),
+  rising to meet the taller cliff the garrison is built into. Above and
+  behind the rim, the backdrop (`canyonBackdrop`) climbs in moonlit slopes
+  and ridges out to 48 m past the map, light 168, fading into the haze.
 - **Vent:** 112, with light falling through a grate halfway (144).
 - **Maintenance:** 128, a bright panel in the middle (192), dark west
   corners (120), and a broken ceiling light flickering in the south-east.

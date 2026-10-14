@@ -828,11 +828,14 @@ headless Node, DF art). Budget for this phase: stay under about 8 ms.
   forward): ramps measured from the DF textures and sprites, with more
   blue-greys and dark tones and a desert range, keeping the ramp names
   the generated art and models use.
-- **A semi-3D skyline** (Mark, 2026-10-13: the stepped ledges looked like
-  "pieces of paper", and he didn't like the rock strata bands): the
+- **A semi-3D skyline** (Mark, 2026-10-13/14: the stepped ledges looked
+  like "pieces of paper", and he didn't like the rock strata bands): the
   canyon's walls end in a low rim, and a backdrop (a coarse height grid
   past the edge of play, drawn voxel-style where the sky shows) climbs
-  from the rim in smooth, moonlit slopes and ridges. No strata.
+  from the rim in smooth, moonlit slopes and ridges. No strata. Also
+  tried and dropped: setting the edge back in the grid itself (the rock
+  behind the face climbing in short steps to a ridge a few tiles in, then
+  sky); Mark preferred the backdrop's ridges.
 - New art is generated (`tools/art`), or cut and recoloured from the DF
   textures already in `assets/custom/textures/` (the pack itself is on
   Mark's machine).
@@ -903,11 +906,11 @@ headless Node, DF art). Budget for this phase: stay under about 8 ms.
 
 ### Mission 1
 
-14. [ ] **The canyon.** A skyline: the cliffs step back in rock ledges
-        (raised floors under the sky, heights from noise) up to about 20,
-        so their rims are jagged against the sky. Rock strata by height
-        (two or three rock textures), a sandy floor with gravel channels,
-        boulders (small angled pillars and rock models), an overhang.
+14. [ ] **The canyon.** A skyline (done): the walls end in a low rim of
+        rock out of reach, and a backdrop of slopes and ridges climbs from
+        it past the edge of play (see Decided). A sandy floor with gravel
+        channels (done), boulders (small angled pillars and rock models),
+        an overhang.
         Imperial perimeter: floodlight towers (models and light sources),
         a sensor mast with a blinking light, barricades and crates by the
         gate. Moonlight, haze, wind, blowing dust.
@@ -1808,3 +1811,9 @@ update the smoke test.
   valleys between the far ridges, 96 tiles past the map. No strata.
   Frame time 3.0 to 3.4 ms; Mission 1's module takes 0.1 s to build it.
   176 tests.
+- 2026-10-14: tried the other way to give the skyline depth, all in the
+  grid: walls rising 5 to 7.5 m at the face, then the rock behind it
+  climbing in short steps (smoothed tile to tile) to a ridge 3 to 7 tiles
+  in, each tile's sky just above the highest rock behind it, then sky. It
+  needed more painter glyphs than the pool had (per-tile heights). Side by
+  side with the backdrop, Mark chose the backdrop. The trial isn't kept.
