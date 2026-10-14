@@ -1,28 +1,9 @@
 // Decals: see-through pictures on wall faces (Phase 1d step 7). Transparent
 // where nothing is drawn. 32 texels are a tile (half a metre), so the crest
 // is a metre across.
-import { PixelCanvas, C, mix, fbm, hash2, rng, seedFrom } from '../lib/tex.js';
+import { PixelCanvas, C, hash2, rng, seedFrom } from '../lib/tex.js';
 
 const T = (name) => `assets/textures/${name}.png`;
-
-/** Soot where a blaster bolt hit: dark in the middle, ragged and dithered at the edge. */
-function scorch() {
-  const c = new PixelCanvas(32, 32);
-  const seed = seedFrom('decal-scorch');
-  const n = fbm(seed, 32, { cells: 3, octaves: 3 });
-  for (let y = 0; y < 32; y++) {
-    for (let x = 0; x < 32; x++) {
-      const d = Math.hypot(x - 15.5, y - 15.5) / 15 + (n(x, y) - 0.5) * 0.6;
-      if (d > 1 || (d > 0.75 && hash2(x, y, seed) < (d - 0.75) * 4)) continue;
-      const t = Math.min(1, d * 1.1);
-      c.set(x, y, mix(C('gray', 0.0), C('rust', 0.12), t * 0.8 + (hash2(x, y, seed + 1) - 0.5) * 0.2));
-    }
-  }
-  // Glassy spatter at the heart.
-  const r = rng(seed);
-  for (let k = 0; k < 10; k++) c.set(15 + r.range(-3, 3), 15 + r.range(-3, 3), C('steel', 0.08));
-  return c;
-}
 
 /** The Empire's crest: a six-spoked wheel in a ring, pale metal. */
 function crest() {
@@ -110,7 +91,6 @@ function vent() {
 }
 
 export default [
-  { name: 'decal-scorch', out: T('decal-scorch'), draw: scorch },
   { name: 'decal-crest', out: T('decal-crest'), draw: crest },
   { name: 'decal-hazard', out: T('decal-hazard'), draw: hazard },
   { name: 'decal-sign', out: T('decal-sign'), draw: sign },

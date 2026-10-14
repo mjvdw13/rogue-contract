@@ -26,8 +26,8 @@ const DESERT = ['sandstone', 'sandstone-dark', 'sandstone-pale', 'desert-sand', 
 const FENCES = ['imp-railing', 'imp-bars', 'imp-cage'];
 
 // Decals on wall faces (tools/art/textures/decals.js): signs, the crest,
-// hazard stripes, a vent, and the scorch blaster bolts leave.
-const DECALS = ['decal-scorch', 'decal-crest', 'decal-hazard', 'decal-sign', 'decal-vent'];
+// hazard stripes and a vent.
+const DECALS = ['decal-crest', 'decal-hazard', 'decal-sign', 'decal-vent'];
 
 const ANIMATED = {
   'imp-computer': { frames: 3, fps: 3 },

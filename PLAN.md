@@ -884,8 +884,8 @@ headless Node, DF art). Budget for this phase: stay under about 8 ms.
        reactor column's bands. Validator, map viewer, tests.
 7. [x] **Decals.** Level `decals: [{ x, y, z, face, tex, glow? }]`: a
        see-through texture on a wall face or a step face (signs, the
-       Imperial crest, hazard stripes, pipes, vents, panels). Blaster
-       bolts leave scorch marks on walls (the last 48 kept).
+       Imperial crest, hazard stripes, pipes, vents, panels). (Blaster
+       bolts left scorch marks on walls; taken out 2026-10-14.)
 8. [ ] **Translucency.** Blend tables (half and additive) built from the
        palette; sprites, effects and fences can be translucent or additive:
        steam, glass, shafts of light, holograms, force fields.
@@ -1817,3 +1817,7 @@ update the smoke test.
   in, each tile's sky just above the highest rock behind it, then sky. It
   needed more painter glyphs than the pool had (per-tile heights). Side by
   side with the backdrop, Mark chose the backdrop. The trial isn't kept.
+- 2026-10-14: scorch marks taken out (Mark: ugly, and they add little).
+  Blaster bolts no longer mark the walls they burst on: the projectile
+  `scorch` field, the world's scorch list, `removeDecal` and the scorch
+  art are gone. Decals placed by levels are unchanged.

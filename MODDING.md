@@ -427,9 +427,8 @@ decals: [
 - `glow: true` ignores the light (a lit screen); `flip: true` mirrors it.
 
 Decal textures are defined with `decal: true` (`src/content/textures.js`) and
-drawn by `tools/art/textures/decals.js`. A projectile with `scorch:
-'decal-scorch'` leaves a scorch mark where it bursts on a wall; the last 48
-stay. The map viewer marks decals with a white tick.
+drawn by `tools/art/textures/decals.js`. The map viewer marks decals with a
+white tick.
 
 ### Backdrop: terrain past the edge of play
 

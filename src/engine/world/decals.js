@@ -3,7 +3,7 @@ import { TEXELS_PER_UNIT as TPU } from '../config.js';
 
 /**
  * Decals: see-through textures on wall faces and step faces (signs, the
- * Imperial crest, hazard stripes, scorch marks). A level lists them as
+ * Imperial crest, hazard stripes, vents). A level lists them as
  * `decals: [{ x, y, z, face, tex, scale?, glow?, flip? }]`: `face` is the way
  * the face looks ('N', 'E', 'S' or 'W'), (x, y) a point on that face's tile
  * edge (the decal's middle along it), `z` the height of its middle. Its size
@@ -33,18 +33,6 @@ export function makeDecal(map, spec, slot) {
 export function addDecal(map, d) {
   map.decals.push(d);
   map.decalsDirty = true;
-}
-
-/** Take a decal away. */
-export function removeDecal(map, d) {
-  const k = map.decals.indexOf(d);
-  if (k >= 0) map.decals.splice(k, 1);
-  for (const e of d.edges ?? []) {
-    const list = map.edgeDecals.get(e);
-    list.splice(list.indexOf(d), 1);
-    map.decalEdge[e]--;
-  }
-  d.edges = null;
 }
 
 /**

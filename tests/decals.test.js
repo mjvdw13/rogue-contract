@@ -1,11 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { buildLevel } from '../src/engine/world/level.js';
-import { makeDecal, layoutDecals, removeDecal } from '../src/engine/world/decals.js';
-import { headlessRenderer, makeWorld, mockInput, registry, room, run } from './helpers.js';
+import { makeDecal, layoutDecals } from '../src/engine/world/decals.js';
+import { headlessRenderer, registry, room } from './helpers.js';
 
 // Decals (PLAN.md Phase 1d step 7): see-through pictures on wall and step
-// faces, and the scorch marks blaster bolts leave.
+// faces.
 
 const ROOM = { floor: 'imp-floor', ceiling: 'imp-ceiling', ceilZ: 4, light: 160 };
 const TILES = ['##########', '#........#', '#........#', '#........#', '##########'];
@@ -22,9 +22,6 @@ test('a decal is laid out on the tile edges it covers, on the side it faces', ()
   // The east wall (x 9) faces west, rows 1 to 3.
   assert.deepEqual(d.edges, [1, 2, 3].map((y) => map.index(9, y) * 4 + 3));
   assert.equal(map.decalEdge[map.index(9, 2) * 4 + 3], 1);
-  removeDecal(map, d);
-  assert.equal(map.decalEdge[map.index(9, 2) * 4 + 3], 0);
-  assert.equal(map.decals.length, 0);
 });
 
 test('bad decals are level errors', () => {
@@ -40,27 +37,6 @@ test('bad decals are level errors', () => {
   assert.match(errors[2], /"tex"/);
   assert.match(errors[3], /outside the map/);
   assert.equal(makeDecal(buildLevel(registry, level()).map, { x: 9, y: 2, z: 1, face: 'W', tex: 'x', scale: 0 }, () => 0), '"scale" must be above 0');
-});
-
-test('bolts leave scorch marks where they hit walls, the last 48 kept', () => {
-  const w = makeWorld(level(), { noMonsters: true });
-  w.player.x = 2.5;
-  w.player.y = 2.5;
-  w.player.angle = 0;
-  const input = mockInput();
-  run(w, input, 0.6);
-  input.hold('fire');
-  run(w, input, 0.4);
-  input.release('fire');
-  run(w, input, 0.3);
-  assert.ok(w.scorches.length >= 1, 'a mark on the east wall');
-  const [s] = w.scorches;
-  assert.equal(s.face, 3, 'its west face');
-  assert.equal(s.x, 9);
-  assert.ok(Math.abs(s.y - 2.5) < 0.2 && s.z > 0.5 && s.z < 2, `where the bolt hit (${s.y}, ${s.z})`);
-  for (let k = 0; k < 60; k++) w.scorch('decal-scorch', 9, 1 + (k % 30) / 10, 1, 3);
-  assert.equal(w.scorches.length, 48);
-  assert.equal(w.map.decals.length, 48);
 });
 
 const { renderer, shot } = await headlessRenderer();

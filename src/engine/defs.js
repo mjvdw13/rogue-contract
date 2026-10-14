@@ -349,12 +349,9 @@ export function defineDecoration(def) {
  * A projectile (fireballs, rockets...). Speed in tiles/second. It flies from
  * its owner's fire height along the shot's slope; `z` instead starts it that
  * high above the owner's feet. Its z is the middle of the sprite.
- * `scorch` names a decal texture it leaves where it bursts on a wall (the
- * last 48 scorch marks stay).
  * @param {{id:string, sheet:SheetSpec, anims:{fly:AnimSpec, explode?:AnimSpec}, speed?:number,
  *   damage?:number|number[], radius?:number, splash?:{radius:number, damage:number},
- *   gravity?:number, z?:number, sounds?:{fire?:string, explode?:string}, trail?:string,
- *   scorch?:string}} def
+ *   gravity?:number, z?:number, sounds?:{fire?:string, explode?:string}, trail?:string}} def
  */
 export function defineProjectile(def) {
   const p = baseThing(def, 'projectile', {
