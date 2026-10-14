@@ -904,6 +904,37 @@ headless Node, DF art). Budget for this phase: stay under about 8 ms.
 13. [ ] Stretch: **mipmaps** for floors and walls in the distance (no
         shimmer on grates and rock).
 
+- [ ] **TODO: glints on armour** (Mark, 2026-10-14: a happy accident worth
+      making a feature; it will take some work). Not yet placed in the
+      order below.
+      - **What happened.** Under Raccoon Alex's palette, the brightest
+        highlight on the DF stormtrooper's armour (252,252,252: 287 pixels,
+        2.4% of the sheet) had no lit colour near it and snapped to
+        glow-yellow's white, so it was fullbright. In a dark room with a
+        lamp, a trooper standing in shadow seemed to catch the lamp on their
+        armour. Outdoors in the dark canyon, with nothing to reflect, the
+        white looked out of place. The fitted palette (step 1) added a lit
+        (253,253,253), and the highlights stopped glowing. The officer (208
+        such pixels, 118 left) and the probe droid (345, 73 left) lost some
+        too; check which of the rest are meant to glow.
+      - **The feature.** Highlight pixels stay lit like the rest of the
+        sprite, but brighten toward fullbright when a light source can see
+        the sprite, even if the sprite stands in shadow. With no source
+        about (the canyon at night) they're plain lit white.
+      - **A sketch.** Mark the pixels per sheet (`glint: [[252, 252, 252]]`
+        at import, kept as a mask beside the frames, or a small `glint`
+        palette range). A second light map channel holds light from
+        sources only (no ambient), baked like the light map, with line of
+        sight but a longer reach than the source's own radius; dynamic
+        lights add to it too, so a muzzle flash makes the troopers' armour
+        flash in the dark. The sprite drawer uses the higher of the two
+        levels for glint pixels. Maybe: stronger when the source is on the
+        viewer's side of the sprite, a per-source `glint: false`, models
+        with shiny faces.
+      - **Check** with screenshots: a trooper in shadow in a lit room (the
+        old look), in the dark canyon (no glints), under a muzzle flash and
+        a passing bolt.
+
 ### Mission 1
 
 14. [ ] **The canyon.** A skyline (done): the walls end in a low rim of
@@ -1821,3 +1852,8 @@ update the smoke test.
   Blaster bolts no longer mark the walls they burst on: the projectile
   `scorch` field, the world's scorch list, `removeDecal` and the scorch
   art are gone. Decals placed by levels are unchanged.
+- 2026-10-14: Added a Phase 1d TODO: glints on armour. The fitted palette
+  ended a happy accident: the DF stormtrooper's brightest armour highlight
+  used to snap to a fullbright white, which read as a lamp's reflection in
+  dark rooms but glowed for no reason in the dark canyon. The TODO makes it
+  a feature: highlights that brighten only when a light source can see them.
