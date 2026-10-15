@@ -4,5 +4,6 @@ import terminal from './terminal.js';
 import reactorRing from './reactor-ring.js';
 import coolantTank from './coolant-tank.js';
 import shuttle from './shuttle.js';
+import barricade from './barricade.js';
 
-export default [terminal, reactorRing, coolantTank, shuttle];
+export default [terminal, reactorRing, coolantTank, shuttle, barricade];

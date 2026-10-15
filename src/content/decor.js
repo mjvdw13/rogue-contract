@@ -19,6 +19,7 @@ export default [
   defineDecoration({ id: 'reactor-ring', model: 'reactor-ring', spin: 0.5 }),
   defineDecoration({ id: 'coolant-tank', model: 'coolant-tank', solid: true, radius: 1, height: 3.6 }),
   defineDecoration({ id: 'shuttle', model: 'shuttle', solid: true, height: 3.5 }),
+  defineDecoration({ id: 'barricade', model: 'barricade', solid: true, height: 1.15 }),
   defineDecoration({ id: 'ceiling-lamp', glyph: 'l', sheet: S('ceiling-lamp', 48, 16), hanging: true, fullbright: true }),
   defineDecoration({
     id: 'fuel-barrel',

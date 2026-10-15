@@ -375,6 +375,13 @@ const list = [
   at('sandtrooper', 56.5, 42, { angle: 270, skill: NOT_EASIEST }),
   at('sandtrooper', 30.5, 52.5, { angle: 270, skill: HARD }), // under ledge A
   at('probe-droid', 44.5, 56.5, { skill: NORMAL_UP }),
+  // Barricades across the approach to the gate, angled out, the guards
+  // behind them, and supply crates stacked against the face by the strips
+  // (one half hides the vent mouth).
+  at('barricade', 43, 46, { angle: 250 }), at('barricade', 53, 46, { angle: 290 }),
+  at('barricade', 37.5, 47.5, { angle: 270 }),
+  at('supply-crate', 58.5, 41.2), at('supply-crate', 59.9, 41.4), at('supply-crate', 59, 42.6),
+  at('supply-crate', 38.2, 41.2), at('supply-crate', 35.3, 41),
   at('jawa', 24, 76, { angle: 270 }), at('jawa', 30, 72, { angle: 225 }),
   at('jawa', 28, 62, { angle: 270, skill: NORMAL_UP }),
   at('jawa', 18.5, 66.5, { angle: 315, skill: HARD }),

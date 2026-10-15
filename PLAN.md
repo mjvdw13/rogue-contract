@@ -944,7 +944,7 @@ headless Node, DF art). Budget for this phase: stay under about 8 ms.
         an overhang.
         Imperial perimeter: floodlight towers (models and light sources),
         a sensor mast with a blinking light, barricades and crates by the
-        gate. Moonlight, haze, wind, blowing dust.
+        gate (done). Moonlight, haze, wind, blowing dust.
 15. [ ] **The garrison's face.** A base wall with the cliff above it
         (bands), a concrete overhang over the gate strip with lights under
         it (a slab), the gate in a deep frame with hazard stripes, the
@@ -1857,3 +1857,12 @@ update the smoke test.
   used to snap to a fullbright white, which read as a lamp's reflection in
   dark rooms but glowed for no reason in the dark canyon. The TODO makes it
   a feature: highlights that brighten only when a light source can see them.
+- 2026-10-15: Phase 1d step 14, in chunks. First: barricades and crates by
+  the gate. A `barricade` model (`models/barricade.js`): an armoured
+  shield 2.6 long and 1.15 tall, sloped both sides, with yellow-on-black
+  hazard stripes along each slope (faces, not a texture: the DF
+  `imp-stripe` is a panel, not stripes) and two red lamps, on feet; solid,
+  with collision lines round its footprint. Three across the approach to
+  the gate, angled out, cover for the gate guards; supply crates stacked
+  against the face by the light strips, one half hiding the vent mouth.
+  Monsters still walk into models until step 12.
