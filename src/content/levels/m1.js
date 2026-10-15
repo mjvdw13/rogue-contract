@@ -57,13 +57,22 @@ p.rect(6, 76, 30, 96, sand(0, { light: 152 }));
 p.chamfer(6, 76, 30, 96, 4, rock, ['SW', 'SE', 'NW']);
 p.rect(2, 80, 5, 84, sand(0, { secret: true, light: 112 }));
 p.rect(5, 80, 6, 84, { door: 'sandstone', secret: true, floor: 'desert-sand', ceiling: 'sky', floorZ: 0, ceilZ: 8, light: 112 });
-// An overhang along the bowl's east wall, 2.25 m up and 1.5 m thick: the
-// cliff juts out over the sand 1 to 2.5 m (deepest in the middle, ragged
-// along its edge), in its own shadow underneath (a slab out of reach).
-const overhang = { bottom: 4.5, top: 7.5, floor: 'desert-sand', ceiling: 'sandstone-dark', side: 'sandstone', light: 104 };
+// An overhang along the bowl's east wall: the cliff juts out over the sand
+// 1 to 2.5 m (deepest in the middle, ragged along its edge), a wedge of
+// rock thickening into the wall. Its underside climbs from about 1.9 m at
+// the wall to 2.3 m at the lip and its top falls from 4.4 m to 3.9 m, both
+// lumpy tile by tile (in steps of 12.5 cm), in its own shadow underneath
+// (a slab out of reach).
+const quarter = (v) => Math.round(v * 4) / 4;
 for (let y = 80; y < 91; y++) {
   const deep = Math.min(Math.min(y - 79, 91 - y) + 1, 3 + Math.round(valueNoise(0, y, 3, 31) * 2));
-  p.rect(30 - deep, y, 30, y + 1, (x, yy, old) => (old.wall ? old : { ...old, slab: overhang }));
+  p.rect(30 - deep, y, 30, y + 1, (x, yy, old) => {
+    if (old.wall) return old;
+    const out = Math.min(1, (29 - x) / 4); // 0 at the wall, 1 at the deepest lip
+    const bottom = quarter(3.75 + 0.9 * out + (valueNoise(x, y, 2, 41) - 0.5) * 0.75);
+    const top = quarter(8.75 - out + (valueNoise(x, y, 2, 43) - 0.5) * 0.75);
+    return { ...old, slab: { bottom, top, floor: 'desert-sand', ceiling: 'sandstone-dark', side: 'sandstone', light: 104 } };
+  });
 }
 
 // 2. The gorge, winding north-east: narrow, so the moon barely reaches in.

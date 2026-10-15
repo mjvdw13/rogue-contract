@@ -1899,3 +1899,10 @@ update the smoke test.
   done but for wind and blowing dust, which wait for steps 9 and 10.
   Frame time on canyon views (headless, 4:3, DF art): 3.3 to 3.5 ms
   before step 14's props, 3.6 to 4.1 ms after.
+- 2026-10-15: the overhang less flat (Mark: its bottom and top were too
+  flat). Each tile has its own slab now, a wedge of rock thickening into
+  the wall: the underside climbs from about 1.9 m at the wall to 2.3 m at
+  the lip, the top falls from 4.4 m to 3.9 m, each with a lumpy offset
+  (value noise, in steps of 12.5 cm). Seen from the bowl the underside
+  steps and the top's silhouette is ragged. (Heights stay per tile: there
+  are no sloped floors or slabs, so the surfaces step rather than slope.)
