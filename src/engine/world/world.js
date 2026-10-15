@@ -569,13 +569,13 @@ export class World {
   _useDoor(d, pt) {
     const p = pt.player;
     if (d.lock === 'remote') {
-      this.playSound('oof');
+      this.playSound('door-locked');
       return;
     }
     if (d.lock && !p.keys.has(d.lock)) {
       const key = this.registry.config.keys?.find((k) => k.id === d.lock);
       this.message(this.registry.text('needKey', { key: key?.name ?? d.lock }));
-      this.playSound('oof');
+      this.playSound('door-locked');
       return;
     }
     if (d.state === 'open' || d.state === 'opening') {

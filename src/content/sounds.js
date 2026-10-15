@@ -16,6 +16,12 @@ const groan = (freq, end, duration, volume = 0.7, extra = {}) => ({
   ...extra,
 });
 const hiss = (duration, volume = 0.5) => ({ wave: 'noise', duration, attack: 0.04, release: duration * 0.6, highpass: 3500, volume });
+const oof = groan(150, 95, 0.22, 0.6);
+const enemyBlaster = {
+  wave: 'saw', freq: 1100, freqEnd: 140, duration: 0.24, attack: 0.002, release: 0.2, lowpass: [4500, 700], volume: 0.45,
+  layers: [{ wave: 'square', freq: 700, freqEnd: 100, duration: 0.18, release: 0.14, volume: 0.25 }],
+};
+const blip = { wave: 'square', freq: 880, freqEnd: 1320, duration: 0.09, attack: 0.002, release: 0.05, volume: 0.35, duty: 0.25 };
 
 export default [
   // --------------------------------------------------------- weapons
@@ -29,14 +35,9 @@ export default [
     },
     pitchVariance: 0.05,
   }),
-  defineSound({
-    id: 'blaster-enemy',
-    synth: {
-      wave: 'saw', freq: 1100, freqEnd: 140, duration: 0.24, attack: 0.002, release: 0.2, lowpass: [4500, 700], volume: 0.45,
-      layers: [{ wave: 'square', freq: 700, freqEnd: 100, duration: 0.18, release: 0.14, volume: 0.25 }],
-    },
-    pitchVariance: 0.08,
-  }),
+  defineSound({ id: 'blaster-enemy', synth: enemyBlaster, pitchVariance: 0.08 }),
+  // The probe droid's shot (sounds like the troopers' unless overridden).
+  defineSound({ id: 'droid-fire', synth: enemyBlaster, pitchVariance: 0.08 }),
   // The Jawas' ion blaster: a buzzing electric zap, and a crackle where it hits.
   defineSound({
     id: 'ion-fire',
@@ -83,14 +84,17 @@ export default [
     id: 'secret',
     synth: { wave: 'triangle', freq: 523, duration: 0.14, attack: 0.005, release: 0.1, volume: 0.5, repeat: { count: 4, interval: 0.09, pitch: 1.26 }, echo: { time: 0.12, feedback: 0.4, mix: 0.5 } },
   }),
-  defineSound({ id: 'oof', synth: groan(150, 95, 0.22, 0.6) }),
+  defineSound({ id: 'oof', synth: oof }),
+  // A locked door (or one opened from elsewhere): the same grunt unless overridden.
+  defineSound({ id: 'door-locked', synth: oof }),
   defineSound({
     id: 'teleport',
     synth: { wave: 'sine', freq: 200, freqEnd: 1600, duration: 0.7, attack: 0.02, release: 0.3, vibrato: { rate: 18, depth: 2 }, volume: 0.5, layers: [{ wave: 'noise', duration: 0.7, highpass: 3000, volume: 0.2, release: 0.5 }] },
   }),
 
   // --------------------------------------------------------- items
-  defineSound({ id: 'item', synth: { wave: 'square', freq: 880, freqEnd: 1320, duration: 0.09, attack: 0.002, release: 0.05, volume: 0.35, duty: 0.25 } }),
+  defineSound({ id: 'item', synth: blip }),
+  defineSound({ id: 'health-pickup', synth: blip }),
   defineSound({ id: 'item-ammo', synth: { ...click(1800, 0.45), layers: [{ ...click(2600, 0.35), delay: 0.05 }, { ...burst(0.05, [6000, 3000], 0.3), delay: 0.02 }] } }),
   defineSound({
     id: 'weapon-pickup',
@@ -105,6 +109,9 @@ export default [
   // --------------------------------------------------------- player
   defineSound({ id: 'player-pain', synth: groan(240, 130, 0.25, 0.7) }),
   defineSound({ id: 'player-pain-low', synth: groan(200, 110, 0.3, 0.7, { vibrato: { rate: 9, depth: 1.5 } }) }),
+  // A soft push off the ground, and the old landing grunt.
+  defineSound({ id: 'player-jump', synth: { ...burst(0.12, [1500, 400], 0.3), attack: 0.01, layers: [thump(90, 60, 0.08, 0.25)] }, pitchVariance: 0.06 }),
+  defineSound({ id: 'player-land', synth: oof }),
   defineSound({
     id: 'player-death',
     synth: {

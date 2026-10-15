@@ -114,7 +114,7 @@ export class Game {
     await this.assets.loadFonts();
     onStatus('fonts');
     this.loop.start();
-    await this.assets.loadAll((done, total) => loading.progress(done, total));
+    await Promise.all([this.assets.loadAll((done, total) => loading.progress(done, total)), this.audio.loadOverrides()]);
     for (const p of this.assets.problems) console.warn(`[assets] ${p}`);
     await this._buildFace();
     onStatus('ready');

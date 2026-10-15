@@ -131,6 +131,7 @@ tools/validate.mjs      content checks: references, files, level reachability
 tools/mapview.mjs       renders levels as top-down PNGs
 tools/snapshot.mjs      renders the 3D view of a level headlessly to a PNG
 tools/smoke.mjs         headless-browser smoke test
+tools/soundboard.html   plays every sound, synthesized and recorded, to try overrides
 tests/                  node --test unit and simulation tests
 ```
 

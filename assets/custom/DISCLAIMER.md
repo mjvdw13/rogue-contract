@@ -2,7 +2,7 @@
 
 The images in this folder (`stormtrooper.png`, `officer.png`,
 `probe-droid.png`, `fists.png`, `blaster.png` and everything in `textures/`
-and `df-textures/`)
+and `df-textures/`) and the sound effects in `sounds/`
 come from *Star Wars: Dark Forces* (LucasArts, 1995). The game and its art belong to Lucasfilm Ltd.
 They are not part of Rogue Contract and are not covered by its license.
 
@@ -10,7 +10,9 @@ They are not part of Rogue Contract and are not covered by its license.
   used through `overrides.json` (see `README.md`), in local testing and on
   the owner's hosted copy of the game (the owner's decision, 2026-10-12).
   `df-textures/` is the whole texture pack, kept as source art for picking
-  textures (the owner's decision, 2026-10-15).
+  textures (the owner's decision, 2026-10-15). The sounds are played
+  through `sound-overrides.json`, in the same way (the owner's decision,
+  2026-10-15).
 - **Do not redistribute them.** Don't copy them out of this repository or
   publish them anywhere else.
 

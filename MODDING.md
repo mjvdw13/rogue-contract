@@ -881,7 +881,12 @@ Synth parameters:
   sounds mixed on top).
 
 The full list is at the top of `src/engine/audio/synth.js`. `pitchVariance`
-randomizes the pitch a little each time the sound plays.
+randomizes the pitch a little each time the sound plays. A file's leading
+silence (MP3s start with some) is cut so it plays the moment it's triggered.
+
+To swap recorded files in for synthesized sounds without touching
+`sounds.js`, list them in `assets/custom/sound-overrides.json` (see
+`assets/custom/README.md`); `tools/soundboard.html` plays them side by side.
 
 ## Music
 
@@ -923,8 +928,9 @@ an audio file: `defineSong({ id, src: 'assets/music/theme.ogg' })`.
   Return a message to show it.
 - `src/content/strings.js` holds all the text: menus, skill names, quit
   messages, the help screen and the finale.
-- `src/content/hero.js` sets the starting health, weapons, ammo, speed and
-  face (see `assets/custom/README.md` for using a photo).
+- `src/content/hero.js` sets the starting health, weapons, ammo, speed,
+  `sounds` (`jump` and `land`) and face (see `assets/custom/README.md` for
+  using a photo).
 - `src/content/config.js` sets the key colours and names, the title and
   intermission music, and where the photo portrait goes on the title screen.
 - `src/content/palette.js` holds the colour ramps and the fitted colours

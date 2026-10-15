@@ -9,4 +9,5 @@ export default {
   startWeapon: 'blaster',
   startAmmo: { energy: 60 },
   blood: 'blood',
+  sounds: { jump: 'player-jump', land: 'player-land' },
 };

@@ -18,7 +18,7 @@ land, and record new decisions here.
 | Platforms (2026-10-12) | **Desktop browsers.** Phones are no longer a target: no phone performance gate, and touch controls aren't required. |
 | Story, revisited (2026-10-13) | **Bad Paper, a prequel to Dark Forces** (`docs/story.md`), set a few months before Dark Forces' first mission. Kyle takes a Guild bounty on Tatooine as cover for the Alliance, and the contract turns on him: the Canyon Garrison is an early field test of Mohc's Dark Trooper project, and its prototype is Phase 3's mini-boss. **Only Mission 1 (Mos Eisley) is free roam:** calm troopers and the tracking fob, until Kyle finds his target and the shooting starts. From there it's straight run-and-gun, and later missions have no stealth or tracker. **The hero is Kyle Katarn** (Mark, 2026-10-13, replacing the earlier "no Kyle Katarn retelling"), and Jan Ors drops him off and picks him up in the Moldy Crow in every mission; the first mission opens with the Crow landing in a Mos Eisley docking bay. |
 | Stacked spaces (2026-10-13) | **Two storeys per tile** (Phase 1c), before the story's maps. Mark wants to walk under other parts of the map. A tile can hold one solid slab, with a storey under it and one on top, like GZDoom's 3D floors. Considered instead: walkable 3D models (bridges only, no rooms under rooms) and overlapping layers joined by portals (Dark Forces' and Build's way: much bigger, for little more). |
-| Rights | A non-commercial fan game. All art, sound and music are generated or original. Nothing ripped from Dark Forces, and no note-for-note John Williams transcriptions. Exception (Mark's decision, 2026-10-12): the ripped Dark Forces enemy and weapon sheets in `assets/custom/` are used, on the hosted site too (see Phase 1b D). |
+| Rights | A non-commercial fan game. All art, sound and music are generated or original. Nothing ripped from Dark Forces, and no note-for-note John Williams transcriptions. Exception (Mark's decision, 2026-10-12): the ripped Dark Forces enemy and weapon sheets in `assets/custom/` are used, on the hosted site too (see Phase 1b D); likewise the Dark Forces sound effects (Mark's decision, 2026-10-15; see Phase 1b N). |
 
 ## Starting point
 
@@ -713,6 +713,77 @@ itself lived outside the repo.
        default; README and DISCLAIMER mention it.
 6. [x] Re-run `textures.mjs` against the new folder: the 32 game textures
        come out byte-identical. Commit.
+
+### N. Dark Forces sound effects (done 2026-10-15)
+
+Mark (2026-10-15): incorporate the sounds in "Sound Effects.zip" (146
+Dark Forces sound effects as MP3s). They're ripped like the art, so they
+go in the same way: kept in `assets/custom/`, swapped in by an override
+file, with the synthesized sounds as the fallback (and what the tests and
+smoke test hear).
+
+Research:
+- Every file is mono (stored as stereo), normalised to about 0 dBFS, with
+  25-80 ms of silence before the sound (MP3 encoder delay) and ~0.4 s
+  after. A shot that starts 50 ms late feels laggy, so the leading
+  silence is cut when a file is decoded.
+- Seven pairs are byte-for-byte the same sound under two names (EEEK2 /
+  EEEK-2, EEEK3 / EEEK-3, EMISBY / EMISBY1, LASRBY1 / LASRFLY, SPLASH1 /
+  SWIM-IN, BUTT1 / SWING, BUTT2 / PUNCH); each is kept once.
+- Not in the pack: stormtrooper and officer voices, Kyle's pain grunts,
+  menu sounds. Those stay synthesized.
+- The engine already plays `src` sounds, but fetches them on first play
+  (so the first shot is silent) and nothing preloads them.
+- DF has sounds for things the game does silently or with `oof`: jump
+  (JUMP-1), landing (LAND-1), a locked door (LOCKED-1), the probe droid's
+  own shot (PROBFIR1), med kit (HEALTH1).
+
+Decided (the mapping, by name; Mark to check by ear on the soundboard):
+
+| Sound id | DF file | | Sound id | DF file |
+| --- | --- | --- | --- | --- |
+| blaster-fire | PISTOL-1 | | lift-start | ELEV2-1 |
+| blaster-enemy | RIFLE-1 | | lift-stop | ELEV2-3 |
+| droid-fire (new) | PROBFIR1 | | switch | SWITCH3 |
+| bolt-hit | EX-TINY1 | | health-pickup (new) | HEALTH1 |
+| explode | EX-MED1 | | item-ammo | AMMO |
+| punch-swing | SWING | | weapon-pickup | WEAPON1 |
+| punch-hit | PUNCH | | key-pickup | KEY |
+| door-open | DOOR | | powerup (shield unit) | SHIELD1 |
+| door-close | DOOR | | player-death | KYLEDIE1 |
+| door-locked (new) | LOCKED-1 | | player-jump (new) | JUMP-1 |
+| droid-sight | PROBALM | | player-land (new) | LAND-1 |
+| droid-active | PROBALM2 | | | |
+
+Each override's volume matches the loudness of the synth sound it
+replaces, so the mix stays where it was tuned.
+
+1. [x] `assets/custom/sounds/<category>/NAME.mp3`: the whole pack sorted
+       by what each sound is (weapons, impacts and explosions, doors and
+       lifts, pickups, player, enemies, ambience, vehicles, interface),
+       with `INDEX.md` saying what each one is.
+2. [x] New sound ids with synth fallbacks that keep today's sound
+       (`door-locked` and `player-land` as `oof`, `droid-fire` as
+       `blaster-enemy`, `health-pickup` as `item`) and a soft synth
+       `player-jump`; the med kit, probe droid, hero and locked doors use
+       them.
+3. [x] Engine: `assets/custom/sound-overrides.json` (sound id -> `{ src,
+       volume }`), loaded at boot unless under test automation; an
+       override's file replaces the synth, and a file that fails to load
+       falls back to it. File sounds start downloading at boot and decode
+       when audio unlocks; leading silence is trimmed.
+4. [x] `sound-overrides.json` with the mapping, volumes matched to the
+       synth sounds' loudness.
+5. [x] `tools/soundboard.html`: every game sound with its synth and its
+       override side by side, and every DF file by folder, to audition
+       and re-map.
+6. [x] Tests (override applied, fallback on a failed load, silence
+       trimming), README, DISCLAIMER, `.gitignore`, the Rights decision;
+       check in the browser; validator and smoke test.
+
+Later: ambience (WIND1 for the canyon, MACHINE1/2 and RUMBLE1 for the
+generator, ELECTRIC) belongs to Phase 1d step 10, the looping positional
+sounds.
 
 ## Phase 1c: Two storeys per tile (done 2026-10-13)
 
@@ -2029,3 +2100,24 @@ update the smoke test.
   and the level folders it came from. `textures.mjs` reads the folder by
   default (no argument), and re-running it writes the 32 game textures
   byte-identical. README and DISCLAIMER updated.
+- 2026-10-15: Phase 1b N, Dark Forces sound effects (Mark: incorporate
+  "Sound Effects.zip"). The 146 MP3s are 139 sounds (seven were duplicates)
+  in `assets/custom/sounds/`, in 9 folders by what they are, with
+  `INDEX.md` saying what each is ("(guess)" where unsure). They play through
+  `assets/custom/sound-overrides.json` (sound id -> `{ src, volume }`),
+  loaded at boot like the art overrides and skipped under test automation:
+  23 game sounds now use DF files (the blaster, trooper rifle, probe droid,
+  bolt hits, explosions, fists, doors, lifts, switch, pickups, Kyle's death,
+  jump and landing). Volumes match the loudness of the synth each replaces
+  (loudest 50 ms), with doors, death and landing set by hand. The engine
+  downloads override files at boot and decodes them when audio unlocks,
+  cuts their leading silence (25-80 ms of MP3 padding), plays the synth
+  until a file is decoded, and falls back to the synth for good if it
+  fails. New sound ids with synth fallbacks that keep the old sounds:
+  `droid-fire`, `door-locked`, `health-pickup`, `player-land`, plus a soft
+  new `player-jump` (the hero's `sounds`). Not in the pack, so still
+  synthesized: trooper, officer and Jawa voices, Kyle's pain, menus.
+  `tools/soundboard.html` plays every game sound's synth and its file side
+  by side, re-maps them and gives the JSON. Checked in Chrome: all 22 files
+  decode (trimmed), no console errors. 4 new tests (188), the validator and
+  smoke test pass.

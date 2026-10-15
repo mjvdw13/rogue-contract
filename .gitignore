@@ -19,6 +19,9 @@ assets/custom/*
 !assets/custom/textures/
 # The whole Dark Forces texture pack, sorted by what each texture shows.
 !assets/custom/df-textures/
+# Dark Forces sound effects, sorted by what each one is, and the ones in use.
+!assets/custom/sounds/
+!assets/custom/sound-overrides.json
 # (Recolouring the cut sheets, and deriving more textures from the DF ones.)
 !assets/custom/recolour.mjs
 !assets/custom/derive.mjs

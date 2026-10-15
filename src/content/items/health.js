@@ -11,6 +11,6 @@ export default [
     sheet: S('med-kit', 32, 24),
     pickup: { health: 25 },
     message: 'Picked up a med kit.',
-    sound: 'item',
+    sound: 'health-pickup',
   }),
 ];

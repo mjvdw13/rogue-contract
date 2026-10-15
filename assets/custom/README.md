@@ -76,6 +76,31 @@ lights, switches, rock and so on) rather than by level.
 folders it came from. To use another texture, look it up there and add it
 to the `TEXTURES` table by name; the script finds it in any folder.
 
+## The Dark Forces sounds
+
+`sounds/` holds Dark Forces' sound effects ("Sound Effects.zip"), sorted
+into folders by what each one is: weapons, impacts and explosions, doors,
+lifts and switches, pickups and gear, the player, enemies, ambience,
+vehicles and interface. `sounds/INDEX.md` says what each one is.
+
+`sound-overrides.json` picks which the game plays: it maps a sound id (from
+`src/content/sounds.js`) to a file and a volume. The file plays instead of
+the synthesized sound, locally and on the hosted site; the synth stands in
+until the file has loaded, and for good if it can't load. The automated
+tests and smoke test never read this file. Each volume was set so the file
+is about as loud as the synth sound it replaces.
+
+```json
+{
+  "blaster-fire": { "src": "assets/custom/sounds/weapons/PISTOL-1.mp3", "volume": 1.08 }
+}
+```
+
+To try other files or volumes, serve the repo (`npm run serve`) and open
+`/tools/soundboard.html`: it plays every game sound's synth and its file side
+by side, lets you pick another file and volume, and gives you the JSON to
+paste into `sound-overrides.json`.
+
 ## The sandtrooper
 
 `sandtrooper/sheet.jpg` is an AI-generated asset sheet (not ripped art), so
