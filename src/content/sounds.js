@@ -59,6 +59,28 @@ export default [
     },
     pitchVariance: 0.08,
   }),
+  // Boba Fett's rocket: a rushing whoosh as it leaves, a smaller blast where it hits.
+  defineSound({
+    id: 'rocket-fire',
+    synth: { wave: 'noise', duration: 0.45, attack: 0.01, release: 0.35, lowpass: [6000, 700], noiseHold: 2, volume: 0.47, layers: [thump(180, 60, 0.2, 0.39)] },
+    pitchVariance: 0.08,
+  }),
+  defineSound({
+    id: 'rocket-hit',
+    synth: { wave: 'noise', duration: 0.6, attack: 0.002, decay: 0.12, sustain: 0.4, release: 0.45, lowpass: [3200, 250], noiseHold: 3, distortion: 0.4, volume: 0.8, layers: [thump(90, 35, 0.4, 0.8)], ...crunch },
+    pitchVariance: 0.08,
+  }),
+  // Bossk's concussion rifle: a hollow thump-and-crack, and a deep boom where it bursts.
+  defineSound({
+    id: 'concussion-fire',
+    synth: { ...thump(260, 70, 0.22, 0.34), layers: [burst(0.18, [5000, 600], 0.22, 2), { wave: 'saw', freq: 420, freqEnd: 90, duration: 0.2, release: 0.16, lowpass: 2000, volume: 0.13 }] },
+    pitchVariance: 0.06,
+  }),
+  defineSound({
+    id: 'concussion-hit',
+    synth: { wave: 'noise', duration: 0.8, attack: 0.002, decay: 0.15, sustain: 0.35, release: 0.6, lowpass: [1800, 120], noiseHold: 5, distortion: 0.3, volume: 0.6, layers: [thump(60, 25, 0.6, 0.66)], ...crunch },
+    pitchVariance: 0.08,
+  }),
   defineSound({ id: 'punch-swing', synth: { wave: 'noise', duration: 0.16, attack: 0.03, release: 0.1, highpass: 1200, lowpass: [5000, 1500], volume: 0.5 }, pitchVariance: 0.1 }),
   defineSound({ id: 'punch-hit', synth: { ...thump(140, 50, 0.14, 0.9), layers: [burst(0.06, [3000, 600], 0.6)] }, pitchVariance: 0.1 }),
 
@@ -159,5 +181,9 @@ export default [
     synth: { wave: 'square', duty: 0.25, freq: 600, duration: 0.07, release: 0.05, volume: 0.3, repeat: { count: 5, interval: 0.08, pitch: 1.3, decay: 0.9 } },
   }),
   defineSound({ id: 'droid-active', synth: { wave: 'sine', freq: 900, freqEnd: 1400, duration: 0.3, release: 0.1, volume: 0.25, vibrato: { rate: 18, depth: 1.5 } } }),
+  // Bossk: low, rasping reptile growls.
+  defineSound({ id: 'bossk-sight', synth: groan(110, 70, 0.7, 0.27, { lowpass: 1100, distortion: 0.6, vibrato: { rate: 22, depth: 3 } }), pitchVariance: 0.06 }),
+  defineSound({ id: 'bossk-pain', synth: groan(150, 95, 0.3, 0.56, { lowpass: 1300, distortion: 0.6, vibrato: { rate: 26, depth: 3 } }), pitchVariance: 0.1 }),
+  defineSound({ id: 'bossk-death', synth: groan(140, 45, 1.1, 0.4, { lowpass: 1000, distortion: 0.6, vibrato: { rate: 18, depth: 4 } }), pitchVariance: 0.06 }),
   defineSound({ id: 'droid-pain', synth: { wave: 'square', duty: 0.3, freq: 1600, freqEnd: 400, duration: 0.15, release: 0.08, volume: 0.3, ...crunch } }),
 ];

@@ -43,11 +43,14 @@ Delete `overrides.json`, or an entry in it, to go back to the committed art.
 
 ## The Dark Forces enemies and weapons
 
-`cut.mjs` cuts the ripped Dark Forces stormtrooper, Imperial officer and
-probe droid sheets into the game's 12-frame monster layout, and the weapons
+`cut.mjs` cuts the ripped Dark Forces stormtrooper, Imperial officer, probe
+droid and Trandoshan (Bossk) sheets into the game's 12-frame monster layout,
+Boba Fett and his rocket into theirs (six frames each), and the weapons
 sheet into the fists and the blaster (the Bryar pistol). It adds their
-entries to `overrides.json`. Give it the folder the sheets are in (their
-file names are listed in the script):
+entries to `overrides.json`, keeping keys added by hand (`glint`, `glow`).
+Give it the folder the sheets are in (their file names are listed in the
+script). Boba Fett comes as a zip of separate cells: unpack it into the
+same folder, so it holds `BOBAFETT.cells/`:
 
 ```
 node assets/custom/cut.mjs "<folder with the sheets>"

@@ -32,4 +32,28 @@ export const projectiles = [
     damage: [3, 8],
     sounds: { explode: 'ion-hit' },
   }),
+  // Boba Fett's rocket: a fast fireball that bursts with a small splash.
+  defineProjectile({
+    id: 'rocket',
+    sheet: FX('rocket', 32, 32),
+    anims: { fly: { frames: [0, 1, 2], fps: 12, loop: true }, explode: { frames: [3, 4, 5], fps: 12 } },
+    radius: 0.2,
+    light: { radius: 4, light: 96 },
+    speed: 24,
+    damage: [8, 16],
+    splash: { radius: 2, damage: 24 },
+    sounds: { explode: 'rocket-hit' },
+  }),
+  // Bossk's concussion rifle: a slow blue-white blast that bursts in a ring.
+  defineProjectile({
+    id: 'concussion-blast',
+    sheet: FX('concussion', 32, 32),
+    anims: { fly: { frames: [0, 1], fps: 10, loop: true }, explode: { frames: [2, 3, 4], fps: 14 } },
+    radius: 0.24,
+    light: { radius: 3.5, light: 80 },
+    speed: 18,
+    damage: [10, 18],
+    splash: { radius: 2.5, damage: 30 },
+    sounds: { explode: 'concussion-hit' },
+  }),
 ];

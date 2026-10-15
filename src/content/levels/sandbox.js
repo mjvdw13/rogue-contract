@@ -22,7 +22,8 @@ import { defineLevel } from '../../engine/defs.js';
 // Two storeys (slabs): a bridge across the pit at the hall's floor, which you
 // can walk under down in the pit; a bunker dug under the west end of the
 // sniper ledge (an energy pack inside); and a walkway with railings running
-// north from the ledge out over the courtyard.
+// north from the ledge out over the courtyard. Bossk and Boba Fett (on his
+// jetpack) wait in the courtyard, to try them out.
 export default defineLevel({
   id: 'sandbox',
   mapLabel: 'M1',
@@ -233,14 +234,14 @@ export default defineLevel({
     '',
     '',
     '       x x',
-    '',
+    '          T',
     '',
     '',
     '                                     p',
     '',
     '',
     '',
-    '',
+    '                                        F',
     '',
     '             f',
     '',

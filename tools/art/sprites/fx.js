@@ -1,5 +1,6 @@
-// Effects and projectiles: blaster puffs, blood, explosions, blaster bolts
-// and the Jawas' ion blasts. Fire is drawn with noisy fullbright gradients.
+// Effects and projectiles: blaster puffs, blood, explosions, blaster bolts,
+// the Jawas' ion blasts, Boba Fett's rockets and Bossk's concussion blasts.
+// Fire is drawn with noisy fullbright gradients.
 import { PixelCanvas } from '../lib/canvas.js';
 import { C, G } from '../lib/pal.js';
 import { sheet } from '../lib/sprite.js';
@@ -162,12 +163,54 @@ function ionBlast() {
   return sheet(frames);
 }
 
+/**
+ * Boba Fett's rocket: a fireball with a dark smoke rim (frames 0-2, looped),
+ * then a burst of fire and smoke where it hits (frames 3-5). 32x32.
+ */
+function rocket() {
+  const frames = [];
+  for (let f = 0; f < 3; f++) {
+    const c = new PixelCanvas(32, 32);
+    smoke(c, 16, 16, 7, 140 + f, 0.3);
+    fireBlob(c, 16, 16, 4.6 + (f % 2) * 0.5, 150 + f, FIRE.slice(0, 5));
+    frames.push(c);
+  }
+  return sheet([...frames, ...explosion(32, FIRE, 160, 3)]);
+}
+
+/**
+ * A concussion blast (Bossk's rifle): a blue-white shimmering ball in flight
+ * (frames 0-1), then a shock ring spreading where it bursts (frames 2-4).
+ * 32x32, all fullbright.
+ */
+function concussion() {
+  const PALE = [[255, 255, 255], [255, 255, 255], G('cyan', 1), G('cyan', 0.67), G('cyan', 0.33)];
+  const frames = [];
+  for (let f = 0; f < 2; f++) {
+    const c = new PixelCanvas(32, 32);
+    fireBlob(c, 16, 16, 6 + f * 0.8, 170 + f, PALE, { holes: 0.15 });
+    frames.push(c);
+  }
+  for (let f = 0; f < 3; f++) {
+    const c = new PixelCanvas(32, 32);
+    const r = 5 + f * 4.5;
+    for (let a = 0; a < Math.PI * 2; a += 0.04) {
+      for (const w of [0, 0.8]) c.set(16 + Math.cos(a) * (r - w), 16 + Math.sin(a) * (r - w) * 0.8, f < 2 ? G('cyan', 1 - f * 0.33) : G('cyan', 0.33));
+    }
+    if (f < 2) fireBlob(c, 16, 16, 6 - f * 2, 180 + f, PALE.slice(f));
+    frames.push(c);
+  }
+  return sheet(frames);
+}
+
 export default [
   { name: 'puff', out: F('puff'), draw: puff },
   { name: 'blood', out: F('blood'), draw: () => blood('blood') },
   { name: 'explosion', out: F('explosion'), draw: () => sheet(explosion(64, FIRE, 31, 5)) },
   { name: 'blaster-bolt', out: F('blaster-bolt'), draw: () => blasterBolt('red') },
   { name: 'ion-blast', out: F('ion-blast'), draw: ionBlast },
+  { name: 'rocket', out: F('rocket'), draw: rocket },
+  { name: 'concussion', out: F('concussion'), draw: concussion },
 ];
 
 export { fireBlob, smoke, FIRE };

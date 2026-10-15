@@ -15,6 +15,9 @@ assets/custom/*
 !assets/custom/probe-droid.png
 !assets/custom/fists.png
 !assets/custom/blaster.png
+!assets/custom/bossk.png
+!assets/custom/boba-fett.png
+!assets/custom/rocket.png
 !assets/custom/textures.mjs
 !assets/custom/textures/
 # The whole Dark Forces texture pack, sorted by what each texture shows.

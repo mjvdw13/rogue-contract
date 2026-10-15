@@ -6,5 +6,7 @@ import sandtrooper from './sandtrooper.js';
 import jawa from './jawa.js';
 import officer from './officer.js';
 import probeDroid from './probe-droid.js';
+import bossk from './bossk.js';
+import bobaFett from './boba-fett.js';
 
-export default [stormtrooper, sandtrooper, jawa, officer, probeDroid];
+export default [stormtrooper, sandtrooper, jawa, officer, probeDroid, bossk, bobaFett];

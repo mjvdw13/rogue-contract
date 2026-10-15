@@ -70,10 +70,82 @@ const SHEETS = [
       ];
     })(),
   },
+  {
+    // Bossk. No firing pose with a flash (the concussion blast glows on its
+    // own), so fire repeats the aiming pose.
+    file: 'MS-DOS - Star Wars_ Dark Forces - Enemies - Trandoshan.png',
+    asset: 'bossk',
+    frames: (() => {
+      const walk = row(0, 98);
+      const stand = row(101, 191, 190);
+      const fall = row(101, 191);
+      return [
+        walk(0, 30), walk(32, 61), walk(63, 92), walk(94, 123),
+        stand(0, 42), stand(0, 42), // aim; fire
+        stand(93, 134), // the white flash of a hit
+        fall(180, 221), fall(223, 285), fall(287, 359), fall(361, 428), fall(430, 494),
+      ];
+    })(),
+  },
+  {
+    // Boba Fett, from the separate cells of his zip (unpack it into the
+    // folder). Only two poses face the viewer: standing (000) and the
+    // legs-apart stance he flies in (001). Firing is the stance with his
+    // fireball (BOBABALL 000) at the gun. Dark Forces drew him big (2.3
+    // units at the others' scale), so he's scaled down to 1.83.
+    cells: {
+      folder: 'BOBAFETT.cells',
+      list: ['001.PNG', { file: '001.PNG', over: [{ file: 'BOBABALL.cells/000.PNG', x: 58, y: 34 }] }, '002.PNG', '003.PNG', '004.PNG', '005.PNG'],
+    },
+    asset: 'boba-fett',
+    scale: 0.7,
+  },
+  {
+    // Boba Fett's fireball: in flight (000-002, facing the viewer) and its
+    // burst (012-014).
+    cells: { folder: 'BOBAFETT.cells/BOBABALL.cells', list: ['000.PNG', '001.PNG', '002.PNG', '012.PNG', '013.PNG', '014.PNG'], align: 'middle' },
+    asset: 'rocket',
+    out: 'assets/sprites/fx/rocket.png',
+  },
 ];
 
-function cut({ file, asset, frames }) {
-  const { width: W, data } = decodePNG(fs.readFileSync(path.join(dir, file)));
+/**
+ * Lays separate cells (one PNG per frame, transparent round the figure) side
+ * by side on a pure blue strip, so they cut like a sheet. `align` 'bottom'
+ * stands figures on one line; 'middle' centres them (projectiles). A cell's
+ * `over` lays other cells on it, centred at (x, y).
+ */
+function strip({ folder, list, align = 'bottom' }) {
+  const load = (file) => decodePNG(fs.readFileSync(path.join(dir, folder, file)));
+  const cells = list.map((c) => (typeof c === 'string' ? { file: c } : c)).map((c) => ({ img: load(c.file), over: (c.over ?? []).map((o) => ({ ...o, img: load(o.file) })) }));
+  const H = Math.max(...cells.map((c) => c.img.height));
+  const W = cells.reduce((w, c) => w + c.img.width + 1, 0);
+  const data = new Uint8Array(W * H * 4);
+  for (let i = 0; i < data.length; i += 4) data.set([0, 0, 255, 255], i);
+  const paint = (img, ox, oy) => {
+    for (let y = 0; y < img.height; y++) {
+      for (let x = 0; x < img.width; x++) {
+        const i = (y * img.width + x) * 4;
+        if (img.data[i + 3] < 128 || ox + x < 0 || ox + x >= W || oy + y < 0 || oy + y >= H) continue;
+        data.set(img.data.subarray(i, i + 3), ((oy + y) * W + ox + x) * 4);
+      }
+    }
+  };
+  const frames = [];
+  let x0 = 0;
+  for (const { img, over } of cells) {
+    const y0 = align === 'bottom' ? H - img.height : Math.floor((H - img.height) / 2);
+    paint(img, x0, y0);
+    for (const o of over) paint(o.img, x0 + o.x - Math.floor(o.img.width / 2), y0 + o.y - Math.floor(o.img.height / 2));
+    frames.push({ box: [x0, x0 + img.width - 1, 0, H - 1], base: H - 1 });
+    x0 += img.width + 1;
+  }
+  return { image: { width: W, data }, frames };
+}
+
+function cut({ file, cells, asset, scale = SCALE, ...sheet }) {
+  const { image, frames } = cells ? strip(cells) : { image: decodePNG(fs.readFileSync(path.join(dir, file))), frames: sheet.frames };
+  const { width: W, data } = image;
   // The background is pure blue.
   const isBg = (x, y) => {
     const o = (y * W + x) * 4;
@@ -104,7 +176,7 @@ function cut({ file, asset, frames }) {
   if (RECOLOUR[asset]) recolour(out, RECOLOUR[asset]);
   fs.writeFileSync(path.join(here, `${asset}.png`), encodePNG(FW * n, FH, out));
   console.log(`${asset}.png: ${n} frames of ${FW}x${FH}`);
-  return { src: `assets/custom/${asset}.png`, frameWidth: FW, frameHeight: FH, scale: SCALE };
+  return { src: `assets/custom/${asset}.png`, frameWidth: FW, frameHeight: FH, scale };
 }
 
 // First-person weapons, drawn 1:1 at the bottom of the 320-wide view (Dark
@@ -167,14 +239,20 @@ function cutWeapon({ asset, anchor, padLeft, padBottom, frames }) {
 const overridesFile = path.join(here, 'overrides.json');
 const overrides = fs.existsSync(overridesFile) ? JSON.parse(fs.readFileSync(overridesFile, 'utf8')) : {};
 for (const sheet of SHEETS) {
-  if (!fs.existsSync(path.join(dir, sheet.file))) {
-    console.log(`skipped ${sheet.asset}: no "${sheet.file}"`);
+  const source = sheet.file ?? sheet.cells.folder;
+  if (!fs.existsSync(path.join(dir, source))) {
+    console.log(`skipped ${sheet.asset}: no "${source}"`);
     continue;
   }
-  overrides[`assets/sprites/monsters/${sheet.asset}.png`] = cut(sheet);
+  // (Keys added by hand, such as `glint` and `glow`, are kept.)
+  const key = sheet.out ?? `assets/sprites/monsters/${sheet.asset}.png`;
+  overrides[key] = { ...overrides[key], ...cut(sheet) };
 }
 if (fs.existsSync(path.join(dir, WEAPON_SHEET))) {
-  for (const weapon of WEAPONS) overrides[`assets/sprites/weapons/${weapon.asset}.png`] = cutWeapon(weapon);
+  for (const weapon of WEAPONS) {
+    const key = `assets/sprites/weapons/${weapon.asset}.png`;
+    overrides[key] = { ...overrides[key], ...cutWeapon(weapon) };
+  }
 } else console.log(`skipped the weapons: no "${WEAPON_SHEET}"`);
 fs.writeFileSync(overridesFile, JSON.stringify(overrides, null, 2) + '\n');
 console.log('updated overrides.json');

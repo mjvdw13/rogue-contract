@@ -11,21 +11,22 @@ import { Model, MAT, skeleton, body } from '../lib/rig.js';
 import { sheet, flash, rotate, shift } from '../lib/sprite.js';
 import { PixelCanvas } from '../lib/canvas.js';
 
-const M = (name) => `assets/sprites/monsters/${name}.png`;
-const RENDER = { light: [-0.5, -0.6, 0.62], ambient: 0.32, aoStrength: 0.45 };
-const W = 64;
-const H = 64;
+// The helpers exported here are shared with the bounty hunters (hunters.js).
+export const M = (name) => `assets/sprites/monsters/${name}.png`;
+export const RENDER = { light: [-0.5, -0.6, 0.62], ambient: 0.32, aoStrength: 0.45 };
+export const W = 64;
+export const H = 64;
 
 /** Glossy white armour plastic. */
-const ARMOR = { spec: 0.55, shine: 22, grain: 0.02 };
+export const ARMOR = { spec: 0.55, shine: 22, grain: 0.02 };
 const WHITE = C('gray', 0.9);
-const BLACK = C('gray', 0.07);
-const GUNMETAL = C('gray', 0.14);
+export const BLACK = C('gray', 0.07);
+export const GUNMETAL = C('gray', 0.14);
 
 // ------------------------------------------------------------------ poses
 
 /** Walk cycle legs: thigh swing and knee bend for frames 0-3. */
-const STRIDE = [
+export const STRIDE = [
   { legL: { thigh: 22, knee: 10 }, legR: { thigh: -16, knee: 26 }, bob: 0 },
   { legL: { thigh: 4, knee: 6 }, legR: { thigh: 2, knee: 8 }, bob: -1 },
   { legL: { thigh: -16, knee: 26 }, legR: { thigh: 22, knee: 10 }, bob: 0 },
@@ -38,9 +39,10 @@ const DIMS = { height: 54, build: 1.05 };
  * Joints for a pose, with the hands placed relative to the chest:
  * `grip` 'port' holds a rifle across the body, 'aim' points it at the viewer,
  * 'pistol' raises one hand toward the viewer, 'side' lets the arms hang.
+ * `dims` sizes the body (see lib/rig.js).
  */
-function pose(p = {}) {
-  const J0 = skeleton(W, H, p, DIMS);
+export function pose(p = {}, dims = DIMS) {
+  const J0 = skeleton(W, H, p, dims);
   const c = J0.chest;
   const arms = {
     port: { armR: { reach: [c[0] + 5, c[1] + 7, c[2] + 7] }, armL: { reach: [c[0] - 4, c[1] + 2, c[2] + 9] } },
@@ -49,11 +51,11 @@ function pose(p = {}) {
     side: { armR: { spread: 10, swing: 4 }, armL: { spread: 10, swing: -4 } },
     hurt: { armR: { spread: 40, swing: -20, bend: 40 }, armL: { spread: 35, swing: -10, bend: 30 } },
   }[p.grip ?? 'port'];
-  return skeleton(W, H, { ...p, ...arms }, DIMS);
+  return skeleton(W, H, { ...p, ...arms }, dims);
 }
 
 /** A blaster rifle held in both hands; `aim` points it at the viewer. */
-function rifle(m, J, aim) {
+export function rifle(m, J, aim) {
   const r = J.handR;
   const l = J.handL;
   if (aim) {
@@ -119,7 +121,7 @@ function trooperFrame(p, { held = 'port', fire = false } = {}) {
  * Falling down: the body turns about its middle (so it stays inside the
  * frame) and is dropped so its lowest point rests on the floor.
  */
-function fall(stand) {
+export function fall(stand) {
   return [0.2, 0.6, 1.1, 1.5, 1.57].map((a, i) => {
     const body = rotate(stand, -a, 32, 36);
     let low = 0;
@@ -136,7 +138,7 @@ function fall(stand) {
   });
 }
 
-function humanSheet(frameFn, { aimGrip }) {
+export function humanSheet(frameFn, { aimGrip }) {
   const frames = STRIDE.map((s) => frameFn(s).c);
   frames.push(frameFn({ grip: aimGrip }, { held: 'aim' }).c);
   frames.push(frameFn({ grip: aimGrip }, { held: 'aim', fire: true }).c);

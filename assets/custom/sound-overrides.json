@@ -21,5 +21,12 @@
   "player-jump": { "src": "assets/custom/sounds/player/JUMP-1.mp3", "volume": 0.64 },
   "player-land": { "src": "assets/custom/sounds/player/LAND-1.mp3", "volume": 1 },
   "droid-sight": { "src": "assets/custom/sounds/enemies/PROBALM.mp3", "volume": 0.81 },
-  "droid-active": { "src": "assets/custom/sounds/enemies/PROBALM2.mp3", "volume": 0.66 }
+  "droid-active": { "src": "assets/custom/sounds/enemies/PROBALM2.mp3", "volume": 0.66 },
+  "rocket-fire": { "src": "assets/custom/sounds/weapons/MISSILE1.mp3", "volume": 1.37 },
+  "rocket-hit": { "src": "assets/custom/sounds/impacts-explosions/EX-SMALL.mp3", "volume": 1.29 },
+  "concussion-fire": { "src": "assets/custom/sounds/weapons/CONCUSS1.mp3", "volume": 1.34 },
+  "concussion-hit": { "src": "assets/custom/sounds/weapons/CONCUSS5.mp3", "volume": 1.37 },
+  "bossk-sight": { "src": "assets/custom/sounds/enemies/BOSSK-1.mp3", "volume": 1.32 },
+  "bossk-pain": { "src": "assets/custom/sounds/enemies/BOSSK-3.mp3", "volume": 1.29 },
+  "bossk-death": { "src": "assets/custom/sounds/enemies/BOSSKDIE.mp3", "volume": 1.31 }
 }

@@ -1,8 +1,8 @@
 # Disclaimer: ripped Dark Forces art
 
 The images in this folder (`stormtrooper.png`, `officer.png`,
-`probe-droid.png`, `fists.png`, `blaster.png` and everything in `textures/`
-and `df-textures/`) and the sound effects in `sounds/`
+`probe-droid.png`, `bossk.png`, `boba-fett.png`, `rocket.png`, `fists.png`,
+`blaster.png` and everything in `textures/` and `df-textures/`) and the sound effects in `sounds/`
 come from *Star Wars: Dark Forces* (LucasArts, 1995). The game and its art belong to Lucasfilm Ltd.
 They are not part of Rogue Contract and are not covered by its license.
 

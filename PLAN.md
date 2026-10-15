@@ -785,6 +785,67 @@ Later: ambience (WIND1 for the canyon, MACHINE1/2 and RUMBLE1 for the
 generator, ELECTRIC) belongs to Phase 1d step 10, the looping positional
 sounds.
 
+### O. Boba Fett and Bossk (2026-10-15)
+
+Mark (2026-10-15): add characters for Boba Fett and Bossk, from the ripped
+Dark Forces "Boba Fett" zip (15 cells plus 15 cells of his projectile,
+`BOBABALL`) and the "Trandoshan" sheet (Bossk, 823x194 on pure blue).
+Neither is in `docs/story.md` yet, so they go in the sandbox only; where
+they appear in the story is Mark's call.
+
+Research:
+- **Bossk's sheet** has a whole front-facing set: a four-frame walk with
+  the concussion rifle shouldered, an aiming pose, a white "hit" flash (as
+  the officer's sheet uses for pain), and a five-frame fall. No firing
+  pose with a muzzle flash: the concussion blast carries its own glow.
+  The DF pack has his voice (BOSSK-1/2/3, BOSSKDIE) and the concussion
+  rifle (CONCUSS1, CONCUSS5).
+- **Boba's cells** have only two front poses (standing, and a legs-apart
+  stance) and a four-frame fall; the rest are other angles. In Dark Forces
+  he flies with his jetpack, and the stance is his flying pose. His
+  projectile's front cells are a fireball (3 frames) and a burst (3).
+  There's no Boba voice in the sound pack.
+- At Dark Forces' pixel density (`scale: 0.85`) Bossk is about 2 units
+  tall (he's 1.9 m), but Boba comes out 2.3; DF drew him big.
+
+Decided:
+- **Bossk** (`bossk`, glyph `T`): a walker, tough and slow, firing slow
+  concussion blasts that burst with splash damage. 90 health. His own
+  voice (`bossk-sight`, `bossk-pain`, `bossk-death`), and
+  `concussion-fire` / `concussion-hit` for the rifle. Layout: walk 0-3,
+  aim 4, fire 5 (the aiming pose again, lit), pain 6, death 7-11.
+- **Boba Fett** (`boba-fett`, glyph `F`): a flyer like the probe droid,
+  hovering a unit off the floor, quick, firing fast rockets (the
+  `BOBABALL` fireball) that burst with a small splash. 200 health and
+  rarely flinches; `boss: true`. Drawn at `scale: 0.7` so he's 1.83 tall
+  beside a trooper. Layout: hover 0 (the stance), fire 1 (the stance with
+  the fireball at his gun), pain 2 (the first frame of the fall, briefly),
+  death 2-5. Masked-human voice: the troopers' pain and death, a synth
+  `rocket-fire`.
+- **Committed art:** generated placeholder sheets in
+  `tools/art/sprites/` (a Mandalorian in green and grey armour with a
+  jetpack, and a scaly Trandoshan in an orange flight suit), and
+  placeholder `rocket` and `concussion` projectiles in `fx.js`. The DF art
+  goes in through `cut.mjs` and `overrides.json` as for the other rips;
+  `cut.mjs` learns to read Boba's separate cells from his zip's folder.
+  DF sounds go in `sound-overrides.json`.
+
+1. [x] Placeholder sheets for both (`tools/art/sprites/hunters.js`, with
+       the humanoid helpers now exported from `imperials.js`; the trooper and
+       officer sheets come out byte-identical), and the two projectiles.
+2. [x] `cut.mjs`: Bossk's sheet, Boba's cells, Boba's projectile; the
+       overrides. Re-running it now keeps keys added by hand (`glint`,
+       `glow`); the existing cut sheets come out byte-identical.
+3. [x] Monsters, projectiles, sounds (synth, plus DF overrides: MISSILE1,
+       EX-SMALL, CONCUSS1, CONCUSS5, BOSSK-1, BOSSK-3, BOSSKDIE). Volumes
+       by the loudest 100 ms against the synth, the measure that gives back
+       the existing volumes; the new synths were turned down to sit with
+       the files, so no file goes above 1.37.
+4. [x] One of each in the sandbox; tests, validator, smoke test;
+       screenshots in game with and without the overrides.
+5. [ ] Later, Mark's call: where they appear in the story, and Boba's
+       other angles once enemies are drawn from several (Phase 2).
+
 ## Phase 1c: Two storeys per tile (done 2026-10-13)
 
 Mark (2026-10-13): we want to walk underneath other parts of the map. Today
@@ -2121,3 +2182,8 @@ update the smoke test.
   by side, re-maps them and gives the JSON. Checked in Chrome: all 22 files
   decode (trimmed), no console errors. 4 new tests (188), the validator and
   smoke test pass.
+- 2026-10-15: Phase 1b O: Boba Fett and Bossk. Bossk (`T`) walks and fires
+  concussion blasts that burst; Boba Fett (`F`) flies on his jetpack and fires
+  rockets. Ripped DF art and sounds through the overrides, generated
+  placeholders committed. One of each in the sandbox. 188 tests, the
+  validator and the smoke test pass.
