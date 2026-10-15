@@ -130,6 +130,8 @@ export class TileMap {
      * and the sources themselves.
      */
     this.srcLight = [new Float32Array(n), new Float32Array(n)];
+    /** The sources' light again, reaching further, for glints (lightsources.js), per storey. */
+    this.glintLight = [new Float32Array(n), new Float32Array(n)];
     /** @type {import('./lightsources.js').LightSource[]} */
     this.sources = [];
     /**

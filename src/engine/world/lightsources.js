@@ -14,7 +14,15 @@ import { lineOfSight } from './physics.js';
  *
  * Sources add into the map's `srcLight` (one array per storey), which the
  * light map adds to each tile's own light.
+ *
+ * Each source is baked a second time, reaching GLINT_REACH times as far,
+ * into `glintLight`: light from sources only, which makes glint pixels on
+ * sprites (armour highlights) catch the light even in shadow. A source with
+ * `glint: false` stays out of it.
  */
+
+/** How much further a source reaches for glints than for light. */
+export const GLINT_REACH = 2;
 
 /** How a source's light fades: all of it at its centre, none at its radius. */
 export function falloff(d, r) {
@@ -36,6 +44,7 @@ export function falloff(d, r) {
  * @property {number} group its light-effect group (-1: none)
  * @property {number} cur the strength it adds now
  * @property {{tiles: number[], weights: number[], storeys: number[]}} baked
+ * @property {{tiles: number[], weights: number[], storeys: number[]}|null} glint baked for glints, or null
  */
 
 /**
@@ -71,8 +80,10 @@ export function addSources(map, specs, groupOf) {
       group: fx ? groupOf(s.sync, fx) : -1,
       cur: s.light,
       baked: bakeSource(map, s),
+      glint: s.glint === false ? null : bakeSource(map, { ...s, radius: s.radius * GLINT_REACH }),
     };
     applySource(map, src.baked, src.cur);
+    if (src.glint) applySource(map, src.glint, src.cur, null, map.glintLight);
     map.sources.push(src);
   });
   return errors;
@@ -109,10 +120,13 @@ export function bakeSource(map, spec) {
   return { tiles, weights, storeys };
 }
 
-/** Add `amount` of a baked source's light into the map (negative takes it away), touching the light map. */
-export function applySource(map, baked, amount, lightmap) {
+/**
+ * Add `amount` of a baked source's light into the map (negative takes it
+ * away), touching the light map: into `srcLight`, or `into` (glintLight).
+ */
+export function applySource(map, baked, amount, lightmap, into = map.srcLight) {
   if (!amount) return;
-  const [s0, s1] = map.srcLight;
+  const [s0, s1] = into;
   const { tiles, weights, storeys } = baked;
   for (let k = 0; k < tiles.length; k++) {
     const i = tiles[k];

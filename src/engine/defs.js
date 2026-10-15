@@ -16,7 +16,9 @@
  *   Frame numbers are indices into the sprite sheet. `fireAt`/`fullbright`/`events`
  *   refer to positions within this animation's `frames` list.
  *
- * @typedef {{src:string, frameWidth?:number, frameHeight?:number}} SheetSpec
+ * @typedef {{src:string, frameWidth?:number, frameHeight?:number, glint?:number[][], glow?:number[][]}} SheetSpec
+ *   `glint`: colours ([r, g, b]) that catch the light (armour highlights);
+ *   `glow`: colours that always shine (see gfx/image.js `quantize`).
  *
  * @typedef {{kind:string, damage?:number|number[], pellets?:number, spread?:number, range?:number,
  *   projectile?:string, count?:number, sound?:string, hitSound?:string, missSound?:string,
@@ -74,7 +76,7 @@ function normalizeAnims(anims = {}) {
 function normalizeSheet(sheet, id) {
   if (!sheet) return null;
   if (typeof sheet === 'string') return { ref: sheet };
-  return { id: sheet.id ?? id, src: sheet.src, frameWidth: sheet.frameWidth ?? 0, frameHeight: sheet.frameHeight ?? 0 };
+  return { id: sheet.id ?? id, src: sheet.src, frameWidth: sheet.frameWidth ?? 0, frameHeight: sheet.frameHeight ?? 0, glint: sheet.glint, glow: sheet.glow };
 }
 
 function requireId(def, what) {

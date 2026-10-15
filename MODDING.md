@@ -42,6 +42,17 @@ with JSDoc types, so editors like VS Code autocomplete the fields.
   are no 8-angle rotations), and the bottom of the frame stands on the floor.
   32 pixels is one tile, so a person about 56 pixels tall stands about 1.75
   tiles high, and fills a 64×64 frame.
+- **Glints and glows:** a sheet can list exact colours (`[r, g, b]`) that
+  behave differently from the rest of its art. `glint` colours are
+  highlights that catch the light, like the shine on a stormtrooper's
+  armour: they're lit like the rest of the sprite, but brighten toward
+  fullbright when a light source can see the thing, even if it stands in
+  shadow, and flash with muzzle flashes and passing bolts. With no source
+  about (a canyon at night) they're plain lit white. `glow` colours always
+  shine, as if they were fullbright (sparks in an explosion):
+  `sheet: { src: '...', frameWidth: 64, frameHeight: 64, glint: [[255, 255, 255]] }`.
+  An art override (`assets/custom/overrides.json`) can set its own `glint`
+  and `glow` for its art.
 - **Textures:** walls and flats are usually 64×64, and span two tiles (32
   texels per tile), about the height of a person. Any power-of-two size from
   16 to 256 works (a door's art is one whole door). Textures are laid out by
@@ -487,6 +498,8 @@ lights: [
   sources with that `sync`.
 - `tag`: `setLight` with the tag sets its `light` (and effect), so a
   trigger can switch it off: `{ action: 'setLight', tag: 'gen-lamps', light: 0 }`.
+- `glint: false`: it doesn't make glints shine (see Art). Otherwise a source
+  makes glints catch its light out to twice its radius, where it can see.
 
 It lights the tiles whose centres it can see. Walls, angled walls and doors
 block it (doors are shut when it's worked out, so it stays in its room). A

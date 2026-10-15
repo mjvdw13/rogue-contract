@@ -3,6 +3,8 @@ import { F_SKY } from '../world/tilemap.js';
 
 const visible = [];
 let fuzzPos = 0;
+/** Glint pixels are lit at the sprite's light plus this many times the glint light where it stands. */
+export const GLINT_GAIN = 3;
 const FUZZ = [1, -1, 1, -1, 1, 1, -1, 1, 1, -1, 1, 1, 1, -1, 1, 1, 1, -1, -1, -1, -1, 1, -1, -1, 1, 1, 1, 1, -1, 1, -1, 1];
 
 /**
@@ -12,7 +14,8 @@ const FUZZ = [1, -1, 1, -1, 1, 1, -1, 1, 1, -1, 1, 1, 1, -1, 1, 1, 1, -1, -1, -1
  *
  * A thing is drawable when it has `sheet` (a Sheet), `frame` (index) and
  * position x/y/z. Optional: `fullbright` (current frame glows), `flipX`,
- * `def.scale`, `def.renderStyle` ('normal' | 'fuzz').
+ * `def.scale`, `def.renderStyle` ('normal' | 'fuzz'). A frame's `glint` pixels
+ * brighten with the glint light (`map.glintmap`) where the thing stands.
  *
  * @param {import('./view.js').View} view
  * @param {Array<any>} things
@@ -59,17 +62,28 @@ export function drawSprites(view, things, map, fb, fbW, colormaps, skip) {
     if (x1 > W) x1 = W;
     if (x1 <= x0) continue;
 
+    const fuzz = t.def?.renderStyle === 'fuzz';
     let lv;
+    // Glint pixels (armour highlights) brighten with the light sources that can see the sprite.
+    let gv = -1;
     if (view.fixedColormap >= 0) lv = view.fixedColormap;
     else if (t.fullbright) lv = 0;
     else {
       // The smooth light where it stands, in its storey.
       const tile = map.inBounds(t.x | 0, t.y | 0) ? (t.y | 0) * map.w + (t.x | 0) : -1;
+      const storey = tile >= 0 ? map.storeyAt(tile, (t.z ?? 0) + 0.5) : 0;
+      const light = tile >= 0 && map.lightmap ? map.lightmap.sample(t.x, t.y, storey) : 128;
       // (Outdoors in haze, fading toward the haze colour.)
-      lv = view.row(tile >= 0 && map.lightmap ? map.lightmap.sample(t.x, t.y, map.storeyAt(tile, (t.z ?? 0) + 0.5)) : 128, depth, tile >= 0 && (map.flags[tile] & F_SKY) !== 0);
+      const outdoor = tile >= 0 && (map.flags[tile] & F_SKY) !== 0;
+      lv = view.row(light, depth, outdoor);
+      if (frame.glint && !fuzz && tile >= 0 && map.glintmap) {
+        const g = map.glintmap.sample(t.x, t.y, storey);
+        if (g >= 1) gv = view.row(light + g * GLINT_GAIN, depth, outdoor);
+      }
     }
     const cm = lv * 256;
-    const fuzz = t.def?.renderStyle === 'fuzz';
+    const gcm = gv * 256;
+    const gmask = gv >= 0 ? frame.glint : null;
     const texScaleX = frame.w / spriteW;
     const texScaleY = frame.h / spriteH;
     const fh = frame.h;
@@ -111,7 +125,7 @@ export function drawSprites(view, things, map, fb, fbW, colormaps, skip) {
             const src = o + FUZZ[fuzzPos++ & 31] * fbW;
             fb[o] = colormaps[6 * 256 + fb[src < 0 || src >= fb.length ? o : src]];
           } else {
-            fb[o] = colormaps[cm + c];
+            fb[o] = colormaps[(gmask && gmask[base + ty] ? gcm : cm) + c];
           }
         }
       }

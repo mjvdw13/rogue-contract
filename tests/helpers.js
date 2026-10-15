@@ -91,9 +91,9 @@ export async function headlessRenderer() {
   assets._loadOverrides = async () => {
     assets.overrides = {};
   };
-  assets._loadImage = async (src) => {
+  assets._loadImage = async (src, opts = {}) => {
     try {
-      return quantize(decodePNG(fs.readFileSync(path.join(root, src))), palette);
+      return quantize(decodePNG(fs.readFileSync(path.join(root, src))), palette, opts);
     } catch {
       return null;
     }

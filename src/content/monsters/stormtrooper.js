@@ -6,7 +6,8 @@ export default defineMonster({
   id: 'stormtrooper',
   name: 'Stormtrooper',
   glyph: 't',
-  sheet: { src: 'assets/sprites/monsters/stormtrooper.png', frameWidth: 64, frameHeight: 64 },
+  // The brightest highlights on the armour catch the light (glints).
+  sheet: { src: 'assets/sprites/monsters/stormtrooper.png', frameWidth: 64, frameHeight: 64, glint: [[255, 255, 255]] },
   health: 30,
   speed: 4.4,
   radius: 0.5, // like the player: a body fits one tile width, so it can stand on one stair

@@ -109,6 +109,9 @@ export class Assets {
     const list = [...srcs].filter(Boolean);
     // Textures that never glow (`fullbright: false`: rock, sand) snap to lit colours only.
     const litOnly = new Set([...reg.textures.values()].filter((t) => t.fullbright === false).map((t) => t.src));
+    // Sprite sheets can list glint and glow colours (an override's replace the sheet's).
+    const sheetOf = new Map([...reg.sheets.values()].filter((s) => s.src).map((s) => [s.src, s]));
+    const opts = (src, o) => ({ litOnly: litOnly.has(src), glint: o?.glint, glow: o?.glow });
     let done = 0;
     const total = list.length;
     onProgress(0, total);
@@ -119,10 +122,10 @@ export class Assets {
         let img = null;
         if (this.overrides[src]) {
           // A missing override (say, a file only on someone's own computer) falls back to the committed art.
-          img = await this._loadImage(this.overrides[src].src, { litOnly: litOnly.has(src) });
+          img = await this._loadImage(this.overrides[src].src, opts(src, { ...sheetOf.get(src), ...this.overrides[src] }));
           if (!img) delete this.overrides[src];
         }
-        this.images.set(src, img ?? (await this._loadImage(src, { litOnly: litOnly.has(src) })));
+        this.images.set(src, img ?? (await this._loadImage(src, opts(src, sheetOf.get(src)))));
         done++;
         onProgress(done, total);
       }

@@ -3,7 +3,8 @@
     "src": "assets/custom/stormtrooper.png",
     "frameWidth": 46,
     "frameHeight": 67,
-    "scale": 0.85
+    "scale": 0.85,
+    "glint": [[252, 252, 252]]
   },
   "assets/sprites/monsters/officer.png": {
     "src": "assets/custom/officer.png",
@@ -15,7 +16,8 @@
     "src": "assets/custom/probe-droid.png",
     "frameWidth": 88,
     "frameHeight": 89,
-    "scale": 0.85
+    "scale": 0.85,
+    "glow": [[252, 252, 252]]
   },
   "assets/sprites/weapons/fists.png": {
     "src": "assets/custom/fists.png",

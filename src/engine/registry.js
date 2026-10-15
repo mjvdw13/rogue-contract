@@ -82,7 +82,7 @@ export class Registry {
     if (sheet.ref) return sheet;
     const sid = sheet.id ?? id;
     if (!this.sheets.has(sid)) {
-      this.sheets.set(sid, { type: 'sheet', id: sid, src: sheet.src, frameWidth: sheet.frameWidth, frameHeight: sheet.frameHeight });
+      this.sheets.set(sid, { type: 'sheet', id: sid, src: sheet.src, frameWidth: sheet.frameWidth, frameHeight: sheet.frameHeight, glint: sheet.glint, glow: sheet.glow });
     }
     return { ref: sid };
   }

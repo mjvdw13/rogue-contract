@@ -911,9 +911,8 @@ headless Node, DF art). Budget for this phase: stay under about 8 ms.
 13. [ ] Stretch: **mipmaps** for floors and walls in the distance (no
         shimmer on grates and rock).
 
-- [ ] **TODO: glints on armour** (Mark, 2026-10-14: a happy accident worth
-      making a feature; it will take some work). Not yet placed in the
-      order below.
+- [x] **Glints on armour** (Mark, 2026-10-14: a happy accident worth
+      making a feature; it will take some work). Done 2026-10-15.
       - **What happened.** Under Raccoon Alex's palette, the brightest
         highlight on the DF stormtrooper's armour (252,252,252: 287 pixels,
         2.4% of the sheet) had no lit colour near it and snapped to
@@ -941,6 +940,47 @@ headless Node, DF art). Budget for this phase: stay under about 8 ms.
       - **Check** with screenshots: a trooper in shadow in a lit room (the
         old look), in the dark canyon (no glints), under a muzzle flash and
         a passing bolt.
+      - **Survey (2026-10-15).** The 252 whites are glints only on the DF
+        stormtrooper (armour highlights in every frame). The officer's are
+        the muzzle flash core, on its attack's fullbright frame already. The
+        DF probe droid's are explosion sparks in its death frames, which
+        aren't fullbright: they glowed by accident under the old palette and
+        went lit with step 1, so the explosion no longer shines. The
+        generated stormtrooper's highlights (255,255,255, 267 pixels) still
+        snap to glow-yellow's white: fullbright everywhere, the old look in
+        the canyon too. Also seen: 65 pixels of the generated Jawa's robe
+        (190,120,65) snap to glow-lamp and glow faintly.
+      - **The work** (done 2026-10-15):
+        - [x] Import: a sheet (or its art override) can list `glint` colours
+              and `glow` colours. `quantize` snaps glint pixels to lit
+              colours only and keeps a mask of them (column-major on each
+              frame, null when a frame has none); glow pixels snap to
+              fullbright colours only. Node loaders (snapshot, tests) pass
+              the options through.
+        - [x] Glint light: each light source is baked a second time with
+              twice its radius (`GLINT_REACH`) into `map.glintLight` (per
+              storey), and a second light map (`world.glintmap`, sources
+              only, no ambient) interpolates it. Animated sources and
+              `setLight` update it; dynamic lights (muzzle flashes, bolts,
+              explosions) add to it at twice their radius too. A source
+              with `glint: false` stays out of it.
+        - [x] Drawing: glint pixels of a sprite that isn't fullbright take
+              the colormap row for its light plus `GLINT_GAIN` times the
+              glint light there (haze and distance as for the sprite).
+              Nothing changes with no source about, under fixed colormaps
+              or the fuzz style.
+        - [x] Content: `glint` on the stormtrooper (255,255,255 on the
+              generated sheet, 252,252,252 on the DF override); `glow` on
+              the DF probe droid (252,252,252: the death sparks shine again).
+        - [x] Tests (the mask, the bake and reach, line of sight, dynamic
+              lights, the drawn colours), the validator, MODDING.md, and
+              screenshots of the four cases above with the DF art; tune
+              `GLINT_REACH` and `GLINT_GAIN` from them (2 and 3 held up:
+              no change). The validator checks the colour lists.
+        - Later, if wanted: stronger when the source is on the viewer's side
+          of the sprite; shiny faces on models; glints on the sandtrooper's
+          armour; the Jawa robe's stray glow-lamp pixels (fix the
+          generator's colour).
 
 ### Mission 1
 
@@ -1926,3 +1966,21 @@ update the smoke test.
   unreachable. A new test pulls the overload switch and checks the hatch is
   still open 30 seconds later. MODDING.md updated. 176 tests, the validator
   and the smoke test pass.
+- 2026-10-15: glints on armour (Phase 1d's TODO). A sprite sheet, or its art
+  override, can list `glint` colours: those pixels snap to lit colours and
+  are kept as a mask on each frame. They're drawn at the sprite's light plus
+  3x (`GLINT_GAIN`) the glint light where it stands: light from sources
+  only, each baked a second time at twice its radius (`GLINT_REACH`) into
+  `map.glintLight`, read through a second light map (`world.glintmap`).
+  Animated sources, `setLight` and dynamic lights (at twice their radius)
+  update it; a source with `glint: false` stays out. The stormtrooper's
+  highlights glint (252,252,252 on the DF art, 255,255,255 on the generated
+  sheet, whose highlights had glowed everywhere). A sheet's `glow` colours
+  snap to fullbright: the DF probe droid's death sparks shine again (lost
+  with the fitted palette). Screenshots with the DF art: in the barracks
+  corridor the armour catches the lamps as crisp white glints, softer on the
+  generator floor 6 tiles from a lamp, none in the dark canyon, and they
+  flash with a muzzle flash and a bolt passing 2.5 tiles away. Cost: 0.14
+  ms a tick for the glint light with three flashes, rendering within noise.
+  MODDING.md, the validator, 7 new tests (183); the validator and smoke test
+  pass.

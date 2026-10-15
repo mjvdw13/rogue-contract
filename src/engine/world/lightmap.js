@@ -19,12 +19,15 @@ import { falloff } from './lightsources.js';
 export class LightMap {
   /**
    * @param {import('./tilemap.js').TileMap} map
-   * @param {{occlusion?: number}} [opts] occlusion: how much darker (light
-   *   units) the light gets toward a wall, at the wall's centre
+   * @param {{occlusion?: number, glint?: boolean}} [opts] occlusion: how much
+   *   darker (light units) the light gets toward a wall, at the wall's
+   *   centre; glint: the glint light instead (the map's `glintLight` and
+   *   dynamic lights, no ambient: see lightsources.js)
    */
-  constructor(map, { occlusion = 0 } = {}) {
+  constructor(map, { occlusion = 0, glint = false } = {}) {
     this.map = map;
     this.occlusion = occlusion;
+    this.glint = glint;
     /** Cells are (w + 1) x (h + 1): cell (cx, cy) lies between tile centres cx - 1..cx and cy - 1..cy. */
     this.cw = map.w + 1;
     this.ch = map.h + 1;
@@ -50,7 +53,9 @@ export class LightMap {
     const i = ty * map.w + tx;
     const f = map.flags[i];
     if (f & F_SOLID) return -1;
-    const l = (s || !(f & F_SLAB) ? map.light[i] : map.light[i] + map.belowLight[i]) + map.srcLight[s][i] + this.dyn[s][i];
+    const l = this.glint
+      ? map.glintLight[s][i] + this.dyn[s][i]
+      : (s || !(f & F_SLAB) ? map.light[i] : map.light[i] + map.belowLight[i]) + map.srcLight[s][i] + this.dyn[s][i];
     return l < 0 ? 0 : l > 255 ? 255 : l;
   }
 

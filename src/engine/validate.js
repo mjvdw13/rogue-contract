@@ -28,6 +28,12 @@ export function validateContent(reg) {
     const s = reg.sheets.get(sheet.ref);
     if (!s) return err(`${owner}: unknown sheet "${sheet.ref}"`);
     if (!s.src) err(`${owner}: sheet "${sheet.ref}" has no src`);
+    for (const key of ['glint', 'glow']) {
+      const list = s[key];
+      if (list === undefined) continue;
+      const colour = (c) => Array.isArray(c) && c.length === 3 && c.every((v) => Number.isInteger(v) && v >= 0 && v <= 255);
+      if (!Array.isArray(list) || !list.every(colour)) err(`${owner}: sheet "${sheet.ref}" ${key} must be a list of [r, g, b] colours (0-255)`);
+    }
     return undefined;
   };
   const checkSound = (owner, id) => {

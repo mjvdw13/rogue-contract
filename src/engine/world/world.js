@@ -7,6 +7,7 @@ import { updateDoors, openDoor, closeDoor } from './doors.js';
 import { updateLifts, startLift, liftAt } from './lifts.js';
 import { LightEffects } from './lights.js';
 import { LightMap } from './lightmap.js';
+import { GLINT_REACH } from './lightsources.js';
 import { FlowField, WALKER } from './nav.js';
 import { noiseAlert } from './noise.js';
 import { Triggers } from './triggers.js';
@@ -104,6 +105,9 @@ export class World {
     /** Smooth light, interpolated between tile centres (the renderer reads `map.lightmap`). */
     this.lightmap = new LightMap(this.map, { occlusion: level.occlusion ?? 0 });
     this.map.lightmap = this.lightmap;
+    /** Light from sources only, reaching further, for glints on sprites (the renderer reads `map.glintmap`). */
+    this.glintmap = new LightMap(this.map, { glint: true });
+    this.map.glintmap = this.glintmap;
     this.lights = new LightEffects(this.map, this.rng, this.lightmap);
     this.nav = new FlowField(this.map);
     /** Flow fields per kind of body (see navFor), the walker's being `nav`. */
@@ -673,8 +677,11 @@ export class World {
       }
     }
     if (list.some((t) => t.removed)) this.things = list.filter((t) => !t.removed);
-    this.lightmap.setDynamic(this.dynamicLights());
+    const dyn = this.dynamicLights();
+    this.lightmap.setDynamic(dyn);
     this.lightmap.update();
+    this.glintmap.setDynamic(dyn.map((l) => ({ ...l, radius: l.radius * GLINT_REACH })));
+    this.glintmap.update();
     // Moving lifts change floor heights, so routes are refreshed while they run.
     this.navRefresh -= dt;
     const refresh = this.navRefresh <= 0 && this.map.lifts.some((l) => l.state === 'moving');
