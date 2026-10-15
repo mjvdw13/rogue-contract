@@ -870,6 +870,24 @@ No longer `flying`; speed 4.8, a little quicker than a trooper.
        34-35, 28-29) stops against its east face and walks on the spot. Not
        new; left for later.
 
+### P. Door art centred top to bottom (done 2026-10-15)
+
+Mark (2026-10-15): the door textures look slightly too low; make sure
+they're centred vertically. The renderer hangs a rising door's 2-tall
+texture exactly on its 2-tall doorway, so the offset is in the art:
+IDDOOR1's inner panel is rows 8-60 of 64 (centre 34, not 31.5), with an
+8-row dark edge and bevel on top and only 3 rows of bevel at the bottom.
+
+1. [x] `textures.mjs`: roll IDDOOR1 up 3 rows (its three darkest top rows
+       go under the bottom bevel, so each edge is 5-6 rows), before the key
+       panels are stamped on, so they stay in the middle.
+2. [x] Re-run `textures.mjs`; only the four door textures change. (It
+       also spreads `overrides.json`'s glint and glow lists over several
+       lines, as `derive.mjs` does; put back by hand. Left for later.)
+3. [x] Looked at it in game (snapshot, m1, with the overrides): the panel
+       now has an even edge top and bottom, the dark seam at the floor.
+       Tests, validator, smoke test pass. Commit.
+
 ## Phase 1c: Two storeys per tile (done 2026-10-13)
 
 Mark (2026-10-13): we want to walk underneath other parts of the map. Today
@@ -2220,3 +2238,7 @@ update the smoke test.
   usual layout (walk 0-3, aim 4, fire 5, pain 6, death 7-10) for the cut
   sheet and the placeholder. 189 tests, the validator and the smoke test
   pass.
+- 2026-10-15: Phase 1b P: door art centred top to bottom. IDDOOR1 sat 3
+  texels low in its image (8-row dark edge on top, 3 rows of bevel below);
+  `textures.mjs` rolls it up 3 rows before the key panels go on, and the four
+  door textures are re-cut. 189 tests, the validator and the smoke test pass.

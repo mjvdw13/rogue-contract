@@ -91,6 +91,16 @@ function rollRows(img, dy) {
   return { w: img.w, h: img.h, data };
 }
 
+/**
+ * The Imperial door, centred top to bottom: IDDOOR1's panel sits 3 rows low
+ * (an 8-row dark edge on top, 3 rows of bevel below), so its darkest top rows
+ * go under the bottom bevel. Key panels are laid on after, in the middle.
+ */
+function impDoor() {
+  const img = load('IDDOOR1');
+  return rollRows(img, img.h - 3);
+}
+
 // Game texture id -> a DF texture name, or a function building the image.
 // `frames: 1` replaces an animated generated texture with a still one.
 // `seeThrough: true` keeps the transparent pixels (fences); other walls are made solid.
@@ -109,10 +119,10 @@ const TEXTURES = {
   'imp-ceiling-light': 'ZPLIT08',
   'lift-floor': 'ZPCIRCL1',
   // Doors and switches
-  'imp-door': 'IDDOOR1',
-  'imp-door-red': () => centred(load('IDDOOR1'), load('ZASWIT01_0')),
-  'imp-door-blue': () => centred(load('IDDOOR1'), load('ZASWIT01_1')),
-  'imp-door-yellow': () => centred(load('IDDOOR1'), redToYellow(load('ZASWIT01_0'))),
+  'imp-door': impDoor,
+  'imp-door-red': () => centred(impDoor(), load('ZASWIT01_0')),
+  'imp-door-blue': () => centred(impDoor(), load('ZASWIT01_1')),
+  'imp-door-yellow': () => centred(impDoor(), redToYellow(load('ZASWIT01_0'))),
   // A doorway's sides: a light strip and a control panel. Doors in walls 1
   // tile thick have jambs half a tile deep: IDJAMPNL's middle 16 columns
   // (the strip and its frame). The gate's are a whole tile.
