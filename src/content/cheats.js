@@ -1,5 +1,13 @@
 import { defineCheat } from '../engine/defs.js';
 
+/** Full health, god mode (on, not toggled), every weapon, keycard, ammo and shields. */
+function loadout(game, world) {
+  game.giveEverything(world);
+  const p = world.player.player;
+  p.god = true;
+  p.health = Math.max(p.health, 100);
+}
+
 // Type these during play. '#' matches one digit.
 export default [
   defineCheat({
@@ -23,11 +31,16 @@ export default [
     // iddqd it doesn't toggle: typing it again keeps you invincible.
     code: 'mercenary',
     run(game, world) {
-      game.giveEverything(world);
-      const p = world.player.player;
-      p.god = true;
-      p.health = Math.max(p.health, 100);
+      loadout(game, world);
       return 'NOBODY SHOOTS BACK';
+    },
+  }),
+  defineCheat({
+    // The same as mercenary, under Raccoon Alex's old name.
+    code: 'raccoon',
+    run(game, world) {
+      loadout(game, world);
+      return 'FULL HEALTH, GOD MODE, EVERYTHING';
     },
   }),
   defineCheat({

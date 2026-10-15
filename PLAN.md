@@ -2187,3 +2187,7 @@ update the smoke test.
   rockets. Ripped DF art and sounds through the overrides, generated
   placeholders committed. One of each in the sandbox. 188 tests, the
   validator and the smoke test pass.
+- 2026-10-15: Added the `raccoon` cheat back (Mark asked): full health, god
+  mode and everything, the same as `mercenary` (they share one function).
+  The README's cheat list now matches `src/content/cheats.js`. 189 tests and
+  the validator pass.

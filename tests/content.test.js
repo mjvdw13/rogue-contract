@@ -79,14 +79,19 @@ test('the garrison is held by stormtroopers, sandtroopers, Jawas, an officer and
   assert.ok(w.things.every((t) => t.kind !== 'npc'), 'no friendlies (yet)');
 });
 
-test('the mercenary cheat gives god mode, every weapon and every keycard', () => {
-  const w = makeWorld('sandbox');
-  const game = { registry, giveEverything: Game.prototype.giveEverything };
-  const p = w.player.player;
-  for (let k = 0; k < 2; k++) {
-    registry.cheats.find((c) => c.code === 'mercenary').run(game, w);
-    assert.equal(p.god, true, 'stays on when typed again');
-  }
-  assert.deepEqual([...p.weapons].sort(), [...registry.weapons.keys()].sort());
-  assert.deepEqual([...p.keys].sort(), ['blue', 'red', 'yellow']);
-});
+for (const code of ['mercenary', 'raccoon']) {
+  test(`the ${code} cheat gives full health, god mode, every weapon and every keycard`, () => {
+    const w = makeWorld('sandbox');
+    const game = { registry, giveEverything: Game.prototype.giveEverything };
+    const p = w.player.player;
+    p.health = 12;
+    for (let k = 0; k < 2; k++) {
+      registry.cheats.find((c) => c.code === code).run(game, w);
+      assert.equal(p.god, true, 'stays on when typed again');
+    }
+    assert.equal(p.health, 100);
+    assert.deepEqual([...p.weapons].sort(), [...registry.weapons.keys()].sort());
+    assert.deepEqual([...p.keys].sort(), ['blue', 'red', 'yellow']);
+    for (const a of registry.ammo.values()) assert.equal(p.ammo[a.id], a.backpackMax);
+  });
+}

@@ -71,10 +71,10 @@ and INSOMNIA!
 E1M4 The Sewers and E1M5 Landfill of the Damned. Each level has three secrets.
 Doors marked with a blue, yellow or red badge need that badge.
 
-**Cheats** (type them during play): `iddqd` and `nap` (well rested: god mode),
-`idkfa` and `espresso` (everything), `raccoon` (god mode and everything),
-`idclip` (walk through walls), `iddt` (reveal the map), `idclev##` (warp, for
-example `idclev13` for E1M3).
+**Cheats** (type them during play): `iddqd` (god mode, toggles), `idkfa`
+(every weapon, keycard, full ammo and shields), `mercenary` and `raccoon` (full
+health, god mode and everything), `idclip` (walk through walls), `iddt` (reveal
+the map), `idclev##` (warp, for example `idclev13` for E1M3).
 
 ## Publish on GitHub Pages
 
