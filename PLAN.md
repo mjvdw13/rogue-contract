@@ -927,6 +927,8 @@ close (still crops the head, and they'd change size as you walk up).
        stays 0.6. Most walkable space is 3+ tall (doors 2).
 2. [x] Tests, validator, smoke test; a snapshot of m1 and the sandbox to
        look at. Commit and push.
+3. [x] Mark (2026-10-15): lower it to 1.25 (74% of the body, about
+       Doom's), pushed without running the tests.
 
 ## Phase 1c: Two storeys per tile (done 2026-10-13)
 
@@ -2294,3 +2296,5 @@ update the smoke test.
   visor; on-screen sizes at a distance are unchanged. Tests that assumed the
   old eye use `EYE_HEIGHT`. 189 tests, the validator and the smoke test
   pass.
+- 2026-10-15: Phase 1b R: eye height 1.5 to 1.25 (Mark asked). Pushed
+  without running the tests, as asked.

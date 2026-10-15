@@ -48,4 +48,4 @@ export const TRANSPARENT = 255;
 
 export const FOV_DEG = 90;
 /** The standing eye above the feet, on a 1.7 body: high enough that a person-sized enemy reads as your height. */
-export const EYE_HEIGHT = 1.5;
+export const EYE_HEIGHT = 1.25;
