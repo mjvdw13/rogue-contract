@@ -23,6 +23,8 @@ export default [
   defineDecoration({ id: 'boulder-large', model: 'boulder-large', solid: true, height: 1.8 }),
   defineDecoration({ id: 'boulder-small', model: 'boulder-small', solid: true, height: 0.8 }),
   defineDecoration({ id: 'floodlight-tower', model: 'floodlight-tower', solid: true, radius: 0.5, height: 7 }),
+  defineDecoration({ id: 'sensor-mast', model: 'sensor-mast', solid: true, radius: 0.45, height: 8.1 }),
+  defineDecoration({ id: 'sensor-dish', model: 'sensor-dish', spin: 0.9 }),
   defineDecoration({ id: 'ceiling-lamp', glyph: 'l', sheet: S('ceiling-lamp', 48, 16), hanging: true, fullbright: true }),
   defineDecoration({
     id: 'fuel-barrel',

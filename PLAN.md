@@ -942,7 +942,7 @@ headless Node, DF art). Budget for this phase: stay under about 8 ms.
         it past the edge of play (see Decided). A sandy floor with gravel
         channels (done), boulders (rock models, done), an overhang.
         Imperial perimeter: floodlight towers (models and light sources,
-        done), a sensor mast with a blinking light, barricades and crates by the
+        done), a sensor mast with a blinking light (done), barricades and crates by the
         gate (done). Moonlight, haze, wind, blowing dust.
 15. [ ] **The garrison's face.** A base wall with the cliff above it
         (bands), a concrete overhang over the gate strip with lights under
@@ -1881,3 +1881,11 @@ update the smoke test.
   64) a few tiles out in front: pools of light out in the bowl. The first
   masts (dark steel, thin) vanished against the cliff in shadow and left
   the lamps floating; the mast is lighter and thicker now.
+- 2026-10-15: step 14, the sensor mast. `models/sensor-mast.js` builds
+  `sensor-mast` (a thin steel mast 8 tall on a concrete footing, an
+  equipment box with a lit panel and its cable, red and white bands near
+  the top, a platform) and `sensor-dish` (a pivot, an arm, a shallow dish
+  tipped up with a feed horn), placed as a spinning decoration (`spin`, like
+  the reactor rings) on the platform. On ledge B, where the sniper
+  stands; a light source with `fx: 'blink'` at the top is the beacon,
+  lighting the rock round it on and off.
