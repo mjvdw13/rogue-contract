@@ -940,7 +940,7 @@ headless Node, DF art). Budget for this phase: stay under about 8 ms.
 14. [ ] **The canyon.** A skyline (done): the walls end in a low rim of
         rock out of reach, and a backdrop of slopes and ridges climbs from
         it past the edge of play (see Decided). A sandy floor with gravel
-        channels, boulders (rock models) and an overhang (done). Imperial
+        channels and boulders (rock models, done). Imperial
         perimeter (done): floodlight towers (models and light sources), a
         sensor mast with a turning dish and a blinking beacon, barricades
         and crates by the gate. Moonlight and haze (done, step 5). Left:
@@ -1906,3 +1906,5 @@ update the smoke test.
   (value noise, in steps of 12.5 cm). Seen from the bowl the underside
   steps and the top's silhouette is ragged. (Heights stay per tile: there
   are no sloped floors or slabs, so the surfaces step rather than slope.)
+- 2026-10-15: the overhang taken out (Mark: he doesn't like it). The start
+  bowl's east wall is a plain cliff again. Step 14 has no overhang.
