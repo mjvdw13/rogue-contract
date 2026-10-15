@@ -911,6 +911,23 @@ about 8.5k of them end up on screen. Keep fixes simple.
        Frame time grows with the window's width: a 1536x730 window is 548
        columns, against 427 at 16:9 and 320 with widescreen off.
 
+### R. Eye height (done 2026-10-15)
+
+Mark (2026-10-15): enemies look too tall when you stand next to them, and
+sprites seem to float a bit. The cause is the eye: 1.0 unit, on a 1.7 body
+(59% of its height; Doom's is 73%, a person's about 93%). A stormtrooper is
+drawn 1.78 tall, so the horizon crosses it at the waist and its head is 0.78
+above your eye; and so little floor shows below the horizon that sprites'
+feet barely read as touching it. Rejected: smaller enemy sprites (they'd
+shrink against the walls at every distance) and squashing sprites only up
+close (still crops the head, and they'd change size as you walk up).
+
+1. [x] `EYE_HEIGHT` 1 to 1.5 (88% of the body). On-screen sizes at a distance
+       don't change; the horizon crosses enemies at the visor. Crouching eye
+       stays 0.6. Most walkable space is 3+ tall (doors 2).
+2. [x] Tests, validator, smoke test; a snapshot of m1 and the sandbox to
+       look at. Commit and push.
+
 ## Phase 1c: Two storeys per tile (done 2026-10-13)
 
 Mark (2026-10-13): we want to walk underneath other parts of the map. Today
@@ -2271,3 +2288,9 @@ update the smoke test.
   march stops where the ray leaves its grid. Same pixels (18 snapshots);
   m1 start 13 to 7.7 ms headless, about 17 to 13.5 ms in Chrome. 189 tests,
   the validator and the smoke test pass.
+- 2026-10-15: Phase 1b R: eye height 1 to 1.5. Enemies looked too tall up
+  close and sprites seemed to float: the eye was at 59% of the 1.7 body, so
+  the horizon crossed a stormtrooper at the waist. Now it crosses at the
+  visor; on-screen sizes at a distance are unchanged. Tests that assumed the
+  old eye use `EYE_HEIGHT`. 189 tests, the validator and the smoke test
+  pass.
