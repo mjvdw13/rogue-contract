@@ -57,6 +57,14 @@ p.rect(6, 76, 30, 96, sand(0, { light: 152 }));
 p.chamfer(6, 76, 30, 96, 4, rock, ['SW', 'SE', 'NW']);
 p.rect(2, 80, 5, 84, sand(0, { secret: true, light: 112 }));
 p.rect(5, 80, 6, 84, { door: 'sandstone', secret: true, floor: 'desert-sand', ceiling: 'sky', floorZ: 0, ceilZ: 8, light: 112 });
+// An overhang along the bowl's east wall, 2.25 m up and 1.5 m thick: the
+// cliff juts out over the sand 1 to 2.5 m (deepest in the middle, ragged
+// along its edge), in its own shadow underneath (a slab out of reach).
+const overhang = { bottom: 4.5, top: 7.5, floor: 'desert-sand', ceiling: 'sandstone-dark', side: 'sandstone', light: 104 };
+for (let y = 80; y < 91; y++) {
+  const deep = Math.min(Math.min(y - 79, 91 - y) + 1, 3 + Math.round(valueNoise(0, y, 3, 31) * 2));
+  p.rect(30 - deep, y, 30, y + 1, (x, yy, old) => (old.wall ? old : { ...old, slab: overhang }));
+}
 
 // 2. The gorge, winding north-east: narrow, so the moon barely reaches in.
 p.rect(14, 60, 34, 76, sand(0, { light: 136 }));

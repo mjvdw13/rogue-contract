@@ -940,10 +940,12 @@ headless Node, DF art). Budget for this phase: stay under about 8 ms.
 14. [ ] **The canyon.** A skyline (done): the walls end in a low rim of
         rock out of reach, and a backdrop of slopes and ridges climbs from
         it past the edge of play (see Decided). A sandy floor with gravel
-        channels (done), boulders (rock models, done), an overhang.
-        Imperial perimeter: floodlight towers (models and light sources,
-        done), a sensor mast with a blinking light (done), barricades and crates by the
-        gate (done). Moonlight, haze, wind, blowing dust.
+        channels, boulders (rock models) and an overhang (done). Imperial
+        perimeter (done): floodlight towers (models and light sources), a
+        sensor mast with a turning dish and a blinking beacon, barricades
+        and crates by the gate. Moonlight and haze (done, step 5). Left:
+        wind and blowing dust, with emitters and ambient sound (steps 9
+        and 10).
 15. [ ] **The garrison's face.** A base wall with the cliff above it
         (bands), a concrete overhang over the gate strip with lights under
         it (a slab), the gate in a deep frame with hazard stripes, the
@@ -1889,3 +1891,11 @@ update the smoke test.
   the reactor rings) on the platform. On ledge B, where the sniper
   stands; a light source with `fx: 'blink'` at the top is the beacon,
   lighting the rock round it on and off.
+- 2026-10-15: step 14, the overhang. Along the start bowl's east wall the
+  cliff juts out over the sand, 2.25 m up and 1.5 m thick, 1 to 2.5 m
+  deep (deepest in the middle, ragged along its edge): a slab out of
+  reach, in its own shadow underneath. A first try 0.75 m thick read as a
+  thin shelf from the start; thicker, it reads as rock. Step 14's art is
+  done but for wind and blowing dust, which wait for steps 9 and 10.
+  Frame time on canyon views (headless, 4:3, DF art): 3.3 to 3.5 ms
+  before step 14's props, 3.6 to 4.1 ms after.
