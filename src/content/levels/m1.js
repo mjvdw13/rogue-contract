@@ -82,6 +82,9 @@ p.stairs(57, 54, 62, 59, 'N', 0.5, 0.5, (z) => sand(z));
 
 // The strip along the garrison's face, in its shadow.
 p.rect(26, 40, 70, 44, sand(0, { light: 120 }));
+// Floodlight towers on the bowl's north corners (things below) light it
+// from above the strip: each throws a pool of light out into the bowl.
+lamps.push({ x: 34.5, y: 48.5, z: 3, radius: 8, light: 64 }, { x: 52.5, y: 48, z: 3, radius: 8, light: 64 });
 
 // ---------------------------------------------------------------- the garrison
 // Everything inside is Imperial wall until carved out.
@@ -380,6 +383,7 @@ const list = [
   // (one half hides the vent mouth).
   at('barricade', 43, 46, { angle: 250 }), at('barricade', 53, 46, { angle: 290 }),
   at('barricade', 37.5, 47.5, { angle: 270 }),
+  at('floodlight-tower', 31.5, 45.5, { angle: 315 }), at('floodlight-tower', 56, 44.8, { angle: 225 }),
   at('supply-crate', 58.5, 41.2), at('supply-crate', 59.9, 41.4), at('supply-crate', 59, 42.6),
   at('supply-crate', 38.2, 41.2), at('supply-crate', 35.3, 41),
   // Boulders fallen from the walls, along their feet and off the way through.

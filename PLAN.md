@@ -941,8 +941,8 @@ headless Node, DF art). Budget for this phase: stay under about 8 ms.
         rock out of reach, and a backdrop of slopes and ridges climbs from
         it past the edge of play (see Decided). A sandy floor with gravel
         channels (done), boulders (rock models, done), an overhang.
-        Imperial perimeter: floodlight towers (models and light sources),
-        a sensor mast with a blinking light, barricades and crates by the
+        Imperial perimeter: floodlight towers (models and light sources,
+        done), a sensor mast with a blinking light, barricades and crates by the
         gate (done). Moonlight, haze, wind, blowing dust.
 15. [ ] **The garrison's face.** A base wall with the cliff above it
         (bands), a concrete overhang over the gate strip with lights under
@@ -1873,3 +1873,11 @@ update the smoke test.
   try read as masonry), the top `sandstone-pale`. Ten along the walls'
   feet in the start bowl, the gorge and the bowl, off the way through.
   The angled rock pillars are left out: the models do the job.
+- 2026-10-15: step 14, floodlight towers. A `floodlight-tower` model: a
+  tapered steel mast 6.6 tall on a base plate, braced and banded yellow at
+  its foot, a crossbar with two lamp heads tilted down (glowing lenses) and
+  a red warning light on top. Two on the bowl's north corners, by the
+  strip, facing into the bowl, each with a light source (radius 8, light
+  64) a few tiles out in front: pools of light out in the bowl. The first
+  masts (dark steel, thin) vanished against the cliff in shadow and left
+  the lamps floating; the mast is lighter and thicker now.
