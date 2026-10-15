@@ -61,6 +61,17 @@ for (const level of registry.levels.values()) {
   });
 }
 
+test('m1: the overload opens the escape hatch for good', () => {
+  const w = makeWorld('m1', { noMonsters: true });
+  const i = 43 * w.map.w + 93; // the overload switch
+  assert.ok(w.map.uses.has(i));
+  w._useSwitch(i, 93, 43);
+  run(w, mockInput(), 30);
+  const hatch = w.map.doors.filter((d) => d.tag === 'escape');
+  assert.ok(hatch.length);
+  for (const d of hatch) assert.equal(d.state, 'open');
+});
+
 test('the garrison is held by stormtroopers, sandtroopers, Jawas, an officer and a probe droid', () => {
   const w = makeWorld('sandbox');
   const ids = w.things.filter((t) => t.kind === 'monster').map((t) => t.def.id);

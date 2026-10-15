@@ -583,7 +583,13 @@ Door options:
 - `secret: true`: the door looks exactly like the wall around it (give it that
   wall's texture), stays open, and hides from the automap and from monsters
   until it's found.
-- `lock: 'remote'`: only triggers can open the door.
+- `lock: 'remote'`: only triggers can open the door. Like any door it shuts
+  again after `wait` seconds, and the player can't reopen it, so a remote
+  door opened once (a one-shot switch or trigger) on the way through needs
+  `stayOpen: true`. The level checker counts a remote door as passable only
+  if it stays open, or if what opens it can be used again (`repeat` on a
+  switch, `once: false` on a trigger).
+- `stayOpen: true`: once open, the door stays open.
 - `speed`: how much of the door opens (or closes) per second, default 3.5:
   under 0.3 seconds, Star Wars-fast.
 - `wait`, `tag` and `sounds` are also available.

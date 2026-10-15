@@ -233,8 +233,9 @@ p.rect(93, 43, 94, 45, {
   ],
 });
 
-// 14. The escape hatch in the east wall, opened by the overload switch.
-p.rect(108, 43, 109, 45, door(6, { lock: 'remote', tag: 'escape', ...tallSide }));
+// 14. The escape hatch in the east wall, opened by the overload switch
+// (once, so it stays open: shut, the way out would be sealed).
+p.rect(108, 43, 109, 45, door(6, { lock: 'remote', tag: 'escape', stayOpen: true, ...tallSide }));
 
 // ---------------------------------------------------------------- the way out
 // 15. The gantry: stairs up to 8, out under the sky.

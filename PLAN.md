@@ -296,6 +296,13 @@ Design rules (what makes it feel like Dark Forces):
        - [x] A per-skill table in `docs/mission1.md`; the validator's
              counts, map viewer at skills 1, 3 and 5, tests, smoke test.
 5. [ ] Validator, map viewer and screenshot review, then playtest.
+       - [x] Playtest bug (Mark, 2026-10-15): the escape hatch shut again
+             a few seconds after the overload opens it, and stays
+             remote-locked, so the way out is sealed. The hatch stays open
+             (`stayOpen`). The level checker counted it as passable because
+             a switch opens it: a remote door now counts only if it stays
+             open or what opens it can be used again. A test pulls the
+             overload switch and checks the hatch is still open later.
 
 ### C. Better placeholder textures, and an import pipeline (after B)
 
@@ -1908,3 +1915,14 @@ update the smoke test.
   are no sloped floors or slabs, so the surfaces step rather than slope.)
 - 2026-10-15: the overhang taken out (Mark: he doesn't like it). The start
   bowl's east wall is a plain cliff again. Step 14 has no overhang.
+- 2026-10-15: playtest fix, the escape hatch (Mark: the door in the reactor
+  room wouldn't open). The overload switch opened it, but like any door it
+  shut after 4 seconds, and being remote-locked it couldn't be opened again:
+  by the time you'd ridden the lift back up to the ring, the way out was
+  sealed. The hatch has `stayOpen` now. The level checker had passed it
+  because a switch opens it; a remote door now counts as passable only if it
+  stays open or what opens it can be used again (a `repeat` switch, a
+  `once: false` trigger), and without the fix it reports Mission 1's exit
+  unreachable. A new test pulls the overload switch and checks the hatch is
+  still open 30 seconds later. MODDING.md updated. 176 tests, the validator
+  and the smoke test pass.
