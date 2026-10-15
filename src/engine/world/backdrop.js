@@ -71,6 +71,13 @@ export class Backdrop {
     return a + (b - a) * v;
   }
 
+  /** How far a ray from (x, y) along (dx, dy) goes before it leaves the grid (in multiples of (dx, dy)). */
+  exit(x, y, dx, dy) {
+    const tx = dx > 0 ? (this.x0 + this.w * this.cell - x) / dx : dx < 0 ? (this.x0 - x) / dx : Infinity;
+    const ty = dy > 0 ? (this.y0 + this.h * this.cell - y) / dy : dy < 0 ? (this.y0 - y) / dy : Infinity;
+    return tx < ty ? tx : ty;
+  }
+
   /** The light at (x, y) (the nearest corner's). */
   lightAt(x, y) {
     const i = Math.round((x - this.x0) / this.cell);

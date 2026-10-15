@@ -74,8 +74,9 @@ const wSt = new Uint8Array(MAX_WIN);
  * Decals (world/decals.js) are drawn over the wall and step faces they're
  * on, clipped to each face.
  *
- * Where the sky shows, a level's backdrop (render/backdrop.js) is drawn in
- * its place, a column at a time when it first shows.
+ * Where the sky shows, a level's backdrop (render/backdrop.js) is drawn over
+ * it: the sky's rows are marked as they're drawn, and once the column's
+ * surfaces are done the backdrop is drawn into just those rows.
  *
  * Fences (see-through walls on tile edges) don't stop the ray: each one it
  * crosses is noted with the rows still open at that point, and once the
@@ -194,11 +195,13 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
       sdy = (mapY + 1 - py) * ddy;
     }
     const skyCol = sky ? view.skyU[x] : 0;
-    // The backdrop's column, drawn the first time this column shows sky.
-    let bdDone = false;
-    const skyBackdrop = () => {
-      drawBackdropColumn(view, backdrop, textures, colormaps, bdBuf, fbW, x, rdx, rdy, thr);
-      bdDone = true;
+    // The rows that show sky (marked in bdBuf), for the backdrop.
+    let skyLo = H;
+    let skyHi = 0;
+    const markSky = (a, b) => {
+      if (a < skyLo) skyLo = a;
+      if (b > skyHi) skyHi = b;
+      for (let o = a * fbW + x; a < b; a++, o += fbW) bdBuf[o] = 1;
     };
 
     // The window being worked on (loaded from and stored back to wTop / wBot).
@@ -377,12 +380,8 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
         if (b > clipBot) b = clipBot;
         if (b > a) {
           if (flags[i] & F_SKY && (s || !slab)) {
-            if (backdrop && !bdDone) skyBackdrop();
+            if (backdrop) markSky(a, b);
             for (let y = a, o = a * fbW + x; y < b; y++, o += fbW) {
-              if (backdrop && bdBuf[o] !== TRANSPARENT) {
-                fb[o] = bdBuf[o];
-                continue;
-              }
               if (!sky) {
                 fb[o] = 0;
                 continue;
@@ -452,12 +451,8 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
     const skyFill = (a, b) => {
       if (a < clipTop) a = clipTop;
       if (b > clipBot) b = clipBot;
-      if (backdrop && !bdDone && b > a) skyBackdrop();
+      if (backdrop && b > a) markSky(a, b);
       for (let y = a, o = a * fbW + x; y < b; y++, o += fbW) {
-        if (backdrop && bdBuf[o] !== TRANSPARENT) {
-          fb[o] = bdBuf[o];
-          continue;
-        }
         if (!sky) {
           fb[o] = 0;
           continue;
@@ -795,6 +790,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
 
     zbuf[x] = end;
     segCount[x] = nseg;
+    if (skyHi > skyLo) drawBackdropColumn(view, backdrop, textures, colormaps, fb, bdBuf, fbW, x, rdx, rdy, thr, skyLo, skyHi);
     if (nf) {
       if (!view.depthValid) {
         mdepth.fill(Infinity);

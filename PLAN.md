@@ -888,6 +888,29 @@ IDDOOR1's inner panel is rows 8-60 of 64 (centre 34, not 31.5), with an
        now has an even edge top and bottom, the dark seam at the floor.
        Tests, validator, smoke test pass. Commit.
 
+### Q. Canyon frame time (2026-10-15)
+
+Mark (2026-10-15): the canyon start runs a bit slow on this computer.
+Measured in Chrome at the m1 start (506 columns, 1536x730 window): the 3D
+view takes about 16 ms a frame, everything else (update, HUD, present)
+under 1 ms. Headless, the backdrop is about half of that: it fills each
+column top to bottom (98k pixels a frame) when sky first shows, and only
+about 8.5k of them end up on screen. Keep fixes simple.
+
+1. [x] Draw the backdrop at the end of each column, only into the rows
+       that showed sky (marked in `view.bdBuf` as the sky is drawn).
+2. [x] Stop the backdrop's march where the ray leaves its grid
+       (`Backdrop.exit`), not at `far` (256 tiles).
+3. [x] Measured again: 18 snapshots of the canyon (6 spots, 3 pitches) are
+       byte-identical before and after. Headless at 506 columns: 13 ms to
+       7.7 ms. Chrome at 548 columns, old and new side by side: about 17 ms
+       to 13.5 ms (this machine is noisy, plus or minus 1.5 ms).
+4. What's left, not done (no cheap, plain fix): floors and ceilings
+       (the per-pixel loops in `flats`) are about a third of the frame; the
+       backdrop's march still costs 2 to 3 ms in Chrome (0.5 ms headless).
+       Frame time grows with the window's width: a 1536x730 window is 548
+       columns, against 427 at 16:9 and 320 with widescreen off.
+
 ## Phase 1c: Two storeys per tile (done 2026-10-13)
 
 Mark (2026-10-13): we want to walk underneath other parts of the map. Today
@@ -2242,3 +2265,9 @@ update the smoke test.
   texels low in its image (8-row dark edge on top, 3 rows of bevel below);
   `textures.mjs` rolls it up 3 rows before the key panels go on, and the four
   door textures are re-cut. 189 tests, the validator and the smoke test pass.
+- 2026-10-15: Phase 1b Q: canyon frame time. The backdrop filled every
+  column top to bottom (98k pixels a frame, about 8.5k shown); now the sky's
+  rows are marked and it draws only those, once the column is done, and its
+  march stops where the ray leaves its grid. Same pixels (18 snapshots);
+  m1 start 13 to 7.7 ms headless, about 17 to 13.5 ms in Chrome. 189 tests,
+  the validator and the smoke test pass.

@@ -74,7 +74,7 @@ export class View {
      */
     this.mdepth = new Float32Array(this.W * this.H);
     this.depthValid = false;
-    /** The backdrop's pixels, for the columns that show sky this frame (render/backdrop.js). */
+    /** Marks the rows of a column that show sky, for the backdrop (render/backdrop.js); all 0 between columns. */
     this.bdBuf = new Uint8Array(this.W * this.H);
   }
 
