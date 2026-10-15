@@ -17,6 +17,8 @@ assets/custom/*
 !assets/custom/blaster.png
 !assets/custom/textures.mjs
 !assets/custom/textures/
+# The whole Dark Forces texture pack, sorted by what each texture shows.
+!assets/custom/df-textures/
 # (Recolouring the cut sheets, and deriving more textures from the DF ones.)
 !assets/custom/recolour.mjs
 !assets/custom/derive.mjs

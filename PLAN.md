@@ -692,6 +692,28 @@ Decided:
              full IDJAMPNL as `imp-gate-jamb`.
        - [x] Screenshots, tests, the validator and smoke test.
 
+### M. The whole Dark Forces texture pack in the repo (done 2026-10-15)
+
+Mark (2026-10-15): unpack the whole "MS-DOS - Star Wars_ Dark Forces -
+Miscellaneous - Textures" zip into the repo, sorted by what each texture
+shows rather than by level. Until now only the ~25 textures that
+`textures.mjs` uses were committed (as the 32 game textures); the pack
+itself lived outside the repo.
+
+1. [x] Unpack into the scratchpad; list duplicate names across level
+       folders and whether their pixels match.
+2. [x] Contact sheets per level folder; look at every texture and give it
+       a category (walls, doors, floors, switches, rock and so on).
+3. [x] Copy into `assets/custom/df-textures/<category>/NAME.png`; one file
+       per texture (identical duplicates once; different ones kept with a
+       suffix).
+4. [x] `assets/custom/df-textures/INDEX.md`: every texture with its size,
+       category and the level folders it came from.
+5. [x] `.gitignore` exception; `textures.mjs` reads the committed folder by
+       default; README and DISCLAIMER mention it.
+6. [x] Re-run `textures.mjs` against the new folder: the 32 game textures
+       come out byte-identical. Commit.
+
 ## Phase 1c: Two storeys per tile (done 2026-10-13)
 
 Mark (2026-10-13): we want to walk underneath other parts of the map. Today
@@ -1993,3 +2015,17 @@ update the smoke test.
   else x), fixed to the world like a wall's. Checked from the start bowl,
   gorge, bowl and landing pad at every 30 degrees and all four diagonals.
   1 new test (184).
+- 2026-10-15: Phase 1b M, the whole Dark Forces texture pack in the repo
+  (Mark: unpack it, sorted by what the textures show). The zip's 918 PNGs
+  are 916 textures in `assets/custom/df-textures/`, in 24 folders by
+  content: walls 189, floors-ceilings 149, machinery 83, doors 76, lights
+  55, computers-screens 55, grates-bars 37, switches-keys 37, door-frames
+  29, stone-brick 28, signs-insignia 28, trims-strips 26, damaged 24,
+  hazard-stripes 21, natural 19, sky 11, crates 10, ships 7, windows 7,
+  3d-models 6, lifts 5, liquids 5, other 5, forcefields 4. Each was looked
+  at on contact sheets. Gromas' recoloured generic textures are kept as
+  `NAME_GROMAS`; two identical duplicates are kept once; `ZCSQUAR1` keeps
+  both of the pack's versions. `INDEX.md` lists every texture with its size
+  and the level folders it came from. `textures.mjs` reads the folder by
+  default (no argument), and re-running it writes the 32 game textures
+  byte-identical. README and DISCLAIMER updated.

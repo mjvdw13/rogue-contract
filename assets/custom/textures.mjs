@@ -3,10 +3,11 @@
 // overrides.json. Switches and key doors are DF wall and door art with DF's
 // small switch and key panels laid on top. See DISCLAIMER.md.
 //
-//   node assets/custom/textures.mjs "<the pack's Textures folder>"
+//   node assets/custom/textures.mjs [<a folder of DF textures>]
 //
-// The folder is the "Textures" folder from the "MS-DOS - Star Wars_ Dark
-// Forces - Miscellaneous - Textures" zip (subfolders per level; the script
+// The folder defaults to df-textures/, the whole "MS-DOS - Star Wars_ Dark
+// Forces - Miscellaneous - Textures" pack sorted by what each texture shows
+// (the zip's own "Textures" folder, sorted by level, works too: the script
 // finds each file by name). Dark Forces draws about 8 texels per foot, close
 // enough to the game's 32 per unit that textures keep their own size.
 import fs from 'node:fs';
@@ -15,8 +16,7 @@ import { fileURLToPath } from 'node:url';
 import { decodePNG, encodePNG } from '../../tools/art/lib/png.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const dir = process.argv[2];
-if (!dir) throw new Error('usage: node assets/custom/textures.mjs <the pack\'s Textures folder>');
+const dir = process.argv[2] ?? path.join(here, 'df-textures');
 
 /** Every PNG under the pack, by upper-case name without the extension. */
 const files = new Map();

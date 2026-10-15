@@ -63,12 +63,18 @@ with one from the Dark Forces texture pack ("MS-DOS - Star Wars_ Dark Forces
 - Miscellaneous - Textures" zip), writing them to `textures/` and adding
 their entries to `overrides.json`. The picks are in the script's `TEXTURES`
 table. Switches and key doors are composited: Dark Forces wall or door art
-with its small switch or key panel laid on top. Give it the zip's
-`Textures` folder:
+with its small switch or key panel laid on top:
 
 ```
-node assets/custom/textures.mjs "<the pack's Textures folder>"
+node assets/custom/textures.mjs
 ```
+
+It reads `df-textures/`: the whole pack (916 textures), sorted into folders
+by what each texture shows (doors, door frames, walls, floors and ceilings,
+lights, switches, rock and so on) rather than by level.
+`df-textures/INDEX.md` lists every texture with its size and the level
+folders it came from. To use another texture, look it up there and add it
+to the `TEXTURES` table by name; the script finds it in any folder.
 
 ## The sandtrooper
 
