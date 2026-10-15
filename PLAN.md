@@ -1984,3 +1984,12 @@ update the smoke test.
   ms a tick for the glint light with three flashes, rendering within noise.
   MODDING.md, the validator, 7 new tests (183); the validator and smoke test
   pass.
+- 2026-10-15: fixed the backdrop's smearing (Mark: artifacts at some
+  angles). Its texture column was x + y along the ray, the same for
+  neighbouring columns when looking along the x = y diagonal, so the rock
+  smeared into horizontal stripes and V shapes there (and was over-busy
+  the other way). Now each corner of the grid notes which way its slope
+  faces, and the texture runs along the face (y where it faces along x,
+  else x), fixed to the world like a wall's. Checked from the start bowl,
+  gorge, bowl and landing pad at every 30 degrees and all four diagonals.
+  1 new test (184).

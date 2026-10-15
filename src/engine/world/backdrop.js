@@ -32,6 +32,9 @@ export class Backdrop {
     const base = def.light ?? 150;
     const cw = this.w + 1;
     this.light = new Uint8Array(cw * (this.h + 1));
+    // Which way each corner's slope faces: 1 if more along x (its texture
+    // then runs along y, as on a wall), else 0.
+    this.facesX = new Uint8Array(cw * (this.h + 1));
     for (let j = 0; j <= this.h; j++) {
       for (let i = 0; i <= this.w; i++) {
         const hx = (this._corner(i + 1, j) - this._corner(i - 1, j)) / (2 * this.cell);
@@ -40,6 +43,7 @@ export class Backdrop {
         const lit = Math.max(0, (-hx * mx - hy * my + mz) / (nl * ml));
         // (The slope's shading is what makes it read as ground going back.)
         this.light[j * cw + i] = Math.max(0, Math.min(255, base * (0.62 + 0.55 * lit)));
+        this.facesX[j * cw + i] = Math.abs(hx) > Math.abs(hy) ? 1 : 0;
       }
     }
   }
@@ -72,6 +76,17 @@ export class Backdrop {
     const i = Math.round((x - this.x0) / this.cell);
     const j = Math.round((y - this.y0) / this.cell);
     return this.light[(j < 0 ? 0 : j > this.h ? this.h : j) * (this.w + 1) + (i < 0 ? 0 : i > this.w ? this.w : i)];
+  }
+
+  /**
+   * The texture's column coordinate (in tiles) at (x, y): along the face, so
+   * it's fixed to the world whichever way it's seen from (y where the slope
+   * there faces along x, else x).
+   */
+  faceU(x, y) {
+    const i = Math.round((x - this.x0) / this.cell);
+    const j = Math.round((y - this.y0) / this.cell);
+    return this.facesX[(j < 0 ? 0 : j > this.h ? this.h : j) * (this.w + 1) + (i < 0 ? 0 : i > this.w ? this.w : i)] ? y : x;
   }
 
   /** The texture for faces at height z. */

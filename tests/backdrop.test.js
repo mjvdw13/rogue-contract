@@ -31,6 +31,17 @@ test('slopes facing the moon are lit brighter', () => {
   assert.ok(west.lightAt(0, 0) > east.lightAt(0, 0));
 });
 
+test('the texture runs along a face, fixed to the world whichever way it is seen', () => {
+  // The ramp faces west, so its texture runs along y, like a wall's.
+  const bd = new Backdrop(ramp(), () => 0);
+  assert.equal(bd.faceU(0.5, 1.25), 1.25);
+  assert.equal(bd.faceU(-1, -0.75), -0.75);
+  // Turned to face north, it runs along x.
+  const heights = [];
+  for (let j = 0; j <= 4; j++) for (let i = 0; i <= 4; i++) heights.push(j * 2);
+  assert.equal(new Backdrop({ ...ramp(), heights }, () => 0).faceU(0.5, 1.25), 0.5);
+});
+
 test('a bad backdrop is a level error', () => {
   assert.deepEqual(checkBackdrop(ramp()), []);
   const errors = checkBackdrop({ ...ramp(), heights: [1, 2], tex: undefined });

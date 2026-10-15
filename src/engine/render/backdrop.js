@@ -35,7 +35,7 @@ export function drawBackdropColumn(view, bd, textures, colormaps, out, fbW, x, r
         if (top < 0) top = 0;
         const lv = fixed >= 0 ? fixed : view.levelF(bd.lightAt(wx, wy), t) - (hazeOn ? t * view.fog : 0);
         const hz = hazeOn && fixed < 0 ? view.hazeF(t) : 0;
-        const u = ((wx + wy) * TPU) | 0;
+        const u = (bd.faceU(wx, wy) * TPU) | 0;
         const zStep = t / fy;
         let z = camZ - (top + 0.5 - horizon) * zStep;
         for (let y = top, o = top * fbW + x; y < ybuf; y++, o += fbW, z -= zStep) {
