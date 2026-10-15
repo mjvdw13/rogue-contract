@@ -135,8 +135,8 @@
   "assets/sprites/monsters/boba-fett.png": {
     "src": "assets/custom/boba-fett.png",
     "frameWidth": 90,
-    "frameHeight": 86,
-    "scale": 0.7
+    "frameHeight": 91,
+    "scale": 0.65
   },
   "assets/sprites/fx/rocket.png": {
     "src": "assets/custom/rocket.png",

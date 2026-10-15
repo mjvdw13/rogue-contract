@@ -45,7 +45,9 @@ Delete `overrides.json`, or an entry in it, to go back to the committed art.
 
 `cut.mjs` cuts the ripped Dark Forces stormtrooper, Imperial officer, probe
 droid and Trandoshan (Bossk) sheets into the game's 12-frame monster layout,
-Boba Fett and his rocket into theirs (six frames each), and the weapons
+Boba Fett into the same with an 11th frame (his fall is four frames, and
+his walk is made from the standing cell, as he only flies in Dark Forces),
+his rocket into its own six frames, and the weapons
 sheet into the fists and the blaster (the Bryar pistol). It adds their
 entries to `overrides.json`, keeping keys added by hand (`glint`, `glow`).
 Give it the folder the sheets are in (their file names are listed in the

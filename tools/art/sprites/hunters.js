@@ -4,11 +4,11 @@
 //
 // Sheet layouts (64x64 frames), matching src/content/monsters/*.js:
 //   Bossk: walk 0-3, aim 4, fire 5, pain 6, death 7-11
-//   Boba Fett: hover 0, fire 1, death 2-5 (frame 2 doubles as pain)
+//   Boba Fett: walk 0-3, aim 4, fire 5, pain 6, death 7-10
 import { C, G } from '../lib/pal.js';
 import { Model, MAT, body } from '../lib/rig.js';
 import { sheet, flash } from '../lib/sprite.js';
-import { M, RENDER, W, H, BLACK, GUNMETAL, ARMOR, pose, rifle, fall, humanSheet } from './imperials.js';
+import { M, RENDER, W, H, BLACK, GUNMETAL, ARMOR, STRIDE, pose, rifle, fall, humanSheet } from './imperials.js';
 
 // ------------------------------------------------------------------ Boba Fett
 
@@ -62,7 +62,7 @@ const BOBA = {
   },
 };
 
-// The flying stance: legs apart, knees bent, the jetpack holding him up.
+// His fighting stance: legs apart, knees bent.
 const STANCE = { legL: { thigh: 10, knee: 26, spread: 26 }, legR: { thigh: -4, knee: 20, spread: 24 }, crouch: 1 };
 
 function bobaFrame(p, { held = 'port', fire = false } = {}) {
@@ -77,8 +77,10 @@ function bobaFrame(p, { held = 'port', fire = false } = {}) {
 function bobaSheet() {
   const falling = fall(bobaFrame({ grip: 'hurt', lean: -2 }, { held: 'none' }).c);
   return sheet([
-    bobaFrame(STANCE).c,
+    ...STRIDE.map((s) => bobaFrame(s).c),
+    bobaFrame({ ...STANCE, grip: 'aim' }, { held: 'aim' }).c,
     bobaFrame({ ...STANCE, grip: 'aim' }, { held: 'aim', fire: true }).c,
+    falling[0],
     falling[0], falling[2], falling[3], falling[4],
   ]);
 }

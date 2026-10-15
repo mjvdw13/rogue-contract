@@ -90,15 +90,23 @@ const SHEETS = [
   {
     // Boba Fett, from the separate cells of his zip (unpack it into the
     // folder). Only two poses face the viewer: standing (000) and the
-    // legs-apart stance he flies in (001). Firing is the stance with his
-    // fireball (BOBABALL 000) at the gun. Dark Forces drew him big (2.3
-    // units at the others' scale), so he's scaled down to 1.83.
+    // legs-apart stance he flies in (001). In Dark Forces he never walks, so
+    // the walk is the standing pose with one knee and then the other lifted.
+    // He aims in the stance, and fires with his fireball (BOBABALL 000) at
+    // the gun. Dark Forces drew him big (2.3 units at the others' scale), so
+    // he's scaled down to 1.83.
     cells: {
       folder: 'BOBAFETT.cells',
-      list: ['001.PNG', { file: '001.PNG', over: [{ file: 'BOBABALL.cells/000.PNG', x: 58, y: 34 }] }, '002.PNG', '003.PNG', '004.PNG', '005.PNG'],
+      list: [
+        '000.PNG', { file: '000.PNG', lift: { x: [0, 20], y: 57, by: 5 } },
+        '000.PNG', { file: '000.PNG', lift: { x: [21, 44], y: 57, by: 5 } },
+        '001.PNG', { file: '001.PNG', over: [{ file: 'BOBABALL.cells/000.PNG', x: 58, y: 34 }] },
+        '002.PNG', // pain: the first frame of the fall
+        '002.PNG', '003.PNG', '004.PNG', '005.PNG',
+      ],
     },
     asset: 'boba-fett',
-    scale: 0.7,
+    scale: 0.65,
   },
   {
     // Boba Fett's fireball: in flight (000-002, facing the viewer) and its
@@ -113,11 +121,27 @@ const SHEETS = [
  * Lays separate cells (one PNG per frame, transparent round the figure) side
  * by side on a pure blue strip, so they cut like a sheet. `align` 'bottom'
  * stands figures on one line; 'middle' centres them (projectiles). A cell's
- * `over` lays other cells on it, centred at (x, y).
+ * `over` lays other cells on it, centred at (x, y), and its `lift` moves the
+ * columns x[0]..x[1] from row y down up by `by` pixels (a leg lifted at the
+ * knee: the rows above are drawn over, the foot leaves the floor).
  */
 function strip({ folder, list, align = 'bottom' }) {
   const load = (file) => decodePNG(fs.readFileSync(path.join(dir, folder, file)));
-  const cells = list.map((c) => (typeof c === 'string' ? { file: c } : c)).map((c) => ({ img: load(c.file), over: (c.over ?? []).map((o) => ({ ...o, img: load(o.file) })) }));
+  const lift = (img, { x: [x0, x1], y, by }) => {
+    const data = new Uint8Array(img.data);
+    for (let x = x0; x <= Math.min(x1, img.width - 1); x++) {
+      for (let yy = y - by; yy < img.height; yy++) {
+        const from = yy + by;
+        const i = (yy * img.width + x) * 4;
+        if (from < img.height) data.set(img.data.subarray((from * img.width + x) * 4, (from * img.width + x) * 4 + 4), i);
+        else data.fill(0, i, i + 4);
+      }
+    }
+    return { ...img, data };
+  };
+  const cells = list
+    .map((c) => (typeof c === 'string' ? { file: c } : c))
+    .map((c) => ({ img: c.lift ? lift(load(c.file), c.lift) : load(c.file), over: (c.over ?? []).map((o) => ({ ...o, img: load(o.file) })) }));
   const H = Math.max(...cells.map((c) => c.img.height));
   const W = cells.reduce((w, c) => w + c.img.width + 1, 0);
   const data = new Uint8Array(W * H * 4);
@@ -254,5 +278,7 @@ if (fs.existsSync(path.join(dir, WEAPON_SHEET))) {
     overrides[key] = { ...overrides[key], ...cutWeapon(weapon) };
   }
 } else console.log(`skipped the weapons: no "${WEAPON_SHEET}"`);
-fs.writeFileSync(overridesFile, JSON.stringify(overrides, null, 2) + '\n');
+// Lists of numbers, and lists of those (colours), stay on one line.
+const inline = (json) => json.replace(/\[\s*((?:-?[\d.]+|\[[^[\]]*\])(?:,\s*(?:-?[\d.]+|\[[^[\]]*\]))*)\s*\]/g, (_, items) => `[${items.replace(/\s+/g, '').replace(/,/g, ', ')}]`);
+fs.writeFileSync(overridesFile, inline(JSON.stringify(overrides, null, 2)) + '\n');
 console.log('updated overrides.json');

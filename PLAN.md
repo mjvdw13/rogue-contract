@@ -846,6 +846,30 @@ Decided:
 5. [ ] Later, Mark's call: where they appear in the story, and Boba's
        other angles once enemies are drawn from several (Phase 2).
 
+Mark (2026-10-15): Boba should walk around instead of flying. His cells
+have no walk (in Dark Forces he only flies), so the walk is made from the
+standing cell (000): stand, left knee up, stand, right knee up, the leg
+below the hip lifted 5 pixels (thigh rows overdrawn, so the knee rises and
+the foot leaves the floor). He goes on to the usual layout like Bossk:
+walk 0-3, aim 4 (the stance, 001), fire 5 (the stance with the fireball),
+pain 6 (the first frame of the fall), death 7-10 (the four-frame fall).
+No longer `flying`; speed 4.8, a little quicker than a trooper.
+
+6. [x] `cut.mjs`: a cell can `lift` a band of columns; Boba's new list.
+       Drawn at `scale: 0.65` now, so standing (91 pixels with the
+       rangefinder) he's 1.85 tall. `overrides.json` is now written with
+       number lists on one line, so a re-run no longer spreads the hand-added
+       `glint` and `glow` colours over five lines each.
+7. [x] The placeholder sheet in `hunters.js` to the same layout (the
+       trooper stride).
+8. [x] `boba-fett.js`: walker, new anims; the sandbox comment.
+9. [x] Tests, validator, smoke test; checked in game (Playwright) with and
+       without the overrides: he walks on the floor and fires from the
+       stance. Seen on the way: a walker (Boba or a trooper) chasing the
+       player round the little rock in the courtyard (the diagonal tiles at
+       34-35, 28-29) stops against its east face and walks on the spot. Not
+       new; left for later.
+
 ## Phase 1c: Two storeys per tile (done 2026-10-13)
 
 Mark (2026-10-13): we want to walk underneath other parts of the map. Today
@@ -2191,3 +2215,8 @@ update the smoke test.
   mode and everything, the same as `mercenary` (they share one function).
   The README's cheat list now matches `src/content/cheats.js`. 189 tests and
   the validator pass.
+- 2026-10-15: Boba Fett walks instead of flying (Phase 1b O, steps 6-9). His
+  walk is made from the standing cell with a knee lifted on each side; the
+  usual layout (walk 0-3, aim 4, fire 5, pain 6, death 7-10) for the cut
+  sheet and the placeholder. 189 tests, the validator and the smoke test
+  pass.
