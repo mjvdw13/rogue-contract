@@ -382,6 +382,12 @@ const list = [
   at('barricade', 37.5, 47.5, { angle: 270 }),
   at('supply-crate', 58.5, 41.2), at('supply-crate', 59.9, 41.4), at('supply-crate', 59, 42.6),
   at('supply-crate', 38.2, 41.2), at('supply-crate', 35.3, 41),
+  // Boulders fallen from the walls, along their feet and off the way through.
+  at('boulder-large', 9, 87.5, { angle: 30 }), at('boulder-small', 7.8, 85.2, { angle: 200 }),
+  at('boulder-large', 26.5, 92.5, { angle: 140 }), at('boulder-small', 11, 79.5, { angle: 80 }),
+  at('boulder-small', 16.5, 72, { angle: 310 }), at('boulder-large', 31.5, 62.5, { angle: 250 }),
+  at('boulder-large', 27, 57.5, { angle: 100 }), at('boulder-small', 29.6, 58.6, { angle: 20 }),
+  at('boulder-small', 42.4, 53.5, { angle: 160 }), at('boulder-large', 51, 58, { angle: 300 }),
   at('jawa', 24, 76, { angle: 270 }), at('jawa', 30, 72, { angle: 225 }),
   at('jawa', 28, 62, { angle: 270, skill: NORMAL_UP }),
   at('jawa', 18.5, 66.5, { angle: 315, skill: HARD }),

@@ -940,8 +940,7 @@ headless Node, DF art). Budget for this phase: stay under about 8 ms.
 14. [ ] **The canyon.** A skyline (done): the walls end in a low rim of
         rock out of reach, and a backdrop of slopes and ridges climbs from
         it past the edge of play (see Decided). A sandy floor with gravel
-        channels (done), boulders (small angled pillars and rock models),
-        an overhang.
+        channels (done), boulders (rock models, done), an overhang.
         Imperial perimeter: floodlight towers (models and light sources),
         a sensor mast with a blinking light, barricades and crates by the
         gate (done). Moonlight, haze, wind, blowing dust.
@@ -1866,3 +1865,11 @@ update the smoke test.
   the gate, angled out, cover for the gate guards; supply crates stacked
   against the face by the light strips, one half hiding the vent mouth.
   Monsters still walk into models until step 12.
+- 2026-10-15: step 14, boulders. `models/boulder.js` builds
+  `boulder-large` (2.6 across, 1.8 tall) and `boulder-small` (1.3, 0.8):
+  a lumpy outline lofted up in six tiers, each the one below shrunk and
+  shifted (so the faces stay flat), rounded like a weathered rock. Rough
+  stone (`desert-gravel`; the DF rock textures' block seams made the first
+  try read as masonry), the top `sandstone-pale`. Ten along the walls'
+  feet in the start bowl, the gorge and the bowl, off the way through.
+  The angled rock pillars are left out: the models do the job.

@@ -5,5 +5,6 @@ import reactorRing from './reactor-ring.js';
 import coolantTank from './coolant-tank.js';
 import shuttle from './shuttle.js';
 import barricade from './barricade.js';
+import { boulderLarge, boulderSmall } from './boulder.js';
 
-export default [terminal, reactorRing, coolantTank, shuttle, barricade];
+export default [terminal, reactorRing, coolantTank, shuttle, barricade, boulderLarge, boulderSmall];
