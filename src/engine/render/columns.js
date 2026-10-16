@@ -29,6 +29,8 @@ const fenceHz = new Float32Array(MAX_FENCES);
 const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
 /** This column's four thresholds (one per row, repeating every 4 rows). */
 const thr = new Float32Array(4);
+/** Per row, 1 / (y + 0.5 - horizon), this frame. */
+let rowInv = new Float64Array(0);
 /** A face's colormap row (times 256) for each of the four rows. */
 const faceCm = new Int32Array(4);
 /** Open windows of rows one column can keep (slabs split them). */
@@ -129,26 +131,9 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
     skyOffset = sky.h - 6 - Math.round(horizon);
   }
 
-  /** Colormap level for floor/ceiling pixel row y at a distance under light l (dithered). */
-  const flatLevel = (l, dist, y) => {
-    if (fixed >= 0) return fixed;
-    let b = DIMINISH / (dist < 0.25 ? 0.25 : dist);
-    if (b > MAX_BRIGHTEN) b = MAX_BRIGHTEN;
-    const lv = ((LIGHT_BLACK - l) * 0.25 - extra - b + dist * fog + thr[y & 3]) | 0;
-    return lv < 0 ? 0 : lv > 31 ? 31 : lv;
-  };
-  /** Like flatLevel, outdoors in haze: the level without the fog, in its haze step's tables. */
-  const flatRowHaze = (l, dist, y) => {
-    let b = DIMINISH / (dist < 0.25 ? 0.25 : dist);
-    if (b > MAX_BRIGHTEN) b = MAX_BRIGHTEN;
-    const d = thr[y & 3];
-    let lv = ((LIGHT_BLACK - l) * 0.25 - extra - b + d) | 0;
-    if (lv < 0) lv = 0;
-    else if (lv > 31) lv = 31;
-    const k = (dist * HAZE_RES) | 0;
-    const h = (hazeTab[k < HAZE_LEN ? k : HAZE_LEN - 1] + d + 0.5) | 0;
-    return h ? HAZE_ROW + (h - 1) * 32 + lv : lv;
-  };
+  // 1 / (y + 0.5 - horizon) per row: floors and ceilings take their distance from it.
+  if (rowInv.length < H) rowInv = new Float64Array(H);
+  for (let y = 0; y < H; y++) rowInv[y] = 1 / (y + 0.5 - horizon);
 
   /**
    * A face's colormap per row phase, for its fractional level lv and haze
@@ -325,6 +310,51 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
     const faceLevel = (s, t, contrast, out) => (fixed >= 0 ? fixed : view.levelF(lm.sample(px + rdx * t, py + rdy * t, s), t) + contrast - (out ? t * fog : 0));
     /** A face's haze step at distance t (0 indoors). */
     const faceHaze = (t, out) => (out ? view.hazeF(t) : 0);
+    /**
+     * Rows [a, b) of this column's floor (kk > 0) or ceiling (kk < 0) in
+     * texture `tex`, kk being (camZ - the plane's height) * fy: a row's
+     * distance is kk / (y + 0.5 - horizon). The light runs from l0 at t0,
+     * changing by dl per unit of distance; outdoors in haze (`hazy`), the
+     * level is without the fog, in its haze step's tables. Levels are as
+     * View.levelF's, and dithered.
+     */
+    const flatSpan = (a, b, kk, tex, hazy, t0, l0, dl) => {
+      const tw = tex.w;
+      const wm = tex.wMask;
+      const hm = tex.hMask;
+      const pix = tex.cur;
+      let o = a * fbW + x;
+      if (fixed >= 0) {
+        const cm = fixed * 256;
+        for (let y = a; y < b; y++, o += fbW) {
+          const dist = kk * rowInv[y];
+          fb[o] = colormaps[cm + pix[(((py + rdy * dist) * TPU) & hm) * tw + (((px + rdx * dist) * TPU) & wm)]];
+        }
+        return;
+      }
+      // The level before the light diminishing is c0 + c1 * dist; the
+      // diminishing (DIMINISH / dist) is dk times the row's offset from the horizon.
+      const c0 = (LIGHT_BLACK - l0 + t0 * dl) * 0.25 - extra;
+      const c1 = (hazy ? 0 : fog) - dl * 0.25;
+      const dk = DIMINISH / kk;
+      for (let y = a; y < b; y++, o += fbW) {
+        const dist = kk * rowInv[y];
+        const tx = ((px + rdx * dist) * TPU) & wm;
+        const ty = ((py + rdy * dist) * TPU) & hm;
+        let br = dk * (y + 0.5 - horizon);
+        if (br > MAX_BRIGHTEN) br = MAX_BRIGHTEN;
+        const d = thr[y & 3];
+        let lv = (c0 + c1 * dist - br + d) | 0;
+        if (lv < 0) lv = 0;
+        else if (lv > 31) lv = 31;
+        if (hazy) {
+          const hk = (dist * HAZE_RES) | 0;
+          const h = (hazeTab[hk < HAZE_LEN ? hk : HAZE_LEN - 1] + d + 0.5) | 0;
+          if (h) lv += HAZE_ROW + (h - 1) * 32;
+        }
+        fb[o] = colormaps[lv * 256 + pix[ty * tw + tx]];
+      }
+    };
     // Floor and ceiling of storey s of tile `i` between distances t0 and t1
     // (under a slab, the slab's underside is the ceiling; on it, its top the
     // floor). The light runs smoothly from where the ray enters to where it
@@ -332,8 +362,10 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
     const flats = (i, s, t0, t1) => {
       const slab = (flags[i] & F_SLAB) !== 0;
       const hazy = hazeOn && (flags[i] & F_SKY) !== 0;
-      const l0 = lm.sample(px + rdx * t0, py + rdy * t0, s);
-      const dl = t1 > t0 ? (lm.sample(px + rdx * t1, py + rdy * t1, s) - l0) / (t1 - t0) : 0;
+      // (The light is sampled only once some rows need it.)
+      let lit = false;
+      let l0 = 0;
+      let dl = 0;
       const fz = slab && s ? slabTop[i] : floorZ[i];
       if (camZ > fz) {
         const k = (camZ - fz) * fy;
@@ -346,27 +378,10 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
           if (slot < 0) {
             for (let y = a, o = a * fbW + x; y < b; y++, o += fbW) fb[o] = 0;
           } else {
-            const tex = textures[slot];
-            const tw = tex.w;
-            const th = tex.h;
-            const wm = tex.wMask;
-            const hm = tex.hMask;
-            const pix = tex.cur;
-            if (hazy) {
-              for (let y = a, o = a * fbW + x; y < b; y++, o += fbW) {
-                const dist = k / (y + 0.5 - horizon);
-                const tx = ((px + rdx * dist) * TPU) & wm;
-                const ty = ((py + rdy * dist) * TPU) & hm;
-                fb[o] = colormaps[flatRowHaze(l0 + (dist - t0) * dl, dist, y) * 256 + pix[ty * tw + tx]];
-              }
-            } else {
-              for (let y = a, o = a * fbW + x; y < b; y++, o += fbW) {
-                const dist = k / (y + 0.5 - horizon);
-                const tx = ((px + rdx * dist) * TPU) & wm;
-                const ty = ((py + rdy * dist) * TPU) & hm;
-                fb[o] = colormaps[flatLevel(l0 + (dist - t0) * dl, dist, y) * 256 + pix[ty * tw + tx]];
-              }
-            }
+            lit = true;
+            l0 = lm.sample(px + rdx * t0, py + rdy * t0, s);
+            dl = t1 > t0 ? (lm.sample(px + rdx * t1, py + rdy * t1, s) - l0) / (t1 - t0) : 0;
+            flatSpan(a, b, k, textures[slot], hazy, t0, l0, dl);
           }
         }
         if (a < clipBot) clipBot = a < clipTop ? clipTop : a;
@@ -397,27 +412,11 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
             if (slot < 0) {
               for (let y = a, o = a * fbW + x; y < b; y++, o += fbW) fb[o] = 0;
             } else {
-              const tex = textures[slot];
-              const tw = tex.w;
-              const th = tex.h;
-              const wm = tex.wMask;
-              const hm = tex.hMask;
-              const pix = tex.cur;
-              if (hazy) {
-                for (let y = a, o = a * fbW + x; y < b; y++, o += fbW) {
-                  const dist = k / (horizon - y - 0.5);
-                  const tx = ((px + rdx * dist) * TPU) & wm;
-                  const ty = ((py + rdy * dist) * TPU) & hm;
-                  fb[o] = colormaps[flatRowHaze(l0 + (dist - t0) * dl, dist, y) * 256 + pix[ty * tw + tx]];
-                }
-              } else {
-                for (let y = a, o = a * fbW + x; y < b; y++, o += fbW) {
-                  const dist = k / (horizon - y - 0.5);
-                  const tx = ((px + rdx * dist) * TPU) & wm;
-                  const ty = ((py + rdy * dist) * TPU) & hm;
-                  fb[o] = colormaps[flatLevel(l0 + (dist - t0) * dl, dist, y) * 256 + pix[ty * tw + tx]];
-                }
+              if (!lit) {
+                l0 = lm.sample(px + rdx * t0, py + rdy * t0, s);
+                dl = t1 > t0 ? (lm.sample(px + rdx * t1, py + rdy * t1, s) - l0) / (t1 - t0) : 0;
               }
+              flatSpan(a, b, -k, textures[slot], hazy, t0, l0, dl);
             }
           }
         }

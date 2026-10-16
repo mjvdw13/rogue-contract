@@ -11,6 +11,9 @@
  * walls). It's lit by `light` (moonlight), shaded by its slope against the
  * `moon` direction, and drawn out to `far` tiles.
  */
+/** The size (in cells) of the blocks whose highest point is kept. */
+export const BLOCK = 8;
+
 export class Backdrop {
   /**
    * @param {*} def the level's `backdrop`
@@ -44,6 +47,23 @@ export class Backdrop {
         // (The slope's shading is what makes it read as ground going back.)
         this.light[j * cw + i] = Math.max(0, Math.min(255, base * (0.62 + 0.55 * lit)));
         this.facesX[j * cw + i] = Math.abs(hx) > Math.abs(hy) ? 1 : 0;
+      }
+    }
+    // The highest corner in each block of BLOCK x BLOCK cells, so the
+    // renderer can pass over blocks too low to show.
+    this.bw = Math.ceil(this.w / BLOCK);
+    this.bh = Math.ceil(this.h / BLOCK);
+    this.blockMax = new Float32Array(this.bw * this.bh).fill(-Infinity);
+    for (let j = 0; j <= this.h; j++) {
+      for (let i = 0; i <= this.w; i++) {
+        const hgt = this.heights[j * cw + i];
+        // (A corner on a block's edge belongs to the blocks either side.)
+        for (let bj = Math.max(0, Math.ceil(j / BLOCK) - 1); bj <= Math.min(this.bh - 1, Math.floor(j / BLOCK)); bj++) {
+          for (let bi = Math.max(0, Math.ceil(i / BLOCK) - 1); bi <= Math.min(this.bw - 1, Math.floor(i / BLOCK)); bi++) {
+            const k = bj * this.bw + bi;
+            if (hgt > this.blockMax[k]) this.blockMax[k] = hgt;
+          }
+        }
       }
     }
   }

@@ -930,6 +930,56 @@ close (still crops the head, and they'd change size as you walk up).
 3. [x] Mark (2026-10-15): lower it to 1.25 (74% of the body, about
        Doom's), pushed without running the tests.
 
+### S. Renderer speed, deeper (2026-10-15)
+
+Mark (2026-10-15), asked whether to move to WebGL: no; look deeper for
+speed-ups without a big drawback (so no fewer columns, no lower quality).
+Bench (scratchpad, m1 with the DF art, 548 columns, headless Node, best of
+5): the canyon start (5 angles x 3 pitches) 6.7 ms, 8 indoor views 4.7 ms.
+Profile: `flats` 40% (two divisions and a light calculation per pixel, and
+two light samples per tile even where a tile shows no floor rows), the ray
+march in `drawWorld` 21% (it builds 13 closures per column), the backdrop
+9%, `face` 6%, `LightMap.sample` 5.5%, models 5% (culled only against the
+view's edges, not against walls). Each step is checked against the bench's
+23 views, byte-identical unless noted.
+
+Chrome numbers below are the same views rendered in the game's page
+(`game.renderer`, 548 columns, best of 5); Chrome runs this code about 1.6
+times slower than Node on this machine, and is noisy (about 0.5 ms).
+
+1. [x] `flats`: find the rows first, and sample the light only when there
+       are some. Byte-identical. Chrome: canyon 11.1 to 10.6 ms.
+2. [x] `flats` per pixel: no divisions (per-row reciprocals for the
+       distance, and the light diminishing from them), in one `flatSpan`
+       for floors and ceilings. 1 to 5 pixels in 110k differ in 5 of 23
+       views (a rounding step at a colormap level). Chrome: 10.6 to 9.75
+       ms, inside 7.9 to 6.8.
+3. [x] Tried, not kept: building the per-column helpers once per frame;
+       no measurable change. Also tried and dropped: reusing the boundary
+       row and light sample between neighbouring tiles (no change), a
+       column-major framebuffer (2% in Node), and V8's inlining limits
+       raised (no change), so call overhead isn't it either.
+4. [x] Models: skip a model whose nearest point is behind the walls in
+       every column it could cover. Byte-identical. Things went from about
+       1 ms to 0.2 ms at the canyon in Chrome.
+5. [x] Backdrop: each 8 x 8 block of its grid keeps its highest corner
+       (`Backdrop.blockMax`); the march passes over a block that can't
+       reach the rows still open, taking the same samples elsewhere, so
+       it's byte-identical. Samples per column at the canyon: about 150
+       to 55. Chrome: about 1.7 to 1.4 ms.
+6. [x] Measured in Chrome, then tests (one new for the block heights),
+       validator, smoke test. Commit.
+7. Result in Chrome: canyon 11.1 to about 9.3 ms (-16%), inside 8.1 to
+   6.1 ms (-24%). What's left, measured by switching parts off: the ray
+   march itself, drawing nothing, is about 5 ms at the canyon (30 tile
+   steps a column on the fine grid, branchy work spread over many lines);
+   floor and ceiling pixels about 2.5 ms; walls under 1 ms; backdrop 1.4
+   ms. The next big step would be several threads (Web Workers splitting
+   the columns), which needs cross-origin isolation for shared memory (on
+   GitHub Pages only through a service-worker shim) and the world's
+   changing state (doors, light, animated textures) sent to the workers
+   every frame. Not started; Mark to decide.
+
 ## Phase 1c: Two storeys per tile (done 2026-10-13)
 
 Mark (2026-10-13): we want to walk underneath other parts of the map. Today
@@ -2298,3 +2348,10 @@ update the smoke test.
   pass.
 - 2026-10-15: Phase 1b R: eye height 1.5 to 1.25 (Mark asked). Pushed
   without running the tests, as asked.
+- 2026-10-15: Phase 1b S: renderer speed, deeper (Mark turned down WebGL).
+  Floors and ceilings sample light only where they draw and do no
+  divisions per pixel; models hidden behind walls are skipped; the
+  backdrop passes over blocks of its grid too low to show. In Chrome at
+  548 columns: canyon 11.1 to about 9.3 ms, indoors 8.1 to 6.1. Output is
+  byte-identical except a few pixels a view at a colormap step. 190 tests,
+  the validator and the smoke test pass.

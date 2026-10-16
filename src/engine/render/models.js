@@ -67,6 +67,21 @@ export function drawModels(view, things, map, textures, fb, fbW, colormaps, skip
     if (cDepth + r < NEAR) continue;
     const cTx = invDet * (dirY * cdx - dirX * cdy);
     if (Math.abs(cTx) - r > cDepth + r) continue;
+    // Hidden behind the walls in every column it could cover (its nearest
+    // point is no nearer than where they end): nothing would draw.
+    const dMin = cDepth - r > NEAR ? cDepth - r : NEAR;
+    const dMax = cDepth + r;
+    const rl = r / view.planeLen;
+    const qLo = Math.min((cTx - rl) / dMin, (cTx - rl) / dMax);
+    const qHi = Math.max((cTx + rl) / dMin, (cTx + rl) / dMax);
+    let hidden = true;
+    for (let x = Math.max(0, Math.floor(halfW * (1 + qLo)) - 1), x1 = Math.min(W, Math.ceil(halfW * (1 + qHi)) + 1); x < x1; x++) {
+      if (zbuf[x] > dMin - 1e-6) {
+        hidden = false;
+        break;
+      }
+    }
+    if (hidden) continue;
 
     const nv = model.verts.length / 3;
     if (camD.length < nv) {

@@ -1,5 +1,6 @@
 import { TEXELS_PER_UNIT as TPU } from '../config.js';
 import { HAZE_ROW } from '../gfx/palette.js';
+import { BLOCK } from '../world/backdrop.js';
 
 /**
  * Draw one screen column of a backdrop (world/backdrop.js) into the
@@ -28,9 +29,36 @@ export function drawBackdropColumn(view, bd, textures, colormaps, fb, sky, fbW, 
   // (Past where the ray leaves the grid there's nothing to draw.)
   const exit = bd.exit(px, py, rdx, rdy);
   const far = exit < bd.far ? exit : bd.far;
+  const { x0, y0, cell, bw, bh, blockMax } = bd;
+  const span = BLOCK * cell;
+  // Until `recheck`, the ray is in a block that may show.
+  let recheck = 0;
   while (t < far && ybuf > lo) {
     const wx = px + rdx * t;
     const wy = py + rdy * t;
+    if (t >= recheck) {
+      // Entering a block: if even its highest point can't reach the rows
+      // still open (nearest it at the block's far side if it's below the
+      // eye, else here), step on to where the ray leaves it.
+      const bi = Math.floor((wx - x0) / span);
+      const bj = Math.floor((wy - y0) / span);
+      if (bi >= 0 && bj >= 0 && bi < bw && bj < bh) {
+        const tx = rdx > 0 ? (x0 + (bi + 1) * span - px) / rdx : rdx < 0 ? (x0 + bi * span - px) / rdx : Infinity;
+        const ty = rdy > 0 ? (y0 + (bj + 1) * span - py) / rdy : rdy < 0 ? (y0 + bj * span - py) / rdy : Infinity;
+        const tOut = tx < ty ? tx : ty;
+        // (A little higher than the highest point, for rounding.)
+        const rise = camZ - blockMax[bj * bw + bi] - 1e-3;
+        if (horizon + (rise * fy) / (rise < 0 ? t : tOut) - 0.5 > ybuf - 1 + 1e-3) {
+          // (This sample is in the block, so at least one step goes.)
+          do {
+            t += dt;
+            dt = t * 0.012 > 0.25 ? t * 0.012 : 0.25;
+          } while (t < tOut && t < far);
+          continue;
+        }
+        recheck = tOut;
+      }
+    }
     const h = bd.heightAt(wx, wy);
     if (h > -Infinity) {
       let top = Math.ceil(horizon + ((camZ - h) * fy) / t - 0.5);
