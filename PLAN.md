@@ -980,6 +980,125 @@ times slower than Node on this machine, and is noisy (about 0.5 ms).
    changing state (doors, light, animated textures) sent to the workers
    every frame. Not started; Mark to decide.
 
+### T. Particles (design 2026-10-15)
+
+Mark (2026-10-15): a particle system for sparks (a broken panel, a droid
+just killed), fire (embers rising from flames), wind and sand outdoors,
+smoke and steam, shrapnel and more. Speed comes first: it must not cost
+frame rate. This replaces Phase 1d step 9 (emitters) and does the
+blending half of step 8 (translucency).
+
+**The main idea: particles are points, not things.** A billboard sprite
+is an object in `world.things`, a frame lookup, a sort, a texture walk per
+column and a light sample. A particle is a slot in typed arrays, drawn as
+a few pixels of one palette colour. That's the difference between about
+50 sprites a frame and a few thousand particles.
+
+**Budget.** 2000 live particles plus 400 of weather in under 0.5 ms a
+frame in Chrome at 548 columns (simulation and drawing together), against
+the canyon's 9.3 ms. Hard caps keep it there in the worst case.
+
+**Simulation** (`world/particles.js`, run in `world.tick`, so it pauses
+with the game):
+- One pool of 4096, structure of arrays: `Float32Array`s for x, y, z, vx,
+  vy, vz, age, life; `Uint8Array`/`Uint16Array`s for the type, the tile
+  (cached), the light (cached). No objects and no garbage. Dead particles
+  are swap-removed, so the live ones stay packed at the front. A full pool
+  drops new spawns; each type also has its own cap.
+- Per tick: gravity, drag (one multiply), wind (types with `wind` take the
+  level's wind and gust), move. Collision only on the tile grid: the
+  particle keeps its tile index and that tile's floor and ceiling, read
+  again only when it crosses into a new tile. Below the floor: bounce
+  (`bounce` 0..1, with friction), stick (shrapnel lies a moment, then
+  fades), or die. In a solid tile: die, or bounce off that axis.
+- Cosmetic only: its own small RNG, never `world.rng`, so gameplay stays
+  deterministic in tests.
+- Light: fullbright types skip it. Lit types sample the light map when
+  spawned and again every 8 ticks (staggered by slot), not every frame.
+
+**Drawing** (`render/particles.js`, after sprites, before the weapon):
+- Per particle: camera transform (the sprite drawer's maths, a few
+  multiplies), cull behind the eye and off screen, project.
+- Size in world units becomes 1 to `maxPx` pixels by depth: a dot (1x1),
+  a square (2x2, 3x3) or, for smoke and steam, a soft disc from small
+  precomputed masks (radius up to 8 px). Fast types (sparks, sand) draw a
+  short streak from where they were last frame to where they are (at
+  most 8 px): motion reads at 60 Hz, and one particle looks like several.
+- Occlusion, per pixel: against `zbuf` (walls) and the ledge windows, as
+  sprites do, and against a per-pixel depth for models, fences and
+  sprites. Today only models and fences fill `view.mdepth`; the sprite
+  drawer also writes its depth there in frames that have particles (it
+  clears the buffer first if nothing else did). Particles aren't sorted:
+  dots don't need it, and additive blending doesn't care about order.
+- Colour: each type has a ramp of palette indices over its life (a spark:
+  white, yellow, orange, dull red; smoke: grey, darker, gone), picked by
+  age. Lit types go through the colormap row for their light and
+  distance (`view.row`, haze included, one call per particle).
+- Blending, per type: `solid`; `add` and `half` through 256 x 256 blend
+  tables built from the palette once (64 KB each, shared with step 8's
+  translucent sprites); `dither` (screen-door: the 4x4 ordered pattern
+  skips pixels by alpha, which also fades a particle out for free).
+  Smoke and steam: `half` or `dither`; sparks and fire: `add`.
+
+**Types and spawning** (content):
+- `defineParticle({ id, colors, life, size, maxPx, gravity, drag,
+  bounce, onFloor, blend, fullbright, streak, wind, cap })` in
+  `src/content/particles.js`.
+- Bursts from code and content: `world.particles.burst(type, x, y, z, {
+  count, dir, spread, speed })`. Hooked into content: a monster's
+  `death: { particles }` (the probe droid throws sparks and shrapnel),
+  projectiles' `hit` (bolts spark on walls; rockets throw shrapnel and
+  smoke) and `trail` (a rocket's smoke).
+- **Emitters**: level `emitters: [{ x, y, z, type, dir?, rate | every,
+  burst?, tag?, on? }]`: a steam vent (steady), a broken panel (a burst of
+  sparks every 0.5 to 3 s, with a flash of dynamic light and, once step 10
+  lands, a crackle), fire (flame particles plus rising embers plus a
+  flickering light source). `setEmitter(tag, on)` from switches and
+  scripts. An emitter more than about 24 tiles from the player doesn't
+  spawn, and its rate falls off past half that.
+- **Weather**: level `weather: { type, count, box, wind, gust }`. A fixed
+  set of particles in a box round the camera (about 16 x 16 x 6 tiles)
+  that wraps: one leaving a side comes in at the other, so nothing is
+  ever spawned or killed. Drawn only in tiles under the sky (`F_SKY`), so
+  sand doesn't blow indoors. The canyon: sand streaks on the wind, gusts
+  from a slow noise, with a few bigger dust puffs (`dither`) low over the
+  ground. Motes over the reactor are an emitter, not weather.
+
+**Steps:**
+1. [ ] **Bench first.** A scratchpad bench (as in S): the canyon start and
+       the reactor with 0, 1000, 2000 and 4000 particles of each draw kind
+       (dot, square, streak, disc) and blend; the numbers go here. Gives
+       the caps and `maxPx` their values.
+2. [ ] **Pool and simulation** (`world/particles.js`, `defineParticle`,
+       validator): spawn, move, collide, bounce, stick, die; caps. Tests:
+       a burst falls and bounces off the floor, stops at walls, never
+       grows past the caps, and doesn't touch `world.rng`.
+3. [ ] **Drawing** (`render/particles.js`): projection, dots, squares,
+       streaks, discs; occlusion by walls, ledges, models, fences and
+       sprites (sprites write depth when particles show); light and haze.
+       Tests on small views (hidden behind a wall, in front of and behind a
+       sprite, under a ledge).
+4. [ ] **Blend tables** (`add`, `half`) and `dither`, built with the
+       palette (cached per palette, checked against a brute-force
+       nearest colour in a test).
+5. [ ] **Content bursts:** sparks and shrapnel when a probe droid dies,
+       sparks where bolts hit walls, shrapnel and smoke from rockets and
+       concussion blasts, a smoke trail on rockets.
+6. [ ] **Emitters** in levels: steam vent, sparking panel, fire (with
+       embers and light), reactor motes; tags; distance cut-off. Validator,
+       map viewer marks, MODDING.md. Placed in the sandbox, then where
+       Mission 1 wants them (the maintenance valve and broken light, the
+       generator).
+7. [ ] **Weather:** sand and wind in the canyon.
+8. [ ] Bench again with everything on (the budget holds?), tests, the
+       validator, the smoke test, screenshots: sparks, steam, fire, the
+       canyon's sand. Commit.
+
+Later, if wanted: particles light themselves (each fire emitter already
+has one light; per particle is too dear); a sound per burst; blood as
+particles; rain for another level; decals left by particles (scorch
+under fire).
+
 ## Phase 1c: Two storeys per tile (done 2026-10-13)
 
 Mark (2026-10-13): we want to walk underneath other parts of the map. Today
@@ -1184,9 +1303,9 @@ headless Node, DF art). Budget for this phase: stay under about 8 ms.
 8. [ ] **Translucency.** Blend tables (half and additive) built from the
        palette; sprites, effects and fences can be translucent or additive:
        steam, glass, shafts of light, holograms, force fields.
-9. [ ] **Emitters.** A decoration that spawns effects at a rate, with
-       spread, velocity and gravity: steam vents, sparks from a broken
-       panel, blowing dust, motes over the reactor. New FX art.
+9. [ ] **Emitters.** Now a particle system: see Phase 1b T (design
+       2026-10-15): steam vents, sparks from a broken panel, blowing
+       dust, motes over the reactor.
 10. [ ] **Ambient sound.** Looping positional sounds placed in a level,
         muffled where there's no line of sight, from looping synth sounds
         (seamless ends); occasional random one-shots (a distant cry, comm
