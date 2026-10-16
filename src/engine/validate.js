@@ -76,9 +76,25 @@ export function validateContent(reg) {
     if (typeof l !== 'object' || !(l.radius > 0) || typeof l.light !== 'number') err(`${owner}: "light" needs a "radius" above 0 and a "light" (how much it adds)`);
   };
 
+  // A list of particle bursts: [{ type, count, speed, spread, dir }] (world/particles.js burst).
+  const checkBursts = (owner, list) => {
+    if (list === undefined) return;
+    if (!Array.isArray(list)) return err(`${owner}: "particles" must be a list of bursts`);
+    for (const b of list) {
+      if (!reg.particles.has(b?.type)) err(`${owner}: unknown particle type "${b?.type}"`);
+      if (b?.count !== undefined && !(Number.isInteger(b.count) && b.count >= 1)) err(`${owner}: a burst's count must be a whole number, at least 1`);
+      const speed = [].concat(b?.speed ?? 0);
+      if (!speed.every((v) => typeof v === 'number' && v >= 0) || speed.length > 2) err(`${owner}: a burst's speed is units a second, or [min, max]`);
+      if (b?.spread !== undefined && !(b.spread >= 0 && b.spread <= 2)) err(`${owner}: a burst's spread must be 0 to 2`);
+      if (b?.dir !== undefined && !(Array.isArray(b.dir) && b.dir.length === 3 && b.dir.every((v) => typeof v === 'number'))) err(`${owner}: a burst's dir is [x, y, z]`);
+    }
+    return undefined;
+  };
+
   for (const t of reg.things.values()) {
     const owner = `${t.kind} "${t.id}"`;
     checkLight(owner, t.light);
+    checkBursts(`${owner} death`, t.death?.particles);
     if (t.model) {
       if (!reg.models.has(t.model)) err(`${owner}: unknown model "${t.model}"`);
     } else checkSheet(owner, t.sheet);

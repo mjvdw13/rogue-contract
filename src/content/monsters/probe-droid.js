@@ -28,5 +28,6 @@ export default defineMonster({
   sounds: { sight: 'droid-sight', active: 'droid-active', pain: 'droid-pain', death: 'explode' },
   bleeds: false,
   explode: { radius: 3.2, damage: 30 },
+  death: { particles: [{ type: 'spark', count: 40, speed: [2, 6] }] }, // sparks fly all round as it blows
   mass: 60,
 });

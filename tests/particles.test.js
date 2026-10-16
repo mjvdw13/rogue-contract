@@ -332,3 +332,31 @@ test('dither particles with fadeIn fade in, then out', async () => {
   assert.ok(quarter > 0 && quarter < half, `fading in (${quarter} then ${half} pixels)`);
   assert.ok(late < half, `then out (${late})`);
 });
+
+test('a probe droid throws sparks when it dies, from the middle of its body', () => {
+  const w = makeWorld(room(OPEN, ['', ' >'], { legend: { '.': ROOM } }), { noMonsters: true });
+  const droid = w.spawn('probe-droid', 8.5, 3.5);
+  const state = w.rng.state;
+  assert.equal(w.particles.n, 0);
+  w.damage(droid, 1000, w.player, w.player);
+  assert.ok(droid.dead);
+  const spark = w.particles.typeIndex('spark');
+  assert.equal(w.particles.n, 40);
+  for (let i = 0; i < w.particles.n; i++) {
+    assert.equal(w.particles.type[i], spark);
+    assert.equal(w.particles.z[i], Math.fround(droid.z + droid.height / 2));
+  }
+  assert.equal(w.rng.state, state, "the sparks don't touch the world's RNG");
+});
+
+test('the validator checks death bursts', () => {
+  const droid = content.things.find((t) => t.id === 'probe-droid');
+  const bad = new Registry({
+    ...content,
+    things: [...content.things.filter((t) => t !== droid), { ...droid, death: { particles: [{ type: 'no-such', count: 0.5, speed: [-1], spread: 3 }] } }],
+  });
+  const { errors } = validateContent(bad);
+  for (const s of ['unknown particle type "no-such"', 'count', 'speed', 'spread']) {
+    assert.ok(errors.some((e) => e.includes('death') && e.includes(s)), `expected "${s}" in ${JSON.stringify(errors)}`);
+  }
+});

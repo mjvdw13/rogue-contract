@@ -24,6 +24,11 @@
  *   projectile?:string, count?:number, sound?:string, hitSound?:string, missSound?:string,
  *   puff?:string, berserkMultiplier?:number, [key:string]:any}} AttackSpec
  *   kind: 'hitscan' | 'projectile' | 'melee' | any custom kind registered with defineAttack().
+ *
+ * @typedef {{type:string, count?:number, speed?:number|[number,number], spread?:number,
+ *   dir?:[number,number,number]}} BurstSpec
+ *   A burst of particles (world/particles.js `burst`): `count` of `type` at
+ *   `speed` units a second, along `dir` (none: all round), `spread` 0 to 2.
  */
 
 const ANIM_DEFAULTS = {
@@ -256,14 +261,16 @@ function baseThing(def, kind, defaults) {
  * Walkers step up to `stepHeight` (default 0.8) and won't walk off drops
  * deeper than `dropHeight` (default: their step height). `flying` monsters
  * ignore floors, hovering `z` above the floor their target stands on, and
- * climb or sink at `flySpeed` (default 3 per second).
+ * climb or sink at `flySpeed` (default 3 per second). `death.particles` are
+ * bursts thrown from the middle of the body when it's killed (shootable
+ * decorations take them too).
  * @param {{id:string, name?:string, glyph?:string, sheet:SheetSpec, anims:Record<string,AnimSpec>,
  *   health:number, speed?:number, radius?:number, height?:number, painChance?:number,
  *   stepHeight?:number, dropHeight?:number, flying?:boolean, flySpeed?:number, z?:number,
  *   attack?:AttackSpec, melee?:AttackSpec, cooldown?:[number,number], reactionTime?:number,
  *   sightRange?:number, drops?:(string|{item:string, chance?:number})[], mass?:number,
  *   splashImmune?:boolean, boss?:boolean, sounds?:Record<string,string>,
- *   hooks?:Record<string,Function>}} def
+ *   death?:{particles?:BurstSpec[]}, hooks?:Record<string,Function>}} def
  */
 export function defineMonster(def) {
   const m = baseThing(def, 'monster', {

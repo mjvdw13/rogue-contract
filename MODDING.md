@@ -361,6 +361,11 @@ along `dir`, 1 a hemisphere round it, 2 all round) or one at a time with
 for looks: they never touch the game's random numbers, so they can't change
 what happens.
 
+Content throws bursts too. A monster (or a shootable decoration) with
+`death: { particles: [{ type: 'spark', count: 40, speed: [2, 6] }] }`
+throws them from the middle of its body when it's killed, as the probe
+droid does; each burst takes the same `count`, `dir`, `spread` and `speed`.
+
 To see what they cost, serve the repo and open `tools/particles.html`: it
 runs Mission 1 with any number of one type in front of you, and times them.
 

@@ -96,6 +96,7 @@ export function kill(world, target, source) {
     if (def.kind !== 'monster') target.removed = true;
   }
   world.playSoundFrom(gib ? (def.sounds.gib ?? def.sounds.death) : def.sounds.death, target);
+  for (const b of def.death?.particles ?? []) world.particles.burst(b.type, target.x, target.y, aimZ(target), b);
   if (def.kind === 'monster' && def.countKill) world.stats.kills++;
   for (const drop of [...(def.drops ?? []), ...(target.drops ?? [])]) {
     if (world.rng.chance(drop.chance ?? 1)) {

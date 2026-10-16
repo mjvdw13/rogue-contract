@@ -1183,6 +1183,20 @@ with the game):
 5. [ ] **Content bursts:** sparks and shrapnel when a probe droid dies,
        sparks where bolts hit walls, shrapnel and smoke from rockets and
        concussion blasts, a smoke trail on rockets.
+       - Mark (2026-10-15): bring it in as small, focused updates, each
+         pushed to main on its own. In order:
+       - [x] 5a. **Sparks when a probe droid dies.** A thing's `death: {
+             particles: [{ type, count, speed, spread, dir }] }` bursts from
+             the middle of its body when it's killed (monsters and shootable
+             decorations alike). Validator (known type, numbers), MODDING.md,
+             a test; looked at in headless screenshots (DF art, the
+             sandbox): 40 sparks at 2 to 6 units a second, all round; white
+             at first, orange and bouncing on the floor by half a second,
+             8 left at 0.8 s.
+       - [ ] 5b. Shrapnel too when it dies.
+       - [ ] 5c. Sparks where bolts hit walls (projectiles' `hit`).
+       - [ ] 5d. Shrapnel and smoke from rockets and concussion blasts.
+       - [ ] 5e. A smoke trail on rockets.
 6. [ ] **Emitters** in levels: steam vent, sparking panel, fire (with
        embers and light), reactor motes; tags; distance cut-off. Validator,
        map viewer marks, MODDING.md. Placed in the sandbox, then where
@@ -2594,3 +2608,6 @@ update the smoke test.
   soft rims on fading discs. Mark: `dust` at 100 is perfect for a sunny Mos
   Eisley (noted under step 7). 205 tests, the validator and the smoke test
   pass; with no particles, 23 views are byte-identical.
+- 2026-10-15: Phase 1b T step 5a: probe droids throw 40 sparks when they
+  die, through a new `death: { particles }` on things (validated, in
+  MODDING.md). 209 tests, the validator and the smoke test pass.
