@@ -1210,6 +1210,23 @@ with the game):
        - [ ] 5c. Sparks where bolts hit walls (projectiles' `hit`).
        - [ ] 5d. Shrapnel and smoke from rockets and concussion blasts.
        - [ ] 5e. A smoke trail on rockets.
+       - [ ] 5f. **An explosion made of particles** (Mark, 2026-10-15): the
+             blast itself, smoke, shrapnel and so on, as one reusable
+             effect. A sketch: a fireball of bright `add` discs that swell
+             and cool from white through yellow and orange to red (a new
+             `fire` type; nothing in the content fits yet), a ring of fast
+             sparks, shrapnel that bounces and lies a moment, embers
+             drifting up, and smoke rising after the fire fades, with the
+             dynamic light flash the `explosion` sprite already has. Named
+             recipes of bursts (say `defineExplosion({ id, particles,
+             light, sound })`, or a list on an effect) so content uses it
+             by id: the probe droid's death (`explode`), Boba Fett's
+             rockets, Bossk's concussion blasts (a bluer variant),
+             exploding scenery. Decide with screenshots whether it
+             replaces the `explosion` sprite or plays over it. It can
+             take in 5b and 5d (shrapnel and smoke on the droid's death,
+             rockets and blasts). Watch the disc cap (150): a fireball and
+             its smoke can't take all of it.
 6. [ ] **Emitters** in levels: steam vent, sparking panel, fire (with
        embers and light), reactor motes; tags; distance cut-off. Validator,
        map viewer marks, MODDING.md. Placed in the sandbox, then where
