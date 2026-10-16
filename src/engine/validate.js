@@ -95,6 +95,13 @@ export function validateContent(reg) {
     const owner = `${t.kind} "${t.id}"`;
     checkLight(owner, t.light);
     checkBursts(`${owner} death`, t.death?.particles);
+    if (t.corpse) {
+      checkBursts(`${owner} corpse`, t.corpse.particles);
+      const range = (v, lo) => [].concat(v).every((n) => typeof n === 'number' && n >= lo) && [].concat(v).length <= 2;
+      if (t.corpse.bursts !== undefined && !range(t.corpse.bursts, 0)) err(`${owner} corpse: bursts is a count, or [min, max]`);
+      if (t.corpse.every !== undefined && !range(t.corpse.every, 0)) err(`${owner} corpse: every is seconds, or [min, max]`);
+      if (t.corpse.z !== undefined && typeof t.corpse.z !== 'number') err(`${owner} corpse: z is a height above the floor`);
+    }
     if (t.model) {
       if (!reg.models.has(t.model)) err(`${owner}: unknown model "${t.model}"`);
     } else checkSheet(owner, t.sheet);

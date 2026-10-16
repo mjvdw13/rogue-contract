@@ -28,6 +28,7 @@ export default defineMonster({
   sounds: { sight: 'droid-sight', active: 'droid-active', pain: 'droid-pain', death: 'explode' },
   bleeds: false,
   explode: { radius: 3.2, damage: 30 },
-  death: { particles: [{ type: 'spark', count: 40, speed: [2, 6] }] }, // sparks fly all round as it blows
+  // Once the wreck lands, it spits a few short jets of sparks.
+  corpse: { bursts: [3, 5], every: [0.25, 0.9], particles: [{ type: 'spark', count: 14, speed: [2, 5] }] },
   mass: 60,
 });

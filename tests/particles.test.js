@@ -10,7 +10,7 @@ import { Rng } from '../src/engine/core/rng.js';
 import { Registry } from '../src/engine/registry.js';
 import { validateContent } from '../src/engine/validate.js';
 import content from '../src/content/index.js';
-import { registry, room, makeWorld, headlessRenderer } from './helpers.js';
+import { registry, room, makeWorld, headlessRenderer, mockInput } from './helpers.js';
 
 // Particles (PLAN.md Phase 1b T): a pool of points and discs, moved on the
 // tile grid and drawn straight into the frame.
@@ -333,30 +333,58 @@ test('dither particles with fadeIn fade in, then out', async () => {
   assert.ok(late < half, `then out (${late})`);
 });
 
-test('a probe droid throws sparks when it dies, from the middle of its body', () => {
+test('a probe droid sparks only once its wreck has landed, in tight jets one way each', () => {
   const w = makeWorld(room(OPEN, ['', ' >'], { legend: { '.': ROOM } }), { noMonsters: true });
   const droid = w.spawn('probe-droid', 8.5, 3.5);
+  droid.z = 0.9;
   const state = w.rng.state;
-  assert.equal(w.particles.n, 0);
   w.damage(droid, 1000, w.player, w.player);
   assert.ok(droid.dead);
-  const spark = w.particles.typeIndex('spark');
-  assert.equal(w.particles.n, 40);
-  for (let i = 0; i < w.particles.n; i++) {
-    assert.equal(w.particles.type[i], spark);
-    assert.equal(w.particles.z[i], Math.fround(droid.z + droid.height / 2));
+  assert.equal(w.particles.n, 0, 'nothing as it blows up');
+  const ps = w.particles;
+  const bursts = droid.corpseBursts;
+  assert.ok(bursts >= 3 && bursts <= 5);
+  let seen = 0;
+  for (let k = 0; k < 6 * 60 && droid.corpseBursts > 0; k++) {
+    const before = droid.corpseBursts;
+    w.tick(DT, mockInput());
+    if (droid.corpseBursts === before) continue;
+    assert.ok(droid.animDone && droid.z === 0, 'only once it lies still');
+    // The newest burst is at the end of the pool: its sparks fly much the same way.
+    const jet = [];
+    for (let i = 0; i < ps.n; i++) if (ps.age[i] < DT * 1.5) jet.push([ps.vx[i], ps.vy[i], ps.vz[i]].map((v, _, a) => v / Math.hypot(...a)));
+    assert.equal(jet.length, 14);
+    const mean = [0, 1, 2].map((c) => jet.reduce((s, v) => s + v[c], 0) / jet.length);
+    assert.ok(Math.hypot(...mean) > 0.85, `clustered (mean length ${Math.hypot(...mean).toFixed(2)})`);
+    seen++;
   }
+  assert.equal(seen, bursts);
   assert.equal(w.rng.state, state, "the sparks don't touch the world's RNG");
 });
 
-test('the validator checks death bursts', () => {
+test('death bursts come from the middle of the body as it dies', () => {
+  const droid = content.things.find((t) => t.id === 'probe-droid');
+  const reg = new Registry({ ...content, things: [...content.things.filter((t) => t !== droid), { ...droid, corpse: undefined, death: { particles: [{ type: 'shrapnel', count: 20 }] } }] });
+  const w = makeWorld(room(OPEN, ['', ' >'], { legend: { '.': ROOM } }), { noMonsters: true, registry: reg });
+  const d = w.spawn('probe-droid', 8.5, 3.5);
+  w.damage(d, 1000, w.player, w.player);
+  assert.equal(w.particles.n, 20);
+  for (let i = 0; i < w.particles.n; i++) assert.equal(w.particles.z[i], Math.fround(d.z + d.height / 2));
+});
+
+test('the validator checks death and corpse bursts', () => {
   const droid = content.things.find((t) => t.id === 'probe-droid');
   const bad = new Registry({
     ...content,
-    things: [...content.things.filter((t) => t !== droid), { ...droid, death: { particles: [{ type: 'no-such', count: 0.5, speed: [-1], spread: 3 }] } }],
+    things: [
+      ...content.things.filter((t) => t !== droid),
+      { ...droid, death: { particles: [{ type: 'no-such', count: 0.5, speed: [-1], spread: 3 }] }, corpse: { bursts: 'x', every: [-1], particles: [{ type: 'nope' }] } },
+    ],
   });
   const { errors } = validateContent(bad);
-  for (const s of ['unknown particle type "no-such"', 'count', 'speed', 'spread']) {
-    assert.ok(errors.some((e) => e.includes('death') && e.includes(s)), `expected "${s}" in ${JSON.stringify(errors)}`);
-  }
+  const has = (s) => assert.ok(errors.some((e) => e.includes(s)), `expected "${s}" in ${JSON.stringify(errors)}`);
+  for (const s of ['unknown particle type "no-such"', 'count', 'speed', 'spread']) has(s);
+  has('corpse: unknown particle type "nope"');
+  has('corpse: bursts');
+  has('corpse: every');
 });

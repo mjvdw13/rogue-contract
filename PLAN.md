@@ -1193,6 +1193,19 @@ with the game):
              sandbox): 40 sparks at 2 to 6 units a second, all round; white
              at first, orange and bouncing on the floor by half a second,
              8 left at 0.8 s.
+       - [x] 5a'. Mark (2026-10-15): the sparks should come out of the
+             corpse once it lands, not with the explosion: a few bursts,
+             each one way (random) with its sparks clustered, not all
+             round. So `corpse: { bursts, every, z, particles }`: once the
+             corpse lies still (on the floor, death animation done) it
+             throws `bursts` of them, `every` seconds apart (the first too),
+             each along one random direction up and out at `spread` 0.3.
+             Timing and directions use the particles' RNG. The droid: 3 to
+             5 jets of 14 sparks, 0.25 to 0.9 s apart, from 0.3 above the
+             floor; in the sandbox the first comes about 1.1 s after the
+             kill. `death.particles` stays (for 5b's shrapnel). Validator,
+             MODDING.md, tests (none at the explosion, only once landed,
+             each jet clustered).
        - [ ] 5b. Shrapnel too when it dies.
        - [ ] 5c. Sparks where bolts hit walls (projectiles' `hit`).
        - [ ] 5d. Shrapnel and smoke from rockets and concussion blasts.
@@ -2610,4 +2623,8 @@ update the smoke test.
   pass; with no particles, 23 views are byte-identical.
 - 2026-10-15: Phase 1b T step 5a: probe droids throw 40 sparks when they
   die, through a new `death: { particles }` on things (validated, in
-  MODDING.md). 209 tests, the validator and the smoke test pass.
+  MODDING.md). 207 tests, the validator and the smoke test pass.
+- 2026-10-15: Phase 1b T step 5a, after Mark's notes: no sparks at the
+  explosion; the landed wreck throws 3 to 5 tight jets of sparks, each a
+  random way (`corpse: { particles }`). 208 tests, the validator and the
+  smoke test pass.

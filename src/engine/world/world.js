@@ -19,7 +19,7 @@ import { PlayerState, playerThink, playerCamera } from '../things/player.js';
 import { monsterThink, wakeMonster, monsterPain, applyMomentum } from '../things/monster.js';
 import { projectileThink, launchProjectile, effectThink } from '../things/projectile.js';
 import { tryPickup } from '../things/pickups.js';
-import { damage, radiusDamage, hitscan, meleeTarget } from '../combat/damage.js';
+import { damage, radiusDamage, hitscan, meleeTarget, corpseThink } from '../combat/damage.js';
 import { weaponSprites, bestWeapon } from '../things/weapons.js';
 import { TEXELS_PER_UNIT } from '../config.js';
 
@@ -660,6 +660,7 @@ export class World {
         case 'monster':
           monsterThink(this, t, dt);
           this.fall(t, dt);
+          corpseThink(this, t, dt);
           break;
         case 'projectile':
           projectileThink(this, t, dt);
@@ -676,6 +677,7 @@ export class World {
           applyMomentum(this, t, dt);
           this.fall(t, dt);
           t.stepAnim(dt);
+          corpseThink(this, t, dt);
           t.def.hooks?.onThink?.(this, t, dt);
       }
     }

@@ -262,15 +262,18 @@ function baseThing(def, kind, defaults) {
  * deeper than `dropHeight` (default: their step height). `flying` monsters
  * ignore floors, hovering `z` above the floor their target stands on, and
  * climb or sink at `flySpeed` (default 3 per second). `death.particles` are
- * bursts thrown from the middle of the body when it's killed (shootable
- * decorations take them too).
+ * bursts thrown from the middle of the body when it's killed; once the
+ * corpse lies still, it throws `corpse.bursts` of `corpse.particles`,
+ * `corpse.every` seconds apart, `corpse.z` above the floor, each one way at
+ * random (shootable decorations take both too).
  * @param {{id:string, name?:string, glyph?:string, sheet:SheetSpec, anims:Record<string,AnimSpec>,
  *   health:number, speed?:number, radius?:number, height?:number, painChance?:number,
  *   stepHeight?:number, dropHeight?:number, flying?:boolean, flySpeed?:number, z?:number,
  *   attack?:AttackSpec, melee?:AttackSpec, cooldown?:[number,number], reactionTime?:number,
  *   sightRange?:number, drops?:(string|{item:string, chance?:number})[], mass?:number,
  *   splashImmune?:boolean, boss?:boolean, sounds?:Record<string,string>,
- *   death?:{particles?:BurstSpec[]}, hooks?:Record<string,Function>}} def
+ *   death?:{particles?:BurstSpec[]}, corpse?:{particles:BurstSpec[], bursts?:number|[number,number],
+ *   every?:number|[number,number], z?:number}, hooks?:Record<string,Function>}} def
  */
 export function defineMonster(def) {
   const m = baseThing(def, 'monster', {

@@ -97,6 +97,12 @@ export function kill(world, target, source) {
   }
   world.playSoundFrom(gib ? (def.sounds.gib ?? def.sounds.death) : def.sounds.death, target);
   for (const b of def.death?.particles ?? []) world.particles.burst(b.type, target.x, target.y, aimZ(target), b);
+  if (def.corpse?.particles) {
+    // Cosmetic: the particles' own RNG, so the game plays out the same.
+    const rng = world.particles.rng;
+    target.corpseBursts = Math.round(between(rng, def.corpse.bursts ?? 3));
+    target.corpseWait = between(rng, def.corpse.every ?? CORPSE_EVERY);
+  }
   if (def.kind === 'monster' && def.countKill) world.stats.kills++;
   for (const drop of [...(def.drops ?? []), ...(target.drops ?? [])]) {
     if (world.rng.chance(drop.chance ?? 1)) {
@@ -112,6 +118,32 @@ export function kill(world, target, source) {
   }
   def.hooks?.onDeath?.(world, target, source);
   world.triggers?.killed(target);
+}
+
+/** Seconds between a corpse's bursts by default. */
+const CORPSE_EVERY = [0.2, 0.8];
+
+/** A number, or one picked at random in [min, max]. */
+const between = (rng, v) => (Array.isArray(v) ? v[0] + (v[1] - v[0]) * rng.next() : v);
+
+/**
+ * A corpse with `corpse.particles` throws its bursts once it lies still (on
+ * the floor, its death animation done): `bursts` of them, `every` seconds
+ * apart (the first one `every` after it settles). Each burst goes one random way, up and out, unless it has a `dir`.
+ */
+export function corpseThink(world, t, dt) {
+  if (!t.dead || !(t.corpseBursts > 0) || !t.animDone || t.z > world.groundZ(t) + 0.001) return;
+  if ((t.corpseWait -= dt) > 0) return;
+  const c = t.def.corpse;
+  const ps = world.particles;
+  const rng = ps.rng;
+  t.corpseWait = between(rng, c.every ?? CORPSE_EVERY);
+  t.corpseBursts--;
+  const a = rng.next() * Math.PI * 2;
+  const up = 0.3 + rng.next() * 0.9;
+  const dir = [Math.cos(a), Math.sin(a), up];
+  const z = t.z + (c.z ?? 0.3);
+  for (const b of c.particles) ps.burst(b.type, t.x, t.y, z, { spread: 0.3, dir, ...b });
 }
 
 /**

@@ -362,9 +362,22 @@ for looks: they never touch the game's random numbers, so they can't change
 what happens.
 
 Content throws bursts too. A monster (or a shootable decoration) with
-`death: { particles: [{ type: 'spark', count: 40, speed: [2, 6] }] }`
-throws them from the middle of its body when it's killed, as the probe
-droid does; each burst takes the same `count`, `dir`, `spread` and `speed`.
+`death: { particles: [{ type: 'shrapnel', count: 30, speed: [2, 6] }] }`
+throws them from the middle of its body when it's killed; each burst takes
+the same `count`, `dir`, `spread` and `speed`. With `corpse`, the wreck
+keeps sparking once it has landed, as the probe droid's does:
+
+```js
+corpse: {
+  bursts: [3, 5],      // how many (a number, or a range)
+  every: [0.25, 0.9],  // seconds between them; the first comes this long after it lands
+  z: 0.3,              // how high above the floor they start (the default)
+  particles: [{ type: 'spark', count: 14, speed: [2, 5] }],
+},
+```
+
+Each corpse burst shoots one way, picked at random (up and out), in a tight
+jet (`spread` 0.3 unless it says otherwise).
 
 To see what they cost, serve the repo and open `tools/particles.html`: it
 runs Mission 1 with any number of one type in front of you, and times them.
