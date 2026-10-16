@@ -4,19 +4,30 @@
 // The kinds are the content's particle types (src/content/particles.js), each
 // with a spawn velocity.
 
-/** The bench's kinds: one per way of drawing (dot, square, streak, disc) and blend. */
+/**
+ * The bench's kinds, one per content type: a label, a spawn velocity, and
+ * optionally spawn heights above the floor (`z`, default 0.05 to 2.5) and the
+ * level's wind while it runs (`wind`, default still air).
+ */
 export const BENCH_KINDS = {
   dust: { label: 'Dust (dot, lit, solid)', vel: (r) => [r(-0.3, 0.3), r(-0.3, 0.3), r(-0.1, 0.1)] },
   shrapnel: { label: 'Shrapnel (square, lit, solid)', vel: (r) => [r(-2, 2), r(-2, 2), r(1, 4)] },
   spark: { label: 'Sparks (streak, glowing, add)', vel: (r) => [r(-3, 3), r(-3, 3), r(1, 5)] },
+  'bolt-spark': { label: 'Bolt sparks (streak, glowing, add)', vel: (r) => [r(-3, 3), r(-3, 3), r(1, 4)] },
+  'ion-spark': { label: 'Ion sparks (streak, glowing, add)', vel: (r) => [r(-5, 5), r(-5, 5), r(-3, 4)] },
   ember: { label: 'Embers (dot, glowing, add)', vel: (r) => [r(-0.3, 0.3), r(-0.3, 0.3), r(0.2, 1)] },
+  mote: { label: 'Motes (dot, glowing, add)', vel: (r) => [r(-0.1, 0.1), r(-0.1, 0.1), r(-0.05, 0.1)], z: [0.3, 3] },
+  'rock-chip': { label: 'Rock chips (square, lit, solid)', vel: (r) => [r(-1.5, 1.5), r(-1.5, 1.5), r(1, 3.5)] },
   smoke: { label: 'Smoke (disc, lit, half)', vel: (r) => [r(-0.2, 0.2), r(-0.2, 0.2), r(0.2, 0.6)] },
   steam: { label: 'Steam (disc, lit, dither)', vel: (r) => [r(-0.3, 0.3), r(-0.3, 0.3), r(0.5, 1.5)] },
+  'dust-puff': { label: 'Dust puffs (disc, lit, half, fading)', vel: (r) => [r(-0.6, 0.6), r(-0.6, 0.6), r(0.1, 0.6)], z: [0.05, 0.4] },
+  mist: { label: 'Mist (disc, lit, half, fading)', vel: (r) => [r(-0.15, 0.15), r(-0.15, 0.15), 0], z: [0.05, 0.35] },
+  'sand-gust': { label: 'Sand gusts (disc, lit, half, fading)', vel: (r) => [r(2, 4), r(0.5, 1.5), 0], z: [0.1, 0.8], wind: [3, 1, 0] },
 };
 
 /**
  * Keeps `count` particles of `kind` alive, spawned at random spots in the
- * view cone 1 to `far` units ahead, between the floor and 2.5 above it. The
+ * view cone 1 to `far` units ahead, at its kind's heights above the floor. The
  * world's caps are lifted (up to the pool's size) while it runs.
  */
 export class BenchSpawner {
@@ -50,7 +61,9 @@ export class BenchSpawner {
     if (this._last !== this.kind || ps.n > this.count) {
       ps.clear();
       this._last = this.kind;
+      ps.wind = kind.wind ? [...kind.wind] : [0, 0, 0];
     }
+    const [z0, z1] = kind.z ?? [0.05, 2.5];
     const r = (a, b) => this.rand(a, b);
     const dirX = Math.cos(cam.angle);
     const dirY = Math.sin(cam.angle);
@@ -63,7 +76,7 @@ export class BenchSpawner {
       if (!map.inBounds(x | 0, y | 0)) continue;
       const floor = map.floorAt(x, y, 0, (cam.z ?? 0) + 1);
       const ceil = map.ceilAt(x, y, 0, (cam.z ?? 0) + 1);
-      const z = floor + r(0.05, Math.min(2.5, ceil - floor - 0.05));
+      const z = floor + r(z0, Math.min(z1, ceil - floor - 0.05));
       const [vx, vy, vz] = kind.vel(r);
       ps.spawn(ti, x, y, z, vx, vy, vz);
     }

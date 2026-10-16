@@ -286,7 +286,9 @@ test('drawing: discs cover their area, streaks run along their velocity, dither 
   ps.age[s] = 5;
   const halfWay = count();
   ps.age[s] = 9.9;
-  assert.ok(full > 0.95 * area && Math.abs(halfWay / full - 0.5) < 0.1, `dither: ${full} then ${halfWay} pixels`);
+  // A full core (0.6 of the radius) and a half-covered rim: 0.36 + 0.64 / 2 of the area.
+  assert.ok(Math.abs(full / area - 0.68) < 0.08, `dither at full strength: ${full} of ${area} pixels`);
+  assert.ok(Math.abs(halfWay / full - 0.5) < 0.1, `dither: ${full} then ${halfWay} pixels`);
   assert.ok(count() < 0.05 * full, 'nearly gone at the end');
 
   ps.clear();
@@ -303,4 +305,30 @@ test('drawing: discs cover their area, streaks run along their velocity, dither 
   const t = ps.types[ps.typeIndex('lit')];
   t.fullbright = true;
   assert.ok(count(ramps.gray[0] + 15) > 0, '(fullbright, its own colour)');
+});
+
+test("every bench kind is one of the content's particle types", async () => {
+  const { BENCH_KINDS } = await import('../tools/lib/particle-bench.js');
+  for (const id of Object.keys(BENCH_KINDS)) assert.ok(registry.particles.has(id), `"${id}"`);
+  for (const id of registry.particles.keys()) assert.ok(BENCH_KINDS[id], `the bench lists "${id}"`);
+});
+
+test('dither particles with fadeIn fade in, then out', async () => {
+  const { renderer } = await headlessRenderer();
+  const green = ramps['glow-green'][0] + 2;
+  const w = new World({ registry, assets: renderer.assets, rng: new Rng(1), settings: { noMonsters: true } }, room(OPEN, ['', ' >'], { legend: { '.': ROOM } }), { skill: 3 });
+  const ps = w.particles;
+  ps.addType(defineParticle({ id: 'fog', colors: [green], fullbright: true, size: 5, maxPx: 20, shape: 'disc', blend: 'dither', fadeIn: 0.5, life: 10 }));
+  Object.assign(w.player, { x: 2.5, y: 3.5, angle: 0 });
+  const s = ps.spawn('fog', 8.5, 3.5, 1.25);
+  const at = (age) => {
+    ps.age[s] = age;
+    renderer.surface.clear(0);
+    renderer.render(w, w.camera(), { skip: w.player });
+    return renderer.surface.px.reduce((n, c) => n + (c === green), 0);
+  };
+  const [start, quarter, half, late] = [at(0), at(2.5), at(5), at(8)];
+  assert.equal(start, 0, 'invisible when born');
+  assert.ok(quarter > 0 && quarter < half, `fading in (${quarter} then ${half} pixels)`);
+  assert.ok(late < half, `then out (${late})`);
 });

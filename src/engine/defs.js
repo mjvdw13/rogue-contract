@@ -389,7 +389,7 @@ export function defineEffect(def) {
  * @param {{id:string, colors:any[], life?:number|number[], size?:number, maxPx?:number,
  *   shape?:'square'|'disc', streak?:number, gravity?:number, drag?:number, bounce?:number,
  *   onFloor?:'die'|'bounce'|'stick', walls?:'die'|'bounce', wind?:number,
- *   blend?:'solid'|'add'|'half'|'dither', alpha?:number, fullbright?:boolean, cap?:number}} def
+ *   blend?:'solid'|'add'|'half'|'dither', alpha?:number, fadeIn?:number, fade?:boolean, fullbright?:boolean, cap?:number}} def
  */
 export function defineParticle(def) {
   requireId(def, 'Particle');

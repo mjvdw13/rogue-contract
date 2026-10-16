@@ -279,6 +279,9 @@ function checkParticles(reg, err, warn) {
     if (p.drag !== undefined && !num(p.drag, 0, 30)) err(`${owner}: drag (velocity lost per second) must be 0 to 30`);
     if (p.bounce !== undefined && !num(p.bounce, 0, 1)) err(`${owner}: bounce must be 0 to 1`);
     if (p.alpha !== undefined && !num(p.alpha, 0, 1)) err(`${owner}: alpha must be 0 to 1`);
+    if (p.fadeIn !== undefined && !num(p.fadeIn, 0, 1)) err(`${owner}: fadeIn is a share of its life, 0 to 1`);
+    if (p.fadeIn && p.blend !== 'dither' && !p.fade) warn(`${owner}: fadeIn only works with blend 'dither', or with fade: true`);
+    if (p.fade && !['add', 'half'].includes(p.blend)) warn(`${owner}: fade is for blend 'add' or 'half' ('dither' always fades)`);
     if (p.streak !== undefined && !num(p.streak, 0, 1)) err(`${owner}: streak is seconds of travel, 0 to 1`);
     for (const key of ['gravity', 'wind']) if (p[key] !== undefined && typeof p[key] !== 'number') err(`${owner}: ${key} must be a number`);
     const classCap = p.shape === 'disc' ? DISC_CAP : POINT_CAP;

@@ -3,6 +3,8 @@ import { BLEND_SOLID, BLEND_ADD, BLEND_HALF, BLEND_DITHER } from '../world/parti
 
 /** 4x4 ordered dither thresholds (0..15) for `dither` particles. */
 const BAYER = new Uint8Array([0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5]);
+/** Fading discs (dither, or `fade`) are drawn at full alpha inside this share of their radius, half outside: a soft rim. */
+const CORE = 0.6;
 /** Streaks are at most this many pixels long. */
 const MAX_STREAK = 8;
 
@@ -38,6 +40,8 @@ let gMdepth = new Float32Array(0);
 let gTable = new Uint8Array(0);
 let gBlend = 0;
 let gAlpha = 16;
+/** Thin `add` and `half` pixels out by gAlpha too (types with `fade`). */
+let gFade = false;
 
 /**
  * Draw rows ya..yb-1 of column x in colour c at `depth`, clipped against the
@@ -81,11 +85,7 @@ function rows(x, y0, y1, depth, c) {
       for (; o < end; o += fbW) if (depth < mdepth[o]) fb[o] = c;
       break;
     case BLEND_DITHER: {
-      // Whole rows of the 4x4 pattern that pass for this column, as a 4-bit mask.
-      const a = gAlpha;
-      const col = x & 3;
-      let mask = 0;
-      for (let r = 0; r < 4; r++) if (a > BAYER[(r << 2) | col]) mask |= 1 << r;
+      const mask = ditherMask(x);
       if (!mask) return;
       for (let y = y0; o < end; o += fbW, y++) if (mask & (1 << (y & 3)) && depth < mdepth[o]) fb[o] = c;
       break;
@@ -93,9 +93,23 @@ function rows(x, y0, y1, depth, c) {
     default: {
       const table = gTable;
       const hi = c << 8;
-      for (; o < end; o += fbW) if (depth < mdepth[o]) fb[o] = table[hi | fb[o]];
+      const mask = gFade ? ditherMask(x) : 15;
+      if (mask === 15) {
+        for (; o < end; o += fbW) if (depth < mdepth[o]) fb[o] = table[hi | fb[o]];
+      } else if (mask) {
+        for (let y = y0; o < end; o += fbW, y++) if (mask & (1 << (y & 3)) && depth < mdepth[o]) fb[o] = table[hi | fb[o]];
+      }
     }
   }
+}
+
+/** The rows (y & 3) of the 4x4 dither pattern that pass gAlpha in column x, as a 4-bit mask. */
+function ditherMask(x) {
+  const a = gAlpha;
+  const col = x & 3;
+  let mask = 0;
+  for (let r = 0; r < 4; r++) if (a > BAYER[(r << 2) | col]) mask |= 1 << r;
+  return mask;
 }
 
 /**
@@ -147,7 +161,8 @@ export function drawParticles(view, ps, map, fb, fbW, colormaps, tables) {
     else if (!t.fullbright) c = colormaps[litRow(view, light[i], depth, (flags[tile[i]] & F_SKY) !== 0 ? 1 : 0) * 256 + c];
     gBlend = t.blend;
     if (t.blend === BLEND_ADD || t.blend === BLEND_HALF) gTable = tables[t.blend];
-    gAlpha = (t.alpha * (1 - f) * 16) | 0;
+    gAlpha = (t.alpha * (1 - f) * (f < t.fadeIn ? f / t.fadeIn : 1) * 16) | 0;
+    gFade = t.fade;
 
     if (t.streak) {
       // From where it was `streak` seconds ago to where it is.
@@ -191,6 +206,9 @@ export function drawParticles(view, ps, map, fb, fbW, colormaps, tables) {
       let x1 = Math.ceil(sx + rx - 0.5);
       if (x0 < 0) x0 = 0;
       if (x1 > W) x1 = W;
+      const soft = t.fade || t.blend === BLEND_DITHER;
+      const full = gAlpha;
+      const rim = full >> 1;
       for (let x = x0; x < x1; x++) {
         const u = (x + 0.5 - sx) / rx;
         const h = ry * Math.sqrt(1 - u * u);
@@ -198,7 +216,27 @@ export function drawParticles(view, ps, map, fb, fbW, colormaps, tables) {
         let yb = Math.ceil(sy + h - 0.5);
         if (ya < 0) ya = 0;
         if (yb > H) yb = H;
-        if (yb > ya) span(x, ya, yb, depth, c);
+        if (yb <= ya) continue;
+        if (!soft) {
+          span(x, ya, yb, depth, c);
+          continue;
+        }
+        // The core's rows in this column (none past its edge), at full alpha; the rim at half.
+        const v = u / CORE;
+        const hc = v * v < 1 ? ry * CORE * Math.sqrt(1 - v * v) : 0;
+        let ia = Math.ceil(sy - hc - 0.5);
+        let ib = Math.ceil(sy + hc - 0.5);
+        if (ia < ya) ia = ya;
+        if (ib > yb) ib = yb;
+        gAlpha = rim;
+        if (ib <= ia) span(x, ya, yb, depth, c);
+        else {
+          if (ia > ya) span(x, ya, ia, depth, c);
+          if (yb > ib) span(x, ib, yb, depth, c);
+          gAlpha = full;
+          span(x, ia, ib, depth, c);
+        }
+        gAlpha = full;
       }
       continue;
     }

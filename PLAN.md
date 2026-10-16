@@ -1155,6 +1155,31 @@ with the game):
              validator, the smoke test; commit and push.
        - Checked in Chrome: 150 smoke puffs (the disc cap) draw in 0.30 ms
          of an 11 ms frame at the canyon, 60 fps.
+4b. [x] **Six more types** (Mark, 2026-10-15: "do all 6"), each tuned in
+       the bench page with screenshots and added to its list:
+       - [x] `bolt-spark`: red-orange sparks where the (red) blaster bolts hit.
+       - [x] `ion-spark`: short cyan crackles: the Jawa's ion bolts, a
+             shorting droid, the broken panel arcing (later force fields).
+       - [x] `rock-chip` and `dust-puff`: grit and a small puff of dust where
+             shots and blasts hit rock and dirt in the canyon. Chips were
+             lost against the sand at 2 px: now up to 3 px, pale in the air
+             and dark on the ground; puffs a step lighter than the floor.
+       - [x] `mote`: slow glowing specks drifting over the generator (amber,
+             with a white glint mid-life). 150 cost 0.05 ms.
+       - [x] `mist`: low, slow puffs on the data vault's floor (looked at in
+             the vault itself, "Inside C"). The dearest type: 60 cost 0.48 ms
+             in Chrome, so its cap is 40.
+       - [x] `sand-gust`: bigger dust puffs blown low over the canyon floor.
+       - [x] `fadeIn` (share of its life) for `dither` types, so mist and
+             gusts fade in instead of popping up; validator, MODDING.md.
+       - [x] Seen in the bench: dithered puffs looked like lace and hard-edged
+             discs like discs. So `fade: true` lets `half` (and `add`) types
+             thin out with the dither pattern only as they fade (smooth when
+             strong), and fading discs get a soft rim (full alpha inside 0.6
+             of the radius, half outside). Puffs, mist and gusts use both.
+       - [x] The bench: each kind's spawn heights and wind; no "leave site?"
+             prompt on reload; tests (every bench kind is a content type,
+             fadeIn), validator, smoke test. Commit and push.
 5. [ ] **Content bursts:** sparks and shrapnel when a probe droid dies,
        sparks where bolts hit walls, shrapnel and smoke from rockets and
        concussion blasts, a smoke trail on rockets.
@@ -1164,6 +1189,9 @@ with the game):
        Mission 1 wants them (the maintenance valve and broken light, the
        generator).
 7. [ ] **Weather:** sand and wind in the canyon.
+       - Mark (2026-10-15), from the bench page: the `dust` type at 100 live
+         particles is "perfect for sunny Mos Eisley" (Mission 1 of the
+         story). Use that as Mos Eisley's weather when its level is built.
 8. [ ] Bench again with everything on (the budget holds?), tests, the
        validator, the smoke test, screenshots: sparks, steam, fire, the
        canyon's sand. Commit.
@@ -2560,3 +2588,9 @@ update the smoke test.
   blend tables built while loading, MODDING.md. 13 new tests (203 in all),
   the validator and the smoke test pass; with no particles, 23 views are
   byte-identical.
+- 2026-10-15: Phase 1b T step 4b: the six more particle types asked for
+  (seven: rock chips come with a dust puff): bolt-spark, ion-spark,
+  rock-chip, dust-puff, mote, mist, sand-gust, tuned in the bench page; `fadeIn`, `fade` for see-through types,
+  soft rims on fading discs. Mark: `dust` at 100 is perfect for a sunny Mos
+  Eisley (noted under step 7). 205 tests, the validator and the smoke test
+  pass; with no particles, 23 views are byte-identical.

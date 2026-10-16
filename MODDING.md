@@ -340,7 +340,10 @@ defineParticle({
   default 3) or `'disc'` (round puffs for smoke and steam).
 - `blend`: `'solid'`, `'add'` (glows: sparks, fire), `'half'` (see-through:
   smoke) or `'dither'` (a screen-door pattern that thins out as the particle
-  ages; `alpha` sets how solid it starts).
+  ages; `alpha` sets how solid it is at its most, and `fadeIn`, the share
+  of its life it takes to fade in, so mist doesn't pop up). `fade: true`
+  makes an `add` or `half` type thin out the same way: soft while it's
+  strong, and still fading in and out.
 - `drag`: the share of its speed lost per second (toward the wind, for
   types with `wind`). `wind`: how much of the level's wind carries it (1:
   all of it).

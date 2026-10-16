@@ -59,6 +59,8 @@
     const $ = (id) => document.getElementById(id);
     const params = new URLSearchParams(location.search);
     for (const [k, v] of [['map', 'm1'], ['nomonsters', ''], ['god', ''], ['mute', '']]) if (!params.has(k)) params.set(k, v);
+    // No "leave site?" prompt on the bench (the game asks mid-level): this listener runs before the game's.
+    window.addEventListener('beforeunload', (e) => e.stopImmediatePropagation());
     const game = new Game({ canvas: $('screen'), stage: $('stage'), content, params });
     window.game = game;
     await game.boot((s) => { if (s === 'fonts') $('boot-message').hidden = true; });

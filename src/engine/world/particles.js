@@ -90,6 +90,10 @@ export function particleType(def, ramps) {
     blend: BLENDS[def.blend ?? 'solid'] ?? BLEND_SOLID,
     /** Opacity for dither (fades out over the particle's life). */
     alpha: def.alpha ?? 1,
+    /** For dither: the share of its life it takes to fade in. */
+    fadeIn: def.fadeIn ?? 0,
+    /** `add` and `half` types with `fade` also thin out (as dither does) with alpha, fadeIn and age. */
+    fade: !!def.fade,
     fullbright: !!def.fullbright,
     cap: def.cap ?? Infinity,
     /** Live count (kept by the pool). */
