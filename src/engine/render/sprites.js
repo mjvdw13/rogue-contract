@@ -16,15 +16,18 @@ const FUZZ = [1, -1, 1, -1, 1, 1, -1, 1, 1, -1, 1, 1, 1, -1, 1, 1, 1, -1, -1, -1
  * position x/y/z. Optional: `fullbright` (current frame glows), `flipX`,
  * `def.scale`, `def.renderStyle` ('normal' | 'fuzz'). A frame's `glint` pixels
  * brighten with the glint light (`map.glintmap`) where the thing stands.
+ * With `writeDepth` (and a valid view.mdepth), each pixel drawn records its
+ * depth there, for particles drawn after.
  *
  * @param {import('./view.js').View} view
  * @param {Array<any>} things
  * @param {import('../world/tilemap.js').TileMap} map
  */
-export function drawSprites(view, things, map, fb, fbW, colormaps, skip) {
+export function drawSprites(view, things, map, fb, fbW, colormaps, skip, writeDepth = false) {
   const { W, H, x: px, y: py, dirX, dirY, planeX, planeY, fx, fy, camZ, horizon, zbuf } = view;
   const { segDist, segTop, segBot, segFirst, segCount, SEG } = view;
   const mdepth = view.depthValid ? view.mdepth : null;
+  const depthOut = writeDepth && mdepth !== null;
   const invDet = 1 / (planeX * dirY - dirX * planeY);
   visible.length = 0;
   for (const t of things) {
@@ -127,6 +130,7 @@ export function drawSprites(view, things, map, fb, fbW, colormaps, skip) {
           } else {
             fb[o] = colormaps[(gmask && gmask[base + ty] ? gcm : cm) + c];
           }
+          if (depthOut) mdepth[o] = depth;
         }
       }
     }

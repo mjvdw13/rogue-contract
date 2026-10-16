@@ -1065,10 +1065,49 @@ with the game):
   ground. Motes over the reactor are an emitter, not weather.
 
 **Steps:**
-1. [ ] **Bench first.** A scratchpad bench (as in S): the canyon start and
+1. [x] **Bench first.** A scratchpad bench (as in S): the canyon start and
        the reactor with 0, 1000, 2000 and 4000 particles of each draw kind
        (dot, square, streak, disc) and blend; the numbers go here. Gives
        the caps and `maxPx` their values.
+       - Mark (2026-10-15): also a bench page to see in the browser:
+         `tools/particles.html` (served from the repo root, as the game
+         is). It runs Mission 1 with no monsters, keeps a chosen number of
+         one kind alive in front of you, shows the 3D view's and the
+         particles' times, and runs a sweep of every kind and count from
+         where you stand. Kinds and spawner: `tools/lib/particle-bench.js`,
+         shared with the headless bench.
+       - To have something to measure, first cuts of steps 2 to 4 are in:
+         `world/particles.js` (pool, simulation), `render/particles.js`
+         (drawing), `gfx/blend.js` (`add` and `half` tables). No tests yet;
+         with no particles, 23 views are byte-identical to before.
+       - Speed-ups found on the way: one tight loop per blend (smoke 1.75 to
+         1.2 ms per 1000, headless); the light row cached per frame by light
+         and distance (`view.row` was 60 ns a particle; lit dots 25% faster).
+         Tried, not kept: discs drawn row by row (2x slower: a disc's
+         columns share cache lines anyway), the view's buffers read once a
+         frame (no change), binary search of the ledge windows (kept: no
+         loss, and the canyon records many).
+       - **Results**, the canyon start, ms a frame to draw (Chrome, 506
+         columns, mean of 80; the view alone 7.85 ms):
+
+         | kind                          | 500  | 1000 | 2000 | 4000  |
+         |-------------------------------|------|------|------|-------|
+         | dust (dot, lit, solid)        | 0.17 | 0.31 | 0.57 | 1.06  |
+         | shrapnel (square, lit, solid) | 0.24 | 0.36 | 0.75 | 1.41  |
+         | spark (streak, glowing, add)  | 0.25 | 0.48 | 0.88 | 1.79  |
+         | smoke (disc, lit, half)       | 1.41 | 2.79 | 5.86 | 10.26 |
+         | steam (disc, lit, dither)     | 1.23 | 2.34 | 4.22 | 9.98  |
+
+         Updating 1000 takes about 0.04 ms a tick (headless). Chrome is
+         about 2 to 2.5 times slower than Node here. Points cost about
+         0.3 to 0.5 ms per 1000; discs are bound by the pixels they cover
+         (1000 smoke puffs up to 16 px cover 1.5 screens, at about 7 ns a
+         pixel headless), about 0.28 ms per 100.
+       - **So:** the budget of 2000 + 400 points in 0.5 ms doesn't hold
+         (about 0.9 ms in Chrome). Proposed caps, for about 0.5 ms in a busy
+         scene: about 1000 live points (sparks, shrapnel, embers, sand)
+         and 150 discs (smoke, steam), each type with its own cap within
+         those; `maxPx` 16 for discs. Mark to try the page and say.
 2. [ ] **Pool and simulation** (`world/particles.js`, `defineParticle`,
        validator): spawn, move, collide, bounce, stick, die; caps. Tests:
        a burst falls and bounces off the floor, stops at walls, never
@@ -2474,3 +2513,9 @@ update the smoke test.
   548 columns: canyon 11.1 to about 9.3 ms, indoors 8.1 to 6.1. Output is
   byte-identical except a few pixels a view at a colormap step. 190 tests,
   the validator and the smoke test pass.
+- 2026-10-15: Phase 1b T step 1: particle bench. First cuts of the pool,
+  the drawer and the blend tables, a headless bench and a browser page
+  (`tools/particles.html`). In Chrome at the canyon start, points cost 0.3
+  to 0.5 ms per 1000 and smoke discs about 0.28 ms per 100, against a 7.85
+  ms view; proposed caps of about 1000 points and 150 discs. With no
+  particles the view is byte-identical. 190 tests and the validator pass.

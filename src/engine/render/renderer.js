@@ -3,6 +3,9 @@ import { drawWorld } from './columns.js';
 import { drawSprites } from './sprites.js';
 import { drawModels } from './models.js';
 import { drawPsprites } from './psprite.js';
+import { drawParticles } from './particles.js';
+import { blendTable } from '../gfx/blend.js';
+import { BLEND_ADD, BLEND_HALF } from '../world/particles.js';
 
 /** Renders the 3D view of a world into the 8-bit framebuffer. */
 export class Renderer {
@@ -16,11 +19,15 @@ export class Renderer {
     this.assets = assets;
     this.palette = palette;
     this.view = new View();
+    /** Blend tables by particle blend mode, built when first needed. */
+    this.blendTables = null;
+    /** Last frame's particle drawing time (ms), for benches and debug readouts. */
+    this.particleMs = 0;
   }
 
   /**
    * @param {{map:any, things:any[], skyTexture:any, fog:number, haze?:{color:number[], half:number}|null,
-   *   backdrop?:import('../world/backdrop.js').Backdrop|null}} scene
+   *   backdrop?:import('../world/backdrop.js').Backdrop|null, particles?:import('../world/particles.js').Particles}} scene
    * @param {{x:number,y:number,angle:number,z?:number,extraLight?:number,fixedColormap?:number}} cam
    * @param {{psprites?:any[], skip?:any}} [extras]
    */
@@ -34,7 +41,23 @@ export class Renderer {
     view.depthValid = false;
     drawWorld(view, scene.map, textures, scene.skyTexture ?? null, s.px, s.w, cms, scene.backdrop ?? null);
     view.depthValid = drawModels(view, scene.things, scene.map, textures, s.px, s.w, cms, extras.skip);
-    drawSprites(view, scene.things, scene.map, s.px, s.w, cms, extras.skip);
+    // With particles about, sprites keep their depth per pixel too (in mdepth), so particles behind them hide.
+    const particles = scene.particles?.n ? scene.particles : null;
+    if (particles && !view.depthValid) {
+      view.mdepth.fill(Infinity);
+      view.depthValid = true;
+    }
+    drawSprites(view, scene.things, scene.map, s.px, s.w, cms, extras.skip, !!particles);
+    if (particles) {
+      if (!this.blendTables) {
+        this.blendTables = [];
+        this.blendTables[BLEND_ADD] = blendTable(this.palette, 'add');
+        this.blendTables[BLEND_HALF] = blendTable(this.palette, 'half');
+      }
+      const t0 = performance.now();
+      drawParticles(view, particles, scene.map, s.px, s.w, cms, this.blendTables);
+      this.particleMs = performance.now() - t0;
+    } else this.particleMs = 0;
     if (extras.psprites?.length) {
       const map = scene.map;
       const tx = Math.floor(cam.x);

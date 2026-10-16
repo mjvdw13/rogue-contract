@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The game loads its assets relative to the repo root (and so do the imports below). -->
+  <base href="../">
+  <title>Particle Bench</title>
+  <link rel="stylesheet" href="css/game.css">
+  <style>
+    #bench {
+      position: fixed; top: 8px; left: 8px; z-index: 10; width: 300px;
+      background: rgba(12, 14, 18, 0.88); color: #d9dde4; border: 1px solid #3a4152; border-radius: 6px;
+      padding: 10px 12px; font: 12px/1.45 system-ui, sans-serif; user-select: text; -webkit-user-select: text;
+    }
+    #bench h1 { font-size: 14px; margin: 0 0 6px; color: #f0c040; }
+    #bench label { display: block; margin: 6px 0 2px; color: #8a93a3; }
+    #bench select, #bench input, #bench button {
+      background: #0d0f12; color: #d9dde4; border: 1px solid #3a4152; border-radius: 4px; font: inherit; padding: 2px 4px;
+    }
+    #bench button { cursor: pointer; background: #2b3140; padding: 3px 9px; margin: 6px 4px 0 0; }
+    #bench button:hover { border-color: #f0c040; }
+    #bench .row { display: flex; gap: 6px; align-items: center; }
+    #bench input[type=range] { flex: 1; }
+    #bench input[type=number] { width: 5em; }
+    #bench table { width: 100%; border-collapse: collapse; margin-top: 6px; font-variant-numeric: tabular-nums; }
+    #bench td, #bench th { padding: 1px 4px; text-align: right; border-bottom: 1px solid #2c313a; }
+    #bench td:first-child, #bench th:first-child { text-align: left; }
+    #bench .dim { color: #8a93a3; }
+    #bench .hide { display: none; }
+    #readout b { color: #f0c040; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <main id="stage">
+    <canvas id="screen" width="320" height="200" aria-label="Game screen" tabindex="0"></canvas>
+    <div id="boot-message" role="status">LOADING...</div>
+  </main>
+  <div id="bench">
+    <h1>Particle bench</h1>
+    <div class="dim">Click the view to look round (Esc to let go); the game's keys to walk.</div>
+    <label for="kind">Kind</label>
+    <select id="kind"></select>
+    <label for="count">Live particles</label>
+    <div class="row"><input id="count" type="range" min="0" max="4000" step="100" value="1000"><input id="countN" type="number" min="0" max="4000" step="100" value="1000"></div>
+    <label for="spot">Go to</label>
+    <select id="spot"></select>
+    <div id="readout" style="margin-top:8px">Loading...</div>
+    <button id="sweep">Run sweep here</button><button id="hideT" class="hide">Hide table</button>
+    <div id="sweepOut"></div>
+  </div>
+  <script type="module">
+    import { Game } from './src/engine/game.js';
+    import content from './src/content/index.js';
+    import { TICK } from './src/engine/config.js';
+    import { contentAngle } from './src/engine/world/level.js';
+    import { benchKinds, BenchSpawner } from './tools/lib/particle-bench.js';
+
+    const $ = (id) => document.getElementById(id);
+    const params = new URLSearchParams(location.search);
+    for (const [k, v] of [['map', 'm1'], ['nomonsters', ''], ['god', ''], ['mute', '']]) if (!params.has(k)) params.set(k, v);
+    const game = new Game({ canvas: $('screen'), stage: $('stage'), content, params });
+    window.game = game;
+    await game.boot((s) => { if (s === 'fonts') $('boot-message').hidden = true; });
+
+    // Wait for the level to start.
+    while (!game.scene?.world) await new Promise((r) => setTimeout(r, 50));
+
+    const kinds = benchKinds(game.palette);
+    for (const [k, v] of Object.entries(kinds)) $('kind').add(new Option(v.label, k));
+    $('kind').value = 'spark';
+
+    // Spots: the headless bench's views (Mission 1).
+    const spots = { here: null };
+    const w0 = game.scene.world;
+    spots['Canyon start'] = [w0.player.x, w0.player.y, 90];
+    [[56, 18, 0], [60.5, 18, 180], [83.5, 47.5, 150], [20.5, 73, 40], [48, 42, 90], [90, 30, 270], [80, 20, 0], [100, 50, 180]]
+      .forEach((v, i) => (spots[`Inside ${'ABCDEFGH'[i]}`] = v));
+    $('spot').add(new Option('(stay here)', 'here'));
+    for (const k of Object.keys(spots)) if (k !== 'here') $('spot').add(new Option(k, k));
+
+    let world = null;
+    let spawner = null;
+    const upd = [];
+    const drw = [];
+    const frm = [];
+    // Hook a (new) world: top particles up after every tick, and time the updates.
+    function hook(w) {
+      world = w;
+      spawner = new BenchSpawner(w, kinds);
+      spawner.kind = $('kind').value;
+      spawner.count = Number($('countN').value);
+      const ps = w.particles;
+      const update = ps.update.bind(ps);
+      ps.update = (dt) => {
+        const t = performance.now();
+        update(dt);
+        upd.push(performance.now() - t);
+      };
+      const tick = w.tick.bind(w);
+      w.tick = (dt, input) => {
+        tick(dt, input);
+        spawner.fill(w.camera());
+      };
+    }
+    const render = game.renderer.render.bind(game.renderer);
+    game.renderer.render = (scene, cam, extras) => {
+      const t = performance.now();
+      render(scene, cam, extras);
+      frm.push(performance.now() - t);
+      drw.push(game.renderer.particleMs);
+    };
+
+    const avg = (a) => (a.length ? a.reduce((s, v) => s + v, 0) / a.length : 0);
+    setInterval(() => {
+      if (game.scene?.world && game.scene.world !== world) hook(game.scene.world);
+      if (!world) return;
+      const n = Math.max(1, frm.length);
+      $('readout').innerHTML =
+        `Live: <b>${world.particles.n}</b> &nbsp; ${game.surface.w} columns &nbsp; ${game.loop.fps} fps<br>` +
+        `3D view: <b>${avg(frm).toFixed(2)}</b> ms a frame<br>` +
+        `&nbsp; of which particles drawn: <b>${avg(drw).toFixed(2)}</b> ms<br>` +
+        `Particle update: <b>${avg(upd).toFixed(3)}</b> ms a tick`;
+      frm.length = drw.length = upd.length = 0;
+    }, 500);
+
+    const setCount = (v) => {
+      $('count').value = $('countN').value = v;
+      if (spawner) spawner.count = Number(v);
+    };
+    $('count').oninput = () => setCount($('count').value);
+    $('countN').onchange = () => setCount($('countN').value);
+    $('kind').onchange = () => { if (spawner) spawner.kind = $('kind').value; $('screen').focus(); };
+    $('spot').onchange = () => {
+      const v = spots[$('spot').value];
+      if (v && world) {
+        const p = world.player;
+        p.x = v[0];
+        p.y = v[1];
+        p.angle = contentAngle(v[2]);
+        p.pitch = 0;
+        p.z = world.floorAt(p.x, p.y, p.radius, -Infinity);
+        world.particles.clear();
+      }
+      $('spot').value = 'here';
+      $('screen').focus();
+    };
+
+    // The sweep: every kind at several counts from this spot, timed frame by frame (mean of 80).
+    $('sweep').onclick = () => {
+      if (!world) return;
+      const ps = world.particles;
+      const p = world.player;
+      const cam = world.camera();
+      const saved = { kind: spawner.kind, count: spawner.count };
+      const counts = [500, 1000, 2000, 4000];
+      const frame = () => { game.renderer.render(world, cam, { psprites: world.psprites(), skip: p }); return game.renderer.particleMs; };
+      let html = `<table><tr><th>kind</th>${counts.map((c) => `<th>${c}</th>`).join('')}</tr>`;
+      ps.clear();
+      for (let k = 0; k < 20; k++) frame();
+      const base = [];
+      for (let k = 0; k < 80; k++) { const t = performance.now(); frame(); base.push(performance.now() - t); }
+      for (const kind of Object.keys(kinds)) {
+        html += `<tr><td>${kind}</td>`;
+        for (const count of counts) {
+          spawner.kind = kind;
+          spawner.count = count;
+          ps.clear();
+          spawner.fill(cam);
+          for (let k = 0; k < 30; k++) { ps.update(TICK); spawner.fill(cam); }
+          for (let k = 0; k < 5; k++) frame();
+          // (Chrome's timer is coarse, 0.1 ms here: the mean of many frames.)
+          const times = [];
+          for (let k = 0; k < 80; k++) times.push(frame());
+          html += `<td>${avg(times).toFixed(2)}</td>`;
+        }
+        html += '</tr>';
+      }
+      html += `</table><div class="dim">ms a frame to draw the particles (mean of 80), at ${game.surface.w} columns; the view alone: ${avg(base).toFixed(2)} ms.</div>`;
+      $('sweepOut').innerHTML = html;
+      $('hideT').classList.remove('hide');
+      spawner.kind = saved.kind;
+      spawner.count = saved.count;
+      ps.clear();
+      frm.length = drw.length = upd.length = 0;
+    };
+    $('hideT').onclick = () => { $('sweepOut').innerHTML = ''; $('hideT').classList.add('hide'); };
+  </script>
+</body>
+</html>

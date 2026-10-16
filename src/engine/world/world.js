@@ -7,6 +7,7 @@ import { updateDoors, openDoor, closeDoor } from './doors.js';
 import { updateLifts, startLift, liftAt } from './lifts.js';
 import { LightEffects } from './lights.js';
 import { LightMap } from './lightmap.js';
+import { Particles } from './particles.js';
 import { GLINT_REACH } from './lightsources.js';
 import { FlowField, WALKER } from './nav.js';
 import { noiseAlert } from './noise.js';
@@ -108,6 +109,8 @@ export class World {
     /** Light from sources only, reaching further, for glints on sprites (the renderer reads `map.glintmap`). */
     this.glintmap = new LightMap(this.map, { glint: true });
     this.map.glintmap = this.glintmap;
+    /** Sparks, smoke, sand: cosmetic, drawn as points (render/particles.js). */
+    this.particles = new Particles(this.map);
     this.lights = new LightEffects(this.map, this.rng, this.lightmap);
     this.nav = new FlowField(this.map);
     /** Flow fields per kind of body (see navFor), the walker's being `nav`. */
@@ -677,6 +680,7 @@ export class World {
       }
     }
     if (list.some((t) => t.removed)) this.things = list.filter((t) => !t.removed);
+    this.particles.update(dt);
     const dyn = this.dynamicLights();
     this.lightmap.setDynamic(dyn);
     this.lightmap.update();
