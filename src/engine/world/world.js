@@ -110,7 +110,7 @@ export class World {
     this.glintmap = new LightMap(this.map, { glint: true });
     this.map.glintmap = this.glintmap;
     /** Sparks, smoke, sand: cosmetic, drawn as points (render/particles.js). */
-    this.particles = new Particles(this.map);
+    this.particles = new Particles(this.map, [...this.registry.particles.values()], this.registry.paletteDef?.ramps);
     this.lights = new LightEffects(this.map, this.rng, this.lightmap);
     this.nav = new FlowField(this.map);
     /** Flow fields per kind of body (see navFor), the walker's being `nav`. */

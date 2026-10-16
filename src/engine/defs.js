@@ -380,6 +380,23 @@ export function defineEffect(def) {
   return e;
 }
 
+/**
+ * A particle type (world/particles.js): sparks, embers, shrapnel, smoke,
+ * steam, dust. Particles are points, not things: cheap enough for hundreds.
+ * Colours over its life are palette ramp steps: `['glow-yellow', 6]`, or
+ * `{ ramp: 'gray', from: 9, to: 4 }` for every step between. Sizes are in
+ * world units (a tile is 1), speeds in units per second.
+ * @param {{id:string, colors:any[], life?:number|number[], size?:number, maxPx?:number,
+ *   shape?:'square'|'disc', streak?:number, gravity?:number, drag?:number, bounce?:number,
+ *   onFloor?:'die'|'bounce'|'stick', walls?:'die'|'bounce', wind?:number,
+ *   blend?:'solid'|'add'|'half'|'dither', alpha?:number, fullbright?:boolean, cap?:number}} def
+ */
+export function defineParticle(def) {
+  requireId(def, 'Particle');
+  if (!Array.isArray(def.colors) || !def.colors.length) throw new Error(`Particle "${def.id}": needs "colors"`);
+  return { ...def, type: 'particle' };
+}
+
 // ---------------------------------------------------------------- audio
 
 /**

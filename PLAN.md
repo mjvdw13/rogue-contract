@@ -1108,18 +1108,53 @@ with the game):
          scene: about 1000 live points (sparks, shrapnel, embers, sand)
          and 150 discs (smoke, steam), each type with its own cap within
          those; `maxPx` 16 for discs. Mark to try the page and say.
-2. [ ] **Pool and simulation** (`world/particles.js`, `defineParticle`,
+       - Mark (2026-10-15): "great, and seems to run super fast"; finalize
+         steps 2 to 4, then bring it into the gameplay (steps 5 to 7).
+2. [x] **Pool and simulation** (`world/particles.js`, `defineParticle`,
        validator): spawn, move, collide, bounce, stick, die; caps. Tests:
        a burst falls and bounces off the floor, stops at walls, never
        grows past the caps, and doesn't touch `world.rng`.
-3. [ ] **Drawing** (`render/particles.js`): projection, dots, squares,
+       - [x] `defineParticle` (defs.js) and `particles` in the content pack
+             and registry. Colours by name: `['glow-yellow', 6]` (a ramp
+             and a step from its dark end) or `{ ramp, from, to }` (every
+             step between); resolved with the palette's ramps.
+       - [x] `src/content/particles.js`: spark, ember, shrapnel, smoke,
+             steam, dust (the bench's kinds, tuned), for steps 5 to 7.
+       - [x] The world's pool gets the registry's types. Caps by class:
+             `POINT_CAP` 1000 live points, `DISC_CAP` 150 discs, and each
+             type's own `cap`; the bench lifts them.
+       - [x] Validator: colours (known ramp, step in range), enums (`blend`,
+             `shape`, `onFloor`, `walls`), numbers (life, size, maxPx,
+             drag 0..1 a tick at most, bounce 0..1).
+       - [x] The bench page and headless bench use the content types.
+       - [x] Tests: falls and bounces, sticks, dies on the floor, dies in or
+             bounces off walls, ceilings, the caps (class and type), swap
+             removal keeps the live ones, wind carries, `world.rng`
+             untouched, colours resolved.
+3. [x] **Drawing** (`render/particles.js`): projection, dots, squares,
        streaks, discs; occlusion by walls, ledges, models, fences and
        sprites (sprites write depth when particles show); light and haze.
        Tests on small views (hidden behind a wall, in front of and behind a
        sprite, under a ledge).
-4. [ ] **Blend tables** (`add`, `half`) and `dither`, built with the
+       - [x] Tests: a dot in the open draws, behind a wall doesn't, behind
+             a stormtrooper doesn't, in front of one does; under a slab
+             seen from above doesn't; a disc covers about its area; a
+             streak runs along its velocity; fullbright vs lit colour.
+4. [x] **Blend tables** (`add`, `half`) and `dither`, built with the
        palette (cached per palette, checked against a brute-force
        nearest colour in a test).
+       - [x] Tests: add black is the identity, half of a colour with itself
+             is itself, entries are near the true mix, cached per palette;
+             dither fades by alpha.
+       - [x] Found by the test: built through the palette's 15-bit colour
+             cube, 11% (add) to 22% (half) of entries weren't the nearest
+             colour. Now an exact search (about 80 ms for both, headless),
+             built while the game loads (`Renderer.prepare`), so no frame
+             stalls at the first spark.
+       - [x] MODDING.md: particles (types, bursts, caps); then tests, the
+             validator, the smoke test; commit and push.
+       - Checked in Chrome: 150 smoke puffs (the disc cap) draw in 0.30 ms
+         of an 11 ms frame at the canyon, 60 fps.
 5. [ ] **Content bursts:** sparks and shrapnel when a probe droid dies,
        sparks where bolts hit walls, shrapnel and smoke from rockets and
        concussion blasts, a smoke trail on rockets.
@@ -2519,3 +2554,9 @@ update the smoke test.
   to 0.5 ms per 1000 and smoke discs about 0.28 ms per 100, against a 7.85
   ms view; proposed caps of about 1000 points and 150 discs. With no
   particles the view is byte-identical. 190 tests and the validator pass.
+- 2026-10-15: Phase 1b T steps 2 to 4 finished: `defineParticle` and six
+  content types (spark, ember, shrapnel, smoke, steam, dust), colours by
+  ramp step, caps of 1000 points and 150 discs, validator checks, exact
+  blend tables built while loading, MODDING.md. 13 new tests (203 in all),
+  the validator and the smoke test pass; with no particles, 23 views are
+  byte-identical.

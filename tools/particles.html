@@ -54,7 +54,7 @@
     import content from './src/content/index.js';
     import { TICK } from './src/engine/config.js';
     import { contentAngle } from './src/engine/world/level.js';
-    import { benchKinds, BenchSpawner } from './tools/lib/particle-bench.js';
+    import { BENCH_KINDS, BenchSpawner } from './tools/lib/particle-bench.js';
 
     const $ = (id) => document.getElementById(id);
     const params = new URLSearchParams(location.search);
@@ -66,8 +66,7 @@
     // Wait for the level to start.
     while (!game.scene?.world) await new Promise((r) => setTimeout(r, 50));
 
-    const kinds = benchKinds(game.palette);
-    for (const [k, v] of Object.entries(kinds)) $('kind').add(new Option(v.label, k));
+    for (const [k, v] of Object.entries(BENCH_KINDS)) $('kind').add(new Option(v.label, k));
     $('kind').value = 'spark';
 
     // Spots: the headless bench's views (Mission 1).
@@ -87,7 +86,7 @@
     // Hook a (new) world: top particles up after every tick, and time the updates.
     function hook(w) {
       world = w;
-      spawner = new BenchSpawner(w, kinds);
+      spawner = new BenchSpawner(w);
       spawner.kind = $('kind').value;
       spawner.count = Number($('countN').value);
       const ps = w.particles;
@@ -160,7 +159,7 @@
       for (let k = 0; k < 20; k++) frame();
       const base = [];
       for (let k = 0; k < 80; k++) { const t = performance.now(); frame(); base.push(performance.now() - t); }
-      for (const kind of Object.keys(kinds)) {
+      for (const kind of Object.keys(BENCH_KINDS)) {
         html += `<tr><td>${kind}</td>`;
         for (const count of counts) {
           spawner.kind = kind;

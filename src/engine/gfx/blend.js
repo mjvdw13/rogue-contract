@@ -1,7 +1,9 @@
 /**
  * Blend tables for translucent drawing into the 8-bit framebuffer: 256 x 256
  * entries, `table[(src << 8) | dst]` is the palette colour nearest to the two
- * colours mixed. Built once per palette (64 KB each).
+ * colours mixed (an exact search; both mixes are symmetric, so half the
+ * pairs). Built once per palette (64 KB each, about 40 ms): the game builds
+ * them while loading (Renderer.prepare).
  *
  * - `add`: src + dst, clamped (glows: sparks, fire)
  * - `half`: the average (smoke, steam, glass)
@@ -20,11 +22,12 @@ export function blendTable(palette, mode) {
   const rgb = palette.rgb;
   const out = new Uint8Array(65536);
   const add = mode === 'add';
+  const memo = new Map();
   for (let s = 0; s < 256; s++) {
     const sr = rgb[s * 3];
     const sg = rgb[s * 3 + 1];
     const sb = rgb[s * 3 + 2];
-    for (let d = 0; d < 256; d++) {
+    for (let d = s; d < 256; d++) {
       const dr = rgb[d * 3];
       const dg = rgb[d * 3 + 1];
       const db = rgb[d * 3 + 2];
@@ -38,7 +41,14 @@ export function blendTable(palette, mode) {
         g = (sg + dg) >> 1;
         b = (sb + db) >> 1;
       }
-      out[(s << 8) | d] = palette.lookup(r, g, b);
+      const key = (r << 16) | (g << 8) | b;
+      let c = memo.get(key);
+      if (c === undefined) {
+        c = palette.nearest(r, g, b);
+        memo.set(key, c);
+      }
+      out[(s << 8) | d] = c;
+      out[(d << 8) | s] = c;
     }
   }
   tables[mode] = out;

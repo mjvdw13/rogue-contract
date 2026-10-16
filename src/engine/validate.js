@@ -3,6 +3,7 @@ import { F_EXIT, F_SOLID, F_VOID, LIGHT_FX } from './world/tilemap.js';
 import { BUILTIN_ACTION_NAMES } from './world/actions.js';
 import { BUILTIN_ATTACKS } from './combat/attacks.js';
 import { BUILTIN_PICKUPS } from './things/pickups.js';
+import { PARTICLE_BLENDS, PARTICLE_FLOORS, PARTICLE_SHAPES, PARTICLE_WALLS, POINT_CAP, DISC_CAP } from './world/particles.js';
 
 const PICKUP_MODIFIERS = ['maxHealth', 'armorClass', 'maxArmor', 'duration', 'always'];
 const TRIGGER_EVENTS = ['start', 'enter', 'use', 'killed', 'pickup'];
@@ -241,6 +242,47 @@ export function validateContent(reg) {
   }
   for (const f of ['small', 'big', 'hud', 'tiny']) if (!reg.fonts.has(f)) err(`Missing font "${f}"`);
   for (const c of reg.cheats) if (typeof c.run !== 'function') err(`Cheat "${c.code}" has no run()`);
+  checkParticles(reg, err, warn);
 
   return { errors, warnings };
+}
+
+/** Particle types: colours by ramp and step, the enums, and numbers in range. */
+function checkParticles(reg, err, warn) {
+  const ramps = reg.paletteDef?.ramps ?? {};
+  const num = (v, lo, hi) => typeof v === 'number' && v >= lo && v <= hi;
+  const enums = { blend: PARTICLE_BLENDS, onFloor: PARTICLE_FLOORS, shape: PARTICLE_SHAPES, walls: PARTICLE_WALLS };
+  if (reg.particles.size > 256) err(`At most 256 particle types (there are ${reg.particles.size})`);
+  for (const p of reg.particles.values()) {
+    const owner = `Particle "${p.id}"`;
+    const step = (name, k) => {
+      const r = ramps[name];
+      if (!r) return err(`${owner}: unknown colour ramp "${name}"`);
+      if (!Number.isInteger(k) || k < 0 || k >= r[1]) err(`${owner}: ramp "${name}" has steps 0 to ${r[1] - 1} (got ${k})`);
+      return undefined;
+    };
+    for (const c of p.colors ?? []) {
+      if (Number.isInteger(c) && c >= 0 && c < 255) continue;
+      if (Array.isArray(c) && c.length === 2 && typeof c[0] === 'string') step(c[0], c[1]);
+      else if (c && typeof c === 'object' && typeof c.ramp === 'string') {
+        step(c.ramp, c.from);
+        step(c.ramp, c.to);
+      } else err(`${owner}: a colour must be [ramp, step], { ramp, from, to } or a palette index 0-254`);
+    }
+    for (const [key, list] of Object.entries(enums)) {
+      if (p[key] !== undefined && !list.includes(p[key])) err(`${owner}: ${key} must be one of ${list.join(', ')} (got "${p[key]}")`);
+    }
+    const life = [].concat(p.life ?? 1);
+    if (!life.every((v) => num(v, 0.001, 600)) || life.length > 2 || (life.length === 2 && life[1] < life[0])) err(`${owner}: life is seconds, or [min, max] (above 0)`);
+    if (p.size !== undefined && !num(p.size, 0, 10)) err(`${owner}: size is in world units, 0 to 10`);
+    if (p.maxPx !== undefined && !(Number.isInteger(p.maxPx) && p.maxPx >= 1 && p.maxPx <= 32)) err(`${owner}: maxPx must be a whole number of pixels, 1 to 32`);
+    if (p.drag !== undefined && !num(p.drag, 0, 30)) err(`${owner}: drag (velocity lost per second) must be 0 to 30`);
+    if (p.bounce !== undefined && !num(p.bounce, 0, 1)) err(`${owner}: bounce must be 0 to 1`);
+    if (p.alpha !== undefined && !num(p.alpha, 0, 1)) err(`${owner}: alpha must be 0 to 1`);
+    if (p.streak !== undefined && !num(p.streak, 0, 1)) err(`${owner}: streak is seconds of travel, 0 to 1`);
+    for (const key of ['gravity', 'wind']) if (p[key] !== undefined && typeof p[key] !== 'number') err(`${owner}: ${key} must be a number`);
+    const classCap = p.shape === 'disc' ? DISC_CAP : POINT_CAP;
+    if (p.cap !== undefined && !(p.cap >= 1)) err(`${owner}: cap must be at least 1`);
+    else if (p.cap > classCap) warn(`${owner}: cap ${p.cap} is above the ${p.shape === 'disc' ? 'disc' : 'point'} cap of ${classCap}`);
+  }
 }

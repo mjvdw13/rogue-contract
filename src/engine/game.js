@@ -116,6 +116,7 @@ export class Game {
     this.loop.start();
     await Promise.all([this.assets.loadAll((done, total) => loading.progress(done, total)), this.audio.loadOverrides()]);
     for (const p of this.assets.problems) console.warn(`[assets] ${p}`);
+    this.renderer.prepare();
     await this._buildFace();
     onStatus('ready');
     if (this.contentErrors.length) {

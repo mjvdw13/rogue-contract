@@ -310,6 +310,57 @@ defineDecoration({ id: 'reactor-ring', model: 'reactor-ring', spin: 0.5 }) // ra
   projectiles. The level checker treats the tiles under the lines as
   blocked, and the map viewer draws them in pink.
 
+### Particles
+
+Sparks, embers, shrapnel, smoke, steam and dust are **particles**: points
+and small discs drawn straight into the frame, far cheaper than sprites, so
+a scene can have hundreds. They're defined in `src/content/particles.js`:
+
+```js
+defineParticle({
+  id: 'spark',
+  colors: [{ ramp: 'glow-yellow', from: 6, to: 0 }], // white-hot to red over its life
+  life: [0.4, 1],     // seconds, picked at random between the two
+  size: 0.02,         // world units; drawn 1 to maxPx pixels across
+  streak: 0.04,       // draw a streak back along its velocity, this many seconds long
+  fullbright: true,   // glows (otherwise it's lit by the light where it is)
+  blend: 'add',
+  gravity: 6,         // units per second per second (negative rises)
+  bounce: 0.5,
+  onFloor: 'bounce',
+  walls: 'bounce',
+  cap: 400,
+})
+```
+
+- `colors`: the colour over the particle's life, first to last. Each entry
+  is a palette ramp and a step counted from its dark end (`['gray', 9]`),
+  or `{ ramp, from, to }` for every step between two (either way round).
+- `shape`: `'square'` (the default; dots and small squares, `maxPx`
+  default 3) or `'disc'` (round puffs for smoke and steam).
+- `blend`: `'solid'`, `'add'` (glows: sparks, fire), `'half'` (see-through:
+  smoke) or `'dither'` (a screen-door pattern that thins out as the particle
+  ages; `alpha` sets how solid it starts).
+- `drag`: the share of its speed lost per second (toward the wind, for
+  types with `wind`). `wind`: how much of the level's wind carries it (1:
+  all of it).
+- `onFloor`: `'die'` (the default), `'bounce'` or `'stick'` (lies there
+  until its life is up; it still bounces off a hard landing). `walls`:
+  `'die'` (the default) or `'bounce'`. Particles stop at ceilings.
+- **Caps:** at most 1000 points and 150 discs live at once (discs cost by
+  the pixels they cover); past that, new ones aren't made. `cap` limits one
+  type within those, so smoke can't crowd out sparks.
+
+Code makes them with `world.particles.burst('spark', x, y, z, { count: 20,
+dir: [1, 0, 0.5], spread: 0.6, speed: [2, 5] })` (`spread` 0 is straight
+along `dir`, 1 a hemisphere round it, 2 all round) or one at a time with
+`world.particles.spawn('smoke', x, y, z, vx, vy, vz)`. Particles are only
+for looks: they never touch the game's random numbers, so they can't change
+what happens.
+
+To see what they cost, serve the repo and open `tools/particles.html`: it
+runs Mission 1 with any number of one type in front of you, and times them.
+
 ## Levels
 
 A level is an ASCII map. Copy `src/content/levels/e1m1.js`, rename it, add it to

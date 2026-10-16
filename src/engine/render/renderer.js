@@ -25,6 +25,14 @@ export class Renderer {
     this.particleMs = 0;
   }
 
+  /** Build what the first frames would otherwise stop to build (the particles' blend tables). */
+  prepare() {
+    if (this.blendTables) return;
+    this.blendTables = [];
+    this.blendTables[BLEND_ADD] = blendTable(this.palette, 'add');
+    this.blendTables[BLEND_HALF] = blendTable(this.palette, 'half');
+  }
+
   /**
    * @param {{map:any, things:any[], skyTexture:any, fog:number, haze?:{color:number[], half:number}|null,
    *   backdrop?:import('../world/backdrop.js').Backdrop|null, particles?:import('../world/particles.js').Particles}} scene
@@ -49,11 +57,7 @@ export class Renderer {
     }
     drawSprites(view, scene.things, scene.map, s.px, s.w, cms, extras.skip, !!particles);
     if (particles) {
-      if (!this.blendTables) {
-        this.blendTables = [];
-        this.blendTables[BLEND_ADD] = blendTable(this.palette, 'add');
-        this.blendTables[BLEND_HALF] = blendTable(this.palette, 'half');
-      }
+      this.prepare();
       const t0 = performance.now();
       drawParticles(view, particles, scene.map, s.px, s.w, cms, this.blendTables);
       this.particleMs = performance.now() - t0;

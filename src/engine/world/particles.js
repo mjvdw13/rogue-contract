@@ -14,16 +14,58 @@ const FLOOR_BOUNCE = 1;
 const FLOOR_STICK = 2;
 const FLOORS = { die: FLOOR_DIE, bounce: FLOOR_BOUNCE, stick: FLOOR_STICK };
 
+/** Names the validator accepts (see particleType). */
+export const PARTICLE_BLENDS = Object.keys(BLENDS);
+export const PARTICLE_FLOORS = Object.keys(FLOORS);
+export const PARTICLE_SHAPES = ['square', 'disc'];
+export const PARTICLE_WALLS = ['die', 'bounce'];
+
+/**
+ * Live particles at most, by how they draw: points (dots, squares, streaks)
+ * and discs (smoke, steam), which cost by the pixels they cover. About 0.5
+ * ms a frame in Chrome with both full (PLAN.md Phase 1b T).
+ */
+export const POINT_CAP = 1000;
+export const DISC_CAP = 150;
+/** The pool's size (the bench lifts the caps up to it). */
+export const POOL_SIZE = 4096;
+
 /** Lit particles sample the light map when spawned and then every this many ticks. */
 const LIGHT_EVERY = 8;
 
 /**
- * A particle type, filled in with defaults.
- * @param {any} def
- * @param {(name:string)=>number} [color] palette index for a colour name (or pass indices)
+ * A particle's colours over its life as palette indices. Each entry is an
+ * index, `[ramp, step]` (a step from the ramp's dark end) or `{ ramp, from,
+ * to }` (every step from one to the other). Unknown ramps give index 0.
+ * @param {any[]} list
+ * @param {Record<string, [number, number]>} ramps the palette's ramps: name to [start, count]
+ * @returns {number[]}
  */
-export function particleType(def, color = (c) => c) {
-  const colors = (def.colors ?? [255]).map((c) => (typeof c === 'number' ? c : color(c)));
+export function particleColors(list, ramps = {}) {
+  const at = (name, k) => {
+    const r = ramps[name];
+    if (!r) return 0;
+    return r[0] + Math.max(0, Math.min(r[1] - 1, Math.round(k)));
+  };
+  const out = [];
+  for (const c of list) {
+    if (typeof c === 'number') out.push(c);
+    else if (Array.isArray(c)) out.push(at(c[0], c[1]));
+    else if (c && typeof c === 'object') {
+      const step = c.to >= c.from ? 1 : -1;
+      for (let k = c.from; step > 0 ? k <= c.to : k >= c.to; k += step) out.push(at(c.ramp, k));
+    }
+  }
+  return out.length ? out : [0];
+}
+
+/**
+ * A particle type (a defineParticle() result), filled in with defaults.
+ * @param {any} def
+ * @param {Record<string, [number, number]>} [ramps] the palette's ramps, for colours by name
+ */
+export function particleType(def, ramps) {
+  const colors = particleColors(def.colors ?? [0], ramps);
   const life = Array.isArray(def.life) ? def.life : [def.life ?? 1, def.life ?? 1];
   return {
     id: def.id,
@@ -63,12 +105,20 @@ export function particleType(def, color = (c) => c) {
 export class Particles {
   /**
    * @param {import('./tilemap.js').TileMap} map
-   * @param {number} [cap]
+   * @param {any[]} [defs] particle types (defineParticle results)
+   * @param {Record<string, [number, number]>} [ramps] the palette's ramps, for colours by name
    */
-  constructor(map, cap = 4096) {
+  constructor(map, defs = [], ramps = {}) {
+    const cap = POOL_SIZE;
     this.map = map;
     this.cap = cap;
     this.n = 0;
+    /** Live points and discs, and their caps. */
+    this.points = 0;
+    this.discs = 0;
+    this.capPoints = POINT_CAP;
+    this.capDiscs = DISC_CAP;
+    this.ramps = ramps;
     /** @type {ReturnType<typeof particleType>[]} */
     this.types = [];
     this.byId = new Map();
@@ -92,21 +142,34 @@ export class Particles {
     /** Set while it lies on the floor (stuck). */
     this.rest = new Uint8Array(cap);
     this.ticks = 0;
+    for (const def of defs) this.addType(def);
   }
 
-  /** Add a type (see particleType); returns its index. */
-  addType(def, color) {
-    const t = def.colors instanceof Uint8Array ? def : particleType(def, color);
-    if (this.byId.has(t.id)) return this.byId.get(t.id);
+  /** Add a type (a defineParticle result); returns its index. At most 256 types. */
+  addType(def) {
+    if (this.byId.has(def.id)) return this.byId.get(def.id);
+    if (this.types.length >= 256) throw new Error('At most 256 particle types');
+    const t = particleType(def, this.ramps);
     this.types.push(t);
     this.byId.set(t.id, this.types.length - 1);
     return this.types.length - 1;
   }
 
-  /** Spawn one particle of type index `ti`. Returns its slot, or -1 when full. */
+  /** The index of a type by id (-1 if there's none). */
+  typeIndex(id) {
+    return this.byId.get(id) ?? -1;
+  }
+
+  /**
+   * Spawn one particle of type `ti` (an index, or an id). Returns its slot,
+   * or -1 when its type or class is at its cap, or the spot is in a wall or
+   * off the map.
+   */
   spawn(ti, x, y, z, vx = 0, vy = 0, vz = 0) {
+    if (typeof ti === 'string') ti = this.typeIndex(ti);
     const t = this.types[ti];
-    if (this.n >= this.cap || t.live >= t.cap) return -1;
+    if (!t || this.n >= this.cap || t.live >= t.cap) return -1;
+    if (t.disc ? this.discs >= this.capDiscs : this.points >= this.capPoints) return -1;
     const map = this.map;
     const tx = x | 0;
     const ty = y | 0;
@@ -115,6 +178,8 @@ export class Particles {
     if (map.flags[tile] & F_SOLID) return -1;
     const i = this.n++;
     t.live++;
+    if (t.disc) this.discs++;
+    else this.points++;
     this.x[i] = x;
     this.y[i] = y;
     this.z[i] = z;
@@ -132,13 +197,14 @@ export class Particles {
   }
 
   /**
-   * A burst of `count` particles from (x, y, z): along `dir` (a vector; none
-   * for all round), spread by `spread` (0 none, 1 a hemisphere, 2 all round),
-   * at `speed` ([min, max] units per second).
+   * A burst of `count` particles of type `ti` (an index or an id) from (x, y,
+   * z): along `dir` (a vector; none for all round), spread by `spread` (0
+   * straight along it, 1 a hemisphere round it, 2 all round), at `speed`
+   * ([min, max] units per second). Returns how many it made (fewer at a cap).
    */
   burst(ti, x, y, z, { count = 10, dir = null, spread = 2, speed = [1, 3] } = {}) {
-    if (typeof ti === 'string') ti = this.byId.get(ti) ?? -1;
-    if (ti < 0) return;
+    if (typeof ti === 'string') ti = this.typeIndex(ti);
+    if (ti < 0) return 0;
     const rng = this.rng;
     let dx = 0;
     let dy = 0;
@@ -175,13 +241,16 @@ export class Particles {
         rz /= l;
       }
       const sp = s0 + (s1 - s0) * rng.next();
-      if (this.spawn(ti, x, y, z, rx * sp, ry * sp, rz * sp) < 0) return;
+      if (this.spawn(ti, x, y, z, rx * sp, ry * sp, rz * sp) < 0) return k;
     }
+    return count;
   }
 
   /** Remove every particle. */
   clear() {
     this.n = 0;
+    this.points = 0;
+    this.discs = 0;
     for (const t of this.types) t.live = 0;
   }
 
@@ -207,7 +276,10 @@ export class Particles {
 
   _kill(i) {
     const last = --this.n;
-    this.types[this.type[i]].live--;
+    const t = this.types[this.type[i]];
+    t.live--;
+    if (t.disc) this.discs--;
+    else this.points--;
     if (i === last) return;
     this.x[i] = this.x[last];
     this.y[i] = this.y[last];
