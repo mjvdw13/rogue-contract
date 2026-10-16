@@ -261,7 +261,8 @@ function baseThing(def, kind, defaults) {
  * Walkers step up to `stepHeight` (default 0.8) and won't walk off drops
  * deeper than `dropHeight` (default: their step height). `flying` monsters
  * ignore floors, hovering `z` above the floor their target stands on, and
- * climb or sink at `flySpeed` (default 3 per second). `death.particles` are
+ * climb or sink at `flySpeed` (default 3 per second). `death.explosion` is
+ * an explosion (defineExplosion) set off where it dies; `death.particles` are
  * bursts thrown from the middle of the body when it's killed; once the
  * corpse lies still, it throws `corpse.bursts` of `corpse.particles`,
  * `corpse.every` seconds apart, `corpse.z` above the floor, each one way at
@@ -272,7 +273,7 @@ function baseThing(def, kind, defaults) {
  *   attack?:AttackSpec, melee?:AttackSpec, cooldown?:[number,number], reactionTime?:number,
  *   sightRange?:number, drops?:(string|{item:string, chance?:number})[], mass?:number,
  *   splashImmune?:boolean, boss?:boolean, sounds?:Record<string,string>,
- *   death?:{particles?:BurstSpec[]}, corpse?:{particles:BurstSpec[], bursts?:number|[number,number],
+ *   death?:{particles?:BurstSpec[], explosion?:string}, corpse?:{particles:BurstSpec[], bursts?:number|[number,number],
  *   every?:number|[number,number], z?:number}, hooks?:Record<string,Function>}} def
  */
 export function defineMonster(def) {
@@ -360,10 +361,12 @@ export function defineDecoration(def) {
 /**
  * A projectile (fireballs, rockets...). Speed in tiles/second. It flies from
  * its owner's fire height along the shot's slope; `z` instead starts it that
- * high above the owner's feet. Its z is the middle of the sprite.
+ * high above the owner's feet. Its z is the middle of the sprite. When it
+ * bursts it sets off its `explosion` (defineExplosion), facing out of what
+ * it hit.
  * @param {{id:string, sheet:SheetSpec, anims:{fly:AnimSpec, explode?:AnimSpec}, speed?:number,
  *   damage?:number|number[], radius?:number, splash?:{radius:number, damage:number},
- *   gravity?:number, z?:number, sounds?:{fire?:string, explode?:string}, trail?:string}} def
+ *   gravity?:number, z?:number, sounds?:{fire?:string, explode?:string}, trail?:string, explosion?:string}} def
  */
 export function defineProjectile(def) {
   const p = baseThing(def, 'projectile', {
@@ -399,12 +402,33 @@ export function defineEffect(def) {
  * @param {{id:string, colors:any[], life?:number|number[], size?:number, maxPx?:number,
  *   shape?:'square'|'disc', streak?:number, gravity?:number, drag?:number, bounce?:number,
  *   onFloor?:'die'|'bounce'|'stick', walls?:'die'|'bounce', wind?:number,
- *   blend?:'solid'|'add'|'half'|'dither', alpha?:number, fadeIn?:number, fade?:boolean, fullbright?:boolean, cap?:number}} def
+ *   blend?:'solid'|'add'|'half'|'dither', alpha?:number, fadeIn?:number, fadeOut?:number, fade?:boolean, fullbright?:boolean,
+ *   grow?:number, trail?:{type:string, every?:number, for?:number}, cap?:number}} def
  */
 export function defineParticle(def) {
   requireId(def, 'Particle');
   if (!Array.isArray(def.colors) || !def.colors.length) throw new Error(`Particle "${def.id}": needs "colors"`);
   return { ...def, type: 'particle' };
+}
+
+/**
+ * An explosion (world/explosions.js): a recipe of particle bursts, a flash of
+ * light, a sound and optionally a sprite effect, set off by id from code
+ * (`world.explode`), things' `death.explosion`, projectiles' `explosion` and
+ * the `explode` trigger action. Only for looks: damage is the exploder's.
+ * Each burst is a BurstSpec plus `delay` (seconds, or [min, max]), `over`
+ * (its count spread over that many seconds), `radius` (they start anywhere
+ * within it), `z` (above the centre) and `dir` 'up' or 'out' (the way the
+ * explosion faces; also what a burst with no `dir` does).
+ * `light: { radius, light, time }` is a flash that fades over `time` seconds.
+ * @param {{id:string, particles:(BurstSpec & {delay?:number|[number,number], over?:number, radius?:number,
+ *   z?:number, dir?:'up'|'out'|[number,number,number]})[], light?:{radius:number, light:number, time?:number},
+ *   sound?:string, effect?:string, name?:string}} def
+ */
+export function defineExplosion(def) {
+  requireId(def, 'Explosion');
+  if (!Array.isArray(def.particles)) throw new Error(`Explosion "${def.id}": needs "particles" (a list of bursts)`);
+  return { ...def, type: 'explosion' };
 }
 
 // ---------------------------------------------------------------- audio

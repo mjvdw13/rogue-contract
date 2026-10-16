@@ -17,10 +17,15 @@ function skyAt(map, x, y, z) {
   return (map.flags[i] & F_SKY) !== 0 && !(map.flags[i] & F_SLAB && map.storeyAt(i, z) === 0);
 }
 
-/** Burst, damaging what's around. `pull` backs it out of the wall it flew into. */
-function explode(world, p, hit, pull = true) {
+/**
+ * Burst, damaging what's around. `pull` backs it out of the wall it flew
+ * into. Its `explosion` faces `face` (out of the floor or ceiling it hit),
+ * else back the way it came (out of a wall), else all round (a body hit).
+ */
+function explode(world, p, hit, pull = true, face = null) {
   if (p.state === 'exploding') return;
   p.state = 'exploding';
+  const dir = face ?? (hit ? null : [-p.vx, -p.vy, 0]);
   p.vx = 0;
   p.vy = 0;
   p.vz = 0;
@@ -32,6 +37,7 @@ function explode(world, p, hit, pull = true) {
     world.radiusDamage(p.x, p.y, p.def.splash.radius ?? 2, p.def.splash.damage ?? 100, p, p.owner, p.z);
   }
   world.playSoundFrom(p.def.sounds.explode, p);
+  if (p.def.explosion) world.explode(p.def.explosion, p.x, p.y, p.z, { dir });
   p.def.hooks?.onExplode?.(world, p, hit);
   if (!p.setAnim('explode')) world.remove(p);
 }
@@ -79,7 +85,7 @@ export function projectileThink(world, p, dt) {
         p.y = ny;
         p.z = up ? ceil - CLEARANCE : floor + CLEARANCE;
       }
-      explode(world, p, null, face);
+      explode(world, p, null, face, face ? null : [0, 0, up ? -1 : 1]);
       return;
     }
     for (const t of world.things) {

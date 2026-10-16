@@ -23,12 +23,18 @@ export const BENCH_KINDS = {
   'dust-puff': { label: 'Dust puffs (disc, lit, half, fading)', vel: (r) => [r(-0.6, 0.6), r(-0.6, 0.6), r(0.1, 0.6)], z: [0.05, 0.4] },
   mist: { label: 'Mist (disc, lit, half, fading)', vel: (r) => [r(-0.15, 0.15), r(-0.15, 0.15), 0], z: [0.05, 0.35] },
   'sand-gust': { label: 'Sand gusts (disc, lit, half, fading)', vel: (r) => [r(2, 4), r(0.5, 1.5), 0], z: [0.1, 0.8], wind: [3, 1, 0] },
+  fire: { label: 'Fire (disc, glowing, add, swelling)', vel: (r) => [r(-0.5, 0.5), r(-0.5, 0.5), r(0, 1)], z: [0.3, 1.5] },
+  'fire-blue': { label: 'Blue fire (disc, glowing, add, swelling)', vel: (r) => [r(-0.5, 0.5), r(-0.5, 0.5), r(0, 1)], z: [0.3, 1.5] },
+  debris: { label: 'Debris (square, glowing, smoke trail)', vel: (r) => [r(-3, 3), r(-3, 3), r(2, 5)] },
+  'smoke-wisp': { label: 'Smoke wisps (disc, lit, half, swelling)', vel: (r) => [r(-0.2, 0.2), r(-0.2, 0.2), r(0.2, 0.6)] },
+  'blast-smoke': { label: 'Blast smoke (disc, lit, half, swelling)', vel: (r) => [r(-0.3, 0.3), r(-0.3, 0.3), r(0.2, 0.8)] },
 };
 
 /**
  * Keeps `count` particles of `kind` alive, spawned at random spots in the
  * view cone 1 to `far` units ahead, at its kind's heights above the floor. The
- * world's caps are lifted (up to the pool's size) while it runs.
+ * world's caps are lifted (up to the pool's size) while it runs; with no
+ * kind ('') it spawns nothing and the real caps hold (to test explosions).
  */
 export class BenchSpawner {
   constructor(world) {
@@ -37,14 +43,19 @@ export class BenchSpawner {
     this.count = 1000;
     this.far = 10;
     const ps = world.particles;
-    ps.capPoints = ps.capDiscs = ps.cap;
-    for (const k of Object.keys(BENCH_KINDS)) {
-      const ti = ps.typeIndex(k);
-      if (ti < 0) throw new Error(`No particle type "${k}" in the content`);
-      ps.types[ti].cap = Infinity;
-    }
+    this.caps = { points: ps.capPoints, discs: ps.capDiscs, types: ps.types.map((t) => t.cap) };
+    for (const k of Object.keys(BENCH_KINDS)) if (ps.typeIndex(k) < 0) throw new Error(`No particle type "${k}" in the content`);
+    this.liftCaps(true);
     // Spawn positions use their own little generator, so runs repeat.
     this.seed = 1;
+  }
+
+  /** Lift the caps (up to the pool's size), or put the real ones back. */
+  liftCaps(on) {
+    const ps = this.world.particles;
+    ps.capPoints = on ? ps.cap : this.caps.points;
+    ps.capDiscs = on ? ps.cap : this.caps.discs;
+    ps.types.forEach((t, i) => (t.cap = on ? Infinity : this.caps.types[i]));
   }
 
   rand(a, b) {
@@ -57,12 +68,15 @@ export class BenchSpawner {
     const ps = this.world.particles;
     const map = this.world.map;
     const kind = BENCH_KINDS[this.kind];
-    const ti = ps.typeIndex(this.kind);
-    if (this._last !== this.kind || ps.n > this.count) {
+    if (this._last !== this.kind) {
       ps.clear();
       this._last = this.kind;
-      ps.wind = kind.wind ? [...kind.wind] : [0, 0, 0];
+      ps.wind = kind?.wind ? [...kind.wind] : [0, 0, 0];
+      this.liftCaps(!!kind);
     }
+    if (!kind) return;
+    const ti = ps.typeIndex(this.kind);
+    if (ps.n > this.count) ps.clear();
     const [z0, z1] = kind.z ?? [0.05, 2.5];
     const r = (a, b) => this.rand(a, b);
     const dirX = Math.cos(cam.angle);

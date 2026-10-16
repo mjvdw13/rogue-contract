@@ -97,6 +97,7 @@ export function kill(world, target, source) {
   }
   world.playSoundFrom(gib ? (def.sounds.gib ?? def.sounds.death) : def.sounds.death, target);
   for (const b of def.death?.particles ?? []) world.particles.burst(b.type, target.x, target.y, aimZ(target), b);
+  if (def.death?.explosion) world.explode(def.death.explosion, target.x, target.y, aimZ(target));
   if (def.corpse?.particles) {
     // Cosmetic: the particles' own RNG, so the game plays out the same.
     const rng = world.particles.rng;

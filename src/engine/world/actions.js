@@ -57,6 +57,17 @@ export const BUILTIN_ACTIONS = {
   setLight(world, { tag, light, lightFx, lightMin }) {
     world.lights.setLight(world.map.tilesWithTag(tag), light, lightFx, lightMin, world.map.sourcesWithTag(tag));
   },
+  /**
+   * Set off an explosion (defineExplosion) at the centre of every tile with
+   * `tag` (or at x, y), `z` above the floor there (default 0.5). Only for
+   * looks: it hurts nothing.
+   */
+  explode(world, { explosion, tag, x, y, z = 0.5 }) {
+    const spots = tag
+      ? world.map.tilesWithTag(tag).map((i) => ({ x: (i % world.map.w) + 0.5, y: Math.floor(i / world.map.w) + 0.5 }))
+      : [{ x, y }];
+    for (const s of spots) world.explode(explosion, s.x, s.y, world.map.floorAt(s.x, s.y) + z);
+  },
   /** Move the player to the first tile with the tag. */
   teleport(world, { tag, angle }) {
     const [i] = world.map.tilesWithTag(tag);

@@ -15,6 +15,7 @@ import decorations from './decor.js';
 import { effects, projectiles } from './effects.js';
 import sounds from './sounds.js';
 import particles from './particles.js';
+import explosions from './explosions.js';
 import songs from './music/index.js';
 import legend from './levels/legend.js';
 import { levels, episodes } from './levels/index.js';
@@ -36,6 +37,7 @@ export default {
   things: [...monsters, ...items, ...decorations, ...effects, ...projectiles],
   sounds,
   particles,
+  explosions,
   songs,
   legend,
   levels,

@@ -8,6 +8,7 @@ import { updateLifts, startLift, liftAt } from './lifts.js';
 import { LightEffects } from './lights.js';
 import { LightMap } from './lightmap.js';
 import { Particles } from './particles.js';
+import { Explosions } from './explosions.js';
 import { GLINT_REACH } from './lightsources.js';
 import { FlowField, WALKER } from './nav.js';
 import { noiseAlert } from './noise.js';
@@ -111,6 +112,8 @@ export class World {
     this.map.glintmap = this.glintmap;
     /** Sparks, smoke, sand: cosmetic, drawn as points (render/particles.js). */
     this.particles = new Particles(this.map, [...this.registry.particles.values()], this.registry.paletteDef?.ramps);
+    /** Explosions made of particles, a flash and a sound (world/explosions.js), set off with explode(). */
+    this.explosions = new Explosions(this);
     this.lights = new LightEffects(this.map, this.rng, this.lightmap);
     this.nav = new FlowField(this.map);
     /** Flow fields per kind of body (see navFor), the walker's being `nav`. */
@@ -252,6 +255,15 @@ export class World {
     const e = this.spawn(id, x, y);
     if (e) e.z = z - (e.sheet ? spriteHeight(e.sheet, e.def) * 0.5 : 0);
     return e;
+  }
+
+  /**
+   * Set off explosion `id` (defineExplosion) at (x, y, z): particles, a flash
+   * and a sound, for looks only. `dir` is the way it faces (out of what it
+   * hit); near the floor it faces up.
+   */
+  explode(id, x, y, z, opts) {
+    return this.explosions.explode(id, x, y, z, opts);
   }
 
   spawnProjectile(id, owner, angle, spec, aim) {
@@ -682,6 +694,7 @@ export class World {
       }
     }
     if (list.some((t) => t.removed)) this.things = list.filter((t) => !t.removed);
+    this.explosions.update(dt);
     this.particles.update(dt);
     const dyn = this.dynamicLights();
     this.lightmap.setDynamic(dyn);
@@ -698,11 +711,11 @@ export class World {
   /**
    * This frame's dynamic lights: things with a `light` while they glow (a
    * fullbright frame: a bolt, a muzzle flash, an explosion), effects and
-   * bursting bolts fading as their animation plays, and the player's muzzle
-   * flash.
+   * bursting bolts fading as their animation plays, explosions' flashes and
+   * the player's muzzle flash.
    */
   dynamicLights() {
-    const out = [];
+    const out = this.explosions.lights([]);
     for (const t of this.things) {
       const l = t.def.light;
       if (!l || !t.fullbright || t.removed) continue;

@@ -161,7 +161,8 @@ export function drawParticles(view, ps, map, fb, fbW, colormaps, tables) {
     else if (!t.fullbright) c = colormaps[litRow(view, light[i], depth, (flags[tile[i]] & F_SKY) !== 0 ? 1 : 0) * 256 + c];
     gBlend = t.blend;
     if (t.blend === BLEND_ADD || t.blend === BLEND_HALF) gTable = tables[t.blend];
-    gAlpha = (t.alpha * (1 - f) * (f < t.fadeIn ? f / t.fadeIn : 1) * 16) | 0;
+    const out = 1 - f < t.fadeOut ? (1 - f) / t.fadeOut : 1;
+    gAlpha = (t.alpha * out * (f < t.fadeIn ? f / t.fadeIn : 1) * 16) | 0;
     gFade = t.fade;
 
     if (t.streak) {
@@ -196,7 +197,7 @@ export function drawParticles(view, ps, map, fb, fbW, colormaps, tables) {
       continue;
     }
 
-    let ry = t.size * fy * inv * 0.5;
+    let ry = (t.grow === 1 ? t.size : t.size * (1 + (t.grow - 1) * f)) * fy * inv * 0.5;
     const maxR = t.maxPx * 0.5;
     if (ry > maxR) ry = maxR;
     const rx = ry * (fx / fy);

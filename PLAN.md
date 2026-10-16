@@ -1227,6 +1227,90 @@ with the game):
              take in 5b and 5d (shrapnel and smoke on the droid's death,
              rockets and blasts). Watch the disc cap (150): a fireball and
              its smoke can't take all of it.
+             - Mark (2026-10-16): particles for the blast itself, maybe
+               smoke from it, and smoking shrapnel kicked out of it. Used in
+               many places and ways, so a few styles defined up front and
+               plugged into events and actions as needed. The bench page
+               (`tools/particles.html`) gets explosions to test them.
+             - Decided:
+               - `defineExplosion({ id, light, sound, effect, particles })`
+                 in `src/content/explosions.js` (registry `explosions`).
+                 `particles` are bursts as elsewhere plus `delay` (seconds
+                 before it starts), `over` (its count spread over that many
+                 seconds), `radius` (start anywhere within it of the
+                 centre, not all from one point), `z` (above the centre)
+                 and `dir: 'up'` / `'out'` (the explosion's facing; none is
+                 all round). `light: { radius, light, time }` is a flash
+                 that fades over `time`; `effect` an optional sprite effect
+                 played with it (the old `explosion` sheet), so whether the
+                 sprite stays is a content choice per style.
+               - `world.explode(id, x, y, z, { dir })` (engine
+                 `world/explosions.js`): the flash goes in with the dynamic
+                 lights, delayed bursts wait in a small list run each tick.
+                 Cosmetic only (the particles' RNG): damage stays where it
+                 is (`explode`, `splash`).
+               - Hooked in: things' `death: { explosion }`, projectiles'
+                 `explosion` (facing back out of what they hit) and a
+                 trigger action `{ action: 'explode', explosion, tag | x, y,
+                 z }`.
+               - Two particle features: `grow` (a disc or square swells to
+                 this many times its size by the end of its life: fireballs,
+                 smoke) and `trail: { type, every, for }` (a particle drops
+                 one of `type` every `every` seconds while it flies, for the
+                 first `for` seconds: smoking shrapnel).
+               - New types: `fire` (bright `add` discs that swell and cool
+                 white, yellow, orange, red), `fire-blue` (the concussion
+                 blast's), `debris` (glowing chunks that fly far, bounce
+                 and lie, trailing smoke), `smoke-wisp` (the small trail
+                 puffs), `blast-smoke` (bigger, darker, swelling smoke).
+               - Styles to start: `small` (a rocket), `large` (a fuel barrel,
+                 the probe droid), `concussion` (blue-white, a ring of ion
+                 sparks, no fire smoke), `sparks` (a droid shorting out:
+                 sparks and a puff, no fire), `dirt` (a blast on sand: rock
+                 chips and dust).
+             - [x] Plan (this), then the engine: `grow`, `trail`, burst
+                   `radius`; `defineExplosion`, registry, `world.explode`,
+                   flashes, delayed bursts; the hooks and the action.
+             - [x] The types and the styles, tuned with headless contact
+                   sheets (six frames from 0.03 to 1.4 s, Mission 1 inside
+                   and in the canyon, DF art):
+                   - The fireball faded over its whole life, so it was lace
+                     by half-way: `fadeOut` (the share of its life it
+                     spends fading at the end; default 1, so other types
+                     are unchanged); fire uses 0.5 and now reads as a solid
+                     swelling ball that cools and goes.
+                   - Dark grey smoke and wisps vanished in the dark corridor:
+                     lightened (blast smoke grey 10 to 5, wisps 11 to 7).
+                   - Wisps took the most discs (`large` hit their cap of 70
+                     by itself): trail every 0.08 s, wisps live 0.4 to 0.75
+                     s, `large` throws 8 chunks, not 10. Peaks now: `large`
+                     about 70 discs and 71 points, `small` 41 and 37,
+                     `dirt` 32 and 33, `concussion` 14 and 48, `sparks` 6
+                     and 46. All gone within 4 s.
+                   - `dirt`: the dust was lost against the sand; puffs now
+                     thrown up and out, with a little grey smoke after.
+                   - The flash lights the room as much as the old sprite's
+                     light (frame brightness 140 to 174 at its peak).
+             - [x] Bench page: an explosion picker, a Detonate button (and
+                   X), repeat every N seconds, distance, on the floor or
+                   in the air or against a wall, the old sprite too (to
+                   compare); live points and discs against their caps and
+                   each type's count. The stream now starts at "(none)":
+                   real caps hold then; a kind lifts them as before
+                   (`?kind=spark` picks one on load).
+                   - In Chrome (canyon start, 506 columns, frames driven by
+                     hand: the automation window was throttled to 2 fps),
+                     3 tiles away over 2 s, ms a frame to draw: `large` 0.25
+                     mean, 1.0 at worst (the fireball close up); `small`
+                     0.15 and 0.5; `dirt` 0.11 and 0.5; `concussion` 0.04
+                     and 0.3; `sparks` 0.02 and 0.2.
+             - [x] Validator, MODDING.md, tests (a burst's delay and over, a
+                   flash fades, trails stop at `for` and when resting, grow,
+                   hooks fire, the world's RNG untouched).
+             - [ ] Mark looks in the bench and tunes; after that
+                   (next step) wire the styles into the probe droid, the
+                   fuel barrel, rockets and concussion blasts, and decide
+                   sprite or no sprite.
 6. [ ] **Emitters** in levels: steam vent, sparking panel, fire (with
        embers and light), reactor motes; tags; distance cut-off. Validator,
        map viewer marks, MODDING.md. Placed in the sandbox, then where
@@ -2645,3 +2729,13 @@ update the smoke test.
   explosion; the landed wreck throws 3 to 5 tight jets of sparks, each a
   random way (`corpse: { particles }`). 208 tests, the validator and the
   smoke test pass.
+- 2026-10-16: Phase 1b T step 5f, first part: explosions made of particles.
+  `defineExplosion` styles (`small`, `large`, `concussion`, `sparks`,
+  `dirt`) in `src/content/explosions.js`, set off by `world.explode`,
+  things' `death.explosion`, projectiles' `explosion` and an `explode`
+  trigger action; bursts with `delay`, `over`, `radius`, facing out of what
+  was hit; a fading flash. New particle features `grow`, `trail` (smoking
+  debris) and `fadeOut`; five new types (fire, fire-blue, debris,
+  smoke-wisp, blast-smoke). The bench page sets them off. Not wired into
+  any monster or weapon yet. 218 tests, the validator and the smoke test
+  pass.

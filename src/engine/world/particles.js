@@ -76,6 +76,8 @@ export function particleType(def, ramps) {
     maxPx: def.maxPx ?? 3,
     /** 'square' (dots and squares) or 'disc' (round, for smoke and steam). */
     disc: def.shape === 'disc',
+    /** It swells (or shrinks) to this many times its size by the end of its life. */
+    grow: def.grow ?? 1,
     /** Fast ones draw a streak back along their velocity, this many seconds long. */
     streak: def.streak ?? 0,
     gravity: def.gravity ?? 0,
@@ -92,9 +94,15 @@ export function particleType(def, ramps) {
     alpha: def.alpha ?? 1,
     /** For dither: the share of its life it takes to fade in. */
     fadeIn: def.fadeIn ?? 0,
+    /** The share of its life it takes to fade out, at the end (1: over its whole life). */
+    fadeOut: def.fadeOut ?? 1,
     /** `add` and `half` types with `fade` also thin out (as dither does) with alpha, fadeIn and age. */
     fade: !!def.fade,
     fullbright: !!def.fullbright,
+    /** While it flies, it drops one of `trail.type` every `trail.every` seconds, for its first `trail.for` seconds. */
+    trail: def.trail ? { type: def.trail.type, every: def.trail.every ?? 0.05, for: def.trail.for ?? Infinity } : null,
+    /** The trail's type index (set by the pool). */
+    trailTi: -1,
     cap: def.cap ?? Infinity,
     /** Live count (kept by the pool). */
     live: 0,
@@ -156,6 +164,7 @@ export class Particles {
     const t = particleType(def, this.ramps);
     this.types.push(t);
     this.byId.set(t.id, this.types.length - 1);
+    for (const u of this.types) if (u.trail) u.trailTi = this.typeIndex(u.trail.type);
     return this.types.length - 1;
   }
 
@@ -204,9 +213,11 @@ export class Particles {
    * A burst of `count` particles of type `ti` (an index or an id) from (x, y,
    * z): along `dir` (a vector; none for all round), spread by `spread` (0
    * straight along it, 1 a hemisphere round it, 2 all round), at `speed`
-   * ([min, max] units per second). Returns how many it made (fewer at a cap).
+   * ([min, max] units per second). With `radius`, each starts anywhere within
+   * that distance of (x, y, z) (at the point itself where that's in a wall).
+   * Returns how many it made (fewer at a cap).
    */
-  burst(ti, x, y, z, { count = 10, dir = null, spread = 2, speed = [1, 3] } = {}) {
+  burst(ti, x, y, z, { count = 10, dir = null, spread = 2, speed = [1, 3], radius = 0 } = {}) {
     if (typeof ti === 'string') ti = this.typeIndex(ti);
     if (ti < 0) return 0;
     const rng = this.rng;
@@ -245,7 +256,18 @@ export class Particles {
         rz /= l;
       }
       const sp = s0 + (s1 - s0) * rng.next();
-      if (this.spawn(ti, x, y, z, rx * sp, ry * sp, rz * sp) < 0) return k;
+      let i = -1;
+      if (radius > 0) {
+        // A point in the ball, no nearer the floor than its own floor.
+        const ou = rng.next() * 2 - 1;
+        const oa = rng.next() * Math.PI * 2;
+        const or = Math.sqrt(1 - ou * ou);
+        const d = radius * Math.cbrt(rng.next());
+        i = this.spawn(ti, x + or * Math.cos(oa) * d, y + or * Math.sin(oa) * d, z + ou * d, rx * sp, ry * sp, rz * sp);
+        if (i >= 0 && this.z[i] < this.floor[i]) this.z[i] = this.floor[i] + 0.01;
+      }
+      if (i < 0) i = this.spawn(ti, x, y, z, rx * sp, ry * sp, rz * sp);
+      if (i < 0) return k;
     }
     return count;
   }
@@ -387,6 +409,11 @@ export class Particles {
       }
       z[i] = nz;
       if (((tick + i) & (LIGHT_EVERY - 1)) === 0) this._light(i);
+      const tr = t.trail;
+      if (tr && a < tr.for && ((a / tr.every) | 0) !== (((a - dt) / tr.every) | 0)) {
+        // (Appended at the end, so it moves this tick too: the loop runs to the new n.)
+        this.spawn(t.trailTi, x[i], y[i], z[i], ux * 0.1, uy * 0.1, uz * 0.1);
+      }
       i++;
     }
   }

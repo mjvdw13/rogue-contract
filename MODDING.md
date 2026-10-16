@@ -343,7 +343,16 @@ defineParticle({
   ages; `alpha` sets how solid it is at its most, and `fadeIn`, the share
   of its life it takes to fade in, so mist doesn't pop up). `fade: true`
   makes an `add` or `half` type thin out the same way: soft while it's
-  strong, and still fading in and out.
+  strong, and still fading in and out. `fadeOut` is the share of its life
+  it spends fading out, at the end (1, the default: its whole life), so a
+  fireball can stay solid and then go.
+- `grow`: a disc or square swells to this many times its `size` by the end
+  of its life (a fireball 2.5, smoke 2); below 1 it shrinks.
+- `trail: { type: 'smoke-wisp', every: 0.08, for: 0.8 }`: while it flies,
+  it drops one particle of `type` every `every` seconds, for its first
+  `for` seconds (all its life if left out), and none once it lies on the
+  floor. Burning debris trails smoke this way. Trails count against their
+  own type's cap.
 - `drag`: the share of its speed lost per second (toward the wind, for
   types with `wind`). `wind`: how much of the level's wind carries it (1:
   all of it).
@@ -381,6 +390,58 @@ jet (`spread` 0.3 unless it says otherwise).
 
 To see what they cost, serve the repo and open `tools/particles.html`: it
 runs Mission 1 with any number of one type in front of you, and times them.
+
+### Explosions
+
+An **explosion** is a named recipe of particle bursts with a flash of light,
+set off by id wherever one is wanted. The styles are in
+`src/content/explosions.js`:
+
+```js
+defineExplosion({
+  id: 'small',
+  light: { radius: 5, light: 112, time: 0.45 }, // a flash that fades over `time` seconds
+  sound: 'rocket-hit',  // optional
+  effect: 'explosion',  // optional: a sprite effect played with it
+  particles: [
+    { type: 'fire', count: 10, speed: [0.5, 2.5], radius: 0.15 },
+    { type: 'spark', count: 24, speed: [3, 7] },
+    { type: 'debris', count: 5, speed: [3, 6] },
+    { type: 'ember', count: 10, speed: [0.5, 1.5], dir: 'up', spread: 0.8, delay: 0.1, over: 0.4 },
+    { type: 'blast-smoke', count: 6, speed: [0.2, 0.6], radius: 0.25, dir: 'up', delay: [0.15, 0.25], over: 0.4 },
+  ],
+})
+```
+
+Each burst takes `type`, `count`, `speed` and `spread` as above, and:
+
+- `delay`: seconds before it starts (or `[min, max]`), so smoke can follow
+  the fire. `over`: its `count` comes out spread over this many seconds
+  instead of all at once.
+- `radius`: each particle starts anywhere within this distance of the
+  centre, so a fireball fills a ball rather than growing from a point.
+- `z`: start this far above the centre.
+- `dir`: `'up'`, a vector `[x, y, z]`, or `'out'` (the default): the way
+  the explosion faces. One set off against a wall or on the floor faces
+  out of it, and its `'out'` bursts keep to that side (a hemisphere at
+  most); one in mid-air throws them all round.
+
+Set one off with:
+
+- `death: { explosion: 'large' }` on a monster or shootable decoration
+  (where it dies, from the middle of its body);
+- `explosion: 'small'` on a projectile (where it bursts, facing out of the
+  wall, floor or ceiling it hit);
+- the trigger action `{ action: 'explode', explosion: 'large', tag:
+  'reactor' }` (or `x, y`), `z` above the floor (0.5 by default);
+- code: `world.explode('large', x, y, z, { dir: [1, 0, 0] })`.
+
+Explosions are only for looks: the damage stays with `explode` (things)
+and `splash` (projectiles). Keep an eye on the caps: one `large` uses
+about 70 of the 150 discs at its peak, so two at once already crowd each
+other. The bench page (`tools/particles.html`) sets them off on the floor,
+in the air or on the wall in front of you, once or every few seconds, with
+the real caps and a count of what's live.
 
 ## Levels
 

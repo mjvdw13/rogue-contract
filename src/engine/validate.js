@@ -76,8 +76,9 @@ export function validateContent(reg) {
     if (typeof l !== 'object' || !(l.radius > 0) || typeof l.light !== 'number') err(`${owner}: "light" needs a "radius" above 0 and a "light" (how much it adds)`);
   };
 
-  // A list of particle bursts: [{ type, count, speed, spread, dir }] (world/particles.js burst).
-  const checkBursts = (owner, list) => {
+  // A list of particle bursts: [{ type, count, speed, spread, dir }] (world/particles.js burst);
+  // an explosion's (`timed`) may also have delay, over, radius, z and dir 'up' or 'out'.
+  const checkBursts = (owner, list, timed = false) => {
     if (list === undefined) return;
     if (!Array.isArray(list)) return err(`${owner}: "particles" must be a list of bursts`);
     for (const b of list) {
@@ -86,15 +87,41 @@ export function validateContent(reg) {
       const speed = [].concat(b?.speed ?? 0);
       if (!speed.every((v) => typeof v === 'number' && v >= 0) || speed.length > 2) err(`${owner}: a burst's speed is units a second, or [min, max]`);
       if (b?.spread !== undefined && !(b.spread >= 0 && b.spread <= 2)) err(`${owner}: a burst's spread must be 0 to 2`);
-      if (b?.dir !== undefined && !(Array.isArray(b.dir) && b.dir.length === 3 && b.dir.every((v) => typeof v === 'number'))) err(`${owner}: a burst's dir is [x, y, z]`);
+      const named = timed && (b?.dir === 'up' || b?.dir === 'out');
+      if (b?.dir !== undefined && !named && !(Array.isArray(b.dir) && b.dir.length === 3 && b.dir.every((v) => typeof v === 'number'))) {
+        err(`${owner}: a burst's dir is [x, y, z]${timed ? ", 'up' or 'out'" : ''}`);
+      }
+      if (!timed) continue;
+      const delay = [].concat(b?.delay ?? 0);
+      if (!delay.every((v) => typeof v === 'number' && v >= 0) || delay.length > 2) err(`${owner}: a burst's delay is seconds, or [min, max]`);
+      for (const key of ['over', 'radius']) if (b?.[key] !== undefined && !(typeof b[key] === 'number' && b[key] >= 0)) err(`${owner}: a burst's ${key} must be a number, 0 or more`);
+      if (b?.z !== undefined && typeof b.z !== 'number') err(`${owner}: a burst's z is a height above the centre`);
     }
     return undefined;
   };
+
+  /** A reference to an explosion (defineExplosion) by id. */
+  const checkExplosion = (owner, id) => {
+    if (id !== undefined && !reg.explosions?.has(id)) err(`${owner}: unknown explosion "${id}"`);
+  };
+
+  for (const e of reg.explosions?.values() ?? []) {
+    const owner = `explosion "${e.id}"`;
+    checkBursts(owner, e.particles, true);
+    if (e.light !== undefined) {
+      checkLight(owner, e.light);
+      if (e.light?.time !== undefined && !(e.light.time > 0)) err(`${owner}: the light's time is seconds, above 0`);
+    }
+    if (e.effect !== undefined && reg.things.get(e.effect)?.kind !== 'effect') err(`${owner}: unknown effect "${e.effect}"`);
+    checkSound(owner, e.sound);
+  }
 
   for (const t of reg.things.values()) {
     const owner = `${t.kind} "${t.id}"`;
     checkLight(owner, t.light);
     checkBursts(`${owner} death`, t.death?.particles);
+    checkExplosion(`${owner} death`, t.death?.explosion);
+    if (t.kind === 'projectile') checkExplosion(owner, t.explosion);
     if (t.corpse) {
       checkBursts(`${owner} corpse`, t.corpse.particles);
       const range = (v, lo) => [].concat(v).every((n) => typeof n === 'number' && n >= lo) && [].concat(v).length <= 2;
@@ -235,6 +262,7 @@ export function validateContent(reg) {
         const lit = name === 'setLight' && map.sourcesWithTag(a.tag).length;
         if (a.tag && !map.tags.has(a.tag) && !lit) err(`${owner}: ${where} refers to tag "${a.tag}" which no tile${name === 'setLight' ? ' or light' : ''} has`);
         if (a.thing && !reg.things.has(a.thing)) err(`${owner}: ${where} spawns unknown thing "${a.thing}"`);
+        if (name === 'explode' && !reg.explosions?.has(a.explosion)) err(`${owner}: ${where} sets off unknown explosion "${a.explosion}"`);
         if (a.action === 'music' && a.id && !reg.songs.has(a.id)) warn(`${owner}: ${where} plays unknown song "${a.id}"`);
         if (a.action === 'setLight' && a.lightFx !== undefined && LIGHT_FX[a.lightFx] === undefined) err(`${owner}: ${where} sets unknown lightFx "${a.lightFx}"`);
       }
@@ -303,10 +331,21 @@ function checkParticles(reg, err, warn) {
     if (p.bounce !== undefined && !num(p.bounce, 0, 1)) err(`${owner}: bounce must be 0 to 1`);
     if (p.alpha !== undefined && !num(p.alpha, 0, 1)) err(`${owner}: alpha must be 0 to 1`);
     if (p.fadeIn !== undefined && !num(p.fadeIn, 0, 1)) err(`${owner}: fadeIn is a share of its life, 0 to 1`);
-    if (p.fadeIn && p.blend !== 'dither' && !p.fade) warn(`${owner}: fadeIn only works with blend 'dither', or with fade: true`);
+    if (p.fadeOut !== undefined && !num(p.fadeOut, 0.001, 1)) err(`${owner}: fadeOut is a share of its life, above 0 and at most 1`);
+    for (const key of ['fadeIn', 'fadeOut']) {
+      if (p[key] && p.blend !== 'dither' && !p.fade) warn(`${owner}: ${key} only works with blend 'dither', or with fade: true`);
+    }
     if (p.fade && !['add', 'half'].includes(p.blend)) warn(`${owner}: fade is for blend 'add' or 'half' ('dither' always fades)`);
     if (p.streak !== undefined && !num(p.streak, 0, 1)) err(`${owner}: streak is seconds of travel, 0 to 1`);
     for (const key of ['gravity', 'wind']) if (p[key] !== undefined && typeof p[key] !== 'number') err(`${owner}: ${key} must be a number`);
+    if (p.grow !== undefined && !num(p.grow, 0, 20)) err(`${owner}: grow is how many times its size it ends at, 0 to 20`);
+    if (p.trail !== undefined) {
+      const tr = p.trail;
+      if (!reg.particles.has(tr?.type)) err(`${owner}: its trail has unknown particle type "${tr?.type}"`);
+      else if (reg.particles.get(tr.type).trail) warn(`${owner}: its trail's type "${tr.type}" leaves a trail too`);
+      if (tr?.every !== undefined && !num(tr.every, 0.001, 60)) err(`${owner}: trail.every is seconds between, above 0`);
+      if (tr?.for !== undefined && !num(tr.for, 0, 600)) err(`${owner}: trail.for is seconds, 0 or more`);
+    }
     const classCap = p.shape === 'disc' ? DISC_CAP : POINT_CAP;
     if (p.cap !== undefined && !(p.cap >= 1)) err(`${owner}: cap must be at least 1`);
     else if (p.cap > classCap) warn(`${owner}: cap ${p.cap} is above the ${p.shape === 'disc' ? 'disc' : 'point'} cap of ${classCap}`);

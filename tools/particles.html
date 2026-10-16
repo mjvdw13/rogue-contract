@@ -12,7 +12,12 @@
       position: fixed; top: 8px; left: 8px; z-index: 10; width: 300px;
       background: rgba(12, 14, 18, 0.88); color: #d9dde4; border: 1px solid #3a4152; border-radius: 6px;
       padding: 10px 12px; font: 12px/1.45 system-ui, sans-serif; user-select: text; -webkit-user-select: text;
+      max-height: calc(100vh - 16px); overflow-y: auto; box-sizing: border-box;
     }
+    #bench h2 { font-size: 12px; margin: 10px 0 0; padding-top: 6px; border-top: 1px solid #2c313a; color: #f0c040; font-weight: 600; }
+    #bench input[type=checkbox] { margin: 0 4px 0 0; vertical-align: -2px; }
+    #bench .check { display: inline-block; margin: 6px 10px 0 0; color: #d9dde4; }
+    #bench #live { color: #8a93a3; margin-top: 4px; }
     #bench h1 { font-size: 14px; margin: 0 0 6px; color: #f0c040; }
     #bench label { display: block; margin: 6px 0 2px; color: #8a93a3; }
     #bench select, #bench input, #bench button {
@@ -39,13 +44,32 @@
   <div id="bench">
     <h1>Particle bench</h1>
     <div class="dim">Click the view to look round (Esc to let go); the game's keys to walk.</div>
+    <label for="spot">Go to</label>
+    <select id="spot"></select>
+    <div id="readout" style="margin-top:8px">Loading...</div>
+    <div id="live"></div>
+
+    <h2>Explosions</h2>
+    <label for="style">Style</label>
+    <select id="style"></select>
+    <label for="where">Where</label>
+    <select id="where">
+      <option value="floor">On the floor ahead</option>
+      <option value="air">In the air ahead</option>
+      <option value="wall">On the wall ahead</option>
+    </select>
+    <label for="dist">Distance ahead</label>
+    <div class="row"><input id="dist" type="range" min="1.5" max="15" step="0.5" value="5"><span id="distN">5</span></div>
+    <label class="check"><input id="sprite" type="checkbox">The old sprite too</label>
+    <label class="check"><input id="repeat" type="checkbox">Every <input id="every" type="number" min="0.2" max="20" step="0.1" value="2"> s</label>
+    <div><button id="boom">Detonate (X)</button></div>
+    <div class="dim">Real caps hold while the stream below is off.</div>
+
+    <h2>Stream</h2>
     <label for="kind">Kind</label>
     <select id="kind"></select>
     <label for="count">Live particles</label>
     <div class="row"><input id="count" type="range" min="0" max="4000" step="100" value="1000"><input id="countN" type="number" min="0" max="4000" step="100" value="1000"></div>
-    <label for="spot">Go to</label>
-    <select id="spot"></select>
-    <div id="readout" style="margin-top:8px">Loading...</div>
     <button id="sweep">Run sweep here</button><button id="hideT" class="hide">Hide table</button>
     <div id="sweepOut"></div>
   </div>
@@ -68,8 +92,10 @@
     // Wait for the level to start.
     while (!game.scene?.world) await new Promise((r) => setTimeout(r, 50));
 
+    $('kind').add(new Option('(none: explosions only)', ''));
     for (const [k, v] of Object.entries(BENCH_KINDS)) $('kind').add(new Option(v.label, k));
-    $('kind').value = 'spark';
+    $('kind').value = params.get('kind') ?? '';
+    for (const e of game.registry.explosions.values()) $('style').add(new Option(e.name ?? e.id, e.id));
 
     // Spots: the headless bench's views (Mission 1).
     const spots = { here: null };
@@ -122,6 +148,11 @@
         `3D view: <b>${avg(frm).toFixed(2)}</b> ms a frame<br>` +
         `&nbsp; of which particles drawn: <b>${avg(drw).toFixed(2)}</b> ms<br>` +
         `Particle update: <b>${avg(upd).toFixed(3)}</b> ms a tick`;
+      const ps = world.particles;
+      const capOf = (c) => (c >= ps.cap ? 'no cap' : `cap ${c}`);
+      $('live').innerHTML =
+        `Points ${ps.points} (${capOf(ps.capPoints)}), discs ${ps.discs} (${capOf(ps.capDiscs)})<br>` +
+        (ps.types.filter((t) => t.live).map((t) => `${t.id} ${t.live}${t.live >= t.cap ? ' (at cap)' : ''}`).join(', ') || '&nbsp;');
       frm.length = drw.length = upd.length = 0;
     }, 500);
 
@@ -186,6 +217,49 @@
       frm.length = drw.length = upd.length = 0;
     };
     $('hideT').onclick = () => { $('sweepOut').innerHTML = ''; $('hideT').classList.add('hide'); };
+
+    // Explosions: set one off ahead of you, on the floor, in the air or on the wall you face.
+    function detonate() {
+      if (!world) return;
+      const map = world.map;
+      const cam = world.camera();
+      const dx = Math.cos(cam.angle);
+      const dy = Math.sin(cam.angle);
+      // The wall straight ahead, and which way its face looks.
+      let wall = 30;
+      let normal = [-dx, -dy, 0];
+      for (let d = 0.05; d < 30; d += 0.05) {
+        const x = cam.x + dx * d;
+        const y = cam.y + dy * d;
+        if (!map.solidPoint(x, y)) continue;
+        wall = d;
+        const px = cam.x + dx * (d - 0.05);
+        const py = cam.y + dy * (d - 0.05);
+        normal = Math.floor(px) !== Math.floor(x) ? [-Math.sign(dx), 0, 0] : [0, -Math.sign(dy), 0];
+        break;
+      }
+      const where = $('where').value;
+      const d = where === 'wall' ? wall - 0.15 : Math.min(Number($('dist').value), wall - 0.4);
+      const x = cam.x + dx * d;
+      const y = cam.y + dy * d;
+      const floor = map.floorAt(x, y, 0, cam.z);
+      const z = where === 'floor' ? floor + 0.1 : where === 'air' ? floor + 1.2 : Math.max(floor + 0.3, cam.z - 0.3);
+      world.explode($('style').value, x, y, z, { dir: where === 'wall' ? normal : null });
+      if ($('sprite').checked) world.spawnEffect('explosion', x, y, z);
+    }
+    $('boom').onclick = () => { detonate(); $('screen').focus(); };
+    window.addEventListener('keydown', (e) => { if (e.code === 'KeyX' && e.target.tagName !== 'INPUT') detonate(); });
+    $('dist').oninput = () => ($('distN').textContent = $('dist').value);
+    for (const id of ['style', 'where']) $(id).addEventListener('change', () => $('screen').focus());
+    let nextBoom = 0;
+    setInterval(() => {
+      if (!$('repeat').checked || !world) return;
+      const now = performance.now();
+      if (now >= nextBoom) {
+        detonate();
+        nextBoom = now + Math.max(0.2, Number($('every').value)) * 1000;
+      }
+    }, 50);
   </script>
 </body>
 </html>
