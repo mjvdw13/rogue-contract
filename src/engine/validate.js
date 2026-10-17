@@ -214,6 +214,13 @@ export function validateContent(reg) {
     else if (!w.anims.fire.events.includes('fire')) err(`${owner}: its "fire" animation needs a fireAt frame`);
     if (w.ammo && !reg.ammo.has(w.ammo)) err(`${owner}: unknown ammo "${w.ammo}"`);
     if (w.reraise !== undefined && typeof w.reraise !== 'boolean') err(`${owner}: reraise must be true or false`);
+    if (w.charge) {
+      const c = w.charge;
+      if (!(c.time > 0)) err(`${owner}: charge.time must be above 0`);
+      if (!(c.min >= 0 && c.min <= 1)) err(`${owner}: charge.min must be 0 to 1`);
+      if (!(c.sink >= 0)) err(`${owner}: charge.sink must be 0 or more`);
+      if (w.fire?.kind !== 'projectile') warn(`${owner}: charge only changes thrown or fired projectiles`);
+    }
     if (!w.fire) err(`${owner}: needs a "fire" attack`);
     checkAttack(owner, w.fire);
     for (const s of Object.values(w.sounds ?? {})) checkSound(owner, s);

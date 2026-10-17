@@ -1540,6 +1540,34 @@ Steps:
        (DF art and stand-ins); commit and push.
 6. [ ] Mark tries it in the game and says: throw distance, bounciness,
        fuse, the clank (MORTAR9 is a guess) and the volumes.
+       - Mark (2026-10-17), first go:
+         - "Leaving the hand shouldn't be a clank. When it bounces it
+           should be a clank, right now it's a thud." So THERMAL1 is the
+           clank (DF's bounce, not its throw) and MORTAR9 a thud.
+         - The hand is too high and covers too much of the view: lower,
+           like the blaster.
+         - Throw on *release*, the distance by how long the button was
+           held: a quick tap a short toss, held down a long throw.
+       Decided: a weapon's `charge: { time, min }`: fire held winds the
+       hand back (it sinks a little), letting go throws. The power runs
+       from `min` (a tap) to 1 (held `time` seconds or more) and scales
+       the projectile's speed (the attack spec carries it as `power`).
+       Changing weapon while winding up drops the throw.
+   - [x] 6a. Sounds: the clank THERMAL1, the throw SWING (a whoosh, as
+         the fist's miss; 0.7); INDEX.md corrected.
+   - [x] 6b. The hand lower, its fist about where the blaster sits
+         (`offset` [40, 28]; the fist's top near row 140 of 200).
+   - [x] 6c. `charge` in the weapon state machine and the launch;
+         validator, MODDING.md; tuned headless (a tap lands a few tiles
+         off, a full throw further than now).
+         - `charge: { time: 1, min: 0.2, sink: 12 }`, the detonator's
+           full speed 18 (was 15). From the Mission 1 start: a tap
+           lands 3 tiles off and rests at 5; held half a second, 6.6
+           and 11; held a second or more, 10.4 and 18.
+   - [x] 6d. Tests (tap short, hold long, nothing thrown until let go,
+         switching drops it), the validator, the smoke test; commit and
+         push.
+   - [ ] 6e. Mark tries it again.
 
 ## Phase 1c: Two storeys per tile (done 2026-10-13)
 
@@ -2984,3 +3012,8 @@ update the smoke test.
   (EX-LRG1), or at once on a body. Engine: projectiles' `bounce`,
   weapons' `reraise`. Pickups (one, a belt of five) in Mission 1 and the
   sandbox. 226 tests, the validator and the smoke test pass.
+- 2026-10-17: Phase 1b U step 6, Mark's first go with the detonator: the
+  clank is THERMAL1 (it was the throw) and the throw SWING; the hand
+  lower, like the blaster; thrown on letting fire go, harder the longer
+  it was held (weapons' `charge`: a tap 3 tiles, a second's hold 10,
+  rolling on to 18). 229 tests, the validator and the smoke test pass.

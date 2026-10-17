@@ -14,6 +14,9 @@ export class WeaponState extends Animated {
     this.y = BOTTOM;
     this.refire = 0;
     this.flash = 0;
+    /** (`charge`) Seconds the throw has been wound up, and the power it was let go at. */
+    this.charge = 0;
+    this.power = 1;
   }
 }
 
@@ -70,7 +73,8 @@ function fire(world, pt, def, ws) {
   }
   const berserk = def.fire.kind === 'melee' && p.powers.berserk > 0;
   const mult = berserk ? (def.fire.berserkMultiplier ?? 10) : 1;
-  performAttack(world, pt, def.fire, pt.angle, { accurate: def.accurateFirstShot && ws.refire === 0, damageMult: mult });
+  const spec = def.charge ? { ...def.fire, power: ws.power } : def.fire;
+  performAttack(world, pt, spec, pt.angle, { accurate: def.accurateFirstShot && ws.refire === 0, damageMult: mult });
   if (def.sounds.fire) world.playSound(def.sounds.fire);
   if (def.noise) world.noiseAlert(pt);
 }
@@ -126,7 +130,10 @@ export function weaponThink(world, pt, input, dt) {
     case 'ready':
       ws.stepAnim(dt);
       if (input.isDown('fire')) {
-        if (hasAmmo(p, def)) {
+        if (hasAmmo(p, def) && def.charge) {
+          ws.state = 'charge';
+          ws.charge = 0;
+        } else if (hasAmmo(p, def)) {
           ws.state = 'fire';
           ws.setAnim('fire');
         } else {
@@ -137,7 +144,24 @@ export function weaponThink(world, pt, input, dt) {
         ws.refire = 0;
       }
       break;
+    case 'charge': {
+      // (`charge`) Held: the hand winds back, sinking a little. Let go: the
+      // throw, harder the longer it was held. Changing weapon drops it.
+      const { time, min, sink } = def.charge;
+      ws.charge += dt;
+      const k = Math.min(1, ws.charge / time);
+      ws.y = sink * k;
+      if (p.pendingWeapon && p.pendingWeapon !== p.weapon) {
+        ws.state = 'lower';
+      } else if (!input.isDown('fire')) {
+        ws.power = min + (1 - min) * k;
+        ws.state = 'fire';
+        ws.setAnim('fire');
+      }
+      break;
+    }
     case 'fire': {
+      if (ws.y > 0) ws.y = Math.max(0, ws.y - RAISE_SPEED * dt); // back up from a wind-up
       const done = ws.stepAnim(dt, (ev) => {
         if (ev === 'fire') fire(world, pt, def, ws);
         else if (ev.startsWith('sound:')) world.playSound(ev.slice(6));

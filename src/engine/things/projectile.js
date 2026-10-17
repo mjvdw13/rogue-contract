@@ -244,7 +244,8 @@ export function launchProjectile(world, id, owner, angle, spec = {}, aim = aimAt
   const off = (owner.radius ?? 0.5) + def.radius + 0.1;
   const p = world.spawn(id, owner.x + Math.cos(angle) * off, owner.y + Math.sin(angle) * off, angle);
   if (!p) return null;
-  const speed = def.speed * (owner.kind === 'monster' && world.skillInfo.fast ? 1.4 : 1);
+  // (`power`: how hard a wound-up throw was let go, 0 to 1; see a weapon's `charge`.)
+  const speed = def.speed * (owner.kind === 'monster' && world.skillInfo.fast ? 1.4 : 1) * (spec.power ?? 1);
   p.owner = owner;
   p.state = 'flying';
   p.vx = Math.cos(angle) * speed;

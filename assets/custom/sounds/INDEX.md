@@ -36,13 +36,13 @@ these are Lucasfilm's and must not be redistributed.
 | FUSION2 | 0.36s | Jeron fusion cutter shot (second). |
 | MORTAR2 | 0.44s | Packered mortar gun (guess: firing). |
 | MORTAR4 | 0.93s | Packered mortar gun (guess: shell in flight). |
-| MORTAR9 | 0.39s | Packered mortar gun (guess: shell bouncing). |
+| MORTAR9 | 0.39s | Packered mortar gun (guess: shell landing; a dull thud). |
 | CONCUSS1 | 0.53s | Stouker concussion rifle (guess: shot). |
 | CONCUSS5 | 0.90s | Stouker concussion rifle (guess: blast). |
 | CONCUSS6 | 0.26s | Stouker concussion rifle (guess: short shot). |
 | PLASMA4 | 0.72s | Assault cannon plasma shot. |
 | MISSILE1 | 0.62s | Assault cannon missile launch. |
-| THERMAL1 | 0.10s | Thermal detonator throw. |
+| THERMAL1 | 0.10s | Thermal detonator bouncing (a metal clank). |
 | CLAYMOR1 | 0.17s | I.M. mine arming. |
 | PISTOUT1 | 0.28s | Pistol out of ammo (dry click). |
 | RIFLOUT | 0.31s | Rifle out of ammo (dry click). |

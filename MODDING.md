@@ -217,6 +217,12 @@ lights the room round you (see *Glowing things* below). `flashLight: 1`
 `reraise: true` drops the hand out of view after each shot and brings the
 next one up (a thrown weapon: see `thermal-detonator.js`); with none left,
 it switches to your best weapon with ammo.
+`charge: { time: 1, min: 0.2, sink: 12 }` throws when fire is let go
+instead of when it's pressed. While fire is held the hand winds back,
+sinking up to `sink` pixels. The throw's power runs from `min` for a tap to
+1 for a hold of `time` seconds or more, and it scales the projectile's
+`speed`, so a tap is a short toss. Changing weapon while winding up drops
+the throw.
 
 ## Items
 
