@@ -27,19 +27,10 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
-- [ ] **Concussion rifle:** try the lock-on and the taller blasts.
-- [ ] **Thermal detonator:** try the higher arc (speed 18, `toss` 7, `loft` 6),
-      the clank and the volumes.
-- [ ] **Explosion shake:** how hard (try it on `tools/particles.html`).
-- [ ] **Sound overrides:** check the DF sound mapping by ear on
-      `tools/soundboard.html`.
-- [ ] **Mission 1 playtest** (the canyon garrison), then tune ammo and skills.
 - [ ] **Boba Fett and Bossk:** where they appear in the story (sandbox only
       today).
 - [ ] **Which mission is the vertical slice:** the Canyon Garrison (built, the
       story's Mission 3) or Mos Eisley (the story's Mission 1).
-- [ ] **Touch controls:** remove them? Phones are no longer a target, but
-      `input/touch.js` and the touch bindings are still live code.
 - [ ] **More renderer speed:** the next step would be Web Workers splitting
       the columns (needs cross-origin isolation, a service-worker shim on
       Pages). The canyon draws in about 9.3 ms in Chrome now.
@@ -47,6 +38,14 @@ These need Mark to try something, or to decide. Don't start them without him.
 ## Next up
 
 In this order unless Mark says otherwise.
+
+### 0. Mark's notes (2026-10-17)
+
+- [x] Concussion rifle: the shot bursts on solid scenery (sprite
+      decorations too) and on villagers, instead of flying through them.
+- [ ] Thermal detonator: a tap tosses it as before the higher arc (speed
+      24, `toss` 6), a long throw keeps the new arc (speed 18, up 13).
+- [ ] Remove touch controls (`input/touch.js`, its bindings and settings).
 
 ### 1. Particles into the game (from the particle system, 2026-10-15)
 

@@ -166,3 +166,17 @@ test('with nothing in the cone, it goes where you aim', () => {
   const shot = fireRifle(w);
   assert.ok(Math.abs(shot.angle) < 1e-9 && Math.abs(shot.vz) < 1e-9);
 });
+
+test('it bursts on a crate and on a villager instead of flying through, and the villager is unhurt', () => {
+  for (const id of ['supply-crate', 'villager-woman']) {
+    const w = world();
+    const t = w.spawn(id, 6.5, 2.5, Math.PI);
+    const p = shoot(w);
+    run(w, mockInput(), 0.4);
+    assert.ok(p.removed || p.state === 'exploding', `${id}: burst`);
+    const conc = w.blasts.filter((b) => b.id === 'concussion');
+    assert.equal(conc.length, 1, `${id}: one blast`);
+    assert.ok(conc[0].x < 6.5 - t.radius && conc[0].x > 5, `${id}: just in front of it (${conc[0].x.toFixed(2)})`);
+    assert.ok(!t.removed && !t.dead, `${id}: still there`);
+  }
+});

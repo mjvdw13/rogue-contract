@@ -215,8 +215,8 @@ export function projectileThink(world, p, dt) {
     for (const t of world.things) {
       if (t === p || t === p.owner || t.dead || t.removed) continue;
       if (!t.shootable) {
-        // Solid model scenery: a burst against it, no damage.
-        if (!blocksShots(t) || overlap(t, nx, ny, p.radius) <= 0) continue;
+        // Solid model scenery (with `hitsSolid`, anything solid): a burst against it, no damage.
+        if (!(blocksShots(t) || (p.def.hitsSolid && t.solid)) || overlap(t, nx, ny, p.radius) <= 0) continue;
         if (nz < t.z - p.radius || nz > t.z + t.height + p.radius) continue;
         explode(world, p, null, true);
         return;

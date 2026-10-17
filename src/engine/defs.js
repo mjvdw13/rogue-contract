@@ -419,7 +419,9 @@ export function defineDecoration(def) {
  * with distance (`falloff: false`: the full damage to all of them); `erupt`
  * is an explosion set off at the feet of each one (see projectile.js). With
  * no `sheet`, it flies unseen (Dark Forces' concussion shot).
- * @param {{id:string, sheet?:SheetSpec, anims?:{fly:AnimSpec, explode?:AnimSpec}, speed?:number,
+ * `hitsSolid` bursts it on anything solid it can't hurt (sprite scenery,
+ * friendly characters) as well, instead of flying through.
+ * @param {{id:string, sheet?:SheetSpec, anims?:{fly:AnimSpec, explode?:AnimSpec}, speed?:number, hitsSolid?:boolean,
  *   damage?:number|number[], radius?:number, splash?:{radius:number, damage:number, falloff?:boolean, erupt?:string},
  *   gravity?:number, z?:number, sounds?:{fire?:string, explode?:string, bounce?:string}, trail?:string, explosion?:string,
  *   bounce?:{restitution?:number, friction?:number, minSpeed?:number, roll?:number, fuse?:number, toss?:number, loft?:number}}} def
@@ -434,6 +436,7 @@ export function defineProjectile(def) {
     fullbright: true,
     gravity: 0,
     splash: null,
+    hitsSolid: false,
   });
   if (def.bounce) p.bounce = { restitution: 0.5, friction: 0.7, minSpeed: 1.5, roll: 3, fuse: 2.5, toss: 4, loft: 0, ...def.bounce };
   return p;
