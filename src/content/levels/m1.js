@@ -383,6 +383,7 @@ const list = [
   at('sandtrooper', 40.5, 42, { angle: 270 }),
   at('sandtrooper', 56.5, 42, { angle: 270, skill: NOT_EASIEST }),
   at('sandtrooper', 30.5, 52.5, { angle: 270, skill: HARD }), // under ledge A
+  at('sandtrooper', 53.5, 55.5, { angle: 200, skill: NOT_EASIEST }), // by the big boulder, facing the gorge
   // Sandtrooper commanders: one at the gate between its guards, one by the
   // vent mouth, the way in once the gate holds.
   at('sandtrooper-commander', 48.5, 42.5, { angle: 270, skill: NOT_EASIEST }),
@@ -459,7 +460,9 @@ const list = [
   at('med-kit', 97.5, 56.5),
   at('energy-pack', 73.5, 40.5, { z: 6 }),
   at('power-cell', 73.5, 27.5), // in the dark under the north-west corner of the ring
-  // The gantry: a med kit before the last fight.
+  // The gantry: a sandtrooper at the top of the stairs, and a med kit before
+  // the last fight.
+  at('sandtrooper', 117.2, 43, { angle: 180, skill: NORMAL_UP }),
   at('med-kit', 115.5, 44, { skill: [1, 2, 3] }),
   // The landing pad, with the pickup shuttle north of the marked spot.
   at('shuttle', 123.5, 38.5, { angle: 270 }),

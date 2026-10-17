@@ -102,16 +102,17 @@ contrast comes from bright pools (184-224).
 
 Skills 1-2 thin the fights and add med kits; 4-5 add a trooper or two to
 most areas (skill 5 also makes monsters faster and doubles ammo pickups, set
-in the engine). Totals: 14 monsters on skill 1, 20 on 2, 25 on 3, 32 on 4
-and 33 on 5.
+in the engine). Totals: 14 monsters on skill 1, 21 on 2, 27 on 3, 34 on 4
+and 35 on 5.
 
 | Area | Every skill | 2+ | 3+ | 4+ (5 only) |
 |------|-------------|----|----|-------------|
-| Canyon | snipers on ledges A and B, a gate sandtrooper, 2 Jawas | a 2nd gate sandtrooper, a sniper on the rock arch, a sandtrooper commander at the gate | the probe droid, a 3rd Jawa, a commander by the vent mouth | a sandtrooper under ledge A, a 4th Jawa |
+| Canyon | snipers on ledges A and B, a gate sandtrooper, 2 Jawas | a 2nd gate sandtrooper, a sniper on the rock arch, a sandtrooper commander at the gate, a sandtrooper by the big boulder (south-east) | the probe droid, a 3rd Jawa, a commander by the vent mouth | a sandtrooper under ledge A, a 4th Jawa |
 | Maintenance | the ambush trooper by the lift | | | a 2nd ambush trooper on the west side |
 | Barracks | a corridor trooper, a bunk-room trooper, the officer (red keycard) | a 2nd bunk-room trooper | a trooper by the red door | a 3rd bunk-room trooper |
 | Vault | a guard by the far banks | | a 2nd guard | an officer by the south door |
 | Generator | the probe droid (over the north bridge), a catwalk trooper (north-west), one on the floor (west) | an east catwalk trooper | | a south catwalk trooper (a 2nd probe droid down on the floor, west) |
+| Gantry | | | a sandtrooper at the top of the stairs | |
 | Landing pad | a stormtrooper | a sandtrooper | | a 2nd stormtrooper |
 
 Items: power cells, energy packs and med kits along the route (the bunk room

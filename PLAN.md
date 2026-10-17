@@ -1857,6 +1857,26 @@ Decided:
 3. [x] Tests, the validator, the smoke test; a look in game beside a
        commander; README; commit and push.
 
+### Z. Two more sandtroopers in Mission 1 (2026-10-17)
+
+Mark (2026-10-17): a couple more sandtroopers in Mission 1. Sandtroopers
+are the outdoor troops, so both go under the sky:
+- **The bowl's south-east**, by the big boulder (53.5, 55.5), facing the
+  gorge's mouth: the open half of the bowl had only the probe droid, so
+  the first look into the bowl now meets fire from the right as well as
+  the ledges. Skills 2+.
+- **The top of the gantry stairs** (117.2, 43), facing the escape hatch:
+  the way to the pad was empty, and the med kit there (skills 1-3) now
+  follows a fight. Skills 3+.
+
+1. [x] Both in `m1.js`; `docs/mission1.md`'s table and totals (14/21/27/34/35).
+2. [x] A look at the map and in game, tests, the validator and the smoke
+       test; commit and push.
+       - The gantry one stands beside the med kit, just off its tile; seen
+         from the hatch it's framed at the top of the stairs. The bowl one
+         hides behind the probe droid from the gorge's mouth, and shows
+         beside the boulder a few steps in.
+
 ## Phase 1c: Two storeys per tile (done 2026-10-13)
 
 Mark (2026-10-13): we want to walk underneath other parts of the map. Today
