@@ -1788,6 +1788,13 @@ Decided:
        (`head_on()`, drawn 8x and averaged down): a round rim lit from the
        upper right, a dark bore, a short barrel into the receiver and the
        stock's edge behind it. The fire frame's flash is on the bore.
+5. [x] Mark (2026-10-17): a couple of commanders in Mission 1's canyon.
+       One at the main gate between the two gate sandtroopers, behind the
+       barricades (skills 2+), one guarding the vent mouth, the way in
+       after the gate (skills 3+). `docs/mission1.md`'s table and totals,
+       a look at the map and in game, tests; commit and push.
+       - Gate (48.5, 42.5) and vent mouth (33.5, 43.5), both facing
+         south. Mission 1 now has 14/20/25/32/33 monsters on skills 1-5.
 
 ## Phase 1c: Two storeys per tile (done 2026-10-13)
 
@@ -3276,3 +3283,7 @@ update the smoke test.
   pointed the rifle to the right; now head-on at the player (a thick
   muzzle painted on the sandtrooper's own frames). Tests, the validator and
   the smoke test pass.
+- 2026-10-17: Phase 1b X step 5, Mark: two sandtrooper commanders in
+  Mission 1's canyon, at the main gate (skills 2+) and by the vent mouth
+  (3+); `docs/mission1.md` updated. Tests, the validator and the smoke
+  test pass.

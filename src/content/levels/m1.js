@@ -374,14 +374,19 @@ const HARD = [4, 5];
 const list = [
   at('player', 14.5, 90.5, { angle: 90 }),
   at('detonator-belt', 17.5, 88.5), // thermal detonators, to try them out
-  // The canyon: snipers on both ledges and the rock arch, two gate guards, a
-  // probe droid round the spire, and a band of Jawas scavenging in the gorge.
+  // The canyon: snipers on both ledges and the rock arch, two gate guards and
+  // their commanders, a probe droid round the spire, and a band of Jawas
+  // scavenging in the gorge.
   at('stormtrooper', 24.5, 65.5, { angle: 270, z: 5, skill: NOT_EASIEST }), // sniper, on the arch
   at('stormtrooper', 22, 50.5, { angle: 0 }), // sniper, ledge A
   at('stormtrooper', 59.5, 48.5, { angle: 180 }), // sniper, ledge B
   at('sandtrooper', 40.5, 42, { angle: 270 }),
   at('sandtrooper', 56.5, 42, { angle: 270, skill: NOT_EASIEST }),
   at('sandtrooper', 30.5, 52.5, { angle: 270, skill: HARD }), // under ledge A
+  // Sandtrooper commanders: one at the gate between its guards, one by the
+  // vent mouth, the way in once the gate holds.
+  at('sandtrooper-commander', 48.5, 42.5, { angle: 270, skill: NOT_EASIEST }),
+  at('sandtrooper-commander', 33.5, 43.5, { angle: 270, skill: NORMAL_UP }),
   at('probe-droid', 44.5, 56.5, { skill: NORMAL_UP }),
   // Barricades across the approach to the gate, angled out, the guards
   // behind them, and supply crates stacked against the face by the strips
