@@ -40,9 +40,9 @@ export default [
     id: 'villager-boy',
     name: 'FARM BOY',
     glyph: 'u',
-    frameWidth: 58,
-    frameHeight: 58,
-    height: 1.5,
+    frameWidth: 48,
+    frameHeight: 49,
+    height: 1.25,
     lines: [
       'You a bounty hunter? Really?',
       'My uncle says to stay off the streets after dark.',

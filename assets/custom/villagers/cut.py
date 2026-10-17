@@ -34,7 +34,7 @@ BACK_WALK = [(1, i) for i in range(6)]
 # front walk, and fronts among the back walk, so those take front stands
 # from row 2, and back poses from row 1 or twice over.
 VILLAGERS = {
-    'villager-boy': ('boy.jpg', (2, 62, 254), 1.5, FRONT_WALK, BACK_WALK),
+    'villager-boy': ('boy.jpg', (2, 62, 254), 1.25, FRONT_WALK, BACK_WALK),
     'villager-woman': ('woman.jpg', (176, 40, 142), 1.64, [(0, 0), (0, 1), (1, 0), (0, 2), (0, 3), (1, 1)],
                        [(1, 2), (1, 3), (1, 4), (1, 5), (0, 4), (0, 5)]),
     'villager-man': ('man.jpg', (0, 5, 254), 1.76, [(0, 0), (0, 1), (0, 2), (0, 3), (0, 5), (1, 0)],
@@ -58,14 +58,14 @@ WALK_VIEWS = [[(0, i) for i in range(6, 12)], [(2, i) for i in range(6)], [(2, i
 STAND_VIEWS = [(3, 7), (3, 8), (3, 9), (3, 10)]
 
 # A softer take on sheetcut.DARK_FORCES, matched to the Dark Forces officer
-# and Bossk rather than the stormtrooper's hard armour: no S-curve or
-# sharpening and a narrower tonal range (spread about 50, like theirs), a
-# gentle side light, no darkened contour, and the source's thin dark line
-# work eased toward the colour round it (`lift`), so seams read as shading
-# rather than black outlines. Downscaled by area averaging (`box`), which
-# doesn't ring at edges as Lanczos does. Snapped to the whole palette, for
-# smooth shading.
-STYLE = dict(widen=1.15, median=5, contrast=0.0, gamma=1.1, sharpen=0.0, side=(0.85, 1.05), outline=1.0, threshold=0.45,
+# and Bossk rather than the stormtrooper's hard armour: no S-curve and a
+# narrower tonal range (spread about 50, like theirs), a gentle side light,
+# no darkened contour, and the source's thin dark line work eased toward the
+# colour round it (`lift`), so seams read as shading rather than black
+# outlines. Downscaled by area averaging (`box`), which doesn't ring at edges
+# as Lanczos does. Snapped to the whole palette, for smooth shading. A light
+# median and a little sharpening keep faces, belts and boot wraps crisp.
+STYLE = dict(widen=1.15, median=3, contrast=0.0, gamma=1.1, sharpen=0.5, side=(0.85, 1.05), outline=1.0, threshold=0.45,
              range=(14, 205), box=True, lift=0.75)
 
 
