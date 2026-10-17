@@ -37,18 +37,21 @@ export default [
     ],
     then: [{ explosion: 'secondary', delay: [0.2, 0.3], offset: [0.6, 0.9], z: 0.2 }],
   }),
-  // Something really big going up: a fireball that fills a hall (4 tiles
-  // wide and high) and rolls up, shrapnel, a cloud of smoke after it, and a
-  // second, smaller blast (`secondary`) beside it a moment later.
+  // Something really big going up: a hard white pop, a shock of hot streaks
+  // racing out along the floor, a fireball that punches out to fill a hall
+  // (4 tiles wide and high) and stops short, shrapnel flung hard, a cloud
+  // of smoke after it, and a second, smaller blast (`secondary`) beside it.
   defineExplosion({
     id: 'extra-large',
-    light: { radius: 9, light: 128, time: 0.8 },
+    light: { radius: 10, light: 160, time: 0.5 },
     particles: [
-      { type: 'fireball', count: 15, speed: [2.5, 6], radius: 0.8, dir: [0, 0, 1], spread: 2, z: 1 },
-      { type: 'fireball', count: 6, speed: [1, 3], radius: 0.6, dir: 'up', spread: 1, z: 0.6, delay: 0.1, over: 0.25 },
-      { type: 'spark', count: 16, speed: [3, 9] },
-      { type: 'debris', count: 6, speed: [3, 8] },
-      { type: 'shrapnel', count: 16, speed: [2, 6] },
+      { type: 'blast-flash', count: 3, speed: [0, 0.5], radius: 0.3, z: 1 },
+      { type: 'blast-streak', count: 60, speed: [12, 20], dir: 'ring', z: 0.1 },
+      { type: 'fireball', count: 15, speed: [10, 18], radius: 0.4, dir: [0, 0, 1], spread: 2, z: 1 },
+      { type: 'fireball', count: 6, speed: [3, 6], radius: 0.4, dir: 'up', spread: 1, z: 0.6, delay: 0.08, over: 0.15 },
+      { type: 'spark', count: 16, speed: [8, 15] },
+      { type: 'debris', count: 6, speed: [5, 11] },
+      { type: 'shrapnel', count: 16, speed: [6, 12] },
       { type: 'ember', count: 20, speed: [0.5, 2], dir: 'up', spread: 0.9, delay: 0.15, over: 0.8 },
       { type: 'smoke-cloud', count: 9, speed: [0.5, 2], radius: 1, dir: [0, 0, 1], spread: 2, z: 1.5, delay: [0.35, 0.5], over: 0.5 },
     ],

@@ -1399,6 +1399,30 @@ with the game):
                                `large` is back as it was in 5a3ede9 (fire,
                                8 chunks, blast smoke); everything above
                                about the fireball is `extra-large`'s.
+                         - [x] Mark: `extra-large` is too floaty, not
+                               kinetic enough; give it some kick:
+                               - [x] A hard white pop in the first frames
+                                     (`blast-flash`: a few big white
+                                     discs living under 0.1 s).
+                               - [x] The fireball punches out fast and
+                                     stops short (fast, heavy drag),
+                                     starts smaller and swells, rises
+                                     less, burns out sooner.
+                               - [x] A flat ring of fast hot streaks
+                                     along the floor (`blast-streak`, a
+                                     'ring' burst): the shock.
+                               - [x] Sparks and shrapnel flung harder;
+                                     a brighter, shorter flash of light.
+                               - [x] Caps, contact sheets, checks. The
+                                     fireball (thrown 10 to 18, drag 9)
+                                     glances off the hall's walls
+                                     instead of dying in them, so it
+                                     still fills it, by 0.25 s now. 70
+                                     discs and 98 points at most; 0.5
+                                     to 1 ms to draw headless at its
+                                     busiest (1 ms only from 2 tiles).
+                               - [ ] Not done, to offer: a screen
+                                     shake (the engine has none yet).
                    - [x] Peaks under the caps again (first pass; see above for now): `large` (with its
                          `small`) 67 discs and 85 points, `small` 28 and
                          35, `concussion` 36 and 99, `dirt` and `sparks`
@@ -2853,4 +2877,6 @@ update the smoke test.
   `smoke-cloud` after it; 72 discs at most, 0.5 to 0.7 ms to draw headless
   at its busiest. 220 tests, the validator and the smoke test pass. Then,
   as Mark wanted: `large` back as it was, and the hall filler a style of
-  its own, `extra-large`.
+  its own, `extra-large`. Then some kick for it: a white pop, a shock of
+  fast streaks along the floor, a fireball that punches out and stops
+  short, sparks and shrapnel flung harder, a brighter, shorter flash.

@@ -211,23 +211,53 @@ export default [
     cap: 40,
   }),
   // A big blast's fireball: great discs, white-hot where they pile up, that
-  // swell out to fill a hall, cool to orange and red, and roll upward.
+  // punch out fast and stop short (thrown hard, heavy drag), swelling to
+  // fill a hall (glancing off its walls), then cool to orange and red and
+  // roll a little upward.
   defineParticle({
     id: 'fireball',
     colors: [['glow-yellow', 6], { ramp: 'glow-yellow', from: 4, to: 0 }, { ramp: 'glow-red', from: 2, to: 0 }],
-    life: [0.7, 1.2],
-    size: 1.1,
-    grow: 2.2,
+    life: [0.55, 0.95],
+    size: 0.8,
+    grow: 3.2,
     maxPx: 64,
     shape: 'disc',
     blend: 'add',
     fade: true,
     fadeOut: 0.5,
     fullbright: true,
-    gravity: -1.5,
-    drag: 4,
+    gravity: -0.6,
+    drag: 9,
+    bounce: 0.3,
     onFloor: 'die',
+    walls: 'bounce',
     cap: 40,
+  }),
+  // A big blast's first instant: a hard white pop, gone in a frame or six.
+  defineParticle({
+    id: 'blast-flash',
+    colors: [['glow-yellow', 6]],
+    life: [0.06, 0.1],
+    size: 1.6,
+    grow: 1.5,
+    maxPx: 64,
+    shape: 'disc',
+    blend: 'add',
+    fullbright: true,
+    onFloor: 'die',
+    cap: 8,
+  }),
+  // And its shock: hot streaks that run out flat along the floor, fast.
+  defineParticle({
+    id: 'blast-streak',
+    colors: [['glow-yellow', 6], ['glow-yellow', 4], ['glow-yellow', 2], ['glow-red', 2]],
+    life: [0.12, 0.25],
+    size: 0.03,
+    streak: 0.06,
+    fullbright: true,
+    blend: 'add',
+    drag: 3,
+    cap: 80,
   }),
   // A concussion blast (after Dark Forces' own, CONCEXP): first a brief
   // white dome with a cyan rim, where it hit.
