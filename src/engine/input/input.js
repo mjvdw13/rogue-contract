@@ -4,7 +4,6 @@
  *   - keyboard: KeyboardEvent.code, e.g. 'KeyW', 'ArrowUp', 'Space'
  *   - mouse: 'Mouse0' (left), 'Mouse1' (middle), 'Mouse2' (right), 'WheelUp', 'WheelDown'
  *   - gamepad: 'Pad0'..'Pad16' (standard mapping button indices)
- *   - touch: 'Touch<Action>' virtual buttons
  */
 export const DEFAULT_BINDINGS = {
   forward: ['KeyW', 'ArrowUp'],
@@ -13,16 +12,16 @@ export const DEFAULT_BINDINGS = {
   strafeRight: ['KeyD'],
   turnLeft: ['ArrowLeft'],
   turnRight: ['ArrowRight'],
-  fire: ['Mouse0', 'KeyF', 'ControlLeft', 'ControlRight', 'Pad7', 'Pad6', 'TouchFire'],
-  use: ['KeyE', 'Mouse2', 'Pad2', 'TouchUse'],
+  fire: ['Mouse0', 'KeyF', 'ControlLeft', 'ControlRight', 'Pad7', 'Pad6'],
+  use: ['KeyE', 'Mouse2', 'Pad2'],
   run: ['ShiftLeft', 'ShiftRight'],
-  jump: ['Space', 'Pad0', 'TouchJump'],
-  crouch: ['KeyC', 'Pad1', 'TouchCrouch'],
+  jump: ['Space', 'Pad0'],
+  crouch: ['KeyC', 'Pad1'],
   lookUp: ['PageUp', 'Home'],
   lookDown: ['PageDown', 'Delete'],
   lookCenter: ['End', 'Pad11'],
-  automap: ['Tab', 'KeyM', 'Pad8', 'TouchMap'],
-  nextWeapon: ['WheelDown', 'BracketRight', 'Pad5', 'TouchWeapon'],
+  automap: ['Tab', 'KeyM', 'Pad8'],
+  nextWeapon: ['WheelDown', 'BracketRight', 'Pad5'],
   prevWeapon: ['WheelUp', 'BracketLeft', 'KeyQ', 'Pad4'],
   weapon1: ['Digit1'],
   weapon2: ['Digit2'],
@@ -35,7 +34,7 @@ export const DEFAULT_BINDINGS = {
   weapon9: ['Digit9'], // the concussion rifle
   zoomIn: ['Equal', 'NumpadAdd'],
   zoomOut: ['Minus', 'NumpadSubtract'],
-  menu: ['Escape', 'Pad9', 'TouchMenu'],
+  menu: ['Escape', 'Pad9'],
   menuUp: ['ArrowUp', 'KeyW', 'Pad12'],
   menuDown: ['ArrowDown', 'KeyS', 'Pad13'],
   menuLeft: ['ArrowLeft', 'KeyA', 'Pad14'],
@@ -64,14 +63,14 @@ export class Input {
     this.pressed = new Set();
     this.mouseDX = 0;
     this.mouseDY = 0;
-    this.pointer = null; // {x, y} client coords of last mouse/touch-in-menu
+    this.pointer = null; // {x, y} client coords of the mouse in menus
     this.clicks = []; // queued client-coordinate clicks for menus
     this.typed = ''; // recent letters, for cheat codes
     this.anyPressed = false;
     this.lastDevice = 'keyboard';
     /** Analog axes from sticks: -1..1 */
     this.analog = { move: 0, strafe: 0, turn: 0 };
-    this.virtual = new Set(); // held virtual codes (touch / gamepad)
+    this.virtual = new Set(); // held virtual codes (gamepad)
     this.pointerLocked = false;
     this.onPointerLockChange = null;
     this._attach();
@@ -100,18 +99,7 @@ export class Input {
       this.virtual.clear();
     });
 
-    // Touches on the canvas (menus) become clicks; the compatibility mouse
-    // events browsers fire right after a tap are ignored.
-    c.addEventListener('pointerdown', (e) => {
-      if (e.pointerType !== 'touch') return;
-      this.lastDevice = 'touch';
-      this._lastTouch = performance.now();
-      this.clicks.push({ x: e.clientX, y: e.clientY });
-      this.anyPressed = true;
-      this.onTouch?.();
-    });
     c.addEventListener('mousedown', (e) => {
-      if (performance.now() - (this._lastTouch ?? -1e9) < 1000) return;
       const code = `Mouse${e.button}`;
       this.lastDevice = 'mouse';
       this.down.add(code);
@@ -188,12 +176,6 @@ export class Input {
   wasPressed(action) {
     for (const code of this._codes(action)) if (this.pressed.has(code)) return true;
     return false;
-  }
-
-  /** Press a virtual code for one tick (touch buttons, gamepad edges). */
-  tap(code) {
-    this.pressed.add(code);
-    this.anyPressed = true;
   }
 
   /** Hold or release a virtual code. */

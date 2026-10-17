@@ -7,7 +7,6 @@ import { Presenter } from './gfx/present.js';
 import { MeltWipe } from './gfx/wipe.js';
 import { Assets } from './assets.js';
 import { Input } from './input/input.js';
-import { TouchControls, isTouchDevice } from './input/touch.js';
 import { GamepadPoller } from './input/gamepad.js';
 import { AudioSystem } from './audio/audio.js';
 import { Storage, DEFAULT_SETTINGS } from './core/storage.js';
@@ -30,9 +29,9 @@ import { FinaleScene } from './scenes/finale.js';
  */
 export class Game {
   /**
-   * @param {{canvas: HTMLCanvasElement, stage: HTMLElement, content: any, params?: URLSearchParams}} opts
+   * @param {{canvas: HTMLCanvasElement, content: any, params?: URLSearchParams}} opts
    */
-  constructor({ canvas, stage, content, params = new URLSearchParams() }) {
+  constructor({ canvas, content, params = new URLSearchParams() }) {
     this.canvas = canvas;
     this.registry = new Registry(content);
     const { errors, warnings } = validateContent(this.registry);
@@ -61,11 +60,6 @@ export class Game {
     this.input.onPointerLockChange = (locked) => {
       if (!locked && this.scene?.wantsPointerLock && !this.menu.active) this.pause();
     };
-    this.input.onTouch = () => {
-      if (this.settings.touchControls === 'auto') this.touchSeen = true;
-    };
-    this.touch = new TouchControls(stage, this.input);
-    this.touchSeen = isTouchDevice();
     this.gamepad = new GamepadPoller(this.input);
     this.audio = new AudioSystem(this.registry, this.settings);
     if (params.has('mute')) this.audio.setMuted(true);
@@ -82,7 +76,7 @@ export class Game {
     this.applySettings(false);
 
     canvas.addEventListener('click', () => {
-      if (this.scene?.wantsPointerLock && !this.menu.active && !this.touchActive) this.input.lockPointer();
+      if (this.scene?.wantsPointerLock && !this.menu.active) this.input.lockPointer();
     });
     window.addEventListener('beforeunload', (e) => {
       if (this.scene instanceof LevelScene && !this.menu.active && !this.scene.world?.player.player.dead) {
@@ -95,11 +89,6 @@ export class Game {
   font(id) {
     const f = this.registry.config.fonts?.[id] ?? id;
     return this.assets.fonts.get(f) ?? null;
-  }
-
-  get touchActive() {
-    const mode = this.settings.touchControls;
-    return mode === 'on' || (mode === 'auto' && this.touchSeen);
   }
 
   // ------------------------------------------------------------ boot
@@ -161,7 +150,6 @@ export class Game {
     const pal = this.menu.active ? PAL_NORMAL : (scene?.paletteIndex?.() ?? PAL_NORMAL);
     this.presenter.present(s.px, this.palette.palettes[pal], this.time);
     const inGame = scene instanceof LevelScene && !this.menu.active;
-    this.touch.setVisible(inGame && this.touchActive);
     this.canvas.classList.toggle('in-game', inGame && this.input.pointerLocked);
   }
 
@@ -295,7 +283,7 @@ export class Game {
 
   onMenuClosed() {
     if (this.scene instanceof TitleScene) return;
-    if (this.scene?.wantsPointerLock && !this.touchActive) this.input.lockPointer();
+    if (this.scene?.wantsPointerLock) this.input.lockPointer();
   }
 
   quitToTitle() {

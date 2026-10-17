@@ -3,7 +3,6 @@ import { Game } from './engine/game.js';
 import content from './content/index.js';
 
 const canvas = document.getElementById('screen');
-const stage = document.getElementById('stage');
 const status = document.getElementById('boot-message');
 
 function showError(err) {
@@ -13,7 +12,7 @@ function showError(err) {
 }
 
 try {
-  const game = new Game({ canvas, stage, content, params: new URLSearchParams(location.search) });
+  const game = new Game({ canvas, content, params: new URLSearchParams(location.search) });
   // Handy for poking at the game from the browser console.
   window.game = game;
   await game.boot((state) => {

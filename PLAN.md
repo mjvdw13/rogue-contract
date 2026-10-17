@@ -16,7 +16,7 @@ MODDING.md, if content authors need it). Keep this file short.
 | Question | Decision |
 |---|---|
 | Engine | **Height grid, our own** (2026-10-11, confirmed 2026-10-12). Tiles with their own floor and ceiling heights, rising doors, lifts, angled walls (one line per tile), two storeys per tile (slabs), see-through fences and 3D models for what the grid can't shape. Rejected: The Force Engine, GZDoom, Godot with TrenchBroom. No WebGL renderer (2026-10-15). |
-| Platform | **Desktop browsers** (2026-10-12). No phone target: no phone performance gate, and touch controls aren't required. |
+| Platform | **Desktop browsers** (2026-10-12). No phone target: no phone performance gate, and no touch controls (removed 2026-10-17). |
 | Scale | 1 tile = 0.5 m, 32 texels per tile; the player is 1.7 tall, eye at 1.25. |
 | Story | **Bad Paper** (`docs/story.md`, 2026-10-13): a prequel to Dark Forces. Kyle Katarn takes a Guild bounty on Tatooine as cover for the Alliance; Jan Ors flies him in and out in the Moldy Crow. Only Mission 1 (Mos Eisley) is free roam; the rest is run-and-gun. |
 | Scope | **A vertical slice first**, then decide on more missions. |
@@ -38,14 +38,6 @@ These need Mark to try something, or to decide. Don't start them without him.
 ## Next up
 
 In this order unless Mark says otherwise.
-
-### 0. Mark's notes (2026-10-17)
-
-- [x] Concussion rifle: the shot bursts on solid scenery (sprite
-      decorations too) and on villagers, instead of flying through them.
-- [x] Thermal detonator: a tap tosses it as before the higher arc (speed
-      24, `toss` 6), a long throw keeps the new arc (speed 18, up 13).
-- [ ] Remove touch controls (`input/touch.js`, its bindings and settings).
 
 ### 1. Particles into the game (from the particle system, 2026-10-15)
 

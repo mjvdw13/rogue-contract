@@ -19,10 +19,6 @@ export class LevelScene {
     this.world = null;
   }
 
-  get showTouch() {
-    return true;
-  }
-
   get wantsPointerLock() {
     return true;
   }
