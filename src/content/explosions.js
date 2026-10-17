@@ -77,7 +77,8 @@ export default [
   // Bossk's concussion blast, after Dark Forces' own (CONCEXP): all blue.
   // A white dome flashes, a flat streak runs out along what it hit, a column
   // of thin blue-white flame shoots out of it with a ripple at its foot, and
-  // breaks up into wisps. No fire, so no smoke.
+  // breaks up into wisps. No fire, so no smoke. The column stands about
+  // 3.3 tall, as DF's (123 px against its 66 px trooper).
   defineExplosion({
     id: 'concussion',
     light: { radius: 6, light: 100, time: 0.35 },
@@ -86,9 +87,9 @@ export default [
       { type: 'fire-blue', count: 16, speed: [0, 0.5], radius: 0.4, z: 0.1 },
       { type: 'conc-streak', count: 36, speed: [7, 12], dir: 'ring' },
       { type: 'conc-ripple', count: 60, speed: [2, 3.5], dir: 'ring', delay: 0.06 },
-      { type: 'conc-flame', count: 130, speed: [1.5, 4.5], radius: 0.25, dir: 'up', spread: 0.06, delay: 0.1, over: 0.45 },
+      { type: 'conc-flame', count: 130, speed: [4, 8], radius: 0.25, dir: 'up', spread: 0.06, delay: 0.1, over: 0.45 },
       { type: 'ion-spark', count: 20, speed: [4, 8], dir: 'up', spread: 0.25, delay: 0.05, over: 0.25 },
-      { type: 'conc-wisp', count: 36, speed: [1.5, 3.5], radius: 0.15, dir: 'up', spread: 0.2, z: 1, delay: 0.25, over: 0.4 },
+      { type: 'conc-wisp', count: 36, speed: [2.5, 5], radius: 0.15, dir: 'up', spread: 0.2, z: 1.6, delay: 0.25, over: 0.4 },
     ],
   }),
   // A droid or a panel shorting out: sparks, a crackle and a wisp of smoke.

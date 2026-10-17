@@ -234,6 +234,12 @@ the same number of pixels. The HUD panels in the bottom corners draw over the
 weapon. The fire animation's length sets the rate of fire. `accurateFirstShot: true` makes a single shot perfectly
 accurate when you aren't holding the trigger. New ammo types go in
 `src/content/ammo.js` as `defineAmmo({ id, name, short, max, clip })`.
+`lockOn: 5` in `fire` aims it Dark Forces' way: of the monsters you can
+see, the nearest one within 5° either side of the crosshair (or under it, so
+one close up is hard to miss) gets the shot, turned and tilted onto it
+however high or low it stands (see `concussion-rifle.js`). Without it,
+shots only get Doom's small nudge up or down onto a body already under the
+crosshair. Turning auto-aim off in the options turns both off.
 `light` is the muzzle flash: on the fire animation's `fullbright` frames it
 lights the room round you (see *Glowing things* below). `flashLight: 1`
 (0-2) instead brightens the whole view, Doom's way.

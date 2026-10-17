@@ -108,3 +108,61 @@ test("Bossk's shot does the same to you", () => {
   const [x, y] = w.blasts[0].at.get(w.player);
   assert.ok(w.blasts.some((b) => b.id === 'concussion' && b.x === x && b.y === y), 'erupting at your feet');
 });
+
+/** A player with the rifle up (the monsters put back where they were placed); fires once, and returns the shot. */
+function fireRifle(w, angle = 0) {
+  const placed = w.things.filter((t) => t.kind === 'monster').map((t) => [t, t.x, t.y]);
+  const p = w.player.player;
+  p.weapons.add('concussion-rifle');
+  p.weapon = 'concussion-rifle';
+  p.ammo.energy = 20;
+  w.player.angle = angle;
+  const input = mockInput();
+  run(w, input, 0.5);
+  // (Noted as it leaves: close up, it bursts within the tick.)
+  let shot = null;
+  const spawn = w.spawnProjectile.bind(w);
+  w.spawnProjectile = (...args) => {
+    const p = spawn(...args);
+    shot ??= { angle: p.angle, vz: p.vz };
+    return p;
+  };
+  for (const [t, x, y] of placed) Object.assign(t, { x, y, vx: 0, vy: 0 });
+  input.hold('fire');
+  run(w, input, 1 / 30);
+  return shot;
+}
+
+test('it locks on to the nearest monster within 5° of your aim', () => {
+  const w = world();
+  // 8 tiles off and 0.5 to the side: about 3.6° off the crosshair.
+  const bossk = w.spawn('bossk', 10.5, 3, Math.PI);
+  w.spawn('bossk', 11.5, 1.5, Math.PI); // further, and further off
+  const shot = fireRifle(w);
+  assert.ok(Math.abs(shot.angle - w.player.angleTo(bossk)) < 1e-9, 'turned onto the near one');
+});
+
+test('close up, a monster wider than the cone is still locked on to', () => {
+  const w = world();
+  const bossk = w.spawn('bossk', 3, 2.9, Math.PI); // 1.5 ahead, 0.4 to the side: 15° off, but under the crosshair
+  const shot = fireRifle(w);
+  assert.ok(Math.abs(shot.angle - w.player.angleTo(bossk)) < 1e-9);
+});
+
+test('it aims up at a monster on a ledge without you looking up', () => {
+  const legend = { ...TALL, L: { floor: 'imp-floor', ceiling: 'imp-ceiling', light: 160, ceilZ: 8, floorZ: 3 } };
+  const w = makeWorld(room(['##############', '#............#', '#.........LLL#', '#............#', '##############'], ['', '', ' >'], { legend }), { noMonsters: true });
+  const bossk = w.spawn('bossk', 11.5, 2.5, Math.PI);
+  assert.equal(bossk.z, 3, 'up on the ledge');
+  const shot = fireRifle(w);
+  assert.ok(shot.vz > 0, 'climbing');
+  run(w, mockInput(), 0.4);
+  assert.ok(bossk.health < bossk.def.health, 'and it reached him');
+});
+
+test('with nothing in the cone, it goes where you aim', () => {
+  const w = world();
+  w.spawn('bossk', 8.5, 1.4, Math.PI); // 6 ahead, 1.1 to the side: 10° off
+  const shot = fireRifle(w);
+  assert.ok(Math.abs(shot.angle) < 1e-9 && Math.abs(shot.vz) < 1e-9);
+});

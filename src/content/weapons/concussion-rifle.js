@@ -19,6 +19,6 @@ export default defineWeapon({
     idle: [0],
     fire: { frames: [1, 2, 0], durations: [0.3, 0.1, 0.4], fireAt: 0, fullbright: [0] },
   },
-  fire: { kind: 'projectile', projectile: 'concussion-shot' },
+  fire: { kind: 'projectile', projectile: 'concussion-shot', lockOn: 5 }, // DF's auto-aim: 5° either side, any height
   sounds: { fire: 'concussion-crack' },
 });

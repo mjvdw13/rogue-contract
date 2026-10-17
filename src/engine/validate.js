@@ -49,6 +49,7 @@ export function validateContent(reg) {
       else if (p.kind !== 'projectile') err(`${owner}: "${a.projectile}" is not a projectile`);
     }
     if (a.puff && !reg.things.has(a.puff)) err(`${owner}: unknown puff effect "${a.puff}"`);
+    if (a.lockOn !== undefined && !(a.lockOn > 0 && a.lockOn <= 90)) err(`${owner}: lockOn is degrees either side, above 0 and up to 90`);
     for (const k of ['sound', 'hitSound', 'missSound']) checkSound(owner, a[k]);
   };
   const checkAnims = (owner, anims) => {

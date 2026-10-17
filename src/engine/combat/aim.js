@@ -60,6 +60,36 @@ export function missileZ(attacker, aim) {
 }
 
 /**
+ * Dark Forces' auto-aim, for an attack with `lockOn` (degrees): of the
+ * monsters the player can see, the nearest one within `lockOn` of the way
+ * they face, or under the crosshair (a close one is wide), gets the shot,
+ * turned and tilted to land three-quarters of the way up its body, however
+ * high or low it stands. `missile`: the shot leaves from a missile's height.
+ * @returns {{angle:number, aim:{z:number, slope:number}}|null} null with none to lock on to
+ */
+export function lockOn(world, shooter, angle, degrees, range = 96, missile = false) {
+  const cone = (degrees * Math.PI) / 180;
+  const dx = Math.cos(angle);
+  const dy = Math.sin(angle);
+  let best = null;
+  let bestD = range;
+  for (const t of world.things) {
+    if (t === shooter || t.kind !== 'monster' || !t.shootable || t.dead || t.removed) continue;
+    const d = Math.hypot(t.x - shooter.x, t.y - shooter.y);
+    if (d >= bestD) continue;
+    const off = Math.abs(Math.atan2(Math.sin(shooter.angleTo(t) - angle), Math.cos(shooter.angleTo(t) - angle)));
+    if (off > cone && rayCircle(shooter.x, shooter.y, dx, dy, t.x, t.y, t.radius) < 0) continue;
+    if (!canSeeBody(world.map, shooter, t)) continue;
+    best = t;
+    bestD = d;
+  }
+  if (!best) return null;
+  const z = fireZ(shooter);
+  const from = missile ? missileZ(shooter, { z }) : z;
+  return { angle: shooter.angleTo(best), aim: { z, slope: (best.z + best.height * 0.75 - from) / Math.max(0.1, bestD) } };
+}
+
+/**
  * Doom-style vertical auto-aim: of the monsters the shot passes over or under
  * (and that the shooter can see), the nearest one within AUTOAIM_SLOPE of the
  * view gets the shot bent just far enough to land on its body.

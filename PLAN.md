@@ -1976,6 +1976,22 @@ Steps:
        the sandbox by the detonators (`R` there: its `9` is a trooper).
        241 tests, the validator and the smoke test pass; commit and push.
 5. [ ] Mark tries it.
+   - Mark (2026-10-17): far too precise. Up close it should be nearly
+     impossible to miss; enemies on a ledge shouldn't need aiming up or
+     down; the blasts are too short. From TFE's `computeAutoaim`: DF aims
+     every weapon at the nearest visible enemy within ±5° of the way you
+     face (227 of 16384), at any pitch and range, three-quarters of the
+     way up its body. DF's CONCEXP stands 123 px against a 66 px trooper:
+     about 3.3 tall.
+   - [x] 5a. `lockOn: degrees` on an attack (aim.js `lockOn`): that
+         cone, or a body under the crosshair (so close ones, wider than
+         5°, count too), turned and tilted onto 3/4 of its height. The
+         rifle has `lockOn: 5`; the blaster keeps Doom's nudge. The
+         auto-aim option turns it off. Validator, MODDING.md, tests.
+   - [x] 5b. A taller column: `conc-flame` speed 4-8 (was 1.5-4.5), life
+         0.2-0.45; the wisps from 1.6 up at 2.5-5. Simulated: the flame
+         reaches 1.9 typically and 3.3 at most, the wisps 3.1-4.
+   - [ ] 5c. Mark tries it again.
 
 ## Phase 1c: Two storeys per tile (done 2026-10-13)
 
@@ -3482,3 +3498,7 @@ update the smoke test.
   frame; `graft(corridor=...)` now takes the sheet over the body only along
   the rifle's line (and the pauldron), for the sandtrooper and commander.
   241 tests, the validator and the smoke test pass.
+- 2026-10-17: Phase 1b AB 5a-5b, Mark: the rifle locks on, Dark Forces'
+  way (`lockOn: 5`: the nearest visible monster within 5° or under the
+  crosshair, at any height), and its blasts stand about twice a trooper's
+  height. 245 tests, the validator and the smoke test pass.

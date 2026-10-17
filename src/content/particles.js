@@ -282,7 +282,7 @@ export default [
   defineParticle({
     id: 'conc-flame',
     colors: [['glow-tube', 1], ['glow-cyan', 3], ['glow-cyan', 2], ['glow-cyan', 1], ['glow-cyan', 0]],
-    life: [0.15, 0.35],
+    life: [0.2, 0.45],
     size: 0.03,
     streak: 0.09,
     fullbright: true,
