@@ -4,8 +4,9 @@ import { Town } from './lib/town.js';
 
 // MISSION 1: MOS EISLEY. The layout, route and numbers are in
 // docs/mission1.md (area numbers below match its table). Painted in code on
-// the fine grid (1 tile = 0.5 m) with the town kit (lib/town.js): buildings
-// are blocks of raised floor under the sky, so each has its own roofline.
+// the fine grid (1 tile = 0.5 m) with the town kit (lib/town.js). Every
+// building is a volume you can walk round: alleys between them, rounded
+// corners, storeys set back, porches, domes and rooms inside. No flat fronts.
 
 const W = 208;
 const H = 152;
@@ -13,53 +14,92 @@ const SKY = 24;
 
 const p = new Painter(W, H, { wall: 'adobe' });
 const town = new Town(p, { sky: SKY });
+const at = (type, x, y, extra = {}) => ({ type, x, y, ...extra });
+const list = [];
 
-// Everything not painted is the town's buildings, out of reach, inside a
-// ring of wall at the map's edge.
-p.rect(1, 1, W - 1, H - 1, town.roofCell({ h: 6 }));
+/** A dome on a roof (or over a round building): placed, and casting its shadow. */
+const DOMES = { 'dome-small': [1.5, 1.9], dome: [2.5, 3], 'dome-large': [4, 4.5] };
+function dome(type, x, y, z) {
+  list.push(at(type, x, y, { z }));
+  town.caster(x, y, DOMES[type][0], z, DOMES[type][1]);
+}
+
+// Everything not painted is the rest of the town, out of reach: blocks of
+// different heights, so the skyline past the streets steps up and down
+// rather than standing as one wall.
+for (let y = 1; y < H - 1; y += 9) {
+  for (let x = 1; x < W - 1; x += 11) {
+    const k = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453;
+    const h = 5 + Math.floor((k - Math.floor(k)) * 5);
+    p.rect(x, y, Math.min(x + 11, W - 1), Math.min(y + 9, H - 1), town.roofCell({ h, wall: h % 2 ? 'adobe' : 'adobe-pale' }));
+  }
+}
 
 // ---------------------------------------------------------------- 2. the main street (west end)
-p.rect(4, 64, 60, 76, town.street());
+// Open ground first: the street (64..76), a back lane north of the first
+// row of houses (44..50) and one south of the second (94..100); the houses
+// stand in it as islands, with alleys between them.
+p.rect(2, 44, 62, 100, town.street());
 
-// North side: a row of houses of different heights, each with a doorway.
-for (const [x0, x1, h, wall] of [[4, 14, 5, 'adobe'], [14, 22, 7, 'adobe-pale'], [22, 34, 6, 'adobe'], [34, 40, 9, 'adobe-pale'], [40, 52, 6, 'adobe-old'], [52, 60, 7, 'adobe']]) {
-  town.block(x0, 56, x1, 64, { h, wall });
-}
-// Doorways: an arch through the front wall into a shallow porch, a shut
-// door (planks) at its back.
-for (const [x, h, wall] of [[8, 5, 'adobe'], [17, 7, 'adobe-pale'], [27, 6, 'adobe'], [45, 6, 'adobe-old']]) {
-  town.arch(x, 62, x + 2, 64, { h, wall, lintel: 3 });
-  p.rect(x, 61, x + 2, 62, { wall: 'planks' });
-}
+// North row.
+// A: a courtyard house. At the back of its porch a low gap (crouch) leads
+// through to a little yard open to the sky, with an energy pack: a secret.
+town.house(4, 50, 14, 63, { h: 6, r: 2 });
+p.rect(7, 53, 12, 59, town.street(0, { secret: true }));
+town.arch(8, 59, 10, 61, { h: 6, lintel: 1.2, light: 120 });
+town.arch(8, 61, 10, 63, { h: 6, lintel: 3 });
+list.push(at('energy-pack', 9.5, 55.5));
+// B: a house with a porch jutting into the street, a room behind it and a
+// dome over the room.
+town.house(16, 50, 28, 62, { h: 6, r: 3, wall: 'adobe-pale' });
+town.room(19, 53, 25, 60, { h: 6, wall: 'adobe-pale', light: 128 });
+town.arch(20, 60, 24, 62, { h: 6, lintel: 3, wall: 'adobe-pale' });
+town.house(19, 62, 25, 66, { h: 4, r: 1, wall: 'adobe-pale' });
+town.arch(20, 62, 24, 66, { h: 4, lintel: 3, wall: 'adobe-pale' });
+dome('dome', 22, 56.5, 6);
+// C: a round tower under a big dome, a low lean-to in front of it with an
+// awning over the street.
+// (The lean-to first: the tower's round wall rises from its roof.)
+town.house(30, 59, 42, 63, { h: 4, r: 1 });
+town.circle(35.5, 56.5, 5, { inside: town.roofCell({ h: 9 }), wall: { wall: 'adobe', wallTop: 9 }, open: 'out' });
+town.awning(31, 63, 41, 66, { z: 3.25 });
+dome('dome-large', 35.5, 56.5, 9);
+// D: a two-storey house, its upper storey set back from the street, a
+// small dome on top.
+// (The porch's back is the house itself, faced in planks: a shut door.)
+town.house(45, 51, 58, 63, { h: 6, r: 2, tiers: [{ box: [48, 51, 58, 58], h: 10, r: 2 }] });
+town.arch(50, 61, 53, 63, { h: 6, lintel: 3 });
+p.rect(50, 60, 53, 61, town.roofCell({ h: 6, wall: 'planks' }));
+dome('dome-small', 54.5, 54.5, 10);
 
-// Secret: the second door opens (a secret door in planks) on a little back
-// yard open to the sky, with an energy pack.
-p.rect(15, 57, 21, 61, town.street(0, { secret: true }));
-p.rect(17, 61, 19, 62, { door: 'planks', secret: true, floor: 'street-sand', ceiling: 'adobe-roof', floorZ: 0, ceilZ: 3, light: 152 });
-p.rect(16, 61, 17, 62, { wall: 'adobe-pale' }).rect(19, 61, 20, 62, { wall: 'adobe-pale' });
-
-// South side: a shop under an awning, and a little square with a round house.
-for (const [x0, x1, h, wall] of [[4, 18, 6, 'adobe'], [18, 30, 8, 'adobe-pale'], [52, 60, 5, 'adobe-old']]) {
-  town.block(x0, 76, x1, 86, { h, wall });
-}
-town.arch(22, 76, 26, 77, { h: 8, wall: 'adobe-pale', lintel: 3 });
-p.rect(22, 77, 26, 78, { wall: 'planks' });
-town.awning(20, 74, 28, 76, { z: 4.5 });
-// The square, and a round house in it (a dome to come).
-p.rect(30, 76, 52, 94, town.street());
-town.circle(41, 86, 4.5, { inside: town.roofCell({ h: 6 }), wall: { wall: 'adobe', ceilZ: 6 }, open: 'out' });
+// South row.
+// E: a shop you can walk into, under an awning, with a dome over it.
+town.house(4, 78, 17, 91, { h: 6, r: 3 });
+town.room(7, 81, 15, 88, { h: 6, light: 128 });
+town.room(9, 81, 12, 83, { h: 6, light: 160 }); // daylight through the door
+town.arch(9, 78, 12, 81, { h: 6, lintel: 3 });
+town.awning(6, 76, 16, 78, { z: 3.5 });
+dome('dome', 11, 84.5, 6);
+// F: a tall house in two steps.
+town.house(20, 79, 30, 92, { h: 7, r: 2, wall: 'adobe-pale', tiers: [{ box: [22, 83, 30, 92], h: 10, r: 2 }] });
+// A square, with a round house under a dome in it.
+town.circle(41, 86, 4.5, { inside: town.roofCell({ h: 5 }), wall: { wall: 'adobe', wallTop: 5 }, open: 'out' });
+dome('dome-large', 41, 86, 5);
+// G: a low house on the square's east side.
+town.house(53, 78, 61, 88, { h: 5, r: 2, wall: 'adobe-pale' });
+dome('dome-small', 57, 83, 5);
 
 // For now the street ends at an exit (until the town goes on east).
-p.rect(58, 64, 60, 76, town.street(0, { exit: true }));
+p.rect(60, 64, 62, 76, town.street(0, { exit: true }));
 
-town.shadows();
+town.finish();
 
-const at = (type, x, y, extra = {}) => ({ type, x, y, ...extra });
-const list = [
-  at('player', 6.5, 70, { angle: 0 }),
-  at('villager-woman', 24, 70), at('villager-man', 38, 80), at('jawa', 48, 68),
-  at('energy-pack', 18, 58.5), // secret: the back yard
-];
+list.push(
+  at('player', 4, 70, { angle: 0 }),
+  at('villager-woman', 24, 70), at('villager-man', 38, 80), at('villager-boy', 12, 84),
+  at('supply-crate', 14, 86.5),
+  at('jawa', 50, 47), // in the north back lane
+);
 
 export default defineLevel({
   id: 'm1',

@@ -118,31 +118,45 @@ A bright, hazy afternoon. The only daylight map in the game.
 ## How it's built: the town kit
 
 `src/content/levels/lib/town.js`, beside the painter. Checked against the
-renderer (`render/columns.js`):
+renderer (`render/columns.js`).
 
-- **A building is a block of raised floor**: tiles at the roof's height with
-  the sky just above them, their `side` texture as the walls. From the
-  street you see the wall up to the roofline and sky above it: between two
-  sky tiles of different heights the renderer draws sky, not wall (as the
-  canyon's rim does in `m3`). So each building has its own height. (A solid
-  wall tile would stand as tall as the street's sky.)
-- **Doorways and arches in an outside wall are slab tiles**: open below the
-  lintel, the slab's top at the roof. A doorway with a plain lowered ceiling
-  would show a wall from the lintel up to the street's sky. A door panel, if
-  there is one, goes one tile further in, where the ceilings match.
-- **Interiors** have real walls (interior textures) inside the roof ring,
-  so outside and inside can look different: adobe walls are two tiles
-  (1 m) thick, which suits Tatooine. Rooms with walkable roofs over them
-  are slab tiles (the room below, the roof on top). Angled walls, doors and
-  lifts can't carry slabs, so round rooms get domes (models) on top instead.
-- **Round shapes:** `circle()` paints a round room or pit with angled walls
-  following the arc (any-angle `line` walls), for the bays, the cantina and
-  the water plaza.
-- **Awnings** are thin cloth slabs (at about 4.5): you walk under them in
-  their shade, and they throw their own shadow.
-- **Shadows:** `sunShadows()` (above).
-- **Glyphs:** the painter's glyph pool (about 490) is too small for this
-  many heights and shades; it grows to more Unicode ranges.
+**No flat fronts** (Mark, 2026-10-17). Every building is a volume you can
+walk round and see the sides of: alleys and yards between buildings,
+rounded corners, upper storeys set back, porches and lean-tos jutting out,
+round towers, domes on the roofs, and doorways that lead into rooms. A row
+of fronts that only vary in height looks like a film set. Check a street
+from several angles, not just down its length.
+
+- **A building is a block of raised floor** (`house()`): tiles at the
+  roof's height under the full sky, their `side` texture as the walls. From
+  the street you see the wall up to the roofline and sky above it, and
+  taller buildings behind over it. (A solid wall tile would stand as tall
+  as the street's sky.) `tiers` stack set-back storeys on it.
+- **Rounded corners and round buildings** (`house({ r })`, `circle()`) are
+  angled walls along the arc with `wallTop` at the roof: the wall stops
+  there and the view goes on over it (an engine feature made for this).
+- **Doorways and arches in an outside wall are slab tiles** (`arch()`):
+  open below the lintel, the slab's top at the roof. A doorway with a plain
+  lowered ceiling would show a wall from the lintel up to the street's sky.
+  A low lintel makes a crawl gap.
+- **Rooms** (`room()`) are the lower storey of a slab: the ceiling below,
+  the roof on top, so a dome can stand on it and it shades the street like
+  the rest of the building. Their walls are the building's raised floor
+  round them, in its plaster.
+- **No solid walls in or beside buildings.** A wall stands as tall as the
+  sky in front of it, so `seal()` brings that sky down to the roofline, and
+  a low sky hides everything behind it above that height (a notch in the
+  building behind). Walls are for the map's edge; a shut door is the
+  building's own raised floor faced in planks. Real doors (which need walls
+  beside them) belong indoors, between rooms.
+- **Domes** are models (`dome-small`, `dome`, `dome-large`) on roofs; the
+  level registers each with `town.caster()` so it casts a shadow. Keep a
+  dome inside its roof: one hanging over a lower roof is clipped.
+- **Awnings** are thin cloth slabs: you walk under them in their shade.
+- **Shadows** (`shadows()`, run by `finish()` after `seal()`): see Light
+  and air.
+- **Glyphs:** the painter's glyph pool grows to several thousand for this
+  many heights and shades.
 
 The engine's limits still hold: no rooms over rooms except slabs, no
 slopes (ramps are stairs), and characters are drawn facing you from every

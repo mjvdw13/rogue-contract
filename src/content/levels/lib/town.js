@@ -32,6 +32,17 @@ export class Town {
     this.wall = wall;
     this.roof = roof;
     this.floor = floor;
+    /** Round props that cast shadows (domes): [x, y, radius, base, height]. */
+    this.casters = [];
+  }
+
+  /**
+   * A round prop (a dome, `radius` across its base at `base`, rising
+   * `height`) that casts a shadow like the buildings do.
+   */
+  caster(x, y, radius, base, height) {
+    this.casters.push([x, y, radius, base, height]);
+    return this;
   }
 
   /** Open ground in the sun at `floorZ`. */
@@ -39,13 +50,9 @@ export class Town {
     return { floor: this.floor, ceiling: 'sky', floorZ, ceilZ: this.sky, light: this.light, side: this.wall, ...extra };
   }
 
-  /**
-   * A roof at `h`: a block of raised floor whose sides are the building's
-   * walls. Out of reach (`walk` false), its sky sits just above it, so walls
-   * behind it (the map's edge) stay low; a walkable roof gets the full sky.
-   */
-  roofCell({ h, wall = this.wall, roof = this.roof, walk = false, light = this.light, extra = {} }) {
-    return { floor: roof, ceiling: 'sky', floorZ: h, ceilZ: walk ? this.sky : h + 0.25, light, side: wall, ...extra };
+  /** A roof at `h`: a block of raised floor whose sides are the building's walls. */
+  roofCell({ h, wall = this.wall, roof = this.roof, light = this.light, extra = {} }) {
+    return { floor: roof, ceiling: 'sky', floorZ: h, ceilZ: this.sky, light, side: wall, ...extra };
   }
 
   /** A building (or part of one) over a box: see `roofCell`. */
@@ -60,9 +67,9 @@ export class Town {
    * sky doesn't put a wall above the roofline). A door panel, if any, goes
    * a tile further in.
    */
-  arch(x0, y0, x1, y1, { h, lintel = 3, floorZ = 0, wall = this.wall, roof = this.roof, floor = this.floor, light = 152, walk = false }) {
+  arch(x0, y0, x1, y1, { h, lintel = 3, floorZ = 0, wall = this.wall, roof = this.roof, floor = this.floor, light = 152 }) {
     const slab = { bottom: floorZ + lintel, top: h, floor: roof, ceiling: wall, side: wall, light };
-    this.p.rect(x0, y0, x1, y1, { floor, ceiling: 'sky', floorZ, ceilZ: walk ? this.sky : h + 0.25, light: this.light, side: wall, slab });
+    this.p.rect(x0, y0, x1, y1, { floor, ceiling: 'sky', floorZ, ceilZ: this.sky, light: this.light, side: wall, slab });
     return this;
   }
 
@@ -83,37 +90,122 @@ export class Town {
    * `r` get `inside`, tiles outside it (within the box round it) `outside`
    * (leave it out to keep them), and tiles the circle crosses get an angled
    * wall along it, the open side's cell plus `wall` (say `{ wall: 'adobe',
-   * ceilZ: 6 }`: under the sky, an angled wall stands as tall as its own
-   * tile's ceiling). `open: 'in'` (a room, a pit) or `'out'` (a round
-   * building, a pillar) says which side people walk on.
+   * wallTop: 6 }`: under the sky, the wall stops at its building's roof and
+   * the view goes on over it). `open: 'in'` (a room, a pit) or `'out'` (a
+   * round building, a pillar) says which side people walk on.
    */
   circle(cx, cy, r, { inside, outside, wall, open = 'in' }) {
-    const p = this.p;
     for (let y = Math.floor(cy - r) - 1; y <= Math.ceil(cy + r); y++) {
-      for (let x = Math.floor(cx - r) - 1; x <= Math.ceil(cx + r); x++) {
-        const corners = [[x, y], [x + 1, y], [x + 1, y + 1], [x, y + 1]];
-        const ins = corners.map(([u, v]) => Math.hypot(u - cx, v - cy) < r);
-        const n = ins.filter(Boolean).length;
-        const pts = n === 0 || n === 4 ? [] : crossings(corners, cx, cy, r);
-        if (pts.length !== 2) {
-          // Wholly on one side (or a corner just grazed): by its middle.
-          const centreIn = Math.hypot(x + 0.5 - cx, y + 0.5 - cy) < r;
-          if (centreIn) p.set(x, y, inside);
-          else if (outside) p.set(x, y, outside);
-          continue;
-        }
-        // Order the points so the solid side is on the right going from the
-        // first to the second (y down): outward for a room, inward for a building.
-        let [a, b] = pts;
-        const mx = (a[0] + b[0]) / 2 - cx;
-        const my = (a[1] + b[1]) / 2 - cy;
-        const right = [-(b[1] - a[1]), b[0] - a[0]];
-        const solidOut = open === 'in';
-        if ((right[0] * mx + right[1] * my > 0) !== solidOut) [a, b] = [b, a];
-        const base = open === 'in' ? inside : outside ?? p.get(x, y);
-        const r4 = (v) => Math.round(v * 1000) / 1000;
-        p.set(x, y, { ...base, ...wall, line: [r4(a[0] - x), r4(a[1] - y), r4(b[0] - x), r4(b[1] - y)] });
+      for (let x = Math.floor(cx - r) - 1; x <= Math.ceil(cx + r); x++) this._arcTile(x, y, cx, cy, r, { inside, outside, wall, open });
+    }
+    return this;
+  }
+
+  /**
+   * A building: a volume over the box, its corners rounded to radius `r`
+   * (0: square), its roof at `h` (see `roofCell` for `wall`, `roof`,
+   * and `light`). `tiers` stack more of it on top, each a box (`[x0, y0, x1, y1]`)
+   * inside it with its own `h` and `r`: a storey set back from the street.
+   * The ground round the rounded corners keeps whatever was there.
+   */
+  house(x0, y0, x1, y1, { h, r = 0, tiers = [], ...opts }) {
+    this._rounded(x0, y0, x1, y1, r, h, opts);
+    for (const t of tiers) this._rounded(...t.box, t.r ?? 0, t.h, { ...opts, ...t });
+    return this;
+  }
+
+  /** A rounded box of roof at `h`; corner tiles outside the arc keep their cell. */
+  _rounded(x0, y0, x1, y1, r, h, opts) {
+    const p = this.p;
+    const inside = this.roofCell({ ...opts, h });
+    const wall = { wall: opts.wall ?? this.wall, wallTop: h };
+    for (let y = y0; y < y1; y++) {
+      for (let x = x0; x < x1; x++) {
+        const cx = x < x0 + r ? x0 + r : x >= x1 - r ? x1 - r : null;
+        const cy = y < y0 + r ? y0 + r : y >= y1 - r ? y1 - r : null;
+        if (cx === null || cy === null) p.set(x, y, inside);
+        // A corner: the arc round (cx, cy), a building on top of what's there.
+        else this._arcTile(x, y, cx, cy, r, { inside, wall, open: 'out' });
       }
+    }
+  }
+
+  /** One tile of a circle (see `circle`). */
+  _arcTile(x, y, cx, cy, r, { inside, outside, wall, open }) {
+    const p = this.p;
+    const corners = [[x, y], [x + 1, y], [x + 1, y + 1], [x, y + 1]];
+    const n = corners.filter(([u, v]) => Math.hypot(u - cx, v - cy) < r).length;
+    const pts = n === 0 || n === 4 ? [] : crossings(corners, cx, cy, r);
+    if (pts.length !== 2) {
+      // Wholly on one side (or a corner just grazed): by its middle.
+      if (Math.hypot(x + 0.5 - cx, y + 0.5 - cy) < r) p.set(x, y, inside);
+      else if (outside) p.set(x, y, outside);
+      return;
+    }
+    // Order the points so the solid side is on the right going from the
+    // first to the second (y down): outward for a room, inward for a building.
+    let [a, b] = pts;
+    const mx = (a[0] + b[0]) / 2 - cx;
+    const my = (a[1] + b[1]) / 2 - cy;
+    const right = [-(b[1] - a[1]), b[0] - a[0]];
+    if ((right[0] * mx + right[1] * my > 0) !== (open === 'in')) [a, b] = [b, a];
+    const base = open === 'in' ? inside : outside ?? p.get(x, y);
+    const r4 = (v) => Math.round(v * 1000) / 1000;
+    p.set(x, y, { ...base, ...wall, line: [r4(a[0] - x), r4(a[1] - y), r4(b[0] - x), r4(b[1] - y)] });
+  }
+
+  /**
+   * A room inside a building whose roof is at `h`: the lower storey of a
+   * slab, its ceiling at `ceilZ`, the roof on top (so a dome can stand on
+   * it, and it shades the street like the rest of the building). Its walls
+   * are the building's raised floor round it.
+   */
+  room(x0, y0, x1, y1, { h, floorZ = 0, ceilZ = 4.5, floor = 'flagstone', ceiling = 'planks', wall = this.wall, roof = this.roof, light = 136 }) {
+    const slab = { bottom: ceilZ, top: h, floor: roof, ceiling, side: wall, light };
+    this.p.rect(x0, y0, x1, y1, { floor, ceiling: 'sky', floorZ, ceilZ: this.sky, light: this.light, side: wall, slab });
+    return this;
+  }
+
+  /**
+   * Finish the town once everything is painted: `seal()`, then `shadows()`.
+   */
+  finish(suns = SUNS) {
+    return this.seal().shadows(suns);
+  }
+
+  /**
+   * A solid wall stands as tall as the sky of the tile in front of it, so
+   * the sky beside every wall (the map's edge, a shut door's frame, the back
+   * of a porch) comes down to the roofline round that wall: the highest
+   * open floor in the 5x5 round it (a door is two tiles deep), plus a hair.
+   */
+  seal() {
+    const { p } = this;
+    const solid = (c) => c && ((c.wall && !c.line && !c.diagonal) || c.door);
+    const fixes = new Map();
+    for (let y = 0; y < p.h; y++) {
+      for (let x = 0; x < p.w; x++) {
+        if (!solid(p.get(x, y))) continue;
+        let top = 0;
+        for (let dy = -2; dy <= 2; dy++) {
+          for (let dx = -2; dx <= 2; dx++) {
+            const n = p.get(x + dx, y + dy);
+            if (n && !solid(n) && n.ceiling === 'sky') top = Math.max(top, n.slab ? n.slab.top : n.floorZ ?? 0);
+          }
+        }
+        for (const [nx, ny] of [[x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]]) {
+          const n = p.get(nx, ny);
+          if (!n || solid(n) || n.ceiling !== 'sky') continue;
+          const k = ny * p.w + nx;
+          fixes.set(k, Math.min(fixes.get(k) ?? Infinity, Math.max(top, n.slab ? n.slab.top : n.floorZ ?? 0) + 0.25));
+        }
+      }
+    }
+    for (const [k, ceilZ] of fixes) {
+      const x = k % p.w;
+      const y = (k - x) / p.w;
+      const c = p.get(x, y);
+      if (ceilZ < c.ceilZ) p.set(x, y, { ...c, ceilZ });
     }
     return this;
   }
@@ -128,7 +220,18 @@ export class Town {
   shadows(suns = SUNS) {
     const { p } = this;
     const { w, h } = p;
+    // (A dome takes its light from the roof under it, so that roof isn't
+    // shaded by the domes.)
     const top = this._tops();
+    const bare = this._tops(false);
+    const under = new Uint8Array(w * h);
+    for (const [cx, cy, r] of this.casters) {
+      for (let y = Math.floor(cy - r); y <= Math.ceil(cy + r); y++) {
+        for (let x = Math.floor(cx - r); x <= Math.ceil(cx + r); x++) {
+          if (x >= 0 && y >= 0 && x < w && y < h && Math.hypot(x + 0.5 - cx, y + 0.5 - cy) < r) under[y * w + x] = 1;
+        }
+      }
+    }
     const dirs = suns.map((s) => {
       const a = (s.az * Math.PI) / 180;
       return { dx: Math.cos(a), dy: -Math.sin(a), rise: Math.tan((s.elev * Math.PI) / 180), drop: s.drop };
@@ -141,6 +244,7 @@ export class Town {
         const c = p.get(x, y);
         if ((c.wall && !c.line && !c.diagonal) || c.door || c.ceiling !== 'sky') continue;
         const z = c.slab ? c.slab.top : c.floorZ ?? 0;
+        const tops = under[y * w + x] ? bare : top;
         let drop = 0;
         for (const d of dirs) {
           const reach = (tallest - z) / d.rise;
@@ -151,7 +255,7 @@ export class Town {
               const ty = Math.floor(y + sy + d.dy * s);
               if (tx < 0 || ty < 0 || tx >= w || ty >= h) break;
               // (Not its own tile: an angled wall's top is above its floor.)
-              if ((tx !== x || ty !== y) && top[ty * w + tx] > z + s * d.rise) {
+              if ((tx !== x || ty !== y) && tops[ty * w + tx] > z + s * d.rise) {
                 hidden++;
                 break;
               }
@@ -167,14 +271,14 @@ export class Town {
   }
 
   /** Each tile's top for shadows: ground, roofs and slabs by their height; walls, doors and interiors as tall as the highest open top beside them. */
-  _tops() {
+  _tops(domes = true) {
     const { p } = this;
     const { w, h } = p;
     const top = new Float32Array(w * h).fill(-Infinity);
     for (let y = 0; y < h; y++) {
       for (let x = 0; x < w; x++) {
         const c = p.get(x, y);
-        if (c.wall && (c.line || c.diagonal)) top[y * w + x] = c.ceilZ;
+        if (c.wall && (c.line || c.diagonal)) top[y * w + x] = c.wallTop ?? c.ceilZ;
         else if (!c.wall && !c.door && c.ceiling === 'sky') top[y * w + x] = c.slab ? Math.max(c.slab.top, c.floorZ ?? 0) : c.floorZ ?? 0;
       }
     }
@@ -199,6 +303,15 @@ export class Town {
       if (!changed) break;
     }
     for (let i = 0; i < top.length; i++) if (top[i] === -Infinity) top[i] = 0;
+    // Domes: a hemisphere's height over each tile.
+    for (const [cx, cy, r, base, height] of domes ? this.casters : []) {
+      for (let y = Math.floor(cy - r); y <= Math.ceil(cy + r); y++) {
+        for (let x = Math.floor(cx - r); x <= Math.ceil(cx + r); x++) {
+          const d = Math.hypot(x + 0.5 - cx, y + 0.5 - cy) / r;
+          if (d < 1 && x >= 0 && y >= 0 && x < w && y < h) top[y * w + x] = Math.max(top[y * w + x], base + height * Math.sqrt(1 - d * d));
+        }
+      }
+    }
     return top;
   }
 }

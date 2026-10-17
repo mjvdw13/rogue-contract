@@ -8,5 +8,6 @@ import barricade from './barricade.js';
 import { boulderLarge, boulderSmall } from './boulder.js';
 import floodlightTower from './floodlight-tower.js';
 import { sensorMast, sensorDish } from './sensor-mast.js';
+import { domeSmall, domeMedium, domeLarge } from './dome.js';
 
-export default [terminal, reactorRing, coolantTank, shuttle, barricade, boulderLarge, boulderSmall, floodlightTower, sensorMast, sensorDish];
+export default [terminal, reactorRing, coolantTank, shuttle, barricade, boulderLarge, boulderSmall, floodlightTower, sensorMast, sensorDish, domeSmall, domeMedium, domeLarge];

@@ -32,7 +32,9 @@ These need Mark to try something, or to decide. Don't start them without him.
   informant, the thug, the customs officer, the bay owner, the water
   seller, Dace, a dewback and a power droid. Until they exist, villagers
   stand in.
-- **Mos Eisley's first look** (`?map=m1`, the west end of the main street):
+- **Mos Eisley's first look** (`?map=m1`, the west end of the main street,
+  rebuilt with every building a volume: alleys, rounded corners, set-back
+  storeys, a porch, a lean-to, a domed tower, a shop to walk into, domes):
   the recoloured DF textures, the sky and how dark the suns' shade is.
   And should both suns be painted onto the DF sky? (It also needs the sky
   to wrap once round the horizon, a small engine change.)
@@ -204,6 +206,9 @@ conversations, then the fob.
       and walks on the spot.
 - [ ] The model builder restarts a cylinder's texture on each face; wrap it
       round.
+- [ ] A low angled wall (`wallTop`) still stops bodies, shots and sight
+      above its top, and its top isn't drawn as a surface (seen from above,
+      it shows wall). Fine out of reach; needed before walkable round roofs.
 - [ ] The generated Jawa's robe has stray pixels that snap to a glow colour
       (fix the generator's colour).
 
