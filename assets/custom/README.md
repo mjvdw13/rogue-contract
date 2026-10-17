@@ -145,8 +145,11 @@ head scarf, a spacer in a vest, a drifter and a bearded hermit), four on
 blue and one on magenta. They share one layout of 51 poses, so `cut.py`
 finds the poses itself (splitting the few that touch) and cuts 14 frames
 of each into `assets/sprites/npcs/`: the front walk, a stand, a flinch, a
-hunch and a fall-back death. Like the sandtrooper, they are restyled to
-the Dark Forces look (`sheetcut.DARK_FORCES`) in a few colour ramps:
+hunch and a fall-back death. They are restyled toward the Dark Forces
+officer and Bossk (the realistic sprites, not the stormtrooper's hard
+armour): soft contrast, gentle side light, and the source's dark line work
+eased into shading, so nothing reads as a black outline (`STYLE` in
+`cut.py`):
 
 ```
 python assets/custom/villagers/cut.py --preview preview.png

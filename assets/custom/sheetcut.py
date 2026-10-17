@@ -212,11 +212,11 @@ def snap(rgb, colours):
     return colours[np.argmin(dist, 1)].reshape(rgb.shape)
 
 
-def resample(arr, box, size, pad=64):
+def resample(arr, box, size, pad=64, filter=Image.LANCZOS):
     """Scales a box of `arr` to `size`; the box may run off the sheet's edges."""
     padded = np.pad(arr.astype(np.float32), pad)
     box = tuple(v + pad for v in box)
-    return np.asarray(Image.fromarray(padded).resize(size, Image.LANCZOS, box=box))
+    return np.asarray(Image.fromarray(padded).resize(size, filter, box=box))
 
 
 LUMA = np.array([0.3, 0.59, 0.11])
@@ -240,14 +240,18 @@ def dark_forces(rgb, opaque, style, tones):
     sharpened, its brightness stretched over the sheet's `tones` (3rd and
     97th percentiles) with an S-curve (`contrast`) and a `gamma` that deepens
     the shadows, lit from one side (`side`: brightness at the body's left and
-    right edges), and its contour darkened (`outline`)."""
+    right edges), and its contour darkened (`outline`). Optional: `range`,
+    the darkest and brightest output (default 8 to 248); `lift`, how far
+    pixels much darker than the opaque pixels round them (line work) are
+    eased toward them, and with `liftEdges` the contour's too."""
     lo, hi = tones
     lum = rgb @ LUMA
     sharp = lum + style['sharpen'] * (lum - blur3(lum))
     t = np.clip((sharp - lo) / (hi - lo), 0, 1)
     k = style['contrast']
     t = (1 - k) * t + k * t * t * (3 - 2 * t)
-    target = 255 * ((8 + 240 * t) / 255) ** style['gamma']
+    dark, light = style.get('range', (8, 248))
+    target = 255 * ((dark + (light - dark) * t) / 255) ** style['gamma']
     rgb = rgb * (target / np.maximum(lum, 1))[..., None]
     cols = np.nonzero(opaque.any(0))[0]
     if len(cols):
@@ -256,6 +260,16 @@ def dark_forces(rgb, opaque, style, tones):
         rgb = rgb * (left + (right - left) * x)[None, :, None]
     pad = np.pad(opaque, 1)
     edge = opaque & ~(pad[:-2, 1:-1] & pad[2:, 1:-1] & pad[1:-1, :-2] & pad[1:-1, 2:])
+    if style.get('lift'):
+        # Ease pixels much darker than the opaque pixels round them (the
+        # source's line work) toward them, so seams read as shading.
+        lum = rgb @ LUMA
+        w = opaque.astype(float)
+        mean = blur3(lum * w) / np.maximum(blur3(w), 1e-3)
+        gap = np.clip(mean - lum - style.get('liftAbove', 12), 0, None)
+        lifted = lum + style['lift'] * gap
+        some = opaque if style.get('liftEdges') else opaque & ~edge
+        rgb[some] *= (lifted / np.maximum(lum, 1))[some][:, None]
     rgb[edge] *= style['outline']
     return np.clip(rgb, 0, 255)
 
@@ -268,8 +282,9 @@ def assemble(frames, scale, glow=None, draw=None, style=None, ramps=None):
     eyes or a muzzle flash) covers most of a pixel: those snap to the
     fullbright colours. `style` (like DARK_FORCES) restyles the frames:
     `widen` stretches them across, `median` smooths the source's fine
-    texture first, `threshold` is how covered a pixel must be to be opaque,
-    and the rest goes to dark_forces(). `draw(i, frame, box)` may paint on
+    texture first, `box` scales by area averaging instead of Lanczos,
+    `threshold` is how covered a pixel must be to be opaque, and the rest
+    goes to dark_forces(). `draw(i, frame, box)` may paint on
     frame i (an RGBA array; `box` is its area on the sheet)."""
     lit, glows, ramp_colours = palette()
     if ramps:
@@ -292,8 +307,11 @@ def assemble(frames, scale, glow=None, draw=None, style=None, ramps=None):
         if style and style.get('median'):
             src = np.asarray(Image.fromarray(np.clip(src, 0, 255).astype(np.uint8)).filter(ImageFilter.MedianFilter(style['median']))).astype(float)
         a = resample(f['alpha'], box, (fw, fh))
-        rgb = np.stack([resample(src[..., c] * f['alpha'], box, (fw, fh)) for c in range(3)], -1)
-        rgb = np.clip(rgb / np.maximum(a, 1e-3)[..., None], 0, 255)
+        rf = Image.BOX if style and style.get('box') else Image.LANCZOS
+        rgb = np.stack([resample(src[..., c] * f['alpha'], box, (fw, fh), filter=rf) for c in range(3)], -1)
+        # The colour, like the alpha, may have been scaled by another filter.
+        a_rgb = resample(f['alpha'], box, (fw, fh), filter=rf) if rf != Image.LANCZOS else a
+        rgb = np.clip(rgb / np.maximum(a_rgb, 1e-3)[..., None], 0, 255)
         opaque = a >= threshold
         if style:
             rgb = dark_forces(rgb, opaque, style, tones)

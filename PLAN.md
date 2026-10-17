@@ -1634,6 +1634,29 @@ Decided:
 4. [x] A few in the sandbox's start room to see them; screenshots beside
        the officer.
 5. [x] Tests, the validator and the smoke test; commit and push.
+6. [ ] Mark (2026-10-17): too much contrast, cartoonish beside the Dark
+       Forces sprites' more realistic colours. The harsh steps between
+       colours read almost like black outlines. A softer style of the
+       villagers' own (the sandtrooper keeps `DARK_FORCES`):
+       - [x] Measure the DF officer and stormtrooper against the
+             villagers: brightness spread, hard steps between neighbours,
+             how dark the steps and contours are, colour count.
+             Officer / Bossk: spread 49 / 48, mean step 15 / 20, hard
+             steps 9 / 15%, contour 70 / 85% of the inside, thin dark
+             lines 0.8 / 2.9%. Villagers: spread 68-76, step 26-40, hard
+             22-37%, contour about 35%, dark lines 2-7%.
+       - [x] Tune the style toward the officer: less S-curve, less
+             sharpening, a lighter contour, and enough colours for smooth
+             shading. Look at it in game beside the officer and trooper.
+             The villagers' own `STYLE` (`villagers/cut.py`): no S-curve
+             or sharpening, output 14-205, a gentler side light, no
+             darkened contour, area-averaged downscaling (no Lanczos
+             ringing), the source's thin dark lines eased toward the
+             colour round them (`lift`, new in `sheetcut`), and the whole
+             palette. Now: spread 46-52, step 15-20, hard 9-14%, contour
+             59-83%, dark lines 0.1-0.3%. The sandtrooper is unchanged
+             (the new options default off).
+       - [x] Tests, the validator and the smoke test; commit and push.
 
 ## Phase 1c: Two storeys per tile (done 2026-10-13)
 
@@ -3095,3 +3118,10 @@ update the smoke test.
   sandtrooper's Dark Forces restyle; `sheetcut.key()` keys magenta too.
   All five stroll about the sandbox's start room. Screenshots beside the
   stormtrooper. 231 tests, the validator and the smoke test pass.
+- 2026-10-17: Phase 1b V step 6, Mark: the villagers looked cartoonish,
+  too much contrast with near-black seams. Measured against the DF
+  officer and Bossk and restyled to match (a softer style of their own:
+  no S-curve or sharpening, a narrower range, no dark contour, the
+  source's line work eased into shading, area-averaged downscaling, the
+  whole palette). Spread, steps and contours now sit in the officer's and
+  Bossk's range. 231 tests, the validator and the smoke test pass.

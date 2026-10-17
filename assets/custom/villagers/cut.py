@@ -24,7 +24,7 @@ from PIL import Image
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent))
-from sheetcut import DARK_FORCES, ROOT, assemble, body_centre, components, grow, key, load, save  # noqa: E402
+from sheetcut import ROOT, assemble, body_centre, components, grow, key, load, save  # noqa: E402
 
 FRONT_WALK = [(0, i) for i in range(6)]
 
@@ -50,9 +50,16 @@ FRAMES = [
     *[(1, i) for i in range(9, 13)],  # hit, falling back, lying, dead
 ]
 
-# The few colour ramps of their cloth, leather, hair and skin, as the Dark
-# Forces sprites use few.
-RAMPS = ['gray', 'concrete', 'sand', 'rust', 'skin', 'beige', 'olive']
+# A softer take on sheetcut.DARK_FORCES, matched to the Dark Forces officer
+# and Bossk rather than the stormtrooper's hard armour: no S-curve or
+# sharpening and a narrower tonal range (spread about 50, like theirs), a
+# gentle side light, no darkened contour, and the source's thin dark line
+# work eased toward the colour round it (`lift`), so seams read as shading
+# rather than black outlines. Downscaled by area averaging (`box`), which
+# doesn't ring at edges as Lanczos does. Snapped to the whole palette, for
+# smooth shading.
+STYLE = dict(widen=1.15, median=5, contrast=0.0, gamma=1.1, sharpen=0.0, side=(0.85, 1.05), outline=1.0, threshold=0.45,
+             range=(14, 205), box=True, lift=0.75)
 
 
 def find_poses(mask):
@@ -114,7 +121,7 @@ def cut(id, source, backdrop, height, walk):
     # NPC's `scale` is 0.85), measured on the standing pose.
     ys = np.nonzero(rows[3][6].any(1))[0]
     scale = height * 32 / 0.85 / (ys.max() + 1 - ys.min())
-    sheet = assemble(frames, scale, style=DARK_FORCES, ramps=RAMPS)
+    sheet = assemble(frames, scale, style=STYLE)
     save(sheet, ROOT / f'assets/sprites/npcs/{id}.png', len(frames))
     return sheet
 
