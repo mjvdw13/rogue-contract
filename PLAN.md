@@ -27,15 +27,7 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
-- [ ] **Thermal detonator:** try a quick tap (back to the old low toss)
-      and a long throw (the high arc, unchanged).
-- [ ] **Boba Fett and Bossk:** where they appear in the story (sandbox only
-      today).
-- [ ] **Which mission is the vertical slice:** the Canyon Garrison (built, the
-      story's Mission 3) or Mos Eisley (the story's Mission 1).
-- [ ] **More renderer speed:** the next step would be Web Workers splitting
-      the columns (needs cross-origin isolation, a service-worker shim on
-      Pages). The canyon draws in about 9.3 ms in Chrome now.
+Nothing right now.
 
 ## Next up
 
