@@ -66,11 +66,10 @@ export const projectiles = [
   // The concussion rifle's shot (yours and Bossk's), as in Dark Forces: unseen
   // and fast, no damage itself. Where it lands, everything within the splash
   // takes the full damage and erupts in a `concussion` blast at its feet; off
-  // a wall or floor, one more goes up there. Being unseen, it bursts on
-  // crates and villagers too rather than vanish through them.
+  // a wall or floor, one more goes up there. Villagers and scenery in the
+  // splash erupt too, unharmed.
   defineProjectile({
     id: 'concussion-shot',
-    hitsSolid: true,
     radius: 0.1,
     speed: 55,
     life: 5,

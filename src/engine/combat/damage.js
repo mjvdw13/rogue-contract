@@ -148,6 +148,22 @@ export function corpseThink(world, t, dt) {
 }
 
 /**
+ * How far a blast at (x, y, z) is from the nearest point of `t`, or -1 when
+ * that's `radius` or more, or a wall, floor or ledge is in the way.
+ */
+export function blastReach(world, t, x, y, z, radius) {
+  const across = Math.max(0, Math.hypot(t.x - x, t.y - y) - t.radius);
+  const vertical = Math.max(0, t.z - z, z - t.z - t.height);
+  const d = Math.hypot(across, vertical);
+  if (d >= radius) return -1;
+  // Sight to the nearest height on the body, a little inside it so the line
+  // doesn't graze the floor it stands on.
+  const inset = Math.min(0.2, t.height / 4);
+  const tz = Math.max(t.z + inset, Math.min(t.z + t.height - inset, z));
+  return lineOfSight3D(world.map, x, y, z, t.x, t.y, tz) ? d : -1;
+}
+
+/**
  * Explosion damage: falls off linearly with the 3D distance from (x, y, z) to
  * the nearest point of each body, and floors, ledges and walls block it. `z`
  * defaults to the middle of a standing body above the floor there.
@@ -159,15 +175,8 @@ export function radiusDamage(world, x, y, radius, maxDamage, inflictor, source, 
   for (const t of [...world.things]) {
     if (!t.shootable || t.dead || t.removed) continue;
     if (t.def.splashImmune) continue;
-    const across = Math.max(0, Math.hypot(t.x - x, t.y - y) - t.radius);
-    const vertical = Math.max(0, t.z - z, z - t.z - t.height);
-    const d = Math.hypot(across, vertical);
-    if (d >= radius) continue;
-    // Sight to the nearest height on the body, a little inside it so the line
-    // doesn't graze the floor it stands on.
-    const inset = Math.min(0.2, t.height / 4);
-    const tz = Math.max(t.z + inset, Math.min(t.z + t.height - inset, z));
-    if (!lineOfSight3D(world.map, x, y, z, t.x, t.y, tz)) continue;
+    const d = blastReach(world, t, x, y, z, radius);
+    if (d < 0) continue;
     const dmg = falloff ? maxDamage * (1 - d / radius) : maxDamage;
     hurt.push(t);
     damage(world, t, dmg, inflictor ?? { x, y }, source);

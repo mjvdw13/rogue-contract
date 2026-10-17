@@ -167,16 +167,22 @@ test('with nothing in the cone, it goes where you aim', () => {
   assert.ok(Math.abs(shot.angle) < 1e-9 && Math.abs(shot.vz) < 1e-9);
 });
 
-test('it bursts on a crate and on a villager instead of flying through, and the villager is unhurt', () => {
-  for (const id of ['supply-crate', 'villager-woman']) {
-    const w = world();
-    const t = w.spawn(id, 6.5, 2.5, Math.PI);
-    const p = shoot(w);
-    run(w, mockInput(), 0.4);
-    assert.ok(p.removed || p.state === 'exploding', `${id}: burst`);
-    const conc = w.blasts.filter((b) => b.id === 'concussion');
-    assert.equal(conc.length, 1, `${id}: one blast`);
-    assert.ok(conc[0].x < 6.5 - t.radius && conc[0].x > 5, `${id}: just in front of it (${conc[0].x.toFixed(2)})`);
-    assert.ok(!t.removed && !t.dead, `${id}: still there`);
-  }
+test('villagers and scenery in the splash erupt too, unhurt; the shot flies past them as before', () => {
+  const w = world();
+  const inPath = w.spawn('villager-woman', 4.5, 2.5, Math.PI); // the shot goes through her
+  const villager = w.spawn('villager-boy', 11.5, 1.5, Math.PI);
+  const crate = w.spawn('supply-crate', 10.5, 3.5, 0);
+  const lamp = w.spawn('ceiling-lamp', 11.5, 3.5, 0); // hangs from the ceiling: nothing goes up under it
+  const far = w.spawn('supply-crate', 6.5, 1.5, 0); // out of reach
+  shoot(w);
+  run(w, mockInput(), 0.4);
+  const conc = w.blasts.filter((b) => b.id === 'concussion');
+  const under = (t) => conc.some((b) => b.x === b.at.get(t)[0] && b.y === b.at.get(t)[1]);
+  assert.ok(conc.some((b) => b.x > 12), 'it burst at the far wall');
+  assert.ok(under(villager), 'under the villager');
+  assert.ok(under(crate), 'under the crate');
+  assert.ok(!under(inPath) && !under(far), 'none under what is out of reach');
+  assert.ok(!under(lamp), 'none under a hanging lamp');
+  assert.equal(conc.length, 3, 'the wall, the villager and the crate');
+  for (const t of [villager, crate, inPath]) assert.ok(!t.removed && !t.dead, `${t.def.id} unhurt`);
 });

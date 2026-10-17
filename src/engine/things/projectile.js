@@ -3,6 +3,7 @@
 import { F_SKY, F_SLAB } from '../world/tilemap.js';
 import { aimAttack, missileZ } from '../combat/aim.js';
 import { blocksShots, overlap } from './shape.js';
+import { blastReach } from '../combat/damage.js';
 
 const STEP = 0.2;
 /** A projectile's z is its centre; it bursts this close to a floor or ceiling. */
@@ -22,8 +23,9 @@ function skyAt(map, x, y, z) {
  * into. Its `explosion` faces `face` (out of the floor or ceiling it hit),
  * else back the way it came (out of a wall), else all round (a body hit).
  * A `splash.erupt` explosion goes up from the floor under every body the
- * splash hurt, and under the burst too unless it hit a body (Dark Forces'
- * concussion rifle).
+ * splash hurt, every friendly character and standing piece of scenery in
+ * its reach (unhurt), and under the burst too unless it hit a body (Dark
+ * Forces' concussion rifle).
  */
 function explode(world, p, hit, pull = true, face = null) {
   if (p.state === 'exploding') return;
@@ -38,10 +40,16 @@ function explode(world, p, hit, pull = true, face = null) {
   }
   const splash = p.def.splash;
   if (splash) {
-    const hurt = world.radiusDamage(p.x, p.y, splash.radius ?? 2, splash.damage ?? 100, p, p.owner, p.z, { falloff: splash.falloff ?? true });
+    const radius = splash.radius ?? 2;
+    const hurt = world.radiusDamage(p.x, p.y, radius, splash.damage ?? 100, p, p.owner, p.z, { falloff: splash.falloff ?? true });
     if (splash.erupt) {
       const up = [0, 0, 1];
-      for (const t of hurt) world.explode(splash.erupt, t.x, t.y, world.map.floorAt(t.x, t.y, 0, t.z), { dir: up });
+      const caught = [...hurt];
+      for (const t of world.things) {
+        if ((t.kind !== 'npc' && t.kind !== 'decoration') || t.def.hanging || t.dead || t.removed || hurt.includes(t)) continue;
+        if (blastReach(world, t, p.x, p.y, p.z, radius) >= 0) caught.push(t);
+      }
+      for (const t of caught) world.explode(splash.erupt, t.x, t.y, world.map.floorAt(t.x, t.y, 0, t.z), { dir: up });
       if (!hit) world.explode(splash.erupt, p.x, p.y, world.map.floorAt(p.x, p.y, 0, p.z), { dir: up });
     }
   }
@@ -215,8 +223,8 @@ export function projectileThink(world, p, dt) {
     for (const t of world.things) {
       if (t === p || t === p.owner || t.dead || t.removed) continue;
       if (!t.shootable) {
-        // Solid model scenery (with `hitsSolid`, anything solid): a burst against it, no damage.
-        if (!(blocksShots(t) || (p.def.hitsSolid && t.solid)) || overlap(t, nx, ny, p.radius) <= 0) continue;
+        // Solid model scenery: a burst against it, no damage.
+        if (!blocksShots(t) || overlap(t, nx, ny, p.radius) <= 0) continue;
         if (nz < t.z - p.radius || nz > t.z + t.height + p.radius) continue;
         explode(world, p, null, true);
         return;

@@ -163,8 +163,8 @@ steps and ledges, and shots into the sky simply vanish. Explosions measure
 
 `src/content/npcs/villagers.js` defines the townsfolk with `defineNpc()`.
 Friendlies are solid, so you bump into them, but they can't be hurt.
-Bullets, projectiles and explosions pass through them (a projectile with
-`hitsSolid` bursts on them, harmlessly), and monsters never
+Bullets, projectiles and explosions pass through them (a `splash.erupt`
+blast still goes up under them, harmlessly), and monsters never
 target them. Each one idles and wanders up to `wander` tiles from where it was
 placed. It stays out of doorways, hazards and one-tile passages, so it never
 blocks the way. When the player bumps into one or presses use on it, it turns to
@@ -329,12 +329,9 @@ be added with `definePickup` (see *Custom behaviour*).
 
   With `erupt`, one more goes up from the floor where it struck a wall or
   floor, but none where it hit a body (that body erupts already). A
-  projectile with no `sheet` flies unseen.
-
-  A projectile flies through what it can't hurt, except solid model
-  scenery. `hitsSolid: true` bursts it on anything solid as well (sprite
-  scenery such as crates, and friendly characters, who still take no harm).
-  The concussion shot has it, since it's unseen.
+  projectile with no `sheet` flies unseen. Friendly characters and scenery
+  in the splash (except hanging scenery) erupt as well, though it doesn't
+  hurt them.
 - **Effects** such as puffs, blood and sprite explosions use
   `defineEffect({ id, sheet, anims: { idle } })`. An effect disappears when its
   animation ends.

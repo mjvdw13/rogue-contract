@@ -194,7 +194,6 @@ export function validateContent(reg) {
       checkSound(owner, t.sound);
     }
     if (t.kind === 'projectile' && t.sheet && !t.anims.fly && !t.anims.idle) err(`${owner}: needs a "fly" animation`);
-    if (t.kind === 'projectile' && typeof t.hitsSolid !== 'boolean') err(`${owner}: hitsSolid is true or false`);
     if (t.kind === 'projectile' && t.splash) {
       const sp = t.splash;
       if (!(sp.radius > 0)) err(`${owner} splash: radius must be above 0`);
