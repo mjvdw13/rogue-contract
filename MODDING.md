@@ -604,7 +604,7 @@ export default defineLevel({
   par: 120,                  // seconds, shown on the tally screen
   fog: 0.05,                 // extra darkness with distance (the default)
   haze: { color: [32, 24, 64], half: 40 }, // outdoors, fade to this colour
-  weather: { type: 'dust', count: 360 }, // particles in the air round you, outdoors
+  weather: { type: 'mote', count: 360 }, // particles in the air round you, outdoors
   tiles: [
     '###########',
     '#....#....#',
@@ -641,7 +641,7 @@ a random speed of up to `drift` (`[0.3, 0.1]`: across, and up or down).
 every particle type with `wind`, smoke included. Ones the player leaves
 behind come round to the far side of the square; ones that die are made
 again somewhere in it. About a quarter of the square is in view at once, so
-Mos Eisley's 360 `dust` look like 100 in front of you. The count can't be
+Mos Eisley's 360 motes look like 100 in front of you. The count can't be
 more than the type's `cap` or the cap for its kind (1000 points, 150
 discs).
 

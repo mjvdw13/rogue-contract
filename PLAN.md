@@ -37,8 +37,8 @@ These need Mark to try something, or to decide. Don't start them without him.
   storeys, a porch, a lean-to, a domed tower, a shop to walk into, and dome
   toppers on nearly every roof, sized to it):
   the recoloured DF textures, the sky and how dark the suns' shade is.
-  Dust in the air: 360 `dust` round you, meant to look like the bench's
-  100 (`count` in m1.js to change it).
+  Dust in the air: 360 glowing motes round you (plain `dust` was too hard
+  to see), as thick in view as the bench's 100 (`count` in m1.js).
   And should both suns be painted onto the DF sky? (It also needs the sky
   to wrap once round the horizon, a small engine change.)
 
