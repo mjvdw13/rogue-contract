@@ -4,6 +4,7 @@ import { F_SKY, F_SLAB } from '../world/tilemap.js';
 import { aimAttack, missileZ } from '../combat/aim.js';
 import { blocksShots, overlap } from './shape.js';
 import { blastReach } from '../combat/damage.js';
+import { lineOfSight3D } from '../world/physics.js';
 
 const STEP = 0.2;
 /** A projectile's z is its centre; it bursts this close to a floor or ceiling. */
@@ -57,6 +58,28 @@ function explode(world, p, hit, pull = true, face = null) {
   if (p.def.explosion) world.explode(p.def.explosion, p.x, p.y, p.z, { dir });
   p.def.hooks?.onExplode?.(world, p, hit);
   if (!p.setAnim('explode')) world.remove(p);
+}
+
+/**
+ * (`proximity`) The nearest of the owner's enemies (monsters for the
+ * player's shot, the player for a monster's) whose body is within
+ * `proximity` of (x, y, z), in plain sight of it. Sets `p.near` and
+ * `p.nearD` (null when there's none).
+ */
+function nearEnemy(world, p, x, y, z) {
+  const owner = p.owner;
+  p.near = null;
+  p.nearD = p.def.proximity;
+  for (const t of world.things) {
+    if (t === owner || !t.shootable || t.dead || t.removed) continue;
+    if ((t.kind !== 'monster' && t.kind !== 'player') || t.kind === owner?.kind) continue;
+    const across = Math.max(0, Math.hypot(t.x - x, t.y - y) - t.radius);
+    const vertical = Math.max(0, t.z - z, z - t.z - t.height);
+    const d = Math.hypot(across, vertical);
+    if (d >= p.nearD || !lineOfSight3D(world.map, x, y, z, t.x, t.y, t.z + t.height / 2)) continue;
+    p.near = t;
+    p.nearD = d;
+  }
 }
 
 /**
@@ -245,6 +268,17 @@ export function projectileThink(world, p, dt) {
     p.x = nx;
     p.y = ny;
     p.z = nz;
+    // A near miss: closing on a body, it bursts once it stops getting
+    // closer (where it passes nearest), as if it had hit it.
+    if (p.def.proximity > 0) {
+      const was = p.near;
+      const wasD = p.nearD;
+      nearEnemy(world, p, nx, ny, nz);
+      if (was && p.near === was && p.nearD > wasD) {
+        explode(world, p, was, false);
+        return;
+      }
+    }
   }
 }
 

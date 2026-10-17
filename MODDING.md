@@ -332,6 +332,13 @@ be added with `definePickup` (see *Custom behaviour*).
   projectile with no `sheet` flies unseen. Friendly characters and scenery
   in the splash (except hanging scenery) erupt as well, though it doesn't
   hurt them.
+
+  `proximity: 2` bursts a projectile that passes within 2 tiles of an
+  enemy's body (monsters for your shots, you for theirs) where it passes
+  nearest, if it can see them, so a near miss in the open still lands its
+  splash on them. The concussion
+  shot has it; without it, a shot just wide of a trooper in the open flies
+  on to the far wall.
 - **Effects** such as puffs, blood and sprite explosions use
   `defineEffect({ id, sheet, anims: { idle } })`. An effect disappears when its
   animation ends.

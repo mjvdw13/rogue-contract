@@ -67,10 +67,12 @@ export const projectiles = [
   // and fast, no damage itself. Where it lands, everything within the splash
   // takes the full damage and erupts in a `concussion` blast at its feet; off
   // a wall or floor, one more goes up there. Villagers and scenery in the
-  // splash erupt too, unharmed.
+  // splash erupt too, unharmed. A near miss in the open bursts beside its
+  // target instead of flying on to the far wall.
   defineProjectile({
     id: 'concussion-shot',
     radius: 0.1,
+    proximity: 2,
     speed: 55,
     life: 5,
     damage: 0,

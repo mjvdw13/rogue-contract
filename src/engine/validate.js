@@ -194,6 +194,7 @@ export function validateContent(reg) {
       checkSound(owner, t.sound);
     }
     if (t.kind === 'projectile' && t.sheet && !t.anims.fly && !t.anims.idle) err(`${owner}: needs a "fly" animation`);
+    if (t.kind === 'projectile' && !(typeof t.proximity === 'number' && t.proximity >= 0)) err(`${owner}: proximity must be a number of tiles, 0 or more`);
     if (t.kind === 'projectile' && t.splash) {
       const sp = t.splash;
       if (!(sp.radius > 0)) err(`${owner} splash: radius must be above 0`);

@@ -10,9 +10,13 @@ import { makeWorld, mockInput, room, run } from './helpers.js';
 const TALL = { '.': { floor: 'imp-floor', ceiling: 'imp-ceiling', light: 160, ceilZ: 8 } };
 const hall = () => room(['##############', '#............#', '#............#', '#............#', '##############'], ['', '', ' >'], { legend: TALL });
 
+/** A hall three times as wide, the player in the middle of its west end. */
+const wide = () =>
+  room(['##############', ...Array(8).fill('#............#'), '##############'], ['', '', '', '', ' >'], { legend: TALL });
+
 /** A world that notes the explosions set off, in `w.blasts`, with where each body stood then. */
-function world() {
-  const w = makeWorld(hall(), { noMonsters: true });
+function world(level = hall()) {
+  const w = makeWorld(level, { noMonsters: true });
   w.blasts = [];
   const explode = w.explode.bind(w);
   w.explode = (id, x, y, z, opts) => {
@@ -35,11 +39,12 @@ test('the shot flies unseen and fast', () => {
 });
 
 test('off a wall: everyone in the splash takes the same damage and erupts at their feet, and one more blast goes up there', () => {
-  const w = world();
-  // Beside the shot's path (not hit by it), near the far wall and further off; one out of reach.
-  const near = w.spawn('bossk', 11.5, 1.4, Math.PI);
-  const mid = w.spawn('bossk', 9.5, 3.6, Math.PI);
-  const far = w.spawn('bossk', 5.5, 1.5, Math.PI);
+  const w = world(wide());
+  // Beside the shot's path (too far off it to set it off), near the far wall
+  // and further off; one out of reach.
+  const near = w.spawn('bossk', 11.5, 1.6, Math.PI);
+  const mid = w.spawn('bossk', 10.5, 7.3, Math.PI);
+  const far = w.spawn('bossk', 5.5, 1.6, Math.PI);
   const hp = near.health;
   shoot(w);
   run(w, mockInput(), 0.4);
@@ -185,4 +190,25 @@ test('villagers and scenery in the splash erupt too, unhurt; the shot flies past
   assert.ok(!under(lamp), 'none under a hanging lamp');
   assert.equal(conc.length, 3, 'the wall, the villager and the crate');
   for (const t of [villager, crate, inPath]) assert.ok(!t.removed && !t.dead, `${t.def.id} unhurt`);
+});
+
+test('a near miss in the open bursts beside the monster instead of flying on to the far wall', () => {
+  const w = world();
+  w.settings.autoAim = false; // no lock-on: the shot goes straight down the hall
+  const bossk = w.spawn('bossk', 9.5, 1.3, Math.PI); // 1.2 to the side of the shot's path
+  const hp = bossk.health;
+  shoot(w);
+  run(w, mockInput(), 0.4);
+  const conc = w.blasts.filter((b) => b.id === 'concussion');
+  assert.ok(bossk.health < hp, 'caught in the splash');
+  assert.ok(conc.length >= 1 && conc.every((b) => b.x < 12), 'no blast at the far wall');
+});
+
+test('a shot passing well wide of a monster flies on to the far wall', () => {
+  const w = world(wide());
+  w.settings.autoAim = false;
+  w.spawn('bossk', 7.5, 1.6, Math.PI); // 2.9 to the side of the shot's path
+  shoot(w);
+  run(w, mockInput(), 0.4);
+  assert.deepEqual(w.blasts.filter((b) => b.id === 'concussion').map((b) => b.x > 12), [true], 'one blast, at the far wall');
 });

@@ -420,7 +420,11 @@ export function defineDecoration(def) {
  * is an explosion set off at the feet of each one, and of each friendly
  * character and standing piece of scenery in reach (see projectile.js). With
  * no `sheet`, it flies unseen (Dark Forces' concussion shot).
- * @param {{id:string, sheet?:SheetSpec, anims?:{fly:AnimSpec, explode?:AnimSpec}, speed?:number,
+ * `proximity` bursts it where it passes nearest an enemy's body that it came
+ * within that distance of (monsters for the player's shot, the player for a
+ * monster's), so a near miss still lands the splash on them; 0 (the
+ * default) bursts only on what it hits.
+ * @param {{id:string, sheet?:SheetSpec, anims?:{fly:AnimSpec, explode?:AnimSpec}, speed?:number, proximity?:number,
  *   damage?:number|number[], radius?:number, splash?:{radius:number, damage:number, falloff?:boolean, erupt?:string},
  *   gravity?:number, z?:number, sounds?:{fire?:string, explode?:string, bounce?:string}, trail?:string, explosion?:string,
  *   bounce?:{restitution?:number, friction?:number, minSpeed?:number, roll?:number, fuse?:number, toss?:number, loft?:number}}} def
@@ -435,6 +439,7 @@ export function defineProjectile(def) {
     fullbright: true,
     gravity: 0,
     splash: null,
+    proximity: 0,
   });
   if (def.bounce) p.bounce = { restitution: 0.5, friction: 0.7, minSpeed: 1.5, roll: 3, fuse: 2.5, toss: 4, loft: 0, ...def.bounce };
   return p;

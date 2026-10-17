@@ -31,6 +31,8 @@ These need Mark to try something, or to decide. Don't start them without him.
       and a long throw (the high arc, unchanged).
 - [ ] **Concussion rifle:** villagers and scenery in the blast erupt in
       blue flame too (unhurt).
+- [ ] **Concussion rifle in the open:** a near miss (within 2 tiles of an
+      enemy) bursts beside them now. Bossk's shots do the same to you.
 - [ ] **Boba Fett and Bossk:** where they appear in the story (sandbox only
       today).
 - [ ] **Which mission is the vertical slice:** the Canyon Garrison (built, the
