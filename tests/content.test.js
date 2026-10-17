@@ -4,11 +4,10 @@ import { validateContent } from '../src/engine/validate.js';
 import { analyseLevel, ammoBudget } from '../tools/lib/levelcheck.mjs';
 import { Game } from '../src/engine/game.js';
 import { blockedByMap } from '../src/engine/world/physics.js';
+import { buildLevel } from '../src/engine/world/level.js';
 import { readFileSync } from 'node:fs';
 import villagers from '../src/content/npcs/villagers.js';
 import { registry, makeWorld, mockInput, room, run } from './helpers.js';
-
-const VILLAGERS = ['villager-boy', 'villager-woman', 'villager-man', 'villager-adventurer', 'villager-wanderer'];
 
 test('the content pack validates without errors', () => {
   const { errors } = validateContent(registry);
@@ -76,12 +75,13 @@ test('m1: the overload opens the escape hatch for good', () => {
   for (const d of hatch) assert.equal(d.state, 'open');
 });
 
-test('the garrison is held by stormtroopers, sandtroopers and their commander, Jawas, an officer and a probe droid', () => {
-  const w = makeWorld('sandbox');
-  const ids = w.things.filter((t) => t.kind === 'monster').map((t) => t.def.id);
-  for (const id of ['stormtrooper', 'sandtrooper', 'sandtrooper-commander', 'jawa', 'officer', 'probe-droid']) assert.ok(ids.includes(id), `has a ${id}`);
-  const npcs = w.things.filter((t) => t.kind === 'npc').map((t) => t.def.id);
-  assert.deepEqual(npcs.sort(), VILLAGERS.slice().sort(), 'and the villagers stroll about the start room');
+test('every monster and friendly is placed in some level, so the minute of play runs it', () => {
+  const placed = new Set();
+  for (const level of registry.levels.values()) {
+    for (const skill of [1, 3, 5]) for (const sp of buildLevel(registry, level, { skill }).spawns) placed.add(sp.type);
+  }
+  const missing = [...registry.things.values()].filter((t) => (t.kind === 'monster' || t.kind === 'npc') && !placed.has(t.id)).map((t) => t.id);
+  assert.deepEqual(missing, [], 'place these in the sandbox');
 });
 
 test('every villager, sandtrooper, commander and Jawa sheet holds all its frames and views, and a villager says a line when used', () => {
