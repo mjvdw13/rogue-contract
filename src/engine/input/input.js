@@ -31,6 +31,8 @@ export const DEFAULT_BINDINGS = {
   weapon5: ['Digit5'],
   weapon6: ['Digit6'],
   weapon7: ['Digit7'],
+  weapon8: ['Digit8'],
+  weapon9: ['Digit9'], // the concussion rifle
   zoomIn: ['Equal', 'NumpadAdd'],
   zoomOut: ['Minus', 'NumpadSubtract'],
   menu: ['Escape', 'Pad9', 'TouchMenu'],
