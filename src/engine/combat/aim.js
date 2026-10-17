@@ -14,6 +14,14 @@ export const AUTOAIM_SLOPE = 0.12;
 /** Player missiles leave a little below the eye, so they don't fill the view. */
 const MISSILE_DROP = 0.2;
 
+/**
+ * Can the player's aim lock on to `t`? Monsters, and friendly characters
+ * that can be hurt (villagers), alive.
+ */
+export function aimable(t) {
+  return (t.kind === 'monster' || t.kind === 'npc') && t.shootable && !t.dead && !t.removed;
+}
+
 /** Height a thing's shots start from: the player's eye, or most of the way up a monster. */
 export function fireZ(t) {
   if (t.player) return t.z + t.player.viewHeight + t.player.viewOffset;
@@ -61,8 +69,8 @@ export function missileZ(attacker, aim) {
 
 /**
  * Dark Forces' auto-aim, for an attack with `lockOn` (degrees): of the
- * monsters the player can see, the nearest one within `lockOn` of the way
- * they face, or under the crosshair (a close one is wide), gets the shot,
+ * monsters and villagers the player can see (see aimable), the nearest one
+ * within `lockOn` of the way they face, or under the crosshair (a close one is wide), gets the shot,
  * turned and tilted to land three-quarters of the way up its body, however
  * high or low it stands. `missile`: the shot leaves from a missile's height.
  * @returns {{angle:number, aim:{z:number, slope:number}}|null} null with none to lock on to
@@ -74,7 +82,7 @@ export function lockOn(world, shooter, angle, degrees, range = 96, missile = fal
   let best = null;
   let bestD = range;
   for (const t of world.things) {
-    if (t === shooter || t.kind !== 'monster' || !t.shootable || t.dead || t.removed) continue;
+    if (t === shooter || !aimable(t)) continue;
     const d = Math.hypot(t.x - shooter.x, t.y - shooter.y);
     if (d >= bestD) continue;
     const off = Math.abs(Math.atan2(Math.sin(shooter.angleTo(t) - angle), Math.cos(shooter.angleTo(t) - angle)));
@@ -90,8 +98,8 @@ export function lockOn(world, shooter, angle, degrees, range = 96, missile = fal
 }
 
 /**
- * Doom-style vertical auto-aim: of the monsters the shot passes over or under
- * (and that the shooter can see), the nearest one within AUTOAIM_SLOPE of the
+ * Doom-style vertical auto-aim: of the monsters and villagers the shot
+ * passes over or under (and that the shooter can see), the nearest one within AUTOAIM_SLOPE of the
  * view gets the shot bent just far enough to land on its body.
  */
 function autoAim(world, shooter, angle, z, slope, range) {
@@ -100,7 +108,7 @@ function autoAim(world, shooter, angle, z, slope, range) {
   let best = slope;
   let bestD = Infinity;
   for (const t of world.things) {
-    if (t === shooter || t.kind !== 'monster' || !t.shootable || t.dead || t.removed) continue;
+    if (t === shooter || !aimable(t)) continue;
     const d = rayCircle(shooter.x, shooter.y, dx, dy, t.x, t.y, t.radius);
     if (d < 0 || d > range || d >= bestD) continue;
     const at = Math.max(0.1, d);

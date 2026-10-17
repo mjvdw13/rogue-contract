@@ -162,14 +162,25 @@ steps and ledges, and shots into the sky simply vanish. Explosions measure
 ## Friendly characters
 
 `src/content/npcs/villagers.js` defines the townsfolk with `defineNpc()`.
-Friendlies are solid, so you bump into them, but they can't be hurt.
-Bullets, projectiles and explosions pass through them (a `splash.erupt`
-blast still goes up under them, harmlessly), and monsters never
-target them. Each one idles and wanders up to `wander` tiles from where it was
+Friendlies are solid, so you bump into them, and monsters never target
+them. Without `health` they can't be hurt: bullets, projectiles and
+explosions pass through them (a `splash.erupt` blast still goes up under
+them, harmlessly). Each one idles and wanders up to `wander` tiles from where it was
 placed. It stays out of doorways, hazards and one-tile passages, so it never
 blocks the way. When the player bumps into one or presses use on it, it turns to
 them, plays `react`, says one of its `lines` (shown as `NAME: line`), plays
 `sounds.react` and pops up a `bubble` effect.
+
+With `health` (the villagers have 20), a friendly can be shot, and your aim
+locks on to it as it does to a monster. The first hit plays its `pain`
+animation; then it runs from you for good, at `fleeSpeed` (tiles a second,
+default 6) along the way monsters find to you, but uphill (through doors,
+round walls, up steps), until it's `fleeDistance` tiles away (default 20)
+or cornered, where it cowers on its `idle` frame until you come near
+again. A frightened friendly says nothing when bumped or used. `flee` is its
+running animation (else `walk`), `death` its fall (it lies there; without
+one it vanishes), and `sounds.pain` and `sounds.death` its cries. Killing
+one doesn't count as a kill. Knockback uses `mass` as for monsters.
 
 ```js
 defineNpc({
@@ -180,16 +191,21 @@ defineNpc({
   wander: 3,                // tiles from the spot; 0 = stays put
   speed: 0.8,
   idleTime: [3, 6],         // seconds between strolls
-  anims: { idle: { frames: [0, 1], durations: [2.8, 1.6], loop: true }, walk: [2, 3, 4, 5], react: [6] },
+  anims: { idle: { frames: [0, 1], durations: [2.8, 1.6], loop: true }, walk: [2, 3, 4, 5], react: [6],
+           pain: [7], death: { frames: [8, 9, 10], fps: 8 } },
   lines: ['Vaporators don't fix themselves.', 'Storm's coming in off the Dune Sea.'],
   bubble: 'bubble-dots',    // optional: an effect (defineEffect) that pops up over them
-  sounds: { react: 'npc-hmph' }, // optional: any sound id
+  sounds: { react: 'npc-hmph', pain: 'villager-pain', death: 'villager-death' }, // optional: any sound ids
+  health: 20,               // optional: can be shot, and flees once hurt
+  fleeSpeed: 6,
+  fleeDistance: 20,
 });
 ```
 
 Animation frame events like `events: { 2: 'sound:npc-sigh' }` play a sound.
-`hooks.onReact(world, self)` and
-`hooks.onThink(world, self, dt)` add custom behaviour.
+`hooks.onReact(world, self)`, `hooks.onThink(world, self, dt)`,
+`hooks.onPain(world, self, source, amount)` and
+`hooks.onDeath(world, self, source)` add custom behaviour.
 
 The villagers' sheets are cut from character sheets by
 `assets/custom/villagers/cut.py` (Python, Pillow), like the sandtroopers and
@@ -228,8 +244,8 @@ the same number of pixels. The HUD panels in the bottom corners draw over the
 weapon. The fire animation's length sets the rate of fire. `accurateFirstShot: true` makes a single shot perfectly
 accurate when you aren't holding the trigger. New ammo types go in
 `src/content/ammo.js` as `defineAmmo({ id, name, short, max, clip })`.
-`lockOn: 5` in `fire` aims it Dark Forces' way: of the monsters you can
-see, the nearest one within 5° either side of the crosshair (or under it, so
+`lockOn: 5` in `fire` aims it Dark Forces' way: of the monsters (and
+friendlies that can be hurt) you can see, the nearest one within 5° either side of the crosshair (or under it, so
 one close up is hard to miss) gets the shot, turned and tilted onto it
 however high or low it stands (see `concussion-rifle.js`). Without it,
 shots only get Doom's small nudge up or down onto a body already under the
@@ -329,12 +345,12 @@ be added with `definePickup` (see *Custom behaviour*).
 
   With `erupt`, one more goes up from the floor where it struck a wall or
   floor, but none where it hit a body (that body erupts already). A
-  projectile with no `sheet` flies unseen. Friendly characters and scenery
-  in the splash (except hanging scenery) erupt as well, though it doesn't
-  hurt them.
+  projectile with no `sheet` flies unseen. Villagers in the splash are
+  hurt and erupt as monsters do; friendlies that can't be hurt, and
+  scenery (except hanging scenery), erupt as well, unharmed.
 
   `proximity: 2` bursts a projectile that passes within 2 tiles of an
-  enemy's body (monsters for your shots, you for theirs) where it passes
+  enemy's body (monsters and villagers for your shots, you for theirs) where it passes
   nearest, if it can see them, so a near miss in the open still lands its
   splash on them. The concussion
   shot has it; without it, a shot just wide of a trooper in the open flies

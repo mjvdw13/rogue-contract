@@ -33,6 +33,7 @@ export function damage(world, target, amount, inflictor, source, opts = {}) {
     return;
   }
   target.def.hooks?.onPain?.(world, target, source, amount);
+  if (target.kind === 'npc') world.npcPain(target);
   if (target.kind !== 'monster') return;
 
   // Infighting: monsters hit by other monsters turn on them (except their own kind).

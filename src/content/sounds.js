@@ -200,6 +200,9 @@ export default [
   }),
   defineSound({ id: 'jawa-pain', synth: groan(620, 430, 0.14, 0.45, { lowpass: 2600 }), pitchVariance: 0.12 }),
   defineSound({ id: 'jawa-death', synth: groan(700, 220, 0.5, 0.5, { lowpass: 2400, vibrato: { rate: 14, depth: 2 } }), pitchVariance: 0.1 }),
+  // Villagers: a short cry when hurt, a longer one when they fall.
+  defineSound({ id: 'villager-pain', synth: groan(330, 230, 0.2, 0.5, { lowpass: 1800, distortion: 0.15 }), pitchVariance: 0.15 }),
+  defineSound({ id: 'villager-death', synth: groan(360, 120, 0.7, 0.55, { lowpass: 1600, distortion: 0.15 }), pitchVariance: 0.12 }),
   // The probe droid: electronic warbles.
   defineSound({
     id: 'droid-sight',

@@ -207,6 +207,10 @@ export function validateContent(reg) {
       if ((t.wander ?? 0) > 0 && !t.anims.walk) warn(`${owner}: wanders but has no "walk" animation (it will stand still)`);
       if (t.bubble && !reg.things.has(t.bubble)) err(`${owner}: unknown speech bubble effect "${t.bubble}"`);
       if (!Array.isArray(t.lines)) err(`${owner}: "lines" must be a list of strings`);
+      if (!(typeof t.health === 'number' && t.health >= 0)) err(`${owner}: health must be a number, 0 or more`);
+      if (!(t.fleeSpeed > 0)) err(`${owner}: fleeSpeed must be above 0`);
+      if (!(t.fleeDistance > 0)) err(`${owner}: fleeDistance must be above 0`);
+      if (t.health > 0 && !t.anims.death) warn(`${owner}: can be hurt but has no "death" animation (it vanishes when killed)`);
     }
     if (t.kind === 'decoration' && t.explode?.effect && !reg.things.has(t.explode.effect)) {
       err(`${owner}: unknown explosion effect "${t.explode.effect}"`);

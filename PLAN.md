@@ -29,10 +29,15 @@ These need Mark to try something, or to decide. Don't start them without him.
 
 - [ ] **Thermal detonator:** try a quick tap (back to the old low toss)
       and a long throw (the high arc, unchanged).
-- [ ] **Concussion rifle:** villagers and scenery in the blast erupt in
-      blue flame too (unhurt).
+- [ ] **Concussion rifle:** scenery in the blast erupts in blue flame too
+      (unhurt); villagers in it are hurt now (below).
 - [ ] **Concussion rifle in the open:** a near miss (within 2 tiles of an
       enemy) bursts beside them now. Bossk's shots do the same to you.
+- [ ] **Villagers can be shot:** 20 health; the first hit hunches them
+      over, then they run from you for good (6 tiles a second, until 20
+      away or cornered) and stop talking. Lock-on, auto-aim and the
+      concussion rifle's near miss take them as targets. Their cries are
+      synth stand-ins. Should other villagers who see it run too?
 - [ ] **Boba Fett and Bossk:** where they appear in the story (sandbox only
       today).
 - [ ] **Which mission is the vertical slice:** the Canyon Garrison (built, the

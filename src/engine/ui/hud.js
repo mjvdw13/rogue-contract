@@ -205,7 +205,7 @@ export class Hud {
         if (t === pt || t.removed) continue;
         let c = pal.ramp('steel', 0.6);
         if (t.kind === 'monster') c = t.dead ? pal.ramp('gray', 0.4) : pal.ramp('glow-red', 1);
-        else if (t.kind === 'npc') c = pal.ramp('glow-green', 1);
+        else if (t.kind === 'npc') c = t.dead ? pal.ramp('gray', 0.4) : pal.ramp('glow-green', 1);
         else if (t.kind === 'item') c = pal.ramp('glow-yellow', 0.6);
         s.fillRect(sx(t.x) - 1, sy(t.y) - 1, 2, 2, c);
       }

@@ -172,10 +172,18 @@ test('with nothing in the cone, it goes where you aim', () => {
   assert.ok(Math.abs(shot.angle) < 1e-9 && Math.abs(shot.vz) < 1e-9);
 });
 
-test('villagers and scenery in the splash erupt too, unhurt; the shot flies past them as before', () => {
+test('a villager in the splash is hurt and erupts as a monster does', () => {
   const w = world();
-  const inPath = w.spawn('villager-woman', 4.5, 2.5, Math.PI); // the shot goes through her
   const villager = w.spawn('villager-boy', 11.5, 1.5, Math.PI);
+  shoot(w);
+  run(w, mockInput(), 0.4);
+  const conc = w.blasts.filter((b) => b.id === 'concussion');
+  assert.ok(villager.health < villager.def.health, 'hurt');
+  assert.ok(conc.some((b) => b.x === b.at.get(villager)[0] && b.y === b.at.get(villager)[1]), 'a blast under the villager');
+});
+
+test('scenery in the splash erupts too, unhurt', () => {
+  const w = world();
   const crate = w.spawn('supply-crate', 10.5, 3.5, 0);
   const lamp = w.spawn('ceiling-lamp', 11.5, 3.5, 0); // hangs from the ceiling: nothing goes up under it
   const far = w.spawn('supply-crate', 6.5, 1.5, 0); // out of reach
@@ -184,12 +192,21 @@ test('villagers and scenery in the splash erupt too, unhurt; the shot flies past
   const conc = w.blasts.filter((b) => b.id === 'concussion');
   const under = (t) => conc.some((b) => b.x === b.at.get(t)[0] && b.y === b.at.get(t)[1]);
   assert.ok(conc.some((b) => b.x > 12), 'it burst at the far wall');
-  assert.ok(under(villager), 'under the villager');
   assert.ok(under(crate), 'under the crate');
-  assert.ok(!under(inPath) && !under(far), 'none under what is out of reach');
+  assert.ok(!under(far), 'none under what is out of reach');
   assert.ok(!under(lamp), 'none under a hanging lamp');
-  assert.equal(conc.length, 3, 'the wall, the villager and the crate');
-  for (const t of [villager, crate, inPath]) assert.ok(!t.removed && !t.dead, `${t.def.id} unhurt`);
+  assert.equal(conc.length, 2, 'the wall and the crate');
+  assert.ok(!crate.removed && !crate.dead, 'the crate is unhurt');
+});
+
+test('a near miss beside a villager bursts beside them too', () => {
+  const w = world();
+  w.settings.autoAim = false;
+  const villager = w.spawn('villager-man', 9.5, 1.3, Math.PI); // 1.2 to the side of the shot's path
+  shoot(w);
+  run(w, mockInput(), 0.4);
+  assert.ok(villager.health < villager.def.health, 'caught in the splash');
+  assert.ok(w.blasts.filter((b) => b.id === 'concussion').every((b) => b.x < 12), 'no blast at the far wall');
 });
 
 test('a near miss in the open bursts beside the monster instead of flying on to the far wall', () => {

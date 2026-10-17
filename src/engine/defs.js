@@ -347,20 +347,26 @@ export function defineMonster(def) {
 }
 
 /**
- * A friendly character, such as a coworker. Friendlies can't be hurt or
- * targeted: bullets, projectiles and explosions pass through them. They idle,
- * wander up to `wander` tiles from where they were placed (staying out of
- * doorways, narrow passages and hazards), and react when the player bumps into
- * them or uses them: they turn to the player, play `react` and say one of
- * their `lines`.
+ * A friendly character, such as a villager. They idle, wander up to `wander`
+ * tiles from where they were placed (staying out of doorways, narrow passages
+ * and hazards), and react when the player bumps into them or uses them: they
+ * turn to the player, play `react` and say one of their `lines`. Monsters
+ * never target them.
+ * With no `health` they can't be hurt: bullets, projectiles and explosions
+ * pass through them. With `health` they can be shot (and the player's aim
+ * locks on to them as it does to monsters); the first hit plays `pain`, then
+ * they flee the player at `fleeSpeed` for good, until `fleeDistance` tiles
+ * away, and say nothing more. They die with `death`, crying out with
+ * `sounds.pain` and `sounds.death`; `flee` is their running animation (else
+ * `walk`).
  * @param {{id:string, name:string, glyph?:string, sheet:SheetSpec,
- *   anims:{idle:AnimSpec, walk?:AnimSpec, react?:AnimSpec}, lines?:string[],
- *   wander?:number, speed?:number, idleTime?:[number,number], reactTime?:number,
- *   reactCooldown?:number, bubble?:string, sounds?:{react?:string},
- *   hooks?:{onReact?:Function}}} def
+ *   anims:{idle:AnimSpec, walk?:AnimSpec, react?:AnimSpec, pain?:AnimSpec, flee?:AnimSpec, death?:AnimSpec},
+ *   lines?:string[], wander?:number, speed?:number, idleTime?:[number,number], reactTime?:number,
+ *   reactCooldown?:number, bubble?:string, health?:number, mass?:number, fleeSpeed?:number, fleeDistance?:number,
+ *   sounds?:{react?:string, pain?:string, death?:string}, hooks?:{onReact?:Function, onPain?:Function, onDeath?:Function}}} def
  */
 export function defineNpc(def) {
-  return baseThing(def, 'npc', {
+  const n = baseThing(def, 'npc', {
     solid: true,
     shootable: false,
     radius: 0.5,
@@ -371,7 +377,11 @@ export function defineNpc(def) {
     reactTime: 1.8,
     reactCooldown: 2.5,
     lines: [],
+    fleeSpeed: 6,
+    fleeDistance: 20,
   });
+  if (n.health > 0) n.shootable = def.shootable ?? true;
+  return n;
 }
 
 /**

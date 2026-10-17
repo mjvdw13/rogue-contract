@@ -24,8 +24,8 @@ function skyAt(map, x, y, z) {
  * into. Its `explosion` faces `face` (out of the floor or ceiling it hit),
  * else back the way it came (out of a wall), else all round (a body hit).
  * A `splash.erupt` explosion goes up from the floor under every body the
- * splash hurt, every friendly character and standing piece of scenery in
- * its reach (unhurt), and under the burst too unless it hit a body (Dark
+ * splash hurt, every unhurt friendly character and standing piece of
+ * scenery in its reach, and under the burst too unless it hit a body (Dark
  * Forces' concussion rifle).
  */
 function explode(world, p, hit, pull = true, face = null) {
@@ -61,8 +61,8 @@ function explode(world, p, hit, pull = true, face = null) {
 }
 
 /**
- * (`proximity`) The nearest of the owner's enemies (monsters for the
- * player's shot, the player for a monster's) whose body is within
+ * (`proximity`) The nearest of the owner's enemies (monsters and villagers
+ * for the player's shot, the player for a monster's) whose body is within
  * `proximity` of (x, y, z), in plain sight of it. Sets `p.near` and
  * `p.nearD` (null when there's none).
  */
@@ -72,7 +72,7 @@ function nearEnemy(world, p, x, y, z) {
   p.nearD = p.def.proximity;
   for (const t of world.things) {
     if (t === owner || !t.shootable || t.dead || t.removed) continue;
-    if ((t.kind !== 'monster' && t.kind !== 'player') || t.kind === owner?.kind) continue;
+    if (owner?.kind === 'monster' ? t.kind !== 'player' : t.kind !== 'monster' && t.kind !== 'npc') continue;
     const across = Math.max(0, Math.hypot(t.x - x, t.y - y) - t.radius);
     const vertical = Math.max(0, t.z - z, z - t.z - t.height);
     const d = Math.hypot(across, vertical);

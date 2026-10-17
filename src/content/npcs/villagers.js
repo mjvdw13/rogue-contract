@@ -1,13 +1,13 @@
 import { defineNpc } from '../../engine/defs.js';
 
 // Townsfolk: friendly characters who stroll about and say a line when Kyle
-// bumps into them or uses them. The art is cut from Mark's villager sheets by
+// bumps into them or uses them. Shot, they hunch over, then run from him for
+// good. The art is cut from Mark's villager sheets by
 // assets/custom/villagers/cut.py, at the Dark Forces sprites' pixel size
 // (hence the scale), in one frame order: 0-5 walk, 6 stand, 7-8 flinch, 9
 // hunch (pain) and 10-13 a fall-back death; then the walk from the other
 // views (14-19 front three-quarter, 20-25 side, 26-31 back three-quarter,
-// 32-37 back) and the stand from them (38-41). NPCs can't be hurt yet, so
-// the pain and death frames are for later (Mission 1's civilians).
+// 32-37 back) and the stand from them (38-41).
 const range = (a, n) => Array.from({ length: n }, (_, i) => a + i);
 
 function villager({ id, name, glyph, frameWidth, frameHeight, height, lines }) {
@@ -22,6 +22,9 @@ function villager({ id, name, glyph, frameWidth, frameHeight, height, lines }) {
     wander: 5,
     speed: 2,
     idleTime: [2, 6],
+    health: 20,
+    fleeSpeed: 6,
+    fleeDistance: 20,
     anims: {
       idle: { frames: [6], fps: 1, loop: true, views: { frontSide: [38], side: [39], backSide: [40], back: [41] } },
       walk: {
@@ -30,7 +33,16 @@ function villager({ id, name, glyph, frameWidth, frameHeight, height, lines }) {
         views: { frontSide: range(14, 6), side: range(20, 6), backSide: range(26, 6), back: range(32, 6) },
       },
       react: { frames: [7, 8, 6], durations: [0.3, 0.7, 0.8] },
+      pain: { frames: [9], durations: [0.4] },
+      // The walk, quicker.
+      flee: {
+        frames: range(0, 6),
+        fps: 13,
+        views: { frontSide: range(14, 6), side: range(20, 6), backSide: range(26, 6), back: range(32, 6) },
+      },
+      death: { frames: range(10, 4), fps: 8 },
     },
+    sounds: { pain: 'villager-pain', death: 'villager-death' },
     lines,
   });
 }

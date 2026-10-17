@@ -1,7 +1,7 @@
 import { buildLevel } from './level.js';
 import { F_SECRET, F_DAMAGE, F_EXIT, F_USE } from './tilemap.js';
 import { Backdrop } from './backdrop.js';
-import { initNpc, npcThink, npcReact } from '../things/npc.js';
+import { initNpc, npcThink, npcReact, npcPain } from '../things/npc.js';
 import { castRay, blockedByMap, fenceBlocks, rayCircle, slantNear } from './physics.js';
 import { updateDoors, openDoor, closeDoor } from './doors.js';
 import { updateLifts, startLift, liftAt } from './lifts.js';
@@ -493,6 +493,10 @@ export class World {
     wakeMonster(this, m, target);
   }
 
+  npcPain(t) {
+    npcPain(this, t);
+  }
+
   monsterPain(m) {
     monsterPain(this, m);
   }
@@ -544,7 +548,7 @@ export class World {
     const hit = castRay(this.map, pt.x, pt.y, dx, dy, USE_RANGE);
     // Friendly characters (NPCs) in front of the player get talked to first.
     for (const t of this.things) {
-      if (t.kind !== 'npc' || t.removed) continue;
+      if (t.kind !== 'npc' || t.removed || t.dead) continue;
       const d = rayCircle(pt.x, pt.y, dx, dy, t.x, t.y, t.radius + 0.1);
       if (d >= 0 && d < Math.min(hit.dist, USE_RANGE)) {
         npcReact(this, t);
@@ -681,6 +685,7 @@ export class World {
           effectThink(this, t, dt);
           break;
         case 'npc':
+          applyMomentum(this, t, dt);
           npcThink(this, t, dt);
           this.fall(t, dt);
           break;
