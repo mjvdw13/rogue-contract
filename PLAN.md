@@ -1307,10 +1307,58 @@ with the game):
              - [x] Validator, MODDING.md, tests (a burst's delay and over, a
                    flash fades, trails stop at `for` and when resting, grow,
                    hooks fire, the world's RNG untouched).
-             - [ ] Mark looks in the bench and tunes; after that
-                   (next step) wire the styles into the probe droid, the
-                   fuel barrel, rockets and concussion blasts, and decide
-                   sprite or no sprite.
+             - [x] Mark looks in the bench and tunes.
+                   - Mark (2026-10-16), from the bench: `small` and `large`
+                     with less shrapnel. No old sprite with these: they
+                     look great without (decided: no sprite). `large`: a
+                     main blast and a smaller secondary one, off to the
+                     side. `concussion` all blue: no orange shrapnel or
+                     sparks. `dirt` is liked as it is ("the dirt pieces
+                     look great").
+             - [x] Mark's notes:
+                   - [x] A style can set off others after it: `then: [{
+                         explosion, delay, offset, z }]` (`offset` how far
+                         to the side, a random way but not into the wall
+                         or floor it faces out of). The validator checks
+                         the ids and refuses a loop.
+                   - [x] `large`: fewer chunks and shrapnel, and `small`
+                         goes off beside it a moment later. (Chunks 8 to
+                         4, shrapnel 16 to 6; `small` 0.2 to 0.3 s later,
+                         0.6 to 0.9 to the side, 0.2 higher.)
+                   - [x] `small`: fewer chunks (5 to 3).
+                   - [x] `concussion`: ion sparks only (the orange
+                         `spark` burst goes). Then, after Mark pointed at
+                         Dark Forces' own concussion explosion
+                         (`CONCEXP`, 8 frames: a white dome with a cyan
+                         rim, a flat streak like a lens flare along the
+                         floor, small flames, a tall column of blue-white
+                         flame with a ripple ring at its foot, breaking
+                         up into wisps that rise), rebuilt to match:
+                         - [x] A burst `dir: 'ring'`: flat, across the
+                               way the explosion faces (along the floor or
+                               the wall it hit). Validator, docs, a test.
+                         - [x] Types: `fire-blue` becomes the brief white
+                               dome; `conc-flame` (the column, white to
+                               cyan to blue, rising), `conc-ripple` (the
+                               ring at its foot), `conc-wisp` (the bits
+                               that rise after), and `conc-streak` (the
+                               flat flash: long, brief streaks). Contact
+                               sheets against the frames.
+                               - Stacked `add` discs sum to white, so
+                                 the dome and the column's core are white
+                                 with blue edges, as in the frames.
+                               - The column and wisps always rise (`'up'`),
+                                 as the upright sprite did; the ring lies
+                                 along what was hit (the floor, or a wall).
+                   - [x] Peaks under the caps again: `large` (with its
+                         `small`) 67 discs and 85 points, `small` 28 and
+                         35, `concussion` 36 and 99, `dirt` and `sparks`
+                         as before. Tests (`then`: delay, offset, not into
+                         the wall; `ring` flat on the floor and on a wall;
+                         the validator's loop), MODDING.md, the bench lists
+                         the new types.
+             - [ ] Next step: wire the styles into the probe droid, the
+                   fuel barrel, rockets and concussion blasts (no sprite).
 6. [ ] **Emitters** in levels: steam vent, sparking panel, fire (with
        embers and light), reactor motes; tags; distance cut-off. Validator,
        map viewer marks, MODDING.md. Placed in the sandbox, then where
@@ -2739,3 +2787,10 @@ update the smoke test.
   smoke-wisp, blast-smoke). The bench page sets them off. Not wired into
   any monster or weapon yet. 218 tests, the validator and the smoke test
   pass.
+- 2026-10-16: Phase 1b T step 5f, Mark's notes from the bench: `small` and
+  `large` throw less shrapnel, with no sprite (decided); `large` sets off a
+  `small` beside it a moment later, through a new `then` on styles; the
+  `concussion` is all blue and rebuilt after Dark Forces' CONCEXP frames
+  (a white dome, a flat ring of streaks through a new burst `dir: 'ring'`,
+  a rising column of blue flame with a ripple at its foot, wisps); `dirt`
+  kept as it is. 220 tests, the validator and the smoke test pass.

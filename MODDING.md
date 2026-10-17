@@ -406,7 +406,7 @@ defineExplosion({
   particles: [
     { type: 'fire', count: 10, speed: [0.5, 2.5], radius: 0.15 },
     { type: 'spark', count: 24, speed: [3, 7] },
-    { type: 'debris', count: 5, speed: [3, 6] },
+    { type: 'debris', count: 3, speed: [3, 6] },
     { type: 'ember', count: 10, speed: [0.5, 1.5], dir: 'up', spread: 0.8, delay: 0.1, over: 0.4 },
     { type: 'blast-smoke', count: 6, speed: [0.2, 0.6], radius: 0.25, dir: 'up', delay: [0.15, 0.25], over: 0.4 },
   ],
@@ -425,6 +425,21 @@ Each burst takes `type`, `count`, `speed` and `spread` as above, and:
   the explosion faces. One set off against a wall or on the floor faces
   out of it, and its `'out'` bursts keep to that side (a hemisphere at
   most); one in mid-air throws them all round.
+  `'ring'` throws them flat instead, across the way it faces: a ring
+  running out along the floor or the wall it hit (round the upright in
+  mid-air), like the flat flash of the `concussion` style.
+
+A style can set off others after it with `then`, say a second, smaller
+blast beside the first (`large` does this with `small`):
+
+```js
+then: [{ explosion: 'small', delay: [0.2, 0.3], offset: [0.6, 0.9], z: 0.2 }],
+```
+
+`delay` is seconds after this one, `offset` how far to the side (a random
+way, never back into the wall or floor it hit, and stopping short of any
+wall), `z` how much higher. Each can be a number or `[min, max]`. The
+validator refuses a loop (a style that, through `then`, sets itself off).
 
 Set one off with:
 
@@ -437,9 +452,9 @@ Set one off with:
 - code: `world.explode('large', x, y, z, { dir: [1, 0, 0] })`.
 
 Explosions are only for looks: the damage stays with `explode` (things)
-and `splash` (projectiles). Keep an eye on the caps: one `large` uses
-about 70 of the 150 discs at its peak, so two at once already crowd each
-other. The bench page (`tools/particles.html`) sets them off on the floor,
+and `splash` (projectiles). Keep an eye on the caps: one `large` (with its
+`small` after it) uses about 67 of the 150 discs at its peak, so two at
+once already crowd each other. The bench page (`tools/particles.html`) sets them off on the floor,
 in the air or on the wall in front of you, once or every few seconds, with
 the real caps and a count of what's live.
 

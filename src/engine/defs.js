@@ -418,11 +418,16 @@ export function defineParticle(def) {
  * the `explode` trigger action. Only for looks: damage is the exploder's.
  * Each burst is a BurstSpec plus `delay` (seconds, or [min, max]), `over`
  * (its count spread over that many seconds), `radius` (they start anywhere
- * within it), `z` (above the centre) and `dir` 'up' or 'out' (the way the
- * explosion faces; also what a burst with no `dir` does).
+ * within it), `z` (above the centre) and `dir` 'up', 'out' (the way the
+ * explosion faces; also what a burst with no `dir` does) or 'ring' (flat,
+ * across the way it faces: along the floor or wall it hit).
  * `light: { radius, light, time }` is a flash that fades over `time` seconds.
+ * `then: [{ explosion, delay, offset, z }]` sets off other explosions after
+ * this one: `delay` seconds later, `offset` to the side (a random way, not
+ * into what it faces out of), `z` higher.
  * @param {{id:string, particles:(BurstSpec & {delay?:number|[number,number], over?:number, radius?:number,
- *   z?:number, dir?:'up'|'out'|[number,number,number]})[], light?:{radius:number, light:number, time?:number},
+ *   z?:number, dir?:'up'|'out'|'ring'|[number,number,number]})[], light?:{radius:number, light:number, time?:number},
+ *   then?:{explosion:string, delay?:number|[number,number], offset?:number|[number,number], z?:number}[],
  *   sound?:string, effect?:string, name?:string}} def
  */
 export function defineExplosion(def) {

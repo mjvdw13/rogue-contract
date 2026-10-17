@@ -16,34 +16,41 @@ export default [
     particles: [
       { type: 'fire', count: 10, speed: [0.5, 2.5], radius: 0.15 },
       { type: 'spark', count: 24, speed: [3, 7] },
-      { type: 'debris', count: 5, speed: [3, 6] },
+      { type: 'debris', count: 3, speed: [3, 6] },
       { type: 'ember', count: 10, speed: [0.5, 1.5], dir: 'up', spread: 0.8, delay: 0.1, over: 0.4 },
       { type: 'blast-smoke', count: 6, speed: [0.2, 0.6], radius: 0.25, dir: 'up', spread: 1, delay: [0.15, 0.25], over: 0.4 },
     ],
   }),
-  // A fuel barrel or a probe droid going up: everything bigger, with
-  // shrapnel, and smoke that keeps coming for a while.
+  // A fuel barrel or a probe droid going up: everything bigger, a little
+  // shrapnel, smoke that keeps coming for a while, and a second, smaller
+  // blast (`small`) going off beside it a moment later.
   defineExplosion({
     id: 'large',
     light: { radius: 7, light: 128, time: 0.6 },
     particles: [
       { type: 'fire', count: 22, speed: [0.8, 4], radius: 0.3 },
       { type: 'spark', count: 40, speed: [3, 9] },
-      { type: 'debris', count: 8, speed: [3, 8] },
-      { type: 'shrapnel', count: 16, speed: [2, 6] },
+      { type: 'debris', count: 4, speed: [3, 8] },
+      { type: 'shrapnel', count: 6, speed: [2, 6] },
       { type: 'ember', count: 20, speed: [0.5, 2], dir: 'up', spread: 0.9, delay: 0.15, over: 0.8 },
       { type: 'blast-smoke', count: 12, speed: [0.2, 0.8], radius: 0.4, dir: 'up', spread: 1, delay: [0.2, 0.35], over: 0.8 },
     ],
+    then: [{ explosion: 'small', delay: [0.2, 0.3], offset: [0.6, 0.9], z: 0.2 }],
   }),
-  // Bossk's concussion blast: a blue-white flash and a crackle of ion
-  // sparks; no fire, so no smoke.
+  // Bossk's concussion blast, after Dark Forces' own (CONCEXP): all blue.
+  // A white dome flashes, a flat streak runs out along what it hit, a column
+  // of blue-white flame shoots out of it with a ripple at its foot, and
+  // breaks up into wisps. No fire, so no smoke.
   defineExplosion({
     id: 'concussion',
     light: { radius: 6, light: 100, time: 0.35 },
     particles: [
-      { type: 'fire-blue', count: 14, speed: [1, 3.5], radius: 0.15 },
-      { type: 'ion-spark', count: 36, speed: [4, 9] },
-      { type: 'spark', count: 12, speed: [2, 5] },
+      { type: 'fire-blue', count: 14, speed: [0, 0.5], radius: 0.3, z: 0.1 },
+      { type: 'conc-streak', count: 36, speed: [7, 12], dir: 'ring' },
+      { type: 'conc-ripple', count: 60, speed: [2, 3.5], dir: 'ring', delay: 0.06 },
+      { type: 'conc-flame', count: 36, speed: [2.5, 8], radius: 0.15, dir: 'up', spread: 0.1, delay: 0.04, over: 0.3 },
+      { type: 'ion-spark', count: 20, speed: [4, 8], dir: 'up', spread: 0.25, delay: 0.05, over: 0.25 },
+      { type: 'conc-wisp', count: 36, speed: [1.5, 3.5], radius: 0.15, dir: 'up', spread: 0.2, z: 1, delay: 0.25, over: 0.4 },
     ],
   }),
   // A droid or a panel shorting out: sparks, a crackle and a wisp of smoke.

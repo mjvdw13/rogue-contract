@@ -77,7 +77,7 @@ export function validateContent(reg) {
   };
 
   // A list of particle bursts: [{ type, count, speed, spread, dir }] (world/particles.js burst);
-  // an explosion's (`timed`) may also have delay, over, radius, z and dir 'up' or 'out'.
+  // an explosion's (`timed`) may also have delay, over, radius, z and dir 'up', 'out' or 'ring'.
   const checkBursts = (owner, list, timed = false) => {
     if (list === undefined) return;
     if (!Array.isArray(list)) return err(`${owner}: "particles" must be a list of bursts`);
@@ -87,9 +87,9 @@ export function validateContent(reg) {
       const speed = [].concat(b?.speed ?? 0);
       if (!speed.every((v) => typeof v === 'number' && v >= 0) || speed.length > 2) err(`${owner}: a burst's speed is units a second, or [min, max]`);
       if (b?.spread !== undefined && !(b.spread >= 0 && b.spread <= 2)) err(`${owner}: a burst's spread must be 0 to 2`);
-      const named = timed && (b?.dir === 'up' || b?.dir === 'out');
+      const named = timed && (b?.dir === 'up' || b?.dir === 'out' || b?.dir === 'ring');
       if (b?.dir !== undefined && !named && !(Array.isArray(b.dir) && b.dir.length === 3 && b.dir.every((v) => typeof v === 'number'))) {
-        err(`${owner}: a burst's dir is [x, y, z]${timed ? ", 'up' or 'out'" : ''}`);
+        err(`${owner}: a burst's dir is [x, y, z]${timed ? ", 'up', 'out' or 'ring'" : ''}`);
       }
       if (!timed) continue;
       const delay = [].concat(b?.delay ?? 0);
@@ -114,7 +114,30 @@ export function validateContent(reg) {
     }
     if (e.effect !== undefined && reg.things.get(e.effect)?.kind !== 'effect') err(`${owner}: unknown effect "${e.effect}"`);
     checkSound(owner, e.sound);
+    if (e.then === undefined) continue;
+    if (!Array.isArray(e.then)) {
+      err(`${owner}: "then" must be a list of { explosion, delay, offset, z }`);
+      continue;
+    }
+    for (const c of e.then) {
+      checkExplosion(`${owner} then`, c?.explosion ?? '');
+      for (const key of ['delay', 'offset']) {
+        const v = [].concat(c?.[key] ?? 0);
+        if (!v.every((n) => typeof n === 'number' && n >= 0) || v.length > 2) err(`${owner}: "then" ${key} is a number, 0 or more, or [min, max]`);
+      }
+      if (c?.z !== undefined && typeof c.z !== 'number') err(`${owner}: "then" z is a height above the centre`);
+    }
   }
+  // An explosion that (through `then`) sets itself off again would never stop.
+  const looping = (id, seen) => {
+    if (seen.has(id)) return true;
+    seen.add(id);
+    const then = reg.explosions?.get(id)?.then;
+    const loops = Array.isArray(then) && then.some((c) => looping(c?.explosion, seen));
+    seen.delete(id);
+    return loops;
+  };
+  for (const e of reg.explosions?.values() ?? []) if (looping(e.id, new Set())) err(`explosion "${e.id}": "then" sets it off again (a loop)`);
 
   for (const t of reg.things.values()) {
     const owner = `${t.kind} "${t.id}"`;

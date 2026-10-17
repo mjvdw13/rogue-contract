@@ -215,9 +215,11 @@ export class Particles {
    * straight along it, 1 a hemisphere round it, 2 all round), at `speed`
    * ([min, max] units per second). With `radius`, each starts anywhere within
    * that distance of (x, y, z) (at the point itself where that's in a wall).
+   * With `ring`, they fly flat instead, in the plane across `dir` (across
+   * up without one): a ring along the floor or a wall.
    * Returns how many it made (fewer at a cap).
    */
-  burst(ti, x, y, z, { count = 10, dir = null, spread = 2, speed = [1, 3], radius = 0 } = {}) {
+  burst(ti, x, y, z, { count = 10, dir = null, spread = 2, speed = [1, 3], radius = 0, ring = false } = {}) {
     if (typeof ti === 'string') ti = this.typeIndex(ti);
     if (ti < 0) return 0;
     const rng = this.rng;
@@ -240,7 +242,24 @@ export class Particles {
       let rx = r * Math.cos(a);
       let ry = r * Math.sin(a);
       let rz = u;
-      if (dir) {
+      if (ring) {
+        // Drop the part along the axis (up when there's no dir): flat across it.
+        const ax = dir ? dx : 0;
+        const ay = dir ? dy : 0;
+        const az = dir ? dz : 1;
+        const along = rx * ax + ry * ay + rz * az;
+        rx -= ax * along;
+        ry -= ay * along;
+        rz -= az * along;
+        const l = Math.hypot(rx, ry, rz);
+        if (l < 1e-6) {
+          k--;
+          continue;
+        }
+        rx /= l;
+        ry /= l;
+        rz /= l;
+      } else if (dir) {
         if (rx * dx + ry * dy + rz * dz < 0 && spread < 2) {
           rx = -rx;
           ry = -ry;

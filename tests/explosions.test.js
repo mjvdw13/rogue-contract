@@ -146,6 +146,55 @@ test("an explosion faces out of what it hit: bursts keep to that side, 'up' ones
   each((i, spark) => spark && assert.ok(ps.vx[i] <= 0));
 });
 
+test("'then' sets off another explosion later, off to the side, never into the wall", () => {
+  const reg = withExplosions(
+    defineExplosion({ id: 'after', light: { radius: 2, light: 50 }, particles: [{ type: 'ember', count: 5, speed: 0 }] }),
+    defineExplosion({ id: 'main', light: { radius: 4, light: 100 }, particles: [{ type: 'spark', count: 5 }], then: [{ explosion: 'after', delay: 0.2, offset: 0.8, z: 0.3 }] }),
+  );
+  const w = makeWorld(level(), { noMonsters: true, registry: reg });
+  w.explode('main', 5.5, 3.5, 1);
+  assert.equal(live(w, 'ember'), 0, 'not yet');
+  tick(w, 0.15);
+  assert.equal(live(w, 'ember'), 0);
+  tick(w, 0.1);
+  assert.equal(live(w, 'ember'), 5, 'after its delay');
+  const flash = w.explosions.flashes.find((f) => f.radius === 2);
+  assert.ok(Math.abs(Math.hypot(flash.x - 5.5, flash.y - 3.5) - 0.8) < 1e-9, 'offset to the side');
+  assert.equal(flash.z, 1.3);
+  assert.equal(w.explosions.pending.length, 0);
+  // Against a wall facing -x, many times: never behind it, never in it.
+  for (let k = 0; k < 40; k++) {
+    w.explosions.clear();
+    w.explode('main', 11.9, 3.5, 1, { dir: [-1, 0, 0] });
+    tick(w, 0.25);
+    const f = w.explosions.flashes.find((l) => l.radius === 2);
+    assert.ok(f.x <= 11.9 && f.x < 12 - 0.1, `beside, not into the wall (${f.x})`);
+  }
+  // Toward a wall nearer than the offset: stops short of it.
+  for (let k = 0; k < 40; k++) {
+    w.explosions.clear();
+    w.explode('main', 1.3, 1.3, 1);
+    tick(w, 0.25);
+    const f = w.explosions.flashes.find((l) => l.radius === 2);
+    assert.ok(f.x > 1 && f.y > 1, `inside the room (${f.x}, ${f.y})`);
+  }
+});
+
+test("a 'ring' burst flies flat across the way the explosion faces", () => {
+  const reg = withExplosions(defineExplosion({ id: 'test', particles: [{ type: 'ion-spark', count: 40, speed: [2, 3], dir: 'ring' }] }));
+  const w = makeWorld(level(), { noMonsters: true, registry: reg });
+  const ps = w.particles;
+  w.explode('test', 5.5, 3.5, 0.1);
+  assert.equal(ps.n, 40);
+  for (let i = 0; i < ps.n; i++) assert.ok(Math.abs(ps.vz[i]) < 1e-9 && Math.hypot(ps.vx[i], ps.vy[i]) >= 2, 'flat along the floor');
+  ps.clear();
+  w.explode('test', 11.9, 3.5, 2, { dir: [-1, 0, 0] });
+  for (let i = 0; i < ps.n; i++) assert.ok(Math.abs(ps.vx[i]) < 1e-9, 'flat along the wall');
+  let up = 0;
+  for (let i = 0; i < ps.n; i++) if (Math.abs(ps.vz[i]) > 1) up++;
+  assert.ok(up > 5, `in the wall's plane, so some go up or down (${up})`);
+});
+
 test("things' death.explosion goes off where they die", () => {
   const droid = content.things.find((t) => t.id === 'probe-droid');
   const reg = new Registry({ ...content, things: [...content.things.filter((t) => t !== droid), { ...droid, corpse: undefined, death: { explosion: 'large' } }] });
@@ -211,7 +260,10 @@ test('the validator checks explosions, the things that use them, trails and grow
         effect: 'probe-droid',
         sound: 'no-sound',
         particles: [{ type: 'no-such', delay: [-1], over: 'x', radius: -2, dir: 'sideways' }],
+        then: [{ explosion: 'nothing', offset: -1 }],
       }),
+      defineExplosion({ id: 'ping', particles: [], then: [{ explosion: 'pong' }] }),
+      defineExplosion({ id: 'pong', particles: [], then: [{ explosion: 'ping', delay: 1 }] }),
     ],
   });
   const { errors, warnings } = validateContent(bad);
@@ -221,10 +273,13 @@ test('the validator checks explosions, the things that use them, trails and grow
   has('grow');
   has('trail has unknown particle type "missing"');
   has('trail.every');
-  for (const s of ['unknown particle type "no-such"', 'delay', 'over', 'radius', "'up' or 'out'", 'light', "time", 'unknown effect "probe-droid"']) {
+  for (const s of ['unknown particle type "no-such"', 'delay', 'over', 'radius', "'out' or 'ring'", 'light', "time", 'unknown effect "probe-droid"']) {
     has(`explosion "bad"`);
     has(s);
   }
+  has('explosion "bad" then: unknown explosion "nothing"');
+  has('"then" offset');
+  has('explosion "ping": "then" sets it off again (a loop)');
   assert.ok(warnings.some((e) => e.startsWith('explosion "bad"') && e.includes('no-sound')), 'its sound');
   assert.deepEqual(
     validateContent(registry).errors.filter((e) => e.startsWith('explosion') || e.startsWith('Particle')),
