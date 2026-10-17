@@ -29,6 +29,11 @@ const FENCES = ['imp-railing', 'imp-bars', 'imp-cage'];
 // hazard stripes and a vent.
 const DECALS = ['decal-crest', 'decal-hazard', 'decal-sign', 'decal-vent'];
 
+// Mos Eisley (Mark, 2026-10-17: Dark Forces textures for now, no generated
+// stand-ins): DF textures recoloured by assets/custom/derive.mjs, loaded from
+// there directly.
+const TOWN = ['adobe', 'adobe-pale', 'adobe-old', 'adobe-brick', 'adobe-roof', 'planks', 'street-sand', 'flagstone'];
+
 const ANIMATED = {
   'imp-computer': { frames: 3, fps: 3 },
 };
@@ -39,5 +44,7 @@ export default [
   ...Object.entries(ANIMATED).map(([id, a]) => defineTexture({ id, src: `assets/textures/${id}.png`, ...a })),
   ...FENCES.map((id) => defineTexture({ id, src: `assets/textures/${id}.png`, fence: true })),
   ...DECALS.map((id) => defineTexture({ id, src: `assets/textures/${id}.png`, decal: true })),
+  ...TOWN.map((id) => defineTexture({ id, src: `assets/custom/textures/${id}.png`, fullbright: false })),
   defineTexture({ id: 'sky-night', src: 'assets/textures/sky-night.png', sky: true }),
+  defineTexture({ id: 'sky-day', src: 'assets/custom/textures/sky-day.png', sky: true }),
 ];
