@@ -202,7 +202,7 @@ test("things' death.explosion goes off where they die", () => {
   const d = w.spawn('probe-droid', 8.5, 3.5);
   d.z = 0.9;
   w.damage(d, 1000, w.player, w.player);
-  assert.ok(live(w, 'fireball') > 0 && live(w, 'spark') > 0);
+  assert.ok(live(w, 'fire') > 0 && live(w, 'spark') > 0);
   assert.ok(w.explosions.flashes.length === 1 && w.explosions.pending.length > 0);
 });
 

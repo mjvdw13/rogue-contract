@@ -21,11 +21,27 @@ export default [
       { type: 'blast-smoke', count: 6, speed: [0.2, 0.6], radius: 0.25, dir: 'up', spread: 1, delay: [0.15, 0.25], over: 0.4 },
     ],
   }),
-  // A fuel barrel or a probe droid going up: a fireball that fills a hall
-  // (4 tiles wide and high) and rolls up, shrapnel, a cloud of smoke after
-  // it, and a second, smaller blast (`secondary`) beside it a moment later.
+  // A fuel barrel or a probe droid going up: everything bigger, with
+  // shrapnel, smoke that keeps coming for a while, and a second, smaller
+  // blast (`secondary`) going off beside it a moment later.
   defineExplosion({
     id: 'large',
+    light: { radius: 7, light: 128, time: 0.6 },
+    particles: [
+      { type: 'fire', count: 22, speed: [0.8, 4], radius: 0.3 },
+      { type: 'spark', count: 16, speed: [3, 9] },
+      { type: 'debris', count: 8, speed: [3, 8] },
+      { type: 'shrapnel', count: 16, speed: [2, 6] },
+      { type: 'ember', count: 20, speed: [0.5, 2], dir: 'up', spread: 0.9, delay: 0.15, over: 0.8 },
+      { type: 'blast-smoke', count: 12, speed: [0.2, 0.8], radius: 0.4, dir: 'up', spread: 1, delay: [0.2, 0.35], over: 0.8 },
+    ],
+    then: [{ explosion: 'secondary', delay: [0.2, 0.3], offset: [0.6, 0.9], z: 0.2 }],
+  }),
+  // Something really big going up: a fireball that fills a hall (4 tiles
+  // wide and high) and rolls up, shrapnel, a cloud of smoke after it, and a
+  // second, smaller blast (`secondary`) beside it a moment later.
+  defineExplosion({
+    id: 'extra-large',
     light: { radius: 9, light: 128, time: 0.8 },
     particles: [
       { type: 'fireball', count: 15, speed: [2.5, 6], radius: 0.8, dir: [0, 0, 1], spread: 2, z: 1 },
@@ -38,8 +54,9 @@ export default [
     ],
     then: [{ explosion: 'secondary', delay: [0.2, 0.3], offset: [0.6, 0.9], z: 0.2 }],
   }),
-  // The second, smaller blast beside a `large` one: a fireball, a few sparks
-  // and embers. The first blast already threw the shrapnel and the smoke.
+  // The second, smaller blast beside a `large` or `extra-large` one: a
+  // fireball, a few sparks and embers. The first blast already threw the
+  // shrapnel and the smoke.
   defineExplosion({
     id: 'secondary',
     light: { radius: 4, light: 96, time: 0.35 },

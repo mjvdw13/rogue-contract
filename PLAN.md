@@ -1394,6 +1394,11 @@ with the game):
                                ms headless at its busiest, up close or at
                                5 tiles (`small` 0.1 to 0.35). Tests,
                                MODDING.md, the bench lists both types.
+                         - [x] Mark: keep `large` as it was; the hall
+                               filler is its own style, `extra-large`.
+                               `large` is back as it was in 5a3ede9 (fire,
+                               8 chunks, blast smoke); everything above
+                               about the fireball is `extra-large`'s.
                    - [x] Peaks under the caps again (first pass; see above for now): `large` (with its
                          `small`) 67 discs and 85 points, `small` 28 and
                          35, `concussion` 36 and 99, `dirt` and `sparks`
@@ -2846,4 +2851,6 @@ update the smoke test.
 - 2026-10-16: Phase 1b T step 5f, Mark: `large` fills a hall now. A new
   `fireball` type of big discs (`maxPx` may now be up to 64, was 32) and a
   `smoke-cloud` after it; 72 discs at most, 0.5 to 0.7 ms to draw headless
-  at its busiest. 220 tests, the validator and the smoke test pass.
+  at its busiest. 220 tests, the validator and the smoke test pass. Then,
+  as Mark wanted: `large` back as it was, and the hall filler a style of
+  its own, `extra-large`.
