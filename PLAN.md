@@ -32,6 +32,10 @@ These need Mark to try something, or to decide. Don't start them without him.
   informant, the thug, the customs officer, the bay owner, the water
   seller, Dace, a dewback and a power droid. Until they exist, villagers
   stand in.
+- **Mos Eisley's first look** (`?map=m1`, the west end of the main street):
+  the recoloured DF textures, the sky and how dark the suns' shade is.
+  And should both suns be painted onto the DF sky? (It also needs the sky
+  to wrap once round the horizon, a small engine change.)
 
 ## Next up
 
@@ -45,10 +49,9 @@ section 5 as it goes (calm troopers, the town's switch, conversations, the
 fob). Each step is a commit with snapshots, playable at `?map=m1`.
 
 - [x] Design: `docs/mission1.md`.
-- [ ] **Daylight and the kit:** `sky-day` (both suns) and a warm haze;
-      adobe and street-sand textures; `lib/town.js` (buildings as raised
-      floor blocks, slab arches, `circle()`, cloth awnings, twin-sun
-      shadows); a bigger glyph pool; `m1` with a test street, registered.
+- [x] **Daylight and the kit:** `sky-day` and a warm haze; DF textures
+      recoloured; `lib/town.js`; a bigger glyph pool; `m1` with a first
+      stretch of street (`?map=m1`).
 - [ ] **Docking Bay 87**, the lane, the owner's office, the customs house.
       The episode starts in `m1`.
 - [ ] **The main street, the market and the water plaza** (stalls,

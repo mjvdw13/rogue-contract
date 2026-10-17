@@ -582,7 +582,12 @@ A level is an ASCII map. Add a file in `src/content/levels/`, import it in
 `src/content/levels/index.js`, and put its id in an episode's `levels` list.
 `sandbox.js` is a typed map like the one below; Mission 3 (`m3.js`) is too
 big to type, so it's painted in code by `levels/lib/painter.js` (rooms,
-chamfers, stairs, lifts), which hands the game an ordinary map.
+chamfers, stairs, lifts), which hands the game an ordinary map. Mos Eisley
+(`m1.js`) adds the town kit, `levels/lib/town.js`: buildings as blocks of
+raised floor under the sky (each with its own roofline), doorways through
+them as slab arches, cloth awnings, round rooms and buildings with angled
+walls along a circle, and shade from two suns worked out from the heights
+(see docs/mission1.md, "How it's built").
 
 ```js
 import { defineLevel } from '../../engine/defs.js';

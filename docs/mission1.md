@@ -96,16 +96,19 @@ A bright, hazy afternoon. The only daylight map in the game.
 
 - **Sun** (open street): 208-216. **Shade** (one sun's shadow): 176.
   **Deep shade** (both suns' shadows, under awnings, alleys): 136-152.
-- **Twin suns' shadows:** the painter casts each building's shadow from two
-  suns low in the south-west (about 50° and 60° up, 15° apart), so every
+- **Twin suns' shadows:** the town kit casts each building's shadow from two
+  suns low in the south-west (42° and 50° up, 16° apart; `SUNS` in
+  `lib/town.js`), so every
   building throws two overlapping shadows across the sand: a darker core
   where both overlap and a lighter fringe where only one does. Worked out
   from the heights when the level is built, so moving a building moves its
   shadows.
-- **Sky:** a new day sky (`sky-day`): pale blue-white, washed out near the
-  horizon, with both suns. **Haze:** a warm dusty tan (about
-  [208, 192, 160]), halfway at 32 m, so far streets and the backdrop fade
-  into dust.
+- **Sky:** `sky-day`, Dark Forces' pale cloudy sky (Robotics' RESKY01)
+  recoloured and warmed to dust at the horizon. The suns aren't in it yet:
+  that needs them painted onto the DF sky, and the sky to wrap once round
+  the horizon instead of twice (a small engine change). **Haze:** a warm
+  dusty tan ([212, 200, 174]), halfway at 32 m, so far streets and the
+  backdrop fade into dust.
 - **Interiors:** dim (112-144), with daylight falling through doorways and
   windows. The cantina is the darkest place (96-120).
 - **Dust in the air** (PLAN.md's weather, `dust` at about 100): drifting motes
@@ -155,13 +158,18 @@ angle unless their sheet has the other views (the villagers do).
   The Moldy Crow comes with the drop-off (story section 5).
 - **Existing:** barricades, supply crates, terminals, consoles, floodlight
   towers (the checkpoint), boulders (the town's edge).
-- **Textures (generated, with Dark Forces' city and stone sets where they
-  fit):** adobe in three tones, plaster, a weathered adobe for the old
-  quarter, packed street sand, flagstones, wooden doors and shutters, rusty
-  metal, cloth (awnings, hangings), the bay's ribbed duracrete, the
-  cantina's dark walls, floor and bar, and the day sky.
-- **Decals:** shop signs in an Aurebesh-like script, the cantina's sign,
-  the Guild's mark, graffiti, wanted posters, stains and blast scars.
+- **Textures:** Dark Forces textures recoloured by
+  `assets/custom/derive.mjs` (Mark, 2026-10-17: DF textures for now, none
+  of our own, so no generated stand-ins). So far: plaster (`adobe`) and
+  whitewash (`adobe-pale`) from the plain top of Gromas' GWANO, weathered
+  plaster (`adobe-old`) from ZPMARBY1, mud brick from ZPBRICK1, roofs from
+  IPGREYC2, the street from ZPROCK02, flagstones from IPDET1, planks from
+  IWGRAN5. To come, the same way: doors and shutters, rusty metal, cloth
+  (awnings, hangings), the bay's ribbed duracrete, the cantina's dark
+  walls, floor and bar. Gradients use the palette's sand and beige ramps:
+  pale tones between them snap to olive greys.
+- **Decals:** from DF's signs and graffiti where they fit: shop signs, the
+  cantina's sign, the Guild's mark, wanted posters, stains and blast scars.
 
 ## Characters
 

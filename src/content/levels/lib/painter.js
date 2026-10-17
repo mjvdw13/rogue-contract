@@ -10,11 +10,18 @@
 //   p.chamfer(10, 10, 30, 20, 3, { wall: 'canyon-rock' });
 //   export default defineLevel({ id: 'm3', ...p.build(), list: [...] });
 
-/** Glyphs for generated legend entries: printable ASCII, then Latin letters. */
+/**
+ * Glyphs for generated legend entries: printable ASCII, then letters and
+ * symbols up to U+2FFF (thousands: a sunlit town has many shades and heights),
+ * skipping combining marks, which join the glyph before them.
+ */
 const POOL = (() => {
   const out = [];
   for (let c = 33; c < 127; c++) out.push(String.fromCharCode(c));
-  for (let c = 0xc0; c < 0x250; c++) if (c !== 0xd7 && c !== 0xf7) out.push(String.fromCharCode(c));
+  for (let c = 0xc0; c < 0x3000; c++) {
+    if (c === 0xd7 || c === 0xf7 || (c >= 0x300 && c < 0x370) || /\p{M}|\s/u.test(String.fromCharCode(c))) continue;
+    out.push(String.fromCharCode(c));
+  }
   return out;
 })();
 
