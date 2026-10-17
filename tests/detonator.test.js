@@ -108,6 +108,19 @@ test('nothing is thrown while fire is held; letting go throws it', () => {
   assert.ok(w.things.some((t) => t.def.id === 'detonator-thrown'));
 });
 
+test('pressing fire pulls the hand right back, quickly, however long it is then held', () => {
+  const { w, p, input } = armed();
+  const { sink, pull, time } = p.weaponState.def.charge;
+  assert.ok(pull < time / 2, 'the pull-back is over long before the power is full');
+  input.hold('fire');
+  run(w, input, pull / 2);
+  assert.ok(p.weaponState.y > sink / 2 && p.weaponState.y < sink, `on its way back (${p.weaponState.y.toFixed(1)})`);
+  run(w, input, pull);
+  assert.equal(p.weaponState.y, sink, 'all the way back');
+  run(w, input, time);
+  assert.equal(p.weaponState.y, sink, 'and it stays there');
+});
+
 test('a tap is a short toss; held down, a long throw', () => {
   const tap = armed();
   const short = throwFor(tap.w, tap.input, 1 / 60);

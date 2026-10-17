@@ -219,6 +219,7 @@ export function validateContent(reg) {
       if (!(c.time > 0)) err(`${owner}: charge.time must be above 0`);
       if (!(c.min >= 0 && c.min <= 1)) err(`${owner}: charge.min must be 0 to 1`);
       if (!(c.sink >= 0)) err(`${owner}: charge.sink must be 0 or more`);
+      if (!(c.pull >= 0)) err(`${owner}: charge.pull must be 0 or more`);
       if (w.fire?.kind !== 'projectile') warn(`${owner}: charge only changes thrown or fired projectiles`);
     }
     if (!w.fire) err(`${owner}: needs a "fire" attack`);

@@ -53,7 +53,7 @@ export const projectiles = [
     anims: { fly: [0] },
     fullbright: false,
     radius: 0.2,
-    speed: 18, // a full throw (a weapon's `charge` scales it down for a short toss)
+    speed: 24, // a full throw (a weapon's `charge` scales it down for a short toss)
     gravity: 28,
     damage: [20, 30],
     splash: { radius: 4, damage: 140 },
@@ -68,7 +68,7 @@ export const projectiles = [
     anims: { fly: { frames: [0, 1], fps: 10, loop: true }, explode: { frames: [2, 3, 4], fps: 14 } },
     radius: 0.24,
     light: { radius: 3.5, light: 80 },
-    speed: 18,
+    speed: 24,
     damage: [10, 18],
     splash: { radius: 2.5, damage: 30 },
     sounds: { explode: 'concussion-hit' },

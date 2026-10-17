@@ -145,12 +145,14 @@ export function weaponThink(world, pt, input, dt) {
       }
       break;
     case 'charge': {
-      // (`charge`) Held: the hand winds back, sinking a little. Let go: the
-      // throw, harder the longer it was held. Changing weapon drops it.
-      const { time, min, sink } = def.charge;
+      // (`charge`) Pressed: the hand pulls back, quickly and always the same,
+      // and stays back while held. Let go: the throw, harder the longer it
+      // was held. Changing weapon drops it.
+      const { time, min, sink, pull } = def.charge;
       ws.charge += dt;
       const k = Math.min(1, ws.charge / time);
-      ws.y = sink * k;
+      const back = pull > 0 ? Math.min(1, ws.charge / pull) : 1;
+      ws.y = sink * (1 - (1 - back) * (1 - back)); // easing out
       if (p.pendingWeapon && p.pendingWeapon !== p.weapon) {
         ws.state = 'lower';
       } else if (!input.isDown('fire')) {

@@ -198,8 +198,9 @@ export function defineAmmo(def) {
  * (`flashLight` instead brightens the whole view, Doom's way.)
  * `reraise: true`: after each shot the hand drops out of view and comes back
  * up with the next one (a thrown detonator).
- * `charge: { time, min, sink }`: holding fire winds the throw up (the hand
- * sinks up to `sink` pixels) and letting go fires it. Its power runs from
+ * `charge: { time, min, sink, pull }`: pressing fire pulls the hand back
+ * (down `sink` pixels over `pull` seconds; it stays there while fire is held)
+ * and letting go fires it. Its power runs from
  * `min` (a tap) to 1 (held `time` seconds or longer) and scales the speed of
  * the projectile it throws.
  * @param {{id:string, name:string, slot:number, ammo?:string|null, ammoPerShot?:number,
@@ -207,7 +208,7 @@ export function defineAmmo(def) {
  *   offset?:[number,number], flashLight?:number, light?:{radius:number, light:number},
  *   noise?:boolean, priority?:number,
  *   accurateFirstShot?:boolean, sounds?:Record<string,string>, bob?:number, reraise?:boolean,
- *   charge?:{time?:number, min?:number, sink?:number}}} def
+ *   charge?:{time?:number, min?:number, sink?:number, pull?:number}}} def
  */
 export function defineWeapon(def) {
   requireId(def, 'Weapon');
@@ -227,7 +228,7 @@ export function defineWeapon(def) {
     sheet: normalizeSheet(def.sheet, `weapon:${def.id}`),
     anims: normalizeAnims(def.anims),
     fire: normalizeAttack(def.fire),
-    charge: def.charge ? { time: 1, min: 0.3, sink: 12, ...def.charge } : null,
+    charge: def.charge ? { time: 1, min: 0.3, sink: 36, pull: 0.18, ...def.charge } : null,
   };
 }
 

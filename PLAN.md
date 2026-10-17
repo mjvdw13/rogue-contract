@@ -1568,6 +1568,22 @@ Steps:
          switching drops it), the validator, the smoke test; commit and
          push.
    - [ ] 6e. Mark tries it again.
+       - Mark (2026-10-17): the wind-up sinking is too subtle. Rather
+         than sinking slowly as fire is held, the pull-back should be
+         one animation that plays the same however long it's held.
+         Decided: `charge.pull` (seconds): pressing fire pulls the hand
+         back `sink` pixels (deeper: 36) over `pull` (0.18 s), easing
+         out, and it stays there while held. The power still builds over
+         `time`. Let go early, mid-pull: thrown from where it got to.
+     - [x] 6f. `pull` in the state machine, defs, validator, MODDING.md;
+           looked at headless; a test (fully back after `pull`, however
+           long the power takes); tests, validator, smoke; commit, push.
+       - Mark (2026-10-17): a full throw should go further.
+     - [x] 6g. The detonator's full speed 24 (was 18) and `min` 0.15 (was
+           0.2), so a tap stays as short. On open ground: a tap lands 3.3
+           tiles off and rests at 5; half a second, 8.4 and 14; a full
+           throw 13.9 and 24 (was 10.7 and 18). Mission 1's halls are
+           shorter than that: a full throw there reaches the far wall.
 
 ## Phase 1c: Two storeys per tile (done 2026-10-13)
 
@@ -3017,3 +3033,7 @@ update the smoke test.
   lower, like the blaster; thrown on letting fire go, harder the longer
   it was held (weapons' `charge`: a tap 3 tiles, a second's hold 10,
   rolling on to 18). 229 tests, the validator and the smoke test pass.
+- 2026-10-17: Phase 1b U step 6, Mark: the wind-up is one quick pull-back
+  (36 px over 0.18 s, whatever the hold), and a full throw goes further
+  (speed 24: lands 14 tiles off, rests at 24 on open ground; a tap is
+  still 3). 230 tests, the validator and the smoke test pass.
