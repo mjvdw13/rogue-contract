@@ -1585,6 +1585,56 @@ Steps:
            throw 13.9 and 24 (was 10.7 and 18). Mission 1's halls are
            shorter than that: a full throw there reaches the far wall.
 
+### V. Villagers (2026-10-17)
+
+Mark (2026-10-17) made five villager sprite sheets and asked for them in
+the game, matching the look of the existing characters (colour depth,
+outlines). The sheets (all AI-generated, so committed like the
+sandtrooper's) share one layout of 51 poses: front walk (6), side walk
+(6); front and back stands (6), a flinch and guard (3), a fall-back death
+(4); side walk (6), back three-quarter walk (6); a hunch and slump death
+(6), a turnaround (5). Three are on blue (1619x972 PNGs and a 1333x800
+JPG), one on blue with a lighter tint, and one on magenta (1333x800 JPG).
+
+- A boy with a head wrap (blue JPG `1hpgbm`), a woman in a head scarf and
+  tabard (magenta JPG `jju7et`), a man in a brown vest (blue JPG
+  `sdvbpg`), a woman in a tunic and belt pouches ("Female Adventurer",
+  PNG), and a bearded man in a tunic ("Bearded Wanderer", PNG).
+
+Decided:
+- **Friendly NPCs** (`defineNpc`, the engine's townsfolk from Raccoon
+  Alex): they idle, stroll and react when bumped or used, with a line.
+  NPCs can't be hurt yet, so the pain and death poses are cut into the
+  sheets now, ready for Phase 2's calm monsters and civilians.
+- **The look:** the sandtrooper's `DARK_FORCES` restyle (stocky, strong
+  contrast, side light, dark contours) and the Dark Forces pixel size
+  (`scale` 0.85), snapped to a few ramps (skin, sand, rust, beige,
+  concrete, gray, olive).
+- **Front views only**, as for every enemy.
+
+1. [x] `sheetcut.key()` keys a magenta backdrop too; the sandtrooper's and
+       Jawa's sheets come out unchanged.
+2. [x] `assets/custom/villagers/cut.py`: one cutter for all five sheets.
+       It finds the 51 poses itself (rows by height, poses left to
+       right), checks the count, and cuts 14 frames per villager: 0-5
+       front walk, 6 stand, 7-8 flinch (react), 9 hunch (pain), 10-13 the
+       fall-back death. Scaled per sheet from the standing pose's height.
+       - Found: the woman's and the spacer's sheets drew back views among
+         the front walk, so each villager lists its own six front poses
+         (front stands from row 2 fill in). Some poses touch (a foot on
+         the head below, an elbow on the next pose): rows split at the
+         emptiest line near each quarter, merged poses at their thinnest
+         column.
+       - Re-cutting the sandtrooper and Jawa now gives other colours than
+         the committed sheets: the palette was refitted (Phase 1d step 1)
+         after they were cut. The blue key is unchanged; the committed
+         sheets stay.
+3. [x] Five NPCs in `src/content/npcs/` with lines in the story's tone
+       (Tatooine townsfolk), glyphs `u w m e n`.
+4. [x] A few in the sandbox's start room to see them; screenshots beside
+       the officer.
+5. [x] Tests, the validator and the smoke test; commit and push.
+
 ## Phase 1c: Two storeys per tile (done 2026-10-13)
 
 Mark (2026-10-13): we want to walk underneath other parts of the map. Today
@@ -3037,3 +3087,11 @@ update the smoke test.
   (36 px over 0.18 s, whatever the hold), and a full throw goes further
   (speed 24: lands 14 tiles off, rests at 24 on open ground; a tap is
   still 3). 230 tests, the validator and the smoke test pass.
+- 2026-10-17: Phase 1b V, villagers from Mark's five sheets: a farm boy
+  (1.5 tall), a townswoman (1.64), a spacer (1.76), a drifter (1.68) and a
+  hermit (1.78), friendly NPCs (glyphs `u w m e n`) with four lines each.
+  `assets/custom/villagers/cut.py` finds the 51 poses on each sheet and
+  cuts 14 frames (walk, stand, flinch, hunch, fall-back death) in the
+  sandtrooper's Dark Forces restyle; `sheetcut.key()` keys magenta too.
+  All five stroll about the sandbox's start room. Screenshots beside the
+  stormtrooper. 231 tests, the validator and the smoke test pass.

@@ -138,8 +138,24 @@ and the muzzle flash snap to fullbright colours, so they glow in the dark:
 python assets/custom/jawa/cut.py --preview preview.png
 ```
 
-Both cutters share their steps (keying, scaling, the palette) through
-`sheetcut.py`.
+## The villagers
+
+`villagers/` holds five AI-generated villager sheets (a boy, a woman in a
+head scarf, a spacer in a vest, a drifter and a bearded hermit), four on
+blue and one on magenta. They share one layout of 51 poses, so `cut.py`
+finds the poses itself (splitting the few that touch) and cuts 14 frames
+of each into `assets/sprites/npcs/`: the front walk, a stand, a flinch, a
+hunch and a fall-back death. Like the sandtrooper, they are restyled to
+the Dark Forces look (`sheetcut.DARK_FORCES`) in a few colour ramps:
+
+```
+python assets/custom/villagers/cut.py --preview preview.png
+```
+
+The cutters share their steps (keying, scaling, the palette) through
+`sheetcut.py`. Re-cutting the sandtrooper or the Jawa today gives
+slightly different colours than the committed sheets, because the
+palette was refitted after they were cut (Phase 1d step 1).
 
 Credits: game and art by LucasArts. The enemy sheets were ripped by Crazy
 Ivan, the weapons sheet by Dolphman.

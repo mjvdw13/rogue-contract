@@ -32,8 +32,10 @@ assets/custom/*
 # (Recolouring the cut sheets, and deriving more textures from the DF ones.)
 !assets/custom/recolour.mjs
 !assets/custom/derive.mjs
-# Character sheets that aren't rips (the sandtrooper and the Jawa), their
+# Character sheets that aren't rips (the sandtrooper, the Jawa and the villagers), their
 # cutters and the cutters' shared steps.
 !assets/custom/sandtrooper/
 !assets/custom/jawa/
+!assets/custom/villagers/
 !assets/custom/sheetcut.py
+__pycache__/

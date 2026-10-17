@@ -23,7 +23,8 @@ import { defineLevel } from '../../engine/defs.js';
 // can walk under down in the pit; a bunker dug under the west end of the
 // sniper ledge (an energy pack inside); and a walkway with railings running
 // north from the ledge out over the courtyard. Bossk and Boba Fett wait in
-// the courtyard, to try them out.
+// the courtyard, to try them out, and five villagers stroll about the start
+// room.
 export default defineLevel({
   id: 'sandbox',
   mapLabel: 'M1',
@@ -216,15 +217,15 @@ export default defineLevel({
     '',
     '',
     '',
-    '',
+    '          u',
     '                 k',
-    '',
-    '                                         9',
+    '              w',
+    '        n                                9',
     '',
     '   > 4                           h       o',
     '',
-    '                                 l',
-    '',
+    '            m                    l',
+    '               e',
     '     x                       C             c',
     '',
     '',

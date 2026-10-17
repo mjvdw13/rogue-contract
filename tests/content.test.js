@@ -4,7 +4,11 @@ import { validateContent } from '../src/engine/validate.js';
 import { analyseLevel, ammoBudget } from '../tools/lib/levelcheck.mjs';
 import { Game } from '../src/engine/game.js';
 import { blockedByMap } from '../src/engine/world/physics.js';
-import { registry, makeWorld, mockInput, run } from './helpers.js';
+import { readFileSync } from 'node:fs';
+import villagers from '../src/content/npcs/villagers.js';
+import { registry, makeWorld, mockInput, room, run } from './helpers.js';
+
+const VILLAGERS = ['villager-boy', 'villager-woman', 'villager-man', 'villager-adventurer', 'villager-wanderer'];
 
 test('the content pack validates without errors', () => {
   const { errors } = validateContent(registry);
@@ -76,7 +80,27 @@ test('the garrison is held by stormtroopers, sandtroopers, Jawas, an officer and
   const w = makeWorld('sandbox');
   const ids = w.things.filter((t) => t.kind === 'monster').map((t) => t.def.id);
   for (const id of ['stormtrooper', 'sandtrooper', 'jawa', 'officer', 'probe-droid']) assert.ok(ids.includes(id), `has a ${id}`);
-  assert.ok(w.things.every((t) => t.kind !== 'npc'), 'no friendlies (yet)');
+  const npcs = w.things.filter((t) => t.kind === 'npc').map((t) => t.def.id);
+  assert.deepEqual(npcs.sort(), VILLAGERS.slice().sort(), 'and the villagers stroll about the start room');
+});
+
+test('every villager sheet holds its 14 frames, and a villager says a line when used', () => {
+  for (const def of villagers) {
+    const id = def.id;
+    const sheet = registry.sheets.get(def.sheet.ref);
+    const png = readFileSync(new URL(`../${sheet.src}`, import.meta.url));
+    assert.equal(png.readUInt32BE(16), 14 * sheet.frameWidth, `${id}: 14 frames across`);
+    assert.equal(png.readUInt32BE(20), sheet.frameHeight, `${id}: one row`);
+    const frames = Object.values(def.anims).flatMap((a) => a.frames);
+    assert.ok(Math.max(...frames) < 14, `${id}: its animations stay on the sheet`);
+  }
+  const w = makeWorld(room(['#########', '#.......#', '#.......#', '#.......#', '#########'], ['', '', ' >m']), { noMonsters: true });
+  const input = mockInput();
+  input.tap('use');
+  run(w, input, 0.1);
+  const spacer = villagers.find((v) => v.id === 'villager-man');
+  const line = w.messages.find((m) => m.startsWith('SPACER: '));
+  assert.ok(line && spacer.lines.includes(line.slice(8)), 'the spacer answers');
 });
 
 for (const code of ['mercenary', 'raccoon']) {

@@ -37,14 +37,21 @@ def palette():
 
 
 def key(rgb, backdrop):
-    """Soft alpha from how blue a pixel is, and its colour with the backdrop taken out."""
+    """Soft alpha from how much a pixel looks like the backdrop (blue, or
+    magenta when the backdrop is red as well as blue), and its colour with
+    the backdrop taken out."""
     r, g, b = rgb[..., 0], rgb[..., 1], rgb[..., 2]
-    blueness = b - np.maximum(r, 0.7 * g)  # a blue backdrop is 140 or more, the art below 40
-    alpha = np.clip((115 - blueness) / 70, 0, 1)
+    if backdrop[0] > 100:
+        magentaness = np.minimum(r, b) - g  # a magenta backdrop is 90 or more, the art below -15
+        alpha = np.clip((98 - magentaness) / 115, 0, 1)
+    else:
+        blueness = b - np.maximum(r, 0.7 * g)  # a blue backdrop is 140 or more, the art below 40
+        alpha = np.clip((115 - blueness) / 70, 0, 1)
     a = np.maximum(alpha, 0.05)[..., None]
     fg = np.clip((rgb - (1 - a) * np.asarray(backdrop, float)) / a, 0, 255)
-    # Remove the backdrop's spill: nothing on these characters is blue or teal.
-    fg[..., 1] = np.minimum(fg[..., 1], fg[..., 0] + 12)
+    # Remove the backdrop's spill: nothing on these characters is blue, teal or purple.
+    if backdrop[0] <= 100:
+        fg[..., 1] = np.minimum(fg[..., 1], fg[..., 0] + 12)
     fg[..., 2] = np.minimum(fg[..., 2], fg[..., 1] + 8)
     return alpha, fg
 
