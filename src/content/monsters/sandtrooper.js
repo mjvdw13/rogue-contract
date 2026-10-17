@@ -1,14 +1,16 @@
 import { defineMonster } from '../../engine/defs.js';
 
-// A sandtrooper: the desert stormtrooper, with a T-21 repeating rifle. Tougher
-// than a stormtrooper, and fires bursts of three bolts. The art is cut from an
-// asset sheet by assets/custom/sandtrooper/cut.py, at the Dark Forces sprites'
-// pixel size (hence the scale).
+// A sandtrooper: the desert stormtrooper, with a T-21 repeating rifle and a
+// black pauldron (its commander's is orange). Tougher than a stormtrooper, and
+// fires bursts of three bolts. The art is cut from an asset sheet by
+// assets/custom/sandtrooper/cut.py, at the Dark Forces sprites' pixel size
+// (hence the scale); its frames are wide for the rifle's barrel, and a little
+// taller for the rifle raised as it falls.
 export default defineMonster({
   id: 'sandtrooper',
   name: 'Sandtrooper',
   glyph: 's',
-  sheet: { src: 'assets/sprites/monsters/sandtrooper.png', frameWidth: 72, frameHeight: 68 },
+  sheet: { src: 'assets/sprites/monsters/sandtrooper.png', frameWidth: 100, frameHeight: 72 },
   scale: 0.85,
   health: 45,
   speed: 4,

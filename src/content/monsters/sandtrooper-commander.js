@@ -1,11 +1,12 @@
 import { defineMonster } from '../../engine/defs.js';
 
 // A sandtrooper commander: a sandtrooper with a heavy repeating rifle (a thick
-// barrel and a wooden stock). Tougher than a sandtrooper and quicker to fire
-// again, with the same bursts of three bolts. The art is the sandtrooper's
-// frames with the new rifle grafted on, by
-// assets/custom/sandtrooper-commander/cut.py; its frames are wider for the
-// longer barrel, and a little taller for the rifle raised as it falls.
+// barrel and a wooden stock) and an orange pauldron (a sandtrooper's is black).
+// Tougher than a sandtrooper and quicker to fire again, with the same bursts
+// of three bolts. The art is the sandtrooper's frames with the new rifle
+// grafted on, by assets/custom/sandtrooper-commander/cut.py; its frames are
+// wide for the longer barrel, and a little taller for the rifle raised as it
+// falls.
 export default defineMonster({
   id: 'sandtrooper-commander',
   name: 'Sandtrooper Commander',

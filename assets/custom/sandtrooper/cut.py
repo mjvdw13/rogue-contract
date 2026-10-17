@@ -5,7 +5,10 @@ backdrop) into the game's sandtrooper sprite sheet.
 
 Needs Python 3 with Pillow and numpy, and Node (to read the game's palette).
 The shared steps are in ../sheetcut.py.
-Writes assets/sprites/monsters/sandtrooper.png. The frame order is the one in
+Writes the frames to base.png (the T-21 and the orange pauldron: the
+sandtrooper commander's body), then runs rifle.py, which gives them the
+sharper T-21 and the black pauldron and writes
+assets/sprites/monsters/sandtrooper.png. The frame order is the one in
 src/content/monsters/sandtrooper.js: 0-5 walk, 6 aim, 7 fire, 8 pain,
 9-12 death; then the walk from the other views, six frames each (13-18
 front three-quarter, 19-24 side, 25-30 back three-quarter, 31-36 back).
@@ -28,7 +31,7 @@ sys.path.insert(0, str(HERE.parent))
 from sheetcut import DARK_FORCES, LAYOUT, ROOT, assemble, components, cut_poses, key, load, save  # noqa: E402
 
 SOURCE = HERE / 'sheet.jpg'
-OUT = ROOT / 'assets/sprites/monsters/sandtrooper.png'
+OUT = HERE / 'base.png'
 
 # Drawn at the Dark Forces sprites' density, about 37.6 px per unit (the
 # game draws 32, so the monster's `scale` is 0.85). A standing sandtrooper
@@ -135,6 +138,9 @@ def main():
                 grid[r * fh:(r + 1) * fh, i * fw:(i + 1) * fw] = frame(starts[r] + i)
         Image.fromarray(grid, 'RGBA').save(full, optimize=True)
         print(f'{full}: {len(poses)} poses in rows of {LAYOUT}, frames of {fw}x{fh}')
+    sys.path.insert(0, str(HERE))
+    import rifle
+    rifle.main()
 
 
 if __name__ == '__main__':

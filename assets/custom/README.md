@@ -128,8 +128,20 @@ before. All 48 poses are cut and restyled together; the game's 37 frames
 (the front poses, then the walk from the four other views) are picked from
 them. `--full` also writes all 48 on a transparent grid in the sheet's
 layout (12, 13, 12 and 11 a row, frames of the game's size), in the game's
-colours and pixel size, for touching up by hand. It needs Python 3 with
-Pillow and numpy:
+colours and pixel size, for touching up by hand. These frames, with the
+plain T-21 and an orange pauldron, go to `sandtrooper/base.png` (the
+commander's body, below).
+
+`rifle.py` (run by `cut.py`, or alone) then gives them a sharper T-21 and a
+black pauldron, from `sandtrooper/rifle-sheet.jpg`: the in-game grid
+redrawn by an image AI, about 2x on a grey checkerboard. The rifle is
+grafted on as for the commander (`graft.py`, below), with the light gaps
+between its barrel's fins kept as rifle; the orange pauldron is recoloured
+black. The sheet's mistakes are left out: the aim and fire poses (drawn
+side-on, though they shoot straight at the player) keep base.png's head-on
+T-21, the falling pose's second rifle on the ground goes, and so does the
+sheet's corpse under the dead pose's rifle. The frames are 100x72, like the
+commander's, for the longer barrel. It needs Python 3 with Pillow and numpy:
 
 ```
 python assets/custom/sandtrooper/cut.py --preview preview.png --full sandtrooper-full.png
@@ -140,16 +152,18 @@ python assets/custom/sandtrooper/cut.py --preview preview.png --full sandtrooper
 `sandtrooper-commander/sheet.jpg` is the sandtrooper's in-game grid
 (`sandtrooper/cut.py --full`) given a heavy rifle (a thick barrel and a
 wooden stock) by an image AI, scaled up about 2x on white. `cut.py` lays it
-over the sandtrooper's committed frames and takes only the rifle from it,
-and the body it uncovers where the T-21 crossed it, so the body stays the
-sandtrooper's pixel for pixel. It leaves out the sheet's mistakes (the
+over the sandtrooper's frames from before its sharper rifle
+(`sandtrooper/base.png`, with the orange pauldron) and takes only the rifle
+from it (`graft.py`, shared with the sandtrooper's `rifle.py`), and the body
+it uncovers where the T-21 crossed it, so the body stays the sandtrooper's
+pixel for pixel. It leaves out the sheet's mistakes (the
 flashes painted on the fire poses, a loose blob past the aim pose's
 barrel), lifts the dead pose's rifle onto the ground, and eases the rifle's
 hard dark outline toward the colours round it. The aim and fire poses shoot
 straight at the player, but the sheet draws the rifle side-on there, so
 they keep the sandtrooper's frames and get the heavy rifle's muzzle painted
-head-on in front of the chest, with the game's red flash on its bore. The frames are wider than the sandtrooper's (100x72) for
-the longer barrel:
+head-on in front of the chest, with the game's red flash on its bore. The
+frames are 100x72, for the longer barrel:
 
 ```
 python assets/custom/sandtrooper-commander/cut.py --preview preview.png

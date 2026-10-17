@@ -1796,6 +1796,67 @@ Decided:
        - Gate (48.5, 42.5) and vent mouth (33.5, 43.5), both facing
          south. Mission 1 now has 14/20/25/32/33 monsters on skills 1-5.
 
+### Y. The sandtrooper's sharper rifle and black pauldron (2026-10-17)
+
+Mark (2026-10-17) gave another sheet made from the sandtrooper's in-game
+grid (`Gemini_Generated_Image_tdwlt9…jpg`, 1920x558, the grid about 2x on a
+grey checkerboard): a more defined T-21 and a black pauldron, so the
+sandtrooper reads apart from the commander's orange one. The aim and fire
+poses are wrong on it (the rifle side-on, though they shoot straight at the
+player).
+
+Decided:
+- **Grafted like the commander**: the body stays the sandtrooper's pixels;
+  from the new sheet only the rifle, and the body it uncovers where the old
+  T-21 crossed it. The graft steps move out of the commander's cutter into
+  a shared module, the commander's output unchanged.
+- **The pauldron**: the sandtrooper's orange pixels recoloured to black
+  armour, keeping their shading.
+- **Aim and fire keep their current frames** (the T-21 head-on at the
+  chest), with the black pauldron.
+- **The commander keeps the old body** (orange pauldron): the sandtrooper's
+  cutter writes its frames before the graft to
+  `assets/custom/sandtrooper/base.png`, which the commander's cutter reads.
+
+1. [x] Move the graft steps into a shared module; the commander's cutter
+       reads `sandtrooper/base.png`; its output must not change.
+       - `assets/custom/graft.py`. The commander's sheet comes out the same
+         but for one pixel: the corpse's boot, which the old graft took for
+         T-21 (now only the barrel's box goes from the dead pose).
+1b. [ ] **The commander's barrel is solid** (Mark, 2026-10-17: it looked
+       partly see-through). The sheet's barrel is a solid tube with a light
+       grey highlight along it, but `gunlike()` takes only dark metal
+       (lum < 95), so the highlight (90-140 px a frame) was dropped and,
+       past the body, left transparent. In `graft.py`'s `graft()`, after
+       `majority()`: `gun |= close(gun, 2) & mine & fg` (dilate then erode
+       2 px), keeping the highlight's own grey. Tried on the committed
+       cutter: every barrel solid, the falling death's raised one too;
+       radius 3 no better. A separate step after 1, as 1 must not change
+       the commander's output; 2 gets it for free. Re-cut the commander,
+       check every frame at 4x, commit and push.
+2. [x] The sheet (`sandtrooper/rifle-sheet.jpg`) keyed off its
+       checkerboard, fitted to the grid; graft the rifle onto the 37
+       frames and recolour the pauldron. Wider frames if the barrel no
+       longer fits 72 px. Check every frame at 4x beside the old ones.
+       - `sandtrooper/rifle.py`, run by `cut.py` after it writes
+         base.png. Fit (2.052, 0, 0.5); backdrop: neutral greys of
+         brightness 112-148.
+       - At the game's pixel size the barrel's fins are light gaps of the
+         backdrop's grey: kept as rifle (`fill_gaps`, a 3x3 closing). The
+         rifle also takes over the old frame's dark pixels (`over_dark`:
+         the black stock and pauldron are one dark mass on the sheet;
+         keeping ours left it mottled).
+       - The side and back three-quarter barrels reach 9 px past the old
+         frame, and the first fall's rifle 2 px above it: frames 100x72,
+         as the commander's.
+       - The sheet drew a second rifle on the ground under the third
+         falling pose (dropped), and under the dead pose's rifle a corpse
+         that doesn't match ours (only the rifle's rows are taken).
+       - The pauldron: orange recoloured to 0.32 of its brightness in the
+         gray ramp, close to the sheet's black.
+3. [x] Tests, the validator, the smoke test; a look in game beside a
+       commander; README; commit and push.
+
 ## Phase 1c: Two storeys per tile (done 2026-10-13)
 
 Mark (2026-10-13): we want to walk underneath other parts of the map. Today

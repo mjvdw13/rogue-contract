@@ -39,4 +39,5 @@ assets/custom/*
 !assets/custom/jawa/
 !assets/custom/villagers/
 !assets/custom/sheetcut.py
+!assets/custom/graft.py
 __pycache__/
