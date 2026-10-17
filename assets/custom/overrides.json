@@ -1,7 +1,7 @@
 {
   "assets/sprites/monsters/stormtrooper.png": {
     "src": "assets/custom/stormtrooper.png",
-    "frameWidth": 46,
+    "frameWidth": 50,
     "frameHeight": 67,
     "scale": 0.85,
     "glint": [[252, 252, 252]]
@@ -135,7 +135,7 @@
   "assets/sprites/monsters/boba-fett.png": {
     "src": "assets/custom/boba-fett.png",
     "frameWidth": 90,
-    "frameHeight": 91,
+    "frameHeight": 92,
     "scale": 0.65
   },
   "assets/sprites/fx/rocket.png": {

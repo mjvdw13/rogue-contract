@@ -54,7 +54,7 @@ export function validateContent(reg) {
   const checkAnims = (owner, anims) => {
     for (const [name, anim] of Object.entries(anims ?? {})) {
       if (!anim) continue;
-      for (const f of anim.frames) {
+      for (const f of anim.views ? anim.views.flat() : anim.frames) {
         if (!Number.isInteger(f) || f < 0) err(`${owner}: animation "${name}" has a bad frame number ${f}`);
       }
     }

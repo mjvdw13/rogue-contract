@@ -84,15 +84,17 @@ test('the garrison is held by stormtroopers, sandtroopers, Jawas, an officer and
   assert.deepEqual(npcs.sort(), VILLAGERS.slice().sort(), 'and the villagers stroll about the start room');
 });
 
-test('every villager sheet holds its 14 frames, and a villager says a line when used', () => {
-  for (const def of villagers) {
+test('every villager, sandtrooper and Jawa sheet holds all its frames and views, and a villager says a line when used', () => {
+  const cut = [...villagers.map((def) => [def, 42]), ...['sandtrooper', 'jawa'].map((id) => [registry.things.get(id), 37])];
+  for (const [def, count] of cut) {
     const id = def.id;
     const sheet = registry.sheets.get(def.sheet.ref);
     const png = readFileSync(new URL(`../${sheet.src}`, import.meta.url));
-    assert.equal(png.readUInt32BE(16), 14 * sheet.frameWidth, `${id}: 14 frames across`);
+    assert.equal(png.readUInt32BE(16), count * sheet.frameWidth, `${id}: ${count} frames across`);
     assert.equal(png.readUInt32BE(20), sheet.frameHeight, `${id}: one row`);
-    const frames = Object.values(def.anims).flatMap((a) => a.frames);
-    assert.ok(Math.max(...frames) < 14, `${id}: its animations stay on the sheet`);
+    const frames = Object.values(def.anims).flatMap((a) => (a.views ? a.views.flat() : a.frames));
+    assert.equal(Math.max(...frames), count - 1, `${id}: its animations and views use the whole sheet, and stay on it`);
+    assert.ok(def.anims.walk.views && def.anims.idle.views, `${id}: walks and idles from every side`);
   }
   const w = makeWorld(room(['#########', '#.......#', '#.......#', '#.......#', '#########'], ['', '', ' >m']), { noMonsters: true });
   const input = mockInput();

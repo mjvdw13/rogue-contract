@@ -4,8 +4,12 @@ import { defineNpc } from '../../engine/defs.js';
 // bumps into them or uses them. The art is cut from Mark's villager sheets by
 // assets/custom/villagers/cut.py, at the Dark Forces sprites' pixel size
 // (hence the scale), in one frame order: 0-5 walk, 6 stand, 7-8 flinch, 9
-// hunch (pain) and 10-13 a fall-back death. NPCs can't be hurt yet, so the
-// last five are for later (Mission 1's civilians).
+// hunch (pain) and 10-13 a fall-back death; then the walk from the other
+// views (14-19 front three-quarter, 20-25 side, 26-31 back three-quarter,
+// 32-37 back) and the stand from them (38-41). NPCs can't be hurt yet, so
+// the pain and death frames are for later (Mission 1's civilians).
+const range = (a, n) => Array.from({ length: n }, (_, i) => a + i);
+
 function villager({ id, name, glyph, frameWidth, frameHeight, height, lines }) {
   return defineNpc({
     id,
@@ -19,8 +23,12 @@ function villager({ id, name, glyph, frameWidth, frameHeight, height, lines }) {
     speed: 2,
     idleTime: [2, 6],
     anims: {
-      idle: { frames: [6], fps: 1, loop: true },
-      walk: { frames: [0, 1, 2, 3, 4, 5], fps: 7 },
+      idle: { frames: [6], fps: 1, loop: true, views: { frontSide: [38], side: [39], backSide: [40], back: [41] } },
+      walk: {
+        frames: range(0, 6),
+        fps: 7,
+        views: { frontSide: range(14, 6), side: range(20, 6), backSide: range(26, 6), back: range(32, 6) },
+      },
       react: { frames: [7, 8, 6], durations: [0.3, 0.7, 0.8] },
     },
     lines,
@@ -47,7 +55,7 @@ export default [
     name: 'TOWNSWOMAN',
     glyph: 'w',
     frameWidth: 52,
-    frameHeight: 63,
+    frameHeight: 64,
     height: 1.64,
     lines: [
       'Watch where you walk, hunter.',

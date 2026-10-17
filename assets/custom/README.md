@@ -44,9 +44,12 @@ Delete `overrides.json`, or an entry in it, to go back to the committed art.
 ## The Dark Forces enemies and weapons
 
 `cut.mjs` cuts the ripped Dark Forces stormtrooper, Imperial officer, probe
-droid and Trandoshan (Bossk) sheets into the game's 12-frame monster layout,
+droid and Trandoshan (Bossk) sheets into the game's 12-frame monster layout
+(the trooper, officer and Bossk with their walk from four more views after
+it: front three-quarter, side, back three-quarter and back),
 Boba Fett into the same with an 11th frame (his fall is four frames, and
-his walk is made from the standing cell, as he only flies in Dark Forces),
+his walk is made from the standing cell, as he only flies in Dark Forces,
+and his standing cells from the four other views follow),
 his rocket into its own six frames, the weapons
 sheet into the fists, the blaster (the Bryar pistol) and the thermal
 detonator, and the detonator in flight and its two pickups from the pickups
@@ -119,11 +122,17 @@ pose (the barrel tips are measured by hand in its `GROUPS` table), scales
 them down to the Dark Forces sprites' pixel size, restyles them to match
 the Dark Forces stormtrooper (`sheetcut.DARK_FORCES`: a stocky build,
 smoothed texture, strong contrast with deep shadows, side lighting, dark
-contours, a few colour ramps) and snaps them to the palette. Only the front-facing poses are used. It needs Python 3 with
+contours, a few colour ramps) and snaps them to the palette. The rifle
+barrels of the side and back three-quarter walks point left, into the pose
+before. All 48 poses are cut and restyled together; the game's 37 frames
+(the front poses, then the walk from the four other views) are picked from
+them. `--full` also writes all 48 on a transparent grid in the sheet's
+layout (12, 13, 12 and 11 a row, frames of the game's size), in the game's
+colours and pixel size, for touching up by hand. It needs Python 3 with
 Pillow and numpy:
 
 ```
-python assets/custom/sandtrooper/cut.py --preview preview.png
+python assets/custom/sandtrooper/cut.py --preview preview.png --full sandtrooper-full.png
 ```
 
 ## The Jawa
@@ -132,7 +141,9 @@ python assets/custom/sandtrooper/cut.py --preview preview.png
 backdrop); `jawa/cut.py` cuts it the same way into
 `assets/sprites/monsters/jawa.png`. Every pose stands apart, so nothing
 needs splitting. Jawas are 1.25 units tall, up to a trooper's chest. The eyes
-and the muzzle flash snap to fullbright colours, so they glow in the dark:
+and the muzzle flash snap to fullbright colours, so they glow in the dark.
+The walk from the other views is found on the sheet (it has the villagers'
+layout) and follows the front poses:
 
 ```
 python assets/custom/jawa/cut.py --preview preview.png
@@ -142,10 +153,12 @@ python assets/custom/jawa/cut.py --preview preview.png
 
 `villagers/` holds five AI-generated villager sheets (a boy, a woman in a
 head scarf, a spacer in a vest, a drifter and a bearded hermit), four on
-blue and one on magenta. They share one layout of 51 poses, so `cut.py`
+blue and one on magenta. They share one layout of 48 poses, so `cut.py`
 finds the poses itself (splitting the few that touch) and cuts 14 frames
 of each into `assets/sprites/npcs/`: the front walk, a stand, a flinch, a
-hunch and a fall-back death. They are restyled toward the Dark Forces
+hunch and a fall-back death, then the walk and the stand from the four
+other views (42 frames). The sheets mix up some front and back walk poses,
+so each villager lists its own. They are restyled toward the Dark Forces
 officer and Bossk (the realistic sprites, not the stormtrooper's hard
 armour): soft contrast, gentle side light, and the source's dark line work
 eased into shading, so nothing reads as a black outline (`STYLE` in

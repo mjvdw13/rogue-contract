@@ -3,7 +3,9 @@
 //
 //   node assets/custom/cut.mjs "<folder with the ripped sheets>"
 //
-// The game's layout: 0-3 walk, 4 aim, 5 fire, 6 pain, 7-11 death.
+// The game's layout: 0-3 walk, 4 aim, 5 fire, 6 pain, 7-11 death; then the
+// walk from the other views (12-15 front three-quarter, 16-19 side, 20-23
+// back three-quarter, 24-27 back). Every side view faces left.
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -30,11 +32,17 @@ const SHEETS = [
       const walk = row(0, 67);
       const attack = row(69, 135);
       const fall = row(205, 271);
+      // Six frames a view on this sheet; the first four of each are used.
+      const side = row(137, 203);
       return [
         walk(0, 28), walk(30, 58), walk(60, 87), walk(89, 117),
         attack(175, 204), attack(206, 235),
         fall(0, 32),
         fall(34, 69), fall(71, 109), fall(111, 152), fall(154, 198), fall(200, 243),
+        walk(181, 222), walk(224, 263), walk(265, 305), walk(307, 346),
+        side(0, 38), side(40, 89), side(91, 139), side(141, 176),
+        side(269, 295), side(297, 334), side(336, 373), side(375, 400),
+        attack(0, 27), attack(29, 56), attack(58, 85), attack(87, 114),
       ];
     })(),
   },
@@ -50,6 +58,10 @@ const SHEETS = [
         r2(93, 125), // the white flash of a blaster hit
         r2(127, 170), r2(172, 218), r2(261, 301),
         r2(303, 348, 100), r2(350, 401, 100), // below the ripper's credit
+        walk(113, 147), walk(149, 175), walk(177, 209), walk(211, 234),
+        walk(236, 277), walk(279, 301), walk(303, 348), walk(350, 370),
+        walk(372, 406), walk(408, 432), walk(434, 473), walk(475, 496),
+        walk(498, 523), walk(525, 550), walk(552, 576), walk(578, 604),
       ];
     })(),
   },
@@ -77,6 +89,7 @@ const SHEETS = [
     asset: 'bossk',
     frames: (() => {
       const walk = row(0, 98);
+      const low = row(0, 100); // the back views stand two rows lower
       const stand = row(101, 191, 190);
       const fall = row(101, 191);
       return [
@@ -84,6 +97,10 @@ const SHEETS = [
         stand(0, 42), stand(0, 42), // aim; fire
         stand(93, 134), // the white flash of a hit
         fall(180, 221), fall(223, 285), fall(287, 359), fall(361, 428), fall(430, 494),
+        walk(125, 166), walk(168, 211), walk(213, 265), walk(267, 312),
+        walk(314, 370), walk(372, 422), walk(424, 478), walk(480, 527),
+        low(529, 574), low(576, 614), low(616, 655), low(657, 695),
+        low(697, 727), low(729, 758), low(760, 789), low(791, 820),
       ];
     })(),
   },
@@ -103,6 +120,9 @@ const SHEETS = [
         '001.PNG', { file: '001.PNG', over: [{ file: 'BOBABALL.cells/000.PNG', x: 58, y: 34 }] },
         '002.PNG', // pain: the first frame of the fall
         '002.PNG', '003.PNG', '004.PNG', '005.PNG',
+        // Standing, from the other views: front three-quarter, side, back
+        // three-quarter, back (his walk from them, as he never walks).
+        '007.PNG', '009.PNG', '011.PNG', '013.PNG',
       ],
     },
     asset: 'boba-fett',

@@ -12,9 +12,13 @@
 
 /**
  * @typedef {number[] | {frames:number[], fps?:number, loop?:boolean, fireAt?:number|number[],
- *   fullbright?: boolean|number[], events?: Record<number,string>, durations?: number[]}} AnimSpec
+ *   fullbright?: boolean|number[], events?: Record<number,string>, durations?: number[],
+ *   views?: {frontSide?:number[], side?:number[], backSide?:number[], back?:number[]}}} AnimSpec
  *   Frame numbers are indices into the sprite sheet. `fireAt`/`fullbright`/`events`
- *   refer to positions within this animation's `frames` list.
+ *   refer to positions within this animation's `frames` list. `frames` is the
+ *   front view; `views` the same animation seen from the thing's left (front
+ *   three-quarter, side, back three-quarter, back), each as long as `frames`.
+ *   From the right the art is mirrored (see things/anim.js `viewOf`).
  *
  * @typedef {{src:string, frameWidth?:number, frameHeight?:number, glint?:number[][], glow?:number[][]}} SheetSpec
  *   `glint`: colours ([r, g, b]) that catch the light (armour highlights);
@@ -67,7 +71,37 @@ export function normalizeAnim(spec, defaults = {}) {
   if (spec.fireAt !== undefined) for (const i of [].concat(spec.fireAt)) events[i] = 'fire';
   if (spec.events) for (const [k, v] of Object.entries(spec.events)) events[Number(k)] = v;
   const total = durations.reduce((a, b) => a + b, 0);
-  return { frames, durations, loop: spec.loop ?? defaults.loop ?? false, fullbright, events, total };
+  return { frames, durations, loop: spec.loop ?? defaults.loop ?? false, fullbright, events, total, views: normalizeViews(spec.views, frames) };
+}
+
+/** The views an animation may list besides its front (`frames`), front to back. */
+export const VIEWS = ['frontSide', 'side', 'backSide', 'back'];
+
+/**
+ * An animation's `views` as five frame lists, front (`frames`) to back, or
+ * null without any. A missing view uses the nearest given one (the nearer
+ * the front on a tie).
+ */
+function normalizeViews(views, frames) {
+  if (views == null) return null;
+  if (typeof views !== 'object' || Array.isArray(views)) throw new Error(`Animation "views" must be an object with any of ${VIEWS.join(', ')}`);
+  for (const k of Object.keys(views)) if (!VIEWS.includes(k)) throw new Error(`Animation views: unknown view "${k}" (use ${VIEWS.join(', ')})`);
+  const given = [frames];
+  for (const k of VIEWS) {
+    const v = views[k];
+    if (v == null) {
+      given.push(null);
+      continue;
+    }
+    if (!Array.isArray(v) && typeof v !== 'number') throw new Error(`Animation view "${k}" must be a list of frame numbers`);
+    const list = (typeof v === 'number' ? [v] : v).map((f) => Number(f));
+    if (list.length !== frames.length) throw new Error(`Animation view "${k}" has ${list.length} frames; it needs ${frames.length}, like "frames"`);
+    given.push(list);
+  }
+  return given.map((list, i) => {
+    for (let d = 1; !list; d++) list = given[i - d] ?? given[i + d];
+    return list;
+  });
 }
 
 function normalizeAnims(anims = {}) {

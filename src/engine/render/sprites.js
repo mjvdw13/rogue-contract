@@ -1,5 +1,6 @@
 import { TEXELS_PER_UNIT, TRANSPARENT } from '../config.js';
 import { F_SKY } from '../world/tilemap.js';
+import { viewOf } from '../things/anim.js';
 
 const visible = [];
 let fuzzPos = 0;
@@ -13,7 +14,9 @@ const FUZZ = [1, -1, 1, -1, 1, 1, -1, 1, 1, -1, 1, 1, 1, -1, 1, 1, 1, -1, -1, -1
  * pixels (view.mdepth, when one drew this frame).
  *
  * A thing is drawable when it has `sheet` (a Sheet), `frame` (index) and
- * position x/y/z. Optional: `fullbright` (current frame glows), `flipX`,
+ * position x/y/z. When its animation has `views`, the frame is the one seen
+ * from the camera, given the thing's `angle` (things/anim.js `viewOf`).
+ * Optional: `fullbright` (current frame glows), `flipX`,
  * `def.scale`, `def.renderStyle` ('normal' | 'fuzz'). A frame's `glint` pixels
  * brighten with the glint light (`map.glintmap`) where the thing stands.
  * With `writeDepth` (and a valid view.mdepth), each pixel drawn records its
@@ -46,7 +49,20 @@ export function drawSprites(view, things, map, fb, fbW, colormaps, skip, writeDe
   visible.sort((a, b) => b._depth - a._depth);
 
   for (const t of visible) {
-    const frame = t.sheet.frame(t.frame);
+    // The view of the thing from where the camera stands (a view frame past
+    // the sheet's end, as on a placeholder sheet, draws the front one).
+    let fi = t.frame;
+    let flipX = t.flipX;
+    const views = t.anim?.views;
+    if (views) {
+      const v = viewOf(t.angle, px - t.x, py - t.y);
+      const f = views[v < 0 ? -v : v][t.animPos];
+      if (f !== undefined && f < t.sheet.count) {
+        fi = f;
+        if (v < 0) flipX = !flipX;
+      }
+    }
+    const frame = t.sheet.frame(fi);
     const depth = t._depth;
     const scale = ((t.def?.scale ?? 1) * (t.sheet.scale ?? 1)) / TEXELS_PER_UNIT;
     const spriteW = (frame.w * scale * fx) / depth;
@@ -104,7 +120,7 @@ export function drawSprites(view, things, map, fb, fbW, colormaps, skip, writeDe
       while (first > 0 && !segFirst[sb + first]) first--;
       let tx = ((x + 0.5 - left) * texScaleX) | 0;
       if (tx >= frame.w) tx = frame.w - 1;
-      if (t.flipX) tx = frame.w - 1 - tx;
+      if (flipX) tx = frame.w - 1 - tx;
       const ct = frame.top[tx];
       if (ct < 0) continue;
       const cb = frame.bottom[tx];

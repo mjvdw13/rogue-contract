@@ -110,17 +110,25 @@ def runs(flags):
     return out
 
 
-def split(mask, figures, tips):
-    """Splits touching poses whose rifles point right into the next pose.
+def split(mask, figures, tips, leftward=False):
+    """Splits touching poses whose rifles point right into the next pose
+    (or with `leftward`, left into the one before).
 
     Bodies are the runs of tall columns. Between two bodies only the left
     pose's barrel shows; a line through it and the measured tip follows the
-    barrel over the next pose. The barrel is thick for a few pixels past the
-    gap, then a thin rod. It goes to its owner; where it crossed the next
-    pose, the hole is filled from around it.
+    barrel over the next pose. A tip of 'gap' ends it just past the gap
+    (a barrel that only touches the next pose). The barrel is thick for a
+    few pixels past the gap, then a thin rod. It goes to its owner; where
+    it crossed the next pose, the hole is filled from around it.
+    `tips` are on the sheet, one per gap from the left, either way.
     Returns a (mask, filled) per pose; `filled` marks the pixels to fill.
     """
     h, w = mask.shape
+    if leftward:
+        # Mirrored, the rifles point right.
+        tips = [t if t is None or t == 'gap' else (w - 1 - t[0], t[1]) for t in reversed(tips)]
+        parts = split(mask[:, ::-1], figures, tips)
+        return [(m[:, ::-1], f[:, ::-1]) for m, f in reversed(parts)]
     counts = mask.sum(0)
     bodies = [r for r in runs(counts > 14) if r[1] - r[0] >= 25]
     if len(bodies) != figures:
@@ -143,6 +151,9 @@ def split(mask, figures, tips):
                 thick.append(segs[0][1] - segs[0][0] + 1)
         if not pts:
             raise SystemExit(f'no barrel between bodies {k} and {k + 1}')
+        if tip == 'gap':
+            m, c = np.polyfit(*zip(*pts), 1) if len(pts) > 1 else (0, pts[0][1])
+            tip = (g1 + 4, m * (g1 + 4) + c)
         px, py = zip(*pts, tip)
         m, c = np.polyfit(px, py, 1, w=[1] * len(pts) + [len(pts)])
         for x in range(g0, int(tip[0]) + 1):
@@ -180,6 +191,73 @@ def inpaint(rgb, known, holes):
     return rgb
 
 
+# The AI sheets' shared layout (the villagers, the Jawa, the sandtrooper):
+# 48 poses in four rows. Row 1: front walk (6), front three-quarter walk
+# (6). Row 2: back walk (6), flinch and guard (3), a fall-back death (4).
+# Row 3: side walk (6), back three-quarter walk (6). Row 4: a hunch and
+# slump death (6), a turnaround (5). Some sheets mix the walks up a little.
+LAYOUT = [12, 13, 12, 11]
+
+
+def split_thin(poses, count):
+    """Splits the widest of a list of pose masks at its thinnest column (in
+    its middle three fifths) until there are `count`: poses that touch body
+    to body, or by a foot or an elbow."""
+    poses = list(poses)
+    while len(poses) < count:
+        k = max(range(len(poses)), key=lambda i: np.ptp(np.nonzero(poses[i].any(0))[0]))
+        cols = np.nonzero(poses[k].any(0))[0]
+        x0, x1 = cols.min(), cols.max()
+        mid = slice(x0 + (x1 - x0) // 5, x1 - (x1 - x0) // 5)
+        x = mid.start + int(np.argmin(poses[k].sum(0)[mid]))
+        left = poses[k].copy()
+        left[:, x:] = False
+        poses[k] = poses[k] & ~left
+        poses.insert(k, left)
+    return poses
+
+
+def find_poses(mask, rows=LAYOUT):
+    """Each pose's mask, row by row, left to right. Some poses touch: a foot
+    on the head below, or an elbow on the next pose. So the rows are split
+    at the emptiest line near each quarter of the sheet, and in a row with
+    too few shapes the widest is split at its thinnest column until the
+    count is right. Specks beside a pose (a lock of hair) go with it."""
+    h = mask.shape[0]
+    counts = mask.sum(1)
+    cuts = [0]
+    for k in range(1, len(rows)):
+        lo, hi = int((k / len(rows) - 1 / 12) * h), int((k / len(rows) + 1 / 12) * h)
+        cuts.append(lo + int(np.argmin(counts[lo:hi])))
+    cuts.append(h)
+    found = []
+    for (top, bottom), expected in zip(zip(cuts, cuts[1:]), rows):
+        band = np.zeros_like(mask)
+        band[top:bottom] = mask[top:bottom]
+        lab, info = components(band)
+        sizes = sorted((c['size'] for c in info.values()), reverse=True)
+        big = [n for n, c in info.items() if c['size'] >= 0.15 * sizes[min(5, len(sizes) - 1)]]
+        poses = split_thin([lab == n for n in big], expected)
+        if len(poses) != expected:
+            raise SystemExit(f'expected {rows} poses per row, found {len(poses)} in the row at {top}-{bottom}')
+        for n, c in info.items():
+            if n not in big:
+                speck = lab == n
+                for p in poses:
+                    if (grow(p, 3) & speck).any():
+                        p |= speck
+                        break
+        poses.sort(key=lambda p: np.nonzero(p.any(0))[0].min())
+        found.append(poses)
+    return found
+
+
+def pose(alpha, rgb, mask):
+    """A pose for assemble(), its lowest pixel (feet, or body lying down) on
+    the frame's bottom row."""
+    return dict(mask=mask, alpha=np.where(mask, alpha, 0), rgb=rgb, centre=body_centre(mask), base=int(np.nonzero(mask.any(1))[0].max()))
+
+
 def body_centre(mask):
     """The middle of the columns tall enough to be body, not a gun."""
     counts = mask.sum(0)
@@ -187,11 +265,16 @@ def body_centre(mask):
     return (cols.min() + cols.max() + 1) / 2
 
 
-def cut_poses(alpha, rgb, lab, info, box, figures=1, tips=(), base=None):
+def cut_poses(alpha, rgb, lab, info, box, figures=1, tips=(), base=None, leftward=False, thin=False):
     """The poses in a box, left to right. `base` is the sheet row of their
-    feet (the frame's bottom row); by default each pose's own lowest pixel."""
+    feet (the frame's bottom row); by default each pose's own lowest pixel.
+    `tips` and `leftward` are for split(); with `thin` the poses are split
+    at their thinnest columns instead (split_thin)."""
     mask = group_mask(lab, info, box)
-    parts = split(mask, figures, tips) if figures > 1 else [(mask, np.zeros_like(mask))]
+    if thin:
+        parts = [(m, np.zeros_like(mask)) for m in split_thin([mask], figures)]
+    else:
+        parts = split(mask, figures, tips, leftward) if figures > 1 else [(mask, np.zeros_like(mask))]
     out = []
     for m, filled in parts:
         a = np.where(m, alpha, 0)

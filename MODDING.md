@@ -38,8 +38,9 @@ with JSDoc types, so editors like VS Code autocomplete the fields.
   and LEDs. A texture defined with `fullbright: false` (rock, sand) only
   snaps to the lit colours, so no stray pixel of it glows.
 - **Sprite sheets:** frames of equal size, left to right and wrapping onto new
-  rows. Frame 0 is the top-left frame. Things always face the player (there
-  are no 8-angle rotations), and the bottom of the frame stands on the floor.
+  rows. Frame 0 is the top-left frame. A thing shows its front from every
+  side unless its animations list `views` (below), and the bottom of the
+  frame stands on the floor.
   32 pixels is one tile, so a person about 56 pixels tall stands about 1.75
   tiles high, and fills a 64×64 frame.
 - **Glints and glows:** a sheet can list exact colours (`[r, g, b]`) that
@@ -109,6 +110,28 @@ the positions that ignore lighting (muzzle flashes). `events` maps a position
 to a string such as `'sound:pumpkin-rustle'`, or to anything a hook wants.
 A monster needs `walk` (or `idle`) and `death`. The last death frame stays on
 the floor as the corpse.
+
+**Views.** `frames` is the animation seen from the front. Add `views` to show
+it from the other sides, as Dark Forces did:
+
+```js
+walk: {
+  frames: [0, 1, 2, 3], fps: 6,
+  views: { frontSide: [12, 13, 14, 15], side: [16, 17, 18, 19], backSide: [20, 21, 22, 23], back: [24, 25, 26, 27] },
+},
+```
+
+Each view is as long as `frames`, drawn with the figure facing the
+viewer's left (so it shows its left side): `frontSide` is the front
+three-quarter view, `side` the profile, `backSide` the back three-quarter.
+Seen from its right, the art is mirrored, so five views cover eight
+directions. A view left out uses the nearest one given. Which one shows
+depends on where the thing faces (its placed `angle`; monsters turn to
+where they walk and to whom they shoot, NPCs to where they stroll and to
+whoever bumps them). Attacks and pain usually face the player, and deaths
+can look the same from every side, so `walk` and `idle` are the ones that
+need views. A view frame past the end of the sheet draws the front frame,
+so an art override can add views the committed sheet lacks.
 
 **Attacks.** An attack is one of:
 

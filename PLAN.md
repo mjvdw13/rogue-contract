@@ -1658,6 +1658,76 @@ Decided:
              (the new options default off).
        - [x] Tests, the validator and the smoke test; commit and push.
 
+### W. Characters seen from every side (2026-10-17)
+
+Mark (2026-10-17): most characters' sheets have the other angles (sides,
+back); make the engine use them. Until now every enemy and NPC showed its
+front whichever way it faced (Phase 1b I: "one view per frame").
+
+What the sheets hold (all side views face left, walking toward the
+viewer's left, so they show the figure's left side):
+- **DF stormtrooper**: the 48-pose layout of the AI sheets (below), six
+  frames a view; the game uses four of the front six.
+- **DF officer and Bossk**: walks of four frames in five views (front,
+  front three-quarter, side, back three-quarter, back), and a five-view
+  turnaround.
+- **Boba Fett** (cells): standing and his flying stance, each in five views
+  (000/007/009/011/013 and 006/008/010/012/014).
+- **Probe droid**: twelve near-identical hover frames, no clear views. Left
+  front-only.
+- **Sandtrooper, Jawa, five villagers** (AI sheets, 48 poses): the walk in
+  five views (front, front three-quarter, back on row 2, side and back
+  three-quarter on row 3), six frames each, and a turnaround (only the
+  villagers' is a true one; the Jawa's is three fronts and two backs).
+  Some sheets drew back views among the front walk, or only four or five
+  back poses: those villagers repeat back poses.
+
+Decided:
+- **Five views, mirrored: Dark Forces' and Doom's way.** An animation may
+  list `views: { frontSide, side, backSide, back }`, each a frame list as
+  long as `frames` (which stays the front). Which one shows depends on the
+  angle between where the thing faces and where the viewer stands, in
+  eight 45° sectors; on the thing's right side the left-facing art is
+  mirrored. A missing view uses the nearest given one.
+- **Only walk and idle get views.** Attacks and pain face the player
+  anyway (a monster turns to its target), and deaths look the same from
+  every side, as in Dark Forces.
+- **Idle views match the idle's front frame**: the villagers stand in
+  their turnaround; the enemies idle on a walk frame, so their idle views
+  are that walk frame from the other views.
+- **Frame numbers don't move**: the new frames are added after the old
+  ones. A view frame past the end of the sheet draws the front frame, so
+  the generated placeholder sheets (the smoke test's, with no overrides)
+  still work.
+- Sheets are re-cut whole, so the sandtrooper's and Jawa's front frames
+  pick up the refitted palette (Phase 1b V step 2 note).
+
+1. [x] Engine: `views` in `normalizeAnim` (checked lengths, nearest-view
+       fill), the view and mirror pick (`things/anim.js`), the sprite
+       renderer drawing the view (falling back to the front frame), the
+       validator, MODDING.md. Tests for the angle sectors, the mirror, the
+       fallback and the normalising.
+2. [x] `sheetcut.py`: the 48-pose finder moves here from the villagers'
+       cutter (shared with the Jawa); `split()` handles rifles pointing
+       left (the sandtrooper's side and back three-quarter views).
+       - Found: the AI layout is 48 poses (12, 13, 12, 11), not 51 as
+         noted in V. Poses touching body to body (the sandtrooper's
+         turnaround, at the feet) split at their thinnest column
+         (`split_thin`, the finder's old splitting step).
+3. [x] Re-cut the villagers (walk views, turnaround stands), the Jawa and
+       the sandtrooper (walk views); their defs list the views.
+       - Mark (2026-10-17): a sandtrooper sheet with every pose apart, in
+         the game's colours and pixel size, saved to his Downloads to touch
+         up (`sandtrooper-ingame-sheet.png`). The cutter now cuts and
+         restyles all 48 poses together (the restyle's tones depend on the
+         set of poses), and the game's frames are picked from that grid, so
+         both match exactly; `--full` writes the grid.
+4. [x] `cut.mjs`: the walk views of the DF stormtrooper, officer and
+       Bossk, Boba Fett's standing views; their defs list the views.
+5. [x] Check in game (screenshots walking past enemies and villagers from
+       each side), tests, the validator and the smoke test; commit and
+       push.
+
 ## Phase 1c: Two storeys per tile (done 2026-10-13)
 
 Mark (2026-10-13): we want to walk underneath other parts of the map. Today
@@ -3125,3 +3195,12 @@ update the smoke test.
   source's line work eased into shading, area-averaged downscaling, the
   whole palette). Spread, steps and contours now sit in the officer's and
   Bossk's range. 231 tests, the validator and the smoke test pass.
+- 2026-10-17: Phase 1b W, characters seen from every side: animations take
+  `views` (front three-quarter, side, back three-quarter, back; mirrored
+  on the right, eight directions in all). Walks and idles from every side
+  for the stormtrooper, officer, Bossk, Boba Fett (standing cells), the
+  sandtrooper, the Jawa and the five villagers; the probe droid stays
+  front-only. Sheets re-cut with the views after the old frames. For Mark,
+  the sandtrooper's 48 poses apart on one grid in the game's colours
+  (`sandtrooper/cut.py --full`, a copy in his Downloads). 234 tests, the
+  validator and the smoke test pass.
