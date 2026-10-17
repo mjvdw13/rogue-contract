@@ -196,11 +196,13 @@ export function defineAmmo(def) {
  * A player weapon. `light: { radius, light }` is its muzzle flash: it lights
  * the room round the player on the fire animation's fullbright frames.
  * (`flashLight` instead brightens the whole view, Doom's way.)
+ * `reraise: true`: after each shot the hand drops out of view and comes back
+ * up with the next one (a thrown detonator).
  * @param {{id:string, name:string, slot:number, ammo?:string|null, ammoPerShot?:number,
  *   sheet: SheetSpec, anims: {idle:AnimSpec, fire:AnimSpec}, fire: AttackSpec,
  *   offset?:[number,number], flashLight?:number, light?:{radius:number, light:number},
  *   noise?:boolean, priority?:number,
- *   accurateFirstShot?:boolean, sounds?:Record<string,string>, bob?:number}} def
+ *   accurateFirstShot?:boolean, sounds?:Record<string,string>, bob?:number, reraise?:boolean}} def
  */
 export function defineWeapon(def) {
   requireId(def, 'Weapon');
@@ -364,9 +366,17 @@ export function defineDecoration(def) {
  * high above the owner's feet. Its z is the middle of the sprite. When it
  * bursts it sets off its `explosion` (defineExplosion), facing out of what
  * it hit.
+ * `bounce` makes it bounce instead (a thrown detonator): thrown along the aim
+ * plus `toss` upward, off walls, floors, ceilings and solid scenery, keeping
+ * `restitution` (0..1) of its speed into what it hit and `friction` of the
+ * rest; slower than `minSpeed` into the floor it stops bouncing and rolls,
+ * losing `roll` of its speed a second. It goes off after `fuse` seconds, or
+ * at once on a body; its `bounce` sound plays on a knock harder than
+ * `minSpeed`.
  * @param {{id:string, sheet:SheetSpec, anims:{fly:AnimSpec, explode?:AnimSpec}, speed?:number,
  *   damage?:number|number[], radius?:number, splash?:{radius:number, damage:number},
- *   gravity?:number, z?:number, sounds?:{fire?:string, explode?:string}, trail?:string, explosion?:string}} def
+ *   gravity?:number, z?:number, sounds?:{fire?:string, explode?:string, bounce?:string}, trail?:string, explosion?:string,
+ *   bounce?:{restitution?:number, friction?:number, minSpeed?:number, roll?:number, fuse?:number, toss?:number}}} def
  */
 export function defineProjectile(def) {
   const p = baseThing(def, 'projectile', {
@@ -379,6 +389,7 @@ export function defineProjectile(def) {
     gravity: 0,
     splash: null,
   });
+  if (def.bounce) p.bounce = { restitution: 0.5, friction: 0.7, minSpeed: 1.5, roll: 3, fuse: 2.5, toss: 4, ...def.bounce };
   return p;
 }
 

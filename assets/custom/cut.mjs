@@ -115,6 +115,12 @@ const SHEETS = [
     asset: 'rocket',
     out: 'assets/sprites/fx/rocket.png',
   },
+  // The thermal detonator: in flight (WDET), and the pickups (one, IDET, and
+  // a belt of them, IDETS), from the pickups zip (unpack it into the folder,
+  // so it holds `Pickups/`).
+  { cells: { folder: 'Pickups/WDET.cells', list: ['000.PNG'], align: 'middle' }, asset: 'thermal-detonator-ball', out: 'assets/sprites/fx/thermal-detonator.png' },
+  { cells: { folder: 'Pickups/IDET.cells', list: ['000.PNG'] }, asset: 'thermal-detonator-item', out: 'assets/sprites/items/thermal-detonator.png' },
+  { cells: { folder: 'Pickups/IDETS.cells', list: ['000.PNG'] }, asset: 'detonator-belt', out: 'assets/sprites/items/detonator-belt.png' },
 ];
 
 /**
@@ -205,8 +211,8 @@ function cut({ file, cells, asset, scale = SCALE, ...sheet }) {
 
 // First-person weapons, drawn 1:1 at the bottom of the 320-wide view (Dark
 // Forces drew them at the same size). Each frame is a box [x0, x1, y0, y1] on
-// the sheet; every frame of a weapon keeps the same `anchor` ('left' or
-// 'centre') on its bottom line, so the hand doesn't jump between frames.
+// the sheet; every frame of a weapon keeps the same `anchor` ('left',
+// 'centre' or 'right') on its bottom line, so the hand doesn't jump between frames.
 // `padLeft` pushes the art right of the weapon's `offset` in its definition,
 // and `padBottom` lifts it back up by the offset's downward part.
 const WEAPON_SHEET = 'MS-DOS - Star Wars_ Dark Forces - Miscellaneous - Weapons.png';
@@ -229,13 +235,25 @@ const WEAPONS = [
     padBottom: 12,
     frames: [[626, 708, 40, 133], [722, 802, 17, 133], [815, 899, 21, 133], [626, 708, 40, 133]],
   },
+  {
+    // thermal-detonator.js: offset [40, 0]; 0 the fist holding one, 1 the
+    // open hand after the throw. The arm comes in at the bottom right, so
+    // frames line up on that corner. (A stray two-pixel speck by the open
+    // hand's wrist is left out.)
+    asset: 'thermal-detonator',
+    anchor: 'right',
+    padLeft: 0,
+    padBottom: 0,
+    frames: [[9, 111, 167, 281], [119, 241, 148, 281]],
+    erase: [[180, 272], [180, 273]],
+  },
 ];
 
-function cutWeapon({ asset, anchor, padLeft, padBottom, frames }) {
+function cutWeapon({ asset, anchor, padLeft, padBottom, frames, erase = [] }) {
   const { width: W, data } = decodePNG(fs.readFileSync(path.join(dir, WEAPON_SHEET)));
   const isBg = (x, y) => {
     const o = (y * W + x) * 4;
-    return data[o] === 0 && data[o + 1] === 128 && data[o + 2] === 255;
+    return (data[o] === 0 && data[o + 1] === 128 && data[o + 2] === 255) || erase.some(([ex, ey]) => ex === x && ey === y);
   };
   const artW = Math.max(...frames.map(([x0, x1]) => x1 - x0 + 1));
   const FW = (padLeft + artW + 1) & ~1;
@@ -243,7 +261,8 @@ function cutWeapon({ asset, anchor, padLeft, padBottom, frames }) {
   const n = frames.length;
   const out = new Uint8Array(FW * n * FH * 4);
   frames.forEach(([x0, x1, y0, y1], f) => {
-    const ox = f * FW + padLeft + (anchor === 'left' ? 0 : Math.floor((artW - (x1 - x0 + 1)) / 2));
+    const spare = artW - (x1 - x0 + 1);
+    const ox = f * FW + padLeft + (anchor === 'left' ? 0 : anchor === 'right' ? spare : Math.floor(spare / 2));
     for (let y = y0; y <= y1; y++) {
       for (let x = x0; x <= x1; x++) {
         if (isBg(x, y)) continue;

@@ -83,6 +83,25 @@ export default [
   }),
   defineSound({ id: 'punch-swing', synth: { wave: 'noise', duration: 0.16, attack: 0.03, release: 0.1, highpass: 1200, lowpass: [5000, 1500], volume: 0.5 }, pitchVariance: 0.1 }),
   defineSound({ id: 'punch-hit', synth: { ...thump(140, 50, 0.14, 0.9), layers: [burst(0.06, [3000, 600], 0.6)] }, pitchVariance: 0.1 }),
+  // The thermal detonator: a quick whoosh as it leaves the hand, a metal
+  // clank each time it bounces, and a big blast.
+  defineSound({ id: 'detonator-throw', synth: { wave: 'noise', duration: 0.14, attack: 0.02, release: 0.1, highpass: 900, lowpass: [4000, 1200], volume: 0.45 }, pitchVariance: 0.1 }),
+  defineSound({
+    id: 'detonator-bounce',
+    synth: {
+      wave: 'square', duty: 0.3, freq: 1900, freqEnd: 1500, duration: 0.09, attack: 0.001, release: 0.08, lowpass: 5000, volume: 0.3,
+      layers: [{ wave: 'triangle', freq: 2700, duration: 0.12, release: 0.11, volume: 0.25 }, burst(0.03, [7000, 2500], 0.35)],
+    },
+    pitchVariance: 0.12,
+  }),
+  defineSound({
+    id: 'detonator-explode',
+    synth: {
+      wave: 'noise', duration: 1.4, attack: 0.002, decay: 0.25, sustain: 0.5, release: 1, lowpass: [2200, 120], noiseHold: 5,
+      distortion: 0.55, volume: 1, layers: [thump(60, 22, 0.9, 1)], ...crunch,
+    },
+    pitchVariance: 0.06,
+  }),
 
   // --------------------------------------------------------- world
   defineSound({

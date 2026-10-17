@@ -113,8 +113,59 @@ function blasterPickup() {
   return m.render({ ...RENDER, light: [-0.4, -0.8, 0.45] });
 }
 
+// ------------------------------------------------------------------ thermal detonator
+
+const DET_METAL = { ...MAT.metal, spec: 0.7, shine: 26 };
+
+/** A thermal detonator: a steel ball with a dark band and red lights round it. */
+function detonator(m, x, y, z, r) {
+  m.sphere(x, y, z, r, C('steel', 0.62), DET_METAL);
+  m.ellipsoid(x, y + r * 0.1, z + 0.5, r * 1.02, r * 0.28, r * 1.02, C('gray', 0.18), MAT.metal);
+  for (const k of [-0.5, 0, 0.5]) m.paint(x + k * r, y + r * 0.1, r * 0.13, r * 0.13, G('red', 1), MAT.glow, { minZ: z });
+}
+
+/** The fist holding a detonator (0), or the open hand after the throw (1). 124x134, the arm in from the bottom right. */
+function detonatorFrame(open = false) {
+  const m = new Model(124, 134, { seed: 107 });
+  if (!open) {
+    forearm(m, [104, 150, 4], [72, 80, 14], 11);
+    detonator(m, 50, 58, 16, 15);
+    fist(m, 66, 66, 20, 15, 1);
+  } else {
+    forearm(m, [112, 150, 4], [88, 82, 12], 11);
+    m.ellipsoid(80, 62, 16, 15, 17, 7, GLOVE, MAT.leather); // the palm
+    const fingers = [[42, 20], [56, 8], [72, 4], [88, 10]];
+    fingers.forEach(([fx, fy], k) => m.capsule(70 + k * 4, 52, 18, fx, fy, 14, 4.2, 3.4, lighten(GLOVE, 0.04), MAT.leather));
+    m.capsule(66, 72, 18, 34, 60, 14, 4.6, 3.6, GLOVE, MAT.leather); // thumb
+  }
+  return m.render(RENDER);
+}
+
+function detonatorSheet() {
+  return sheet([detonatorFrame(), detonatorFrame(true)]);
+}
+
+/** One detonator in flight (16x16), or lying on the floor (16x16). */
+function detonatorBall() {
+  const m = new Model(16, 16, { seed: 109 });
+  detonator(m, 8, 8, 6, 5.5);
+  return m.render({ ...RENDER, light: [-0.4, -0.8, 0.45] });
+}
+
+/** A belt of five detonators on the floor. 48x24. */
+function detonatorBelt() {
+  const m = new Model(48, 24, { seed: 111 });
+  m.capsule(3, 18, 2, 45, 18, 2, 2.2, 2.2, C('rust', 0.3), MAT.leather);
+  for (let k = 0; k < 5; k++) detonator(m, 7 + k * 8.5, 14, 5, 4.2);
+  return m.render({ ...RENDER, light: [-0.4, -0.8, 0.45] });
+}
+
 export default [
   { name: 'fists', out: W('fists'), draw: fistsSheet, dither: 'fs' },
   { name: 'blaster', out: W('blaster'), draw: blasterSheet, dither: 'fs' },
   { name: 'pickup-blaster', out: 'assets/sprites/items/pickup-blaster.png', draw: blasterPickup, dither: 'fs' },
+  { name: 'thermal-detonator', out: W('thermal-detonator'), draw: detonatorSheet, dither: 'fs' },
+  { name: 'det-ball', out: 'assets/sprites/fx/thermal-detonator.png', draw: detonatorBall, dither: 'fs' },
+  { name: 'det-pickup', out: 'assets/sprites/items/thermal-detonator.png', draw: detonatorBall, dither: 'fs' },
+  { name: 'detonator-belt', out: 'assets/sprites/items/detonator-belt.png', draw: detonatorBelt, dither: 'fs' },
 ];

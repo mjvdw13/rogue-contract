@@ -143,5 +143,28 @@
     "frameWidth": 18,
     "frameHeight": 15,
     "scale": 0.85
+  },
+  "assets/sprites/fx/thermal-detonator.png": {
+    "src": "assets/custom/thermal-detonator-ball.png",
+    "frameWidth": 16,
+    "frameHeight": 15,
+    "scale": 0.85
+  },
+  "assets/sprites/items/thermal-detonator.png": {
+    "src": "assets/custom/thermal-detonator-item.png",
+    "frameWidth": 16,
+    "frameHeight": 15,
+    "scale": 0.85
+  },
+  "assets/sprites/items/detonator-belt.png": {
+    "src": "assets/custom/detonator-belt.png",
+    "frameWidth": 44,
+    "frameHeight": 25,
+    "scale": 0.85
+  },
+  "assets/sprites/weapons/thermal-detonator.png": {
+    "src": "assets/custom/thermal-detonator.png",
+    "frameWidth": 124,
+    "frameHeight": 134
   }
 }

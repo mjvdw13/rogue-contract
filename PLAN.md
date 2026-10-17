@@ -1474,6 +1474,73 @@ has one light; per particle is too dear); a sound per burst; blood as
 particles; rain for another level; decals left by particles (scorch
 under fire).
 
+### U. The thermal detonator (2026-10-16)
+
+Mark (2026-10-16): the thermal detonator, as a weapon. Its hand from the
+weapons sheet (second row, the first two: the fist holding it and the
+open hand after the throw); thrown, it clanks round and bounces a few
+times before it goes off as the `large` explosion. Sounds from the DF
+pack.
+
+Found:
+- The pickups zip has the detonator lying on the floor (`IDET`), a belt
+  of them (`IDETS`) and the one in flight (`WDET`, a dark ball). The
+  projectiles zip's `DETEXP` is DF's sprite explosion: not used, the
+  `large` particle explosion is.
+- Sounds: `THERMAL1` (the throw), `MORTAR9` (the mortar shell bouncing,
+  a guess, so the clank; Mark to check on the soundboard), `EX-LRG1` (a
+  large explosion).
+- Projectiles burst on anything they touch, and a lobbed one aims to land
+  on the target. Nothing bounces yet.
+
+Decided:
+- Slot 4 (as in DF), its own ammo, `detonator` (max 50, DF's), shown
+  as `DET`. Pickups: one detonator (`IDET`, gives the weapon and 1) and
+  a belt (`IDETS`, the weapon and 5). Mission 1 gets a belt near the
+  start and one or two singles; the hero doesn't start with it.
+- Thrown (primary fire only): it flies along your aim, tossed a little
+  up, and arcs down. It bounces off walls, floors, ceilings and solid
+  scenery, losing speed each time, and rolls to a stop; it goes off
+  when its fuse runs out (about 2.5 s), or at once if it hits a body.
+  The blast: `large`, with splash damage (it can hurt you too).
+- Engine: a projectile's `bounce: { restitution, friction, fuse, sound,
+  minSpeed }` turns on bouncing (no `bounce`: everything as now). The
+  clank plays on a hit harder than `minSpeed`. A weapon's `reraise:
+  true` drops the hand out of view after each throw and raises the next
+  one (the fist with a detonator), as DF does.
+- Art: `cut.mjs` cuts the two hands (anchored on their right edge, so
+  the wrist stays put; no empty third frame: the hand drops away
+  instead), and the ball and the two pickups from the pickups zip's
+  cells. Generated stand-ins for all four (the tests and the hosted
+  build without the overrides use those).
+
+Steps:
+1. [x] Engine: `bounce` in `projectileThink` (walls by axis, floors,
+       ceilings, steps, doors, solid models; resting and rolling; rising
+       lifts carry it; fuse), the throw's velocity, `reraise`.
+       Validator.
+2. [x] Content: the `detonator` ammo, the `thermal-detonator` weapon
+       (slot 4), the `detonator-thrown` projectile (things share one set
+       of ids, and the pickup is `thermal-detonator`), the pickups, sounds
+       (`detonator-throw`, `detonator-bounce`, `detonator-explode`) with
+       synth fallbacks and DF overrides (volumes a first guess: 1, 0.8,
+       1.15).
+       - Tuned in a headless run from the Mission 1 start: thrown 15 a
+         second plus 6 up, it lands about 7 tiles off, bounces three
+         times (clank, clank, clank), rolls to rest about 13 tiles away
+         by 1.2 s and goes off at 2.5 s; off a near wall it comes back.
+3. [x] Art: generated stand-ins; `cut.mjs` for the DF hands, the ball
+       and the pickups; `overrides.json`.
+4. [x] Placed in Mission 1 (a belt beside the start, singles by the
+       gate guards' med kit and in maintenance) and the sandbox (a belt,
+       glyph `4`, by the start).
+5. [x] Tests (bounces off a wall and the floor, loses speed, comes to
+       rest, goes off at the fuse, bursts on a body, reraise), MODDING.md,
+       the validator, the smoke test; looked at in headless screenshots
+       (DF art and stand-ins); commit and push.
+6. [ ] Mark tries it in the game and says: throw distance, bounciness,
+       fuse, the clank (MORTAR9 is a guess) and the volumes.
+
 ## Phase 1c: Two storeys per tile (done 2026-10-13)
 
 Mark (2026-10-13): we want to walk underneath other parts of the map. Today
@@ -2910,3 +2977,10 @@ update the smoke test.
   stays put. Validator, a test, MODDING.md. 221 tests, the validator and
   the smoke test pass. Then, as Mark asked, the other styles shake too,
   less the smaller they are (`large` 0.6 down to `sparks` 0.1).
+- 2026-10-16: Phase 1b U, the thermal detonator (slot 4): DF's hand
+  (fist with a detonator, open hand), thrown with THERMAL1; it bounces
+  off walls, floors, ceilings and scenery with a clank (MORTAR9), rolls
+  to rest and goes off at its 2.5 s fuse as the `large` explosion
+  (EX-LRG1), or at once on a body. Engine: projectiles' `bounce`,
+  weapons' `reraise`. Pickups (one, a belt of five) in Mission 1 and the
+  sandbox. 226 tests, the validator and the smoke test pass.

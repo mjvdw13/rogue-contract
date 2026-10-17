@@ -214,6 +214,9 @@ accurate when you aren't holding the trigger. New ammo types go in
 `light` is the muzzle flash: on the fire animation's `fullbright` frames it
 lights the room round you (see *Glowing things* below). `flashLight: 1`
 (0-2) instead brightens the whole view, Doom's way.
+`reraise: true` drops the hand out of view after each shot and brings the
+next one up (a thrown weapon: see `thermal-detonator.js`); with none left,
+it switches to your best weapon with ammo.
 
 ## Items
 
@@ -258,6 +261,26 @@ be added with `definePickup` (see *Custom behaviour*).
   barrel that explodes (see `toxic-drum`).
 - **Projectiles** are defined in `src/content/effects.js` with
   `defineProjectile({ id, sheet, anims: { fly, explode }, speed, damage, splash: { radius, damage }, gravity, sounds })`.
+  Give one `bounce` to make it bounce instead of bursting on what it hits
+  (a thrown detonator, `detonator-thrown`):
+
+  ```js
+  gravity: 28,
+  bounce: {
+    toss: 6,            // thrown along your aim, plus this much upward speed
+    restitution: 0.55,  // share of its speed into a wall or floor it keeps (0-1)
+    friction: 0.75,     // share of the rest it keeps at each bounce (0-1)
+    minSpeed: 1.5,      // slower than this into the floor, it stops bouncing and rolls
+    roll: 3,            // rolling, it loses this much of its speed a second
+    fuse: 2.5,          // seconds until it goes off (at once on a body)
+  },
+  sounds: { bounce: 'detonator-bounce', explode: 'detonator-explode' },
+  ```
+
+  It bounces off walls, floors, ceilings, doors and solid scenery, and a
+  lift rising under it carries it up. Its `bounce` sound plays on each
+  knock harder than `minSpeed`. It goes off where it lies (its `explosion`
+  facing up off the floor), with its `splash`, which can hurt its thrower.
 - **Effects** such as puffs, blood, bug ichor and explosions use
   `defineEffect({ id, sheet, anims: { idle } })`. An effect disappears when its
   animation ends.

@@ -221,7 +221,7 @@ export default defineLevel({
     '',
     '                                         9',
     '',
-    '   >                             h       o',
+    '   > 4                           h       o',
     '',
     '                                 l',
     '',

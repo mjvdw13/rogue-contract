@@ -42,12 +42,127 @@ function explode(world, p, hit, pull = true, face = null) {
   if (!p.setAnim('explode')) world.remove(p);
 }
 
+/**
+ * A bouncing projectile (`bounce`: a thrown detonator). It bounces off walls,
+ * floors, ceilings, doors and solid scenery, keeping `restitution` of its
+ * speed into what it hit and `friction` of the rest, then rolls to a stop.
+ * It goes off when its fuse (`life`) runs out, or at once on a body. It rests
+ * with its centre `radius` above the floor, so its sprite sits on it.
+ */
+function bounceThink(world, p, dt) {
+  const b = p.def.bounce;
+  p.life -= dt;
+  if (p.life <= 0) {
+    explode(world, p, null, false, p.resting ? [0, 0, 1] : null);
+    return;
+  }
+  const map = world.map;
+  const lift = p.radius;
+  // A lift rising under it carries it up.
+  const under = map.floorAt(p.x, p.y, 0, p.z);
+  if (p.z - lift < under && under - (p.z - lift) < 0.5) p.z = under + lift;
+  let hit = 0; // the hardest knock this tick (its speed into what it hit)
+  const speed = Math.hypot(p.vx, p.vy, p.vz);
+  const steps = Math.max(1, Math.ceil((speed * dt) / STEP));
+  const sdt = dt / steps;
+  for (let s = 0; s < steps; s++) {
+    p.vz -= (p.def.gravity ?? 0) * sdt;
+    let nx = p.x + p.vx * sdt;
+    let ny = p.y + p.vy * sdt;
+    let nz = p.z + p.vz * sdt;
+    // Walls, doors and the faces of steps and ledges: turn back along the
+    // axis that's blocked (both, into a corner).
+    const blocked = (x, y) =>
+      map.solidPoint(x, y) ||
+      (map.doors.length > 0 && map.panelCrossed(p.x, p.y, x, y, nz)) ||
+      map.floorAt(x, y, 0, p.z) > p.z - lift + 0.05 ||
+      map.ceilAt(x, y, 0, p.z) < p.z + lift - 0.05;
+    if (blocked(nx, ny)) {
+      const bx = blocked(nx, p.y);
+      const by = blocked(p.x, ny);
+      const knock = (bx || !by ? Math.abs(p.vx) : 0) + (by || !bx ? Math.abs(p.vy) : 0);
+      if (bx || !by) p.vx = -p.vx * b.restitution;
+      if (by || !bx) p.vy = -p.vy * b.restitution;
+      p.vz *= b.friction;
+      hit = Math.max(hit, knock);
+      nx = p.x;
+      ny = p.y;
+    }
+    // Solid scenery: back off it, away from its middle.
+    for (const t of world.things) {
+      if (t === p || t.dead || t.removed || t.shootable || !blocksShots(t)) continue;
+      if (overlap(t, nx, ny, p.radius) <= 0 || nz < t.z - p.radius || nz > t.z + t.height + p.radius) continue;
+      const dx = p.x - t.x;
+      const dy = p.y - t.y;
+      const d = Math.hypot(dx, dy) || 1;
+      const into = -(p.vx * dx + p.vy * dy) / d;
+      if (into > 0) {
+        p.vx = (p.vx + ((1 + b.restitution) * into * dx) / d) * b.friction;
+        p.vy = (p.vy + ((1 + b.restitution) * into * dy) / d) * b.friction;
+        hit = Math.max(hit, into);
+      }
+      nx = p.x;
+      ny = p.y;
+    }
+    // Floor and ceiling.
+    const floor = map.floorAt(nx, ny, 0, p.z);
+    const ceil = map.ceilAt(nx, ny, 0, p.z);
+    if (nz + lift > ceil) {
+      if (skyAt(map, nx, ny, p.z)) {
+        world.remove(p);
+        return;
+      }
+      hit = Math.max(hit, p.vz);
+      p.vz = -p.vz * b.restitution;
+      nz = ceil - lift;
+    }
+    p.resting = false;
+    if (nz - lift <= floor) {
+      nz = floor + lift;
+      if (p.vz < 0) {
+        hit = Math.max(hit, -p.vz);
+        // Too slow to bounce: it lies there (and rolls).
+        p.vz = -p.vz > b.minSpeed ? -p.vz * b.restitution : 0;
+        p.vx *= b.friction;
+        p.vy *= b.friction;
+      }
+      if (p.vz === 0) {
+        p.resting = true;
+        const roll = Math.max(0, 1 - b.roll * sdt);
+        p.vx *= roll;
+        p.vy *= roll;
+      }
+    }
+    // A body (not its thrower's): it goes off at once.
+    for (const t of world.things) {
+      if (t === p || t === p.owner || !t.shootable || t.dead || t.removed) continue;
+      if (t.model ? overlap(t, nx, ny, p.radius) <= 0 : (t.x - nx) ** 2 + (t.y - ny) ** 2 > (t.radius + p.radius) ** 2) continue;
+      if (nz < t.z - p.radius || nz > t.z + t.height + p.radius) continue;
+      p.x = nx;
+      p.y = ny;
+      p.z = nz;
+      world.damage(t, world.rng.roll(p.def.damage), p, p.owner);
+      explode(world, p, t, false);
+      return;
+    }
+    p.x = nx;
+    p.y = ny;
+    p.z = nz;
+  }
+  if (Math.hypot(p.vx, p.vy) > 0.01) p.angle = Math.atan2(p.vy, p.vx);
+  if (hit > b.minSpeed && p.def.sounds.bounce) world.playSoundFrom(p.def.sounds.bounce, p);
+}
+
 export function projectileThink(world, p, dt) {
   if (p.state === 'exploding') {
     if (p.stepAnim(dt) || p.animDone) world.remove(p);
     return;
   }
   p.stepAnim(dt);
+  if (p.def.bounce) {
+    bounceThink(world, p, dt);
+    return;
+  }
   p.life = (p.life ?? 10) - dt;
   if (p.life <= 0) {
     world.remove(p);
@@ -140,7 +255,10 @@ export function launchProjectile(world, id, owner, angle, spec = {}, aim = aimAt
   const floor = world.map.floorAt(p.x, p.y, 0, p.z);
   const ceil = world.map.ceilAt(p.x, p.y, 0, p.z);
   p.z = Math.max(floor + CLEARANCE, Math.min(ceil - CLEARANCE, p.z));
-  if (def.gravity) {
+  if (def.bounce) {
+    // Thrown: along the aim, tossed a little up.
+    p.vz = aim.slope * speed + def.bounce.toss;
+  } else if (def.gravity) {
     // Lob so it lands near the target (or 12 tiles ahead, plus the aim).
     const target = owner.target ?? null;
     const dist = target ? Math.hypot(target.x - owner.x, target.y - owner.y) : 12;
@@ -150,10 +268,17 @@ export function launchProjectile(world, id, owner, angle, spec = {}, aim = aimAt
   } else {
     p.vz = aim.slope * speed;
   }
-  p.life = def.life ?? 10;
+  p.life = def.bounce?.fuse ?? def.life ?? 10;
   world.playSoundFrom(def.sounds.fire, owner);
-  // If it spawned inside a wall, burst immediately.
-  if (world.map.blocks(Math.floor(p.x), Math.floor(p.y))) explode(world, p, null);
+  // If it spawned inside a wall, burst immediately (a bouncer starts from
+  // the thrower instead, and bounces off it).
+  if (world.map.blocks(Math.floor(p.x), Math.floor(p.y))) {
+    if (!def.bounce) explode(world, p, null);
+    else {
+      p.x = owner.x;
+      p.y = owner.y;
+    }
+  }
   return p;
 }
 

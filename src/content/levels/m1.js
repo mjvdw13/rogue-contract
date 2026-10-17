@@ -373,6 +373,7 @@ const NORMAL_UP = [3, 4, 5];
 const HARD = [4, 5];
 const list = [
   at('player', 14.5, 90.5, { angle: 90 }),
+  at('detonator-belt', 17.5, 88.5), // thermal detonators, to try them out
   // The canyon: snipers on both ledges and the rock arch, two gate guards, a
   // probe droid round the spire, and a band of Jawas scavenging in the gorge.
   at('stormtrooper', 24.5, 65.5, { angle: 270, z: 5, skill: NOT_EASIEST }), // sniper, on the arch
@@ -402,6 +403,7 @@ const list = [
   at('jawa', 18.5, 66.5, { angle: 315, skill: HARD }),
   at('power-cell', 24.5, 68.5),
   at('med-kit', 29.5, 42.5, { skill: [1, 2, 3] }), // after the gate guards, by the vent
+  at('thermal-detonator', 30.5, 42.5),
   at('energy-pack', 59.5, 45.5), // secret: ledge B
   at('shield-unit', 3.5, 82), // secret: the rock alcove
   // The vent: a power cell where light falls through the grate.
@@ -413,6 +415,7 @@ const list = [
   at('console', 39.5, 15.5),
   at('terminal', 34, 14.6, { angle: 270 }), at('terminal', 35.4, 14.6, { angle: 270 }),
   at('energy-pack', 28.5, 24.5),
+  at('thermal-detonator', 29.5, 24.5),
   at('power-cell', 40.5, 24.5),
   // The barracks: the officer carries the red keycard.
   at('stormtrooper', 68.5, 18, { angle: 180 }),

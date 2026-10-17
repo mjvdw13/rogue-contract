@@ -44,6 +44,23 @@ export const projectiles = [
     splash: { radius: 2, damage: 24 },
     sounds: { explode: 'rocket-hit' },
   }),
+  // A thermal detonator, thrown: a dark ball that bounces and clanks round,
+  // then goes off as a `large` explosion (or at once on a body). It's lit by
+  // the room, so it can be lost in the dark.
+  defineProjectile({
+    id: 'detonator-thrown',
+    sheet: FX('thermal-detonator', 16, 16),
+    anims: { fly: [0] },
+    fullbright: false,
+    radius: 0.2,
+    speed: 15,
+    gravity: 28,
+    damage: [20, 30],
+    splash: { radius: 4, damage: 140 },
+    bounce: { restitution: 0.55, friction: 0.75, minSpeed: 1.5, roll: 3, fuse: 2.5, toss: 6 },
+    explosion: 'large',
+    sounds: { bounce: 'detonator-bounce', explode: 'detonator-explode' },
+  }),
   // Bossk's concussion rifle: a slow blue-white blast that bursts in a ring.
   defineProjectile({
     id: 'concussion-blast',

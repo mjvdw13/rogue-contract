@@ -28,5 +28,8 @@
   "concussion-hit": { "src": "assets/custom/sounds/weapons/CONCUSS5.mp3", "volume": 1.37 },
   "bossk-sight": { "src": "assets/custom/sounds/enemies/BOSSK-1.mp3", "volume": 1.32 },
   "bossk-pain": { "src": "assets/custom/sounds/enemies/BOSSK-3.mp3", "volume": 1.29 },
-  "bossk-death": { "src": "assets/custom/sounds/enemies/BOSSKDIE.mp3", "volume": 1.31 }
+  "bossk-death": { "src": "assets/custom/sounds/enemies/BOSSKDIE.mp3", "volume": 1.31 },
+  "detonator-throw": { "src": "assets/custom/sounds/weapons/THERMAL1.mp3", "volume": 1 },
+  "detonator-bounce": { "src": "assets/custom/sounds/weapons/MORTAR9.mp3", "volume": 0.8 },
+  "detonator-explode": { "src": "assets/custom/sounds/impacts-explosions/EX-LRG1.mp3", "volume": 1.15 }
 }

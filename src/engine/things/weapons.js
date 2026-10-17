@@ -144,7 +144,9 @@ export function weaponThink(world, pt, input, dt) {
       });
       if (done) {
         ws.refire++;
-        if (input.isDown('fire') && hasAmmo(p, def) && !p.pendingWeapon) {
+        if (def.reraise) {
+          ws.state = 'reload';
+        } else if (input.isDown('fire') && hasAmmo(p, def) && !p.pendingWeapon) {
           ws.setAnim('fire');
         } else {
           ws.state = 'ready';
@@ -158,6 +160,18 @@ export function weaponThink(world, pt, input, dt) {
       }
       break;
     }
+    case 'reload':
+      // (`reraise`) The empty hand drops out of view; the next one comes up
+      // (or, with none left, the best weapon that has ammo).
+      ws.y += LOWER_SPEED * dt;
+      if (ws.y >= BOTTOM) {
+        if (!hasAmmo(p, def)) {
+          const best = bestWeapon(reg, p, def.id);
+          if (best && best !== p.weapon) p.pendingWeapon = best;
+        }
+        ws.state = 'lower';
+      }
+      break;
     default:
       ws.state = 'raise';
   }
