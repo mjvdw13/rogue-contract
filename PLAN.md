@@ -1823,17 +1823,21 @@ Decided:
        - `assets/custom/graft.py`. The commander's sheet comes out the same
          but for one pixel: the corpse's boot, which the old graft took for
          T-21 (now only the barrel's box goes from the dead pose).
-1b. [ ] **The commander's barrel is solid** (Mark, 2026-10-17: it looked
+1b. [x] **The commander's barrel is solid** (Mark, 2026-10-17: it looked
        partly see-through). The sheet's barrel is a solid tube with a light
        grey highlight along it, but `gunlike()` takes only dark metal
        (lum < 95), so the highlight (90-140 px a frame) was dropped and,
-       past the body, left transparent. In `graft.py`'s `graft()`, after
-       `majority()`: `gun |= close(gun, 2) & mine & fg` (dilate then erode
-       2 px), keeping the highlight's own grey. Tried on the committed
-       cutter: every barrel solid, the falling death's raised one too;
-       radius 3 no better. A separate step after 1, as 1 must not change
-       the commander's output; 2 gets it for free. Re-cut the commander,
-       check every frame at 4x, commit and push.
+       past the body, left transparent. A closing alone (any radius) left
+       holes in the side views: the barrel is ~6 px across and its top
+       edge is often too light to be metal, so there is nothing to close
+       against. Done: `graft(..., solid=True)`: past the body (off a 2 px
+       rim round it, the sheet's slightly larger body), every piece of the
+       pose holding dark metal is rifle, but only its grey (r - b < 18, not
+       the armour's beige: a patch in the falling death) and not its outer
+       edge (the JPEG's pale fringe); then `fill_gaps=2` (close() takes a
+       radius now; True stays 1). The commander passes both; the
+       sandtrooper's output is unchanged. 400 px more opaque, none less,
+       all within 4 px of the rifle; every frame checked at 5x.
 2. [x] The sheet (`sandtrooper/rifle-sheet.jpg`) keyed off its
        checkerboard, fitted to the grid; graft the rifle onto the 37
        frames and recolour the pauldron. Wider frames if the barrel no

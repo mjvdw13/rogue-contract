@@ -71,19 +71,26 @@ def majority(mask, within):
     return np.where(within, count >= 5, mask)
 
 
-def close(mask):
-    """Fills the one-pixel gaps in `mask` (a 3x3 closing)."""
-    def spread(m, op):
-        p = np.pad(m, 1, constant_values=op is np.logical_and)
+def spread(mask, op, radius=1):
+    """`mask` grown (op np.logical_or) or shrunk (np.logical_and) by `radius`
+    pixels, a 3x3 square at a time."""
+    for _ in range(radius):
+        p = np.pad(mask, 1, constant_values=op is np.logical_and)
         out = p[1:-1, 1:-1].copy()
         for dy in (-1, 0, 1):
             for dx in (-1, 0, 1):
                 out = op(out, p[1 + dy:p.shape[0] - 1 + dy, 1 + dx:p.shape[1] - 1 + dx])
-        return out
-    return spread(spread(mask, np.logical_or), np.logical_and)
+        mask = out
+    return mask
 
 
-def graft(old, new, fg, side, top, dead_barrel=None, over_dark=False, fill_gaps=False, rows=None):
+def close(mask, radius=1):
+    """Fills the gaps in `mask` up to 2 * radius pixels wide (a closing with a
+    square of side 2 * radius + 1)."""
+    return spread(spread(mask, np.logical_or, radius), np.logical_and, radius)
+
+
+def graft(old, new, fg, side, top, dead_barrel=None, over_dark=False, fill_gaps=False, rows=None, solid=False):
     """The sandtrooper's frame `old` (RGBA, FW x FH) with the rifle of `new`
     (the sheet over the frame, `side` px wider each side and `top` px above,
     and rows under it, RGB); `fg` is what on `new` isn't backdrop.
@@ -94,8 +101,10 @@ def graft(old, new, fg, side, top, dead_barrel=None, over_dark=False, fill_gaps=
     also replaces the old frame's dark pixels (else only what it clearly
     changes, so the body stays exact). `fill_gaps`: the light gaps between
     the rifle's dark lines (its fins, at the frame's pixel size the
-    backdrop's grey) are rifle too. `rows` (y0, y1 in the sandtrooper's
-    frame): the rifle is only taken from these rows (the sheet's mistakes
+    backdrop's grey) are rifle too; True, or how wide a gap it fills
+    (a radius for close()). `solid`: the rifle past the body is all of the
+    pose there that holds its dark metal, its light shine too. `rows` (y0,
+    y1 in the sandtrooper's frame): the rifle is only taken from these rows (the sheet's mistakes
     elsewhere). Returns the frame's colours,
     what is opaque, and what is new, cropped to the frame's height."""
     h, w = new.shape[:2]
@@ -113,8 +122,19 @@ def graft(old, new, fg, side, top, dead_barrel=None, over_dark=False, fill_gaps=
     differs = np.abs(lum_new - lum_old) > 40
     gun = mine & gunlike(new) & (~was | differs | (over_dark & (lum_old < 80)))
     gun = majority(gun, was)
+    if solid:
+        # Past the body the sheet shows only the rifle and a thin rim of its
+        # (a little larger) body: every piece of the pose there, off that
+        # rim, that holds some of the rifle's dark metal is rifle, its light
+        # shine too. Only its grey (not the armour's beige), and not its
+        # outer edge, the JPEG's pale fringe.
+        rim = spread(was, np.logical_or, 2)
+        lab, _ = components(mine & ~rim)
+        piece = np.isin(lab, [n for n in np.unique(lab[gun]) if n])
+        grey = new[..., 0] - new[..., 2] < 18
+        gun |= piece & grey & spread(fg, np.logical_and)
     if fill_gaps:
-        gun = close(gun)
+        gun = close(gun, fill_gaps)
     if rows:
         band = np.zeros_like(gun)
         band[top + rows[0]:top + rows[1]] = True

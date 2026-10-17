@@ -158,8 +158,10 @@ from it (`graft.py`, shared with the sandtrooper's `rifle.py`), and the body
 it uncovers where the T-21 crossed it, so the body stays the sandtrooper's
 pixel for pixel. It leaves out the sheet's mistakes (the
 flashes painted on the fire poses, a loose blob past the aim pose's
-barrel), lifts the dead pose's rifle onto the ground, and eases the rifle's
-hard dark outline toward the colours round it. The aim and fire poses shoot
+barrel), lifts the dead pose's rifle onto the ground, fills the light
+highlight along the barrel (too light to read as metal, so it was left
+see-through), and eases the rifle's hard dark outline toward the colours
+round it. The aim and fire poses shoot
 straight at the player, but the sheet draws the rifle side-on there, so
 they keep the sandtrooper's frames and get the heavy rifle's muzzle painted
 head-on in front of the chest, with the game's red flash on its bore. The
