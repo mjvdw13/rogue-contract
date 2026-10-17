@@ -24,6 +24,7 @@ export const BENCH_KINDS = {
   mist: { label: 'Mist (disc, lit, half, fading)', vel: (r) => [r(-0.15, 0.15), r(-0.15, 0.15), 0], z: [0.05, 0.35] },
   'sand-gust': { label: 'Sand gusts (disc, lit, half, fading)', vel: (r) => [r(2, 4), r(0.5, 1.5), 0], z: [0.1, 0.8], wind: [3, 1, 0] },
   fire: { label: 'Fire (disc, glowing, add, swelling)', vel: (r) => [r(-0.5, 0.5), r(-0.5, 0.5), r(0, 1)], z: [0.3, 1.5] },
+  fireball: { label: 'Fireball (big disc, glowing, add, swelling)', vel: (r) => [r(-0.5, 0.5), r(-0.5, 0.5), r(0, 1)], z: [0.5, 2] },
   'fire-blue': { label: 'Concussion flash (disc, glowing, add, brief)', vel: (r) => [r(-0.3, 0.3), r(-0.3, 0.3), r(0, 0.3)], z: [0.3, 1.5] },
   'conc-flame': { label: 'Concussion flame (streak, glowing, add, rising)', vel: (r) => [r(-0.3, 0.3), r(-0.3, 0.3), r(1.5, 4)], z: [0.05, 0.3] },
   'conc-streak': { label: 'Concussion streaks (streak, glowing, add, brief)', vel: (r) => [r(-9, 9), r(-9, 9), 0], z: [0.1, 1] },
@@ -31,6 +32,7 @@ export const BENCH_KINDS = {
   'conc-wisp': { label: 'Concussion wisps (streak, glowing, add, rising)', vel: (r) => [r(-0.5, 0.5), r(-0.5, 0.5), r(1, 3)], z: [0.3, 1.5] },
   debris: { label: 'Debris (square, glowing, smoke trail)', vel: (r) => [r(-3, 3), r(-3, 3), r(2, 5)] },
   'smoke-wisp': { label: 'Smoke wisps (disc, lit, half, swelling)', vel: (r) => [r(-0.2, 0.2), r(-0.2, 0.2), r(0.2, 0.6)] },
+  'smoke-cloud': { label: 'Smoke cloud (big disc, half, swelling)', vel: (r) => [r(-0.3, 0.3), r(-0.3, 0.3), r(0.1, 0.5)], z: [0.5, 2] },
   'blast-smoke': { label: 'Blast smoke (disc, lit, half, swelling)', vel: (r) => [r(-0.3, 0.3), r(-0.3, 0.3), r(0.2, 0.8)] },
 };
 

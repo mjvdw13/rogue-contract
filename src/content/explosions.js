@@ -21,19 +21,20 @@ export default [
       { type: 'blast-smoke', count: 6, speed: [0.2, 0.6], radius: 0.25, dir: 'up', spread: 1, delay: [0.15, 0.25], over: 0.4 },
     ],
   }),
-  // A fuel barrel or a probe droid going up: everything bigger, with
-  // shrapnel, smoke that keeps coming for a while, and a second, smaller
-  // blast (`secondary`) going off beside it a moment later.
+  // A fuel barrel or a probe droid going up: a fireball that fills a hall
+  // (4 tiles wide and high) and rolls up, shrapnel, a cloud of smoke after
+  // it, and a second, smaller blast (`secondary`) beside it a moment later.
   defineExplosion({
     id: 'large',
-    light: { radius: 7, light: 128, time: 0.6 },
+    light: { radius: 9, light: 128, time: 0.8 },
     particles: [
-      { type: 'fire', count: 22, speed: [0.8, 4], radius: 0.3 },
+      { type: 'fireball', count: 15, speed: [2.5, 6], radius: 0.8, dir: [0, 0, 1], spread: 2, z: 1 },
+      { type: 'fireball', count: 6, speed: [1, 3], radius: 0.6, dir: 'up', spread: 1, z: 0.6, delay: 0.1, over: 0.25 },
       { type: 'spark', count: 16, speed: [3, 9] },
-      { type: 'debris', count: 8, speed: [3, 8] },
+      { type: 'debris', count: 6, speed: [3, 8] },
       { type: 'shrapnel', count: 16, speed: [2, 6] },
       { type: 'ember', count: 20, speed: [0.5, 2], dir: 'up', spread: 0.9, delay: 0.15, over: 0.8 },
-      { type: 'blast-smoke', count: 12, speed: [0.2, 0.8], radius: 0.4, dir: 'up', spread: 1, delay: [0.2, 0.35], over: 0.8 },
+      { type: 'smoke-cloud', count: 9, speed: [0.5, 2], radius: 1, dir: [0, 0, 1], spread: 2, z: 1.5, delay: [0.35, 0.5], over: 0.5 },
     ],
     then: [{ explosion: 'secondary', delay: [0.2, 0.3], offset: [0.6, 0.9], z: 0.2 }],
   }),

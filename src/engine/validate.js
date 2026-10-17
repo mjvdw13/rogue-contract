@@ -349,7 +349,7 @@ function checkParticles(reg, err, warn) {
     const life = [].concat(p.life ?? 1);
     if (!life.every((v) => num(v, 0.001, 600)) || life.length > 2 || (life.length === 2 && life[1] < life[0])) err(`${owner}: life is seconds, or [min, max] (above 0)`);
     if (p.size !== undefined && !num(p.size, 0, 10)) err(`${owner}: size is in world units, 0 to 10`);
-    if (p.maxPx !== undefined && !(Number.isInteger(p.maxPx) && p.maxPx >= 1 && p.maxPx <= 32)) err(`${owner}: maxPx must be a whole number of pixels, 1 to 32`);
+    if (p.maxPx !== undefined && !(Number.isInteger(p.maxPx) && p.maxPx >= 1 && p.maxPx <= 64)) err(`${owner}: maxPx must be a whole number of pixels, 1 to 64`);
     if (p.drag !== undefined && !num(p.drag, 0, 30)) err(`${owner}: drag (velocity lost per second) must be 0 to 30`);
     if (p.bounce !== undefined && !num(p.bounce, 0, 1)) err(`${owner}: bounce must be 0 to 1`);
     if (p.alpha !== undefined && !num(p.alpha, 0, 1)) err(`${owner}: alpha must be 0 to 1`);

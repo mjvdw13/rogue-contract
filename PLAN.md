@@ -1372,6 +1372,28 @@ with the game):
                          to 0.16), size 0.55 swelling 2.2 times (was 0.4,
                          2), 16 of them in a 0.4 ball; the flames start
                          at 0.1 s.
+                   - [x] Mark: `large` is still fairly small; it should
+                         fill the hallway at the bench's "Inside A" (4
+                         tiles wide, 4 high, seen from 5 tiles away).
+                         - [x] A disc couldn't be drawn wider than its
+                               `maxPx`, at most 32 (about a tile at 5
+                               tiles off): now up to 64.
+                         - [x] A `fireball` type (size 1.1 swelling 2.2
+                               times, up to 64 px, 0.7 to 1.2 s, white-hot
+                               to orange to red, rolling up): `large`
+                               throws 15 out of a ball a tile above the
+                               floor and 6 more rising after, instead of
+                               `fire`; by 0.45 s it fills the hall wall
+                               to wall and nearly to the ceiling. Then a
+                               `smoke-cloud` (9 big dark discs, up to 64
+                               px) instead of `blast-smoke`; the flash
+                               reaches 9 tiles for 0.8 s.
+                         - [x] 72 discs at most (debris 8 to 6 for room:
+                               their smoke trails are most of it); all
+                               gone in 4 s. Drawing it costs 0.5 to 0.7
+                               ms headless at its busiest, up close or at
+                               5 tiles (`small` 0.1 to 0.35). Tests,
+                               MODDING.md, the bench lists both types.
                    - [x] Peaks under the caps again (first pass; see above for now): `large` (with its
                          `small`) 67 discs and 85 points, `small` 28 and
                          35, `concussion` 36 and 99, `dirt` and `sparks`
@@ -2821,3 +2843,7 @@ update the smoke test.
   blast is its own lighter style, `secondary`; the concussion's flame is
   thin electric streaks, not round discs. Then the concussion's first flash made
   bigger and longer.
+- 2026-10-16: Phase 1b T step 5f, Mark: `large` fills a hall now. A new
+  `fireball` type of big discs (`maxPx` may now be up to 64, was 32) and a
+  `smoke-cloud` after it; 72 discs at most, 0.5 to 0.7 ms to draw headless
+  at its busiest. 220 tests, the validator and the smoke test pass.

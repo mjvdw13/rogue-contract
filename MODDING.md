@@ -337,7 +337,8 @@ defineParticle({
   is a palette ramp and a step counted from its dark end (`['gray', 9]`),
   or `{ ramp, from, to }` for every step between two (either way round).
 - `shape`: `'square'` (the default; dots and small squares, `maxPx`
-  default 3) or `'disc'` (round puffs for smoke and steam).
+  default 3) or `'disc'` (round puffs for smoke and steam). `maxPx` is at
+  most 64: a big disc right in front of you still stops at 64 pixels.
 - `blend`: `'solid'`, `'add'` (glows: sparks, fire), `'half'` (see-through:
   smoke) or `'dither'` (a screen-door pattern that thins out as the particle
   ages; `alpha` sets how solid it is at its most, and `fadeIn`, the share
@@ -454,7 +455,7 @@ Set one off with:
 
 Explosions are only for looks: the damage stays with `explode` (things)
 and `splash` (projectiles). Keep an eye on the caps: one `large` (with its
-`secondary` after it) uses about 73 of the 150 discs at its peak, so two at
+`secondary` after it) uses about 71 of the 150 discs at its peak, so two at
 once already crowd each other. The bench page (`tools/particles.html`) sets them off on the floor,
 in the air or on the wall in front of you, once or every few seconds, with
 the real caps and a count of what's live.

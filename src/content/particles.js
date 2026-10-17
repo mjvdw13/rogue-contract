@@ -210,6 +210,25 @@ export default [
     onFloor: 'die',
     cap: 40,
   }),
+  // A big blast's fireball: great discs, white-hot where they pile up, that
+  // swell out to fill a hall, cool to orange and red, and roll upward.
+  defineParticle({
+    id: 'fireball',
+    colors: [['glow-yellow', 6], { ramp: 'glow-yellow', from: 4, to: 0 }, { ramp: 'glow-red', from: 2, to: 0 }],
+    life: [0.7, 1.2],
+    size: 1.1,
+    grow: 2.2,
+    maxPx: 64,
+    shape: 'disc',
+    blend: 'add',
+    fade: true,
+    fadeOut: 0.5,
+    fullbright: true,
+    gravity: -1.5,
+    drag: 4,
+    onFloor: 'die',
+    cap: 40,
+  }),
   // A concussion blast (after Dark Forces' own, CONCEXP): first a brief
   // white dome with a cyan rim, where it hit.
   defineParticle({
@@ -316,6 +335,26 @@ export default [
     wind: 0.6,
     onFloor: 'die',
     cap: 70,
+  }),
+  // The smoke a big blast leaves: a cloud of great dark discs that fills
+  // the hall where the fireball was, then thins as it rises.
+  defineParticle({
+    id: 'smoke-cloud',
+    colors: [{ ramp: 'gray', from: 8, to: 4 }],
+    life: [1.8, 2.8],
+    size: 1,
+    grow: 2,
+    maxPx: 64,
+    shape: 'disc',
+    blend: 'half',
+    fade: true,
+    fadeIn: 0.2,
+    fadeOut: 0.6,
+    gravity: -0.4,
+    drag: 2,
+    wind: 0.6,
+    onFloor: 'die',
+    cap: 24,
   }),
   // The smoke a blast leaves: big, dark, swelling as it rises and thins.
   defineParticle({
