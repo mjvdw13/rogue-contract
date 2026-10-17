@@ -1,7 +1,7 @@
 # Custom art
 
 Use this folder to try out art from outside the generators, such as sprites
-ripped from other games or photos of real people. New files here are ignored
+ripped from other games or your own drawings. New files here are ignored
 by git, so they stay on your computer.
 
 The exception is the Dark Forces art below, committed with `cut.mjs` and

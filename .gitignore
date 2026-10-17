@@ -3,7 +3,7 @@ tools/art/out/
 .smoke/
 *.log
 .DS_Store
-# Photos of real people stay on your own computer (see assets/custom/README.md).
+# Art you try out here stays on your own computer unless listed below (see assets/custom/README.md).
 assets/custom/*
 !assets/custom/README.md
 # Ripped Dark Forces art, for local testing only (see DISCLAIMER.md).

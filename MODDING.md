@@ -1,11 +1,11 @@
-# Modding Raccoon Alex
+# Modding Rogue Contract
 
-Everything that makes this game *Raccoon Alex* lives in `src/content/` as plain
-data. The engine in `src/engine/` never mentions Alex. It only reads that
-content pack. Each new monster, weapon, item, level, sound or song is a small
-definition in a file, plus one line in an index.
+Everything that makes this game *Rogue Contract* lives in `src/content/` as
+plain data. The engine in `src/engine/` never mentions Star Wars. It only
+reads that content pack. Each new monster, weapon, item, level, sound or song
+is a small definition in a file, plus one line in an index.
 
-This guide covers each kind of content in turn: monsters, coworkers, weapons,
+This guide covers each kind of content in turn: monsters, friendly characters, weapons,
 items, scenery, levels, textures, sounds, music, cheats and custom behaviour.
 All paths are relative to the repository root.
 
@@ -17,7 +17,7 @@ All paths are relative to the repository root.
    exit, keys and secrets can be reached from the start. It also prints an
    ammo budget for each level.
 3. Reload the game. Jump straight to a level with
-   `index.html?map=e1m2&skill=3`, and add `&god` or `&nomonsters` while
+   `index.html?map=m1&skill=3`, and add `&god` or `&nomonsters` while
    testing.
 4. Run `npm test` before you push.
 
@@ -61,7 +61,7 @@ with JSDoc types, so editors like VS Code autocomplete the fields.
   out on the door instead. An animated texture is a horizontal strip of
   frames.
 - **The built-in art** comes from code in `tools/art/`. Run `npm run art`, or
-  `node tools/art/generate.mjs --only ant --preview`. It uses a small
+  `node tools/art/generate.mjs --only stormtrooper --preview`. It uses a small
   software "clay" renderer (`tools/art/lib/model.js`), and a rig for
   humanoids (`lib/rig.js`). You can also just draw PNGs by hand. If you
   hand-edit a generated PNG, don't regenerate that asset afterwards, or your
@@ -76,10 +76,10 @@ Make a file in `src/content/monsters/`, import it in
 import { defineMonster } from '../../engine/defs.js';
 
 export default defineMonster({
-  id: 'temp',                 // unique id
-  name: 'Rabid Temp',
-  glyph: 't',                 // its letter in level maps (must be unused)
-  sheet: { src: 'assets/sprites/monsters/temp.png', frameWidth: 64, frameHeight: 64 },
+  id: 'scout-trooper',        // unique id
+  name: 'Scout Trooper',
+  glyph: 'q',                 // its letter in level maps (must be unused)
+  sheet: { src: 'assets/sprites/monsters/scout-trooper.png', frameWidth: 64, frameHeight: 64 },
   health: 40,
   speed: 2.6,                 // tiles per second
   radius: 0.3,                // collision radius in tiles
@@ -87,8 +87,8 @@ export default defineMonster({
   reactionTime: 0.4,          // seconds before reacting after being woken
   cooldown: [1, 2.2],         // seconds between attacks (random in range)
   aggression: 0.65,           // how eagerly it attacks when it could
-  attack: { kind: 'projectile', projectile: 'exception-fireball', range: 30, minRange: 1.5 },
-  melee: { kind: 'melee', damage: [6, 18], range: 1.1, hitSound: 'claw' },
+  attack: { kind: 'projectile', projectile: 'trooper-bolt', spread: 0.07, range: 60, sound: 'blaster-enemy' },
+  melee: { kind: 'melee', damage: [6, 18], range: 1.1, hitSound: 'punch-hit' },
   anims: {
     idle: { frames: [0, 1], fps: 2, loop: true },
     walk: { frames: [0, 1, 2, 3], fps: 6 },
@@ -97,9 +97,8 @@ export default defineMonster({
     pain: [6],
     death: { frames: [7, 8, 9, 10], fps: 8 },
   },
-  sounds: { sight: 'firefly-sight', active: 'firefly-active', pain: 'firefly-pain', death: 'firefly-death' },
-  blood: 'ichor',             // effect when hit (bugs bleed green)
-  drops: ['staples-clip', { item: 'donut', chance: 0.25 }],
+  sounds: { sight: 'trooper-sight', pain: 'trooper-pain', death: 'trooper-death' },
+  drops: ['power-cell', { item: 'med-kit', chance: 0.25 }],
 });
 ```
 
@@ -107,7 +106,7 @@ export default defineMonster({
 `{ frames, fps | durations, loop, fireAt, fullbright, events }`. `fireAt` is
 the position (within `frames`) at which the attack happens. `fullbright` lists
 the positions that ignore lighting (muzzle flashes). `events` maps a position
-to a string such as `'sound:pumpkin-rustle'`, or to anything a hook wants.
+to a string such as `'sound:droid-active'`, or to anything a hook wants.
 A monster needs `walk` (or `idle`) and `death`. The last death frame stays on
 the floor as the corpse.
 
@@ -136,7 +135,7 @@ so an art override can add views the committed sheet lacks.
 **Attacks.** An attack is one of:
 
 - `{ kind: 'hitscan', damage: [3, 12], spread: 0.1, range: 24, pellets: 1, sound }`
-- `{ kind: 'projectile', projectile: 'exception-fireball', count: 1, spread: 0 }`
+- `{ kind: 'projectile', projectile: 'trooper-bolt', count: 1, spread: 0 }`
 - `{ kind: 'melee', damage: [10, 30], range: 1.1, hitSound }`
 - a custom kind (see *Custom behaviour*)
 
@@ -150,7 +149,7 @@ steps and ledges, and shots into the sky simply vanish. Explosions measure
 3D distance, so a blast on the floor below a ledge doesn't reach over it.
 
 **Other fields:** `scale` (sprite size), `height`, `mass` (knockback),
-`sightRange`, `splashImmune`, `infighting: false`, `boss: true`,
+`sightRange`, `splashImmune`, `bleeds: false` (a puff instead of `blood` when hit: droids), `infighting: false`, `boss: true`,
 `renderStyle: 'fuzz'` (shimmering, partly invisible), `countKill: false`,
 `stepHeight`, `dropHeight`, `flying: true` with `z` and `flySpeed` (see
 *Heights* under Levels).
@@ -158,48 +157,42 @@ steps and ledges, and shots into the sky simply vanish. Explosions measure
 **Hooks** run your own code: `onSpawn(world, self)`, `onSight(world, self)`,
 `onThink(world, self, dt)` (return `true` to skip the normal AI that tick),
 `onAttack(world, self, attack)`, `onPain(world, self, source, amount)`,
-`onDeath(world, self, source)` and `onEvent(world, self, eventName)`. The Pumpkin
-King in `monsters/pumpkin-king.js` uses `onThink` to cackle for reinforcements.
+`onDeath(world, self, source)` and `onEvent(world, self, eventName)`.
 
-## Coworkers (friendly characters)
+## Friendly characters
 
-`src/content/coworkers.js` defines Alex's coworkers with `defineNpc()`.
+`src/content/npcs/villagers.js` defines the townsfolk with `defineNpc()`.
 Friendlies are solid, so you bump into them, but they can't be hurt.
 Bullets, projectiles and explosions pass through them, and monsters never
 target them. Each one idles and wanders up to `wander` tiles from where it was
 placed. It stays out of doorways, hazards and one-tile passages, so it never
-blocks the way. When Alex bumps into one or presses use on it, it turns to
-him, plays `react`, says one of its `lines` (shown as `NAME: line`), plays
+blocks the way. When the player bumps into one or presses use on it, it turns to
+them, plays `react`, says one of its `lines` (shown as `NAME: line`), plays
 `sounds.react` and pops up a `bubble` effect.
 
 ```js
 defineNpc({
-  id: 'vera',
-  name: 'VERA',
-  glyph: '2',
-  sheet: { src: 'assets/sprites/coworkers/vera.png', frameWidth: 64, frameHeight: 64 },
+  id: 'moisture-farmer',
+  name: 'FARMER',
+  glyph: 'z',
+  sheet: { src: 'assets/sprites/npcs/moisture-farmer.png', frameWidth: 64, frameHeight: 64 },
   wander: 3,                // tiles from the spot; 0 = stays put
   speed: 0.8,
   idleTime: [3, 6],         // seconds between strolls
   anims: { idle: { frames: [0, 1], durations: [2.8, 1.6], loop: true }, walk: [2, 3, 4, 5], react: [6] },
-  lines: ['Cool.', 'Wow. Riveting.'],
-  bubble: 'bubble-dots',    // an effect from content/effects.js
-  sounds: { react: 'npc-hmph' },
+  lines: ['Vaporators don't fix themselves.', 'Storm's coming in off the Dune Sea.'],
+  bubble: 'bubble-dots',    // optional: an effect (defineEffect) that pops up over them
+  sounds: { react: 'npc-hmph' }, // optional: any sound id
 });
 ```
 
-Animation frame events like `events: { 2: 'sound:npc-sigh' }` play a sound
-(Dale sighs on his idle loop). `hooks.onReact(world, self)` and
+Animation frame events like `events: { 2: 'sound:npc-sigh' }` play a sound.
+`hooks.onReact(world, self)` and
 `hooks.onThink(world, self, dt)` add custom behaviour.
 
-The sprites are hand-drawn pixel art, one file per coworker in
-`tools/art/sprites/people/`. Each character is drawn as text grids, one
-character per pixel and a legend of palette colours, split into parts (head,
-body, arms, legs) so poses can reuse them. `compose()` stamps the parts onto a
-frame and `paint()` finishes it: dithered blends between shades, a light
-fabric grain, soft edges between materials, and a shadow-side outline instead
-of a black one (all in `tools/art/lib/pixels.js`). Edit a grid, then run
-`npm run art -- --only coworker-<id>`.
+The villagers' sheets are cut from character sheets by
+`assets/custom/villagers/cut.py` (Python, Pillow), like the sandtroopers and
+the Jawa; see `assets/custom/README.md`.
 
 ## Weapons
 
@@ -210,20 +203,20 @@ pickup item for it (see *Items*).
 import { defineWeapon } from '../../engine/defs.js';
 
 export default defineWeapon({
-  id: 'hole-punch',
-  name: 'HOLE PUNCH',
+  id: 'repeater',
+  name: 'REPEATER',
   slot: 3,                        // number key; several weapons can share a slot
-  ammo: 'tacks',                  // or null for melee
+  ammo: 'energy',                 // or null for melee
   ammoPerShot: 1,
   priority: 3,                    // auto-switch preference when picking up ammo
   light: { radius: 5, light: 96 }, // the muzzle flash lights the room round you
-  sheet: { src: 'assets/sprites/weapons/hole-punch.png', frameWidth: 128, frameHeight: 96 },
+  sheet: { src: 'assets/sprites/weapons/repeater.png', frameWidth: 128, frameHeight: 96 },
   anims: {
     idle: [0],
     fire: { frames: [1, 2, 0], durations: [0.08, 0.15, 0.2], fireAt: 0, fullbright: [0] },
   },
   fire: { kind: 'hitscan', damage: [5, 15], pellets: 3, spread: 0.06, range: 40 },
-  sounds: { fire: 'tack-fire' },
+  sounds: { fire: 'blaster-fire' },
 });
 ```
 
@@ -277,8 +270,8 @@ Built-in `pickup` effects (combine as many as you like):
 | Effect | Meaning |
 |---|---|
 | `health: n` | Heal `n`, up to `maxHealth` (default 100) |
-| `armor: n` | Add caffeine (armor), up to `maxArmor` (default 200). With `armorClass: 1` or `2`, set it to `n` with that absorption (⅓ or ½) |
-| `ammo: { staples: 10 }` | Give ammo (doubled on the easiest and hardest skills) |
+| `armor: n` | Add shields (armor), up to `maxArmor` (default 200). With `armorClass: 1` or `2`, set it to `n` with that absorption (⅓ or ½) |
+| `ammo: { energy: 15 }` | Give ammo (doubled on the easiest and hardest skills) |
 | `weapon: 'id'` | Give a weapon and switch to it |
 | `key: 'blue'` | Give a key (the ids are listed in `config.keys`) |
 | `powerup: 'invulnerable' \| 'nightvision' \| 'hazard' \| 'berserk'` | Timed powerup (`duration` in seconds, default 30). Berserk lasts the whole level |
@@ -336,7 +329,7 @@ be added with `definePickup` (see *Custom behaviour*).
   With `erupt`, one more goes up from the floor where it struck a wall or
   floor, but none where it hit a body (that body erupts already). A
   projectile with no `sheet` flies unseen.
-- **Effects** such as puffs, blood, bug ichor and explosions use
+- **Effects** such as puffs, blood and sprite explosions use
   `defineEffect({ id, sheet, anims: { idle } })`. An effect disappears when its
   animation ends.
 
@@ -559,18 +552,21 @@ the real caps and a count of what's live.
 
 ## Levels
 
-A level is an ASCII map. Copy `src/content/levels/e1m1.js`, rename it, add it to
+A level is an ASCII map. Add a file in `src/content/levels/`, import it in
 `src/content/levels/index.js`, and put its id in an episode's `levels` list.
+`sandbox.js` is a typed map like the one below; Mission 1 (`m1.js`) is too
+big to type, so it's painted in code by `levels/lib/painter.js` (rooms,
+chamfers, stairs, lifts), which hands the game an ordinary map.
 
 ```js
 import { defineLevel } from '../../engine/defs.js';
 
 export default defineLevel({
-  id: 'e1m6',
-  mapLabel: 'E1M6',
-  name: 'THE ROOF',
-  music: 'office',
-  sky: 'sky-city',
+  id: 'm2',
+  mapLabel: 'M2',
+  name: 'THE HOMESTEAD',
+  music: 'garrison',
+  sky: 'sky-night',
   par: 120,                  // seconds, shown on the tally screen
   fog: 0.05,                 // extra darkness with distance (the default)
   haze: { color: [32, 24, 64], half: 40 }, // outdoors, fade to this colour
@@ -579,14 +575,14 @@ export default defineLevel({
     '#....#....#',
     '#.:..D..:.#',           // D: a door, : a bright floor tile
     '#....#....#',
-    '#1#########',           // 1: a door that needs the blue badge
+    '#1#########',           // 1: a door that needs the blue keycard
     '#.#',                   // short rows are padded with solid nothing
     '#X#',                   // X: the exit switch
   ],
   things: [
     '',
-    ' >  b  i',              // player start facing east, blue badge, ant
-    '        d',             // a donut
+    ' >  b  t',              // player start facing east, blue keycard, stormtrooper
+    '        h',             // a med kit
   ],
   legend: {},                // per-level tile glyphs (see below)
   thingLegend: {},           // per-level thing glyphs
@@ -609,13 +605,13 @@ more or override them in `legend`. A glyph means one of these:
 
 ```js
 // A wall:
-'#': { wall: 'drywall' },
+'#': { wall: 'imp-panel' },
 // A floor (the ceiling: 'sky' opens it to the sky):
-'.': { floor: 'carpet', ceiling: 'ceiling-tile', light: 160 },
-// A door ('slide' or 'split'; lock: 'blue' | 'yellow' | 'red' | 'remote'):
-'D': { door: 'door-office', jamb: 'door-jamb' },
+'.': { floor: 'imp-floor', ceiling: 'imp-ceiling', light: 160 },
+// A door ('rise', 'slide' or 'split'; lock: 'blue' | 'yellow' | 'red' | 'remote'):
+'D': { door: 'imp-door', jamb: 'imp-jamb', upper: 'imp-lintel', style: 'rise' },
 // A switch (use it to run actions):
-'X': { wall: 'switch-exit', use: 'exit', switchTo: 'switch-exit-on' },
+'X': { wall: 'imp-switch', use: 'exit', switchTo: 'imp-switch-on' },
 // Copy another glyph and change some of it:
 'a': { base: '.', light: 220, lightFx: 'flicker', tag: 'hall' },
 ```
@@ -989,15 +985,15 @@ against the ceiling turns back.
 The `things` grid lines up with `tiles`. Put a thing's glyph on a floor tile.
 The player start is `^ > v <` (facing north, east, south or west). Every
 monster, item and decoration has a `glyph` in its definition. Glyphs for
-skill-specific placement are in the shared `things` legend: `!` is an Off-By-One Ant
-on skill 3 and up, and `+` is a donut on skills 1–2. Add your own in
+skill-specific placement are in the shared `things` legend: `!` is a
+stormtrooper on skill 3 and up, and `+` is a med kit on skills 1–2. Add your own in
 `thingLegend`:
 
 ```js
 thingLegend: {
-  Z: { type: 'firefly', tag: 'closet-flies' },  // tag it for triggers
-  9: { type: 'beetle', skill: [3, 4, 5] },      // only on these skills
-  8: { type: 'ant', ambush: true, angle: 'W' }  // ambush: waits until it sees you
+  Z: { type: 'probe-droid', tag: 'closet-droids' }, // tag it for triggers
+  9: { type: 'sandtrooper', skill: [3, 4, 5] },     // only on these skills
+  8: { type: 'jawa', ambush: true, angle: 'W' }     // ambush: waits until it sees you
 },
 ```
 
@@ -1007,19 +1003,19 @@ it dies. The validator and the reachability check count a key that a
 reachable monster always drops (chance 1) as placed.
 
 You can also place things precisely with
-`list: [{ type: 'donut', x: 3.5, y: 7.25 }]`. A `z` there puts a thing (or
+`list: [{ type: 'med-kit', x: 3.5, y: 7.25 }]`. A `z` there puts a thing (or
 the player start) on top of a slab rather than under it.
 
 ### Triggers and actions
 
 ```js
 triggers: [
-  { on: 'start', do: [{ action: 'message', text: 'THE ROOF. IT IS RAINING.' }] },
+  { on: 'start', do: [{ action: 'message', text: 'THE HOMESTEAD. TWIN SUNSET.' }] },
   { on: 'enter', tag: 'hall', do: [{ action: 'openDoors', tag: 'closet' }] },
   { on: 'use', tag: 'panel', do: ['exit'] },
-  { on: 'pickup', thing: 'badge-red', do: [{ action: 'spawn', thing: 'firefly', tag: 'spawn-spot' }] },
-  { on: 'killed', tag: 'closet-flies', do: [{ action: 'setLight', tag: 'hall', light: 200 }] },
-  { on: 'killed', thing: 'pumpkin-king', do: [{ action: 'finale' }] },
+  { on: 'pickup', thing: 'keycard-red', do: [{ action: 'spawn', thing: 'stormtrooper', tag: 'spawn-spot' }] },
+  { on: 'killed', tag: 'closet-droids', do: [{ action: 'setLight', tag: 'hall', light: 200 }] },
+  { on: 'killed', thing: 'boba-fett', do: [{ action: 'finale' }] },
 ],
 ```
 
@@ -1063,7 +1059,7 @@ Actions:
 - `npm run validate -- --verbose` also lists unreachable items and one-way
   areas: places the player can drop into but never get back out of to the
   start. Some are on purpose, but a pit with no lift or stairs out is a trap.
-- `node tools/mapview.mjs e1m6` writes `tools/art/out/maps/e1m6.png`, a
+- `node tools/mapview.mjs m1` writes `tools/art/out/maps/m1.png`, a
   top-down picture with monsters in red, items in yellow, keys in their colour
   and unreachable floor cross-hatched. Floors are shaded by height (higher is
   brighter), with a black edge where a ledge is too high to walk up and a grey
@@ -1087,7 +1083,7 @@ Tips from the built-in maps:
 `defineEpisode({ id, name, levels: [...], map, finale: { text, background, endImage, endText, music } })`.
 If there is more than one episode, the menu asks which one to play.
 
-`map: { spots: { e1m1: [82, 34], ... } }` places each level on the
+`map: { spots: { m1: [160, 100], ... } }` places each level on the
 intermission picture (`assets/ui/intermission.png`). Spots are in the
 picture's centre 320×200, which is all a 4:3 screen shows. Full-screen
 pictures can be 560×200 so they also fill a 21:9 screen; a 320-wide picture is
@@ -1112,7 +1108,7 @@ Sounds are defined in `src/content/sounds.js`. Each one is either synthesized
 from parameters or loaded from a file:
 
 ```js
-defineSound({ id: 'stapler-jam', synth: { wave: 'square', freq: 300, freqEnd: 80, duration: 0.2, bits: 6 } }),
+defineSound({ id: 'droid-beep', synth: { wave: 'square', freq: 300, freqEnd: 80, duration: 0.2, bits: 6 } }),
 defineSound({ id: 'scream', src: 'assets/sounds/scream.wav', volume: 0.8 }),
 ```
 
@@ -1176,10 +1172,9 @@ an audio file: `defineSong({ id, src: 'assets/music/theme.ogg' })`.
 - `src/content/strings.js` holds all the text: menus, skill names, quit
   messages, the help screen and the finale.
 - `src/content/hero.js` sets the starting health, weapons, ammo, speed,
-  `sounds` (`jump` and `land`) and face (see `assets/custom/README.md` for
-  using a photo).
+  body and `sounds` (`jump` and `land`).
 - `src/content/config.js` sets the key colours and names, the title and
-  intermission music, and where the photo portrait goes on the title screen.
+  intermission music, and how far below the screen's edge weapons sit.
 - `src/content/palette.js` holds the colour ramps and the fitted colours
   after them. Change one and run `npm run art` to re-theme everything.
   `node tools/fit-palette.mjs` scores how well the palette fits the art
@@ -1196,20 +1191,20 @@ import { defineAction, defineAttack, definePickup } from '../engine/defs.js';
 export default {
   // ...
   actions: [
-    // { action: 'shake', seconds: 1 } in any trigger
-    defineAction('shake', (world, params) => world.message('THE BUILDING SHUDDERS')),
+    // { action: 'rumble' } in any trigger
+    defineAction('rumble', (world, params) => world.message('THE GARRISON SHUDDERS')),
   ],
   attacks: [
-    // { kind: 'triple-exception' } in any monster or weapon
+    // { kind: 'triple-bolt' } in any monster or weapon
     // opts.aim is { z, slope }: where the attack starts and how steeply it climbs.
-    defineAttack('triple-exception', (world, attacker, spec, angle, opts) => {
-      for (const d of [-0.2, 0, 0.2]) world.spawnProjectile('exception-fireball', attacker, angle + d, spec, opts.aim);
+    defineAttack('triple-bolt', (world, attacker, spec, angle, opts) => {
+      for (const d of [-0.2, 0, 0.2]) world.spawnProjectile('trooper-bolt', attacker, angle + d, spec, opts.aim);
       return true;
     }),
   ],
   pickups: [
-    // pickup: { coffeeBreak: 5 } in any item
-    definePickup('coffeeBreak', (world, player, value) => {
+    // pickup: { bacta: 5 } in any item
+    definePickup('bacta', (world, player, value) => {
       player.health = Math.min(200, player.health + value);
       return true; // consumed
     }),
@@ -1229,6 +1224,6 @@ export default {
 
 ## Making a different game
 
-The engine knows nothing about Alex. To start a different game, copy
+The engine knows nothing about Star Wars. To start a different game, copy
 `src/content/` and change it: the palette, strings, hero, art and levels. Then
 point `src/main.js` at the new pack.
