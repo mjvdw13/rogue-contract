@@ -1584,6 +1584,21 @@ Steps:
            tiles off and rests at 5; half a second, 8.4 and 14; a full
            throw 13.9 and 24 (was 10.7 and 18). Mission 1's halls are
            shorter than that: a full throw there reaches the far wall.
+       - Mark (2026-10-17): throw it in a higher arc, especially charged
+         up. It rose only half a tile above the hand, however hard it
+         was thrown. Decided: a bouncer's `loft`, upward speed added
+         times the throw's power (`toss` stays the same for every
+         throw). Rooms are 3 to 5 tiles tall, so a full throw peaks
+         about 4 above the floor, where most ceilings start.
+     - [x] 6h. `loft` (engine, defs, validator, MODDING.md); the
+           detonator's speed 18 (was 24), `toss` 7 (was 6), `loft` 6.
+           On open ground: a tap rises about 1 tile above the hand,
+           lands 2.7 off and rests at 4.2 (was 2.9 and 4.5); half a
+           second, 1.7 up, 9.3 and 15 (was 0.5 up, 8.4 and 14); a full
+           throw 2.8 up, 18.5 and 31 (was 0.5 up, 13.9 and 24). Tests:
+           a hard throw goes higher than a tap; the bounce test throws
+           at half power, and the body test throws flat (a full lob now
+           sails over a trooper 4 tiles off).
 
 ### V. Villagers (2026-10-17)
 
@@ -3502,3 +3517,8 @@ update the smoke test.
   way (`lockOn: 5`: the nearest visible monster within 5° or under the
   crosshair, at any height), and its blasts stand about twice a trooper's
   height. 245 tests, the validator and the smoke test pass.
+- 2026-10-17: Phase 1b U 6h, Mark: the detonator thrown in a higher arc,
+  more so charged up (projectiles' `bounce.loft`, upward speed times the
+  throw's power): a tap rises about a tile and still lands 3 off, a full
+  throw nearly three and lands 18 off (rests at 31). 246 tests, the
+  validator and the smoke test pass.

@@ -267,8 +267,8 @@ export function launchProjectile(world, id, owner, angle, spec = {}, aim = aimAt
   const ceil = world.map.ceilAt(p.x, p.y, 0, p.z);
   p.z = Math.max(floor + CLEARANCE, Math.min(ceil - CLEARANCE, p.z));
   if (def.bounce) {
-    // Thrown: along the aim, tossed a little up.
-    p.vz = aim.slope * speed + def.bounce.toss;
+    // Thrown: along the aim, tossed up, higher the harder it was thrown.
+    p.vz = aim.slope * speed + def.bounce.toss + def.bounce.loft * (spec.power ?? 1);
   } else if (def.gravity) {
     // Lob so it lands near the target (or 12 tiles ahead, plus the aim).
     const target = owner.target ?? null;

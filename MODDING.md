@@ -251,8 +251,8 @@ let go instead of when it's pressed. Pressing fire pulls the hand back,
 down `sink` pixels over `pull` seconds, and it stays there while fire is
 held. The throw's power runs from `min` for a tap to
 1 for a hold of `time` seconds or more, and it scales the projectile's
-`speed`, so a tap is a short toss. Changing weapon while winding up drops
-the throw.
+`speed` (and a bouncer's `loft`), so a tap is a short, low toss. Changing
+weapon while winding up drops the throw.
 
 ## Items
 
@@ -303,7 +303,8 @@ be added with `definePickup` (see *Custom behaviour*).
   ```js
   gravity: 28,
   bounce: {
-    toss: 6,            // thrown along your aim, plus this much upward speed
+    toss: 7,            // thrown along your aim, plus this much upward speed
+    loft: 6,            // and this much more times the throw's power (a weapon's `charge`)
     restitution: 0.55,  // share of its speed into a wall or floor it keeps (0-1)
     friction: 0.75,     // share of the rest it keeps at each bounce (0-1)
     minSpeed: 1.5,      // slower than this into the floor, it stops bouncing and rolls

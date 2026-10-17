@@ -158,7 +158,7 @@ export function validateContent(reg) {
     if (t.kind === 'projectile' && t.bounce) {
       const b = t.bounce;
       for (const key of ['restitution', 'friction']) if (!(b[key] >= 0 && b[key] <= 1)) err(`${owner} bounce: ${key} must be 0 to 1`);
-      for (const key of ['minSpeed', 'roll', 'toss']) if (!(typeof b[key] === 'number' && b[key] >= 0)) err(`${owner} bounce: ${key} must be a number, 0 or more`);
+      for (const key of ['minSpeed', 'roll', 'toss', 'loft']) if (!(typeof b[key] === 'number' && b[key] >= 0)) err(`${owner} bounce: ${key} must be a number, 0 or more`);
       if (!(b.fuse > 0)) err(`${owner} bounce: fuse is seconds, above 0`);
       if (!(t.gravity > 0)) warn(`${owner}: bounces but has no gravity (it will fly straight until its fuse runs out)`);
     }

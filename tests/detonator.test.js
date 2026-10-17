@@ -9,15 +9,15 @@ import { makeWorld, mockInput, room, run } from './helpers.js';
 const TALL = { '.': { floor: 'imp-floor', ceiling: 'imp-ceiling', light: 160, ceilZ: 8 } };
 const hall = () => room(['##############', '#............#', '#............#', '#............#', '##############'], ['', '', ' >'], { legend: TALL });
 
-/** Throw one from the player, level (slope 0) from `z`; the sounds it makes are in `w.heard`. */
-function toss(w, angle = 0, z = 1) {
+/** Throw one from the player at `power`, level (slope 0) from `z`; the sounds it makes are in `w.heard`. */
+function toss(w, angle = 0, z = 1, power = 1) {
   w.heard = [];
   const play = w.playSoundFrom.bind(w);
   w.playSoundFrom = (id, t) => {
     if (id) w.heard.push({ id, time: w.time });
     return play(id, t);
   };
-  return w.spawnProjectile('detonator-thrown', w.player, angle, {}, { z, slope: 0 });
+  return w.spawnProjectile('detonator-thrown', w.player, angle, { power }, { z, slope: 0 });
 }
 
 test('a thrown detonator bounces off the wall and comes back, without going off', () => {
@@ -36,11 +36,14 @@ test('a thrown detonator bounces off the wall and comes back, without going off'
 
 test('it bounces a few times, clanking, loses speed and comes to rest on the floor', () => {
   const w = makeWorld(hall(), { noMonsters: true });
-  const p = toss(w, 0, 2);
-  run(w, mockInput(), 2.2);
+  const p = toss(w, 0, 2, 0.5);
+  let rolling = null;
+  run(w, mockInput(), 2.4, () => {
+    if (p.resting) rolling ??= w.time;
+  });
   const clanks = w.heard.filter((s) => s.id === 'detonator-bounce');
   assert.ok(clanks.length >= 3, `clanked ${clanks.length} times`);
-  assert.ok(clanks.at(-1).time < 1.6, 'and not while it rolls or lies there');
+  assert.ok(rolling != null && clanks.at(-1).time <= rolling, 'and not while it rolls or lies there');
   assert.ok(p.resting, 'lying on the floor');
   assert.ok(Math.abs(p.z - p.radius) < 1e-9, 'its centre its radius above the floor');
   assert.ok(Math.hypot(p.vx, p.vy, p.vz) < 0.05, 'stopped');
@@ -66,6 +69,7 @@ test('it goes off at once on a body', () => {
   const w = makeWorld(hall(), { noMonsters: true });
   const trooper = w.spawn('stormtrooper', 5.5, 2.5, Math.PI);
   const p = toss(w);
+  p.vz = 0; // straight at it, not lobbed over
   run(w, mockInput(), 0.4);
   assert.ok(p.removed || p.state === 'exploding', 'burst on the trooper');
   assert.ok(p.x < 6, `where the trooper stands (${p.x.toFixed(2)})`);
@@ -131,6 +135,20 @@ test('a tap is a short toss; held down, a long throw', () => {
   assert.equal(long.power, 1, 'held a second or more: full power');
   const speed = (d) => Math.hypot(d.vx, d.vy);
   assert.ok(speed(long.det) > 2.5 * speed(short.det), 'the long throw flies much faster');
+});
+
+test('a hard throw is lobbed higher than a tap', () => {
+  const peak = (power) => {
+    const w = makeWorld(hall(), { noMonsters: true });
+    const p = toss(w, 0, 1, power);
+    let top = p.z;
+    run(w, mockInput(), 1, () => (top = Math.max(top, p.z)));
+    return top - 1;
+  };
+  const tap = peak(0.15);
+  const full = peak(1);
+  assert.ok(tap > 0.7, `a tap still goes up (${tap.toFixed(2)})`);
+  assert.ok(full > 2 * tap, `a full throw much higher (${full.toFixed(2)} vs ${tap.toFixed(2)})`);
 });
 
 test('changing weapon while winding up drops the throw', () => {

@@ -408,7 +408,8 @@ export function defineDecoration(def) {
  * bursts it sets off its `explosion` (defineExplosion), facing out of what
  * it hit.
  * `bounce` makes it bounce instead (a thrown detonator): thrown along the aim
- * plus `toss` upward, off walls, floors, ceilings and solid scenery, keeping
+ * plus `toss` upward (and `loft` more times the throw's power, so a hard
+ * throw goes up higher), off walls, floors, ceilings and solid scenery, keeping
  * `restitution` (0..1) of its speed into what it hit and `friction` of the
  * rest; slower than `minSpeed` into the floor it stops bouncing and rolls,
  * losing `roll` of its speed a second. It goes off after `fuse` seconds, or
@@ -421,7 +422,7 @@ export function defineDecoration(def) {
  * @param {{id:string, sheet?:SheetSpec, anims?:{fly:AnimSpec, explode?:AnimSpec}, speed?:number,
  *   damage?:number|number[], radius?:number, splash?:{radius:number, damage:number, falloff?:boolean, erupt?:string},
  *   gravity?:number, z?:number, sounds?:{fire?:string, explode?:string, bounce?:string}, trail?:string, explosion?:string,
- *   bounce?:{restitution?:number, friction?:number, minSpeed?:number, roll?:number, fuse?:number, toss?:number}}} def
+ *   bounce?:{restitution?:number, friction?:number, minSpeed?:number, roll?:number, fuse?:number, toss?:number, loft?:number}}} def
  */
 export function defineProjectile(def) {
   const p = baseThing(def, 'projectile', {
@@ -434,7 +435,7 @@ export function defineProjectile(def) {
     gravity: 0,
     splash: null,
   });
-  if (def.bounce) p.bounce = { restitution: 0.5, friction: 0.7, minSpeed: 1.5, roll: 3, fuse: 2.5, toss: 4, ...def.bounce };
+  if (def.bounce) p.bounce = { restitution: 0.5, friction: 0.7, minSpeed: 1.5, roll: 3, fuse: 2.5, toss: 4, loft: 0, ...def.bounce };
   return p;
 }
 

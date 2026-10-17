@@ -53,11 +53,12 @@ export const projectiles = [
     anims: { fly: [0] },
     fullbright: false,
     radius: 0.2,
-    speed: 24, // a full throw (a weapon's `charge` scales it down for a short toss)
+    speed: 18, // a full throw (a weapon's `charge` scales it down for a short toss)
     gravity: 28,
     damage: [20, 30],
     splash: { radius: 4, damage: 140 },
-    bounce: { restitution: 0.55, friction: 0.75, minSpeed: 1.5, roll: 3, fuse: 2.5, toss: 6 },
+    // Lobbed high: a tap rises about a tile, a full throw nearly three.
+    bounce: { restitution: 0.55, friction: 0.75, minSpeed: 1.5, roll: 3, fuse: 2.5, toss: 7, loft: 6 },
     explosion: 'large',
     sounds: { bounce: 'detonator-bounce', explode: 'detonator-explode' },
   }),
