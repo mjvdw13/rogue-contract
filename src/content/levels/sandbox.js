@@ -250,6 +250,6 @@ export default defineLevel({
     '',
     '',
     '',
-    '       C   a           9      s   j',
+    '       C   a           9      s S j',
   ],
 });

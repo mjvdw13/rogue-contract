@@ -76,16 +76,16 @@ test('m1: the overload opens the escape hatch for good', () => {
   for (const d of hatch) assert.equal(d.state, 'open');
 });
 
-test('the garrison is held by stormtroopers, sandtroopers, Jawas, an officer and a probe droid', () => {
+test('the garrison is held by stormtroopers, sandtroopers and their commander, Jawas, an officer and a probe droid', () => {
   const w = makeWorld('sandbox');
   const ids = w.things.filter((t) => t.kind === 'monster').map((t) => t.def.id);
-  for (const id of ['stormtrooper', 'sandtrooper', 'jawa', 'officer', 'probe-droid']) assert.ok(ids.includes(id), `has a ${id}`);
+  for (const id of ['stormtrooper', 'sandtrooper', 'sandtrooper-commander', 'jawa', 'officer', 'probe-droid']) assert.ok(ids.includes(id), `has a ${id}`);
   const npcs = w.things.filter((t) => t.kind === 'npc').map((t) => t.def.id);
   assert.deepEqual(npcs.sort(), VILLAGERS.slice().sort(), 'and the villagers stroll about the start room');
 });
 
-test('every villager, sandtrooper and Jawa sheet holds all its frames and views, and a villager says a line when used', () => {
-  const cut = [...villagers.map((def) => [def, 42]), ...['sandtrooper', 'jawa'].map((id) => [registry.things.get(id), 37])];
+test('every villager, sandtrooper, commander and Jawa sheet holds all its frames and views, and a villager says a line when used', () => {
+  const cut = [...villagers.map((def) => [def, 42]), ...['sandtrooper', 'sandtrooper-commander', 'jawa'].map((id) => [registry.things.get(id), 37])];
   for (const [def, count] of cut) {
     const id = def.id;
     const sheet = registry.sheets.get(def.sheet.ref);

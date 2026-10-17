@@ -1728,6 +1728,60 @@ Decided:
        each side), tests, the validator and the smoke test; commit and
        push.
 
+### X. A sandtrooper commander (2026-10-17)
+
+Mark (2026-10-17) gave a sandtrooper sheet with a heavier rifle (a thick
+barrel and a wooden stock), made from the in-game grid
+(`sandtrooper/cut.py --full`, scaled up 2.05x on white), and asked for it
+as a new character, the sandtrooper commander. Only the weapon may change:
+the body stays exactly the sandtrooper's. Some poses are wrong (mainly the
+aim and the ones with a flash), to be fixed before use.
+
+Found on the sheet (`Gemini_Generated_Image_86qin1…jpg`, 1920x558):
+- Same 48 poses in the same places; the bodies match the grid.
+- The rifle is longer than the T-21: barrels run past the 72 px frame,
+  into the next pose. The commander needs wider frames.
+- Aim: a loose blob past the barrel's end. Fire (and the third aiming
+  pose): a flash painted on, orange, running into the next frame. The
+  prone death (unused) is a kneeling shot instead.
+
+Decided:
+- **Body pixels from the sandtrooper's own frames**, untouched; from the new
+  sheet only the weapon, and the body it uncovers where the old rifle
+  crossed it. Old rifle pixels with backdrop behind them now go.
+- **Flashes removed**; the cutter draws the game's red flash at the new
+  muzzle, as for the sandtrooper.
+- Its own frames, centred like the sandtrooper's, wide enough for the rifle.
+- A tougher sandtrooper: same burst, more health; glyph `S`.
+- Mark (2026-10-17): the sheet's rifle has a slightly cartoonish outline;
+  blend it in, no harsh borders.
+
+1. [x] `assets/custom/sandtrooper-commander/`: the sheet and a cutter that
+       grafts the weapon onto the sandtrooper's 37 frames (the poses the
+       game uses), dropping the painted flashes and stray bits; the aim
+       pose fixed. Check every frame at 4x beside the sandtrooper's.
+       - The sheet fits the grid at 2.052x (fitted on the bodies). Weapon
+         pixels: this pose's part of the sheet (what touches the body),
+         dark metal or brown wood, outside the body or clearly changed
+         there; a 3x3 majority inside the body stops pixels flipping
+         between stock and shoulder. New pixels snap to the gray, beige,
+         concrete, orange and rust ramps; the rifle's contour is eased
+         60% toward the colours round it (the outline becomes shading).
+       - Aim: the loose blob dropped (it doesn't touch the body). Fire:
+         cut past the barrel's end (column 77), the sandtrooper's old
+         flash removed, the red flash drawn at the new muzzle.
+       - Dead: the rifle was drawn below the base; lifted onto the ground,
+         lying in front of the corpse, and the T-21's barrel spike gone.
+       - Frames 100x72 (14 px each side for the barrel, 4 on top for the
+         falling deaths' raised rifle), centred like the sandtrooper's.
+2. [x] Monster `src/content/monsters/sandtrooper-commander.js`, in the
+       registry; one in the sandbox, beside the sandtrooper on the sniper
+       ledge. Health 70 (45), pain chance 0.25 (0.35), quicker to fire
+       again (cooldown 1.1-2.1 s), a little tighter spread, always drops
+       a power cell.
+3. [x] Tests (frames and views), the validator, the smoke test; a look in
+       game beside a sandtrooper; README; commit and push.
+
 ## Phase 1c: Two storeys per tile (done 2026-10-13)
 
 Mark (2026-10-13): we want to walk underneath other parts of the map. Today
@@ -3204,3 +3258,10 @@ update the smoke test.
   the sandtrooper's 48 poses apart on one grid in the game's colours
   (`sandtrooper/cut.py --full`, a copy in his Downloads). 234 tests, the
   validator and the smoke test pass.
+- 2026-10-17: Phase 1b X, the sandtrooper commander (glyph `S`) from
+  Mark's sheet with a heavy rifle: the sandtrooper's own frames with only
+  the rifle grafted on (`sandtrooper-commander/cut.py`), its outline eased
+  into shading, the painted flashes and the aim pose's loose blob left out,
+  the dead pose's rifle lifted onto the ground. Wider frames (100x72).
+  Tougher than a sandtrooper; one in the sandbox. 234 tests, the validator
+  and the smoke test pass.

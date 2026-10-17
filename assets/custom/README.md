@@ -135,6 +135,24 @@ Pillow and numpy:
 python assets/custom/sandtrooper/cut.py --preview preview.png --full sandtrooper-full.png
 ```
 
+## The sandtrooper commander
+
+`sandtrooper-commander/sheet.jpg` is the sandtrooper's in-game grid
+(`sandtrooper/cut.py --full`) given a heavy rifle (a thick barrel and a
+wooden stock) by an image AI, scaled up about 2x on white. `cut.py` lays it
+over the sandtrooper's committed frames and takes only the rifle from it,
+and the body it uncovers where the T-21 crossed it, so the body stays the
+sandtrooper's pixel for pixel. It leaves out the sheet's mistakes (the
+flashes painted on the fire poses, a loose blob past the aim pose's
+barrel), lifts the dead pose's rifle onto the ground, eases the rifle's hard
+dark outline toward the colours round it, and draws the game's red flash at
+the new muzzle. The frames are wider than the sandtrooper's (100x72) for
+the longer barrel:
+
+```
+python assets/custom/sandtrooper-commander/cut.py --preview preview.png
+```
+
 ## The Jawa
 
 `jawa/sheet.png` is a Jawa sprite sheet (painted pixel-art poses on a blue
