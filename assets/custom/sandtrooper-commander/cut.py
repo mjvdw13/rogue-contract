@@ -13,10 +13,12 @@ longer rifle. `--preview` also writes the sheet 4x on grey, for checking.
 The body stays the sandtrooper's, pixel for pixel. From the new sheet comes
 only the rifle (dark metal and the wooden stock), and the body it uncovers
 where the T-21 crossed it; T-21 pixels with backdrop behind them now go. The
-sheet's mistakes are left out: the flashes painted on the fire poses (the
-cutter draws the game's red flash at the new muzzle instead) and the loose
-blob past the aim pose's barrel. The sheet's rifle has a hard dark outline,
-so its contour is eased toward the colours round it.
+sheet's mistakes are left out: the aim and fire poses shoot straight at the
+player, but the sheet draws the rifle side-on there (with a painted flash),
+so those keep the sandtrooper's frames and get the heavy rifle's muzzle
+painted head-on (head_on()), the game's red flash on its bore. The sheet's
+rifle has a hard dark outline, so its contour is eased toward the colours
+round it.
 """
 import importlib.util
 import sys
@@ -46,11 +48,12 @@ SCALE, DX, DY = 2.052, -0.5, 0.0
 # The sheet is read BELOW further down, for the dead pose's rifle.
 SIDE, TOP, BELOW = 14, 4, 8
 
-FIRE = 7  # the sandtrooper's fire frame
-# Per frame: the column (in the commander's frame) from which on everything
-# is left out, past the barrel's end (the painted flash).
-CLIP = {FIRE: 77}
-MUZZLE = (79, 28)  # the fire frame's muzzle, in the commander's frame
+AIM, FIRE = 6, 7  # the sandtrooper's aim and fire frames: the rifle points at the viewer
+# The sheet draws the rifle side-on there, so the commander keeps the
+# sandtrooper's frames (the T-21 head-on, a dark block at the chest) and the
+# heavy rifle's thick muzzle is painted in front, facing the viewer (head_on()):
+# its centre per frame, in the commander's frame. The flash is on the bore.
+MUZZLES = {AIM: (SIDE + 44, TOP + 24), FIRE: (SIDE + 46, TOP + 24)}
 DEAD = 12  # its rifle is drawn below the body's base: lifted onto the ground
 T21_DEAD = (50, 56, 72, 63)  # the T-21's barrel in the sandtrooper's dead frame (x0, y0, x1, y1), dark pixels
 FLASH = [(255, 250, 200), (255, 170, 30), (255, 40, 30), (210, 20, 20)]  # sandtrooper/cut.py's muzzle_flash()
@@ -102,6 +105,46 @@ def majority(mask, within):
     return np.where(within, count >= 5, mask)
 
 
+def head_on(frame, centre, ramp):
+    """Paints the heavy rifle pointing at the viewer onto `frame` (RGBA):
+    the thick barrel's end, a round muzzle with a dark bore, lit from the
+    upper right, and the wooden stock's edge beside the receiver. Drawn 8x
+    and averaged down, so its edge blends into the body."""
+    ss, cx, cy = 8, centre[0], centre[1]
+    x0, y0, w, h = int(cx) - 10, int(cy) - 6, 16, 12
+    ys, xs = (np.mgrid[0:h * ss, 0:w * ss] + 0.5) / ss
+    xs, ys = xs + x0 - cx - 0.5, ys + y0 - cy - 0.5  # relative to the muzzle's centre
+    col = np.zeros(xs.shape + (3,))
+    cov = np.zeros(xs.shape)
+    # The stock's edge, behind the receiver toward the shoulder.
+    stock = (np.abs(ys + 1.6) < 1.1) & (xs > -8.5) & (xs < -4)
+    col[stock], cov[stock] = (128, 80, 40), 1
+    # The barrel, a short thick tube running back up-left into the receiver.
+    bx, by = -2.5, -1.2  # its far end, from the muzzle's centre
+    t = np.clip((xs * bx + ys * by) / (bx * bx + by * by), 0, 1)
+    tube = np.hypot(xs - bx * t, ys - by * t) < 3.6
+    shade = 60 + 35 * np.clip((xs - ys) / 5, -1, 1)
+    col[tube], cov[tube] = np.stack([shade] * 3, -1)[tube], 1
+    # The muzzle: a rim lit on its upper right, a dark lip, and the bore.
+    r = np.hypot(xs, ys)
+    lit = np.clip((xs - ys) / (np.sqrt(2) * np.maximum(r, 0.1)), -1, 1)
+    rim = r < 4.0
+    col[rim], cov[rim] = np.stack([85 + 80 * lit] * 3, -1)[rim], 1
+    col[r < 2.4] = (38, 38, 40)
+    col[r < 1.7] = (10, 10, 11)
+    # Averaged down to the frame's pixels.
+    blk = lambda a: a.reshape(h, ss, w, ss, *a.shape[2:]).mean((1, 3))  # noqa: E731
+    c = blk(cov)
+    rgb = blk(col * cov[..., None]) / np.maximum(c, 1e-3)[..., None]
+    area = frame[y0:y0 + h, x0:x0 + w].astype(float)
+    under = area[..., 3:] > 0
+    mixed = np.where(under, c[..., None] * rgb + (1 - c[..., None]) * area[..., :3], rgb)
+    paint = (c > 0.15) & under[..., 0] | (c >= 0.5)
+    area[paint, :3] = snap(mixed[paint][None], ramp)[0]
+    area[paint, 3] = 255
+    frame[y0:y0 + h, x0:x0 + w] = area.astype(np.uint8)
+
+
 def graft(old, new, k):
     """Frame k: the sandtrooper's frame `old` (RGBA, FW x FH) with the rifle of
     `new` (the sheet over the commander's frame and BELOW rows under it, RGB).
@@ -115,8 +158,6 @@ def graft(old, new, k):
     rgb = body[..., :3]
     dist = np.abs(255 - new).max(-1)
     fg = dist > BACKDROP_DIST
-    if k in CLIP:
-        fg[:, CLIP[k]:] = False
     # This pose on the sheet: what touches the sandtrooper's body, not the
     # neighbours' barrels reaching in, nor loose blobs.
     lab, _ = components(fg)
@@ -156,14 +197,21 @@ def main():
         old = trooper_sheet[:, k * FW:(k + 1) * FW]
         x0, y0 = i * FW, r * FH
         new = sheet_img[y0:y0 + TOP + FH + BELOW, x0:x0 + FW + 2 * SIDE]
-        rgb, opaque, fresh = graft(old, new, k)
         frame = np.zeros((FH + TOP, FW + 2 * SIDE, 4), np.uint8)
+        if k in MUZZLES:
+            frame[TOP:, SIDE:SIDE + FW] = old
+            flash = np.isin(frame[..., :3].astype(int) @ [65536, 256, 1], [c[0] * 65536 + c[1] * 256 + c[2] for c in FLASH])
+            frame[flash & (frame[..., 3] > 0)] = 0
+            head_on(frame, MUZZLES[k], lit)
+            if k == FIRE:
+                trooper.muzzle_flash(frame, *MUZZLES[k])
+            frames.append(frame)
+            continue
+        rgb, opaque, fresh = graft(old, new, k)
         # The sandtrooper's pixels keep their exact colours; only new ones snap.
         keep = ~fresh
         frame[..., :3] = np.where(keep[..., None], np.clip(rgb, 0, 255), snap(rgb, lit)).astype(np.uint8)
         frame[..., 3] = np.where(opaque, 255, 0)
-        if k == FIRE:
-            trooper.muzzle_flash(frame, *MUZZLE)
         frames.append(frame)
     save(np.concatenate(frames, 1), OUT, len(frames))
 

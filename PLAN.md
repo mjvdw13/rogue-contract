@@ -1781,6 +1781,13 @@ Decided:
        a power cell.
 3. [x] Tests (frames and views), the validator, the smoke test; a look in
        game beside a sandtrooper; README; commit and push.
+4. [x] Mark (2026-10-17): the aim and fire poses fire straight at the
+       player, so the rifle must point head-on, not to the right. They
+       keep the sandtrooper's frames (its T-21 is head-on there), with the
+       heavy rifle's thick muzzle painted in front of the chest
+       (`head_on()`, drawn 8x and averaged down): a round rim lit from the
+       upper right, a dark bore, a short barrel into the receiver and the
+       stock's edge behind it. The fire frame's flash is on the bore.
 
 ## Phase 1c: Two storeys per tile (done 2026-10-13)
 
@@ -3265,3 +3272,7 @@ update the smoke test.
   the dead pose's rifle lifted onto the ground. Wider frames (100x72).
   Tougher than a sandtrooper; one in the sandbox. 234 tests, the validator
   and the smoke test pass.
+- 2026-10-17: Phase 1b X step 4, Mark: the commander's aim and fire poses
+  pointed the rifle to the right; now head-on at the player (a thick
+  muzzle painted on the sandtrooper's own frames). Tests, the validator and
+  the smoke test pass.

@@ -144,9 +144,11 @@ over the sandtrooper's committed frames and takes only the rifle from it,
 and the body it uncovers where the T-21 crossed it, so the body stays the
 sandtrooper's pixel for pixel. It leaves out the sheet's mistakes (the
 flashes painted on the fire poses, a loose blob past the aim pose's
-barrel), lifts the dead pose's rifle onto the ground, eases the rifle's hard
-dark outline toward the colours round it, and draws the game's red flash at
-the new muzzle. The frames are wider than the sandtrooper's (100x72) for
+barrel), lifts the dead pose's rifle onto the ground, and eases the rifle's
+hard dark outline toward the colours round it. The aim and fire poses shoot
+straight at the player, but the sheet draws the rifle side-on there, so
+they keep the sandtrooper's frames and get the heavy rifle's muzzle painted
+head-on in front of the chest, with the game's red flash on its bore. The frames are wider than the sandtrooper's (100x72) for
 the longer barrel:
 
 ```
