@@ -6,17 +6,18 @@ import { defineMonster } from '../../engine/defs.js';
 // of three bolts. The art is the sandtrooper's frames with the new rifle
 // grafted on, by assets/custom/sandtrooper-commander/cut.py; its frames are
 // wide for the longer barrel, and a little taller for the rifle raised as it
-// falls.
+// falls. Drawn at the sandtrooper's scale, slightly taller than a
+// stormtrooper.
 export default defineMonster({
   id: 'sandtrooper-commander',
   name: 'Sandtrooper Commander',
   glyph: 'S',
   sheet: { src: 'assets/sprites/monsters/sandtrooper-commander.png', frameWidth: 100, frameHeight: 72 },
-  scale: 0.85,
+  scale: 0.9,
   health: 70,
   speed: 4,
   radius: 0.5, // like the player: a body fits one tile width, so it can stand on one stair
-  height: 1.76,
+  height: 1.8,
   painChance: 0.25,
   reactionTime: 0.45,
   cooldown: [1.1, 2.1],
