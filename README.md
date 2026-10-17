@@ -7,7 +7,7 @@
 Tatooine, a few months before *Dark Forces*. Kyle Katarn takes a bounty
 contract as cover for the Alliance, and the contract turns on him. The
 story is in [docs/story.md](docs/story.md); the one mission built so far is
-the Canyon Garrison ([docs/mission1.md](docs/mission1.md)): an Imperial base
+the Canyon Garrison ([docs/mission3.md](docs/mission3.md)): an Imperial base
 dug into a desert canyon at night, with snipers on the ledges, a crawl
 vent, a data vault and a generator to overload on the way out.
 
@@ -63,7 +63,7 @@ Handy URL parameters:
 
 | Parameter | Effect |
 |---|---|
-| `?map=m1` | Straight into a level (`&skill=1`..`5`, default 3). `?map=sandbox` is the engine test map, with every enemy and villager |
+| `?map=m3` | Straight into a level (`&skill=1`..`5`, default 3). `?map=sandbox` is the engine test map, with every enemy and villager |
 | `&god` / `&nomonsters` / `&all` | Invincible / no monsters / every weapon |
 | `&wide=0` | The 4:3 frame instead of widescreen |
 | `&crt=off` / `subtle` / `full` | CRT effect (also in Options) |
@@ -83,8 +83,8 @@ npm test             # unit and simulation tests, and a minute of play in every 
 npm run validate     # check all content, assets and level layouts
 npm run smoke        # browser smoke test (needs Playwright; see tools/smoke.mjs)
 npm run art          # regenerate the built-in art (tools/art/generate.mjs)
-node tools/snapshot.mjs m1 --custom --at 48,42,90   # render a 3D view to a PNG
-node tools/mapview.mjs m1                           # draw a level map to a PNG
+node tools/snapshot.mjs m3 --custom --at 48,42,90   # render a 3D view to a PNG
+node tools/mapview.mjs m3                           # draw a level map to a PNG
 ```
 
 GitHub Actions runs the tests, the validator and the smoke test on every
@@ -104,7 +104,7 @@ assets/                 generated textures, sprites and UI art
 assets/custom/          Dark Forces art and sounds, character sheets and their cutters
 tools/                  validator, map viewer, snapshot, smoke test, art generators
 tests/                  node --test tests
-docs/                   story, Mission 1 design, the plan's archive
+docs/                   story, Mission 3 design, the plan's archive
 ```
 
 ## Art and sound

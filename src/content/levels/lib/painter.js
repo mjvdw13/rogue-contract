@@ -8,7 +8,7 @@
 //   const p = new Painter(128, 100, { wall: 'canyon-rock' });
 //   p.rect(10, 10, 30, 20, { floor: 'sand', ceiling: 'sky', ceilZ: 24 });
 //   p.chamfer(10, 10, 30, 20, 3, { wall: 'canyon-rock' });
-//   export default defineLevel({ id: 'm1', ...p.build(), list: [...] });
+//   export default defineLevel({ id: 'm3', ...p.build(), list: [...] });
 
 /** Glyphs for generated legend entries: printable ASCII, then Latin letters. */
 const POOL = (() => {

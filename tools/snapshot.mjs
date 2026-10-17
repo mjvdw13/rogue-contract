@@ -6,8 +6,8 @@
 //   node tools/snapshot.mjs sandbox --at 12.5,7.5,90      x,y,angle (content degrees: 0 east, 90 north)
 //   node tools/snapshot.mjs sandbox --pitch 30 --z 0.2    look up 30 px, raise the eye 0.2 above the floor
 //   node tools/snapshot.mjs sandbox --out shot.png --scale 3 --nomonsters
-//   node tools/snapshot.mjs m1 --custom                   with the art overrides (the Dark Forces art)
-//   node tools/snapshot.mjs m1 --doors 0.5                every door half open
+//   node tools/snapshot.mjs m3 --custom                   with the art overrides (the Dark Forces art)
+//   node tools/snapshot.mjs m3 --doors 0.5                every door half open
 //   node tools/snapshot.mjs sandbox --at 33.5,8.5,90 --top  on top of a slab (under it by default)
 //
 // The default output is tools/art/out/snapshots/<level>.png.

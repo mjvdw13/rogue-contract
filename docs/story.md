@@ -283,7 +283,7 @@ the doorways open arches or add that first.
 
 ## Map C: The Canyon Garrison (Mission 3, changes to the existing map)
 
-`docs/mission1.md` describes the map, and it stays a combat mission entered
+`docs/mission3.md` describes the map, and it stays a combat mission entered
 by the vent. This story adds:
 
 - **The drop-off** in the start bowl, which is already open to the sky.

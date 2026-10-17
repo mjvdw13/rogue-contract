@@ -11,7 +11,7 @@ calls.
   to-dos in order. Read it before starting anything.
 - **[MODDING.md](MODDING.md)**: every content field and what it does. The
   reference for content work, and the place to document new fields.
-- `docs/story.md` (the story), `docs/mission1.md` (Mission 1's design,
+- `docs/story.md` (the story), `docs/mission3.md` (Mission 3's design,
   per-skill placement table), `docs/plan-archive.md` (why finished features
   work the way they do: search it by feature name before redesigning one).
 
@@ -33,7 +33,7 @@ src/engine/      the engine; never mentions Star Wars or any content id
                  models, particles, backdrop, psprite (the weapon), view
   gfx/ audio/ input/ ui/ scenes/ core/
 src/content/     the game as data: monsters/, weapons/, items/, npcs/,
-                 models/, levels/ (m1 is painted in code by levels/lib/painter.js;
+                 models/, levels/ (m3 is painted in code by levels/lib/painter.js;
                  sandbox is a typed test map with one of everything), sounds,
                  particles, explosions, palette, strings, config
 assets/          generated art (from tools/art; don't hand-edit, it's regenerated)
@@ -57,8 +57,8 @@ npm test                 # ~12 s, all tests (includes a minute of play in every 
 node --test tests/x.test.js   # one file, while iterating
 npm run validate         # ~2 s, content and level checks; must be 0 errors, 0 warnings
 npm run smoke            # ~30 s, headless Chromium (Playwright); CI runs it on every push
-node tools/snapshot.mjs m1 --custom --at X,Y,ANGLE [--pitch P] [--scale 2] --out file.png
-node tools/mapview.mjs m1 [--skill 5]    # top-down map PNG in tools/art/out/maps/
+node tools/snapshot.mjs m3 --custom --at X,Y,ANGLE [--pitch P] [--scale 2] --out file.png
+node tools/mapview.mjs m3 [--skill 5]    # top-down map PNG in tools/art/out/maps/
 npm run art -- --only NAME               # regenerate one generated asset
 npm run serve                            # http://localhost:8080/?map=sandbox&god
 ```

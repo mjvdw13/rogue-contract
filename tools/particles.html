@@ -82,7 +82,7 @@
 
     const $ = (id) => document.getElementById(id);
     const params = new URLSearchParams(location.search);
-    for (const [k, v] of [['map', 'm1'], ['nomonsters', ''], ['god', ''], ['mute', '']]) if (!params.has(k)) params.set(k, v);
+    for (const [k, v] of [['map', 'm3'], ['nomonsters', ''], ['god', ''], ['mute', '']]) if (!params.has(k)) params.set(k, v);
     // No "leave site?" prompt on the bench (the game asks mid-level): this listener runs before the game's.
     window.addEventListener('beforeunload', (e) => e.stopImmediatePropagation());
     const game = new Game({ canvas: $('screen'), content, params });
@@ -97,7 +97,7 @@
     $('kind').value = params.get('kind') ?? '';
     for (const e of game.registry.explosions.values()) $('style').add(new Option(e.name ?? e.id, e.id));
 
-    // Spots: the headless bench's views (Mission 1).
+    // Spots: the headless bench's views (Mission 3).
     const spots = { here: null };
     const w0 = game.scene.world;
     spots['Canyon start'] = [w0.player.x, w0.player.y, 90];

@@ -17,7 +17,7 @@ All paths are relative to the repository root.
    exit, keys and secrets can be reached from the start. It also prints an
    ammo budget for each level.
 3. Reload the game. Jump straight to a level with
-   `index.html?map=m1&skill=3`, and add `&god` or `&nomonsters` while
+   `index.html?map=m3&skill=3`, and add `&god` or `&nomonsters` while
    testing.
 4. Run `npm test` before you push.
 
@@ -487,7 +487,7 @@ Each corpse burst shoots one way, picked at random (up and out), in a tight
 jet (`spread` 0.3 unless it says otherwise).
 
 To see what they cost, serve the repo and open `tools/particles.html`: it
-runs Mission 1 with any number of one type in front of you, and times them.
+runs Mission 3 with any number of one type in front of you, and times them.
 
 ### Explosions
 
@@ -580,7 +580,7 @@ the real caps and a count of what's live.
 
 A level is an ASCII map. Add a file in `src/content/levels/`, import it in
 `src/content/levels/index.js`, and put its id in an episode's `levels` list.
-`sandbox.js` is a typed map like the one below; Mission 1 (`m1.js`) is too
+`sandbox.js` is a typed map like the one below; Mission 3 (`m3.js`) is too
 big to type, so it's painted in code by `levels/lib/painter.js` (rooms,
 chamfers, stairs, lifts), which hands the game an ordinary map.
 
@@ -733,7 +733,7 @@ the middle of a canyon would show above the canyon's rims.
 `canyonBackdrop(p, { rim, tex, light })` (`src/content/levels/lib/backdrop.js`)
 makes one for a painted level: low over its open sky, starting at the
 canyon's rim (`rim(x, y, floor)` gives its height) and climbing away in
-smooth slopes and ridges, out to 96 tiles past the map. Mission 1 ends its
+smooth slopes and ridges, out to 96 tiles past the map. Mission 3 ends its
 canyon walls in a low rim of rock (one tile out of reach, with its sky just
 above it so the view ends there) and lets the backdrop take over above it.
 
@@ -1085,7 +1085,7 @@ Actions:
 - `npm run validate -- --verbose` also lists unreachable items and one-way
   areas: places the player can drop into but never get back out of to the
   start. Some are on purpose, but a pit with no lift or stairs out is a trap.
-- `node tools/mapview.mjs m1` writes `tools/art/out/maps/m1.png`, a
+- `node tools/mapview.mjs m3` writes `tools/art/out/maps/m3.png`, a
   top-down picture with monsters in red, items in yellow, keys in their colour
   and unreachable floor cross-hatched. Floors are shaded by height (higher is
   brighter), with a black edge where a ledge is too high to walk up and a grey
@@ -1109,7 +1109,7 @@ Tips from the built-in maps:
 `defineEpisode({ id, name, levels: [...], map, finale: { text, background, endImage, endText, music } })`.
 If there is more than one episode, the menu asks which one to play.
 
-`map: { spots: { m1: [160, 100], ... } }` places each level on the
+`map: { spots: { m3: [160, 100], ... } }` places each level on the
 intermission picture (`assets/ui/intermission.png`). Spots are in the
 picture's centre 320×200, which is all a 4:3 screen shows. Full-screen
 pictures can be 560×200 so they also fill a 21:9 screen; a 320-wide picture is

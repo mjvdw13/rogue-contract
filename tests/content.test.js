@@ -16,7 +16,7 @@ test('the content pack validates without errors', () => {
 
 test('the episode lists every level once, in order', () => {
   const ep = registry.firstEpisode();
-  assert.deepEqual(ep.levels, ['m1']);
+  assert.deepEqual(ep.levels, ['m3']);
   assert.ok(ep.finale?.text);
 });
 
@@ -64,8 +64,8 @@ for (const level of registry.levels.values()) {
   });
 }
 
-test('m1: the overload opens the escape hatch for good', () => {
-  const w = makeWorld('m1', { noMonsters: true });
+test('m3: the overload opens the escape hatch for good', () => {
+  const w = makeWorld('m3', { noMonsters: true });
   const i = 43 * w.map.w + 93; // the overload switch
   assert.ok(w.map.uses.has(i));
   w._useSwitch(i, 93, 43);

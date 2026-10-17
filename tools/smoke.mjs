@@ -143,7 +143,7 @@ for (const level of new Registry(content).levels.values()) {
   await shot(p, 'wide-menu');
   await p.close();
 
-  const q = await page('index.html?map=m1&mute&nomonsters', { width: 1280, height: 720 });
+  const q = await page('index.html?map=m3&mute&nomonsters', { width: 1280, height: 720 });
   await q.waitForFunction(() => window.game.scene.constructor.name === 'LevelScene', null, { timeout: 20000 }).catch(() => {});
   await q.waitForTimeout(1500);
   await shot(q, 'wide-playing');

@@ -3,8 +3,8 @@ import { Painter } from './lib/painter.js';
 import { valueNoise } from './lib/noise.js';
 import { canyonBackdrop } from './lib/backdrop.js';
 
-// MISSION 1: THE CANYON GARRISON. The layout, route and numbers are in
-// docs/mission1.md (area numbers below match its table). Painted in code on
+// MISSION 3: THE CANYON GARRISON. The layout, route and numbers are in
+// docs/mission3.md (area numbers below match its table). Painted in code on
 // the fine grid (1 tile = 0.5 m; the player is 1.7 tall and 1 wide).
 
 const W = 128;
@@ -365,7 +365,7 @@ for (const [x, y, c] of cliff) p.set(x, y, c);
 
 // ---------------------------------------------------------------- things
 const at = (type, x, y, extra = {}) => ({ type, x, y, ...extra });
-// Skills (docs/mission1.md has the table): 1-2 thin out the fights and add
+// Skills (docs/mission3.md has the table): 1-2 thin out the fights and add
 // med kits; 4-5 add a trooper or two to most areas.
 const EASY = [1, 2];
 const NOT_EASIEST = [2, 3, 4, 5];
@@ -473,7 +473,7 @@ const list = [
 ];
 
 export default defineLevel({
-  id: 'm1',
+  id: 'm3',
   mapLabel: 'M1',
   name: 'THE CANYON GARRISON',
   music: 'garrison',

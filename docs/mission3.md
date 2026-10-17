@@ -1,4 +1,4 @@
-# Mission 1: the Canyon Garrison (design)
+# Mission 3: the Canyon Garrison (design)
 
 The first real level (PLAN.md Phase 1b B, then Phase 4). An original
 mercenary, hired by the Rebellion, breaks into an Imperial garrison dug into
@@ -12,7 +12,7 @@ landing pad's pickup spot. The red keycard and a generator switch gate the way.
   at 1. Steps go up to 0.8, jumps up to about 1.56, crouch spaces are 1.2
   high, and running jumps clear gaps of up to 4 tiles.
 - The map is 128 x 100 tiles. Everything not painted is canyon rock.
-- **Built in code, not typed as ASCII.** `src/content/levels/m1.js` paints
+- **Built in code, not typed as ASCII.** `src/content/levels/m3.js` paints
   areas with a small painter (`src/content/levels/lib/painter.js`): rooms,
   corridors, chamfered corners, lifts and doors, each cell carrying its own
   floor, ceiling, heights and light. The painter dedupes the cells into

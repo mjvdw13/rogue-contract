@@ -19,7 +19,7 @@ MODDING.md, if content authors need it). Keep this file short.
 | Platform | **Desktop browsers** (2026-10-12). No phone target: no phone performance gate, and no touch controls (removed 2026-10-17). |
 | Scale | 1 tile = 0.5 m, 32 texels per tile; the player is 1.7 tall, eye at 1.25. |
 | Story | **Bad Paper** (`docs/story.md`, 2026-10-13): a prequel to Dark Forces. Kyle Katarn takes a Guild bounty on Tatooine as cover for the Alliance; Jan Ors flies him in and out in the Moldy Crow. Only Mission 1 (Mos Eisley) is free roam; the rest is run-and-gun. |
-| Scope | **A vertical slice first**, then decide on more missions. The slice is **Mission 1, Mos Eisley** (2026-10-17): the first level we make. The Canyon Garrison already built (`m1` in the code) is the story's Mission 3. |
+| Scope | **A vertical slice first**, then decide on more missions. The slice is **Mission 1, Mos Eisley** (2026-10-17): the first level we make. The Canyon Garrison already built (`m3`) is the story's Mission 3. |
 | Title and repo | **Rogue Contract**. Public repo `mjvdw13/rogue-contract`, served by GitHub Pages from `main`. "Star Wars" and "Dark Forces" stay out of the title. |
 | Art, sound and rights | A non-commercial fan game. Mark's decisions (2026-10-12, 2026-10-15): ripped Dark Forces art and sound effects are committed in `assets/custom/` and used on the hosted site, through `overrides.json` and `sound-overrides.json`, with generated art and synth sounds as the fallback (and what tests and the smoke test use). Characters Mark makes with AI image tools are committed as our own art. Music stays original: no note-for-note John Williams. |
 
@@ -33,7 +33,18 @@ Nothing right now.
 
 In this order unless Mark says otherwise.
 
-### 1. Particles into the game (from the particle system, 2026-10-15)
+### 1. Mission 1: Mos Eisley
+
+The story's Map A (`docs/story.md`). It pulls in the story pieces it needs
+from section 5 as it goes (calm troopers, the town's switch, conversations,
+the fob).
+
+- [ ] Design: `docs/mission1.md` from Map A (layout, route, per-skill table).
+- [ ] Build `m1`, painted in code like `m3`, with a daylight sky; the
+      episode starts there.
+- [ ] Townsfolk, troopers and Jawas placed; a first playable loop.
+
+### 2. Particles into the game (from the particle system, 2026-10-15)
 
 The explosion styles (`src/content/explosions.js`) are only used by the
 detonator (`large`) and the concussion rifle (`concussion`).
@@ -45,14 +56,14 @@ detonator (`large`) and the concussion rifle (`concussion`).
       Jawa's ion bolts).
 - [ ] **Emitters** in levels: steam vent, sparking panel, fire with embers
       and a light, reactor motes; tags, `setEmitter`, a distance cut-off.
-      Validator, map viewer marks, MODDING.md. Then in Mission 1: the
+      Validator, map viewer marks, MODDING.md. Then in Mission 3: the
       maintenance valve and broken light, the generator.
 - [ ] **Weather:** sand and wind in the canyon (a wrapping box of particles
       round the camera, only under the sky). For Mos Eisley later: `dust` at
       about 100 (Mark: "perfect for sunny Mos Eisley").
 - [ ] Bench again with everything on (does the budget hold?).
 
-### 2. Mission 1: detail and immersion
+### 3. Mission 3 (the Canyon Garrison): detail and immersion
 
 Engine pieces still to build, each proven in the level as it lands:
 
@@ -92,9 +103,9 @@ Areas, each with screenshots before and after:
       open to a view east down the canyon, landing lights, the **Moldy Crow**
       model in place of the placeholder shuttle.
 - [ ] **Tune and check:** light and sound mix, frame time, cover round the new
-      props, the per-skill check; `docs/mission1.md`.
+      props, the per-skill check; `docs/mission3.md`.
 
-### 3. Dark Forces systems
+### 4. Dark Forces systems
 
 - [ ] A mission briefing screen (scrolling text over a picture).
 - [ ] Mission objectives; the exit only works once they're done.
@@ -108,7 +119,7 @@ Areas, each with screenshots before and after:
 - [ ] A headlamp that drains batteries, infrared goggles and a gas mask.
 - [ ] Music that switches between exploration and combat (like iMUSE).
 
-### 4. For the story (`docs/story.md`)
+### 5. For the story (`docs/story.md`)
 
 Small or medium pieces, mostly extending existing code. Each new action or
 trigger goes in the validator (it rejects unknown actions), MODDING.md and a
@@ -140,7 +151,7 @@ conversations, then the fob.
       flying (the Crow); `spawn` stays quiet with `fog: false`; the headless
       play test skips opening cutscenes.
 
-### 5. Content for the slice
+### 6. Content for the slice
 
 - [ ] Enemies still missing: a commando, and the mini-boss (a prototype
       assault droid, an early Dark Trooper test).
