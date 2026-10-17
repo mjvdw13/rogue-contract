@@ -1366,6 +1366,12 @@ with the game):
                                blast is its own style, `secondary` (7 fire,
                                8 sparks, 8 embers; no chunks or smoke).
                                `large` with it: 73 discs at most.
+                   - [x] Mark: the concussion's first flash (the dome
+                         before the flames go up) bigger and longer, to be
+                         seen: `fire-blue` lives 0.2 to 0.32 s (was 0.08
+                         to 0.16), size 0.55 swelling 2.2 times (was 0.4,
+                         2), 16 of them in a 0.4 ball; the flames start
+                         at 0.1 s.
                    - [x] Peaks under the caps again (first pass; see above for now): `large` (with its
                          `small`) 67 discs and 85 points, `small` 28 and
                          35, `concussion` 36 and 99, `dirt` and `sparks`
@@ -2813,4 +2819,5 @@ update the smoke test.
 - 2026-10-16: Phase 1b T step 5f, Mark's second look: shrapnel back as it
   was and fewer sparks instead in `small` and `large`; `large`'s second
   blast is its own lighter style, `secondary`; the concussion's flame is
-  thin electric streaks, not round discs.
+  thin electric streaks, not round discs. Then the concussion's first flash made
+  bigger and longer.
