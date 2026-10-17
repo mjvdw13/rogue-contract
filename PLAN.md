@@ -34,7 +34,8 @@ These need Mark to try something, or to decide. Don't start them without him.
   stand in.
 - **Mos Eisley's first look** (`?map=m1`, the west end of the main street,
   rebuilt with every building a volume: alleys, rounded corners, set-back
-  storeys, a porch, a lean-to, a domed tower, a shop to walk into, domes):
+  storeys, a porch, a lean-to, a domed tower, a shop to walk into, and dome
+  toppers on nearly every roof, sized to it):
   the recoloured DF textures, the sky and how dark the suns' shade is.
   And should both suns be painted onto the DF sky? (It also needs the sky
   to wrap once round the horizon, a small engine change.)

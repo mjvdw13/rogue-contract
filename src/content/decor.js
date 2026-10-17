@@ -1,4 +1,5 @@
 import { defineDecoration } from '../engine/defs.js';
+import { DOMES } from './models/dome.js';
 
 // Scenery. Solid ones block movement; ones with health can be shot (and
 // `explode`).
@@ -26,9 +27,7 @@ export default [
   defineDecoration({ id: 'sensor-mast', model: 'sensor-mast', solid: true, radius: 0.45, height: 8.1 }),
   defineDecoration({ id: 'sensor-dish', model: 'sensor-dish', spin: 0.9 }),
   // Mos Eisley's domes, on roofs and over round buildings.
-  defineDecoration({ id: 'dome-small', model: 'dome-small', solid: true, radius: 1.5, height: 1.9 }),
-  defineDecoration({ id: 'dome', model: 'dome', solid: true, radius: 2.5, height: 3 }),
-  defineDecoration({ id: 'dome-large', model: 'dome-large', solid: true, radius: 4, height: 4.5 }),
+  ...DOMES.map((d) => defineDecoration({ id: d.id, model: d.id, solid: true, radius: d.radius, height: d.height })),
   defineDecoration({ id: 'ceiling-lamp', glyph: 'l', sheet: S('ceiling-lamp', 48, 16), hanging: true, fullbright: true }),
   defineDecoration({
     id: 'fuel-barrel',

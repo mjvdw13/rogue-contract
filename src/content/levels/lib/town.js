@@ -7,7 +7,11 @@
 //   p.rect(4, 64, 52, 76, town.street());
 //   town.block(10, 56, 20, 64, { h: 6 });
 //   town.arch(14, 63, 16, 64, { h: 6, lintel: 3 });
-//   town.shadows();
+//   town.house(24, 50, 36, 62, { h: 6, r: 2, dome: true });
+//   town.finish();
+//   list.push(...town.things);  // the domes
+
+import { DOMES } from '../../models/dome.js';
 
 /**
  * The suns, low in the south-west: content azimuth (degrees, 0 east,
@@ -34,6 +38,22 @@ export class Town {
     this.floor = floor;
     /** Round props that cast shadows (domes): [x, y, radius, base, height]. */
     this.casters = [];
+    /** Things the kit places (domes), for the level's list. */
+    this.things = [];
+  }
+
+  /**
+   * A dome on a roof at `z`, centred on (x, y): the widest that's no more
+   * than `width` tiles across (3 to 11), in plaster `wall` ('adobe' or
+   * 'adobe-pale'). It casts a shadow. Keep it inside its roof: one hanging
+   * over a lower roof is clipped.
+   */
+  dome(x, y, z, width, { wall = this.wall } = {}) {
+    const pale = wall === 'adobe-pale';
+    const d = DOMES.find((o) => o.id.endsWith('-pale') === pale && o.radius * 2 <= width);
+    if (!d) return this;
+    this.things.push({ type: d.id, x, y, z });
+    return this.caster(x, y, d.radius, z, d.height);
   }
 
   /**
@@ -107,10 +127,19 @@ export class Town {
    * and `light`). `tiers` stack more of it on top, each a box (`[x0, y0, x1, y1]`)
    * inside it with its own `h` and `r`: a storey set back from the street.
    * The ground round the rounded corners keeps whatever was there.
+   * `dome` tops it with a dome (a topper) on its highest box, as wide as
+   * fits with a rim of roof round it: `true` in the wall's plaster, or a
+   * plaster's name.
    */
-  house(x0, y0, x1, y1, { h, r = 0, tiers = [], ...opts }) {
+  house(x0, y0, x1, y1, { h, r = 0, tiers = [], dome, ...opts }) {
     this._rounded(x0, y0, x1, y1, r, h, opts);
     for (const t of tiers) this._rounded(...t.box, t.r ?? 0, t.h, { ...opts, ...t });
+    if (dome) {
+      const t = tiers.at(-1);
+      const [bx0, by0, bx1, by1] = t ? t.box : [x0, y0, x1, y1];
+      const wall = typeof dome === 'string' ? dome : t?.wall ?? opts.wall;
+      this.dome((bx0 + bx1) / 2, (by0 + by1) / 2, t ? t.h : h, Math.min(bx1 - bx0, by1 - by0) - 1.5, { wall });
+    }
     return this;
   }
 

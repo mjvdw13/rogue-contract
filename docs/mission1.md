@@ -120,12 +120,13 @@ A bright, hazy afternoon. The only daylight map in the game.
 `src/content/levels/lib/town.js`, beside the painter. Checked against the
 renderer (`render/columns.js`).
 
-**No flat fronts** (Mark, 2026-10-17). Every building is a volume you can
-walk round and see the sides of: alleys and yards between buildings,
-rounded corners, upper storeys set back, porches and lean-tos jutting out,
-round towers, domes on the roofs, and doorways that lead into rooms. A row
-of fronts that only vary in height looks like a film set. Check a street
-from several angles, not just down its length.
+**No flat fronts** (Mark, 2026-10-17). Every building is a volume, not a
+front: rounded corners, upper storeys set back, porches and lean-tos
+jutting out, round towers, a dome on the roof, and doorways that lead into
+rooms. A row of fronts that only vary in height looks like a film set.
+Buildings may touch, share walls and back onto each other or the town's
+edge; the player needn't be able to get behind them (Mark, the same day).
+Check a street from several angles, not just down its length.
 
 - **A building is a block of raised floor** (`house()`): tiles at the
   roof's height under the full sky, their `side` texture as the walls. From
@@ -149,9 +150,16 @@ from several angles, not just down its length.
   building behind). Walls are for the map's edge; a shut door is the
   building's own raised floor faced in planks. Real doors (which need walls
   beside them) belong indoors, between rooms.
-- **Domes** are models (`dome-small`, `dome`, `dome-large`) on roofs; the
-  level registers each with `town.caster()` so it casts a shadow. Keep a
-  dome inside its roof: one hanging over a lower roof is clipped.
+- **Domes** are the toppers on the roofs, Tatooine's mark: models
+  (`models/dome.js`, a dome on a drum over a lip) in nine widths, 3 to 11
+  tiles across, in each plaster (`dome-9`, `dome-9-pale`).
+  `house({ dome: true })` tops a building with the widest that fits its
+  highest storey with a rim of roof round it; `town.dome()` places one
+  anywhere (over a round building). Both cast shadows, and land in
+  `town.things` for the level's list. Most blocks of the town past the
+  streets get one too, so the skyline is domes. Keep a dome inside its roof:
+  one hanging over a lower roof is clipped. 189 of them cost about 0.1 ms a
+  frame.
 - **Awnings** are thin cloth slabs: you walk under them in their shade.
 - **Shadows** (`shadows()`, run by `finish()` after `seal()`): see Light
   and air.
