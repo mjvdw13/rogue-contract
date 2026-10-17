@@ -27,7 +27,11 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
-Nothing right now.
+- **Character sheets for Mos Eisley** (`docs/mission1.md`, Characters):
+  cantina aliens (4-6 kinds), the band, the bartender, the broker, the
+  informant, the thug, the customs officer, the bay owner, the water
+  seller, Dace, a dewback and a power droid. Until they exist, villagers
+  stand in.
 
 ## Next up
 
@@ -35,14 +39,37 @@ In this order unless Mark says otherwise.
 
 ### 1. Mission 1: Mos Eisley
 
-The story's Map A (`docs/story.md`). It pulls in the story pieces it needs
-from section 5 as it goes (calm troopers, the town's switch, conversations,
-the fob).
+The story's Map A. The design (areas, light, the town kit, art and sound
+lists) is `docs/mission1.md`. It pulls in the story pieces it needs from
+section 5 as it goes (calm troopers, the town's switch, conversations, the
+fob). Each step is a commit with snapshots, playable at `?map=m1`.
 
-- [ ] Design: `docs/mission1.md` from Map A (layout, route, per-skill table).
-- [ ] Build `m1`, painted in code like `m3`, with a daylight sky; the
-      episode starts there.
-- [ ] Townsfolk, troopers and Jawas placed; a first playable loop.
+- [x] Design: `docs/mission1.md`.
+- [ ] **Daylight and the kit:** `sky-day` (both suns) and a warm haze;
+      adobe and street-sand textures; `lib/town.js` (buildings as raised
+      floor blocks, slab arches, `circle()`, cloth awnings, twin-sun
+      shadows); a bigger glyph pool; `m1` with a test street, registered.
+- [ ] **Docking Bay 87**, the lane, the owner's office, the customs house.
+      The episode starts in `m1`.
+- [ ] **The main street, the market and the water plaza** (stalls,
+      awnings, the condenser tower).
+- [ ] **The cantina:** entrance, steps down, the round room, the bar,
+      booths, bandstand, back rooms.
+- [ ] **Bay 86, the dewback stable and the speeder garage.**
+- [ ] **The Jawa junk yard and the sandcrawler.**
+- [ ] **The back alleys and the back lane.**
+- [ ] **The checkpoint and the rooftops.**
+- [ ] **The prefecture** and its comm tower.
+- [ ] **The old quarter and the dry wash.**
+- [ ] **The derelict bay** and the gutted freighter.
+- [ ] **The skyline:** dunes and mesas in the backdrop, the town's edges.
+- [ ] **Life:** calm troopers and the switch (section 5), patrols,
+      villagers, Jawas and the cantina's customers placed.
+- [ ] **Air and sound:** dust, emitters, ambient sound, the cantina band
+      (sections 2 and 3).
+- [ ] **The story:** conversations, the fob, the drop-off and pickup, the
+      loud half (section 5).
+- [ ] **Tune:** light, frame time with a full market, the per-skill table.
 
 ### 2. Particles into the game (from the particle system, 2026-10-15)
 

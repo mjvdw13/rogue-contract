@@ -191,7 +191,8 @@ an informant, or climb over the rooftops.
 A loop. Kyle walks east through a calm town in daylight, finds Dace at the
 far end, then fights back west through the same streets to the bay he
 started in. The second half reuses the first half's geometry, with every
-trooper you passed now shooting.
+trooper you passed now shooting. The level's full design, which grows this
+sketch (a bigger map, more areas), is `docs/mission1.md`.
 
 - **Size:** about 150 × 110 tiles (75 × 55 m). The Canyon Garrison is
   128 × 100.
@@ -395,6 +396,3 @@ sheets would help (Phase 2's multi-angle stretch goal).
 2. With Dace taken in Mission 1, the Homestead mission is about his hidden
    recordings, and Dace waits until Mission 3. Or should Kyle get Dace out
    of Mos Eisley, and the Empire take him at the farm instead?
-3. The vertical slice in PLAN.md is still the Canyon Garrison, which is now
-   Mission 3. Keep it as the slice, or make Mos Eisley the next level to
-   build?
