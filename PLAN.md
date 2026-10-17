@@ -27,6 +27,10 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
+- [ ] **Thermal detonator:** try a quick tap (back to the old low toss)
+      and a long throw (the high arc, unchanged).
+- [ ] **Concussion rifle:** try a shot into a crate or a villager (it
+      bursts on them now).
 - [ ] **Boba Fett and Bossk:** where they appear in the story (sandbox only
       today).
 - [ ] **Which mission is the vertical slice:** the Canyon Garrison (built, the
