@@ -29,10 +29,6 @@ These need Mark to try something, or to decide. Don't start them without him.
 
 - [ ] **Thermal detonator:** try a quick tap (back to the old low toss)
       and a long throw (the high arc, unchanged).
-- [ ] **Concussion rifle:** scenery in the blast erupts in blue flame too
-      (unhurt); villagers in it are hurt.
-- [ ] **Concussion rifle in the open:** a near miss (within 2 tiles of an
-      enemy) bursts beside them now. Bossk's shots do the same to you.
 - [ ] **Boba Fett and Bossk:** where they appear in the story (sandbox only
       today).
 - [ ] **Which mission is the vertical slice:** the Canyon Garrison (built, the
