@@ -11,6 +11,7 @@
  */
 export const BENCH_KINDS = {
   dust: { label: 'Dust (dot, lit, solid)', vel: (r) => [r(-0.3, 0.3), r(-0.3, 0.3), r(-0.1, 0.1)] },
+  glint: { label: 'Glints (dot, lit, add)', vel: (r) => [r(-0.3, 0.3), r(-0.3, 0.3), r(-0.1, 0.1)] },
   shrapnel: { label: 'Shrapnel (square, lit, solid)', vel: (r) => [r(-2, 2), r(-2, 2), r(1, 4)] },
   spark: { label: 'Sparks (streak, glowing, add)', vel: (r) => [r(-3, 3), r(-3, 3), r(1, 5)] },
   'bolt-spark': { label: 'Bolt sparks (streak, glowing, add)', vel: (r) => [r(-3, 3), r(-3, 3), r(1, 4)] },

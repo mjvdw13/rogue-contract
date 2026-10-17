@@ -143,8 +143,7 @@ export default [
     onFloor: 'die',
     cap: 40,
   }),
-  // Glowing specks hanging in the air, fading in and out: over the generator,
-  // and Mos Eisley's dust catching the suns (its weather, 360 of them).
+  // Glowing specks hanging in the air, fading in and out: over the generator.
   defineParticle({
     id: 'mote',
     colors: [['glow-amber', 0], ['glow-amber', 1], ['glow-pale', 0], ['glow-amber', 1], ['glow-amber', 0]],
@@ -156,7 +155,7 @@ export default [
     gravity: -0.05,
     drag: 0.5,
     onFloor: 'die',
-    cap: 400,
+    cap: 150,
   }),
   // Cold mist lying on a floor: wide, faint, slow, fading in and out.
   defineParticle({
@@ -417,5 +416,20 @@ export default [
     wind: 1,
     onFloor: 'die',
     cap: 500,
+  }),
+  // Dust catching the suns: specks that brighten what's behind them a little
+  // (added, sand steps 1 to 4 and back), so they show on bright sand without
+  // the generator motes' glare. Mos Eisley's weather.
+  defineParticle({
+    id: 'glint',
+    colors: [{ ramp: 'sand', from: 1, to: 4 }, { ramp: 'sand', from: 4, to: 1 }],
+    life: [3, 6],
+    size: 0.02,
+    maxPx: 1,
+    blend: 'add',
+    gravity: -0.05,
+    drag: 0.5,
+    onFloor: 'die',
+    cap: 400,
   }),
 ];
