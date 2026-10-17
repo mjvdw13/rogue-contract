@@ -213,10 +213,4 @@ export class Assets {
   animate(time) {
     for (const t of this.animated) t.animate(time);
   }
-
-  /** Load an arbitrary image by URL (e.g. the custom face photo) as RGBA. */
-  async loadRGBA(src, crop) {
-    const img = await loadImageElement(src);
-    return readPixels(img, crop);
-  }
 }

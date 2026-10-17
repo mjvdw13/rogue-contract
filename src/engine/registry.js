@@ -50,10 +50,9 @@ export class Registry {
     for (const a of pack.attacks ?? []) this.attacks.set(a.name, a.fn);
     for (const p of pack.pickups ?? []) this.pickups.set(p.name, p.fn);
 
-    // Inline sprite sheets on things/weapons/hero become registered sheets.
+    // Inline sprite sheets on things and weapons become registered sheets.
     for (const t of this.things.values()) this._inlineSheet(t);
     for (const w of this.weapons.values()) this._inlineSheet(w);
-    if (this.hero?.face?.sheet) this.hero.face.sheet = this._inlineSheetSpec(this.hero.face.sheet, 'hero:face');
 
     // Glyph legends: shared tiles + shared things + each thing's own glyph.
     this.tileLegend = { ...(pack.legend?.tiles ?? {}) };

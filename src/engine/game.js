@@ -5,7 +5,6 @@ import { Palette, PAL_NORMAL } from './gfx/palette.js';
 import { Surface } from './gfx/surface.js';
 import { Presenter } from './gfx/present.js';
 import { MeltWipe } from './gfx/wipe.js';
-import { Sheet } from './gfx/sheet.js';
 import { Assets } from './assets.js';
 import { Input } from './input/input.js';
 import { TouchControls, isTouchDevice } from './input/touch.js';
@@ -18,7 +17,6 @@ import { Renderer } from './render/renderer.js';
 import { Hud } from './ui/hud.js';
 import { MenuSystem } from './ui/menu.js';
 import { pauseMenu } from './ui/menus.js';
-import { buildPhotoFace } from './ui/photoface.js';
 import { LoadingScene } from './scenes/loading.js';
 import { TitleScene } from './scenes/title.js';
 import { LevelScene } from './scenes/level.js';
@@ -80,8 +78,6 @@ export class Game {
     this.scene = null;
     this.time = 0;
     this.session = null;
-    this.faceSheet = null;
-    this.photoPortrait = null;
     this.loop = new Loop({ update: (dt) => this.update(dt), render: (dt) => this.render(dt) });
     this.applySettings(false);
 
@@ -117,7 +113,6 @@ export class Game {
     await Promise.all([this.assets.loadAll((done, total) => loading.progress(done, total)), this.audio.loadOverrides()]);
     for (const p of this.assets.problems) console.warn(`[assets] ${p}`);
     this.renderer.prepare();
-    await this._buildFace();
     onStatus('ready');
     if (this.contentErrors.length) {
       console.error(`${this.contentErrors.length} content error(s); see above.`);
@@ -133,23 +128,6 @@ export class Game {
       console.warn(`No level "${this.debug.map}"`);
     }
     this.setScene(new TitleScene(this));
-  }
-
-  async _buildFace() {
-    // ?photo=assets/custom/me.jpg previews a face photo without editing hero.js.
-    const face = { ...(this.registry.hero?.face ?? {}) };
-    if (this.params.get('photo')) face.photo = this.params.get('photo');
-    if (face.photo) {
-      try {
-        const { sheet, portrait } = await buildPhotoFace(this.assets, this.palette, face);
-        this.faceSheet = new Sheet(sheet, 24, 30);
-        this.photoPortrait = portrait;
-        return;
-      } catch (err) {
-        console.warn(`Could not use face photo "${face.photo}"; using the drawn face.`, err);
-      }
-    }
-    this.faceSheet = this.assets.sheets.get(face.sheet?.ref) ?? null;
   }
 
   // ------------------------------------------------------------ frame

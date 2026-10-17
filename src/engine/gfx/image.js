@@ -123,37 +123,3 @@ export function readPixels(img, crop) {
   return ctx.getImageData(0, 0, sw, sh);
 }
 
-/** Box-filter downscale of RGBA data (good quality for shrinking photos). */
-export function downscale(rgba, w, h) {
-  const { width: sw, height: sh, data } = rgba;
-  const out = new Uint8ClampedArray(w * h * 4);
-  for (let y = 0; y < h; y++) {
-    const y0 = Math.floor((y * sh) / h);
-    const y1 = Math.max(y0 + 1, Math.floor(((y + 1) * sh) / h));
-    for (let x = 0; x < w; x++) {
-      const x0 = Math.floor((x * sw) / w);
-      const x1 = Math.max(x0 + 1, Math.floor(((x + 1) * sw) / w));
-      let r = 0;
-      let g = 0;
-      let b = 0;
-      let a = 0;
-      let n = 0;
-      for (let yy = y0; yy < y1; yy++) {
-        for (let xx = x0; xx < x1; xx++) {
-          const o = (yy * sw + xx) * 4;
-          r += data[o];
-          g += data[o + 1];
-          b += data[o + 2];
-          a += data[o + 3];
-          n++;
-        }
-      }
-      const o = (y * w + x) * 4;
-      out[o] = r / n;
-      out[o + 1] = g / n;
-      out[o + 2] = b / n;
-      out[o + 3] = a / n;
-    }
-  }
-  return { width: w, height: h, data: out };
-}

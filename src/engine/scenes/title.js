@@ -27,12 +27,6 @@ export class TitleScene {
     s.clear(0);
     const img = g.assets.image('title');
     if (img) s.blitBackdrop(img, g.palette.colormap(BACKDROP_EDGE));
-    const portrait = g.photoPortrait;
-    const pos = g.registry.config.titlePortrait;
-    if (portrait && pos) {
-      s.blit(portrait, pos.x, pos.y);
-      s.rect(pos.x - 1, pos.y - 1, portrait.width + 2, portrait.height + 2, g.palette.ramp('gray', 0.02));
-    }
     // Dim the picture behind the menu so the items stay readable.
     if (g.menu.active) s.shadeRect(s.left, 0, s.w, SCREEN_H, g.palette.colormap(g.menu.stack.length > 1 ? 20 : 12));
     if (!g.menu.active && Math.floor(this.time * 2) % 2 === 0) {
