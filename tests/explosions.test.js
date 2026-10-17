@@ -120,17 +120,20 @@ test('an explosion throws its bursts now, after their delay, or spread over a wh
   assert.equal(w.rng.state, state, "explosions don't touch the world's RNG");
 });
 
-test("a shake jolts the view near it, not your aim, dies away, and only 'extra-large' has one", () => {
-  assert.deepEqual(
-    content.explosions.filter((e) => e.shake).map((e) => e.id),
-    ['extra-large'],
-  );
-  const w = makeWorld(level(), { noMonsters: true });
+test('a shake jolts the view near it, not your aim, and dies away; the bigger the style, the harder', () => {
+  const amount = Object.fromEntries(content.explosions.map((e) => [e.id, e.shake?.amount ?? 0]));
+  const order = ['extra-large', 'large', 'concussion', 'small', 'dirt', 'secondary', 'sparks'];
+  assert.deepEqual(Object.keys(amount).sort(), [...order].sort());
+  assert.equal(amount['extra-large'], 1);
+  for (let k = 1; k < order.length; k++) {
+    assert.ok(amount[order[k]] > 0 && amount[order[k]] < amount[order[k - 1]], `${order[k]} shakes, less than ${order[k - 1]}`);
+  }
+  const w = makeWorld(level(), { noMonsters: true, registry: withExplosions(defineExplosion({ id: 'still', particles: [] })) });
   const pt = w.player;
   Object.assign(pt, { x: 2.5, y: 3.5, angle: 0, pitch: 0 });
   const still = w.camera();
-  w.explode('large', 5.5, 3.5, 0);
-  assert.equal(w.explosions.shakes.length, 0, "'large' doesn't shake");
+  w.explode('still', 5.5, 3.5, 0);
+  assert.equal(w.explosions.shakes.length, 0, 'none without a `shake`');
   w.explode('extra-large', 5.5, 3.5, 0);
   const ex = w.explosions;
   assert.ok(ex.shake(5.5, 3.5, 0) > 0.99, 'full right beside it');

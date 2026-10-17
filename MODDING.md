@@ -443,12 +443,16 @@ way, never back into the wall or floor it hit, and stopping short of any
 wall), `z` how much higher. Each can be a number or `[min, max]`. The
 validator refuses a loop (a style that, through `then`, sets itself off).
 
-A style can shake the view too (only `extra-large` does, so keep it for the
-really big ones):
+A style can shake the view too. `extra-large` shakes it the hardest:
 
 ```js
 shake: { amount: 1, time: 0.6, radius: 16 },
 ```
+
+The rest shake it less, the smaller the blast, for a shorter time and from
+nearer: `large` 0.6, `concussion` 0.45, `small` 0.35, `dirt` 0.3,
+`secondary` 0.25 (on top of the blast that set it off), `sparks` just a
+tick (0.1, within 4 tiles). Keep 1 for the really big ones.
 
 `amount` is how hard right beside it, above 0 and at most 1 (the hardest
 the engine shakes). It dies away fast, then slowly, over `time` seconds

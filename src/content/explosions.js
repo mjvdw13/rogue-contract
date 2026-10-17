@@ -13,6 +13,7 @@ export default [
   defineExplosion({
     id: 'small',
     light: { radius: 5, light: 112, time: 0.45 },
+    shake: { amount: 0.35, time: 0.4, radius: 8 },
     particles: [
       { type: 'fire', count: 10, speed: [0.5, 2.5], radius: 0.15 },
       { type: 'spark', count: 10, speed: [3, 7] },
@@ -27,6 +28,7 @@ export default [
   defineExplosion({
     id: 'large',
     light: { radius: 7, light: 128, time: 0.6 },
+    shake: { amount: 0.6, time: 0.5, radius: 12 },
     particles: [
       { type: 'fire', count: 22, speed: [0.8, 4], radius: 0.3 },
       { type: 'spark', count: 16, speed: [3, 9] },
@@ -41,7 +43,7 @@ export default [
   // racing out along the floor, a fireball that punches out to fill a hall
   // (4 tiles wide and high) and stops short, shrapnel flung hard, a cloud
   // of smoke after it, and a second, smaller blast (`secondary`) beside it.
-  // The only one that shakes the view.
+  // It shakes the view the hardest.
   defineExplosion({
     id: 'extra-large',
     light: { radius: 10, light: 160, time: 0.5 },
@@ -65,6 +67,7 @@ export default [
   defineExplosion({
     id: 'secondary',
     light: { radius: 4, light: 96, time: 0.35 },
+    shake: { amount: 0.25, time: 0.3, radius: 8 },
     particles: [
       { type: 'fire', count: 7, speed: [0.5, 2.5], radius: 0.15 },
       { type: 'spark', count: 8, speed: [3, 7] },
@@ -78,6 +81,7 @@ export default [
   defineExplosion({
     id: 'concussion',
     light: { radius: 6, light: 100, time: 0.35 },
+    shake: { amount: 0.45, time: 0.4, radius: 10 },
     particles: [
       { type: 'fire-blue', count: 16, speed: [0, 0.5], radius: 0.4, z: 0.1 },
       { type: 'conc-streak', count: 36, speed: [7, 12], dir: 'ring' },
@@ -91,6 +95,7 @@ export default [
   defineExplosion({
     id: 'sparks',
     light: { radius: 3, light: 64, time: 0.2 },
+    shake: { amount: 0.1, time: 0.2, radius: 4 },
     particles: [
       { type: 'spark', count: 30, speed: [2, 6] },
       { type: 'ion-spark', count: 16, speed: [3, 7] },
@@ -101,6 +106,7 @@ export default [
   defineExplosion({
     id: 'dirt',
     light: { radius: 5, light: 96, time: 0.35 },
+    shake: { amount: 0.3, time: 0.4, radius: 8 },
     particles: [
       { type: 'fire', count: 6, speed: [0.5, 2], radius: 0.1 },
       { type: 'rock-chip', count: 30, speed: [2, 6] },

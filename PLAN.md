@@ -1439,6 +1439,14 @@ with the game):
                                            tiles). Tests, MODDING.md.
                                      - [ ] Mark tries it on the bench
                                            and says how hard.
+                                     - [x] Mark: the other styles shake
+                                           too, less, by size: `large`
+                                           0.6, `concussion` 0.45,
+                                           `small` 0.35, `dirt` 0.3,
+                                           `secondary` 0.25, `sparks` a
+                                           tick (0.1). Shorter and nearer
+                                           the smaller they are. Test,
+                                           MODDING.md.
                    - [x] Peaks under the caps again (first pass; see above for now): `large` (with its
                          `small`) 67 discs and 85 points, `small` 28 and
                          35, `concussion` 36 and 99, `dirt` and `sparks`
@@ -2900,4 +2908,5 @@ update the smoke test.
   only. Explosions take `shake: { amount, time, radius }`; the camera
   jolts its eye height, tilt and turn with a smooth wobble, and the aim
   stays put. Validator, a test, MODDING.md. 221 tests, the validator and
-  the smoke test pass.
+  the smoke test pass. Then, as Mark asked, the other styles shake too,
+  less the smaller they are (`large` 0.6 down to `sparks` 0.1).
