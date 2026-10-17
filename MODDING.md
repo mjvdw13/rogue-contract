@@ -297,8 +297,8 @@ be added with `definePickup` (see *Custom behaviour*).
   ```js
   gravity: 28,
   bounce: {
-    toss: 7,            // thrown along your aim, plus this much upward speed
-    loft: 6,            // and this much more times the throw's power (a weapon's `charge`)
+    toss: 4.25,         // thrown along your aim, plus this much upward speed
+    loft: 8.75,         // and this much more times the throw's power (a weapon's `charge`)
     restitution: 0.55,  // share of its speed into a wall or floor it keeps (0-1)
     friction: 0.75,     // share of the rest it keeps at each bounce (0-1)
     minSpeed: 1.5,      // slower than this into the floor, it stops bouncing and rolls

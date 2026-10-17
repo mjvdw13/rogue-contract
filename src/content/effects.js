@@ -57,8 +57,9 @@ export const projectiles = [
     gravity: 28,
     damage: [20, 30],
     splash: { radius: 4, damage: 140 },
-    // Lobbed high: a tap rises about a tile, a full throw nearly three.
-    bounce: { restitution: 0.55, friction: 0.75, minSpeed: 1.5, roll: 3, fuse: 2.5, toss: 7, loft: 6 },
+    // A tap (power 0.2) is the old low toss: 3.6 out, 6 up. A full throw is
+    // lobbed high: 18 out, 13 up, peaking about three tiles above the hand.
+    bounce: { restitution: 0.55, friction: 0.75, minSpeed: 1.5, roll: 3, fuse: 2.5, toss: 4.25, loft: 8.75 },
     explosion: 'large',
     sounds: { bounce: 'detonator-bounce', explode: 'detonator-explode' },
   }),

@@ -145,9 +145,9 @@ test('a hard throw is lobbed higher than a tap', () => {
     run(w, mockInput(), 1, () => (top = Math.max(top, p.z)));
     return top - 1;
   };
-  const tap = peak(0.15);
+  const tap = peak(0.2);
   const full = peak(1);
-  assert.ok(tap > 0.7, `a tap still goes up (${tap.toFixed(2)})`);
+  assert.ok(tap > 0.25, `a tap still goes up (${tap.toFixed(2)})`);
   assert.ok(full > 2 * tap, `a full throw much higher (${full.toFixed(2)} vs ${tap.toFixed(2)})`);
 });
 

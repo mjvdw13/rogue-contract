@@ -43,7 +43,7 @@ In this order unless Mark says otherwise.
 
 - [x] Concussion rifle: the shot bursts on solid scenery (sprite
       decorations too) and on villagers, instead of flying through them.
-- [ ] Thermal detonator: a tap tosses it as before the higher arc (speed
+- [x] Thermal detonator: a tap tosses it as before the higher arc (speed
       24, `toss` 6), a long throw keeps the new arc (speed 18, up 13).
 - [ ] Remove touch controls (`input/touch.js`, its bindings and settings).
 

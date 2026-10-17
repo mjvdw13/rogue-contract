@@ -19,6 +19,6 @@ export default defineWeapon({
   },
   fire: { kind: 'projectile', projectile: 'detonator-thrown', spread: 0.02 },
   reraise: true,
-  charge: { time: 1, min: 0.15, sink: 36, pull: 0.18 }, // the fist pulls back hard as fire goes down
+  charge: { time: 1, min: 0.2, sink: 36, pull: 0.18 }, // the fist pulls back hard as fire goes down
   sounds: { fire: 'detonator-throw' },
 });
