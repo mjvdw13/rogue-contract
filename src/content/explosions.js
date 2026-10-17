@@ -41,9 +41,11 @@ export default [
   // racing out along the floor, a fireball that punches out to fill a hall
   // (4 tiles wide and high) and stops short, shrapnel flung hard, a cloud
   // of smoke after it, and a second, smaller blast (`secondary`) beside it.
+  // The only one that shakes the view.
   defineExplosion({
     id: 'extra-large',
     light: { radius: 10, light: 160, time: 0.5 },
+    shake: { amount: 1, time: 0.6, radius: 16 },
     particles: [
       { type: 'blast-flash', count: 3, speed: [0, 0.5], radius: 0.3, z: 1 },
       { type: 'blast-streak', count: 60, speed: [12, 20], dir: 'ring', z: 0.1 },

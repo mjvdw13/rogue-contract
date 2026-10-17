@@ -120,6 +120,41 @@ test('an explosion throws its bursts now, after their delay, or spread over a wh
   assert.equal(w.rng.state, state, "explosions don't touch the world's RNG");
 });
 
+test("a shake jolts the view near it, not your aim, dies away, and only 'extra-large' has one", () => {
+  assert.deepEqual(
+    content.explosions.filter((e) => e.shake).map((e) => e.id),
+    ['extra-large'],
+  );
+  const w = makeWorld(level(), { noMonsters: true });
+  const pt = w.player;
+  Object.assign(pt, { x: 2.5, y: 3.5, angle: 0, pitch: 0 });
+  const still = w.camera();
+  w.explode('large', 5.5, 3.5, 0);
+  assert.equal(w.explosions.shakes.length, 0, "'large' doesn't shake");
+  w.explode('extra-large', 5.5, 3.5, 0);
+  const ex = w.explosions;
+  assert.ok(ex.shake(5.5, 3.5, 0) > 0.99, 'full right beside it');
+  assert.ok(ex.shake(pt.x, pt.y, 0.8) > 0.6 && ex.shake(pt.x, pt.y, 0.8) < 0.9, '3 tiles off: less');
+  assert.equal(ex.shake(5.5 + 16, 3.5, 0), 0, 'none from its radius');
+  let turn = 0;
+  let tilt = 0;
+  let rise = 0;
+  tick(w, 0.3, () => {
+    const cam = w.camera();
+    turn = Math.max(turn, Math.abs(cam.angle - still.angle));
+    tilt = Math.max(tilt, Math.abs(cam.horizonOffset - still.horizonOffset));
+    rise = Math.max(rise, Math.abs(cam.z - still.z));
+  });
+  assert.ok(turn > 0.002 && turn < 0.016, `turn ${turn}`);
+  assert.ok(tilt > 1 && tilt < 8, `tilt ${tilt}`);
+  assert.ok(rise > 0.01 && rise < 0.08, `rise ${rise}`);
+  assert.equal(pt.angle, 0, 'your aim stays put');
+  assert.equal(pt.pitch, 0);
+  tick(w, 0.35);
+  assert.equal(ex.shakes.length, 0, 'gone after its time');
+  assert.deepEqual(w.camera(), still);
+});
+
 test("an explosion faces out of what it hit: bursts keep to that side, 'up' ones rise", () => {
   const reg = withExplosions(
     defineExplosion({ id: 'test', particles: [{ type: 'spark', count: 60, speed: [2, 3] }, { type: 'ember', count: 20, dir: 'up', spread: 0.3 }] }),
@@ -262,6 +297,8 @@ test('the validator checks explosions, the things that use them, trails and grow
         particles: [{ type: 'no-such', delay: [-1], over: 'x', radius: -2, dir: 'sideways' }],
         then: [{ explosion: 'nothing', offset: -1 }],
       }),
+      defineExplosion({ id: 'quake', particles: [], shake: { amount: 2, time: 0, radius: -1 } }),
+      defineExplosion({ id: 'rumble', particles: [], shake: 3 }),
       defineExplosion({ id: 'ping', particles: [], then: [{ explosion: 'pong' }] }),
       defineExplosion({ id: 'pong', particles: [], then: [{ explosion: 'ping', delay: 1 }] }),
     ],
@@ -279,6 +316,8 @@ test('the validator checks explosions, the things that use them, trails and grow
   }
   has('explosion "bad" then: unknown explosion "nothing"');
   has('"then" offset');
+  for (const s of ["shake's amount", "shake's time", "shake's radius"]) has(`explosion "quake": the ${s}`);
+  has('explosion "rumble": "shake" must be');
   has('explosion "ping": "then" sets it off again (a loop)');
   assert.ok(warnings.some((e) => e.startsWith('explosion "bad"') && e.includes('no-sound')), 'its sound');
   assert.deepEqual(

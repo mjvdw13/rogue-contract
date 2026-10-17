@@ -422,11 +422,15 @@ export function defineParticle(def) {
  * explosion faces; also what a burst with no `dir` does) or 'ring' (flat,
  * across the way it faces: along the floor or wall it hit).
  * `light: { radius, light, time }` is a flash that fades over `time` seconds.
+ * `shake: { amount, time, radius }` jolts the view: `amount` (0 to 1, 1 the
+ * hardest) right beside it, dying away over `time` seconds (0.5), less the
+ * farther off, none from `radius` (12) away.
  * `then: [{ explosion, delay, offset, z }]` sets off other explosions after
  * this one: `delay` seconds later, `offset` to the side (a random way, not
  * into what it faces out of), `z` higher.
  * @param {{id:string, particles:(BurstSpec & {delay?:number|[number,number], over?:number, radius?:number,
  *   z?:number, dir?:'up'|'out'|'ring'|[number,number,number]})[], light?:{radius:number, light:number, time?:number},
+ *   shake?:{amount?:number, time?:number, radius?:number},
  *   then?:{explosion:string, delay?:number|[number,number], offset?:number|[number,number], z?:number}[],
  *   sound?:string, effect?:string, name?:string}} def
  */

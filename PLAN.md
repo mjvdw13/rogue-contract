@@ -1421,8 +1421,24 @@ with the game):
                                      discs and 98 points at most; 0.5
                                      to 1 ms to draw headless at its
                                      busiest (1 ms only from 2 tiles).
-                               - [ ] Not done, to offer: a screen
-                                     shake (the engine has none yet).
+                               - [x] A screen shake, on `extra-large`
+                                     only (Mark asked):
+                                     - [x] `shake: { amount, time,
+                                           radius }` on an explosion:
+                                           it fades over `time`,
+                                           weakens with distance and
+                                           is gone at `radius`.
+                                           Validator.
+                                     - [x] The view jolts (eye height,
+                                           pitch, a little turn),
+                                           smooth rather than jittery;
+                                           your aim stays where it was.
+                                     - [x] Only `extra-large` has one
+                                           (amount 1, 0.6 s, 16 tiles:
+                                           about 70% from the bench's 5
+                                           tiles). Tests, MODDING.md.
+                                     - [ ] Mark tries it on the bench
+                                           and says how hard.
                    - [x] Peaks under the caps again (first pass; see above for now): `large` (with its
                          `small`) 67 discs and 85 points, `small` 28 and
                          35, `concussion` 36 and 99, `dirt` and `sparks`
@@ -2880,3 +2896,8 @@ update the smoke test.
   its own, `extra-large`. Then some kick for it: a white pop, a shock of
   fast streaks along the floor, a fireball that punches out and stops
   short, sparks and shrapnel flung harder, a brighter, shorter flash.
+- 2026-10-16: Phase 1b T step 5f, Mark: a screen shake, on `extra-large`
+  only. Explosions take `shake: { amount, time, radius }`; the camera
+  jolts its eye height, tilt and turn with a smooth wobble, and the aim
+  stays put. Validator, a test, MODDING.md. 221 tests, the validator and
+  the smoke test pass.

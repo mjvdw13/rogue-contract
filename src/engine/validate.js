@@ -112,6 +112,15 @@ export function validateContent(reg) {
       checkLight(owner, e.light);
       if (e.light?.time !== undefined && !(e.light.time > 0)) err(`${owner}: the light's time is seconds, above 0`);
     }
+    if (e.shake !== undefined) {
+      const s = e.shake;
+      if (!s || typeof s !== 'object') err(`${owner}: "shake" must be { amount, time, radius }`);
+      else {
+        if (s.amount !== undefined && !(s.amount > 0 && s.amount <= 1)) err(`${owner}: the shake's amount is above 0, at most 1`);
+        if (s.time !== undefined && !(s.time > 0)) err(`${owner}: the shake's time is seconds, above 0`);
+        if (s.radius !== undefined && !(s.radius > 0)) err(`${owner}: the shake's radius is above 0`);
+      }
+    }
     if (e.effect !== undefined && reg.things.get(e.effect)?.kind !== 'effect') err(`${owner}: unknown effect "${e.effect}"`);
     checkSound(owner, e.sound);
     if (e.then === undefined) continue;

@@ -253,19 +253,32 @@ function verticalMove(world, pt, dt) {
   if (p.viewOffset < 0) p.viewOffset = Math.min(0, p.viewOffset + Math.max(1.2, -p.viewOffset * 10) * dt);
 }
 
-/** Camera for the renderer: eye position, bob, muzzle-flash light, powerup colormaps. */
+/** At the hardest shake (an explosion's `shake`): the eye's jolt up and down, the view's tilt in pixels, its turn in radians. */
+const SHAKE_Z = 0.08;
+const SHAKE_PITCH = 8;
+const SHAKE_TURN = 0.015;
+
+/** A smooth wobble, -1 to 1: two sines that don't line up, so it never settles into a beat. */
+const wobble = (t, rate, phase) => 0.6 * Math.sin(t * rate + phase) + 0.4 * Math.sin(t * rate * 1.73 + phase * 2.1);
+
+/**
+ * Camera for the renderer: eye position, bob, shake, muzzle-flash light,
+ * powerup colormaps. The shake only moves the view: your aim stays put.
+ */
 export function playerCamera(world, pt) {
   const p = pt.player;
   const bob = p.dead ? 0 : Math.sin(p.bobPhase * 2) * 0.036 * p.bobAmount;
+  const shake = world.explosions.shake(pt.x, pt.y, pt.z + p.viewHeight);
+  const t = world.time;
   let fixedColormap = -1;
   if (p.powerVisible('invulnerable', world.time)) fixedColormap = COLORMAP_INVERSE;
   else if (p.powerVisible('nightvision', world.time)) fixedColormap = 0;
   return {
     x: pt.x,
     y: pt.y,
-    angle: pt.angle,
-    z: pt.z + Math.max(0.1, p.viewHeight + p.viewOffset + bob),
-    horizonOffset: pt.pitch ?? 0,
+    angle: pt.angle + shake * SHAKE_TURN * wobble(t, 71, 0),
+    z: pt.z + Math.max(0.1, p.viewHeight + p.viewOffset + bob + shake * SHAKE_Z * wobble(t, 83, 1.3)),
+    horizonOffset: (pt.pitch ?? 0) + shake * SHAKE_PITCH * wobble(t, 59, 2.7),
     extraLight: p.weaponState.flash ?? 0,
     fixedColormap,
   };

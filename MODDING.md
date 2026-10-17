@@ -443,6 +443,20 @@ way, never back into the wall or floor it hit, and stopping short of any
 wall), `z` how much higher. Each can be a number or `[min, max]`. The
 validator refuses a loop (a style that, through `then`, sets itself off).
 
+A style can shake the view too (only `extra-large` does, so keep it for the
+really big ones):
+
+```js
+shake: { amount: 1, time: 0.6, radius: 16 },
+```
+
+`amount` is how hard right beside it, above 0 and at most 1 (the hardest
+the engine shakes). It dies away fast, then slowly, over `time` seconds
+(0.5 if left out), and is weaker the farther you are, with none from
+`radius` (12) away. Shakes close together add up, still at most 1. Only
+the view moves: the eye jolts up and down, the view tips and turns a
+little, and your aim stays where it was.
+
 Set one off with:
 
 - `death: { explosion: 'large' }` on a monster or shootable decoration

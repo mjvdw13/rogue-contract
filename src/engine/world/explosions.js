@@ -2,10 +2,11 @@ import { castRay } from './physics.js';
 
 /**
  * Explosions (PLAN.md Phase 1b T step 5f): named recipes (defineExplosion)
- * of particle bursts, a flash of light, a sound and optionally a sprite
- * effect, set off by id with `world.explode`; a recipe's `then` sets off
- * more after it, off to the side. Only for looks: the damage is the
- * exploder's (`explode`, `splash`), and the particles' RNG is their own.
+ * of particle bursts, a flash of light, a shake of the view, a sound and
+ * optionally a sprite effect, set off by id with `world.explode`; a
+ * recipe's `then` sets off more after it, off to the side. Only for looks:
+ * the damage is the exploder's (`explode`, `splash`), and the particles'
+ * RNG is their own.
  */
 
 /** An explosion this close above the floor (with no facing of its own) faces up. */
@@ -23,6 +24,8 @@ export class Explosions {
     this.pending = [];
     /** Flashes of light, fading. */
     this.flashes = [];
+    /** Shakes of the view, fading. */
+    this.shakes = [];
   }
 
   /**
@@ -71,6 +74,8 @@ export class Explosions {
     }
     const l = def.light;
     if (l) this.flashes.push({ x, y, z, radius: l.radius, light: l.light, time: l.time ?? 0.4, age: 0 });
+    const s = def.shake;
+    if (s) this.shakes.push({ x, y, z, amount: s.amount ?? 1, radius: s.radius ?? 12, time: s.time ?? 0.5, age: 0 });
     if (def.effect) world.spawnEffect(def.effect, x, y, z);
     if (def.sound) world.playSoundAt(def.sound, x, y);
     return true;
@@ -122,6 +127,23 @@ export class Explosions {
     }
     const flashes = this.flashes;
     for (let k = flashes.length - 1; k >= 0; k--) if ((flashes[k].age += dt) >= flashes[k].time) flashes.splice(k, 1);
+    const shakes = this.shakes;
+    for (let k = shakes.length - 1; k >= 0; k--) if ((shakes[k].age += dt) >= shakes[k].time) shakes.splice(k, 1);
+  }
+
+  /**
+   * How hard the view shakes at (x, y, z), 0 to 1: each shake at its full
+   * `amount` at first, dying away fast and then slowly over its `time`,
+   * weaker the farther off, gone at its `radius`.
+   */
+  shake(x, y, z) {
+    let sum = 0;
+    for (const s of this.shakes) {
+      const near = 1 - Math.hypot(s.x - x, s.y - y, s.z - z) / s.radius;
+      const left = 1 - s.age / s.time;
+      if (near > 0) sum += s.amount * near * left * left;
+    }
+    return Math.min(1, sum);
   }
 
   /** Add the flashes to a list of dynamic lights ({ x, y, z, radius, light }). */
@@ -136,5 +158,6 @@ export class Explosions {
   clear() {
     this.pending.length = 0;
     this.flashes.length = 0;
+    this.shakes.length = 0;
   }
 }
