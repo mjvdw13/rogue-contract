@@ -218,7 +218,7 @@ export default [
     life: [0.2, 0.32],
     size: 0.55,
     grow: 2.2,
-    maxPx: 48,
+    maxPx: 32,
     shape: 'disc',
     blend: 'add',
     fade: true,
