@@ -151,8 +151,11 @@ export function corpseThink(world, t, dt) {
  * Explosion damage: falls off linearly with the 3D distance from (x, y, z) to
  * the nearest point of each body, and floors, ledges and walls block it. `z`
  * defaults to the middle of a standing body above the floor there.
+ * `falloff: false` gives every body caught the full damage. Returns the
+ * bodies it hurt.
  */
-export function radiusDamage(world, x, y, radius, maxDamage, inflictor, source, z = world.map.floorAt(x, y) + 0.8) {
+export function radiusDamage(world, x, y, radius, maxDamage, inflictor, source, z = world.map.floorAt(x, y) + 0.8, { falloff = true } = {}) {
+  const hurt = [];
   for (const t of [...world.things]) {
     if (!t.shootable || t.dead || t.removed) continue;
     if (t.def.splashImmune) continue;
@@ -165,9 +168,11 @@ export function radiusDamage(world, x, y, radius, maxDamage, inflictor, source, 
     const inset = Math.min(0.2, t.height / 4);
     const tz = Math.max(t.z + inset, Math.min(t.z + t.height - inset, z));
     if (!lineOfSight3D(world.map, x, y, z, t.x, t.y, tz)) continue;
-    const dmg = maxDamage * (1 - d / radius);
+    const dmg = falloff ? maxDamage * (1 - d / radius) : maxDamage;
+    hurt.push(t);
     damage(world, t, dmg, inflictor ?? { x, y }, source);
   }
+  return hurt;
 }
 
 /**

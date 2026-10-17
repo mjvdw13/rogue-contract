@@ -83,8 +83,8 @@ const SHEETS = [
     })(),
   },
   {
-    // Bossk. No firing pose with a flash (the concussion blast glows on its
-    // own), so fire repeats the aiming pose.
+    // Bossk. No firing pose with a flash (Dark Forces has none for him), so
+    // fire repeats the aiming pose.
     file: 'MS-DOS - Star Wars_ Dark Forces - Enemies - Trandoshan.png',
     asset: 'bossk',
     frames: (() => {
@@ -141,6 +141,8 @@ const SHEETS = [
   { cells: { folder: 'Pickups/WDET.cells', list: ['000.PNG'], align: 'middle' }, asset: 'thermal-detonator-ball', out: 'assets/sprites/fx/thermal-detonator.png' },
   { cells: { folder: 'Pickups/IDET.cells', list: ['000.PNG'] }, asset: 'thermal-detonator-item', out: 'assets/sprites/items/thermal-detonator.png' },
   { cells: { folder: 'Pickups/IDETS.cells', list: ['000.PNG'] }, asset: 'detonator-belt', out: 'assets/sprites/items/detonator-belt.png' },
+  // The concussion rifle lying on the floor (ICONCUS), Bossk's drop.
+  { cells: { folder: 'Pickups/ICONCUS.cells', list: ['000.PNG'] }, asset: 'concussion-rifle-item', out: 'assets/sprites/items/concussion-rifle.png' },
 ];
 
 /**
@@ -267,22 +269,33 @@ const WEAPONS = [
     frames: [[9, 111, 167, 281], [119, 241, 148, 281]],
     erase: [[180, 272], [180, 273]],
   },
+  {
+    // concussion-rifle.js: 0 idle, 1 the shot (lit), 2 its after-glow. The
+    // firing frames are only the front of the rifle, so each frame sits where
+    // Dark Forces drew it (`at`: its left edge, from DF's x positions 130, 191
+    // and 188), not by an anchor.
+    asset: 'concussion-rifle',
+    at: [0, 61, 58],
+    padLeft: 0,
+    padBottom: 12,
+    frames: [[36, 208, 627, 731], [214, 313, 625, 731], [321, 415, 628, 731]],
+  },
 ];
 
-function cutWeapon({ asset, anchor, padLeft, padBottom, frames, erase = [] }) {
+function cutWeapon({ asset, anchor, at, padLeft, padBottom, frames, erase = [] }) {
   const { width: W, data } = decodePNG(fs.readFileSync(path.join(dir, WEAPON_SHEET)));
   const isBg = (x, y) => {
     const o = (y * W + x) * 4;
     return (data[o] === 0 && data[o + 1] === 128 && data[o + 2] === 255) || erase.some(([ex, ey]) => ex === x && ey === y);
   };
-  const artW = Math.max(...frames.map(([x0, x1]) => x1 - x0 + 1));
+  const artW = Math.max(...frames.map(([x0, x1], f) => (at?.[f] ?? 0) + x1 - x0 + 1));
   const FW = (padLeft + artW + 1) & ~1;
   const FH = Math.max(...frames.map(([, , y0, y1]) => y1 - y0 + 1)) + padBottom;
   const n = frames.length;
   const out = new Uint8Array(FW * n * FH * 4);
   frames.forEach(([x0, x1, y0, y1], f) => {
     const spare = artW - (x1 - x0 + 1);
-    const ox = f * FW + padLeft + (anchor === 'left' ? 0 : anchor === 'right' ? spare : Math.floor(spare / 2));
+    const ox = f * FW + padLeft + (at ? at[f] : anchor === 'left' ? 0 : anchor === 'right' ? spare : Math.floor(spare / 2));
     for (let y = y0; y <= y1; y++) {
       for (let x = x0; x <= x1; x++) {
         if (isBg(x, y)) continue;

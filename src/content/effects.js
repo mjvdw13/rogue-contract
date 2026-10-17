@@ -61,16 +61,17 @@ export const projectiles = [
     explosion: 'large',
     sounds: { bounce: 'detonator-bounce', explode: 'detonator-explode' },
   }),
-  // Bossk's concussion rifle: a slow blue-white blast that bursts in a ring.
+  // The concussion rifle's shot (yours and Bossk's), as in Dark Forces: unseen
+  // and fast, no damage itself. Where it lands, everything within the splash
+  // takes the full damage and erupts in a `concussion` blast at its feet; off
+  // a wall or floor, one more goes up there.
   defineProjectile({
-    id: 'concussion-blast',
-    sheet: FX('concussion', 32, 32),
-    anims: { fly: { frames: [0, 1], fps: 10, loop: true }, explode: { frames: [2, 3, 4], fps: 14 } },
-    radius: 0.24,
-    light: { radius: 3.5, light: 80 },
-    speed: 24,
-    damage: [10, 18],
-    splash: { radius: 2.5, damage: 30 },
-    sounds: { explode: 'concussion-hit' },
+    id: 'concussion-shot',
+    radius: 0.1,
+    speed: 55,
+    life: 5,
+    damage: 0,
+    splash: { radius: 3.3, damage: 60, falloff: false, erupt: 'concussion' },
+    sounds: { fire: 'concussion-fire', explode: 'concussion-hit' },
   }),
 ];

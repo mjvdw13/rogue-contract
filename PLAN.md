@@ -1881,6 +1881,62 @@ are the outdoor troops, so both go under the sky:
          hides behind the probe droid from the gorge's mouth, and shows
          beside the boulder a few steps in.
 
+### AB. The concussion rifle (2026-10-17)
+
+Mark (2026-10-17): the Stouker concussion rifle, for the player and Bossk,
+with the three DF weapon frames from Dolphman's weapons sheet (bottom left
+of `MS-DOS - Star Wars_ Dark Forces - Miscellaneous - Weapons.png`). Part
+of T (wiring the `concussion` style in).
+
+How Dark Forces does it (The Force Engine's reverse-engineered source:
+`weaponFireFunc.cpp` `weaponFire_concussion`, `projectile.cpp`,
+`hitEffect.cpp` `hitEffectExplodeFunc`, and its `ExternalData/DarkForces`
+json):
+- It *is* a projectile, but an invisible one (a "spirit": no sprite, zero
+  width) and fast: 190 DF units a second (about 55 of ours; the blaster
+  bolt is 60), for up to 5 s. It does no damage itself.
+- Where it hits a wall or floor, a concussion blast (CONCEXP) appears on
+  the floor below that point, with EX-LRG1. If it hits a body, no blast at
+  that point (`HEFFECT_CONCUSSION2` has no sprite).
+- Either way, everything within 25 units (3D, roughly 0.8 of the
+  detonator's 30) takes the full 30 damage, no falloff, and erupts in its
+  own CONCEXP at its feet: enemies, the player too (you can hurt yourself
+  firing at a wall up close), breakable scenery, and mines set off. Only
+  the push falls off with distance. It also wakes enemies within 60.
+- Ammo: power cells, 4 a shot. Fire: CONCUSS6 and CONCUSS5 together;
+  empty: CONCUSS1. Frames 1 (lit, 0.30 s), 2 (0.10 s), back to 0 (0.40 s):
+  0.8 s a shot. Weapon key 9.
+- Bossk fires the same shot (sound CONCUSS5, no spread, 10-100 units) and
+  drops the rifle when he dies.
+
+Steps:
+1. [x] Art: cut the three frames (idle, firing glow, after-glow) from the
+       weapons sheet into `assets/custom/concussion-rifle.png` (`cut.mjs`,
+       like the blaster), and the pickup (ICONCUS) from the pickups zip.
+       The firing frames are only the front of the rifle, so each frame
+       sits where DF drew it (`at`, from DF's x positions), offset
+       [57, 12]. Generated stand-ins in `tools/art/sprites/weapons.js`.
+2. [x] Engine: a projectile with no sheet flies unseen; `splash.falloff:
+       false` (every body caught takes the full damage) and `splash.erupt`
+       (an explosion going up from the floor under each one, and under the
+       burst unless it hit a body). `radiusDamage` returns the bodies it
+       hurt; a projectile with `damage: 0` doesn't hurt what it hits.
+       Validator, MODDING.md, tests.
+3. [x] Content: the `concussion-rifle` weapon (slot 9, energy, 4 a shot,
+       frames 0.3 / 0.1 / 0.4 s), its pickup (glyph 9, 30 energy), the
+       `concussion-shot` (speed 55, life 5, splash 3.3 and 60), Bossk on it
+       (no spread) and dropping the rifle. Sounds: `concussion-crack`
+       CONCUSS6 (yours) with `concussion-fire` CONCUSS5 (the shot's, so
+       Bossk's too), `concussion-hit` EX-LRG1; INDEX.md corrected. Not done:
+       CONCUSS1, DF's empty click (the game has no empty sound yet). The
+       old visible `concussion` FX sprite is gone.
+4. [x] Tried headless in the sandbox: one shot into three grouped
+       stormtroopers (30 health) kills all three, each erupting; one 6
+       tiles further on is untouched. One in Mission 1 by the start, one in
+       the sandbox by the detonators (`R` there: its `9` is a trooper).
+       241 tests, the validator and the smoke test pass; commit and push.
+5. [ ] Mark tries it.
+
 ## Phase 1c: Two storeys per tile (done 2026-10-13)
 
 Mark (2026-10-13): we want to walk underneath other parts of the map. Today
@@ -3372,3 +3428,9 @@ update the smoke test.
   Mission 1's canyon, at the main gate (skills 2+) and by the vent mouth
   (3+); `docs/mission1.md` updated. Tests, the validator and the smoke
   test pass.
+- 2026-10-17: Phase 1b AB steps 1-4: the concussion rifle, after Dark
+  Forces (The Force Engine's source): an unseen fast shot; everything in
+  its splash takes the full damage and erupts in a `concussion` blast at
+  its feet (`splash.falloff: false`, `splash.erupt`). Slot 9, energy, 4 a
+  shot; DF's frames and pickup; Bossk fires it and drops it. Sounds put
+  right. 241 tests, the validator and the smoke test pass.

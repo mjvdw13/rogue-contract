@@ -311,6 +311,24 @@ be added with `definePickup` (see *Custom behaviour*).
   lift rising under it carries it up. Its `bounce` sound plays on each
   knock harder than `minSpeed`. It goes off where it lies (its `explosion`
   facing up off the floor), with its `splash`, which can hurt its thrower.
+
+  A `splash` hurts every body within `radius` of the burst (walls and
+  floors shelter them), `damage` falling off with distance. Dark Forces'
+  concussion rifle (`concussion-shot`) works another way:
+
+  ```js
+  damage: 0,          // no damage itself; the splash does it all
+  splash: {
+    radius: 3.3,
+    damage: 60,
+    falloff: false,   // every body caught takes the full damage
+    erupt: 'concussion', // an explosion going up from the floor under each one
+  },
+  ```
+
+  With `erupt`, one more goes up from the floor where it struck a wall or
+  floor, but none where it hit a body (that body erupts already). A
+  projectile with no `sheet` flies unseen.
 - **Effects** such as puffs, blood, bug ichor and explosions use
   `defineEffect({ id, sheet, anims: { idle } })`. An effect disappears when its
   animation ends.

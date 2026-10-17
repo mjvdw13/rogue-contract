@@ -70,7 +70,13 @@ export default [
     synth: { wave: 'noise', duration: 0.6, attack: 0.002, decay: 0.12, sustain: 0.4, release: 0.45, lowpass: [3200, 250], noiseHold: 3, distortion: 0.4, volume: 0.8, layers: [thump(90, 35, 0.4, 0.8)], ...crunch },
     pitchVariance: 0.08,
   }),
-  // Bossk's concussion rifle: a hollow thump-and-crack, and a deep boom where it bursts.
+  // The concussion rifle: a hollow thump-and-crack (yours and Bossk's), the
+  // trigger's sharp crack (yours only), and a deep boom where it bursts.
+  defineSound({
+    id: 'concussion-crack',
+    synth: { ...burst(0.12, [6000, 900], 0.3, 2), layers: [thump(320, 120, 0.1, 0.25)] },
+    pitchVariance: 0.06,
+  }),
   defineSound({
     id: 'concussion-fire',
     synth: { ...thump(260, 70, 0.22, 0.34), layers: [burst(0.18, [5000, 600], 0.22, 2), { wave: 'saw', freq: 420, freqEnd: 90, duration: 0.2, release: 0.16, lowpass: 2000, volume: 0.13 }] },

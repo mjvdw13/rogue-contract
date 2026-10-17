@@ -414,8 +414,12 @@ export function defineDecoration(def) {
  * losing `roll` of its speed a second. It goes off after `fuse` seconds, or
  * at once on a body; its `bounce` sound plays on a knock harder than
  * `minSpeed`.
- * @param {{id:string, sheet:SheetSpec, anims:{fly:AnimSpec, explode?:AnimSpec}, speed?:number,
- *   damage?:number|number[], radius?:number, splash?:{radius:number, damage:number},
+ * `splash` hurts bodies within `radius` of the burst, `damage` falling off
+ * with distance (`falloff: false`: the full damage to all of them); `erupt`
+ * is an explosion set off at the feet of each one (see projectile.js). With
+ * no `sheet`, it flies unseen (Dark Forces' concussion shot).
+ * @param {{id:string, sheet?:SheetSpec, anims?:{fly:AnimSpec, explode?:AnimSpec}, speed?:number,
+ *   damage?:number|number[], radius?:number, splash?:{radius:number, damage:number, falloff?:boolean, erupt?:string},
  *   gravity?:number, z?:number, sounds?:{fire?:string, explode?:string, bounce?:string}, trail?:string, explosion?:string,
  *   bounce?:{restitution?:number, friction?:number, minSpeed?:number, roll?:number, fuse?:number, toss?:number}}} def
  */

@@ -2,5 +2,6 @@
 import fists from './fists.js';
 import blaster from './blaster.js';
 import thermalDetonator from './thermal-detonator.js';
+import concussionRifle from './concussion-rifle.js';
 
-export default [fists, blaster, thermalDetonator];
+export default [fists, blaster, thermalDetonator, concussionRifle];

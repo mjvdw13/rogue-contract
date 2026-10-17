@@ -22,6 +22,8 @@ assets/custom/*
 !assets/custom/thermal-detonator-ball.png
 !assets/custom/thermal-detonator-item.png
 !assets/custom/detonator-belt.png
+!assets/custom/concussion-rifle.png
+!assets/custom/concussion-rifle-item.png
 !assets/custom/textures.mjs
 !assets/custom/textures/
 # The whole Dark Forces texture pack, sorted by what each texture shows.

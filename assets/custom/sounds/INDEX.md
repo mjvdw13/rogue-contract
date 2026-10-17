@@ -37,9 +37,9 @@ these are Lucasfilm's and must not be redistributed.
 | MORTAR2 | 0.44s | Packered mortar gun (guess: firing). |
 | MORTAR4 | 0.93s | Packered mortar gun (guess: shell in flight). |
 | MORTAR9 | 0.39s | Packered mortar gun (guess: shell landing; a dull thud). |
-| CONCUSS1 | 0.53s | Stouker concussion rifle (guess: shot). |
-| CONCUSS5 | 0.90s | Stouker concussion rifle (guess: blast). |
-| CONCUSS6 | 0.26s | Stouker concussion rifle (guess: short shot). |
+| CONCUSS1 | 0.53s | Stouker concussion rifle: fired with no ammo left. |
+| CONCUSS5 | 0.90s | Stouker concussion rifle: the shot (the player's, and Bossk's). |
+| CONCUSS6 | 0.26s | Stouker concussion rifle: the trigger's crack, with CONCUSS5 (the player's only). Its blast is EX-LRG1. |
 | PLASMA4 | 0.72s | Assault cannon plasma shot. |
 | MISSILE1 | 0.62s | Assault cannon missile launch. |
 | THERMAL1 | 0.10s | Thermal detonator bouncing (a metal clank). |

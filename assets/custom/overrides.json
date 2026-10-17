@@ -166,5 +166,16 @@
     "src": "assets/custom/thermal-detonator.png",
     "frameWidth": 124,
     "frameHeight": 134
+  },
+  "assets/sprites/items/concussion-rifle.png": {
+    "src": "assets/custom/concussion-rifle-item.png",
+    "frameWidth": 62,
+    "frameHeight": 19,
+    "scale": 0.85
+  },
+  "assets/sprites/weapons/concussion-rifle.png": {
+    "src": "assets/custom/concussion-rifle.png",
+    "frameWidth": 174,
+    "frameHeight": 119
   }
 }

@@ -21,6 +21,9 @@ function skyAt(map, x, y, z) {
  * Burst, damaging what's around. `pull` backs it out of the wall it flew
  * into. Its `explosion` faces `face` (out of the floor or ceiling it hit),
  * else back the way it came (out of a wall), else all round (a body hit).
+ * A `splash.erupt` explosion goes up from the floor under every body the
+ * splash hurt, and under the burst too unless it hit a body (Dark Forces'
+ * concussion rifle).
  */
 function explode(world, p, hit, pull = true, face = null) {
   if (p.state === 'exploding') return;
@@ -33,8 +36,14 @@ function explode(world, p, hit, pull = true, face = null) {
     p.x -= Math.cos(p.angle) * 0.3;
     p.y -= Math.sin(p.angle) * 0.3;
   }
-  if (p.def.splash) {
-    world.radiusDamage(p.x, p.y, p.def.splash.radius ?? 2, p.def.splash.damage ?? 100, p, p.owner, p.z);
+  const splash = p.def.splash;
+  if (splash) {
+    const hurt = world.radiusDamage(p.x, p.y, splash.radius ?? 2, splash.damage ?? 100, p, p.owner, p.z, { falloff: splash.falloff ?? true });
+    if (splash.erupt) {
+      const up = [0, 0, 1];
+      for (const t of hurt) world.explode(splash.erupt, t.x, t.y, world.map.floorAt(t.x, t.y, 0, t.z), { dir: up });
+      if (!hit) world.explode(splash.erupt, p.x, p.y, world.map.floorAt(p.x, p.y, 0, p.z), { dir: up });
+    }
   }
   world.playSoundFrom(p.def.sounds.explode, p);
   if (p.def.explosion) world.explode(p.def.explosion, p.x, p.y, p.z, { dir });
@@ -217,7 +226,8 @@ export function projectileThink(world, p, dt) {
       const owner = p.owner;
       // Monsters are immune to their own species' projectiles (as in Doom).
       const sameKind = owner && owner.kind === 'monster' && t.kind === 'monster' && t.def.id === owner.def.id;
-      if (!sameKind) world.damage(t, world.rng.roll(p.def.damage), p, owner);
+      const amount = world.rng.roll(p.def.damage);
+      if (!sameKind && amount > 0) world.damage(t, amount, p, owner);
       p.x = nx;
       p.y = ny;
       p.z = nz;

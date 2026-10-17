@@ -374,6 +374,7 @@ const HARD = [4, 5];
 const list = [
   at('player', 14.5, 90.5, { angle: 90 }),
   at('detonator-belt', 17.5, 88.5), // thermal detonators, to try them out
+  at('concussion-rifle', 19.5, 88.5), // and the concussion rifle (Bossk's)
   // The canyon: snipers on both ledges and the rock arch, two gate guards and
   // their commanders, a probe droid round the spire, and a band of Jawas
   // scavenging in the gorge.

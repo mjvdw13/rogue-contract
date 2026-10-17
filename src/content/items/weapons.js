@@ -11,7 +11,19 @@ export default [
     pickup: { weapon: 'blaster', ammo: { energy: 30 } },
     message: 'Picked up a blaster pistol.',
     sound: 'weapon-pickup',
-  }),  // Thermal detonators: one lying on the floor, and a belt of five.
+  }),
+  // The concussion rifle, as Bossk drops it.
+  defineItem({
+    id: 'concussion-rifle',
+    name: 'Concussion Rifle',
+    glyph: '9',
+    sheet: { src: 'assets/sprites/items/concussion-rifle.png', frameWidth: 64, frameHeight: 24 },
+    radius: 0.7,
+    pickup: { weapon: 'concussion-rifle', ammo: { energy: 30 } },
+    message: 'Picked up a concussion rifle.',
+    sound: 'weapon-pickup',
+  }),
+  // Thermal detonators: one lying on the floor, and a belt of five.
   defineItem({
     id: 'thermal-detonator',
     name: 'Thermal Detonator',

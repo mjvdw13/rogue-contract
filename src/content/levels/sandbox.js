@@ -155,7 +155,7 @@ export default defineLevel({
       fence: { tex: 'imp-railing', edges: 'E', height: 0.75 },
     },
   },
-  thingLegend: { '9': { type: 'stormtrooper', angle: 'S' } },
+  thingLegend: { '9': { type: 'stormtrooper', angle: 'S' }, R: { type: 'concussion-rifle' } }, // (here 9 is a trooper, not the rifle)
   tiles: [
     'OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO',
     'OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO',
@@ -222,7 +222,7 @@ export default defineLevel({
     '              w',
     '        n                                9',
     '',
-    '   > 4                           h       o',
+    '   > 4 R                         h       o',
     '',
     '            m                    l',
     '               e',

@@ -477,8 +477,8 @@ export class World {
     if (target?.player) target.health = target.player.health;
   }
 
-  radiusDamage(x, y, radius, amount, inflictor, source, z) {
-    radiusDamage(this, x, y, radius, amount, inflictor, source, z);
+  radiusDamage(x, y, radius, amount, inflictor, source, z, opts) {
+    return radiusDamage(this, x, y, radius, amount, inflictor, source, z, opts);
   }
 
   hitscan(shooter, angle, range, amount, spec, aim) {

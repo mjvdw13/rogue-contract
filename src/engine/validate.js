@@ -170,7 +170,7 @@ export function validateContent(reg) {
     }
     if (t.model) {
       if (!reg.models.has(t.model)) err(`${owner}: unknown model "${t.model}"`);
-    } else checkSheet(owner, t.sheet);
+    } else if (t.kind !== 'projectile' || t.sheet) checkSheet(owner, t.sheet); // (a projectile with no sheet flies unseen)
     checkAnims(owner, t.anims);
     for (const s of Object.values(t.sounds ?? {})) checkSound(owner, s);
     if (t.kind === 'monster') {
@@ -192,7 +192,14 @@ export function validateContent(reg) {
       }
       checkSound(owner, t.sound);
     }
-    if (t.kind === 'projectile' && !t.anims.fly && !t.anims.idle) err(`${owner}: needs a "fly" animation`);
+    if (t.kind === 'projectile' && t.sheet && !t.anims.fly && !t.anims.idle) err(`${owner}: needs a "fly" animation`);
+    if (t.kind === 'projectile' && t.splash) {
+      const sp = t.splash;
+      if (!(sp.radius > 0)) err(`${owner} splash: radius must be above 0`);
+      if (!(typeof sp.damage === 'number' && sp.damage >= 0)) err(`${owner} splash: damage must be a number, 0 or more`);
+      if (sp.falloff !== undefined && typeof sp.falloff !== 'boolean') err(`${owner} splash: falloff is true or false`);
+      if (sp.erupt !== undefined) checkExplosion(`${owner} splash erupt`, sp.erupt);
+    }
     if (t.kind === 'npc') {
       if (!t.anims.idle) err(`${owner}: needs an "idle" animation`);
       if ((t.wander ?? 0) > 0 && !t.anims.walk) warn(`${owner}: wanders but has no "walk" animation (it will stand still)`);
