@@ -4,6 +4,10 @@
  * the tile's own floor and ceiling. The solid side is on the right as you go
  * from the first point to the second, looking at the map as drawn (north up).
  *
+ * An angled wall stands up to the tile's ceiling, or stops short of it at
+ * `wallTop`: under the sky, a rounded corner as tall as its building, with
+ * the view going on over it.
+ *
  * The four 45° presets name the corner that is solid:
  *   NE ◥   NW ◤   SE ◢   SW ◣
  */
@@ -23,8 +27,9 @@ export class Slant {
    * @param {number} tx tile x
    * @param {number} ty tile y
    * @param {number} tex texture slot of the wall face
+   * @param {number} [top] the wall's top, if it stops below the tile's ceiling
    */
-  constructor(line, tx, ty, tex) {
+  constructor(line, tx, ty, tex, top = Infinity) {
     const [ax, ay, bx, by] = line;
     this.tx = tx;
     this.ty = ty;
@@ -39,6 +44,8 @@ export class Slant {
     this.nx = -this.ey / this.len;
     this.ny = this.ex / this.len;
     this.tex = tex;
+    /** Where the wall stops (Infinity: at the tile's ceiling). */
+    this.top = top;
     this.poly = clipSquare(tx, ty, this);
   }
 

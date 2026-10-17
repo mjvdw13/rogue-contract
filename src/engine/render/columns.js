@@ -105,6 +105,8 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
   const { fences, fenceAt } = map;
   const { slabBot, slabTop, slabTopTex, slabUnderTex, slabSideTex } = map;
   const { bandIndex, bandSets } = map;
+  // Nothing in the level stands higher (TileMap.computeSkyline).
+  const skyline = map.skyline;
   if (map.decalsDirty) layoutDecals(map, textures);
   const { edgeDecals, decalEdge } = map;
   const hasDecals = map.decals.length > 0;
@@ -499,22 +501,40 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
 
       // An angled wall in the current tile stops the ray where it crosses the line.
       // (Angled-wall and door tiles have no slab: their windows are all in storey 0.)
+      // One that stops short of the ceiling (`wallTop`) stops it only up to
+      // its top, and the view goes on over it; a ray that came in through
+      // its solid side has drawn its back already (below), so carries on.
       if (flags[cur] & F_SLANT) {
         const sl = slants[slantIndex[cur]];
+        const low = sl.top < ceilZ[cur];
         const t = sl.ray(px, py, rdx, rdy, along);
-        if (t >= tEnter - 1e-6 && t <= tExit + 1e-6) {
+        if (t >= tEnter - 1e-6 && t <= tExit + 1e-6 && !(low && sl.solidAt(px + rdx * tEnter, py + rdy * tEnter))) {
           seen[cur] = 1;
           // Texture runs right-to-left from the second point (as seen from the open side).
           const u = (1 - along[0]) * sl.len;
           const lv = faceLevel(0, t, 0, out);
+          const top = low ? sl.top : ceilZ[cur];
+          const a = rowOf(top, t);
           for (let k = 0; k < nw; k++) {
             clipTop = wTop[k];
             clipBot = wBot[k];
             flats(cur, 0, tEnter, t);
-            face(t, rowOf(ceilZ[cur], t), rowOf(floorZ[cur], t), ceilZ[cur], sl.tex, u, lv, faceHaze(t, out));
+            face(t, a, rowOf(floorZ[cur], t), top, sl.tex, u, lv, faceHaze(t, out));
+            if (a < clipBot) clipBot = a < clipTop ? clipTop : a;
+            wTop[k] = clipTop;
+            wBot[k] = clipBot;
           }
-          end = t;
-          break;
+          if (!low) {
+            end = t;
+            break;
+          }
+          record(t);
+          compact();
+          if (!nw) {
+            end = t;
+            break;
+          }
+          tEnter = t;
         }
       }
 
@@ -624,6 +644,8 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
       let solid = (f & F_SOLID) !== 0;
       let tex = wallTex[next];
       let u = wx;
+      // The top of a low angled wall entered from behind (-Infinity: none).
+      let backTop = -Infinity;
 
       // A fence on this edge: note it, with the rows open here, and carry on.
       if (hasFences && !solid) {
@@ -672,9 +694,14 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
           }
         }
       } else if (f & F_SLANT && slants[slantIndex[next]].solidAt(px + rdx * tExit, py + rdy * tExit)) {
-        // Entering an angled-wall tile through its solid side: the back of the wall.
-        solid = true;
-        tex = slants[slantIndex[next]].tex;
+        // Entering an angled-wall tile through its solid side: the back of the
+        // wall. One with a top below the ceiling is a step up to its top
+        // (below), which the view goes on over.
+        if (slants[slantIndex[next]].top < ceilZ[next]) backTop = slants[slantIndex[next]].top;
+        else {
+          solid = true;
+          tex = slants[slantIndex[next]].tex;
+        }
       } else if (solid && flags[cur] & F_DOOR) {
         const jamb = doors[doorIndex[cur]].jamb;
         if (jamb >= 0) tex = jamb;
@@ -702,9 +729,10 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
 
       // Step faces into the next open tile, in each window: a raised floor, a
       // lowered ceiling, and the edge of a slab, which may split the window.
-      const fN = floorZ[next];
+      const fN = backTop > floorZ[next] ? backTop : floorZ[next];
       const cN = ceilZ[next];
       const nextSlab = (f & F_SLAB) !== 0;
+      const sideN = backTop > -Infinity ? slants[slantIndex[next]].tex : sideTex[next];
       const nextBands = bandIndex[next] >= 0 ? bandSets[bandIndex[next]] : null;
       const n0 = nw;
       for (let k = 0; k < n0; k++) {
@@ -717,7 +745,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
           const a = rowOf(fN, tExit);
           seen[next] = 1;
           const lv = faceLevel(s, tExit, contrast, out);
-          face(tExit, a, rowOf(fC, tExit), fN, sideTex[next], wx, lv, hz);
+          face(tExit, a, rowOf(fC, tExit), fN, sideN, wx, lv, hz);
           if (nextBands) bandFaces(tExit, fN, fC, nextBands, wx, lv, hz);
           if (decals) decalFaces(tExit, fN, fC, decals, edgePos, mirrored, lv, hz);
           if (a < clipBot) clipBot = a < clipTop ? clipTop : a;
@@ -775,6 +803,28 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
       if (nw === 1 ? wBot[0] <= wTop[0] : (compact(), !nw)) {
         end = tExit;
         break;
+      }
+      // Looking out over the skyline: whatever lies further shows below the
+      // rows still open, so they can only be sky. Fill them and stop (over a
+      // town, rays would otherwise cross the rooftops to the map's edge).
+      if (camZ < skyline) {
+        const r = rowOf(skyline, tExit);
+        let over = true;
+        for (let k = 0; k < nw; k++) {
+          if (wBot[k] > r) {
+            over = false;
+            break;
+          }
+        }
+        if (over) {
+          for (let k = 0; k < nw; k++) {
+            clipTop = wTop[k];
+            clipBot = wBot[k];
+            skyFill(clipTop, clipBot);
+          }
+          end = tExit;
+          break;
+        }
       }
       // Which storey of the next tile each window looks into (by its middle row's height here).
       if (nextSlab) {

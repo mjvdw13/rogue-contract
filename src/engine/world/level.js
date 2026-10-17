@@ -215,6 +215,9 @@ export function buildLevel(registry, level, opts = {}) {
       if (side) map.sideTex[i] = slot(side);
       if (upper) map.upperTex[i] = slot(upper);
       if (map.ceilZ[i] < map.floorZ[i]) errors.push(`Tile (${x}, ${y}) has its ceiling below its floor`);
+      if (e.wallTop !== undefined && !(e.wall && (e.diagonal !== undefined || e.line !== undefined))) {
+        errors.push(`Tile (${x}, ${y}): "wallTop" is only for angled walls`);
+      }
 
       if (e.wall && (e.diagonal !== undefined || e.line !== undefined)) {
         // An angled wall: the tile stays open floor on one side of the line.
@@ -223,7 +226,10 @@ export function buildLevel(registry, level, opts = {}) {
         else {
           map.flags[i] |= F_SLANT;
           map.slantIndex[i] = map.slants.length;
-          map.slants.push(new Slant(line, x, y, slot(e.wall)));
+          map.slants.push(new Slant(line, x, y, slot(e.wall), e.wallTop ?? Infinity));
+          if (e.wallTop !== undefined && !(e.wallTop > map.floorZ[i] && e.wallTop < map.ceilZ[i])) {
+            errors.push(`Tile (${x}, ${y}): "wallTop" (${e.wallTop}) must be above the floor and below the ceiling`);
+          }
         }
       } else if (e.wall) {
         map.flags[i] |= F_SOLID;
@@ -472,5 +478,6 @@ export function buildLevel(registry, level, opts = {}) {
     if (map.blocks(px, py)) errors.push(`Player start (${px}, ${py}) is inside a wall`);
   }
 
+  map.computeSkyline();
   return { map, spawns, playerStart, errors, legend, glyphAt };
 }

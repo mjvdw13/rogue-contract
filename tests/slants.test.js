@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { buildLevel } from '../src/engine/world/level.js';
 import { castRay } from '../src/engine/world/physics.js';
 import { Slant, DIAGONALS } from '../src/engine/world/slants.js';
-import { makeWorld, mockInput, room, coarse, run, registry } from './helpers.js';
+import { makeWorld, mockInput, room, coarse, run, registry, headlessRenderer } from './helpers.js';
 
 const FLOOR = { floor: 'imp-floor', ceiling: 'imp-ceiling', light: 160 };
 
@@ -98,4 +98,41 @@ test('projectiles burst on angled walls', () => {
     }
   });
   assert.ok(burst, 'it exploded');
+});
+
+// ------------------------------------------------------------ low angled walls
+
+const { renderer, shot } = await headlessRenderer();
+const OPEN = { floor: 'desert-sand', ceiling: 'sky', ceilZ: 8, light: 176 };
+/**
+ * A yard under the sky with a tall block at each end, and (with `wallTop`) a
+ * low angled wall across the middle, solid on its east half. The rows above
+ * the horizon, looking along `angle` from (x, 2.5).
+ */
+function overWall(wallTop, x, angle) {
+  const row = (m) => `#BB....${m}....BB#`;
+  const level = room(['#'.repeat(17), row('.'), row('.'), row(wallTop ? 's' : '.'), row('.'), row('.'), '#'.repeat(17)], [], {
+    legend: {
+      '.': OPEN,
+      B: { ...OPEN, floorZ: 5 },
+      s: { ...OPEN, wall: 'imp-panel', line: [0.5, 1, 0.5, 0], wallTop },
+    },
+    sky: 'sky-night',
+  });
+  const px = shot(level, { x, y: 3.5, angle, z: 1.25 });
+  return px.subarray(0, renderer.surface.w * (renderer.surface.h / 2 - 4));
+}
+
+test('an angled wall can stop short of the sky, and the view goes on over it from the front and from behind', () => {
+  // Without a wall, the far block shows above the horizon.
+  assert.deepEqual(overWall(0.75, 3.5, 0), overWall(undefined, 3.5, 0), 'from the front (west), the far block shows over it');
+  assert.deepEqual(overWall(0.75, 13.5, Math.PI), overWall(undefined, 13.5, Math.PI), 'from behind (east), its back stands no taller than its top');
+});
+
+test('"wallTop" must lie between the floor and the ceiling, on an angled wall', () => {
+  const tile = (extra) => buildLevel(registry, room(['####', '#x.#', '####'], ['', '  ^'], { legend: { '.': OPEN, x: { ...OPEN, ...extra } } })).errors;
+  assert.deepEqual(tile({ wall: 'imp-panel', diagonal: 'NE', wallTop: 3 }), []);
+  assert.ok(tile({ wall: 'imp-panel', diagonal: 'NE', wallTop: 9 }).some((e) => e.includes('wallTop')), 'above the ceiling');
+  assert.ok(tile({ wall: 'imp-panel', diagonal: 'NE', wallTop: 0 }).some((e) => e.includes('wallTop')), 'at the floor');
+  assert.ok(tile({ wallTop: 3 }).some((e) => e.includes('only for angled walls')), 'on open floor');
 });

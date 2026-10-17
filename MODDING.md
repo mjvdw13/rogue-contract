@@ -584,10 +584,12 @@ A level is an ASCII map. Add a file in `src/content/levels/`, import it in
 big to type, so it's painted in code by `levels/lib/painter.js` (rooms,
 chamfers, stairs, lifts), which hands the game an ordinary map. Mos Eisley
 (`m1.js`) adds the town kit, `levels/lib/town.js`: buildings as blocks of
-raised floor under the sky (each with its own roofline), doorways through
-them as slab arches, cloth awnings, round rooms and buildings with angled
-walls along a circle, and shade from two suns worked out from the heights
-(see docs/mission1.md, "How it's built").
+raised floor under the sky (each with its own roofline), with rounded
+corners and storeys set back (low angled walls, `wallTop`), doorways
+through them as slab arches, rooms inside them as the lower storey of a
+slab, cloth awnings, round buildings, and shade from two suns (and the
+domes) worked out from the heights (see docs/mission1.md, "How it's
+built").
 
 ```js
 import { defineLevel } from '../../engine/defs.js';
@@ -903,6 +905,14 @@ other. Give the entry a `wall` texture plus either a 45° preset or a line:
   or shallower walls. For example `[1, 0.5, 0, 1]` then `[1, 0, 0, 0.5]` in
   the tile to its east makes a wall about 26.6° off horizontal across two
   tiles.
+- `wallTop`: the wall stops at this height instead of the tile's ceiling,
+  and you see over it, from the front and from behind. Under the sky it's a
+  round building's wall or a rounded corner as tall as its roof, with the
+  sky (and anything taller behind it) above. Without it, an angled wall
+  under the sky stands as tall as the sky over the tile in front of it, and
+  hides everything behind. It must lie between the tile's floor and ceiling.
+  Bodies, shots and sight still stop at the line at any height, and its top
+  isn't drawn as a surface, so keep it out of reach.
 
 The wall texture runs along the line at 32 texels per unit, so it isn't
 stretched. Players and monsters slide along angled walls, and shots, sight
