@@ -405,8 +405,8 @@ defineExplosion({
   effect: 'explosion',  // optional: a sprite effect played with it
   particles: [
     { type: 'fire', count: 10, speed: [0.5, 2.5], radius: 0.15 },
-    { type: 'spark', count: 24, speed: [3, 7] },
-    { type: 'debris', count: 3, speed: [3, 6] },
+    { type: 'spark', count: 10, speed: [3, 7] },
+    { type: 'debris', count: 5, speed: [3, 6] },
     { type: 'ember', count: 10, speed: [0.5, 1.5], dir: 'up', spread: 0.8, delay: 0.1, over: 0.4 },
     { type: 'blast-smoke', count: 6, speed: [0.2, 0.6], radius: 0.25, dir: 'up', delay: [0.15, 0.25], over: 0.4 },
   ],
@@ -430,10 +430,11 @@ Each burst takes `type`, `count`, `speed` and `spread` as above, and:
   mid-air), like the flat flash of the `concussion` style.
 
 A style can set off others after it with `then`, say a second, smaller
-blast beside the first (`large` does this with `small`):
+blast beside the first (`large` does this with `secondary`, a fireball
+with no shrapnel or smoke of its own):
 
 ```js
-then: [{ explosion: 'small', delay: [0.2, 0.3], offset: [0.6, 0.9], z: 0.2 }],
+then: [{ explosion: 'secondary', delay: [0.2, 0.3], offset: [0.6, 0.9], z: 0.2 }],
 ```
 
 `delay` is seconds after this one, `offset` how far to the side (a random
@@ -453,7 +454,7 @@ Set one off with:
 
 Explosions are only for looks: the damage stays with `explode` (things)
 and `splash` (projectiles). Keep an eye on the caps: one `large` (with its
-`small` after it) uses about 67 of the 150 discs at its peak, so two at
+`secondary` after it) uses about 73 of the 150 discs at its peak, so two at
 once already crowd each other. The bench page (`tools/particles.html`) sets them off on the floor,
 in the air or on the wall in front of you, once or every few seconds, with
 the real caps and a count of what's live.

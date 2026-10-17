@@ -15,31 +15,42 @@ export default [
     light: { radius: 5, light: 112, time: 0.45 },
     particles: [
       { type: 'fire', count: 10, speed: [0.5, 2.5], radius: 0.15 },
-      { type: 'spark', count: 24, speed: [3, 7] },
-      { type: 'debris', count: 3, speed: [3, 6] },
+      { type: 'spark', count: 10, speed: [3, 7] },
+      { type: 'debris', count: 5, speed: [3, 6] },
       { type: 'ember', count: 10, speed: [0.5, 1.5], dir: 'up', spread: 0.8, delay: 0.1, over: 0.4 },
       { type: 'blast-smoke', count: 6, speed: [0.2, 0.6], radius: 0.25, dir: 'up', spread: 1, delay: [0.15, 0.25], over: 0.4 },
     ],
   }),
-  // A fuel barrel or a probe droid going up: everything bigger, a little
+  // A fuel barrel or a probe droid going up: everything bigger, with
   // shrapnel, smoke that keeps coming for a while, and a second, smaller
-  // blast (`small`) going off beside it a moment later.
+  // blast (`secondary`) going off beside it a moment later.
   defineExplosion({
     id: 'large',
     light: { radius: 7, light: 128, time: 0.6 },
     particles: [
       { type: 'fire', count: 22, speed: [0.8, 4], radius: 0.3 },
-      { type: 'spark', count: 40, speed: [3, 9] },
-      { type: 'debris', count: 4, speed: [3, 8] },
-      { type: 'shrapnel', count: 6, speed: [2, 6] },
+      { type: 'spark', count: 16, speed: [3, 9] },
+      { type: 'debris', count: 8, speed: [3, 8] },
+      { type: 'shrapnel', count: 16, speed: [2, 6] },
       { type: 'ember', count: 20, speed: [0.5, 2], dir: 'up', spread: 0.9, delay: 0.15, over: 0.8 },
       { type: 'blast-smoke', count: 12, speed: [0.2, 0.8], radius: 0.4, dir: 'up', spread: 1, delay: [0.2, 0.35], over: 0.8 },
     ],
-    then: [{ explosion: 'small', delay: [0.2, 0.3], offset: [0.6, 0.9], z: 0.2 }],
+    then: [{ explosion: 'secondary', delay: [0.2, 0.3], offset: [0.6, 0.9], z: 0.2 }],
+  }),
+  // The second, smaller blast beside a `large` one: a fireball, a few sparks
+  // and embers. The first blast already threw the shrapnel and the smoke.
+  defineExplosion({
+    id: 'secondary',
+    light: { radius: 4, light: 96, time: 0.35 },
+    particles: [
+      { type: 'fire', count: 7, speed: [0.5, 2.5], radius: 0.15 },
+      { type: 'spark', count: 8, speed: [3, 7] },
+      { type: 'ember', count: 8, speed: [0.5, 1.5], dir: 'up', spread: 0.8, delay: 0.1, over: 0.3 },
+    ],
   }),
   // Bossk's concussion blast, after Dark Forces' own (CONCEXP): all blue.
   // A white dome flashes, a flat streak runs out along what it hit, a column
-  // of blue-white flame shoots out of it with a ripple at its foot, and
+  // of thin blue-white flame shoots out of it with a ripple at its foot, and
   // breaks up into wisps. No fire, so no smoke.
   defineExplosion({
     id: 'concussion',
@@ -48,7 +59,7 @@ export default [
       { type: 'fire-blue', count: 14, speed: [0, 0.5], radius: 0.3, z: 0.1 },
       { type: 'conc-streak', count: 36, speed: [7, 12], dir: 'ring' },
       { type: 'conc-ripple', count: 60, speed: [2, 3.5], dir: 'ring', delay: 0.06 },
-      { type: 'conc-flame', count: 36, speed: [2.5, 8], radius: 0.15, dir: 'up', spread: 0.1, delay: 0.04, over: 0.3 },
+      { type: 'conc-flame', count: 130, speed: [1.5, 4.5], radius: 0.25, dir: 'up', spread: 0.06, delay: 0.04, over: 0.45 },
       { type: 'ion-spark', count: 20, speed: [4, 8], dir: 'up', spread: 0.25, delay: 0.05, over: 0.25 },
       { type: 'conc-wisp', count: 36, speed: [1.5, 3.5], radius: 0.15, dir: 'up', spread: 0.2, z: 1, delay: 0.25, over: 0.4 },
     ],

@@ -228,23 +228,20 @@ export default [
     onFloor: 'die',
     cap: 30,
   }),
-  // Then a column of blue-white flame shooting out of it, cooling to blue.
+  // Then a column of electric fire shooting up out of it: thin, flickering
+  // tongues (short-lived streaks), white at first, cooling to blue.
   defineParticle({
     id: 'conc-flame',
     colors: [['glow-tube', 1], ['glow-cyan', 3], ['glow-cyan', 2], ['glow-cyan', 1], ['glow-cyan', 0]],
-    life: [0.35, 0.65],
-    size: 0.2,
-    grow: 1.8,
-    maxPx: 20,
-    shape: 'disc',
-    blend: 'add',
-    fade: true,
-    fadeOut: 0.5,
+    life: [0.15, 0.35],
+    size: 0.03,
+    streak: 0.09,
     fullbright: true,
-    gravity: -2,
-    drag: 2.5,
+    blend: 'add',
+    gravity: -5,
+    drag: 1,
     onFloor: 'die',
-    cap: 40,
+    cap: 120,
   }),
   // The flat flash along what it hit: long white-blue streaks, very brief.
   defineParticle({

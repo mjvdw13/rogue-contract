@@ -1350,7 +1350,23 @@ with the game):
                                - The column and wisps always rise (`'up'`),
                                  as the upright sprite did; the ring lies
                                  along what was hit (the floor, or a wall).
-                   - [x] Peaks under the caps again: `large` (with its
+                   - [x] Mark (2026-10-16), second look: "less" meant
+                         less *sparks*, not shrapnel: chunks and shrapnel
+                         back as they were, sparks cut (`small` 24 to 10,
+                         `large` 40 to 16). The concussion's round flame
+                         discs looked wrong: it should be electric fire,
+                         thin, not round.
+                         - [x] `conc-flame` is now short-lived streaks
+                               rising fast (130 over 0.45 s, from a 0.25
+                               base): thin flickering tongues, white
+                               cooling to blue, as in the frames.
+                         - [x] With the shrapnel back, `large` plus a
+                               `small` beside it hit 96 discs (the smoke
+                               trails ran out at their cap): the second
+                               blast is its own style, `secondary` (7 fire,
+                               8 sparks, 8 embers; no chunks or smoke).
+                               `large` with it: 73 discs at most.
+                   - [x] Peaks under the caps again (first pass; see above for now): `large` (with its
                          `small`) 67 discs and 85 points, `small` 28 and
                          35, `concussion` 36 and 99, `dirt` and `sparks`
                          as before. Tests (`then`: delay, offset, not into
@@ -2794,3 +2810,7 @@ update the smoke test.
   (a white dome, a flat ring of streaks through a new burst `dir: 'ring'`,
   a rising column of blue flame with a ripple at its foot, wisps); `dirt`
   kept as it is. 220 tests, the validator and the smoke test pass.
+- 2026-10-16: Phase 1b T step 5f, Mark's second look: shrapnel back as it
+  was and fewer sparks instead in `small` and `large`; `large`'s second
+  blast is its own lighter style, `secondary`; the concussion's flame is
+  thin electric streaks, not round discs.
