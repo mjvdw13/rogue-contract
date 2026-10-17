@@ -111,15 +111,15 @@ A bright, hazy afternoon. The only daylight map in the game.
   backdrop fade into dust.
 - **Interiors:** dim (112-144), with daylight falling through doorways and
   windows. The cantina is the darkest place (96-120).
-- **Dust in the air:** `weather: { type: 'glint', count: 240 }`, specks
+- **Dust in the air:** `weather: { type: 'glint', count: 120 }`, specks
   catching the suns, drifting in still air everywhere under the sky. Mark
   picked `dust` at 100 on the particle bench (2026-10-15), all in view;
   360 in the 20 x 20 tiles round the player put as many on screen (82 dust
   pixels a view on the bench, 88 here, over seven views of the street).
   Plain `dust` was too hard to see in the bright street, and the
   generator's glowing motes too intense (Mark), so `glint` adds dim sand
-  colours to what's behind it, and there are a third fewer. About 0.03 ms
-  a frame.
+  colours to what's behind it. 240 of them still distracted (Mark), so
+  120, a third of the bench's thickness. About 0.02 ms a frame.
   Still to come: blowing sand at the town's edges and in the old quarter.
 
 ## How it's built: the town kit

@@ -37,9 +37,9 @@ These need Mark to try something, or to decide. Don't start them without him.
   storeys, a porch, a lean-to, a domed tower, a shop to walk into, and dome
   toppers on nearly every roof, sized to it):
   the recoloured DF textures, the sky and how dark the suns' shade is.
-  Dust in the air: 240 soft `glint` specks round you (`dust` was too hard
-  to see, glowing motes too intense), a third fewer than the bench's 100
-  in view (`count` in m1.js; the type's colours in particles.js).
+  Dust in the air: 120 soft `glint` specks round you (`dust` was too hard
+  to see, glowing motes too intense, 240 glints still distracting), a
+  third as thick in view as the bench's 100 (`count` in m1.js).
   And should both suns be painted onto the DF sky? (It also needs the sky
   to wrap once round the horizon, a small engine change.)
 
