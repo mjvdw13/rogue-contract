@@ -345,6 +345,7 @@ export function validateContent(reg) {
       if (!Array.isArray(c) || c.length !== 3 || !c.every((v) => typeof v === 'number' && v >= 0 && v <= 255)) err(`${owner}: haze needs a "color" of three numbers 0-255, like [40, 36, 64]`);
       if (level.haze.half !== undefined && !(level.haze.half > 0)) err(`${owner}: haze "half" (the distance in tiles at which it's halfway) must be above 0`);
     }
+    if (level.weather) checkWeather(reg, level.weather, owner, err);
     for (const id of [level.next, level.secretNext]) if (id && !reg.levels.has(id)) err(`${owner}: next level "${id}" does not exist`);
   }
 
@@ -357,6 +358,20 @@ export function validateContent(reg) {
   checkParticles(reg, err, warn);
 
   return { errors, warnings };
+}
+
+/** A level's weather: a particle type it can keep that many of, and numbers in range. */
+function checkWeather(reg, w, owner, err) {
+  const nums = (v, n, lo) => Array.isArray(v) && v.length === n && v.every((k) => typeof k === 'number' && k >= lo);
+  const type = reg.particles.get(w.type);
+  if (!type) return err(`${owner}: weather uses unknown particle type "${w.type}"`);
+  const cap = Math.min(type.cap ?? Infinity, type.shape === 'disc' ? DISC_CAP : POINT_CAP);
+  if (!Number.isInteger(w.count) || w.count < 1 || w.count > cap) err(`${owner}: weather "count" must be a whole number, 1 to ${cap} (the most "${w.type}" there can be at once)`);
+  if (w.range !== undefined && !(typeof w.range === 'number' && w.range >= 1 && w.range <= 64)) err(`${owner}: weather "range" (tiles each way round the camera) must be 1 to 64`);
+  if (w.z !== undefined && !(nums(w.z, 2, 0) && w.z[1] > w.z[0])) err(`${owner}: weather "z" must be [low, high] heights above the floor, like [0.05, 2.5]`);
+  if (w.drift !== undefined && !nums(w.drift, 2, 0)) err(`${owner}: weather "drift" must be [across, up or down] speeds of 0 or more, like [0.3, 0.1]`);
+  if (w.wind !== undefined && !nums(w.wind, 3, -Infinity)) err(`${owner}: weather "wind" must be [x, y, z] in units per second, like [3, 1, 0]`);
+  return undefined;
 }
 
 /** Particle types: colours by ramp and step, the enums, and numbers in range. */

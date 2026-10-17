@@ -604,6 +604,7 @@ export default defineLevel({
   par: 120,                  // seconds, shown on the tally screen
   fog: 0.05,                 // extra darkness with distance (the default)
   haze: { color: [32, 24, 64], half: 40 }, // outdoors, fade to this colour
+  weather: { type: 'dust', count: 360 }, // particles in the air round you, outdoors
   tiles: [
     '###########',
     '#....#....#',
@@ -631,6 +632,18 @@ sky (seen from a sky tile) fade toward the haze colour with distance
 instead, halfway there at `half` tiles (40 by default): a night canyon
 fades into purple air rather than black. Pick a colour like the sky's near
 the horizon. Indoors, haze changes nothing.
+
+`weather` keeps `count` particles of one type (see Particles) in the air
+round the player, in a square `range` tiles each way (10), and only in
+tiles under the sky. Each is made `z` above the floor (`[0.05, 2.5]`) with
+a random speed of up to `drift` (`[0.3, 0.1]`: across, and up or down).
+`wind: [x, y, z]` (units per second) is the level's wind, which carries
+every particle type with `wind`, smoke included. Ones the player leaves
+behind come round to the far side of the square; ones that die are made
+again somewhere in it. About a quarter of the square is in view at once, so
+Mos Eisley's 360 `dust` look like 100 in front of you. The count can't be
+more than the type's `cap` or the cap for its kind (1000 points, 150
+discs).
 
 ### Tiles
 

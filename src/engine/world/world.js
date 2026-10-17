@@ -8,6 +8,7 @@ import { updateLifts, startLift, liftAt } from './lifts.js';
 import { LightEffects } from './lights.js';
 import { LightMap } from './lightmap.js';
 import { Particles } from './particles.js';
+import { Weather } from './weather.js';
 import { Explosions } from './explosions.js';
 import { GLINT_REACH } from './lightsources.js';
 import { FlowField, WALKER } from './nav.js';
@@ -112,6 +113,8 @@ export class World {
     this.map.glintmap = this.glintmap;
     /** Sparks, smoke, sand: cosmetic, drawn as points (render/particles.js). */
     this.particles = new Particles(this.map, [...this.registry.particles.values()], this.registry.paletteDef?.ramps);
+    /** Dust or sand in the air round the camera, under the sky (world/weather.js); filled on the first tick. */
+    this.weather = level.weather ? new Weather(this.particles, this.map, level.weather) : null;
     /** Explosions made of particles, a flash and a sound (world/explosions.js), set off with explode(). */
     this.explosions = new Explosions(this);
     this.lights = new LightEffects(this.map, this.rng, this.lightmap);
@@ -704,6 +707,7 @@ export class World {
     if (list.some((t) => t.removed)) this.things = list.filter((t) => !t.removed);
     this.explosions.update(dt);
     this.particles.update(dt);
+    this.weather?.update(pt.x, pt.y);
     const dyn = this.dynamicLights();
     this.lightmap.setDynamic(dyn);
     this.lightmap.update();

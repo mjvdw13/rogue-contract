@@ -115,6 +115,9 @@ export default defineLevel({
   sky: 'sky-day',
   // A hazy afternoon: far streets fade into warm dust, halfway at 32 m.
   haze: { color: [212, 200, 174], half: 64 },
+  // Dust drifting in still air: as thick in view as the 100 on the particle
+  // bench that Mark picked (2026-10-15), 360 in the 20 x 20 tiles round you.
+  weather: { type: 'dust', count: 360 },
   par: 600,
   ...p.build(),
   things: [],

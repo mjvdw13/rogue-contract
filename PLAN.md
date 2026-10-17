@@ -37,6 +37,8 @@ These need Mark to try something, or to decide. Don't start them without him.
   storeys, a porch, a lean-to, a domed tower, a shop to walk into, and dome
   toppers on nearly every roof, sized to it):
   the recoloured DF textures, the sky and how dark the suns' shade is.
+  Dust in the air: 360 `dust` round you, meant to look like the bench's
+  100 (`count` in m1.js to change it).
   And should both suns be painted onto the DF sky? (It also needs the sky
   to wrap once round the horizon, a small engine change.)
 
@@ -94,6 +96,11 @@ detonator (`large`) and the concussion rifle (`concussion`).
 - [ ] **Weather:** sand and wind in the canyon (a wrapping box of particles
       round the camera, only under the sky). For Mos Eisley later: `dust` at
       about 100 (Mark: "perfect for sunny Mos Eisley").
+      - [x] Level `weather: { type, count, range, z, drift, wind }`
+            (world/weather.js): defs, validator, MODDING.md, tests; the
+            snapshot tool fills it round the camera.
+      - [x] Mos Eisley: `dust`, as thick in view as the bench's 100.
+      - [ ] The canyon: sand on the wind, with gusts.
 - [ ] Bench again with everything on (does the budget hold?).
 
 ### 3. Mission 3 (the Canyon Garrison): detail and immersion

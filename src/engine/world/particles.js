@@ -291,6 +291,30 @@ export class Particles {
     return count;
   }
 
+  /**
+   * Put particle i at (x, y, z) at once (weather wrapping round the camera).
+   * Returns false, leaving it where it was, if that spot is off the map or in a wall.
+   */
+  move(i, x, y, z) {
+    const map = this.map;
+    const tx = x | 0;
+    const ty = y | 0;
+    if (x < 0 || y < 0 || tx >= map.w || ty >= map.h) return false;
+    const tile = ty * map.w + tx;
+    if (map.flags[tile] & F_SOLID) return false;
+    this.x[i] = x;
+    this.y[i] = y;
+    this.z[i] = z;
+    this._enter(i, tile);
+    this._light(i);
+    return true;
+  }
+
+  /** Remove particle i (the last one takes its slot). */
+  remove(i) {
+    this._kill(i);
+  }
+
   /** Remove every particle. */
   clear() {
     this.n = 0;

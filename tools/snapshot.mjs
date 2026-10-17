@@ -71,6 +71,8 @@ export function snapshot(ctx, levelId, { at, pitch = 0, z, skill = 3, noMonsters
     // (Under a slab, unless `top` stands on it.)
     if (world.floorAt) pt.z = world.floorAt(pt.x, pt.y, pt.radius, top ? Infinity : -Infinity);
   }
+  // The level's weather, round where the camera is.
+  world.weather?.fill(pt.x, pt.y);
   const cam = { ...world.camera(), horizonOffset: pitch };
   if (z !== undefined) cam.z = (pt.z ?? 0) + z;
   surface.clear(0);

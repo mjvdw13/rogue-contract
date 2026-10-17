@@ -544,10 +544,16 @@ export function defineSong(def) {
  * (content/levels/legend.js) and can be overridden per level via `legend` and
  * `thingLegend`. `fog` darkens surfaces with distance (colormap levels per
  * tile); outdoors (under the sky), `haze: { color: [r, g, b], half }` fades
- * them toward a colour instead, halfway there at `half` tiles.
+ * them toward a colour instead, halfway there at `half` tiles. `weather`
+ * keeps `count` particles of `type` in the air round the camera, `range`
+ * tiles each way (10), under the sky only: made `z` ([0.05, 2.5]) above the
+ * floor with a random speed of up to `drift` ([0.3, 0.1]: across, up or
+ * down), carried by `wind` ([x, y, z] units per second; still by default).
  * @param {{id:string, name:string, tiles:string[], things?:string[], legend?:object,
  *   thingLegend?:object, list?:object[], triggers?:object[], music?:string, sky?:string,
- *   fog?:number, haze?:{color:number[], half?:number}, par?:number, next?:string,
+ *   fog?:number, haze?:{color:number[], half?:number},
+ *   weather?:{type:string, count:number, range?:number, z?:number[], drift?:number[], wind?:number[]},
+ *   par?:number, next?:string,
  *   secretNext?:string, defaults?:object}} def
  */
 export function defineLevel(def) {

@@ -81,6 +81,13 @@ export class BenchSpawner {
       this._last = this.kind;
       ps.wind = kind?.wind ? [...kind.wind] : [0, 0, 0];
       this.liftCaps(!!kind);
+      // The level's weather is off while a kind runs, so the count is only that kind.
+      if (this.weather === undefined) this.weather = this.world.weather;
+      this.world.weather = kind ? null : this.weather;
+      if (!kind && this.weather) {
+        this.weather.filled = false;
+        if (this.weather.wind) ps.wind = [...this.weather.wind];
+      }
     }
     if (!kind) return;
     const ti = ps.typeIndex(this.kind);
