@@ -1881,6 +1881,46 @@ are the outdoor troops, so both go under the sky:
          hides behind the probe droid from the gorge's mouth, and shows
          beside the boulder a few steps in.
 
+### AA. Crisper villagers and a smaller farm boy (2026-10-17)
+
+Mark (2026-10-17), from a lineup of every character: the villagers look a
+little soft (V step 6's restyle went too far), and the farm boy is far too
+tall: he should stand as tall as a Jawa (1.25).
+
+1. [x] Crisper villagers: try a few settings of the villagers' `STYLE`
+       (less pre-smoothing, some sharpening at the output size, line work
+       eased less) beside the DF officer and stormtrooper, without the
+       hard black seams Mark disliked in V step 6. Pick one, re-cut.
+       - Five tried beside the officer and stormtrooper. Picked `median`
+         5 to 3 and `sharpen` 0 to 0.5: mean step between neighbours 17-23
+         to 21-28 (officer 13, stormtrooper 28), no dark seams. Sharper
+         still (0.8, no median, Lanczos) began to look crunchy.
+2. [x] The farm boy 1.25 tall (`cut.py` and `villagers.js`, with his new
+       frame size). Frames 48x49.
+3. [x] Mark (2026-10-17): the sandtroopers should stand slightly taller
+       than a stormtrooper; they were a little shorter (1.70 on screen
+       against the stormtrooper's 1.73, all `height: 1.76`). Both
+       sandtroopers to 1.80 by their `scale` (0.85 to 0.9) and `height`:
+       re-cutting bigger would throw off the rifle grafts, fitted to the
+       current frames, and 6% bigger pixels don't show.
+3b. [x] Mark (2026-10-17): the standing sandtrooper looked very different
+       from its aim pose. Not the source: the T-21 graft took the rifle
+       sheet's dark shading for metal and pasted the sheet's grimier body over
+       half of each grafted frame (612 of the standing frame's 1,156 pixels;
+       mid-greys 26% to 39%). `graft(corridor=3)` now only takes the sheet
+       over the body along the rifle's line (fitted past the body, refitted
+       along it), plus the pauldron (`keep`), and clears the old rifle along
+       its own line. Mid-greys now 31%, beside the aim's 29%; the commander
+       too. Sharpening the sandtroopers was tried and dropped (it made the
+       gap worse). Mark: "This looks great."
+4. [x] A new lineup, tests, the validator and the smoke test; commit and
+       push.
+       - Mark asked whether the feet line up (the stormtrooper's looked
+         lower): they do. Every standing frame's feet are on its bottom
+         row, which stands on the floor (the probe droid hovers; the
+         sandtroopers' stride lifts 1 px). The offset was in a comparison
+         image, pasted 10 px low.
+
 ### AB. The concussion rifle (2026-10-17)
 
 Mark (2026-10-17): the Stouker concussion rifle, for the player and Bossk,
@@ -3434,3 +3474,11 @@ update the smoke test.
   its feet (`splash.falloff: false`, `splash.erupt`). Slot 9, energy, 4 a
   shot; DF's frames and pickup; Bossk fires it and drops it. Sounds put
   right. 241 tests, the validator and the smoke test pass.
+- 2026-10-17: Phase 1b AA, Mark, from a lineup of every character: the
+  villagers crisper (`median` 3, `sharpen` 0.5), the farm boy as tall as a
+  Jawa (1.25), the sandtroopers slightly taller than a stormtrooper (1.80,
+  `scale` 0.9). The standing sandtrooper looked unlike its aim pose: the
+  T-21 graft had pasted the rifle sheet's grimier body over half of each
+  frame; `graft(corridor=...)` now takes the sheet over the body only along
+  the rifle's line (and the pauldron), for the sandtrooper and commander.
+  241 tests, the validator and the smoke test pass.

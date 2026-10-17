@@ -14,9 +14,10 @@ The body is the sandtrooper's before its own rifle was redone
 (sandtrooper/base.png: the T-21 and the orange pauldron), pixel for pixel.
 The graft is ../graft.py's: from the new sheet comes only the rifle (dark
 metal and the wooden stock), and the body it uncovers where the T-21
-crossed it. The barrel is a solid tube with a light highlight along it,
-too light to read as metal, so past the body it is taken whole and its
-gaps filled (`solid`, `fill_gaps`). The sheet's mistakes are left out: the
+crossed it (only along the rifle's line: elsewhere the sheet's body,
+redrawn grimier, would mottle the armour). The barrel is a solid tube
+with a light highlight along it, too light to read as metal, so past the
+body it is taken whole and its gaps filled (`solid`, `fill_gaps`). The sheet's mistakes are left out: the
 aim and fire poses shoot straight at the player, but the sheet draws the
 rifle side-on there (with a painted flash), so those keep the sandtrooper's
 frames and get the heavy rifle's muzzle painted head-on (head_on()), the
@@ -57,6 +58,7 @@ AIM, FIRE = 6, 7  # the sandtrooper's aim and fire frames: the rifle points at t
 # its centre per frame, in the commander's frame. The flash is on the bore.
 MUZZLES = {AIM: (SIDE + 44, TOP + 24), FIRE: (SIDE + 46, TOP + 24)}
 DEAD = 12  # its rifle is drawn below the body's base: lifted onto the ground
+CORRIDOR = 3  # over the body, the sheet is taken this many px either side of the rifle's line
 T21_DEAD = (50, 56, 72, 63)  # the T-21's barrel in the sandtrooper's dead frame (x0, y0, x1, y1), dark pixels
 
 BACKDROP_DIST = 34  # how far from white the sheet's backdrop goes (JPEG noise)
@@ -123,7 +125,7 @@ def main():
             continue
         fg = np.abs(255 - new).max(-1) > BACKDROP_DIST
         rgb, opaque, fresh = graft(old, new, fg, SIDE, TOP, T21_DEAD if k == DEAD else None,
-                                   solid=True, fill_gaps=2)
+                                   solid=True, fill_gaps=2, corridor=CORRIDOR)
         # The sandtrooper's pixels keep their exact colours; only new ones snap.
         keep = ~fresh
         frame[..., :3] = np.where(keep[..., None], np.clip(rgb, 0, 255), snap(rgb, lit)).astype(np.uint8)

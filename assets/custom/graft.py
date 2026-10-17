@@ -7,7 +7,8 @@ The body stays the sandtrooper's, pixel for pixel. From the sheet comes only
 the rifle (dark metal and wood), and the body it uncovers where the old
 rifle crossed it; old rifle pixels with backdrop behind them go. The sheet's
 rifle has a hard dark outline, so its contour is eased toward the colours
-round it.
+round it. The AI redrew the body too, grimier: with `corridor`, nothing of
+it comes over the body but along the rifle's line.
 """
 import numpy as np
 from PIL import Image, ImageOps
@@ -90,7 +91,26 @@ def close(mask, radius=1):
     return spread(spread(mask, np.logical_or, radius), np.logical_and, radius)
 
 
-def graft(old, new, fg, side, top, dead_barrel=None, over_dark=False, fill_gaps=False, rows=None, solid=False):
+def line_near(seed, pool, half):
+    """Where within `half` px of the line fitted to `seed` and then refitted
+    to the `pool` pixels near it (so it follows the whole of a rifle from the
+    part of it that shows); None when `seed` is too small to fit one."""
+    if seed.sum() < 8:
+        return None
+    yy, xx = np.mgrid[:seed.shape[0], :seed.shape[1]]
+    pick = seed
+    for _ in range(3):
+        ys, xs = np.nonzero(pick)
+        pts = np.stack([xs, ys], 1).astype(float)
+        c = pts.mean(0)
+        u = np.linalg.svd(pts - c)[2][0]  # the rifle's direction
+        dist = np.abs((xx - c[0]) * u[1] - (yy - c[1]) * u[0])
+        pick = pool & (dist <= 2 * half)
+    return dist <= half
+
+
+def graft(old, new, fg, side, top, dead_barrel=None, over_dark=False, fill_gaps=False, rows=None, solid=False,
+          corridor=None, keep=None):
     """The sandtrooper's frame `old` (RGBA, FW x FH) with the rifle of `new`
     (the sheet over the frame, `side` px wider each side and `top` px above,
     and rows under it, RGB); `fg` is what on `new` isn't backdrop.
@@ -105,7 +125,11 @@ def graft(old, new, fg, side, top, dead_barrel=None, over_dark=False, fill_gaps=
     (a radius for close()). `solid`: the rifle past the body is all of the
     pose there that holds its dark metal, its light shine too. `rows` (y0,
     y1 in the sandtrooper's frame): the rifle is only taken from these rows (the sheet's mistakes
-    elsewhere). Returns the frame's colours,
+    elsewhere). `corridor`: over the body, the sheet's rifle is only taken
+    this many px either side of its line (fitted to it past the body) and in
+    `keep` (a mask over `old`), and the old rifle only cleared as far from
+    either rifle's line, so the body's own pixels stay elsewhere: the
+    sheet's dark shading there passes for metal. Returns the frame's colours,
     what is opaque, and what is new, cropped to the frame's height."""
     h, w = new.shape[:2]
     body = np.zeros((h, w, 4), float)
@@ -139,9 +163,23 @@ def graft(old, new, fg, side, top, dead_barrel=None, over_dark=False, fill_gaps=
         band = np.zeros_like(gun)
         band[top + rows[0]:top + rows[1]] = True
         gun &= band
+    near = np.ones_like(gun)
+    if corridor:
+        # Along the new rifle (fitted to it past the body), and along the old
+        # one (fitted to it where the sheet shows nothing), to clear it.
+        dark_old = was & (lum_old < 80)
+        near = line_near(gun & ~spread(was, np.logical_or), gun, corridor)
+        if near is None:
+            near = np.ones_like(gun)
+        old_line = line_near(dark_old & differs & ~mine, dark_old, corridor)
+        if keep is not None:
+            near[top:top + FH, side:side + FW] |= keep
+        gun &= ~was | near
+        if old_line is not None:
+            near |= old_line
     # The old rifle where the sheet shows the body through it (the body's own
     # colours there), or nothing.
-    old_gun = was & (lum_old < 80) & differs & ~gun
+    old_gun = was & (lum_old < 80) & differs & ~gun & near
     uncovered = old_gun & mine
     gone = old_gun & ~mine
     out_rgb = rgb.copy()
