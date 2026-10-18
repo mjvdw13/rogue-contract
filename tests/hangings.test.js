@@ -71,6 +71,19 @@ test("a cloth leans with the level's wind", () => {
   assert.ok(windy > still + 0.1, `leans ${windy.toFixed(2)} east in the wind, ${still.toFixed(2)} in still air`);
 });
 
+test('a cloth tied against a wall sways, but never into the wall', () => {
+  // Tied 0.05 out from the yard's north wall (its face at y 1), the wind blowing it at the wall.
+  const level = yard([{ type: 'rag', from: [5, 1.05, 3], to: [7, 1.05, 3], length: 1.5 }], { weather: { type: 'dust', count: 1, wind: [0, -4, 0] } });
+  const world = makeWorld(level);
+  const before = points(world);
+  for (let k = 0; k < 6; k++) {
+    run(world, mockInput(), 0.5);
+    for (const [, y] of points(world)) assert.ok(y > 1, `a point at y ${y.toFixed(3)} is in the wall`);
+  }
+  const moved = points(world).some((p, i) => Math.hypot(p[0] - before[i][0], p[2] - before[i][2]) > 1e-3);
+  assert.ok(moved, 'and still moves');
+});
+
 test('hangings far from the player hold still', () => {
   const world = makeWorld(yard([{ type: 'rag', from: [90, 4.5, 3], to: [92, 4.5, 3], length: 1.5 }], {}, 100));
   const before = points(world);

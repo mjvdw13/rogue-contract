@@ -589,8 +589,8 @@ defineHanging({
   texture: 'cloth-rag',    // a cloth's weave; its transparent texels are its tears
   color: ['rust', 0.55],   // a palette ramp and a place on it, 0 dark to 1 light
                            // (a rope's colour, or a cloth's with no texture)
-  breeze: 0.8,             // the breeze that comes and goes, units per second
-  drag: 2.5,               // how fast it takes up the air's speed, per second
+  breeze: 1.6,             // the breeze that comes and goes, units per second
+  drag: 4,                 // how fast it takes up the air's speed, per second
 })
 ```
 
@@ -607,7 +607,9 @@ defineHanging({
   Closer is smoother and costs more.
 - `wind`: the share of the level's wind (its `weather.wind`) that carries
   it (1). `breeze` moves it even in still air, in slow waves that travel
-  down the street, so neighbours move a little differently.
+  down the street, so neighbours move a little differently, and a quicker
+  flutter in closer ripples, so a short cloth moves too. It comes and goes
+  in gusts. Cloth catches more of it than rope: a higher `drag`.
 - `gravity` (20), `damping` (0.98, the share of its speed kept each
   sixtieth of a second), `stiffness` (2, passes a step that hold its
   length), `folds` (a cloth's pleats: every other column of points this
@@ -616,7 +618,9 @@ defineHanging({
 
 A level places them in its `hangings` list. Points are `[x, y, z]`, z the
 height above 0, not above the floor; tie them just in front of a wall
-(0.05 out), not in it:
+(0.05 out), not in it. A wall within 0.3 of where a hanging is tied is
+behind it, and it sways against the wall, never into it (a rope strung
+between two points is out in the air, so it isn't checked):
 
 ```js
 hangings: [

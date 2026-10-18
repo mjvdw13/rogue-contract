@@ -1,4 +1,4 @@
-import { F_SKY } from './tilemap.js';
+import { F_SKY, F_SLAB } from './tilemap.js';
 import { TEXELS_PER_UNIT } from '../config.js';
 
 /** Hangings further than this from the camera (tiles) hold still. */
@@ -19,6 +19,15 @@ const LIGHT_EVERY = 4;
  * few centimetres, and it halves the cost.
  */
 const STEP_EVERY = 2;
+/**
+ * A wall within this of where a hanging is tied (units) is behind it: no
+ * point goes nearer the wall's face than WALL_GAP, so cloth and rope sway
+ * against it, not into it.
+ */
+const WALL_REACH = 0.3;
+const WALL_GAP = 0.03;
+/** The flutter's strength, for a breeze of 1. */
+const FLUTTER = 1;
 
 const FULL = `is one too many: a level's hangings have at most ${POINT_CAP} points between them`;
 
@@ -91,10 +100,10 @@ export class Hangings {
     this.oz = new Float64Array(n);
     /**
      * Each point's place in the breeze's waves (from where it was made): the
-     * cosine and sine of its phase in each of the three, so a tick needs only
-     * three sines a hanging (sin(a + s) = sin a cos s + cos a sin s).
+     * cosine and sine of its phase in each of the four, so a tick needs only
+     * a few sines a hanging (sin(a + s) = sin a cos s + cos a sin s).
      */
-    this.wave = new Float64Array(n * 6);
+    this.wave = new Float64Array(n * 8);
     /** 0 for a pinned point (it never moves), 1 otherwise. */
     this.free = new Uint8Array(n);
     /** The floor under each point where it was made: it never sinks below. */
@@ -142,26 +151,62 @@ export class Hangings {
     for (let k = 0; k < SETTLE * 60; k++) this.update(dt, NaN, NaN);
   }
 
-  _point(x, y, z, free) {
+  _point(x, y, z, free, h) {
+    // Clear of the wall behind it (a fold may have put it in).
+    const s = x * h.px + y * h.py - h.pd;
+    if (s < 0) {
+      x -= h.px * s;
+      y -= h.py * s;
+    }
     const i = this.n++;
     this.x[i] = this.ox[i] = x;
     this.y[i] = this.oy[i] = y;
     this.z[i] = this.oz[i] = z;
     this.free[i] = free ? 1 : 0;
     // The breeze's waves travel along the street: each point's phase is by where it is.
-    const s = x * 0.45 + y * 0.3;
+    const ph = x * 0.45 + y * 0.3;
+    // The flutter's ripples are closer together, and run down a cloth too.
+    const fl = x * 1.3 + y * 1.1 + z * 1.7;
     const w = this.wave;
-    w[i * 6] = Math.cos(s);
-    w[i * 6 + 1] = Math.sin(s);
-    w[i * 6 + 2] = Math.cos(s * 2.1);
-    w[i * 6 + 3] = Math.sin(s * 2.1);
-    w[i * 6 + 4] = Math.cos(s * 0.8);
-    w[i * 6 + 5] = -Math.sin(s * 0.8);
+    w[i * 8] = Math.cos(ph);
+    w[i * 8 + 1] = Math.sin(ph);
+    w[i * 8 + 2] = Math.cos(ph * 2.1);
+    w[i * 8 + 3] = Math.sin(ph * 2.1);
+    w[i * 8 + 4] = Math.cos(ph * 0.8);
+    w[i * 8 + 5] = -Math.sin(ph * 0.8);
+    w[i * 8 + 6] = Math.cos(fl);
+    w[i * 8 + 7] = Math.sin(fl);
     const map = this.map;
     // (A point made inside a block, against a wall, has no floor under it.)
     const f = map.inBounds(x | 0, y | 0) ? map.floorAt(x, y, 0, z) : Infinity;
     this.floor[i] = f <= z ? f + 0.02 : -Infinity;
     return i;
+  }
+
+  /**
+   * The wall behind a hanging tied at (x, y, z), if there's one within
+   * WALL_REACH straight along x or y: the plane WALL_GAP in front of its
+   * face, as {px, py, pd} (a point is clear of it while x px + y py >= pd).
+   * Walls are tile faces, so the plane lies along x or y.
+   */
+  _wall(x, y, z) {
+    const map = this.map;
+    // Solid, or a block's roof, a slab (a lintel) or a ceiling across that
+    // height. (Under an open sky the ceiling isn't one.)
+    const at = (wx, wy) => {
+      if (map.solidPoint(wx, wy)) return true;
+      const i = map.index(wx | 0, wy | 0);
+      const f = map.flags[i];
+      if (map.floorZ[i] > z || (f & F_SLAB && map.slabBot[i] < z && z < map.slabTop[i])) return true;
+      return !(f & F_SKY) && map.ceilZ[i] < z;
+    };
+    for (let d = 0.05; d <= WALL_REACH + 1e-9; d += 0.05) {
+      if (at(x - d, y)) return { px: 1, py: 0, pd: Math.floor(x - d) + 1 + WALL_GAP };
+      if (at(x + d, y)) return { px: -1, py: 0, pd: -(Math.floor(x + d) - WALL_GAP) };
+      if (at(x, y - d)) return { px: 0, py: 1, pd: Math.floor(y - d) + 1 + WALL_GAP };
+      if (at(x, y + d)) return { px: 0, py: -1, pd: -(Math.floor(y + d) - WALL_GAP) };
+    }
+    return { px: 0, py: 0, pd: -Infinity };
   }
 
   /** Tether point p to pinned points a and b (b may be -1) at its distances from them now. */
@@ -195,7 +240,11 @@ export class Hangings {
     if (to !== null && !isPoint(to)) return '"to" must be [x, y, z]';
     const p0 = this.n;
     const l0 = this.nl;
-    const h = { type: t, shape: t.shape, p0, np: 0, l0, nl: 0, cx: 0, cy: 0, cz: 0, radius: 0, phase: k * 2.399 };
+    // (Looked for where it's tied: the middle of its top edge, a strung rope's
+    // middle, which is out in the air, or a hanging rope's knot.)
+    const top = to ? [(from[0] + to[0]) / 2, (from[1] + to[1]) / 2, Math.min(from[2], to[2]) - 0.05] : [from[0], from[1], from[2] - 0.05];
+    const wall = to && t.shape === 'rope' ? { px: 0, py: 0, pd: -Infinity } : this._wall(...top);
+    const h = { type: t, shape: t.shape, p0, np: 0, l0, nl: 0, cx: 0, cy: 0, cz: 0, radius: 0, phase: k * 2.399, ...wall };
     if (t.shape === 'rope') {
       if (to) {
         // Strung between two points, sagging `sag` in the middle (a parabola, near enough a catenary at small sags).
@@ -206,7 +255,7 @@ export class Hangings {
         if (this.n + segs + 1 > POINT_CAP || this.nl + segs > LINK_CAP) return FULL;
         for (let j = 0; j <= segs; j++) {
           const q = j / segs;
-          const p = this._point(lerp(from[0], to[0], q), lerp(from[1], to[1], q), lerp(from[2], to[2], q) - 4 * sag * q * (1 - q), j > 0 && j < segs);
+          const p = this._point(lerp(from[0], to[0], q), lerp(from[1], to[1], q), lerp(from[2], to[2], q) - 4 * sag * q * (1 - q), j > 0 && j < segs, h);
           if (j) this._link(p - 1, p);
         }
         // The rest lengths are the curve's, so it keeps its sag (the curve is
@@ -224,7 +273,7 @@ export class Hangings {
         const segs = clampInt(Math.ceil(length / t.spacing), 1, MAX_SEGMENTS);
         if (this.n + segs + 1 > POINT_CAP || this.nl + segs > LINK_CAP) return FULL;
         for (let j = 0; j <= segs; j++) {
-          const p = this._point(from[0], from[1], from[2] - (length * j) / segs, j > 0);
+          const p = this._point(from[0], from[1], from[2] - (length * j) / segs, j > 0, h);
           if (j) this._link(p - 1, p);
         }
         for (let p = p0 + 1; p < this.n; p++) this._tether(p, p0, -1);
@@ -248,7 +297,7 @@ export class Hangings {
           const q = i / cols;
           const pinned = j === 0 && (!corners || i === 0 || i === cols);
           const fold = i % 2 ? t.folds : -t.folds;
-          const p = this._point(lerp(from[0], to[0], q) + fx * fold, lerp(from[1], to[1], q) + fy * fold, lerp(from[2], to[2], q) - (length * j) / rows, !pinned);
+          const p = this._point(lerp(from[0], to[0], q) + fx * fold, lerp(from[1], to[1], q) + fy * fold, lerp(from[2], to[2], q) - (length * j) / rows, !pinned, h);
           if (i) this._link(p - 1, p);
           if (j) this._link(p - pw, p);
           // Across each cell both ways too, so it holds together as a sheet (with
@@ -351,11 +400,12 @@ export class Hangings {
       const k = t.drag * dt;
       const keep = Math.pow(t.damping, dt * 60);
       const g = t.gravity * dt2;
-      const b = t.breeze;
       const ph = h.phase;
       // The breeze: two slow waves across and one along, travelling down the
-      // street, so neighbouring points move a little differently and the
-      // cloth ripples. Each point's phase was set where it was made.
+      // street, so neighbouring points move a little differently, and a
+      // quicker flutter in closer ripples, so a short cloth moves too. It
+      // rises and falls in gusts. Each point's phase was set where it was made.
+      const b = t.breeze * (0.7 + 0.3 * Math.sin(T * 0.37 + ph * 0.8));
       const a1 = T * 0.9 + ph;
       const a2 = T * 2.3 + ph * 1.7;
       const a3 = T * 0.7 + ph * 0.6;
@@ -365,15 +415,19 @@ export class Hangings {
       const c2 = 0.5 * b * Math.cos(a2);
       const s3 = 0.7 * b * Math.sin(a3);
       const c3 = 0.7 * b * Math.cos(a3);
+      const a4 = T * 3.1 + ph * 1.3;
+      const s4 = FLUTTER * b * Math.sin(a4);
+      const c4 = FLUTTER * b * Math.cos(a4);
+      const { px, py, pd } = h;
       const ax = wx * t.wind;
       const ay = wy * t.wind;
       const az = wz * t.wind;
       const end = h.p0 + h.np;
       for (let i = h.p0; i < end; i++) {
         if (!free[i]) continue;
-        const o = i * 6;
-        const bx = ax + s1 * wave[o] + c1 * wave[o + 1] + s2 * wave[o + 2] + c2 * wave[o + 3];
-        const by = ay + s3 * wave[o + 4] + c3 * wave[o + 5];
+        const o = i * 8;
+        const bx = ax + s1 * wave[o] + c1 * wave[o + 1] + s2 * wave[o + 2] + c2 * wave[o + 3] + s4 * wave[o + 6] + c4 * wave[o + 7];
+        const by = ay + s3 * wave[o + 4] + c3 * wave[o + 5] + c4 * wave[o + 6] - s4 * wave[o + 7];
         // Last tick's step, pulled toward the air's step, plus gravity.
         let dx = x[i] - ox[i];
         let dy = y[i] - oy[i];
@@ -421,6 +475,12 @@ export class Hangings {
         if (tb[i] < 0) tether(x, y, z, i, ta[i], da[i]);
         else tether2(x, y, z, i, ta[i], da[i], tb[i], db[i]);
         if (z[i] < floor[i]) z[i] = oz[i] = floor[i];
+        // (No branch for a hanging with no wall: pd is -Infinity.)
+        const w = x[i] * px + y[i] * py - pd;
+        if (w < 0) {
+          x[i] -= px * w;
+          y[i] -= py * w;
+        }
         if (((((tick / STEP_EVERY) | 0) + i) & (LIGHT_EVERY - 1)) === 0) this._light(i);
       }
       if (h.model) this._shape(h);
