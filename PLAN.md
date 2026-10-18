@@ -75,14 +75,14 @@ These need Mark to try something, or to decide. Don't start them without him.
   0.44 ms a frame on average over eight views, 0.75 at worst (headless,
   measured with the machine at about half its usual speed).
 
-- **The landspeeder** (`?map=m1`, on the main street by C's awning, nose
-  west): how it looks against your references (its size, about 1.25 times
-  life against you, 4.2 long; how pink the paint comes out once the
-  palette has it, as it leans terracotta; how much rust), its dithered
-  shadow, and where it's parked. 289 faces. It costs about 1 ms a frame
-  to draw when it's near (2.4 at worst, standing over it; headless, the
-  machine busy), 0.3 of that the shadow: say if the shadow should go.
-  Should it bob as it hovers (a new decoration field)?
+- **The landspeeder** (`?map=m1`, pulled up nose first to D's front, east
+  of its porch): Mark's notes of 2026-10-18 done: a subtler shadow (grime
+  now, taking a third of the light under the hull and fading out, no
+  dither dots), a gentle bob (0.05 up and down every 2.6 s) and parked
+  against a building. How the shadow and the bob look, and whether nose-in
+  is the right way to park it (every straight wall on the street has a
+  door or arch in its middle, so there's no room alongside one). It costs
+  about 0.7 ms a frame near it, 2.1 standing over it (headless).
 
 ## Next up
 

@@ -71,9 +71,9 @@ const GRIME = [
 // an awning looking east or west, `-hem` its scalloped front edge.
 const AWNINGS = ['red', 'teal', 'sand', 'olive'].flatMap((c) => [`awning-${c}`, `awning-${c}-x`, `awning-${c}-hem`]);
 
-// The landspeeder's windscreen and shadow, mostly see-through
-// (tools/art/textures/speeder.js).
-const SPEEDER = ['speeder-glass', 'speeder-shadow'];
+// The landspeeder's windscreen, mostly see-through, and its shadow, grime
+// on the ground (tools/art/textures/speeder.js).
+const SPEEDER = ['speeder-glass'];
 
 const ANIMATED = {
   'imp-computer': { frames: 3, fps: 3 },
@@ -85,7 +85,7 @@ export default [
   ...Object.entries(ANIMATED).map(([id, a]) => defineTexture({ id, src: `assets/textures/${id}.png`, ...a })),
   ...FENCES.map((id) => defineTexture({ id, src: `assets/textures/${id}.png`, fence: true })),
   ...DECALS.map((id) => defineTexture({ id, src: `assets/textures/${id}.png`, decal: true })),
-  ...GRIME.map((id) => defineTexture({ id, src: `assets/textures/${id}.png`, grime: true })),
+  ...[...GRIME, 'speeder-shadow'].map((id) => defineTexture({ id, src: `assets/textures/${id}.png`, grime: true })),
   ...AWNINGS.map((id) => defineTexture({ id, src: `assets/textures/${id}.png`, fullbright: false })),
   ...SPEEDER.map((id) => defineTexture({ id, src: `assets/textures/${id}.png`, fullbright: false })),
   ...TOWN.map((id) => defineTexture({ id, src: `assets/custom/textures/${id}.png`, fullbright: false })),

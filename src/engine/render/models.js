@@ -1,5 +1,6 @@
-import { TRANSPARENT } from '../config.js';
+import { TRANSPARENT, LIGHT_LEVELS, SHADE_STEP } from '../config.js';
 import { F_SKY } from '../world/tilemap.js';
+import { HAZE_STEPS } from '../gfx/palette.js';
 
 /** Nearest depth drawn; polygons are clipped here. */
 export const NEAR = 0.05;
@@ -12,6 +13,8 @@ const LIGHT = (() => {
 /** Colormap levels darker for a face turned fully away from the light. */
 export const SHADE = 8;
 const MAX_POLY = 16;
+/** 4 x 4 ordered dither thresholds, centred on 0, for grime faces' fractional levels (as columns.js). */
+const DITHER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map((v) => (v + 0.5) / 16 - 0.5);
 
 // Scratch space: per-vertex camera space, and the clipped polygon.
 let camD = new Float64Array(256);
@@ -90,7 +93,10 @@ export function drawModels(view, things, map, textures, fb, fbW, colormaps, skip
     }
     const c = Math.cos(t.angle ?? 0);
     const sn = Math.sin(t.angle ?? 0);
-    const tz = t.z ?? 0;
+    // (A bobbing thing, `bob`, is drawn `bobZ` off its place; its grime
+    // faces, a shadow on the ground, stay where they are.)
+    const bob = t.bobZ ?? 0;
+    const tz = (t.z ?? 0) + bob;
     const vs = model.verts;
     for (let i = 0; i < nv; i++) {
       const mx = vs[i * 3] * s;
@@ -132,6 +138,7 @@ export function drawModels(view, things, map, textures, fb, fbW, colormaps, skip
       }
 
       // Clip at the near plane (Sutherland-Hodgman), in camera space.
+      const dz = f.grime ? -bob : 0;
       let k = 0;
       const uv = f.uv;
       for (let i = 0; i < m; i++) {
@@ -142,7 +149,7 @@ export function drawModels(view, things, map, textures, fb, fbW, colormaps, skip
         if (da >= NEAR) {
           inD[k] = da;
           inX[k] = camX[a];
-          inZ[k] = camZ_[a];
+          inZ[k] = camZ_[a] + dz;
           if (uv) {
             inU[k] = uv[i * 2];
             inV[k] = uv[i * 2 + 1];
@@ -153,7 +160,7 @@ export function drawModels(view, things, map, textures, fb, fbW, colormaps, skip
           const q = (NEAR - da) / (db - da);
           inD[k] = NEAR;
           inX[k] = camX[a] + (camX[b] - camX[a]) * q;
-          inZ[k] = camZ_[a] + (camZ_[b] - camZ_[a]) * q;
+          inZ[k] = camZ_[a] + (camZ_[b] - camZ_[a]) * q + dz;
           if (uv) {
             const j = (i + 1) % m;
             inU[k] = uv[i * 2] + (uv[j * 2] - uv[i * 2]) * q;
@@ -203,6 +210,10 @@ export function drawModels(view, things, map, textures, fb, fbW, colormaps, skip
       const wm = tex ? tex.wMask : 0;
       const hm = tex ? tex.hMask : 0;
       const pix = tex ? tex.cur : null;
+      // Grime darkens what's there by its texels' levels, less in haze, and
+      // hides nothing behind it (it writes no depth).
+      const grime = f.grime ? tex.shade : null;
+      const hazy = outdoor && view.hazeOn;
 
       for (let x = x0; x < x1; x++) {
         const xc = x + 0.5;
@@ -295,6 +306,18 @@ export function drawModels(view, things, map, textures, fb, fbW, colormaps, skip
             if (!(y >= segTop[sb + k] && y < segBot[sb + k])) continue;
           }
           let ci;
+          if (grime) {
+            const u = (uA + dU * along) * depth;
+            const v = (vA + dV * along) * depth;
+            const sh = grime[(Math.floor(u * tw) & wm) * th + (Math.floor(v * th) & hm)];
+            if (sh === 0) continue;
+            const g = hazy ? (1 - view.hazeF(depth) / (HAZE_STEPS - 1)) / SHADE_STEP : 1 / SHADE_STEP;
+            let l = (sh * g + DITHER[(x & 3) + (y & 3) * 4] + 0.5) | 0;
+            if (l <= 0) continue;
+            if (l >= LIGHT_LEVELS) l = LIGHT_LEVELS - 1;
+            fb[o] = colormaps[l * 256 + fb[o]];
+            continue;
+          }
           if (pix) {
             const u = (uA + dU * along) * depth;
             const v = (vA + dV * along) * depth;

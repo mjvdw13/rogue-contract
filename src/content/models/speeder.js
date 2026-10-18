@@ -148,7 +148,9 @@ m.loft([[-0.84, -0.07], [-1.24, -0.07], [-1.24, 0.07], [-0.84, 0.07]], ZT - 0.02
   side: (i) => [PAINT, METAL, PAINT, RED][i], top: false, bottom: false,
 });
 
-// Its shadow on the street: a dithered oval (speeder-shadow), just above the ground.
+// Its shadow on the street, just above the ground: speeder-shadow is
+// grime, so it darkens the street under it a little rather than covering
+// it, and stays down while the speeder bobs.
 m.face([[2.05, -0.95, 0.01], [2.05, 0.95, 0.01], [-1.35, 0.95, 0.01], [-1.35, -0.95, 0.01]], { tex: 'speeder-shadow', uv: [[0, 0], [1, 0], [1, 1], [0, 1]] }, [0, 0, -1]);
 
 // Collision: round the hull and the side engines (the centre one is overhead).

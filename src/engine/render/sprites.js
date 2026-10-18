@@ -71,7 +71,7 @@ export function drawSprites(view, things, map, fb, fbW, colormaps, skip, writeDe
     const screenX = (W / 2) * (1 + t._tx / depth);
     const left = screenX - spriteW / 2;
     // Projectiles hang centred on their z; everything else stands on it.
-    const z = t.kind === 'projectile' ? t.z - (frame.h * scale) / 2 : t.z ?? 0;
+    const z = t.kind === 'projectile' ? t.z - (frame.h * scale) / 2 : (t.z ?? 0) + (t.bobZ ?? 0);
     const bottom = horizon + ((camZ - z) * fy) / depth;
     const top = bottom - spriteH;
 

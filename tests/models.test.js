@@ -5,7 +5,9 @@ import { Registry } from '../src/engine/registry.js';
 import content from '../src/content/index.js';
 import { Palette } from '../src/engine/gfx/palette.js';
 import { Surface } from '../src/engine/gfx/surface.js';
-import { Assets } from '../src/engine/assets.js';
+import { Assets, Texture } from '../src/engine/assets.js';
+import { IndexedImage } from '../src/engine/gfx/image.js';
+import { validateContent } from '../src/engine/validate.js';
 import { Model } from '../src/engine/gfx/model.js';
 import { Renderer } from '../src/engine/render/renderer.js';
 import { NEAR } from '../src/engine/render/models.js';
@@ -188,6 +190,7 @@ const gameReg = new Registry({
     defineDecoration({ id: 'test-spinner', model: 'terminal', spin: 1 }),
     defineDecoration({ id: 'test-prop', model: 'terminal', radius: 0.55 }),
     defineDecoration({ id: 'test-prop-fixed', model: 'terminal', radius: 0.55, fixed: true }),
+    defineDecoration({ id: 'test-bobber', model: 'terminal', fixed: true, bob: { height: 0.1, period: 2 } }),
   ],
 });
 const arena = room(['############', ...Array(9).fill('#..........#'), '############'], [], { legend });
@@ -285,4 +288,59 @@ test('textured faces show their texture, at the walls\' scale with world-unit uv
   const flat = new Set();
   for (let x = mid - 20; x < mid + 20; x++) if (view.mdepth[at(x, y)] < Infinity) flat.add(renderer.surface.px[at(x, y)]);
   assert.equal(flat.size, 1, 'a flat-coloured face is one colour');
+});
+
+/** A grime texture (mid grey: it takes some of the light) in the test assets, and an upright square wearing it. */
+function grimeSquare() {
+  const rgba = new Uint8Array(4 * 4 * 4).fill(128);
+  const slot = assets.textures.push(new Texture('test-grime', new IndexedImage(4, 4, new Uint8Array(16).fill(1)), { grime: true }, { width: 4, height: 4, data: rgba })) - 1;
+  return new Model(
+    defineModel({
+      id: 'grime-square',
+      vertices: [[0, -0.5, 0], [0, -0.5, 1], [0, 0.5, 1], [0, 0.5, 0]],
+      faces: [{ v: [0, 1, 2, 3], tex: 'test-grime', uv: [[0, 1], [0, 0], [1, 0], [1, 1]] }],
+    }),
+    palette,
+    () => slot,
+    assets.textures,
+  );
+}
+const brightness = (c) => palette.rgb[c * 3] + palette.rgb[c * 3 + 1] + palette.rgb[c * 3 + 2];
+
+test('a model face in a grime texture darkens what is behind it, and hides nothing', () => {
+  const model = grimeSquare();
+  assert.equal(model.faces[0].grime, true);
+  const empty = frame(open, []);
+  const fb = frame(open, [thing(model, 5.5, 2.5)]);
+  const o = at(mid, rowAt(0.5, 4));
+  assert.ok(brightness(fb[o]) < brightness(empty[o]), 'darker than the wall behind it');
+  assert.equal(view.mdepth[o], Infinity, 'it writes no depth, so what is behind still shows through it');
+});
+
+test('a bobbing decoration floats up and down round its place, each at its own point, and collides where it stands', () => {
+  const w = makeWorld(arena, { noMonsters: true, registry: gameReg });
+  const a = w.spawn('test-bobber', 3.5, 3.5);
+  const b = w.spawn('test-bobber', 7.5, 6.5);
+  const seen = [];
+  for (let i = 0; i < 120; i++) {
+    w.tick(1 / 30, mockInput());
+    seen.push(a.bobZ);
+    assert.equal(a.z, 0, 'its place stays on the floor');
+  }
+  assert.ok(Math.max(...seen) > 0.09 && Math.min(...seen) < -0.09, 'it rises and falls by its height over its period');
+  assert.notEqual(a.bobZ.toFixed(3), b.bobZ.toFixed(3), 'two of them are not in step');
+});
+
+test('a bobbing model is drawn off its place, but its grime faces stay where they are', () => {
+  const up = (model) => [frame(open, [thing(model, 5.5, 2.5)]), frame(open, [thing(model, 5.5, 2.5, { bobZ: 0.3 })])];
+  const [still, bobbed] = up(square());
+  assert.notDeepEqual(bobbed, still, 'the square is drawn higher');
+  const [shadow, raised] = up(grimeSquare());
+  assert.deepEqual(raised, shadow, 'the grime stays put');
+});
+
+test('the validator checks a decoration\'s bob', () => {
+  const bad = defineDecoration({ id: 'bad-bob', model: 'terminal', bob: { height: 0.1 } });
+  const { errors } = validateContent(new Registry({ ...content, things: [...content.things, bad] }));
+  assert.deepEqual(errors.filter((e) => e.includes('bad-bob')), ['decoration "bad-bob": "bob" needs a "height" of 0 or more and a "period" above 0 (seconds)']);
 });

@@ -70,6 +70,21 @@ function animProgress(t) {
   return t.animDone ? 1 : total > 0 ? Math.min(1, done / total) : 0;
 }
 
+/**
+ * How far a bobbing decoration (`bob: { height, period }`) is drawn above
+ * its place at `time`: a slow sine `height` up and down, each thing at its
+ * own point in it (from where it was put), so two don't bob together.
+ * Drawn only: its z, collision and shots stay where it is.
+ */
+function bobAt(t, time) {
+  if (t.bobPhase === undefined) {
+    const k = Math.sin(t.x * 12.9898 + t.y * 78.233) * 43758.5453;
+    t.bobPhase = k - Math.floor(k);
+  }
+  const { height, period } = t.def.bob;
+  return height * Math.sin((time / period + t.bobPhase) * Math.PI * 2);
+}
+
 export class World {
   /**
    * @param {{registry:any, assets?:any, audio?:any, rng:any, settings?:any, hooks?:any}} services
@@ -708,6 +723,7 @@ export class World {
           break;
         default:
           if (t.def.spin) t.angle += t.def.spin * dt;
+          if (t.def.bob) t.bobZ = bobAt(t, this.time);
           applyMomentum(this, t, dt);
           this.fall(t, dt);
           t.stepAnim(dt);

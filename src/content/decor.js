@@ -47,9 +47,9 @@ export default [
   ...PIPE_MODELS.map((id) => defineDecoration({ id, model: id, fixed: true })),
   // Things on Mos Eisley's streets: crates, drums, canisters, junk, rubble, scrap, a vaporator.
   ...Object.entries(CLUTTER).map(([id, c]) => defineDecoration({ id, model: id, solid: !!c.solid, radius: c.radius, height: c.height, fixed: true })),
-  // An X-34 landspeeder parked on the street, hovering (models/speeder.js): it
-  // collides as its outline, as high as its windscreen.
-  defineDecoration({ id: 'landspeeder', model: 'landspeeder', solid: true, height: 1.22, fixed: true }),
+  // An X-34 landspeeder parked on the street, hovering (models/speeder.js),
+  // bobbing gently: it collides as its outline, as high as its windscreen.
+  defineDecoration({ id: 'landspeeder', model: 'landspeeder', solid: true, height: 1.22, fixed: true, bob: { height: 0.05, period: 2.6 } }),
   // Docking Bay 87's fittings (models/bay.js): ribs up its wall and pumps (colliding as
   // their outlines), fuel lines down to the pumps, lamps on its rim.
   defineDecoration({ id: 'bay-rib', model: 'bay-rib', solid: true, height: BAY_WALL, fixed: true }),

@@ -409,8 +409,13 @@ export function defineItem(def) {
  * settles on the highest floor its `radius` reaches; a `fixed` one stays at
  * the height it's placed at instead (on the floor under its middle, or a
  * level thing's `z`): props against a wall, fixtures on it, things stacked.
+ * `spin` turns it (radians a second). `bob: { height, period }` floats it
+ * up and down, `height` either way over `period` seconds (a hovering
+ * speeder): drawn only, so it collides where it stands, and a model's grime
+ * faces (its shadow) stay on the ground.
  * @param {{id:string, glyph?:string, sheet:SheetSpec, anims?:Record<string,AnimSpec>, solid?:boolean,
  *   radius?:number, height?:number, z?:number, hanging?:boolean, fixed?:boolean, health?:number,
+ *   spin?:number, bob?:{height:number, period:number},
  *   explode?:{radius:number, damage:number, sound?:string}}} def
  */
 export function defineDecoration(def) {

@@ -218,6 +218,9 @@ export function validateContent(reg) {
       if (t.health > 0 && !t.anims.death) warn(`${owner}: can be hurt but has no "death" animation (it vanishes when killed)`);
     }
     if (t.kind === 'decoration' && typeof t.fixed !== 'boolean') err(`${owner}: fixed must be true or false`);
+    if (t.kind === 'decoration' && t.bob !== undefined && !(t.bob && t.bob.height >= 0 && t.bob.period > 0)) {
+      err(`${owner}: "bob" needs a "height" of 0 or more and a "period" above 0 (seconds)`);
+    }
     if (t.kind === 'decoration' && t.explode?.effect && !reg.things.has(t.explode.effect)) {
       err(`${owner}: unknown explosion effect "${t.explode.effect}"`);
     }

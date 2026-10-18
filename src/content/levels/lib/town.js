@@ -732,10 +732,12 @@ export class Town {
    * cargo pod, junk with litter and a droid's dome, rubble, scrap and power
    * units. Litter lies about the open
    * street too. `amount` scales how much (1 the usual, 2 a mess); placed at
-   * random from `seed`, the same every time. Run it after `finish()` (and
-   * after `drifts()`).
+   * random from `seed`, the same every time. `keep` boxes ([x0, y0, x1, y1])
+   * are left clear for things placed by hand (a group with anything in one
+   * is left out, and the rest come out as they would without it). Run it
+   * after `finish()` (and after `drifts()`).
    */
-  clutter({ amount = 1, seed = 13, clear = 4 } = {}) {
+  clutter({ amount = 1, seed = 13, clear = 4, keep = [] } = {}) {
     const { p } = this;
     const r = random(seed);
     const ns = (face) => face === 'N' || face === 'S';
@@ -813,19 +815,21 @@ export class Town {
           a += 1;
           continue;
         }
+        const group = [];
         for (const [type, along, off, z] of placed.items) {
           const c = CLUTTER[type];
           const u = placed.at + along;
           if (off === 'wall') {
             // Built against a wall: on the wall's edge, a hair out, facing away from it.
             const d = out * 0.01;
-            this.things.push({ type, ...(ns(face) ? { x: round(u), y: line + d } : { x: line + d, y: round(u) }), angle });
+            group.push({ type, ...(ns(face) ? { x: round(u), y: line + d } : { x: line + d, y: round(u) }), angle });
             continue;
           }
           const d = line + out * (c.depth / 2 + 0.06 + off);
           const turn = angle + Math.round(r.range(-12, 12));
-          this.things.push({ type, ...(ns(face) ? { x: round(u), y: round(d) } : { x: round(d), y: round(u) }), angle: turn, ...(z !== undefined && { z }) });
+          group.push({ type, ...(ns(face) ? { x: round(u), y: round(d) } : { x: round(d), y: round(u) }), angle: turn, ...(z !== undefined && { z }) });
         }
+        if (!group.some((t) => keep.some(([x0, y0, x1, y1]) => t.x >= x0 && t.x <= x1 && t.y >= y0 && t.y <= y1))) this.things.push(...group);
         a = placed.end + r.range(1, 4) / amount;
       }
     }
@@ -835,7 +839,9 @@ export class Town {
         if (r() > 0.006 * amount) continue;
         let open = true;
         for (let dy = -2; dy <= 2 && open; dy++) for (let dx = -2; dx <= 2 && open; dx++) open = street(p.get(x + dx, y + dy)) && (p.get(x + dx, y + dy).floorZ ?? 0) === 0;
-        if (open) this.things.push({ type: r() < 0.5 ? 'litter' : 'litter-small', x: x + 0.5, y: y + 0.5, angle: Math.round(r.range(0, 360)) });
+        const type = open && (r() < 0.5 ? 'litter' : 'litter-small');
+        const angle = open && Math.round(r.range(0, 360));
+        if (open && !keep.some(([x0, y0, x1, y1]) => x + 0.5 >= x0 && x + 0.5 <= x1 && y + 0.5 >= y0 && y + 0.5 <= y1)) this.things.push({ type, x: x + 0.5, y: y + 0.5, angle });
       }
     }
     return this;

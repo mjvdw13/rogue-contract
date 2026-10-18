@@ -308,7 +308,12 @@ be added with `definePickup` (see *Custom behaviour*).
   highest floor its `radius` reaches, so one standing against a raised
   floor climbs onto it; `fixed: true` keeps it at the height it's placed
   at (the floor under its middle, or the level thing's `z`): props against
-  a wall, fixtures on one, things stacked on others.
+  a wall, fixtures on one, things stacked on others. `spin` turns one
+  (radians a second), and `bob: { height, period }` floats one up and down
+  by `height` either way over `period` seconds, like the hovering
+  `landspeeder`. Bobbing is drawn only: the thing collides and stops shots
+  where it stands, each bobs at its own point in the swing, and a model's
+  grime faces (its shadow) stay on the ground.
 - **Projectiles** are defined in `src/content/effects.js` with
   `defineProjectile({ id, sheet, anims: { fly, explode }, speed, damage, splash: { radius, damage }, gravity, sounds })`.
   Give one `bounce` to make it bounce instead of bursting on what it hits
@@ -397,6 +402,9 @@ defineDecoration({ id: 'reactor-ring', model: 'reactor-ring', spin: 0.5 }) // ra
   (texture repeats) or `uvw` (world units, at the walls' scale). `glow`
   makes a face fullbright (animated textures keep animating), and `twoSided`
   draws it from behind too. Faces are shaded by a fixed light from above.
+  A face in a grime texture (`grime: true`, see Decals) darkens what's
+  behind it instead of covering it and hides nothing: a soft shadow on the
+  ground (`speeder-shadow`, a grey oval).
 - **Building in code:** `ModelBuilder` in `src/content/models/lib/build.js`
   makes boxes, prisms, lofts (tapered prisms) and cylinders along any axis,
   winds their faces, and projects textures upright at the walls' scale.

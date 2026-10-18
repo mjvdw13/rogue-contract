@@ -1,18 +1,19 @@
 // The X-34 landspeeder's see-through parts (models/speeder.js; its paint
-// and metal are DF textures, assets/custom/derive.mjs). The model drawer
-// can't blend, so both are mostly transparent texels:
-//   speeder-glass   32 x 32, the windscreen: clear, with two glints of the
-//                   suns running across it and specks of dust. Tiles.
+// and metal are DF textures, assets/custom/derive.mjs):
+//   speeder-glass   32 x 32, the windscreen: clear (transparent texels),
+//                   with two glints of the suns running across it and
+//                   specks of dust. Tiles.
 //   speeder-shadow  128 x 64, the shadow under it (stretched over 3.4 x
-//                   1.9, so its texels are about square): an oval, solid
-//                   dark under the hull and dithered thinner toward its
-//                   edge, so the street shows through more and more of it.
+//                   1.9, so its texels are about square): grime (a texel's
+//                   grey is the share of light it leaves, see grime.js), an
+//                   oval taking a third of the light under the hull and
+//                   fading to nothing at its edge. Raw greys, not palette
+//                   colours.
 import { PixelCanvas, C, hash2, seedFrom } from '../lib/tex.js';
 
 const T = (name) => `assets/textures/${name}.png`;
-
-/** 4 x 4 ordered dither thresholds, 0..1. */
-const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map((v) => (v + 0.5) / 16);
+/** How much light the shadow takes away under the hull (0 to 1). */
+const SHADOW = 0.35;
 
 function glass() {
   const S = 32;
@@ -37,9 +38,10 @@ function shadow() {
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
       const r = Math.hypot((x + 0.5) / w - 0.5, (y + 0.5) / h - 0.5) * 2;
-      // Solid to 0.55 of the way out, none at the rim.
-      const cover = Math.min(1, Math.max(0, (1 - r) / 0.45));
-      if (cover > BAYER[(y & 3) * 4 + (x & 3)]) c.set(x, y, C('sand', 0.05));
+      // Full to 0.4 of the way out, then fading smoothly to none at the rim.
+      const t = Math.min(1, Math.max(0, (1 - r) / 0.6));
+      const v = Math.round(255 * (1 - SHADOW * t * t * (3 - 2 * t)));
+      c.set(x, y, v < 254 ? [v, v, v] : null);
     }
   }
   return c;
@@ -47,5 +49,5 @@ function shadow() {
 
 export default [
   { name: 'speeder-glass', out: T('speeder-glass'), draw: glass },
-  { name: 'speeder-shadow', out: T('speeder-shadow'), draw: shadow },
+  { name: 'speeder-shadow', out: T('speeder-shadow'), draw: shadow, raw: true },
 ];

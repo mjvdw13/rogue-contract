@@ -214,7 +214,9 @@ Check a street from several angles, not just down its length.
   straight walls where the street is open 4 tiles out in front (so alleys
   stay clear), off doors, arches and low fixtures, the first group of a
   few tries that fits what's left of the wall; litter lies about the open
-  street too. `amount` scales it; placed from a seed. Hand-place the
+  street too. `amount` scales it; placed from a seed; `keep` boxes stay
+  clear for things put there by hand (the parked speeder), and the rest
+  comes out the same. Hand-place the
   groups a place wants (the stall's counter, the vaporator on the
   square): the main street's walls are short between their doors and
   arches, so the kit finds little room there. About 160 in the first
@@ -285,8 +287,8 @@ angle unless their sheet has the other views (the villagers do).
 
 - **Models (built):** domes, awnings, tarps, tin roofs, pipes and wall
   boxes, the street clutter (above), and an X-34 landspeeder
-  (`models/speeder.js`, parked on the main street; the garage's can be
-  another of it).
+  (`models/speeder.js`), pulled up nose first to D's front, bobbing over a
+  soft grime shadow (the garage's can be another of it).
 - **Models (new):** moisture condenser tower, swoop bike,
   droid parts, the sandcrawler, the gutted freighter, the comm tower,
   the cantina's round bar and booth tables, a power droid (until a sprite),
