@@ -604,7 +604,7 @@ export default defineLevel({
   par: 120,                  // seconds, shown on the tally screen
   fog: 0.05,                 // extra darkness with distance (the default)
   haze: { color: [32, 24, 64], half: 40 }, // outdoors, fade to this colour
-  weather: { type: 'glint', count: 120 }, // particles in the air round you, outdoors
+  weather: { type: 'glint', count: 60 }, // particles in the air round you, outdoors
   tiles: [
     '###########',
     '#....#....#',
