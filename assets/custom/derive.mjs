@@ -100,9 +100,10 @@ export const DECALS = [
   // A shop's roll-down shutter, 3 tiles wide: a strip of Nar Shaddaa's
   // corrugated door clear of its red sign, stretched sideways.
   { out: 'shutter', df: 'NDCORUG1', crop: [119, 0, 8, 96], size: [96, 72], gradient: [[30, 26, 22], [74, 66, 56], [118, 108, 92], [160, 150, 132]], keep: 0, contrast: 0.9, mask: 'round', r: 4, rim: REVEAL },
-  // Windows: dark behind rusty bars, and teal louvred shutters.
-  { out: 'window-bars', df: 'SPBARS1', size: [40, 40], gradient: [[8, 6, 4], [30, 22, 14], [80, 58, 36], [136, 98, 60]], keep: 0.2, contrast: 1, mask: 'round', r: 8, rim: REVEAL },
-  { out: 'window-louvre', df: 'NPVENTS1', size: [40, 48], gradient: TEAL, keep: 0, contrast: 0.9, mask: 'arch', rim: REVEAL },
+  // Windows, a tile wide and 1.25 high to fill their notch (town.window()):
+  // dark behind rusty bars, and teal louvred shutters.
+  { out: 'window-bars', df: 'SPBARS1', size: [32, 40], gradient: [[8, 6, 4], [30, 22, 14], [80, 58, 36], [136, 98, 60]], keep: 0.2, contrast: 1, mask: 'round', r: 8, rim: REVEAL },
+  { out: 'window-louvre', df: 'NPVENTS1', size: [32, 40], gradient: TEAL, keep: 0, contrast: 0.9, mask: 'arch', rim: REVEAL },
 ];
 
 /**

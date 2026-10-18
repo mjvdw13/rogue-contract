@@ -174,9 +174,11 @@ Check a street from several angles, not just down its length.
   into a straight wall (an arch), a round-topped door on its back wall (a
   decal: `door-steel`, `door-rust`, `door-teal`, `door-wood`, or the shop
   `shutter`) and a flagstone step outside; `depth: 0` puts it on the wall
-  itself (the back of a porch). Windows are decals flush on the wall
-  (`window-bars`, `window-louvre`), with a dark rim for the reveal's
-  shadow. Decals only go on straight faces, not round walls.
+  itself (the back of a porch). Windows are set in too (Mark: inset
+  matters more than their shape): a notch a tile deep, the wall below it
+  a sill and a slab over it up to the roof, the window (`window-bars`,
+  `window-louvre`) on its back wall. Decals only go on straight faces, not
+  round walls.
 - **Plasters and the skirt:** houses come in five plasters (`adobe`,
   `adobe-pale`, `adobe-ochre`, `adobe-rose`, `adobe-grey`), domes in each.
   The palette has no golden ochres, so ochre comes out terracotta: use it

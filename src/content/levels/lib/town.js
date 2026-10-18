@@ -220,12 +220,32 @@ export class Town {
   }
 
   /**
-   * A window on a building's straight outside wall: a decal (`tex`) with
-   * its middle at height `z`, at (x, y) on the wall's edge, looking `face`
-   * (as for `door`).
+   * A window set into a building's straight outside wall, its middle at
+   * height `z`, at (x, y) on the wall's edge, looking `face` (as for
+   * `door`): a notch a tile deep and `width` wide (keep (x, y) halfway
+   * along a tile for an odd width), open `tall` tiles high, the wall below
+   * it a sill and a slab over it up to the roof. The window (a decal,
+   * `tex`) is on the notch's back wall. The roof's height, plaster and
+   * skirt come from the wall it's cut into, so it works on any storey.
    */
-  window(x, y, face, { z = 3.5, tex = 'window-bars' } = {}) {
-    this.decals.push({ x, y, z, face, tex });
+  window(x, y, face, { z = 3.5, tex = 'window-bars', width = 1, tall = 1.25, light = 152 } = {}) {
+    const ns = face === 'N' || face === 'S';
+    const along = ns ? x : y;
+    const a0 = Math.round(along - width / 2);
+    const out = face === 'S' || face === 'E' ? 1 : -1;
+    const line = ns ? y : x;
+    // The tiles of wall behind the edge, and the edge of the notch's back wall.
+    const row = out > 0 ? line - 1 : line;
+    const back = line - out;
+    const [sill, top] = [z - tall / 2, z + tall / 2];
+    for (let a = a0; a < a0 + width; a++) {
+      const [tx, ty] = ns ? [a, row] : [row, a];
+      const c = this.p.get(tx, ty);
+      if (!c || c.wall || c.slab || !(c.floorZ >= top + 0.25)) throw new Error(`Town: no wall at (${tx}, ${ty}) for a window up to ${top}`);
+      const wall = c.side ?? this.wall;
+      this.p.set(tx, ty, { ...c, floorZ: sill, slab: { bottom: top, top: c.floorZ, floor: c.floor, ceiling: wall, side: wall, light } });
+    }
+    this.decals.push({ ...(ns ? { x: a0 + width / 2, y: back } : { x: back, y: a0 + width / 2 }), z, face, tex });
     return this;
   }
 

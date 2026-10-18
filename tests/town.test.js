@@ -125,3 +125,19 @@ test('a door is set into its wall: a recess, the door on its back wall and a ste
   assert.deepEqual(errors, []);
   assert.equal(map.decals.length, 1);
 });
+
+test('a window is set into its wall: a notch with a sill and a lintel, the window on its back wall', () => {
+  const { p, town } = kit();
+  town.house(4, 4, 16, 14, { h: 6, wall: 'adobe-pale', skirt: 'plinth', tiers: [{ box: [6, 4, 14, 10], h: 10 }] });
+  town.window(10.5, 14, 'S', { z: 3, tex: 'window-louvre' });
+  const c = p.get(10, 13);
+  assert.equal(c.floorZ, 2.375, 'the sill');
+  assert.deepEqual([c.slab.bottom, c.slab.top, c.slab.side], [3.625, 6, 'adobe-pale'], 'the lintel, up to the roof');
+  assert.equal(c.bands[0].tex, 'adobe-brick', 'the skirt goes on under it');
+  assert.equal(p.get(11, 13).floorZ, 6, 'the wall beside it');
+  assert.deepEqual(town.decals[0], { x: 10.5, y: 13, z: 3, face: 'S', tex: 'window-louvre' });
+  // On the upper storey, up to its own roof.
+  town.window(10.5, 10, 'S', { z: 8 });
+  assert.equal(p.get(10, 9).slab.top, 10);
+  assert.throws(() => town.window(7.5, 14, 'S', { z: 9 }), /no wall/, 'not above the roof');
+});
