@@ -109,7 +109,8 @@ export function drawModels(view, things, map, textures, fb, fbW, colormaps, skip
     }
 
     const tile = map.inBounds(t.x | 0, t.y | 0) ? (t.y | 0) * map.w + (t.x | 0) : -1;
-    const light = tile >= 0 && map.lightmap ? map.lightmap.sample(t.x, t.y, map.storeyAt(tile, (t.z ?? 0) + 0.5)) : 128;
+    // (A thing may carry its own light: a tarp over the shade it makes.)
+    const light = t.fixedLight >= 0 ? t.fixedLight : tile >= 0 && map.lightmap ? map.lightmap.sample(t.x, t.y, map.storeyAt(tile, (t.z ?? 0) + 0.5)) : 128;
     const outdoor = tile >= 0 && (map.flags[tile] & F_SKY) !== 0;
     const fixed = view.fixedColormap;
 

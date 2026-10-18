@@ -84,6 +84,20 @@ test('a cloth tied against a wall sways, but never into the wall', () => {
   assert.ok(moved, 'and still moves');
 });
 
+test('a tarp pinned at its four corners sags in its middle and stays sagging', () => {
+  const tarp = { type: 'rag', from: [4, 3, 3], to: [9, 3, 3], out: [0, 3, 0], sag: 0.3, pin: 'corners' };
+  const world = makeWorld(yard([tarp]));
+  const hs = world.hangings;
+  const pinned = Array.from({ length: hs.n }, (_, i) => i).filter((i) => !hs.free[i]);
+  assert.equal(pinned.length, 4, 'its four corners');
+  for (const i of pinned) assert.ok([3, 6].includes(hs.y[i]) && Math.abs(hs.z[i] - 3) < 0.1, 'at the ends of its two edges (give or take a fold)');
+  const lowest = () => Math.min(...points(world).map((p) => p[2]));
+  run(world, mockInput(), 3);
+  assert.ok(lowest() < 2.95 && lowest() > 2.2, `its middle hangs at ${lowest().toFixed(2)}`);
+  const ys = points(world).map((p) => p[1]);
+  assert.ok(Math.min(...ys) > 2.8 && Math.max(...ys) < 6.2, 'and it stays stretched between its corners');
+});
+
 test('hangings far from the player hold still', () => {
   const world = makeWorld(yard([{ type: 'rag', from: [90, 4.5, 3], to: [92, 4.5, 3], length: 1.5 }], {}, 100));
   const before = points(world);
@@ -107,6 +121,9 @@ test('the validator checks a level\'s hangings', () => {
     bad(3, { type: 'rag', from: [1.5, 1.5, 1], length: 1 }),
     bad(4, { type: 'rag', from: [1.5, 1.5, 1], to: [3.5, 1.5, 1], pin: 'middle' }),
     bad(5, { type: 'rope', from: [1.5, 1.5, -1], length: 1 }),
+    bad(6, { type: 'rope', from: [1.5, 1.5, 1], out: [0, 1, 0] }),
+    bad(7, { type: 'rag', from: [1.5, 1.5, 1], to: [3.5, 1.5, 1], out: [0, 1, 0], length: 1 }),
+    bad(8, { type: 'rag', from: [1.5, 1.5, 1], to: [3.5, 1.5, 1], length: 1, light: 300 }),
   ];
   const { errors } = validateContent(new Registry({ ...content, levels: [...content.levels, ...levels] }));
   const ours = (k) => errors.filter((e) => e.includes(`bad-hangings-${k}`));
@@ -138,6 +155,12 @@ test('a cloth draws from either side', () => {
   for (const cam of [{ x: 1.5, y: 4.5, angle: 0, z: 1.25 }, { x: 11.5, y: 4.5, angle: Math.PI, z: 1.25 }]) {
     assert.ok(differs(shot(yard(cloth), cam), shot(yard([]), cam)), `seen looking ${cam.angle ? 'west' : 'east'}`);
   }
+});
+
+test("a cloth with its own light is drawn in it, whatever the light where it hangs", () => {
+  const cloth = (light) => [{ type: 'rag', from: [6.5, 3.5, 2.5], to: [6.5, 5.5, 2.5], length: 1.5, light }];
+  const cam = { x: 1.5, y: 4.5, angle: 0, z: 1.25 };
+  assert.ok(differs(shot(yard(cloth(40)), cam), shot(yard(cloth(250)), cam)));
 });
 
 test("the scene shows through a cloth's transparent texels: its tears", () => {

@@ -80,8 +80,10 @@ export class Town {
     this.openings = [];
     /** Houses with their own `grime`: [x0, y0, x1, y1, amount]. */
     this.grimeBoxes = [];
-    /** Hangings the kit places (awnings' valances), for the level's `hangings`. */
+    /** Hangings the kit places (awnings' valances, tarps), for the level's `hangings`. */
     this.hangings = [];
+    /** Tarps, for their shade and light: { box, z, cx, cy, hanging }. */
+    this.tarps = [];
   }
 
   /**
@@ -333,6 +335,52 @@ export class Town {
       const e = front + out * 0.05;
       const tie = (a) => (ns ? [a, e, top - 0.06] : [e, a, top - 0.06]);
       this.hangings.push({ type: valance, from: tie(a0 + 0.1), to: tie(a1 - 0.1), length: 0.5 });
+    }
+    return this;
+  }
+
+  /**
+   * A tarp over a box (a market stall): a cloth tied at its four corners,
+   * `z` above `floorZ`, sagging `sag` in its middle and billowing in the
+   * breeze (a hanging, `tarp-<cloth>`, in `this.hangings`). With `face`,
+   * its front looks that way and its back edge is `rise` higher; poles hold
+   * up its corners ('all', or 'front' when its back is tied to a wall, or
+   * 'none'). The ground under it is in its shade (`shadows()`), and the
+   * cloth is lit as the suns find it up there. Pole heights are quarters
+   * from 2.5 to 5.5.
+   */
+  tarp(x0, y0, x1, y1, { z = 3, face = 'S', rise = 0, cloth = 'sand', sag = 0.3, poles = 'all', floorZ = 0 } = {}) {
+    const where = `Town: the tarp at (${x0}, ${y0})`;
+    if (!AWNING_CLOTHS.includes(cloth)) throw new Error(`${where} has no cloth "${cloth}" (${AWNING_CLOTHS.join(', ')})`);
+    const e = 0.1;
+    // Its corners going round: back left, back right, front right, front left (looking out).
+    const box = [[x0 + e, y0 + e], [x1 - e, y0 + e], [x1 - e, y1 - e], [x0 + e, y1 - e]];
+    const turn = { S: 0, W: 1, N: 2, E: 3 }[face];
+    if (turn === undefined) throw new Error(`${where}: "face" must be N, E, S or W`);
+    const [bl, br, fr, fl] = [0, 1, 2, 3].map((k) => box[(k + turn) % 4]);
+    const back = floorZ + z + rise;
+    const front = floorZ + z;
+    const hanging = {
+      type: `tarp-${cloth}`,
+      from: [...bl, back],
+      to: [...br, back],
+      out: [fl[0] - bl[0], fl[1] - bl[1], front - back],
+      sag,
+      pin: 'corners',
+    };
+    this.hangings.push(hanging);
+    this.tarps.push({ box: [x0, y0, x1, y1], z: front - sag, cx: (x0 + x1) / 2, cy: (y0 + y1) / 2, hanging });
+    const pole = (pt, h) => {
+      if (!AWNING_POLES.includes(h)) throw new Error(`${where}: a pole ${h} high (poles are quarters from 2.5 to 5.5)`);
+      this.things.push({ type: poleId(h), x: pt[0], y: pt[1], z: floorZ });
+    };
+    if (poles !== 'none') {
+      pole(fl, z);
+      pole(fr, z);
+      if (poles === 'all') {
+        pole(bl, z + rise);
+        pole(br, z + rise);
+      }
     }
     return this;
   }
@@ -614,35 +662,44 @@ export class Town {
     });
     let tallest = 0;
     for (const t of top) if (t > tallest && t < Infinity) tallest = t;
+    // How much light the suns' shadows take from the tile (x, y) at height z.
+    const dropAt = (x, y, z, tops) => {
+      let drop = 0;
+      for (const d of dirs) {
+        const reach = (tallest - z) / d.rise;
+        let hidden = 0;
+        for (const [sx, sy] of SAMPLES) {
+          for (let s = 0.4; s <= reach; s += 0.4) {
+            const tx = Math.floor(x + sx + d.dx * s);
+            const ty = Math.floor(y + sy + d.dy * s);
+            if (tx < 0 || ty < 0 || tx >= w || ty >= h) break;
+            // (Not its own tile: an angled wall's top is above its floor.)
+            if ((tx !== x || ty !== y) && tops[ty * w + tx] > z + s * d.rise) {
+              hidden++;
+              break;
+            }
+          }
+        }
+        drop += (d.drop * hidden) / SAMPLES.length;
+      }
+      return drop;
+    };
     const out = [];
     for (let y = 0; y < h; y++) {
       for (let x = 0; x < w; x++) {
         const c = p.get(x, y);
         if ((c.wall && !c.line && !c.diagonal) || c.door || c.ceiling !== 'sky') continue;
         const z = c.slab ? c.slab.top : c.floorZ ?? 0;
-        const tops = under[y * w + x] ? bare : top;
-        let drop = 0;
-        for (const d of dirs) {
-          const reach = (tallest - z) / d.rise;
-          let hidden = 0;
-          for (const [sx, sy] of SAMPLES) {
-            for (let s = 0.4; s <= reach; s += 0.4) {
-              const tx = Math.floor(x + sx + d.dx * s);
-              const ty = Math.floor(y + sy + d.dy * s);
-              if (tx < 0 || ty < 0 || tx >= w || ty >= h) break;
-              // (Not its own tile: an angled wall's top is above its floor.)
-              if ((tx !== x || ty !== y) && tops[ty * w + tx] > z + s * d.rise) {
-                hidden++;
-                break;
-              }
-            }
-          }
-          drop += (d.drop * hidden) / SAMPLES.length;
-        }
+        const drop = dropAt(x, y, z, under[y * w + x] ? bare : top);
         if (drop > 0) out.push([x, y, { ...c, light: Math.round((c.light - drop) / 8) * 8 }]);
       }
     }
     for (const [x, y, c] of out) p.set(x, y, c);
+    // A tarp is lit as the sun finds it up there, over the shade it makes.
+    for (const t of this.tarps) {
+      const z = Math.min(t.hanging.from[2], t.hanging.to[2]);
+      t.hanging.light = Math.round((this.light - dropAt(Math.floor(t.cx), Math.floor(t.cy), z, top)) / 8) * 8;
+    }
     return this;
   }
 
@@ -679,6 +736,10 @@ export class Town {
       if (!changed) break;
     }
     for (let i = 0; i < top.length; i++) if (top[i] === -Infinity) top[i] = 0;
+    // Tarps: their lowest edge over the ground under them.
+    for (const { box: [x0, y0, x1, y1], z } of this.tarps) {
+      for (let y = y0; y < y1; y++) for (let x = x0; x < x1; x++) top[y * w + x] = Math.max(top[y * w + x], z);
+    }
     // Domes: a hemisphere's height over each tile.
     for (const [cx, cy, r, base, height] of domes ? this.casters : []) {
       for (let y = Math.floor(cy - r); y <= Math.ceil(cy + r); y++) {

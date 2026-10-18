@@ -109,6 +109,8 @@ export class Hangings {
     /** The floor under each point where it was made: it never sinks below. */
     this.floor = new Float32Array(n);
     this.light = new Uint8Array(n);
+    /** A hanging's own light for its points (its `light`), or -1 to read the light map. */
+    this.fixedLight = new Int16Array(n).fill(-1);
     this.outdoor = new Uint8Array(n);
     this.nl = 0;
     const nl = LINK_CAP;
@@ -236,6 +238,7 @@ export class Hangings {
     if (!t) return 'has an unknown type';
     const from = s.from;
     if (!isPoint(from)) return 'needs "from": [x, y, z]';
+    if (s.light !== undefined && !(s.light >= 0 && s.light <= 255)) return '"light" must be 0 to 255';
     const to = s.to ?? null;
     if (to !== null && !isPoint(to)) return '"to" must be [x, y, z]';
     const p0 = this.n;
@@ -280,24 +283,55 @@ export class Hangings {
       }
     } else {
       if (!to) return 'needs "to": [x, y, z] (a cloth hangs from the line between "from" and "to")';
-      const length = s.length ?? 1;
-      if (!(length > 0)) return '"length" must be above 0';
+      // `out`: its far edge runs from `from` + out to `to` + out (a tarp),
+      // instead of hanging `length` straight down.
+      const out = s.out ?? null;
+      if (out !== null && !isPoint(out)) return '"out" must be [x, y, z]';
+      const length = out ? Math.hypot(out[0], out[1], out[2]) : s.length ?? 1;
+      if (!(length > 0)) return out ? '"out" must not be [0, 0, 0]' : '"length" must be above 0';
+      const sag = s.sag ?? 0;
+      if (!(sag >= 0)) return '"sag" must be 0 or more';
+      const [ox, oy, oz] = out ?? [0, 0, -length];
       const width = Math.hypot(to[0] - from[0], to[1] - from[1], to[2] - from[2]);
       const cols = clampInt(Math.round(width / t.spacing), 1, MAX_CELLS);
       const rows = clampInt(Math.round(length / t.spacing), 1, MAX_CELLS);
       const pw = cols + 1;
       if (this.n + pw * (rows + 1) > POINT_CAP || this.nl + cols * (rows + 1) + rows * pw + 2 * cols * rows > LINK_CAP) return FULL;
       const corners = s.pin === 'corners';
-      // Across the top edge, flat: the way the folds stand out.
-      const fl = Math.hypot(to[0] - from[0], to[1] - from[1]) || 1;
-      const fx = -(to[1] - from[1]) / fl;
-      const fy = (to[0] - from[0]) / fl;
+      // Its folds stand out of its face: across the top edge, flat, for one
+      // hanging down; for one with `out`, along the sheet's normal.
+      let fx;
+      let fy;
+      let fz = 0;
+      if (out) {
+        const ex = to[0] - from[0];
+        const ey = to[1] - from[1];
+        const ez = to[2] - from[2];
+        const nx = ey * oz - ez * oy;
+        const ny = ez * ox - ex * oz;
+        const nz = ex * oy - ey * ox;
+        const nl = Math.hypot(nx, ny, nz) || 1;
+        [fx, fy, fz] = [nx / nl, ny / nl, nz / nl];
+      } else {
+        const fl = Math.hypot(to[0] - from[0], to[1] - from[1]) || 1;
+        fx = -(to[1] - from[1]) / fl;
+        fy = (to[0] - from[0]) / fl;
+      }
       for (let j = 0; j <= rows; j++) {
         for (let i = 0; i <= cols; i++) {
           const q = i / cols;
-          const pinned = j === 0 && (!corners || i === 0 || i === cols);
+          // Pinned: its top edge; or its top corners; with `out`, all four corners.
+          const pinned = corners ? (i === 0 || i === cols) && (j === 0 || (out && j === rows)) : j === 0;
           const fold = i % 2 ? t.folds : -t.folds;
-          const p = this._point(lerp(from[0], to[0], q) + fx * fold, lerp(from[1], to[1], q) + fy * fold, lerp(from[2], to[2], q) - (length * j) / rows, !pinned, h);
+          // Made sagging `sag` in its middle (half that at its edges' middles), so it keeps the sag.
+          const dip = out ? sag * 2 * (q * (1 - q) + (j / rows) * (1 - j / rows)) : 0;
+          const p = this._point(
+            lerp(from[0], to[0], q) + (ox * j) / rows + fx * fold,
+            lerp(from[1], to[1], q) + (oy * j) / rows + fy * fold,
+            lerp(from[2], to[2], q) + (oz * j) / rows + fz * fold - dip,
+            !pinned,
+            h,
+          );
           if (i) this._link(p - 1, p);
           if (j) this._link(p - pw, p);
           // Across each cell both ways too, so it holds together as a sheet (with
@@ -308,14 +342,29 @@ export class Hangings {
           }
         }
       }
-      // Tethered to the top of its column, or to both top corners.
-      for (let j = 1; j <= rows; j++) {
-        for (let i = 0; i <= cols; i++) {
-          if (corners) this._tether(p0 + j * pw + i, p0, p0 + cols);
-          else this._tether(p0 + j * pw + i, p0 + i, -1);
+      if (out && corners) {
+        // Tethered to its two nearest corners.
+        const cs = [p0, p0 + cols, p0 + rows * pw, p0 + rows * pw + cols];
+        for (let j = 0; j <= rows; j++) {
+          for (let i = 0; i <= cols; i++) {
+            const p = p0 + j * pw + i;
+            if (!this.free[p]) continue;
+            const d = (c) => Math.hypot(this.x[p] - this.x[c], this.y[p] - this.y[c], this.z[p] - this.z[c]);
+            const [a, b] = [...cs].sort((u, v) => d(u) - d(v));
+            this._tether(p, a, b);
+          }
         }
       }
-      if (corners) for (let i = 1; i < cols; i++) this._tether(p0 + i, p0, p0 + cols);
+      // Tethered to the top of its column, or to both top corners.
+      else {
+        for (let j = 1; j <= rows; j++) {
+          for (let i = 0; i <= cols; i++) {
+            if (corners) this._tether(p0 + j * pw + i, p0, p0 + cols);
+            else this._tether(p0 + j * pw + i, p0 + i, -1);
+          }
+        }
+        if (corners) for (let i = 1; i < cols; i++) this._tether(p0 + i, p0, p0 + cols);
+      }
       h.model = {
         verts: new Float32Array(pw * (rows + 1) * 3),
         radius: 0,
@@ -340,10 +389,11 @@ export class Hangings {
         }
       }
       // The model drawer's view of it: a thing at its centre.
-      h.thing = { x: 0, y: 0, z: 0, angle: 0, model: h.model };
+      h.thing = { x: 0, y: 0, z: 0, angle: 0, model: h.model, fixedLight: s.light ?? -1 };
       this.cloths.push(h.thing);
     }
     h.np = this.n - p0;
+    if (s.light !== undefined) this.fixedLight.fill(Math.round(s.light), p0, this.n);
     h.nl = this.nl - l0;
     // Its centre and reach (with room to swing), for culling and sleep.
     const xs = this.x.subarray(p0, this.n);
@@ -376,7 +426,8 @@ export class Hangings {
     if (!map.inBounds(tx, ty)) return;
     const tile = ty * map.w + tx;
     this.outdoor[i] = map.flags[tile] & F_SKY ? 1 : 0;
-    this.light[i] = map.lightmap ? Math.min(255, map.lightmap.sample(this.x[i], this.y[i], map.storeyAt(tile, this.z[i]))) : 160;
+    if (this.fixedLight[i] >= 0) this.light[i] = this.fixedLight[i];
+    else this.light[i] = map.lightmap ? Math.min(255, map.lightmap.sample(this.x[i], this.y[i], map.storeyAt(tile, this.z[i]))) : 160;
   }
 
   /**

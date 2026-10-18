@@ -100,6 +100,8 @@ town.dome(41, 86, 5, 8.5, { wall: 'adobe-rose' });
 town.house(53, 78, 61, 88, { h: 5, r: 2, wall: 'adobe-ochre', skirt: null, dome: true });
 town.door(57, 78, 'N', { h: 5, wall: 'adobe-ochre' });
 town.window(53, 83.5, 'W', { z: 3, tex: 'window-louvre' });
+// A stall on the square in front of G, under a tarp that billows.
+town.tarp(46, 80, 50, 84, { z: 2.75, face: 'W', rise: 0.5, cloth: 'red' });
 
 // For now the street ends at an exit (until the town goes on east).
 p.rect(60, 64, 62, 76, town.street(0, { exit: true }));

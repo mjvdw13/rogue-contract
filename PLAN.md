@@ -138,7 +138,7 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
           over the kit's slab, which stays as their shade and underside;
           `town.awning({ cloth, face, valance })`, a valance either a
           fixed fringe or a swaying cloth (`town.hangings`).
-    - [ ] A tarp: a cloth hanging pinned at four corners (`out`), sagging
+    - [x] A tarp: a cloth hanging pinned at four corners (`out`), sagging
           and billowing over a stall. Defs, validator, MODDING.md, tests.
     - [ ] Lean-to roofs in rusty corrugated metal (derived from DF's
           corrugated door): sloped sheets with an overhang,

@@ -23,4 +23,9 @@ export default [
   ...['red', 'teal', 'sand', 'olive'].map((c) =>
     defineHanging({ id: `valance-${c}`, shape: 'cloth', texture: `awning-${c}-hem`, color: ['beige', 0.7], breeze: 1.2, drag: 3.25 }),
   ),
+  // A tarp over a stall, tied at its corners (lib/town.js, tarp()): the
+  // awning canvas, a coarser grid (it's wide), billowing a little.
+  ...['red', 'teal', 'sand', 'olive'].map((c) =>
+    defineHanging({ id: `tarp-${c}`, shape: 'cloth', texture: `awning-${c}`, color: ['beige', 0.7], spacing: 0.5, folds: 0.03, breeze: 0.8, drag: 2.5 }),
+  ),
 ];

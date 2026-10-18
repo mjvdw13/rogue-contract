@@ -179,6 +179,12 @@ Check a street from several angles, not just down its length.
   fixed fringe for a swaying one (a hanging, `valance-<cloth>`, or a
   `rag`), which lands in `town.hangings` for the level's `hangings`. The
   two in the first stretch (22 models) cost about 0.15 ms a frame.
+- **Tarps** (`tarp()`): a stall's cover, a cloth tied at its four corners
+  to poles (or its back two to a wall), sagging and billowing (a hanging,
+  `tarp-<cloth>`, the awning canvas). Its ground is in its shade
+  (`shadows()` counts it as a roof), while the cloth is lit as the suns
+  find it at its height. Dear up close (about 0.4 ms filling a third of
+  the view), so one or two in a view.
 - **Hangings** (the level's `hangings`, MODDING.md): cables strung across
   the street, ropes, and torn cloth (curtains, valances on the awnings,
   banners, sheets across the lanes) that sway in the breeze. Tie each

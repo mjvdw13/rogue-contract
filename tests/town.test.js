@@ -213,3 +213,18 @@ test('an awning of a size or height there are no models for is an error', () => 
   assert.throws(() => town.awning(6, 10, 14, 14, { z: 3.25 }), /deep/);
   assert.throws(() => town.awning(6, 10, 14, 12, { z: 3.3 }), /quarter/);
 });
+
+test('a tarp is a cloth tied at four corners on poles, shading the ground under it but lit itself', () => {
+  const { p, town } = kit();
+  town.tarp(10, 10, 14, 14, { z: 2.75, face: 'W', rise: 0.5, cloth: 'red' });
+  town.finish();
+  assert.equal(town.hangings.length, 1);
+  const h = town.hangings[0];
+  assert.equal(h.type, 'tarp-red');
+  assert.equal(h.pin, 'corners');
+  assert.ok(h.from[2] > h.from[2] + h.out[2], 'its back edge is higher');
+  assert.ok(h.out[0] < 0, 'its front looks west');
+  assert.equal(town.things.filter((t) => t.type.startsWith('awning-pole')).length, 4);
+  assert.ok(p.get(12, 12).light < town.light, 'the ground under it is in its shade');
+  assert.equal(h.light, town.light, 'the cloth is in the sun');
+});

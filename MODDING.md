@@ -637,6 +637,22 @@ hangings: [
 
 A rope with a `to` is strung between two points (`sag`, 0.3 by default);
 without one it hangs `length` (1) from `from`. A cloth always has both.
+
+A tarp is a cloth with `out`: its far edge runs from `from + out` to
+`to + out` instead of hanging straight down (and it is as long as `out`,
+so it has no `length`). With `pin: 'corners'` all four corners are tied,
+and `sag` is how far its middle hangs below them (half that at the middle
+of each edge). `light` (0 to 255) lights it with that instead of the light
+map's: a tarp over a stall is in the sun, though the ground under it is in
+its shade.
+
+```js
+// A tarp over a stall, 2 m square, tied to four poles, its back edge higher.
+{ type: 'tarp-red', from: [50, 83.9, 3.25], to: [50, 80.1, 3.25], out: [-3.8, 0, -0.5], sag: 0.3, pin: 'corners', light: 216 },
+```
+
+A cloth's drawing costs mostly by the pixels it covers: a 2 m tarp filling
+a third of the view costs about 0.4 ms.
 They settle before the level starts, and ones more than 40 tiles from you
 hold still. Cost (Chromium, the Mos Eisley street, ms a frame): a cable
 right across the view about 0.012 to draw, a 1 x 1 m cloth about 0.032;

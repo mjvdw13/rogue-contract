@@ -441,6 +441,15 @@ function checkHangings(reg, level, map, owner, err) {
       if (s.sag !== undefined && !num(s.sag, 0, 100)) bad('"sag" (how far its middle hangs below the line between its ends) must be 0 or more');
     } else if (s.length !== undefined && !num(s.length, 0.01, 100)) bad('"length" must be above 0');
     if (type.shape === 'cloth' && s.pin !== undefined && !HANGING_PINS.includes(s.pin)) bad(`"pin" must be one of ${HANGING_PINS.join(', ')}`);
+    if (s.out !== undefined) {
+      const o = s.out;
+      if (type.shape !== 'cloth') bad('"out" is only for a cloth');
+      else if (!Array.isArray(o) || o.length !== 3 || !o.every((v) => typeof v === 'number' && Number.isFinite(v))) bad('"out" must be [x, y, z]: the way from its top edge to its far edge');
+      else if (!o.some((v) => v !== 0)) bad('"out" must not be [0, 0, 0]');
+      else if (s.length !== undefined) bad('has both "out" and "length": a cloth with "out" is as long as it');
+      if (s.sag !== undefined && !num(s.sag, 0, 100)) bad('"sag" (how far its middle sags) must be 0 or more');
+    }
+    if (s.light !== undefined && !num(s.light, 0, 255)) bad('"light" must be 0 to 255');
     return undefined;
   });
   // Room for them all (the level's hangings share one pool).
