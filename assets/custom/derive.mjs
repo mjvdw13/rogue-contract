@@ -97,6 +97,8 @@ export const TOWN = [
  * the opening's reveal, so a flat decal looks set into the wall.
  */
 const REVEAL = { width: 3, color: [52, 38, 26] };
+/** Grey metal that has been out in the suns: rust in its darks. */
+const RUSTY_GREY = [[26, 20, 14], [70, 58, 46], [116, 108, 96], [156, 150, 138], [196, 190, 176]];
 const TEAL = [[4, 16, 18], [16, 58, 62], [44, 116, 118], [110, 190, 188]];
 export const DECALS = [
   // Doors after the film's (Mark's reference, 2026-10-17): a panel with a
@@ -116,6 +118,15 @@ export const DECALS = [
   // dark behind rusty bars, and teal louvred shutters.
   { out: 'window-bars', df: 'SPBARS1', size: [32, 40], gradient: [[8, 6, 4], [30, 22, 14], [80, 58, 36], [136, 98, 60]], keep: 0.2, contrast: 1, mask: 'round', r: 8, rim: REVEAL },
   { out: 'window-louvre', df: 'NPVENTS1', size: [32, 40], gradient: TEAL, keep: 0, contrast: 0.9, mask: 'arch', rim: REVEAL },
+  // Things on the walls (town.vent()): grilles and slats over vents, a
+  // round vent, a fan in its box and a row of gauges, in
+  // weathered grey; `vent-slats` has no transparent edge, so the
+  // `wall-unit` model wears it too.
+  { out: 'vent-grille', df: 'IAFAN', crop: [0, 0, 64, 64], size: [32, 32], gradient: RUSTY_GREY, keep: 0.3, contrast: 1, mask: 'round', r: 3, rim: { width: 1.5, color: [30, 24, 18] } },
+  { out: 'vent-slats', df: 'NPVENTS2', size: [64, 32], gradient: RUSTY_GREY, keep: 0.5, contrast: 1, rim: { width: 1.5, color: [30, 24, 18] } },
+  { out: 'vent-round', df: 'SPGRATE1', size: [32, 32], gradient: RUSTY_GREY, keep: 0.5, contrast: 1, mask: 'round', r: 16, rim: { width: 2, color: [30, 24, 18] } },
+  { out: 'wall-fan', df: 'IATRKDEV', crop: [0, 0, 64, 64], size: [32, 32], gradient: [[24, 20, 16], [70, 62, 52], [120, 110, 94], [170, 160, 140]], keep: 0.4, contrast: 1, mask: 'round', r: 3 },
+  { out: 'wall-meter', df: 'SWSWITCH', size: [8, 32], mask: 'round', r: 1 },
 ];
 
 /**

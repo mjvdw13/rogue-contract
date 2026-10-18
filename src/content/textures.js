@@ -42,7 +42,11 @@ const TOWN = [
 ];
 
 // Mos Eisley's doors and windows: decals cut from DF textures by derive.mjs.
-const TOWN_DECALS = ['door-red', 'door-grey', 'door-sign', 'door-panel', 'shutter', 'window-bars', 'window-louvre'];
+const TOWN_DECALS = [
+  'door-red', 'door-grey', 'door-sign', 'door-panel', 'shutter', 'window-bars', 'window-louvre',
+  // Vents, a fan and gauges on the walls (lib/town.js, vent()).
+  'vent-grille', 'vent-slats', 'vent-round', 'wall-fan', 'wall-meter',
+];
 
 // Grime: darkens the walls it's on (tools/art/textures/grime.js); the town
 // kit weathers Mos Eisley's walls with it (lib/town.js, grime()).

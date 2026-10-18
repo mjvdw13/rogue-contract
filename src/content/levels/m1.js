@@ -105,6 +105,17 @@ town.window(53, 83.5, 'W', { z: 3, tex: 'window-louvre' });
 // A stall on the square in front of G, under a tarp that billows.
 town.tarp(46, 80, 50, 84, { z: 2.75, face: 'W', rise: 0.5, cloth: 'red' });
 
+// Pipes, vents and boxes on the walls (lib/town.js): downpipes off the
+// roofs, a tank and a box unit in the alleys, conduits, vents and a fan.
+town.pipe(6.5, 63, 'S').pipe(4, 53, 'W').pipe(47.2, 63, 'S').pipe(27.6, 79, 'N').pipe(53, 85.5, 'W');
+town.fixture('wall-tank', 14, 56.5, 'E', { z: 3.2 }).fixture('wall-tank', 17, 84.5, 'E', { z: 3 });
+town.fixture('wall-unit', 45, 56, 'W', { z: 2.4 }).fixture('wall-unit', 30, 83.5, 'E', { z: 2.2 });
+town.fixture('conduit-4', 49.5, 63, 'S', { z: 5.2 }).fixture('conduit-6', 30, 87.5, 'E', { z: 4.6 }).fixture('conduit-3', 57.5, 78, 'N', { z: 4.2 });
+town.vent(35.6, 63, 'S', { z: 2.3, tex: 'wall-fan' }).vent(36.4, 63, 'S', { z: 1.5, tex: 'wall-meter' });
+town.vent(23, 79, 'N', { z: 1.1, tex: 'vent-slats' }).vent(55.6, 78, 'N', { z: 3.6, tex: 'vent-round' });
+town.vent(9, 63, 'S', { z: 4.6, tex: 'vent-grille' });
+town.vent(16, 53.5, 'W', { z: 4, tex: 'vent-round' }).vent(28, 55, 'E', { z: 3.4, tex: 'vent-slats' });
+
 // For now the street ends at an exit (until the town goes on east).
 p.rect(60, 64, 62, 76, town.street(0, { exit: true }));
 

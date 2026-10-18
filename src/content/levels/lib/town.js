@@ -18,6 +18,7 @@
 import { DOMES } from '../../models/dome.js';
 import { AWNING_CLOTHS, AWNING_DEPTHS, AWNING_POLES, AWNING_SLOPE, poleId } from '../../models/awning.js';
 import { TIN_DEPTHS, TIN_METALS, TIN_SLOPE } from '../../models/tin.js';
+import { PIPE_HEIGHTS } from '../../models/pipes.js';
 import { valueNoise, random } from './noise.js';
 
 /**
@@ -397,6 +398,52 @@ export class Town {
       }
     }
     return this;
+  }
+
+  /**
+   * A downpipe down a building's straight outside wall, from its roofline
+   * to the street: (x, y) on the wall's edge, `face` the way the wall looks
+   * (as for `door`). Its height is the wall's, from the tile behind it.
+   */
+  pipe(x, y, face, { floorZ = 0 } = {}) {
+    const [bx, by] = this._behind(x, y, face);
+    const c = this.p.get(bx, by);
+    const h = Math.round((c?.slab ? c.slab.top : c?.floorZ ?? 0) - floorZ);
+    if (!PIPE_HEIGHTS.includes(h)) throw new Error(`Town: no wall for a downpipe at (${x}, ${y}) (its wall is ${h} high; pipes are ${PIPE_HEIGHTS[0]} to ${PIPE_HEIGHTS.at(-1)})`);
+    return this.fixture(`pipe-${h}`, x, y, face, { z: floorZ });
+  }
+
+  /**
+   * A model made to hang on a wall (built looking south, its back on y = 0:
+   * a `conduit-<length>`, the `wall-tank`, the `wall-unit`), at (x, y) on
+   * a straight wall's edge, its base at height `z`, turned to look `face`.
+   */
+  fixture(type, x, y, face, { z = 0 } = {}) {
+    const angle = { S: 0, E: 90, N: 180, W: 270 }[face];
+    if (angle === undefined) throw new Error(`Town: "${type}" at (${x}, ${y}) needs a face (N, E, S or W)`);
+    // (A hair out from the wall, so it takes its light from the street in front.)
+    const out = face === 'S' || face === 'E' ? 0.01 : -0.01;
+    const ns = face === 'N' || face === 'S';
+    this.things.push({ type, x: ns ? x : x + out, y: ns ? y + out : y, z, angle });
+    return this;
+  }
+
+  /**
+   * A vent, fan or gauge on a wall (a decal: `vent-grille`, `vent-slats`,
+   * `vent-round`, `wall-fan`, `wall-meter`), its middle at height `z`, at
+   * (x, y) on a straight wall's edge, looking `face`.
+   */
+  vent(x, y, face, { z = 3, tex = 'vent-grille', scale } = {}) {
+    this.decals.push({ x, y, z, face, tex, ...(scale !== undefined && { scale }) });
+    return this;
+  }
+
+  /** The tile behind (x, y) on a wall's edge that looks `face`: the wall's own tile. */
+  _behind(x, y, face) {
+    if (face === 'S') return [Math.floor(x), y - 1];
+    if (face === 'N') return [Math.floor(x), y];
+    if (face === 'E') return [x - 1, Math.floor(y)];
+    return [x, Math.floor(y)];
   }
 
   /**

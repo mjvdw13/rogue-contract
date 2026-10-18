@@ -254,3 +254,26 @@ test('an awning rising above the wall behind it is an error', () => {
   town.house(4, 4, 16, 10, { h: 4 });
   assert.throws(() => town.awning(6, 10, 14, 13, { z: 3.25, face: 'S' }), /above the wall behind it/);
 });
+
+test("a downpipe is as tall as its wall, and wall fixtures turn to face their wall, a hair out from it", () => {
+  const { town } = kit();
+  town.house(4, 4, 16, 10, { h: 6 });
+  town.house(20, 4, 26, 12, { h: 4 });
+  town.pipe(8.5, 10, 'S').pipe(26, 7, 'E').fixture('wall-tank', 4, 7, 'W', { z: 3 });
+  const [a, b, tank] = town.things;
+  assert.equal(a.type, 'pipe-6');
+  assert.equal(b.type, 'pipe-4');
+  assert.deepEqual([a.angle, b.angle, tank.angle], [0, 90, 270]);
+  assert.ok(a.y > 10 && b.x > 26 && tank.x < 4, 'out on the street side of the wall');
+  assert.equal(tank.z, 3);
+  for (const t of town.things) assert.ok(registry.things.get(t.type), `${t.type} is a decoration`);
+  assert.throws(() => town.pipe(30.5, 20, 'S'), /no wall for a downpipe/);
+});
+
+test('a vent is a decal on the wall', () => {
+  const { town } = kit();
+  town.house(4, 4, 16, 10, { h: 6 });
+  town.vent(8, 10, 'S', { z: 4, tex: 'vent-round' });
+  assert.deepEqual(town.decals.at(-1), { x: 8, y: 10, z: 4, face: 'S', tex: 'vent-round' });
+  assert.ok(registry.textures.get('vent-round')?.decal);
+});

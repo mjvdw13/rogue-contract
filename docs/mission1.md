@@ -186,6 +186,14 @@ Check a street from several angles, not just down its length.
   panel), a triangle of tin closing each end (`models/tin.js`). Seen
   mostly from down the street, over the roofline. An awning under one
   has to stay below the wall behind it (the kit says so if not).
+- **Pipes, boxes and vents** on the walls: `pipe()` runs a downpipe from
+  a wall's roofline to the street (as tall as the wall); `fixture()` hangs
+  a model built for a wall (`conduit-<length>`, `wall-tank`, `wall-unit`,
+  `models/pipes.js`) at a height; `vent()` puts a decal on one
+  (`vent-grille`, `vent-slats`, `vent-round`, `wall-fan`, `wall-meter`,
+  cut from DF grilles, louvres and panels by derive.mjs). All placed on a
+  straight wall's edge like a door, and none under an awning (the
+  awning's slab would cut through them).
 - **Tarps** (`tarp()`): a stall's cover, a cloth tied at its four corners
   to poles (or its back two to a wall), sagging and billowing (a hanging,
   `tarp-<cloth>`, the awning canvas). Its ground is in its shade

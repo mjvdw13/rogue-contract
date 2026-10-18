@@ -2,6 +2,7 @@ import { defineDecoration } from '../engine/defs.js';
 import { DOMES } from './models/dome.js';
 import { AWNING_MODELS, AWNING_POLES, poleId } from './models/awning.js';
 import { TIN_MODELS } from './models/tin.js';
+import { PIPE_MODELS } from './models/pipes.js';
 
 // Scenery. Solid ones block movement; ones with health can be shot (and
 // `explode`).
@@ -37,6 +38,8 @@ export default [
   ...AWNING_POLES.map((h) => defineDecoration({ id: poleId(h), model: poleId(h), solid: true, radius: 0.12, height: h })),
   // Tin roofs on Mos Eisley's lean-tos (on the roofs, out of reach).
   ...TIN_MODELS.map((id) => defineDecoration({ id, model: id })),
+  // Pipes, conduits, a tank and a box unit on Mos Eisley's walls (against the wall, so not solid).
+  ...PIPE_MODELS.map((id) => defineDecoration({ id, model: id })),
   defineDecoration({ id: 'ceiling-lamp', glyph: 'l', sheet: S('ceiling-lamp', 48, 16), hanging: true, fullbright: true }),
   defineDecoration({
     id: 'fuel-barrel',

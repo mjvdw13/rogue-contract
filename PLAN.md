@@ -144,10 +144,10 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
           ribbed panel): sloped sheets with an overhang, `town.leanTo()`;
           C's lean-to and B's porch. (Tin patches on flat roofs dropped:
           nobody in the street sees a roof.)
-    - [ ] Vents and pipes: wall decals (grilles, a fan, a junction box)
-          cut from DF textures; pipe models (downpipes by height, conduits
-          by length, a wall tank, a box unit); `town.pipe()`,
-          `town.vent()`.
+    - [x] Vents and pipes: wall decals (grilles, a fan, gauges) cut
+          from DF textures; pipe models (downpipes by height, conduits by
+          length, a wall tank, a box unit); `town.pipe()`,
+          `town.fixture()`, `town.vent()`.
     - [ ] Street clutter, a library (`models/clutter.js`): crates, barrels,
           clay jars, sacks, a trash heap and litter, rubble, scrap sheets,
           a vaporator, a bench. `town.clutter()` sets groups along the
