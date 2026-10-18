@@ -120,6 +120,19 @@ These need Mark to try something, or to decide. Don't start them without him.
   average but 3 to 4 standing by the queue's tarp (not yet looked into:
   maybe drop the tarp or make it smaller).
 
+- **Calm troopers and Jawas in Mos Eisley** (`?map=m1`, 2026-10-18,
+  `things/calm.js`): a pair of sandtroopers walking the main street from
+  the west end to the blast doors and back, one walking round the
+  market, a guard at the blast doors, and six Jawas (two haggling at the
+  droid seller's pen, three about the street and market, one in the north
+  back lane). Bump into one or press use to hear a line. Firing a blaster
+  or hitting anyone turns the whole town at once (nothing else happens
+  yet: m1 has no `on: 'hostile'` trigger). How they walk (2 tiles a
+  second, the walk slowed to match; Jawas 2.4), how many, the lines (the
+  Jawaese is made up), and whether Jawas should run rather than fight
+  when the town turns (the story has civilians run; Jawas are monsters,
+  so they fight).
+
 ## Next up
 
 In this order unless Mark says otherwise.
@@ -182,8 +195,9 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
 - [ ] **The old quarter and the dry wash.**
 - [ ] **The derelict bay** and the gutted freighter.
 - [ ] **The skyline:** dunes and mesas in the backdrop, the town's edges.
-- [ ] **Life:** calm troopers and the switch (section 5), patrols,
-      villagers, Jawas and the cantina's customers placed.
+- [ ] **Life:** the cantina's customers, the customs officer, the
+      dewback with the patrol; an `on: 'hostile'` trigger (blast doors,
+      reinforcements, music). Calm troopers and Jawas are placed.
 - [ ] **Air and sound:** dust, emitters, ambient sound, the cantina band
       (sections 2 and 3).
 - [ ] **The story:** conversations, the fob, the drop-off and pickup, the
@@ -337,21 +351,6 @@ conversations, then the fob.
       for a few seconds, HUD and weapon hidden, input locked; use or fire
       skips. An override of `world.camera()`.
 - [ ] **`wait` in trigger lists:** a trigger's actions can pause.
-- [ ] **Calm monsters** (2026-10-18: Jawas wandering Mos Eisley's
-      streets, sandtroopers on patrol, none attacking): a placement's
-      `calm` (`true`, or `{ lines, wander, patrol, loop, speed, idleTime }`
-      over the type's own `calm`) skips the sight check and noise, and the
-      monster stands its post, strolls like a friendly, or walks `patrol`
-      (a list of points, straight walks between them, there and back
-      unless `loop`), pausing at each. Bumped or used, it turns to you and
-      says a line. Hurt, it turns normal.
-  - [x] Engine: `things/calm.js`, defs, validator (points in the open and
-        in sight of each other), MODDING.md, tests.
-  - [x] **The town's switch:** a `hostile` action and an `on: 'hostile'`
-        trigger turn every calm monster normal at once; the player firing
-        a noisy weapon or hurting anyone runs it.
-  - [ ] Mos Eisley: sandtrooper patrols on the main street and the
-        market, Jawas strolling; snapshots; then Waiting on Mark.
 - [ ] **Conversations:** an `on: 'talk'` trigger from `npcReact`, lines that
       move on with each use, story flags (`setFlag`, `if` on triggers).
 - [ ] **The tracking fob:** a weapon with no attack, a per-tick weapon hook
@@ -359,7 +358,7 @@ conversations, then the fob.
       actions.
 - [ ] **`remove` and `place` actions.**
 - [ ] **`damage { tag, amount }` action** (the overload hurts the prototype).
-- [ ] Nice to have: patrol routes, villagers who see a shooting
+- [ ] Nice to have: villagers who see a shooting
       running too (only the one hit runs today), factions (Tuskens
       against troopers).
 - [ ] Fixes that go with these: the level checker skips models placed high or

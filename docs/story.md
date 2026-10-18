@@ -314,8 +314,8 @@ triggers and actions.
 
 | Feature | What it does | Built from | Size | Used in |
 |---------|--------------|------------|------|---------|
-| **Calm troopers and the town's switch** | A placed monster can start `calm`: it stands its post or wanders, says lines when bumped or used, and doesn't attack. A `hostile` action flips every calm monster on the level to a normal monster at once. Firing a weapon or hitting anyone while calm monsters are on the level runs it too. An `on: 'hostile'` trigger closes doors, spawns the reinforcements and changes the music. | NPC and monster code | Small to medium | M1 |
-| **Patrol routes** | `patrol: 'street'` walks tiles tagged `street-1`, `street-2` and so on, in order, with pauses. Without it, calm troopers just wander, as NPCs do. | The flow field | Small to medium, nice to have | M1 |
+| **Calm troopers and the town's switch** | A placed monster can start `calm`: it stands its post or wanders, says lines when bumped or used, and doesn't attack. A `hostile` action flips every calm monster on the level to a normal monster at once. Firing a weapon or hitting anyone while calm monsters are on the level runs it too. An `on: 'hostile'` trigger closes doors, spawns the reinforcements and changes the music. Built (2026-10-18). | NPC and monster code | Small to medium | M1 |
+| **Patrol routes** | `calm: { patrol: [[x, y], ...] }` walks straight from point to point, in order, with pauses, there and back (or round). Without it, calm troopers just wander, as NPCs do. Built (2026-10-18). | Calm monsters | Small to medium, nice to have | M1 |
 | **The tracking fob** | A weapon slot with no attack, whose light blinks with the signal (a new weapon `onThink` hook), a beep whose speed follows the distance, a `setSignal` action, and a way to take the fob away. | Weapons | Small to medium | M1 |
 | **Conversations** | NPC lines that move on each time you use them, lines that depend on story flags, an `on: 'talk'` trigger, and a `setFlag` action plus `if` conditions on triggers. Enough for the broker, the Jawa and the informant. Jan and Kyle's radio lines are plain messages (`JAN: ...`). | NPC lines, triggers | Small to medium | M1 |
 | **Flying models** | A `fly` action moves a tagged model decoration along keyframes (position, height, facing, time), for the Crow landing and leaving and the shuttle leaving. It's only solid while it stands still. | Model decorations | Small | All |
@@ -332,7 +332,7 @@ Mission 1's opening and a calm trooper could look like this:
 
 ```js
 at('moldy-crow', 20, 90, { tag: 'crow', z: 30 }),   // starts high above the bay
-at('stormtrooper', 40.5, 22.5, { calm: { patrol: 'street', lines: ['Move along.', 'Hunter.'] } }),
+at('stormtrooper', 40.5, 22.5, { calm: { patrol: [[40.5, 22.5], [80.5, 22.5]], lines: ['Move along.', 'Hunter.'] } }),
 // on the level:
 triggers: [
   { on: 'start', do: [
