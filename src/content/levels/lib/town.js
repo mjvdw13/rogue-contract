@@ -26,22 +26,34 @@ export const SUNS = [
   { az: 238, elev: 50, drop: 32 },
 ];
 
+/**
+ * The feet of the buildings' walls: a band of `tex` up to height `to`. A
+ * building picks one by name with `skirt` (or gives its own `{ tex, to }`,
+ * or null for none), so they aren't all alike.
+ */
+export const SKIRTS = {
+  // Dirt kicked up from the street, darker toward the ground.
+  dirt: { tex: 'adobe-skirt', to: 1 },
+  // A plinth of bare mud brick under the plaster.
+  plinth: { tex: 'adobe-brick', to: 1.5 },
+};
+
 export class Town {
   /**
    * @param {import('./painter.js').Painter} p
    * @param {{sky?:number, light?:number, wall?:string, roof?:string, floor?:string}} opts
    *   `sky`: the height of the open sky over walkable ground; `light`: sunlight.
-   *   `skirt`: the dirty foot of every building's walls, a band of `tex` up
-   *   to height `to` (null for none).
+   *   `skirt`: the foot of a building's walls unless it says otherwise (see
+   *   `SKIRTS`; null for none).
    */
-  constructor(p, { sky = 24, light = 216, wall = 'adobe', roof = 'adobe-roof', floor = 'street-sand', skirt = { tex: 'adobe-skirt', to: 1 } } = {}) {
+  constructor(p, { sky = 24, light = 216, wall = 'adobe', roof = 'adobe-roof', floor = 'street-sand', skirt = 'dirt' } = {}) {
     this.p = p;
     this.sky = sky;
     this.light = light;
     this.wall = wall;
     this.roof = roof;
     this.floor = floor;
-    this.bands = skirt ? [{ to: skirt.to, tex: skirt.tex }] : undefined;
+    this.skirt = skirt;
     /** Round props that cast shadows (domes): [x, y, radius, base, height]. */
     this.casters = [];
     /** Things the kit places (domes), for the level's list. */
@@ -78,9 +90,22 @@ export class Town {
     return { floor: this.floor, ceiling: 'sky', floorZ, ceilZ: this.sky, light: this.light, side: this.wall, ...extra };
   }
 
-  /** A roof at `h`: a block of raised floor whose sides are the building's walls, with the skirt at their foot. */
-  roofCell({ h, wall = this.wall, roof = this.roof, light = this.light, extra = {} }) {
-    return { floor: roof, ceiling: 'sky', floorZ: h, ceilZ: this.sky, light, side: wall, ...(this.bands && { bands: this.bands }), ...extra };
+  /**
+   * A roof at `h`: a block of raised floor whose sides are the building's
+   * walls, with its `skirt` at their foot (the town's, unless it names
+   * another or null).
+   */
+  roofCell({ h, wall = this.wall, roof = this.roof, light = this.light, skirt, extra = {} }) {
+    const bands = this._bands(skirt);
+    return { floor: roof, ceiling: 'sky', floorZ: h, ceilZ: this.sky, light, side: wall, ...(bands && { bands }), ...extra };
+  }
+
+  /** The wall bands for a building's `skirt` (undefined: the town's). */
+  _bands(skirt) {
+    const s = skirt === undefined ? this.skirt : skirt;
+    const k = typeof s === 'string' ? SKIRTS[s] : s;
+    if (typeof s === 'string' && !k) throw new Error(`Town: no skirt "${s}"`);
+    return k ? [{ to: k.to, tex: k.tex }] : undefined;
   }
 
   /**
@@ -89,16 +114,26 @@ export class Town {
    * tiles of a building, thinning out in patches by a noise. Only in full
    * sun: pale sand in the shade snaps to the palette's olive greys and looks
    * like puddles. Run it after `finish()`.
+   *
+   * Each tile corner is sand or drift, and a tile with some of each takes
+   * the edge texture for its corners (`tex-1` to `tex-14`, made by
+   * assets/custom/derive.mjs): the drift's edge wanders through the tile
+   * rather than following the grid.
    */
-  drifts({ tex = 'street-drift', reach = 2, seed = 7 } = {}) {
+  drifts({ tex = 'street-drift', reach = 3, seed = 7 } = {}) {
     const { p } = this;
+    const { w, h } = p;
     const open = (c) => c && !c.wall && !c.door && c.ceiling === 'sky' && !c.slab && c.floor === this.floor && c.light >= this.light;
-    const out = [];
-    for (let y = 0; y < p.h; y++) {
-      for (let x = 0; x < p.w; x++) {
+    // How much each tile wants drift: open ground near a building by
+    // distance and a noise, a building's foot a little, anything else not at all.
+    const score = new Float32Array(w * h).fill(-1);
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
         const c = p.get(x, y);
-        if (!open(c)) continue;
-        // How close the nearest building's foot is (a tile higher than this one).
+        if (!open(c)) {
+          if (c.floorZ > 1 && !c.wall && !c.slab) score[y * w + x] = 0.4;
+          continue;
+        }
         let near = Infinity;
         for (let dy = -reach; dy <= reach; dy++) {
           for (let dx = -reach; dx <= reach; dx++) {
@@ -106,9 +141,26 @@ export class Town {
             if (n && (n.floorZ ?? 0) > (c.floorZ ?? 0) + 1) near = Math.min(near, Math.max(Math.abs(dx), Math.abs(dy)));
           }
         }
-        if (near > reach) continue;
-        const n = valueNoise(x, y, 3, seed);
-        if (n > 0.35 + (near - 1) * 0.25) out.push([x, y, { ...c, floor: tex }]);
+        if (near <= reach) score[y * w + x] = valueNoise(x, y, 4, seed) - 0.2 - (near - 1) * 0.2;
+      }
+    }
+    // A corner is drift when the tiles round it want it, and none of them is
+    // ground that can't take it (so no edge stops short at a tile's side).
+    const corner = new Uint8Array((w + 1) * (h + 1));
+    for (let y = 1; y < h; y++) {
+      for (let x = 1; x < w; x++) {
+        const s = [score[(y - 1) * w + x - 1], score[(y - 1) * w + x], score[y * w + x], score[y * w + x - 1]];
+        if (s.every((v) => v > -1) && s[0] + s[1] + s[2] + s[3] > 0) corner[y * (w + 1) + x] = 1;
+      }
+    }
+    const out = [];
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const c = p.get(x, y);
+        if (!open(c)) continue;
+        const k = y * (w + 1) + x;
+        const m = corner[k] | (corner[k + 1] << 1) | (corner[k + w + 2] << 2) | (corner[k + w + 1] << 3);
+        if (m) out.push([x, y, { ...c, floor: m === 15 ? tex : `${tex}-${m}` }]);
       }
     }
     for (const [x, y, c] of out) p.set(x, y, c);
@@ -196,11 +248,13 @@ export class Town {
    * wall along it, the open side's cell plus `wall` (say `{ wall: 'adobe',
    * wallTop: 6 }`: under the sky, the wall stops at its building's roof and
    * the view goes on over it). `open: 'in'` (a room, a pit) or `'out'` (a
-   * round building, a pillar) says which side people walk on.
+   * round building, a pillar) says which side people walk on. A round
+   * building's wall gets its `skirt` (see `roofCell`).
    */
-  circle(cx, cy, r, { inside, outside, wall, open = 'in' }) {
-    // (A round building's wall gets the skirt at its foot.)
-    if (open === 'out' && this.bands && wall) wall = { bands: this.bands, ...wall };
+  circle(cx, cy, r, { inside, outside, wall, open = 'in', skirt }) {
+    // (A round building's wall gets its skirt at its foot.)
+    const bands = open === 'out' && wall ? this._bands(skirt) : undefined;
+    if (bands) wall = { bands, ...wall };
     for (let y = Math.floor(cy - r) - 1; y <= Math.ceil(cy + r); y++) {
       for (let x = Math.floor(cx - r) - 1; x <= Math.ceil(cx + r); x++) this._arcTile(x, y, cx, cy, r, { inside, outside, wall, open });
     }
@@ -210,7 +264,7 @@ export class Town {
   /**
    * A building: a volume over the box, its corners rounded to radius `r`
    * (0: square), its roof at `h` (see `roofCell` for `wall`, `roof`,
-   * and `light`). `tiers` stack more of it on top, each a box (`[x0, y0, x1, y1]`)
+   * `light` and `skirt`). `tiers` stack more of it on top, each a box (`[x0, y0, x1, y1]`)
    * inside it with its own `h` and `r`: a storey set back from the street.
    * The ground round the rounded corners keeps whatever was there.
    * `dome` tops it with a dome (a topper) on its highest box, as wide as
@@ -233,7 +287,8 @@ export class Town {
   _rounded(x0, y0, x1, y1, r, h, opts) {
     const p = this.p;
     const inside = this.roofCell({ ...opts, h });
-    const wall = { wall: opts.wall ?? this.wall, wallTop: h, ...(this.bands && { bands: this.bands }) };
+    const bands = this._bands(opts.skirt);
+    const wall = { wall: opts.wall ?? this.wall, wallTop: h, ...(bands && { bands }) };
     for (let y = y0; y < y1; y++) {
       for (let x = x0; x < x1; x++) {
         const cx = x < x0 + r ? x0 + r : x >= x1 - r ? x1 - r : null;

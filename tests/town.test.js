@@ -68,10 +68,44 @@ test('sand drifts lie along the walls in the sun, not in the open or the shade',
   town.house(4, 4, 36, 10, { h: 2 });
   town.finish();
   town.drifts();
-  const drift = (y) => Array.from({ length: 28 }, (_, k) => p.get(6 + k, y)).filter((c) => c.floor === 'street-drift');
+  const drift = (y) => Array.from({ length: 28 }, (_, k) => p.get(6 + k, y)).filter((c) => c.floor.startsWith('street-drift'));
   assert.ok(drift(10).length > 0, 'beside the wall');
   assert.equal(drift(30).length, 0, 'out in the open');
   assert.ok(drift(10).every((c) => c.light >= town.light), 'only in full sun');
+});
+
+test("a drift's edge tiles agree with their neighbours at every corner they share", () => {
+  const { p, town } = kit();
+  town.house(4, 4, 36, 10, { h: 2 });
+  town.house(14, 20, 26, 30, { h: 3 });
+  town.finish();
+  town.drifts();
+  // A tile's corners as drift bits (NW 1, NE 2, SE 4, SW 8), from its floor.
+  const bits = ({ floor = '' }) => (floor === 'street-drift' ? 15 : floor.startsWith('street-drift-') ? Number(floor.slice(13)) : floor === 'street-sand' ? 0 : null);
+  let edges = 0;
+  for (let y = 1; y < 39; y++) {
+    for (let x = 1; x < 39; x++) {
+      const a = bits(p.get(x, y));
+      if (a === null) continue;
+      if (a > 0 && a < 15) edges++;
+      const east = bits(p.get(x + 1, y));
+      const south = bits(p.get(x, y + 1));
+      if (east !== null) assert.equal(((a >> 1) & 1) | (((a >> 2) & 1) << 1), (east & 1) | (((east >> 3) & 1) << 1), `(${x}, ${y}) and east`);
+      if (south !== null) assert.equal(((a >> 3) & 1) | (((a >> 2) & 1) << 1), (south & 1) | (((south >> 1) & 1) << 1), `(${x}, ${y}) and south`);
+    }
+  }
+  assert.ok(edges > 0, 'some tiles are edges');
+});
+
+test('buildings pick their skirt, or none', () => {
+  const { p, town } = kit();
+  town.house(4, 4, 10, 10, { h: 4, skirt: 'plinth' });
+  town.house(14, 4, 20, 10, { h: 4, skirt: null });
+  town.house(24, 4, 30, 10, { h: 4 });
+  assert.equal(p.get(6, 4).bands[0].tex, 'adobe-brick');
+  assert.equal(p.get(16, 4).bands, undefined);
+  assert.equal(p.get(26, 4).bands[0].tex, 'adobe-skirt', "the town's own");
+  assert.throws(() => town.house(4, 20, 10, 26, { h: 4, skirt: 'gold' }), /no skirt "gold"/);
 });
 
 test('a door is set into its wall: a recess, the door on its back wall and a step outside', () => {

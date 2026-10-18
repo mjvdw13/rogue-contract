@@ -180,12 +180,17 @@ Check a street from several angles, not just down its length.
 - **Plasters and the skirt:** houses come in five plasters (`adobe`,
   `adobe-pale`, `adobe-ochre`, `adobe-rose`, `adobe-grey`), domes in each.
   The palette has no golden ochres, so ochre comes out terracotta: use it
-  sparingly, as the accent. Every building wall, rounded corners
-  included, has a dirty skirt along its foot (`adobe-skirt`, a band up to
-  1 tile: `skirt` on the kit).
+  sparingly, as the accent. A building's walls, rounded corners included,
+  can have a band along their foot (`skirt`, `SKIRTS` in the kit): dirt
+  (`adobe-skirt`, up to 1 tile), a plinth of mud brick (`adobe-brick`, up
+  to 1.5) or none. Not all alike (Mark, 2026-10-17).
 - **Sand drifts** (`drifts()`, after `finish()`): pale loose sand along the
   walls, in patches, only in full sun (pale sand in the shade snaps to
-  olive greys and looks like puddles).
+  olive greys and looks like puddles). Tile corners are sand or drift, and
+  a tile with some of each takes one of 14 edge textures
+  (`street-drift-1` to `-14`, made by `derive.mjs`), whose edge wanders
+  through the tile on a noise that repeats every tile, so the drifts'
+  outlines are soft and don't follow the grid (Mark: not blocky).
 - **Shadows** (`shadows()`, run by `finish()` after `seal()`): see Light
   and air.
 - **Glyphs:** the painter's glyph pool grows to several thousand for this

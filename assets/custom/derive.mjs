@@ -105,6 +105,59 @@ export const DECALS = [
   { out: 'window-louvre', df: 'NPVENTS1', size: [40, 48], gradient: TEAL, keep: 0, contrast: 0.9, mask: 'arch', rim: REVEAL },
 ];
 
+/**
+ * The edges of the street's sand drifts: one 64x64 texture for each way a
+ * tile's corners can be sand or drift (bit 1 its north-west corner, 2
+ * north-east, 4 south-east, 8 south-west), `street-drift-1` to `-14`. Each
+ * texel blends the corners and adds a noise that repeats every tile, so a
+ * drift's edge wanders across the tile and meets the next tile's edge
+ * exactly. A quarter of the texture shows on each tile (the floors are
+ * world-aligned, 64 texels to 2 tiles), so each quarter is cut the same.
+ */
+export const DRIFT_EDGES = { sand: 'street-sand', drift: 'street-drift', out: 'street-drift', amp: 0.7 };
+
+/** Smooth value noise in 0-1 that repeats every `period` texels, over cells of `cell`. */
+function periodicNoise(x, y, cell, period, seed) {
+  const n = period / cell;
+  const h = (i, j) => {
+    let v = Math.imul(((i % n) + n) % n * 374761393 + (((j % n) + n) % n) * 668265263 + seed * 1442695041, 1274126177);
+    v = Math.imul(v ^ (v >>> 13), 1103515245);
+    return ((v ^ (v >>> 16)) >>> 0) / 4294967296;
+  };
+  const fx = x / cell;
+  const fy = y / cell;
+  const i = Math.floor(fx);
+  const j = Math.floor(fy);
+  const u = (fx - i) * (fx - i) * (3 - 2 * (fx - i));
+  const v = (fy - j) * (fy - j) * (3 - 2 * (fy - j));
+  const a = h(i, j) + (h(i + 1, j) - h(i, j)) * u;
+  const b = h(i, j + 1) + (h(i + 1, j + 1) - h(i, j + 1)) * u;
+  return a + (b - a) * v;
+}
+
+/** The drift edge for corner bits `m` (see DRIFT_EDGES), from the sand and drift images. */
+export function driftEdge(sand, drift, m, amp = DRIFT_EDGES.amp) {
+  const { width: w, height: h } = sand;
+  const data = new Uint8Array(sand.data);
+  const T = 32;
+  const c = [m & 1, (m >> 1) & 1, (m >> 2) & 1, (m >> 3) & 1].map(Number);
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const lx = x % T;
+      const ly = y % T;
+      const u = (lx + 0.5) / T;
+      const v = (ly + 0.5) / T;
+      const blend = (c[0] * (1 - u) + c[1] * u) * (1 - v) + (c[3] * (1 - u) + c[2] * u) * v;
+      const n = periodicNoise(lx, ly, 8, T, 3) * 0.65 + periodicNoise(lx, ly, 4, T, 4) * 0.35;
+      if (blend + amp * (n - 0.5) > 0.5) {
+        const i = (y * w + x) * 4;
+        data.set(drift.data.subarray(i, i + 4), i);
+      }
+    }
+  }
+  return { width: w, height: h, data };
+}
+
 /** Colour at position t (0..1) along a gradient of key colours. */
 function along(keys, t) {
   const f = Math.max(0, Math.min(1, t)) * (keys.length - 1);
@@ -251,6 +304,7 @@ function packFiles() {
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const pack = packFiles();
+  const made = new Map();
   for (const spec of TOWN) {
     let img = decodePNG(fs.readFileSync(pack.get(spec.df)));
     if (spec.crop) img = cropped(img, spec.crop);
@@ -259,9 +313,15 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     img = gradientMap(img, spec);
     if (spec.fade) img = faded(img, spec.fade);
     for (let i = 3; i < img.data.length; i += 4) img.data[i] = 255;
+    made.set(spec.out, img);
     fs.writeFileSync(path.join(texDir, `${spec.out}.png`), encodePNG(img.width, img.height, img.data));
     console.log(`${spec.out}.png from ${spec.df} (${img.width}x${img.height})`);
   }
+  for (let m = 1; m < 15; m++) {
+    const img = driftEdge(made.get(DRIFT_EDGES.sand), made.get(DRIFT_EDGES.drift), m);
+    fs.writeFileSync(path.join(texDir, `${DRIFT_EDGES.out}-${m}.png`), encodePNG(img.width, img.height, img.data));
+  }
+  console.log(`${DRIFT_EDGES.out}-1..14.png, the drifts' edges`);
   for (const spec of DECALS) {
     let img = decodePNG(fs.readFileSync(pack.get(spec.df)));
     if (spec.crop) img = cropped(img, spec.crop);
