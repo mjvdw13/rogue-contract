@@ -9,6 +9,7 @@ import { LightEffects } from './lights.js';
 import { LightMap } from './lightmap.js';
 import { Particles } from './particles.js';
 import { Weather } from './weather.js';
+import { Hangings } from './hangings.js';
 import { Explosions } from './explosions.js';
 import { GLINT_REACH } from './lightsources.js';
 import { FlowField, WALKER } from './nav.js';
@@ -115,6 +116,9 @@ export class World {
     this.particles = new Particles(this.map, [...this.registry.particles.values()], this.registry.paletteDef?.ramps);
     /** Dust or sand in the air round the camera, under the sky (world/weather.js); filled on the first tick. */
     this.weather = level.weather ? new Weather(this.particles, this.map, level.weather) : null;
+    /** Ropes and cloth hanging from fixed points, moving in the air (world/hangings.js): cosmetic. */
+    this.hangings = new Hangings(this.map, [...this.registry.hangings.values()], level.hangings ?? [], this.registry.paletteDef?.ramps, level.weather?.wind);
+    this.buildErrors.push(...this.hangings.errors);
     /** Explosions made of particles, a flash and a sound (world/explosions.js), set off with explode(). */
     this.explosions = new Explosions(this);
     this.lights = new LightEffects(this.map, this.rng, this.lightmap);
@@ -708,6 +712,7 @@ export class World {
     this.explosions.update(dt);
     this.particles.update(dt);
     this.weather?.update(pt.x, pt.y);
+    this.hangings.update(dt, pt.x, pt.y);
     const dyn = this.dynamicLights();
     this.lightmap.setDynamic(dyn);
     this.lightmap.update();

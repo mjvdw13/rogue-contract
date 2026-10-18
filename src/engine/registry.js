@@ -22,6 +22,7 @@ export class Registry {
     this.things = new Map();
     this.sounds = new Map();
     this.particles = new Map();
+    this.hangings = new Map();
     this.explosions = new Map();
     this.songs = new Map();
     this.levels = new Map();
@@ -41,6 +42,7 @@ export class Registry {
     this._addAll(pack.things, this.things, 'thing');
     this._addAll(pack.sounds, this.sounds, 'sound');
     this._addAll(pack.particles, this.particles, 'particle');
+    this._addAll(pack.hangings, this.hangings, 'hanging');
     this._addAll(pack.explosions, this.explosions, 'explosion');
     this._addAll(pack.songs, this.songs, 'song');
     this._addAll(pack.levels, this.levels, 'level');

@@ -92,7 +92,61 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
       loud half (section 5).
 - [ ] **Tune:** light, frame time with a full market, the per-skill table.
 
-### 2. Particles into the game (from the particle system, 2026-10-15)
+### 2. Hangings: cables and cloth that sway (Mark, 2026-10-17)
+
+Cables strung between buildings, and ropes and ragged cloth hanging from
+them, swaying gently in the air: life for Mos Eisley (the market's hanging
+cloth, the alleys' laundry lines). Cosmetic, like particles: they never
+touch gameplay, keep their own clock and never use `world.rng`. Budget:
+the whole town's under 0.5 ms a frame, simulation and drawing together.
+
+- **Simulation** (`world/hangings.js`): points in typed arrays (position,
+  last position, pinned), links as index pairs with rest lengths (a
+  cloth's run across each cell too, so it holds together as a sheet).
+  Verlet: gravity, drag toward the air, `stiffness` passes over the links
+  (forward then back), then tethers: each free point is never further
+  from its pins than it was at rest (both ends of a strung cable: onto the
+  circle where the two spheres meet), so long chains don't stretch and a
+  cable keeps its sag. The air is the level's wind (times the type's
+  `wind`) plus a breeze of slow waves travelling down the street. Each
+  hanging steps every other tick (30 a second, half on even ticks and half
+  on odd). Hangings more than 40 tiles from the camera hold still; all
+  settle at load (2 s of steps).
+- **Drawing** (`render/hangings.js`, and the model drawer for cloth): a
+  rope segment is one span of rows per screen column, at least 1 px
+  thick, clipped like particles and writing `mdepth`. A cloth is a model
+  of one two-sided quad a cell, shaded by its slope.
+- **Content:** `defineHanging` (MODDING.md, Hangings); level `hangings`.
+
+Bench (Chromium, the Mos Eisley start, 504 columns, best of 6 batches of
+60 frames, `renderer.hangingMs`; the machine was busy, frames 12 to 16
+ms, a quiet run about a third less). Cables run right across the street,
+cloths are 1 x 1 m:
+
+| count | cables, draw | cables, move | cloths, draw | cloths, move |
+|-------|--------------|--------------|--------------|--------------|
+| 10    | 0.17         | 0.02         | 0.37         | 0.04         |
+| 20    | 0.32         | 0.05         | 0.46         | 0.07         |
+| 40    | 0.70         | 0.12         | 0.76         | 0.21         |
+| 80    | 1.16         | 0.18         | 1.33         | 0.31         |
+
+So about 10 cables and 10 cloths in view at once is the budget (0.4 ms on
+the quiet run, 0.6 on this one). Found on
+the way: the model drawer's per-pixel walk of the ledge windows was its
+hottest line in Mos Eisley (now a binary search per column: models there
+21% faster, byte-identical). The cap is 4096 points a level.
+
+Steps:
+
+- [x] First cuts of the simulation and drawing, and the bench.
+- [x] The content and level fields: defs, validator, MODDING.md, tests.
+- [ ] In Mos Eisley: cables across the street, a few rags and a banner.
+      Snapshots, then Waiting on Mark (the look, how fast they sway, how
+      many; and the cloth grid: 0.4 reads as tabs at the hem, 0.3 as torn
+      strips but costs half as much again).
+- [ ] Explosions push the hangings near them (a blast flaps the cloth).
+
+### 3. Particles into the game (from the particle system, 2026-10-15)
 
 The explosion styles (`src/content/explosions.js`) are only used by the
 detonator (`large`) and the concussion rifle (`concussion`).
@@ -116,7 +170,7 @@ detonator (`large`) and the concussion rifle (`concussion`).
       - [ ] The canyon: sand on the wind, with gusts.
 - [ ] Bench again with everything on (does the budget hold?).
 
-### 3. Mission 3 (the Canyon Garrison): detail and immersion
+### 4. Mission 3 (the Canyon Garrison): detail and immersion
 
 Engine pieces still to build, each proven in the level as it lands:
 
@@ -158,7 +212,7 @@ Areas, each with screenshots before and after:
 - [ ] **Tune and check:** light and sound mix, frame time, cover round the new
       props, the per-skill check; `docs/mission3.md`.
 
-### 4. Dark Forces systems
+### 5. Dark Forces systems
 
 - [ ] A mission briefing screen (scrolling text over a picture).
 - [ ] Mission objectives; the exit only works once they're done.
@@ -172,7 +226,7 @@ Areas, each with screenshots before and after:
 - [ ] A headlamp that drains batteries, infrared goggles and a gas mask.
 - [ ] Music that switches between exploration and combat (like iMUSE).
 
-### 5. For the story (`docs/story.md`)
+### 6. For the story (`docs/story.md`)
 
 Small or medium pieces, mostly extending existing code. Each new action or
 trigger goes in the validator (it rejects unknown actions), MODDING.md and a
@@ -204,7 +258,7 @@ conversations, then the fob.
       flying (the Crow); `spawn` stays quiet with `fog: false`; the headless
       play test skips opening cutscenes.
 
-### 6. Content for the slice
+### 7. Content for the slice
 
 - [ ] Enemies still missing: a commando, and the mini-boss (a prototype
       assault droid, an early Dark Trooper test).

@@ -576,6 +576,60 @@ across) about 70, so two at once already crowd each other. The bench page (`tool
 in the air or on the wall in front of you, once or every few seconds, with
 the real caps and a count of what's live.
 
+### Hangings: ropes, cables and cloth
+
+Cables strung between buildings, ropes and ragged cloth that sway in the
+air. They're only for looks: nothing in play touches them (you walk and
+shoot through them). Types are in `src/content/hangings.js`:
+
+```js
+defineHanging({
+  id: 'rag',
+  shape: 'cloth',          // 'rope' (the default) or 'cloth'
+  color: ['rust', 0.55],   // a palette ramp and a place on it, 0 dark to 1 light
+  breeze: 0.8,             // the breeze that comes and goes, units per second
+  drag: 2.5,               // how fast it takes up the air's speed, per second
+})
+```
+
+- `width`: a rope's thickness in units (0.04); it's never drawn thinner
+  than a pixel, nor thicker than 4.
+- `spacing`: units between its points (0.5 for a rope, 0.4 for a cloth).
+  Closer is smoother and costs more; a cloth's hem is ragged in steps of it.
+- `wind`: the share of the level's wind (its `weather.wind`) that carries
+  it (1). `breeze` moves it even in still air, in slow waves that travel
+  down the street, so neighbours move a little differently.
+- `gravity` (20), `damping` (0.98, the share of its speed kept each
+  sixtieth of a second), `stiffness` (2, passes a step that hold its
+  length), `folds` (a cloth's pleats: every other column of points this
+  far forward or back, 0.08, so the light picks them out),
+  `fullbright`.
+
+A level places them in its `hangings` list. Points are `[x, y, z]`, z the
+height above 0, not above the floor; tie them just in front of a wall
+(0.05 out), not in it:
+
+```js
+hangings: [
+  // A cable across the street, its middle 1.2 below its ends.
+  { type: 'cable', from: [13.8, 63.05, 5.6], to: [10, 77.95, 5.4], sag: 1.2 },
+  // A rope hanging 1.6 down from a wall.
+  { type: 'rope', from: [12, 63.05, 5], length: 1.6 },
+  // A cloth hanging 1.8 from the line between two points: its hem torn
+  // (ragged 0 to 1) and a few holes (the share of its cells missing).
+  { type: 'rag', from: [19.5, 66.05, 3.9], to: [22.5, 66.05, 3.9], length: 1.8, ragged: 0.8, holes: 0.1 },
+  // Laundry: pinned only at its top corners, so it sags between them.
+  { type: 'cloth-pale', from: [7, 77.95, 5.8], to: [9, 77.95, 5.8], length: 2.5, pin: 'corners' },
+]
+```
+
+A rope with a `to` is strung between two points (`sag`, 0.3 by default);
+without one it hangs `length` (1) from `from`. A cloth always has both.
+They settle before the level starts, and ones more than 40 tiles from you
+hold still. Cost (Chromium, the Mos Eisley street, ms a frame): a cable
+right across the view about 0.017 to draw, a 1 x 1 m cloth about 0.03;
+both about 0.003 to move. A level has room for 4096 points in all.
+
 ## Levels
 
 A level is an ASCII map. Add a file in `src/content/levels/`, import it in
@@ -605,6 +659,7 @@ export default defineLevel({
   fog: 0.05,                 // extra darkness with distance (the default)
   haze: { color: [32, 24, 64], half: 40 }, // outdoors, fade to this colour
   weather: { type: 'glint', count: 60 }, // particles in the air round you, outdoors
+  hangings: [],              // ropes, cables and cloth (see Hangings)
   tiles: [
     '###########',
     '#....#....#',

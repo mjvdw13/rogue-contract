@@ -485,6 +485,27 @@ export function defineParticle(def) {
 }
 
 /**
+ * A hanging type (world/hangings.js): a rope or cable, or a cloth, hanging
+ * from fixed points and moving in the air. A level places them (its
+ * `hangings`). Cosmetic: nothing in play touches them. `color` is a palette
+ * ramp and a place on it, 0 dark to 1 light (`['rust', 0.5]`); `width` is a
+ * rope's thickness in units (drawn at least a pixel); points sit about
+ * `spacing` units apart. They follow the level's wind (times `wind`) and a
+ * breeze of `breeze` units per second that comes and goes, taking up the
+ * air's speed at `drag` per second; `stiffness` passes a step hold their
+ * length, and `damping` is the share of their speed kept each sixtieth of a
+ * second. A cloth's `folds` set every other column of points that far
+ * forward or back, so the light picks out pleats.
+ * @param {{id:string, shape?:'rope'|'cloth', color?:[string, number], width?:number, spacing?:number,
+ *   gravity?:number, drag?:number, wind?:number, breeze?:number, stiffness?:number, damping?:number,
+ *   folds?:number, fullbright?:boolean}} def
+ */
+export function defineHanging(def) {
+  requireId(def, 'Hanging');
+  return { shape: 'rope', ...def, type: 'hanging' };
+}
+
+/**
  * An explosion (world/explosions.js): a recipe of particle bursts, a flash of
  * light, a sound and optionally a sprite effect, set off by id from code
  * (`world.explode`), things' `death.explosion`, projectiles' `explosion` and

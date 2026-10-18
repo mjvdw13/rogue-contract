@@ -4,6 +4,7 @@ import { drawSprites } from './sprites.js';
 import { drawModels } from './models.js';
 import { drawPsprites } from './psprite.js';
 import { drawParticles } from './particles.js';
+import { drawRopes } from './hangings.js';
 import { blendTable } from '../gfx/blend.js';
 import { BLEND_ADD, BLEND_HALF } from '../world/particles.js';
 
@@ -23,6 +24,8 @@ export class Renderer {
     this.blendTables = null;
     /** Last frame's particle drawing time (ms), for benches and debug readouts. */
     this.particleMs = 0;
+    /** Last frame's hangings drawing time (ms), likewise. */
+    this.hangingMs = 0;
   }
 
   /** Build what the first frames would otherwise stop to build (the particles' blend tables). */
@@ -35,7 +38,8 @@ export class Renderer {
 
   /**
    * @param {{map:any, things:any[], skyTexture:any, fog:number, haze?:{color:number[], half:number}|null,
-   *   backdrop?:import('../world/backdrop.js').Backdrop|null, particles?:import('../world/particles.js').Particles}} scene
+   *   backdrop?:import('../world/backdrop.js').Backdrop|null, particles?:import('../world/particles.js').Particles,
+   *   hangings?:import('../world/hangings.js').Hangings}} scene
    * @param {{x:number,y:number,angle:number,z?:number,extraLight?:number,fixedColormap?:number}} cam
    * @param {{psprites?:any[], skip?:any}} [extras]
    */
@@ -49,6 +53,20 @@ export class Renderer {
     view.depthValid = false;
     drawWorld(view, scene.map, textures, scene.skyTexture ?? null, s.px, s.w, cms, scene.backdrop ?? null);
     view.depthValid = drawModels(view, scene.things, scene.map, textures, s.px, s.w, cms, extras.skip);
+    // Hangings: the cloths are models; the ropes write their depth, so what's behind them hides.
+    const hangings = scene.hangings?.list.length ? scene.hangings : null;
+    if (hangings) {
+      const t0 = performance.now();
+      if (hangings.cloths.length) view.depthValid = drawModels(view, hangings.cloths, scene.map, textures, s.px, s.w, cms, null);
+      if (hangings.cloths.length < hangings.list.length) {
+        if (!view.depthValid) {
+          view.mdepth.fill(Infinity);
+          view.depthValid = true;
+        }
+        drawRopes(view, hangings, s.px, s.w, cms);
+      }
+      this.hangingMs = performance.now() - t0;
+    } else this.hangingMs = 0;
     // With particles about, sprites keep their depth per pixel too (in mdepth), so particles behind them hide.
     const particles = scene.particles?.n ? scene.particles : null;
     if (particles && !view.depthValid) {

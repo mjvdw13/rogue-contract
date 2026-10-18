@@ -4,6 +4,7 @@ import { BUILTIN_ACTION_NAMES } from './world/actions.js';
 import { BUILTIN_ATTACKS } from './combat/attacks.js';
 import { BUILTIN_PICKUPS } from './things/pickups.js';
 import { PARTICLE_BLENDS, PARTICLE_FLOORS, PARTICLE_SHAPES, PARTICLE_WALLS, POINT_CAP, DISC_CAP } from './world/particles.js';
+import { Hangings, HANGING_SHAPES, HANGING_PINS } from './world/hangings.js';
 
 const PICKUP_MODIFIERS = ['maxHealth', 'armorClass', 'maxArmor', 'duration', 'always'];
 const TRIGGER_EVENTS = ['start', 'enter', 'use', 'killed', 'pickup'];
@@ -346,6 +347,7 @@ export function validateContent(reg) {
       if (level.haze.half !== undefined && !(level.haze.half > 0)) err(`${owner}: haze "half" (the distance in tiles at which it's halfway) must be above 0`);
     }
     if (level.weather) checkWeather(reg, level.weather, owner, err);
+    if (level.hangings !== undefined) checkHangings(reg, level, map, owner, err);
     for (const id of [level.next, level.secretNext]) if (id && !reg.levels.has(id)) err(`${owner}: next level "${id}" does not exist`);
   }
 
@@ -356,6 +358,7 @@ export function validateContent(reg) {
   for (const f of ['small', 'big', 'hud', 'tiny']) if (!reg.fonts.has(f)) err(`Missing font "${f}"`);
   for (const c of reg.cheats) if (typeof c.run !== 'function') err(`Cheat "${c.code}" has no run()`);
   checkParticles(reg, err, warn);
+  checkHangingTypes(reg, err);
 
   return { errors, warnings };
 }
@@ -371,6 +374,72 @@ function checkWeather(reg, w, owner, err) {
   if (w.z !== undefined && !(nums(w.z, 2, 0) && w.z[1] > w.z[0])) err(`${owner}: weather "z" must be [low, high] heights above the floor, like [0.05, 2.5]`);
   if (w.drift !== undefined && !nums(w.drift, 2, 0)) err(`${owner}: weather "drift" must be [across, up or down] speeds of 0 or more, like [0.3, 0.1]`);
   if (w.wind !== undefined && !nums(w.wind, 3, -Infinity)) err(`${owner}: weather "wind" must be [x, y, z] in units per second, like [3, 1, 0]`);
+  return undefined;
+}
+
+/** Hanging types: the shape, a colour on a ramp, and numbers in range. */
+function checkHangingTypes(reg, err) {
+  const ramps = reg.paletteDef?.ramps ?? {};
+  const num = (v, lo, hi) => typeof v === 'number' && v >= lo && v <= hi;
+  const ranges = {
+    width: [0.001, 1, "a rope's thickness in units"],
+    spacing: [0.1, 4, 'units between points'],
+    gravity: [0, 100, 'units per second per second'],
+    drag: [0, 30, "how fast it takes up the air's speed, per second"],
+    wind: [-10, 10, "the share of the level's wind that carries it"],
+    breeze: [0, 10, 'units per second'],
+    damping: [0, 1, 'the share of its speed kept each sixtieth of a second'],
+    folds: [0, 1, 'units'],
+  };
+  for (const h of reg.hangings.values()) {
+    const owner = `Hanging "${h.id}"`;
+    if (!HANGING_SHAPES.includes(h.shape)) err(`${owner}: shape must be one of ${HANGING_SHAPES.join(', ')} (got "${h.shape}")`);
+    if (h.color !== undefined) {
+      const [ramp, t] = Array.isArray(h.color) ? h.color : [];
+      if (!ramps[ramp] || !num(t ?? 0.5, 0, 1)) err(`${owner}: color must be [ramp, 0 to 1], like ['rust', 0.5]`);
+    }
+    for (const [key, [lo, hi, what]] of Object.entries(ranges)) {
+      if (h[key] !== undefined && !num(h[key], lo, hi)) err(`${owner}: ${key} (${what}) must be ${lo} to ${hi}`);
+    }
+    if (h.stiffness !== undefined && !(Number.isInteger(h.stiffness) && h.stiffness >= 1 && h.stiffness <= 8)) err(`${owner}: stiffness (passes a step) must be a whole number, 1 to 8`);
+  }
+}
+
+/** A level's hangings: known types, points in the open, the numbers each shape needs, and room for them all. */
+function checkHangings(reg, level, map, owner, err) {
+  const list = level.hangings;
+  if (!Array.isArray(list)) return err(`${owner}: "hangings" must be a list`);
+  const num = (v, lo, hi) => typeof v === 'number' && v >= lo && v <= hi;
+  let ok = true;
+  list.forEach((s, k) => {
+    const where = `${owner}: hanging ${k + 1}`;
+    const bad = (m) => {
+      err(`${where} ${m}`);
+      ok = false;
+    };
+    const type = reg.hangings.get(s?.type);
+    if (!type) return bad(`has unknown type "${s?.type}"`);
+    const point = (key) => {
+      const p = s[key];
+      if (!Array.isArray(p) || p.length !== 3 || !p.every((v) => typeof v === 'number' && Number.isFinite(v))) return bad(`needs "${key}": [x, y, z]`);
+      if (!map.inBounds(p[0] | 0, p[1] | 0) || p[0] < 0 || p[1] < 0) return bad(`"${key}" is off the map`);
+      if (map.flags[(p[1] | 0) * map.w + (p[0] | 0)] & F_SOLID) return bad(`"${key}" is inside a wall (hang it just in front of one)`);
+      if (map.floorAt(p[0], p[1], 0, p[2]) > p[2]) return bad(`"${key}" is below the floor there`);
+      return undefined;
+    };
+    point('from');
+    if (type.shape === 'cloth' || s.to !== undefined) point('to');
+    if (type.shape === 'rope' && s.to !== undefined) {
+      if (s.sag !== undefined && !num(s.sag, 0, 100)) bad('"sag" (how far its middle hangs below the line between its ends) must be 0 or more');
+    } else if (s.length !== undefined && !num(s.length, 0.01, 100)) bad('"length" must be above 0');
+    if (type.shape === 'cloth') {
+      if (s.pin !== undefined && !HANGING_PINS.includes(s.pin)) bad(`"pin" must be one of ${HANGING_PINS.join(', ')}`);
+      for (const key of ['ragged', 'holes']) if (s[key] !== undefined && !num(s[key], 0, 1)) bad(`"${key}" must be 0 to 1`);
+    }
+    return undefined;
+  });
+  // Room for them all (the level's hangings share one pool).
+  if (ok) for (const e of new Hangings(map, [...reg.hangings.values()], list, reg.paletteDef?.ramps).errors) err(`${owner}: ${e}`);
   return undefined;
 }
 
