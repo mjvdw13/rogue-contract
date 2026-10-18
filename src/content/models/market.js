@@ -49,9 +49,10 @@ export const CISTERN = { radius: 2.6, height: 4 };
 
 /**
  * The moisture condenser tower over the water plaza, the market's landmark
- * (about 10 m): a round cistern of rusty tin on a brick plinth, banded and
- * lidded; a tapering column out of it with condenser fins and rings, a
- * collar and a pointed cap, an antenna with a red beacon; two pipes down
+ * (about 10 m): a round duracrete cistern on a brick plinth, banded in
+ * steel and lidded; a tapering column out of it with rings, and near its
+ * top the condenser, a stack of wide thin plates; a collar and a pointed
+ * cap, an antenna with a red beacon; two pipes down
  * into the cistern; and the water seller's tap on its south side over a
  * basin. It collides as its plinth and the basin.
  */
@@ -59,20 +60,18 @@ function condenserTower() {
   const m = new ModelBuilder('condenser-tower');
   const turn = Math.PI / 12;
   m.prism(ring(12, CISTERN.radius, turn), 0, 0.4, { tex: 'adobe-brick', bottom: false });
-  m.cylinder([0, 0, 0.4], 2.3, 3, { segments: 12, turn, tex: 'metal-rust', top: false, bottom: false });
+  m.cylinder([0, 0, 0.4], 2.3, 3, { segments: 12, turn, tex: 'bay-wall', top: false, bottom: false });
   for (const z of [1.2, 2.6]) m.cylinder([0, 0, z], 2.36, 0.12, { segments: 12, turn, color: ['gray', 0.25], top: false, bottom: false });
   m.loft(ring(12, 2.35, turn), 3.4, ring(12, 1.3, turn), CISTERN.height, { color: ['gray', 0.4], bottom: false, top: false });
   // The column, tapering, and its rings.
   const [z0, z1, r0, r1] = [CISTERN.height, 17, 1.0, 0.6];
   const rAt = (z) => r0 + ((z - z0) / (z1 - z0)) * (r1 - r0);
   m.loft(ring(10, r0, turn), z0, ring(10, r1, turn), z1, { tex: 'metal-grey', top: false, bottom: false });
-  for (const z of [6, 9, 12, 15]) m.cylinder([0, 0, z], rAt(z) + 0.08, 0.2, { segments: 10, turn, color: ['gray', 0.22] });
-  // Condenser fins: thin plates standing out round the upper column, narrower toward the top.
+  for (const z of [6.5, 9.5]) m.cylinder([0, 0, z], rAt(z) + 0.08, 0.2, { segments: 10, turn, color: ['gray', 0.22] });
+  // The condenser: wide thin plates stacked up the top of the column.
   for (let k = 0; k < 6; k++) {
-    const a = (k / 6) * Math.PI * 2 + Math.PI / 6;
-    const [c, s] = [Math.cos(a), Math.sin(a)];
-    const at = (r, z) => [c * r, s * r, z];
-    m.face([at(rAt(7.2), 7.2), at(rAt(7.2) + 1.3, 7.6), at(rAt(14.6) + 0.7, 14.6), at(rAt(14.6), 14.8)], { color: ['gray', 0.55], twoSided: true });
+    const z = 11.6 + k * 0.85;
+    m.cylinder([0, 0, z], 1.75 - k * 0.07, 0.12, { segments: 10, turn, color: ['steel', 0.5], bottom: { color: ['gray', 0.2] } });
   }
   // The collar, the cap and the antenna with its beacon.
   m.cylinder([0, 0, z1 - 0.2], 1.25, 0.3, { segments: 10, turn, color: ['gray', 0.35] });
@@ -102,13 +101,13 @@ function condenserTower() {
  */
 function trough() {
   const m = new ModelBuilder('water-trough');
-  const [hl, hw, h, t] = [1.6, 0.45, 0.75, 0.14];
+  const [hl, hw, h, t] = [1.6, 0.45, 0.75, 0.1];
   const stone = { tex: 'adobe-brick', top: { color: ['tan', 0.5] }, bottom: false };
   m.box([-hl, -hw, 0], [hl, -hw + t, h], stone);
   m.box([-hl, hw - t, 0], [hl, hw, h], stone);
   m.box([-hl, -hw + t, 0], [-hl + t, hw - t, h], stone);
   m.box([hl - t, -hw + t, 0], [hl, hw - t, h], stone);
-  m.face([[-hl + t, -hw + t, h - 0.15], [hl - t, -hw + t, h - 0.15], [hl - t, hw - t, h - 0.15], [-hl + t, hw - t, h - 0.15]], { color: WATER }, [0, 0, 0]);
+  m.face([[-hl + t, -hw + t, h - 0.07], [hl - t, -hw + t, h - 0.07], [hl - t, hw - t, h - 0.07], [-hl + t, hw - t, h - 0.07]], { color: WATER }, [0, 0, 0]);
   m.outlineLines([[-hl, -hw], [hl, -hw], [hl, hw], [-hl, hw]]);
   return m.build();
 }

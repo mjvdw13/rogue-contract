@@ -1,6 +1,7 @@
 import { defineLevel } from '../../engine/defs.js';
 import { Painter } from './lib/painter.js';
 import { Town } from './lib/town.js';
+import { CISTERN } from '../models/market.js';
 
 // MISSION 1: MOS EISLEY. The layout, route and numbers are in
 // docs/mission1.md (area numbers below match its table). Painted in code on
@@ -195,6 +196,14 @@ town.window(130, 79.5, 'W', { z: 4.4, tex: 'window-louvre' });
 // them; and in the north-east corner the droid seller's pen, behind a cage.
 town.stall(62, 60, 65, 64, 'E', { cloth: 'red' }).stall(68, 59, 72, 62, 'S', { cloth: 'olive' }).stall(62, 76, 65, 80, 'E', { cloth: 'teal' });
 town.stall(89, 59, 93, 62, 'S', { cloth: 'sand' }).stall(89, 77, 93, 80, 'N', { cloth: 'red', valance: 'valance-red' }).stall(97, 77, 101, 80, 'N', { cloth: 'olive' });
+// 13. The water plaza, in the market's middle: a round paving round the
+// moisture condenser tower (models/market.js), the landmark, the water
+// seller's tap on its south side with a tarp over the queue, and a
+// dewback trough. The tower's cistern and column cast shadows.
+const PLAZA = { cx: 78, cy: 70, r: 8.5 };
+p.rect(PLAZA.cx - 9, PLAZA.cy - 9, PLAZA.cx + 9, PLAZA.cy + 9, (x, y, c) => (Math.hypot(x + 0.5 - PLAZA.cx, y + 0.5 - PLAZA.cy) < PLAZA.r ? { ...c, floor: 'flagstone' } : c));
+town.caster(PLAZA.cx, PLAZA.cy, CISTERN.radius, 0, CISTERN.height).caster(PLAZA.cx, PLAZA.cy, 1, CISTERN.height, 13);
+town.tarp(76, 74, 80, 78, { z: 3, face: 'S', rise: 0.25, cloth: 'teal' });
 const CAGE = { tex: 'imp-cage', height: 1.5 };
 p.fence(96, 58, 97, 60, 'W', CAGE).fence(96, 62, 97, 64, 'W', CAGE).fence(96, 63, 102, 64, 'S', CAGE);
 
@@ -340,6 +349,13 @@ list.push(
   at('crate-tan', 49, 81.1, { angle: 95 }), at('barrel-grey', 49.1, 83), at('litter-small', 45, 83, { angle: 40 }),
 );
 
+// The water plaza: the tower, water cans by the tap, and the trough.
+list.push(
+  at('condenser-tower', PLAZA.cx, PLAZA.cy, { angle: 0 }),
+  at('canister', 80.7, 72.4, { angle: 20 }), at('canister', 81.15, 72.75, { angle: 70 }), at('crate-grey-small', 81.1, 73.6, { angle: 12 }),
+  at('water-trough', 80, 63.4, { angle: 0 }),
+);
+
 // The market: wares on the stalls' counters, and in the droid seller's pen
 // droids' domes, parts and power units for sale.
 list.push(
@@ -381,6 +397,10 @@ list.push(
   // Stallholders behind their counters, staying there.
   at('villager-man', 63.43, 62, { angle: 0, wander: 0 }), at('villager-woman', 91, 60.43, { angle: 270, wander: 0 }),
   at('villager-wanderer', 99, 78.57, { angle: 90, wander: 0 }),
+  // The water seller by his tap (a villager until his sheet exists), and the queue waiting for it.
+  at('villager-man', 79.6, 73, { angle: 180, wander: 0 }),
+  at('villager-woman', 78, 74.3, { angle: 90, wander: 0 }), at('villager-boy', 78.2, 75.5, { angle: 90, wander: 0 }),
+  at('villager-wanderer', 77.9, 76.7, { angle: 100, wander: 0 }),
 );
 
 // Cables, ropes and cloth moving in the air (world/hangings.js). Each is

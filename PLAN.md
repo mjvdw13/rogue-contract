@@ -103,6 +103,18 @@ These need Mark to try something, or to decide. Don't start them without him.
   that (headless). Then it replaces the placeholder shuttle on
   m3's pad, and the drop-off flies it.
 
+- **The main street east, the market and the water plaza** (`?map=m1`,
+  2026-10-18): the street on to x 136 past the blast doors' frame (flush
+  steel strips, easy to miss) and its bend; six stalls with their
+  stallholders, the droid seller's pen, cables and cloth; the condenser
+  tower (the landmark), the water seller and his queue under a teal tarp,
+  the dewback trough. The cantina's front, the stable, the garage and the
+  rooftops' first house are plain houses until their steps. The tower's
+  look and height, the stalls, how full the market feels. Frame time
+  (headless): the market adds about 1.2 ms a frame, the plaza 1.6 on
+  average but 3 to 4 standing by the queue's tarp (not yet looked into:
+  maybe drop the tarp or make it smaller).
+
 ## Next up
 
 In this order unless Mark says otherwise.
@@ -155,21 +167,6 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
         their pylons. Collision lines; under the face budget.
   - [x] Parked on the main street; snapshots.
   - [ ] Waiting on Mark.
-- [ ] **The main street, the market and the water plaza** (stalls,
-      awnings, the condenser tower).
-  - [x] Town kit: a building with an angled front (`town.slanted()`, a
-        convex outline whose slanting sides are angled walls), for the
-        street's bend.
-  - [x] The street on east to x 136: houses both sides, the frame the
-        blast doors will slide out of (x 104..106), the bend past it, the
-        exit moved to the street's end. The cantina's front, the stable,
-        the garage and the rooftops' first house are plain houses for now.
-  - [x] The market (x 62..102, y 58..82): stalls under awnings that
-        stand free, stallholders who stay put (a placement's `wander`),
-        the droid seller's pen, hangings, clutter.
-  - [ ] The water plaza: the condenser tower (a model, the landmark), the
-        water seller's tap and the dewback trough.
-  - [ ] Townsfolk; snapshots and frame time; then Waiting on Mark.
 - [ ] **The cantina:** entrance, steps down, the round room, the bar,
       booths, bandstand, back rooms.
 - [ ] **Bay 86, the dewback stable and the speeder garage.**

@@ -301,8 +301,11 @@ angle unless their sheet has the other views (the villagers do).
   (`models/speeder.js`) on the main street by C's awning, bobbing over a
   soft grime shadow (the garage's can be another of it), Docking Bay
   87's ribs, fuel lines, pumps and rim lamps (`models/bay.js`), and the
-  market's stall counters (`models/market.js`).
-- **Models (new):** moisture condenser tower, swoop bike,
+  market's stall counters, the moisture condenser tower over the water
+  plaza (about 10 m, a duracrete cistern with the water seller's tap,
+  condenser plates near its top, a red beacon) and a dewback trough
+  (`models/market.js`).
+- **Models (new):** swoop bike,
   droid parts, the sandcrawler, the gutted freighter, the comm tower,
   the cantina's round bar and booth tables, a power droid (until a sprite),
   water tanks, blast doors in their recesses.
