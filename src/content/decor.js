@@ -3,6 +3,7 @@ import { DOMES } from './models/dome.js';
 import { AWNING_MODELS, AWNING_POLES, poleId } from './models/awning.js';
 import { TIN_MODELS } from './models/tin.js';
 import { PIPE_MODELS } from './models/pipes.js';
+import { CLUTTER } from './models/clutter.js';
 
 // Scenery. Solid ones block movement; ones with health can be shot (and
 // `explode`).
@@ -40,6 +41,8 @@ export default [
   ...TIN_MODELS.map((id) => defineDecoration({ id, model: id })),
   // Pipes, conduits, a tank and a box unit on Mos Eisley's walls (against the wall, so not solid).
   ...PIPE_MODELS.map((id) => defineDecoration({ id, model: id })),
+  // Things on Mos Eisley's streets: crates, barrels, jars, sacks, junk, rubble, a vaporator.
+  ...Object.entries(CLUTTER).map(([id, c]) => defineDecoration({ id, model: id, solid: !!c.solid, radius: c.radius, height: c.height })),
   defineDecoration({ id: 'ceiling-lamp', glyph: 'l', sheet: S('ceiling-lamp', 48, 16), hanging: true, fullbright: true }),
   defineDecoration({
     id: 'fuel-barrel',

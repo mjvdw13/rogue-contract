@@ -13,5 +13,6 @@ import doorJamb from './door-jamb.js';
 import awnings from './awning.js';
 import tin from './tin.js';
 import pipes from './pipes.js';
+import clutter from './clutter.js';
 
-export default [terminal, reactorRing, coolantTank, shuttle, barricade, boulderLarge, boulderSmall, floodlightTower, sensorMast, sensorDish, ...domes, doorJamb, ...awnings, ...tin, ...pipes];
+export default [terminal, reactorRing, coolantTank, shuttle, barricade, boulderLarge, boulderSmall, floodlightTower, sensorMast, sensorDish, ...domes, doorJamb, ...awnings, ...tin, ...pipes, ...clutter];

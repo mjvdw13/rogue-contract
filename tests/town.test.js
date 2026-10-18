@@ -277,3 +277,28 @@ test('a vent is a decal on the wall', () => {
   assert.deepEqual(town.decals.at(-1), { x: 8, y: 10, z: 4, face: 'S', tex: 'vent-round' });
   assert.ok(registry.textures.get('vent-round')?.decal);
 });
+
+test('clutter stands along the walls of the open street, off the doors, and leaves narrow alleys clear', () => {
+  const make = () => {
+    const { p, town } = kit();
+    town.house(4, 4, 36, 12, { h: 6 });
+    // Two houses with a 2-wide alley between them, on the far side of the street.
+    town.house(4, 24, 18, 36, { h: 6 });
+    town.house(20, 24, 36, 36, { h: 6 });
+    town.door(20, 12, 'S', { h: 6 });
+    town.finish();
+    town.clutter({ amount: 2 });
+    return { p, town };
+  };
+  const { town } = make();
+  const placed = town.things.filter((t) => !t.type.startsWith('door') && !t.type.startsWith('litter'));
+  assert.ok(placed.length > 10, `${placed.length} things`);
+  for (const t of placed) {
+    const nearWall = (t.y > 12 && t.y < 13.8) || (t.y < 24 && t.y > 22.2);
+    assert.ok(nearWall, `${t.type} at (${t.x}, ${t.y}) is against a wall`);
+    if (t.y < 14) assert.ok(t.x < 18.4 || t.x > 21.6, `${t.type} at ${t.x} is off the door`);
+    assert.ok(!(t.x > 18 && t.x < 20 && t.y > 24), `${t.type} is not in the alley`);
+    assert.ok(registry.things.get(t.type), `${t.type} is a decoration`);
+  }
+  assert.deepEqual(make().town.things, town.things, 'the same every time');
+});

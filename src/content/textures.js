@@ -37,6 +37,8 @@ const TOWN = [
   'planks', 'street-sand', 'street-drift', 'flagstone', 'door-jamb',
   // Corrugated tin for lean-to roofs, rusty and galvanised.
   'metal-rust', 'metal-grey',
+  // Street clutter: crates and junk (models/clutter.js).
+  'crate-tan', 'crate-grey', 'crate-rust', 'junk',
   // The drifts' edges, by which corners are drift (lib/town.js, drifts()).
   ...Array.from({ length: 14 }, (_, k) => `street-drift-${k + 1}`),
 ];
@@ -46,6 +48,8 @@ const TOWN_DECALS = [
   'door-red', 'door-grey', 'door-sign', 'door-panel', 'shutter', 'window-bars', 'window-louvre',
   // Vents, a fan and gauges on the walls (lib/town.js, vent()).
   'vent-grille', 'vent-slats', 'vent-round', 'wall-fan', 'wall-meter',
+  // Litter on the ground: the clutter's `litter` models wear it.
+  'litter',
 ];
 
 // Grime: darkens the walls it's on (tools/art/textures/grime.js); the town

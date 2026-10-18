@@ -194,6 +194,21 @@ Check a street from several angles, not just down its length.
   cut from DF grilles, louvres and panels by derive.mjs). All placed on a
   straight wall's edge like a door, and none under an awning (the
   awning's slab would cut through them).
+- **Clutter** (`clutter()`, after `finish()` and `drifts()`): the things
+  found on the street (`models/clutter.js`): cargo crates in three sizes
+  (DF's Ramshed crates in tan, grey and rust), drums, clay jars, sacks, a
+  heap of junk and litter (DF's trash pile), rubble of plaster and brick,
+  scrap tin leaning on a wall, a bench and a moisture vaporator. The kit
+  sets them in groups (a stack of crates, two or three drums, jars,
+  sacks, junk, rubble, scrap, a bench, or one thing alone) against the
+  straight walls where the street is open 4 tiles out in front (so alleys
+  stay clear), off doors, arches and low fixtures, the first group of a
+  few tries that fits what's left of the wall; litter lies about the open
+  street too. `amount` scales it; placed from a seed. Hand-place the
+  groups a place wants (the stall's counter, the vaporator on the
+  square): the main street's walls are short between their doors and
+  arches, so the kit finds little room there. About 160 in the first
+  stretch cost about 0.2 ms a frame.
 - **Tarps** (`tarp()`): a stall's cover, a cloth tied at its four corners
   to poles (or its back two to a wall), sagging and billowing (a hanging,
   `tarp-<cloth>`, the awning canvas). Its ground is in its shade
@@ -255,9 +270,10 @@ angle unless their sheet has the other views (the villagers do).
 
 ## Props and models
 
-- **Models (new):** market stall with awning, domes (three sizes),
-  vaporator, moisture condenser tower, landspeeder, swoop bike, droid parts
-  and scrap piles, the sandcrawler, the gutted freighter, the comm tower,
+- **Models (built):** domes, awnings, tarps, tin roofs, pipes and wall
+  boxes, and the street clutter (above).
+- **Models (new):** moisture condenser tower, landspeeder, swoop bike,
+  droid parts, the sandcrawler, the gutted freighter, the comm tower,
   the cantina's round bar and booth tables, a power droid (until a sprite),
   water tanks, blast doors in their recesses, gantry lamps for the bay rim.
   The Moldy Crow comes with the drop-off (story section 5).

@@ -84,6 +84,12 @@ export const TOWN = [
   // or galvanised grey going rusty.
   { out: 'metal-rust', df: 'ZWGRUV1', crop: [0, 0, 32, 64], tile: [2, 1], gradient: [[30, 16, 8], [74, 40, 18], [120, 66, 32], [160, 96, 52], [190, 130, 82]], keep: 0, contrast: 0.9, rust: { color: [52, 26, 12], amount: 0.6, cell: 16, seed: 1 } },
   { out: 'metal-grey', df: 'ZWGRUV1', crop: [0, 0, 32, 64], tile: [2, 1], gradient: [[40, 40, 40], [88, 86, 82], [130, 126, 118], [166, 160, 150], [196, 190, 178]], keep: 0, contrast: 0.9, rust: { color: [120, 64, 30], amount: 0.5, cell: 16, seed: 2 } },
+  // Street clutter (models/clutter.js): cargo crates from Ramshed's, in
+  // tan, grey and rust, and a heap of junk from TestBase's trash pile.
+  { out: 'crate-tan', df: 'IPRMCRT3', gradient: [[56, 44, 28], [112, 90, 60], [160, 134, 96], [196, 172, 130], [222, 202, 162]], keep: 0.15, contrast: 0.85 },
+  { out: 'crate-grey', df: 'IPRMCRT9', gradient: [[40, 40, 38], [86, 84, 78], [130, 126, 116], [170, 166, 154], [204, 198, 184]], keep: 0.4, contrast: 0.85 },
+  { out: 'crate-rust', df: 'IPRMCRT8', gradient: [[44, 22, 10], [96, 52, 24], [146, 86, 44], [184, 122, 72], [212, 158, 108]], keep: 0.2, contrast: 0.85 },
+  { out: 'junk', df: 'IPTRSHC1', gradient: [[22, 16, 10], [62, 48, 32], [110, 90, 64], [154, 132, 98], [196, 176, 138]], keep: 0.35, contrast: 1.1 },
   // A hazy day: Robotics' pale cloudy sky, twice as wide, warming to dust at the horizon.
   { out: 'sky-day', df: 'RESKY01', gradient: [[74, 128, 182], [120, 166, 206], [168, 198, 222], [214, 226, 236]], keep: 0.3, contrast: 0.9, tile: [2, 1], fade: { color: [212, 200, 174], from: 0.55 } },
 ];
@@ -127,6 +133,9 @@ export const DECALS = [
   { out: 'vent-round', df: 'SPGRATE1', size: [32, 32], gradient: RUSTY_GREY, keep: 0.5, contrast: 1, mask: 'round', r: 16, rim: { width: 2, color: [30, 24, 18] } },
   { out: 'wall-fan', df: 'IATRKDEV', crop: [0, 0, 64, 64], size: [32, 32], gradient: [[24, 20, 16], [70, 62, 52], [120, 110, 94], [170, 160, 140]], keep: 0.4, contrast: 1, mask: 'round', r: 3 },
   { out: 'wall-meter', df: 'SWSWITCH', size: [8, 32], mask: 'round', r: 1 },
+  // Litter on the ground (the `litter` models' texture): the junk pile cut
+  // to a ragged blob, see-through round it and through its gaps.
+  { out: 'litter', df: 'IPTRSHC1', size: [64, 64], gradient: [[22, 16, 10], [62, 48, 32], [110, 90, 64], [154, 132, 98], [196, 176, 138]], keep: 0.35, contrast: 1.1, mask: 'blob', seed: 4 },
 ];
 
 /**
@@ -253,8 +262,21 @@ function resized(img, [w, h]) {
 }
 
 /** Cut a decal's shape out (see DECALS): transparent outside it, the rim darkened inside its edge. */
-function masked(img, { mask, r = 0, rim }) {
+function masked(img, { mask, r = 0, rim, seed = 1 }) {
   const { width: w, height: h, data: d } = img;
+  if (mask === 'blob') {
+    // A ragged blob: in where a noise beats the distance from the middle,
+    // with holes where the noise dips (the cut edge darkened by `rim`).
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const i = (y * w + x) * 4;
+        const dist = Math.hypot((x + 0.5) / w - 0.5, (y + 0.5) / h - 0.5) * 2;
+        const n = periodicNoise(x, y, 8, w, seed) * 0.6 + periodicNoise(x, y, 4, w, seed + 1) * 0.4;
+        d[i + 3] = n * 1.25 - dist * 0.8 > 0.02 ? 255 : 0;
+      }
+    }
+    return img;
+  }
   // How far (in texels) a texel's centre is inside the shape; below 0 is outside.
   const depth = (x, y) => {
     const px = x + 0.5;

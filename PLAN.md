@@ -61,6 +61,18 @@ These need Mark to try something, or to decide. Don't start them without him.
   or a house's own `grime`). Rounded corners and round walls have none:
   decals only go on tile edges.
 
+- **Awnings, tin, pipes and clutter in Mos Eisley** (`?map=m1`): cloth
+  awnings in stripes and canvas (C teal with a fixed fringe, E red with a
+  swaying valance), a tarp over a stall on the square, tin on C's lean-to
+  and B's porch, downpipes, tanks, box units, conduits and vents on the
+  walls, and the street clutter: crates, drums, jars, sacks, junk and
+  litter, rubble, scrap, benches and a vaporator, set along the walls by
+  `town.clutter()` and by hand on the main street. How they look, how
+  much clutter (`amount`), whether the tarp and the valance sway too much,
+  and whether more awnings should sway. All the new models together cost
+  0.44 ms a frame on average over eight views, 0.75 at worst (headless,
+  measured with the machine at about half its usual speed).
+
 ## Next up
 
 In this order unless Mark says otherwise.
@@ -129,31 +141,6 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
     - [ ] In Mos Eisley: real doors where a building has an inside (Mark
           to pick which in this first stretch), then snapshots, and Waiting
           on Mark.
-  - [ ] **Awnings, lean-tos, pipes and street clutter** (Mark,
-        2026-10-17: the street is a bit empty; build a library of things
-        found on the street, and use the hangings where they help). Frame
-        time before and after each step.
-    - [x] Awnings in coloured cloth: generated striped and plain canvases;
-          `awning` models (a sloped top over ribs, a scalloped front, poles)
-          over the kit's slab, which stays as their shade and underside;
-          `town.awning({ cloth, face, valance })`, a valance either a
-          fixed fringe or a swaying cloth (`town.hangings`).
-    - [x] A tarp: a cloth hanging pinned at four corners (`out`), sagging
-          and billowing over a stall. Defs, validator, MODDING.md, tests.
-    - [x] Lean-to roofs in rusty corrugated metal (derived from DF's
-          ribbed panel): sloped sheets with an overhang, `town.leanTo()`;
-          C's lean-to and B's porch. (Tin patches on flat roofs dropped:
-          nobody in the street sees a roof.)
-    - [x] Vents and pipes: wall decals (grilles, a fan, gauges) cut
-          from DF textures; pipe models (downpipes by height, conduits by
-          length, a wall tank, a box unit); `town.pipe()`,
-          `town.fixture()`, `town.vent()`.
-    - [ ] Street clutter, a library (`models/clutter.js`): crates, barrels,
-          clay jars, sacks, a trash heap and litter, rubble, scrap sheets,
-          a vaporator, a bench. `town.clutter()` sets groups along the
-          walls of the open street (clear of doors, arches and alleys);
-          hand-placed groups where the street wants them.
-    - [ ] In Mos Eisley: snapshots, frame time, then Waiting on Mark.
   - [ ] Waiting on Mark.
 - [ ] **Docking Bay 87**, the lane, the owner's office, the customs house.
       The episode starts in `m1`.

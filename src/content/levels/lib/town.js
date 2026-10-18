@@ -19,6 +19,7 @@ import { DOMES } from '../../models/dome.js';
 import { AWNING_CLOTHS, AWNING_DEPTHS, AWNING_POLES, AWNING_SLOPE, poleId } from '../../models/awning.js';
 import { TIN_DEPTHS, TIN_METALS, TIN_SLOPE } from '../../models/tin.js';
 import { PIPE_HEIGHTS } from '../../models/pipes.js';
+import { CLUTTER } from '../../models/clutter.js';
 import { valueNoise, random } from './noise.js';
 
 /**
@@ -425,6 +426,8 @@ export class Town {
     const out = face === 'S' || face === 'E' ? 0.01 : -0.01;
     const ns = face === 'N' || face === 'S';
     this.things.push({ type, x: ns ? x : x + out, y: ns ? y + out : y, z, angle });
+    // (Low ones, so clutter keeps clear of them.)
+    if (z < 1.5) this.openings.push({ kind: 'fixture', face, line: ns ? y : x, a0: (ns ? x : y) - 0.5, a1: (ns ? x : y) + 0.5, floorZ: z });
     return this;
   }
 
@@ -684,6 +687,122 @@ export class Town {
     }
     // (First, so the signs and doors are drawn over their walls' grime.)
     this.decals.unshift(...out);
+    return this;
+  }
+
+  /**
+   * Things found on the street (models/clutter.js), set in groups against
+   * the buildings' straight walls where the street is open in front of
+   * them (`clear` tiles of it, so alleys stay free), clear of doors, low
+   * fixtures and arches: stacks of crates, barrels, clay jars, sacks, junk
+   * with litter, rubble, scrap and benches. Litter lies about the open
+   * street too. `amount` scales how much (1 the usual, 2 a mess); placed at
+   * random from `seed`, the same every time. Run it after `finish()` (and
+   * after `drifts()`).
+   */
+  clutter({ amount = 1, seed = 13, clear = 4 } = {}) {
+    const { p } = this;
+    const r = random(seed);
+    const ns = (face) => face === 'N' || face === 'S';
+    const street = (c) => c && !c.wall && !c.door && c.ceiling === 'sky' && (!c.slab || c.slab.top - c.slab.bottom <= 0.25) && (c.floor === this.floor || c.floor.startsWith('street-drift'));
+    // (A raised floor: not an arch or an awning, whose slabs stand over open ground; a window's sill is.)
+    const building = (c) => c && !c.wall && !c.door && c.ceiling === 'sky' && (c.floorZ ?? 0) >= 1.2;
+    // The tile behind an edge, and the k-th tile out in front of it.
+    const tileAt = (face, line, a, k) => {
+      const out = face === 'S' || face === 'E' ? 1 : -1;
+      const row = out > 0 ? line + k : line - 1 - k;
+      return ns(face) ? [a, row] : [row, a];
+    };
+    // Runs of straight wall with open street in front.
+    const runs = [];
+    for (const face of 'NESW') {
+      const lines = (ns(face) ? p.h : p.w) + 1;
+      const length = ns(face) ? p.w : p.h;
+      for (let line = 0; line < lines; line++) {
+        let run = null;
+        for (let a = 0; a <= length; a++) {
+          let ok = a < length && building(p.get(...tileAt(face, line, a, -1)));
+          for (let k = 0; ok && k < clear; k++) {
+            const c = p.get(...tileAt(face, line, a, k));
+            ok = street(c) && (c.floorZ ?? 0) === 0;
+          }
+          if (ok && run) run.a1 = a + 1;
+          else if (ok) run = { face, line, a0: a, a1: a + 1 };
+          else if (run) {
+            runs.push(run);
+            run = null;
+          }
+        }
+      }
+    }
+    // What a group is made of: [type, along, out (from its middle), stacked on top at z].
+    const GROUPS = [
+      ['crates', 3, () => [['crate-tan', 0, 0], ...(r() < 0.6 ? [['crate-grey-small', r.range(-0.15, 0.15), 0, 0.9]] : []), ...(r() < 0.5 ? [['crate-rust-long', 1.35, 0.05]] : [['crate-grey-small', 0.85, 0.1]])]],
+      ['barrels', 2, () => [['barrel-rust', 0, 0], [r() < 0.5 ? 'barrel-grey' : 'barrel-rust', 0.7, 0.05], ...(r() < 0.4 ? [['barrel-rust', 0.35, 0.65]] : [])]],
+      ['jars', 2, () => [['jar', 0, 0], ['jar-small', 0.62, 0.1], ...(r() < 0.6 ? [['jar-pale', -0.65, 0.05]] : [])]],
+      ['sacks', 1.5, () => [['sack', 0, 0], ['sack-sand', 0.8, 0.05], ...(r() < 0.5 ? [['sack', 0.4, 0, 0.33]] : []), ['jar-small', -0.6, 0.1]]],
+      ['junk', 1.5, () => [['junk-heap', 0.4, 0.1], ['litter', 1.4, 0.7], ['litter-small', -0.6, 0.8]]],
+      ['rubble', 1.5, () => [['rubble', 0, 0], ['litter-small', 0.9, 0.5]]],
+      ['scrap', 1, () => [['scrap', 0, 'wall'], ['litter-small', 0.9, 0.6]]],
+      ['bench', 0.8, () => [['bench', 0, 'wall'], ...(r() < 0.5 ? [['jar-small', 1.2, 0.05]] : [])]],
+      ['single', 2, () => [[r.pick(['barrel-rust', 'barrel-grey', 'crate-tan', 'jar', 'jar-pale', 'crate-grey-small']), 0, 0]]],
+    ];
+    const total = GROUPS.reduce((n, g) => n + g[1], 0);
+    const pick = () => {
+      let k = r() * total;
+      for (const g of GROUPS) if ((k -= g[1]) < 0) return g;
+      return GROUPS[0];
+    };
+    const blocked = (face, line, lo, hi) =>
+      this.openings.some((o) => o.face === face && o.line === line && o.kind !== 'window' && o.a1 + 0.6 > lo && o.a0 - 0.6 < hi);
+    const round = (v) => Math.round(v * 100) / 100;
+    for (const { face, line, a0, a1 } of runs) {
+      const out = face === 'S' || face === 'E' ? 1 : -1;
+      const angle = { S: 0, E: 90, N: 180, W: 270 }[face];
+      // Along the run: now and then a group (the first of a few tries that
+      // fits what's left before the run's end and is off the doors), then a gap.
+      let a = a0 + 0.3 + r.range(0, 2) / amount;
+      while (a < a1 - 0.9) {
+        if (r() > 0.7 * amount) {
+          a += r.range(1, 3);
+          continue;
+        }
+        let placed = null;
+        for (let tries = 0; tries < 4 && !placed; tries++) {
+          const items = pick()[2]();
+          const span = items.reduce((m, [type, along]) => [Math.min(m[0], along - CLUTTER[type].depth / 2), Math.max(m[1], along + CLUTTER[type].depth / 2)], [0, 0]);
+          const at = a - span[0];
+          if (at + span[1] <= a1 - 0.3 && !blocked(face, line, a, at + span[1])) placed = { items, at, end: at + span[1] };
+        }
+        if (!placed) {
+          a += 1;
+          continue;
+        }
+        for (const [type, along, off, z] of placed.items) {
+          const c = CLUTTER[type];
+          const u = placed.at + along;
+          if (off === 'wall') {
+            // Built against a wall: on the wall's edge, a hair out, facing away from it.
+            const d = out * 0.01;
+            this.things.push({ type, ...(ns(face) ? { x: round(u), y: line + d } : { x: line + d, y: round(u) }), angle });
+            continue;
+          }
+          const d = line + out * (c.depth / 2 + 0.06 + off);
+          const turn = angle + Math.round(r.range(-12, 12));
+          this.things.push({ type, ...(ns(face) ? { x: round(u), y: round(d) } : { x: round(d), y: round(u) }), angle: turn, ...(z !== undefined && { z }) });
+        }
+        a = placed.end + r.range(1, 4) / amount;
+      }
+    }
+    // Litter about the open street, away from the walls.
+    for (let y = 0; y < p.h; y++) {
+      for (let x = 0; x < p.w; x++) {
+        if (r() > 0.006 * amount) continue;
+        let open = true;
+        for (let dy = -2; dy <= 2 && open; dy++) for (let dx = -2; dx <= 2 && open; dx++) open = street(p.get(x + dx, y + dy)) && (p.get(x + dx, y + dy).floorZ ?? 0) === 0;
+        if (open) this.things.push({ type: r() < 0.5 ? 'litter' : 'litter-small', x: x + 0.5, y: y + 0.5, angle: Math.round(r.range(0, 360)) });
+      }
+    }
     return this;
   }
 
