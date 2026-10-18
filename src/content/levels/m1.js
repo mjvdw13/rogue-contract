@@ -123,6 +123,33 @@ list.push(
   at('jawa', 50, 47), // in the north back lane
 );
 
+// Cables, ropes and cloth moving in the air (world/hangings.js). Each is
+// tied 0.05 out from a straight stretch of wall, clear of the rounded
+// corners.
+const hangings = [
+  // Cables across the main street, house to house.
+  { type: 'cable', from: [10, 63.05, 5.4], to: [8.5, 77.95, 5.2], sag: 1 },
+  { type: 'cable', from: [21.5, 66.05, 3.7], to: [27, 78.95, 6.2], sag: 0.8 },
+  { type: 'cable', from: [54, 63.05, 5.5], to: [55.5, 77.95, 4.6], sag: 1 },
+  // A long one high up, from C's tower to F's upper storey.
+  { type: 'cable', from: [35.5, 61.55, 8.2], to: [24.5, 82.95, 9], sag: 1.5 },
+  // Across the alley between A and B.
+  { type: 'cable', from: [14.05, 55, 5.5], to: [15.95, 57, 5.2], sag: 0.3 },
+  // Ropes hanging from walls.
+  { type: 'rope', from: [6.5, 63.05, 5.6], length: 1.4 },
+  { type: 'rope', from: [56, 58.05, 9.5], length: 2 },
+  // A rag over B's porch doorway, like a curtain.
+  { type: 'rag', from: [20.2, 66.05, 3.9], to: [23.8, 66.05, 3.9], length: 1.5 },
+  // Cloth hanging from the awnings' front edges.
+  { type: 'cloth-pale', from: [32, 66.05, 3.2], to: [35, 66.05, 3.2], length: 0.6 },
+  { type: 'rag', from: [37, 66.05, 3.2], to: [40, 66.05, 3.2], length: 0.9 },
+  { type: 'cloth-pale', from: [7, 75.95, 3.45], to: [11, 75.95, 3.45], length: 0.7 },
+  // A long banner down G's west wall, facing the square.
+  { type: 'rag', from: [52.95, 80.4, 4.8], to: [52.95, 81.8, 4.8], length: 2.4 },
+  // A sheet slung across the north back lane, pinned at its corners.
+  { type: 'cloth-pale', from: [12, 44.05, 4], to: [12.5, 49.95, 4], length: 1, pin: 'corners' },
+];
+
 export default defineLevel({
   id: 'm1',
   mapLabel: 'M1',
@@ -138,6 +165,7 @@ export default defineLevel({
   // distracted, and Mark halved that twice.
   weather: { type: 'glint', count: 60 },
   decals: town.decals,
+  hangings,
   par: 600,
   ...p.build(),
   things: [],

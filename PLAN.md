@@ -44,6 +44,15 @@ These need Mark to try something, or to decide. Don't start them without him.
   No suns painted on the sky (Mark, 2026-10-17). The textures are fine
   but a little monochrome: being worked on under Mission 1, "The look".
 
+- **Hangings in Mos Eisley** (`?map=m1`): five cables (one high, from
+  C's tower to F's upper storey), two ropes, a rag curtain over B's porch
+  doorway, valances on both awnings, a long banner on G's west wall and a
+  sheet slung across the north back lane. The look (the generated
+  `cloth-rag` and `cloth-pale`, their tears about 1 unit deep, so short
+  cloths are mostly tatters), how fast and far they sway (`breeze`), and
+  how many. 0.04 to 0.38 ms a frame at six views (headless, 320
+  columns); the dearest is the lane's sheet up close.
+
 ## Next up
 
 In this order unless Mark says otherwise.
@@ -171,9 +180,7 @@ Steps:
 
 - [x] First cuts of the simulation and drawing, and the bench.
 - [x] The content and level fields: defs, validator, MODDING.md, tests.
-- [ ] In Mos Eisley: cables across the street, a few rags and a banner.
-      Snapshots, then Waiting on Mark (the look, how fast they sway, how
-      many).
+- [x] In Mos Eisley: cables across the street, a few rags and a banner.
 - [ ] Explosions push the hangings near them (a blast flaps the cloth).
 
 ### 3. Particles into the game (from the particle system, 2026-10-15)

@@ -170,6 +170,11 @@ Check a street from several angles, not just down its length.
   one hanging over a lower roof is clipped. 189 of them cost about 0.1 ms a
   frame.
 - **Awnings** are thin cloth slabs: you walk under them in their shade.
+- **Hangings** (the level's `hangings`, MODDING.md): cables strung across
+  the street, ropes, and torn cloth (curtains, valances on the awnings,
+  banners, sheets across the lanes) that sway in the breeze. Tie each
+  0.05 out from a straight stretch of wall, clear of rounded corners; about
+  10 cables and 10 cloths in view at once is the budget.
 - **Doors and windows** (`door()`, `window()`): a door is a recess a tile
   into a straight wall, 2 wide and 3 high (an arch), and follows the
   film's (Mark's reference, 2026-10-17): the door itself on the back wall
