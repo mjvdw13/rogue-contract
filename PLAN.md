@@ -18,6 +18,7 @@ MODDING.md, if content authors need it). Keep this file short.
 | Engine | **Height grid, our own** (2026-10-11, confirmed 2026-10-12). Tiles with their own floor and ceiling heights, rising doors, lifts, angled walls (one line per tile), two storeys per tile (slabs), see-through fences and 3D models for what the grid can't shape. Rejected: The Force Engine, GZDoom, Godot with TrenchBroom. No WebGL renderer (2026-10-15). |
 | Platform | **Desktop browsers** (2026-10-12). No phone target: no phone performance gate, and no touch controls (removed 2026-10-17). |
 | Scale | 1 tile = 0.5 m, 32 texels per tile; the player is 1.7 tall, eye at 1.25. |
+| Resolution | **1x and 2x** (Mark, 2026-10-18): the 3D view at 320x200 or 640x400; the HUD and menus stay 320x200 pixel art, drawn as 2x2 blocks. Not 1.5x: the HUD's pixels come out unevenly 1 and 2 wide. |
 | Story | **Bad Paper** (`docs/story.md`, 2026-10-13): a prequel to Dark Forces. Kyle Katarn takes a Guild bounty on Tatooine as cover for the Alliance; Jan Ors flies him in and out in the Moldy Crow. Only Mission 1 (Mos Eisley) is free roam; the rest is run-and-gun. |
 | Scope | **A vertical slice first**, then decide on more missions. The slice is **Mission 1, Mos Eisley** (2026-10-17): the first level we make. The Canyon Garrison already built (`m3`) is the story's Mission 3. |
 | Title and repo | **Rogue Contract**. Public repo `mjvdw13/rogue-contract`, served by GitHub Pages from `main`. "Star Wars" and "Dark Forces" stay out of the title. |
@@ -362,6 +363,61 @@ conversations, then the fob.
       (a data tape).
 - [ ] The finale has its own picture (it reuses the title and intermission
       ones).
+
+### 8. 2x resolution (Mark, 2026-10-18)
+
+The 3D view drawn at 640x400 (twice 320x200 each way): distant walls,
+ceilings and figures resolve, and mid-distance shimmer mostly goes. Near
+surfaces look the same (the textures are 32 texels a tile). A setting,
+1x by default. A prototype proved the shape of it: 11 files, about 165
+lines, 88 of them one new class.
+
+What 2x costs: 2.3 to 2.8 times the render time (headless: Mos Eisley
+18 to 45 ms, m3 12 to 28, sandbox 6.5 to 18). What 1x must not lose: the
+prototype's 1x renders were byte-identical on 12 views and timed within
+noise (at most about 1% on views full of sky). Time 1x before and after
+in one process, alternating blocks of frames: separate runs on this
+machine drift by up to 20%, more than the change.
+
+How it fits together:
+
+- **Surface:** `pw` and `ph` (the pixel buffer's size) and `scale`, beside
+  `w`, `h` and `ox`, which stay in layout units. `ScaledSurface extends
+  Surface` overrides `pixel`, `fillRect`, `shadeRect` and `blit` to draw
+  each layout pixel as a 2x2 block, so the HUD, menus, fonts and automap
+  don't change, and 1x keeps the old methods untouched.
+- **Renderer:** `View` takes the scale: height and focal length times 2,
+  `horizonOffset` (pitch, in layout pixels) times 2. The renderer draws
+  into `px` at `pw`. Gameplay never sees the scale (aim, pitch and look
+  stay in layout units).
+- **Fixes the scale needs:** the sky is a texel per layout row
+  (`y >> skyShift`, the only per-pixel change); ropes' `MAX_PX` and
+  particles' `MAX_STREAK` scale; the weapon is placed in layout units.
+- **The screen:** the presenter's texture and buffers at `pw` x `ph`; the
+  CRT scanlines stay at 200 rows (a uniform of their own, `u_src` is the
+  texture's size); the melt's columns and speed scale.
+
+Steps, one commit each:
+
+- [ ] `ScaledSurface` and `pw`/`ph`/`scale` on `Surface`; tests (a blit,
+      a fill and a shade land on whole 2x2 blocks; clipping at the edges
+      and with `ox` on widescreen).
+- [ ] The renderer at a scale (`View`, the sky, ropes, particles, the
+      weapon) and `snapshot.mjs --res 2`. Snapshots at 1x before and
+      after, byte-identical; 1x frame time A/B; 2x snapshots of m1, m3
+      and sandbox to look at. Tests: at 2x a wall's top and bottom rows
+      and a sprite's height are twice 1x's (within a row); the horizon
+      moves twice as far for the same pitch.
+- [ ] The screen at 2x: presenter, scanlines at 200 rows, the melt,
+      `game.js` builds the surface, presenter and melt at the scale;
+      `?res=2` in the URL. Smoke test, plus a smoke run at `?res=2`.
+- [ ] A setting in the options menu (1x or 2x, saved with the others),
+      switching without a reload: rebuild the surface, the renderer's
+      view, the presenter's buffers and the melt.
+- [ ] Frame time in Chromium at 1x and 2x (Mos Eisley, m3, widescreen
+      and 4:3) for the record; then Waiting on Mark: the look (sparks
+      and ropes can be 1 pixel thin at 2x, the dithering is finer), and
+      whether the menu should warn that 2x needs a fast machine.
 
 ## Small fixes and known rough edges
 
