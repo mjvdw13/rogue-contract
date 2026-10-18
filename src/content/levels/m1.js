@@ -157,9 +157,23 @@ list.push(
 
 list.push(
   at('player', 4, 70, { angle: 0 }),
-  at('villager-woman', 24, 70), at('villager-man', 38, 80), at('villager-boy', 12, 84),
   at('supply-crate', 14, 86.5),
   at('jawa', 50, 47), // in the north back lane
+);
+
+// Townsfolk (npcs/villagers.js), all five kinds, each strolling up to 5
+// tiles from its spot: most on the main street and the square, a few in
+// the back lanes and an alley, and some indoors (the shop, B's room, G's).
+list.push(
+  // The main street.
+  at('villager-boy', 9, 73), at('villager-woman', 24, 70), at('villager-wanderer', 33, 67),
+  at('villager-adventurer', 46, 71), at('villager-man', 55, 73),
+  // The square and the stall.
+  at('villager-man', 38, 80), at('villager-woman', 49, 87),
+  // The back lanes and the alley between E and F.
+  at('villager-woman', 34, 47), at('villager-wanderer', 30, 97), at('villager-adventurer', 18.5, 88),
+  // Indoors: the shop, B's room and G's.
+  at('villager-boy', 12, 84), at('villager-woman', 22, 56), at('villager-man', 57, 84),
 );
 
 // Cables, ropes and cloth moving in the air (world/hangings.js). Each is
