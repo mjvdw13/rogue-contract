@@ -59,7 +59,22 @@ These need Mark to try something, or to decide. Don't start them without him.
   0.2 ms a frame). How dark (the pictures' greys,
   `tools/art/textures/grime.js`) and how much (`town.grime({ amount })`,
   or a house's own `grime`). Rounded corners and round walls have none:
-  decals only go on tile edges.
+  decals can go on angled walls now (`face: 'angled'`, as the bay's
+  scars do), but `grime()` doesn't place any there yet.
+
+- **Docking Bay 87** (`?map=m1`, where you start, south of the south
+  back lane): a round pit 21 m across under the sky, duracrete walls
+  braced at the foot, twelve ribs up them, lamps on the rim, fuel lines
+  down to four pumps, eight soot scars, a landing and stairs up to the
+  4-wide bay door. A maintenance pit in the floor (hazard stripes, steel
+  lining) with a crawlspace off it under the floor: the shield unit
+  secret. On the lane either side of the door: the customs house (a
+  grey corrugated prefab jutting into the lane, a terminal and impounded
+  cargo inside) and the owner's office (in the bay's building, a red
+  door and a window you see through). The walls' colours (they shade a
+  bit olive), how big and dark the scars are, the pit's Imperial steel,
+  and whether the customs house reads as a prefab. The owner and the
+  customs officer wait on their sheets.
 
 - **Awnings, tin, pipes and clutter in Mos Eisley** (`?map=m1`): cloth
   awnings in stripes and canvas (C teal with a fixed fringe, E red with a
@@ -136,26 +151,6 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
         their pylons. Collision lines; under the face budget.
   - [x] Parked on the main street; snapshots.
   - [ ] Waiting on Mark.
-- [ ] **Docking Bay 87**, the lane, the owner's office, the customs house.
-      The episode starts in `m1`. The design's boxes overlap the first
-      stretch's south row, so the bay goes south of the south back lane
-      (centre 32, 126, 44 tiles across), its door on the lane, and the
-      alleys between the south row's houses are the lane up to the
-      main street.
-  - [x] The pit: floor at -5 under the sky, round walls up to a rim at 6
-        (duracrete, derived from DF), a landing inside the door at street
-        level and stairs down from it, the bay door (4 wide, rising) onto
-        the back lane, the player's start on the bay floor. Snapshots.
-  - [x] Decals on angled walls (the engine: placed by a point on the
-        wall, running on round a curve with `wallU`), and blast scars on
-        the bay's walls (soot grime).
-  - [x] The walls' ribs (models round the circle), fuel lines and pumps,
-        gantry lamps on the rim.
-  - [x] The maintenance pit in the floor where the Crow lands (secret: a
-        shield unit).
-  - [ ] The owner's office (a window onto the lane) and the customs house
-        (a grey prefab) by the bay door.
-  - [ ] `docs/mission1.md` to match, then Waiting on Mark.
 - [ ] **The main street, the market and the water plaza** (stalls,
       awnings, the condenser tower).
 - [ ] **The cantina:** entrance, steps down, the round room, the bar,

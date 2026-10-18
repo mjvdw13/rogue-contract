@@ -124,6 +124,32 @@ const bayFloor = town.street(BAY.floorZ, { floor: 'bay-floor', side: 'bay-wall',
 p.rect(9, 100, 56, 149, town.roofCell({ h: BAY.rim, wall: 'bay-wall', skirt: null }));
 // Its front on the lane, in plaster.
 p.rect(9, 100, 56, 101, town.roofCell({ h: BAY.rim, wall: 'adobe-grey' }));
+// A window cut through a front wall in row `y`, from x0 to x1: open
+// (Tatooine's are), at eye height between a sill and a lintel, so you see
+// in from the lane and out from the room behind. Too low to climb through.
+const windowThrough = (x0, x1, y, { sill = 1.1, top = 2.25, light = 136 } = {}) => {
+  for (let x = x0; x < x1; x++) {
+    const c = p.get(x, y);
+    p.set(x, y, { ...c, floorZ: sill, slab: { bottom: top, top: c.floorZ, floor: c.floor, ceiling: c.side, side: c.side, light } });
+  }
+};
+// The customs house, west of the bay door: a grey prefab lower than the
+// bay, jutting a tile into the lane, its door into an office with a
+// terminal and impounded cargo, a window by the door.
+town.house(11, 99, 22, 107, { h: 5, wall: 'metal-grey', roof: 'metal-grey', skirt: null });
+town.room(12, 100, 21, 105, { h: 5, ceilZ: 4, floor: 'imp-floor', ceiling: 'imp-panel-dark', wall: 'metal-grey', light: 136 });
+town.door(15, 99, 'N', { h: 5, tex: 'door-grey', wall: 'metal-grey', opens: true });
+windowThrough(18, 20, 99);
+// The bay owner's office, east of the door, in the bay's building: a red
+// door and a wide window onto the lane, to watch who comes and goes.
+town.room(44, 101, 54, 106, { h: BAY.rim, wall: 'adobe-grey', light: 128 });
+town.door(46, 100, 'N', { h: BAY.rim, tex: 'door-red', wall: 'adobe-grey', opens: true });
+windowThrough(49, 53, 100);
+list.push(
+  at('terminal', 16.5, 104.3, { angle: 90 }), at('crate-grey-small', 13, 101.2, { angle: 5 }), at('crate-rust-long', 13.2, 103.4, { angle: 92 }),
+  at('cargo-pod', 20.2, 101.5, { angle: 270 }),
+  at('terminal', 51, 101.6, { angle: 270 }), at('crate-tan', 44.8, 105.2, { angle: 12 }), at('canister', 53.3, 105.3), at('power-unit', 45, 102),
+);
 town.circle(BAY.cx, BAY.cy, BAY.r, {
   inside: bayFloor,
   wall: { wall: 'bay-wall', wallTop: BAY.rim, bands: RIBBED },
