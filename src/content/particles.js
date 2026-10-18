@@ -419,7 +419,8 @@ export default [
   }),
   // Dust catching the suns: specks that brighten what's behind them a little
   // (added, sand steps 1 to 4 and back), so they show on bright sand without
-  // the generator motes' glare. Mos Eisley's weather.
+  // the generator motes' glare. Mos Eisley's weather. Settling out of still
+  // air: they sink at 0.04 units a second (gravity over drag), 2 cm/s.
   defineParticle({
     id: 'glint',
     colors: [{ ramp: 'sand', from: 1, to: 4 }, { ramp: 'sand', from: 4, to: 1 }],
@@ -427,7 +428,7 @@ export default [
     size: 0.02,
     maxPx: 1,
     blend: 'add',
-    gravity: -0.05,
+    gravity: 0.02,
     drag: 0.5,
     onFloor: 'die',
     cap: 400,

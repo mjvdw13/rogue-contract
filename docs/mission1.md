@@ -112,7 +112,8 @@ A bright, hazy afternoon. The only daylight map in the game.
 - **Interiors:** dim (112-144), with daylight falling through doorways and
   windows. The cantina is the darkest place (96-120).
 - **Dust in the air:** `weather: { type: 'glint', count: 120 }`, specks
-  catching the suns, drifting in still air everywhere under the sky. Mark
+  catching the suns, drifting in still air everywhere under the sky and
+  sinking slowly (2 cm/s), not rising like the generator's motes (Mark). Mark
   picked `dust` at 100 on the particle bench (2026-10-15), all in view;
   360 in the 20 x 20 tiles round the player put as many on screen (82 dust
   pixels a view on the bench, 88 here, over seven views of the street).
