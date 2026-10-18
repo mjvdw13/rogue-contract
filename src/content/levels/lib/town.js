@@ -10,11 +10,12 @@
 //   town.house(24, 50, 36, 62, { h: 6, r: 2, dome: true });
 //   town.door(30, 62, 'S', { h: 6, tex: 'door-grey' });
 //   town.finish();
+//   town.grime();
 //   list.push(...town.things);  // the domes
-//   decals: town.decals,        // the doors and windows
+//   decals: town.decals,        // the doors, windows and grime
 
 import { DOMES } from '../../models/dome.js';
-import { valueNoise } from './noise.js';
+import { valueNoise, random } from './noise.js';
 
 /**
  * The suns, low in the south-west: content azimuth (degrees, 0 east,
@@ -38,6 +39,19 @@ export const SKIRTS = {
   plinth: { tex: 'adobe-brick', to: 1.5 },
 };
 
+/**
+ * The grime decals (tools/art/textures/grime.js) by what they're for, with
+ * their sizes in tiles (32 texels a tile).
+ */
+const GRIME = {
+  streaks: [['grime-streaks-1', 2, 3], ['grime-streaks-2', 2, 3], ['grime-streaks-3', 3, 2]],
+  drip: [['grime-drip-1', 1, 2], ['grime-drip-2', 1.25, 1.5]],
+  blotch: [['grime-blotch-1', 2, 1.5], ['grime-blotch-2', 3, 2]],
+  smudge: [['grime-smudge', 1, 1.25]],
+  crack: [['grime-crack-1', 1, 2], ['grime-crack-2', 1.25, 1.5]],
+  dust: [['grime-dust-1', 4, 1], ['grime-dust-2', 4, 1.25]],
+};
+
 export class Town {
   /**
    * @param {import('./painter.js').Painter} p
@@ -58,8 +72,12 @@ export class Town {
     this.casters = [];
     /** Things the kit places (domes), for the level's list. */
     this.things = [];
-    /** Decals the kit places (doors, windows), for the level's `decals`. */
+    /** Decals the kit places (doors, windows, grime), for the level's `decals`. */
     this.decals = [];
+    /** Doors and windows, for `grime()`: where their drips and smudges go. */
+    this.openings = [];
+    /** Houses with their own `grime`: [x0, y0, x1, y1, amount]. */
+    this.grimeBoxes = [];
   }
 
   /**
@@ -231,6 +249,7 @@ export class Town {
     const wallAt = depth > 0 ? line : back;
     if (sign) this.decals.push({ ...at(mid, wallAt), z: floorZ + tall + 0.4, face, tex: 'door-sign' });
     if (panel) this.decals.push({ ...at(mid + width / 2 + 0.35, wallAt), z: floorZ + 1.6, face, tex: 'door-panel' });
+    this.openings.push({ kind: 'door', face, line: wallAt, a0, a1, floorZ, panel: panel ? mid + width / 2 + 0.35 : null });
     return this;
   }
 
@@ -261,6 +280,7 @@ export class Town {
       this.p.set(tx, ty, { ...c, floorZ: sill, slab: { bottom: top, top: c.floorZ, floor: c.floor, ceiling: wall, side: wall, light } });
     }
     this.decals.push({ ...(ns ? { x: a0 + width / 2, y: back } : { x: back, y: a0 + width / 2 }), z, face, tex });
+    this.openings.push({ kind: 'window', face, line, a0, a1: a0 + width, floorZ: sill });
     return this;
   }
 
@@ -304,9 +324,11 @@ export class Town {
    * The ground round the rounded corners keeps whatever was there.
    * `dome` tops it with a dome (a topper) on its highest box, as wide as
    * fits with a rim of roof round it: `true` in the wall's plaster, or a
-   * plaster's name.
+   * plaster's name. `grime` says how weathered its walls are (see
+   * `grime()`).
    */
-  house(x0, y0, x1, y1, { h, r = 0, tiers = [], dome, ...opts }) {
+  house(x0, y0, x1, y1, { h, r = 0, tiers = [], dome, grime, ...opts }) {
+    if (grime !== undefined) this.grimeBoxes.push([x0, y0, x1, y1, grime]);
     this._rounded(x0, y0, x1, y1, r, h, opts);
     for (const t of tiers) this._rounded(...t.box, t.r ?? 0, t.h, { ...opts, ...t });
     if (dome) {
@@ -368,6 +390,114 @@ export class Town {
   room(x0, y0, x1, y1, { h, floorZ = 0, ceilZ = 4.5, floor = 'flagstone', ceiling = 'planks', wall = this.wall, roof = this.roof, light = 136 }) {
     const slab = { bottom: ceilZ, top: h, floor: roof, ceiling, side: wall, light };
     this.p.rect(x0, y0, x1, y1, { floor, ceiling: 'sky', floorZ, ceilZ: this.sky, light: this.light, side: wall, slab });
+    return this;
+  }
+
+  /**
+   * Weather the buildings' straight walls under the sky with grime (decals
+   * that darken the wall, in its own colour): streaks off each roofline,
+   * dust above the foot of the walls along the street, stains and cracks,
+   * a drip under each window and smudges by each door's controls. `amount`
+   * scales it (0 none, 1 the usual, 2 neglected); a house's own `grime`
+   * replaces it on its walls. Placed at random from `seed`, the same every
+   * time. Run it after `finish()`. Rounded corners and round walls get
+   * none: decals go on tile edges.
+   */
+  grime({ amount = 1, seed = 11 } = {}) {
+    const { p } = this;
+    const r = random(seed);
+    const out = [];
+    const ns = (face) => face === 'N' || face === 'S';
+    // The tile a face belongs to (behind it), and the one in front, at tile `a` along its edge `line`.
+    const behind = (face, line, a) => (face === 'S' ? [a, line - 1] : face === 'N' ? [a, line] : face === 'E' ? [line - 1, a] : [line, a]);
+    const before = (face, line, a) => (face === 'S' ? [a, line] : face === 'N' ? [a, line - 1] : face === 'E' ? [line, a] : [line - 1, a]);
+    const levelAt = ([x, y]) => {
+      let g = amount;
+      for (const [x0, y0, x1, y1, k] of this.grimeBoxes) if (x >= x0 && x < x1 && y >= y0 && y < y1) g = k;
+      return g;
+    };
+    // One of `kind` round `a` along the edge `line` (kept inside lo..hi),
+    // its middle at `z`, or its top at `top`, or its bottom at `bottom`.
+    // Returns its width, or nothing if it doesn't fit.
+    const put = (kind, face, line, a, lo, hi, { scale = 1, z, top, bottom }) => {
+      const [tex, w, h] = r.pick(GRIME[kind]);
+      const half = (w * scale) / 2;
+      const flip = r() < 0.5;
+      if (hi - lo < half * 2) return undefined;
+      const mid = Math.min(hi - half, Math.max(lo + half, a));
+      const zz = z ?? (top !== undefined ? top - (h * scale) / 2 : bottom + (h * scale) / 2);
+      const round = (v) => Math.round(v * 100) / 100;
+      const at = ns(face) ? { x: round(mid), y: line } : { x: line, y: round(mid) };
+      out.push({ ...at, z: round(zz), face, tex, ...(scale !== 1 && { scale: round(scale) }), ...(flip && { flip }) });
+      return w * scale;
+    };
+    const height = (c) => (c.slab ? c.slab.top : c.floorZ ?? 0);
+    const open = (c) => c && !c.wall && !c.door && c.ceiling === 'sky' && (!c.slab || c.slab.top - c.slab.bottom <= 0.25);
+    const building = (c) => c && !c.wall && !c.door && c.ceiling === 'sky';
+
+    // Runs of straight wall: the same face, ground, roofline and grime.
+    const runs = [];
+    for (const face of 'NESW') {
+      const lines = (ns(face) ? p.h : p.w) + 1;
+      const length = ns(face) ? p.w : p.h;
+      for (let line = 0; line < lines; line++) {
+        let run = null;
+        for (let a = 0; a <= length; a++) {
+          let edge = null;
+          const back = behind(face, line, a);
+          const b = a < length ? p.get(...back) : null;
+          const f = a < length ? p.get(...before(face, line, a)) : null;
+          if (open(f) && building(b) && height(b) - (f.floorZ ?? 0) >= 2) {
+            edge = { bot: f.floorZ ?? 0, top: height(b), g: levelAt(back), street: f.floor === this.floor, skirt: b.bands?.[0]?.to ?? 0 };
+          }
+          const same = run && edge && edge.bot === run.bot && edge.top === run.top && edge.g === run.g && edge.street === run.street;
+          if (same) run.a1 = a + 1;
+          else {
+            if (run) runs.push(run);
+            run = edge && { ...edge, face, line, a0: a, a1: a + 1 };
+          }
+        }
+      }
+    }
+
+    for (const { face, line, a0, a1, bot, top, g, street, skirt } of runs) {
+      if (g <= 0) continue;
+      const len = a1 - a0;
+      const tall = top - bot;
+      const [lo, hi] = [a0 + 0.15, a1 - 0.15];
+      // Streaks off the roofline, with gaps between.
+      for (let a = a0 + r.range(0, 1.5); a < a1; a += r.range(0.5, 3) / g) {
+        if (r() < 0.75 * g) a += put('streaks', face, line, a + 1, lo, hi, { scale: Math.min(r.range(0.8, 1.2), (tall - 0.8) / 3), top }) ?? 0;
+      }
+      // Dust kicked up against the walls along the street, above the skirt.
+      if (street) {
+        for (let a = a0 + r.range(0, 1); a < a1 - 1; a += r.range(2, 4)) {
+          if (r() < 0.5 * g) put('dust', face, line, a + 1.5, lo, hi, { scale: r.range(0.6, 1), bottom: bot + Math.max(0.05, skirt - 0.4) });
+        }
+      }
+      // Stains and cracks anywhere on the wall.
+      for (let k = Math.round((len / 5) * g * r.range(0.5, 1.5)); k > 0; k--) {
+        put('blotch', face, line, r.range(a0, a1), lo, hi, { scale: r.range(0.7, 1.2), z: r.range(bot + 1.2, top - 1) });
+      }
+      for (let k = Math.round((len / 14) * g * r.range(0, 1.5)); k > 0; k--) {
+        put('crack', face, line, r.range(a0, a1), lo, hi, { scale: r.range(0.6, 1), top: top - r.range(0.3, 1.5) });
+      }
+    }
+
+    // A drip under each window's sill; smudges by each door's controls.
+    for (const o of this.openings) {
+      const g = levelAt(behind(o.face, o.line, Math.floor((o.a0 + o.a1) / 2)));
+      if (g <= 0) continue;
+      const mid = (o.a0 + o.a1) / 2;
+      if (o.kind === 'window' && r() < 0.6 + 0.2 * g) {
+        put('drip', o.face, o.line, mid + r.range(-0.15, 0.15), o.a0 - 0.5, o.a1 + 0.5, { scale: r.range(0.75, 1.1), top: o.floorZ });
+      }
+      if (o.kind === 'door' && o.panel !== null) {
+        put('smudge', o.face, o.line, o.panel + r.range(-0.1, 0.25), o.panel - 1, o.panel + 1, { scale: r.range(0.8, 1.1), z: o.floorZ + 1.4 });
+      }
+    }
+    // (First, so the signs and doors are drawn over their walls' grime.)
+    this.decals.unshift(...out);
     return this;
   }
 

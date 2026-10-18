@@ -175,6 +175,15 @@ Check a street from several angles, not just down its length.
   banners, sheets across the lanes) that sway in the breeze. Tie each
   0.05 out from a straight stretch of wall, clear of rounded corners; about
   10 cables and 10 cloths in view at once is the budget.
+- **Grime** (`grime()`, after `finish()`): decals that darken the wall
+  under them in its own colour (MODDING.md, Decals), so the plain plaster
+  breaks up without any plaster repeating it. Every straight wall under
+  the sky gets streaks off its roofline, dust above its foot along the
+  street, stains and cracks; a window gets a drip under its sill and a
+  door smudges by its controls. `town.grime({ amount })` scales it (0
+  none, 1 the usual, 2 neglected) and a house's own `grime` replaces it on
+  its walls. Placed at random from a seed, the same every time. Rounded
+  corners and round walls get none (decals go on tile edges).
 - **Doors and windows** (`door()`, `window()`): a door is a recess a tile
   into a straight wall, 2 wide and 3 high (an arch), and follows the
   film's (Mark's reference, 2026-10-17): the door itself on the back wall

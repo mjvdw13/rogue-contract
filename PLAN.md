@@ -53,6 +53,14 @@ These need Mark to try something, or to decide. Don't start them without him.
   how many. 0.04 to 0.38 ms a frame at six views (headless, 320
   columns); the dearest is the lane's sheet up close.
 
+- **Grime in Mos Eisley** (`?map=m1`): streaks off every straight
+  roofline, dust above the walls' feet, stains and cracks, a drip under
+  each window and smudges by the doors' controls (`town.grime()`, about
+  0.2 ms a frame). How dark (the pictures' greys,
+  `tools/art/textures/grime.js`) and how much (`town.grime({ amount })`,
+  or a house's own `grime`). Rounded corners and round walls have none:
+  decals only go on tile edges.
+
 ## Next up
 
 In this order unless Mark says otherwise.
@@ -76,6 +84,23 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
   - [x] Doors and windows, inset: doors after Mark's reference (a
         lattice door, a tiled jamb, a sign and controls) and windows in
         notches, cut from DF textures; `town.door()` and `town.window()`.
+  - [ ] **Grime** (Mark, 2026-10-17: break up the plain plaster): decals
+        that darken the wall under them instead of covering it, so one set
+        fits every plaster and nothing repeats.
+    - [x] Engine: `grime: true` decal textures (a texel's grey is the
+          share of light it leaves), drawn as darker colormaps over what's
+          there and fading out into the haze. Defs, validator, MODDING.md,
+          tests; m3 and sandbox snapshots byte-identical.
+    - [x] Art: generated grime decals: streaks, drips, blotches, smudges,
+          cracks, dust above the skirt.
+    - [x] Town kit: `town.grime()` weathers every straight wall under the
+          sky (streaks from roof edges and under windows and signs,
+          smudges by doors, cracks, blotches, dust), and a house's `grime`
+          says how much (0 clean to 2 neglected). Frame time before and
+          after.
+    - [ ] Bare brick where the plaster has fallen: ordinary decals cut
+          from `adobe-brick` with ragged edges.
+    - [x] In Mos Eisley: snapshots, then Waiting on Mark.
   - [ ] **Doors that open under the sky** (engine). Today the town's doors
         are pictures on solid wall: a door tile has a lowered ceiling, and
         under the open sky the renderer draws a wall above it all the way

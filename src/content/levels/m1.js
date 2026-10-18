@@ -114,6 +114,8 @@ for (const { box: [x0, y0, x1, y1], h, wall } of blocks) {
 
 town.finish();
 town.drifts();
+// Rain streaks, dust and stains on the walls (lib/town.js).
+town.grime();
 list.push(...town.things);
 
 list.push(

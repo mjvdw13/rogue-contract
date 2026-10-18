@@ -158,3 +158,24 @@ test('a window is set into its wall: a notch with a sill and a lintel, the windo
   assert.equal(p.get(10, 9).slab.top, 10);
   assert.throws(() => town.window(7.5, 14, 'S', { z: 9 }), /no wall/, 'not above the roof');
 });
+
+test("grime weathers a house's straight walls and the wall under its window, not its rounded corners or a clean house", () => {
+  const { p, town } = kit();
+  town.house(4, 4, 16, 14, { h: 6, r: 2 });
+  town.window(10.5, 14, 'S', { z: 3 });
+  town.house(20, 4, 32, 14, { h: 6, grime: 0 });
+  town.finish();
+  town.grime({ amount: 2 });
+  const grime = town.decals.filter((d) => d.tex.startsWith('grime-'));
+  assert.ok(grime.length > 4, `${grime.length} pieces`);
+  for (const d of grime) {
+    // On the first house's straight walls (each rounded corner takes its end tile).
+    const ok = (d.face === 'S' && d.y === 14) || (d.face === 'N' && d.y === 4) ? d.x > 5 && d.x < 15 : (d.face === 'W' && d.x === 4) || (d.face === 'E' && d.x === 16) ? d.y > 5 && d.y < 13 : false;
+    assert.ok(ok, `on a straight wall: ${JSON.stringify(d)}`);
+  }
+  const drip = grime.find((d) => d.tex.startsWith('grime-drip'));
+  assert.ok(drip && drip.y === 14 && drip.z < 2.375, 'a drip under the sill');
+  assert.equal(town.decals.at(-1).tex, 'window-bars', 'the window is drawn over the grime');
+  const level = { id: 't', name: 'T', ...p.build(), decals: town.decals, list: [{ type: 'player', x: 20, y: 20 }, ...town.things] };
+  assert.deepEqual(buildLevel(registry, level).errors, []);
+});
