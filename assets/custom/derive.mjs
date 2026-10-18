@@ -45,11 +45,23 @@ export const DERIVED = [
 // them snap to olive greys in the game.)
 const PLASTER = [[96, 74, 48], [137, 109, 74], [179, 151, 109], [199, 172, 129], [216, 193, 152], [232, 214, 176]];
 const WHITEWASH = [[95, 86, 66], [153, 141, 112], [181, 169, 138], [209, 198, 168], [236, 226, 198]];
+const OCHRE = [[110, 76, 46], [176, 130, 88], [214, 160, 112], [224, 170, 120], [232, 186, 140], [240, 206, 166]];
+const ROSE = [[110, 80, 60], [186, 150, 120], [226, 190, 156], [236, 200, 166], [240, 214, 184]];
+const GREY = [[80, 76, 68], [124, 118, 106], [164, 156, 142], [180, 172, 156], [196, 188, 170], [214, 206, 188]];
 export const TOWN = [
   // Smooth plaster: Gromas' plain speckled wall.
   { out: 'adobe', df: 'GWANO', crop: [0, 0, 128, 128], smooth: 1, gradient: PLASTER, keep: 0, contrast: 0.35 },
   // Whitewash, paler and cooler.
   { out: 'adobe-pale', df: 'GWANO', crop: [0, 0, 128, 128], smooth: 1, gradient: WHITEWASH, keep: 0, contrast: 0.35 },
+  // More plasters, so a street isn't one colour: ochre (the palette's rust
+  // ramp: it has no golden ochres, so it comes out terracotta), rose (a
+  // pale peach, its skin ramp) and grey (its concrete ramp).
+  { out: 'adobe-ochre', df: 'GWANO', crop: [0, 0, 128, 128], smooth: 1, gradient: OCHRE, keep: 0, contrast: 0.35 },
+  { out: 'adobe-rose', df: 'GWANO', crop: [0, 0, 128, 128], smooth: 1, gradient: ROSE, keep: 0, contrast: 0.35 },
+  { out: 'adobe-grey', df: 'GWANO', crop: [0, 0, 128, 128], smooth: 1, gradient: GREY, keep: 0, contrast: 0.35 },
+  // The dirty foot of every wall: sand kicked up and rain-less grime, darker
+  // toward the ground. A band 1 tile high shows its top 32 rows.
+  { out: 'adobe-skirt', df: 'GWANO', crop: [0, 0, 128, 32], gradient: [[56, 40, 24], [96, 72, 46], [128, 100, 68], [150, 122, 86], [170, 144, 106]], keep: 0, contrast: 0.6, fade: { color: [84, 62, 40], from: 0 } },
   // Weathered plaster, darker and dirtier, for the old quarter.
   { out: 'adobe-old', df: 'ZPMARBY1', gradient: [[34, 24, 16], [86, 62, 42], [136, 104, 72], [178, 144, 104], [206, 178, 136]], keep: 0.1, contrast: 0.7 },
   // Sun-bleached wooden planks (doors, shutters, stalls): TestBase's streaked granite.
@@ -60,6 +72,8 @@ export const TOWN = [
   { out: 'adobe-roof', df: 'IPGREYC2', gradient: [[50, 36, 24], [104, 80, 56], [146, 116, 82], [180, 150, 110], [204, 178, 136]], keep: 0.1, contrast: 0.8 },
   // The street: sand packed hard, and flagstones in the plazas.
   { out: 'street-sand', df: 'ZPROCK02', gradient: [[62, 46, 30], [116, 90, 62], [160, 128, 92], [192, 162, 120], [214, 188, 146]], keep: 0.1, contrast: 0.6 },
+  // Loose sand the wind piles against the walls: paler and softer.
+  { out: 'street-drift', df: 'ZPROCK02', smooth: 1, gradient: [[150, 120, 82], [199, 172, 129], [216, 193, 152], [232, 214, 176]], keep: 0, contrast: 0.5 },
   { out: 'flagstone', df: 'IPDET1', gradient: [[44, 32, 22], [100, 78, 56], [150, 122, 90], [190, 162, 124], [220, 198, 160]], keep: 0.1, contrast: 0.9 },
   // A hazy day: Robotics' pale cloudy sky, twice as wide, warming to dust at the horizon.
   { out: 'sky-day', df: 'RESKY01', gradient: [[74, 128, 182], [120, 166, 206], [168, 198, 222], [214, 226, 236]], keep: 0.3, contrast: 0.9, tile: [2, 1], fade: { color: [212, 200, 174], from: 0.55 } },

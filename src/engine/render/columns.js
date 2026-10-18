@@ -515,11 +515,13 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
           const lv = faceLevel(0, t, 0, out);
           const top = low ? sl.top : ceilZ[cur];
           const a = rowOf(top, t);
+          const bands = bandIndex[cur] >= 0 ? bandSets[bandIndex[cur]] : null;
           for (let k = 0; k < nw; k++) {
             clipTop = wTop[k];
             clipBot = wBot[k];
             flats(cur, 0, tEnter, t);
             face(t, a, rowOf(floorZ[cur], t), top, sl.tex, u, lv, faceHaze(t, out));
+            if (bands) bandFaces(t, top, floorZ[cur], bands, u, lv, faceHaze(t, out));
             if (a < clipBot) clipBot = a < clipTop ? clipTop : a;
             wTop[k] = clipTop;
             wBot[k] = clipBot;

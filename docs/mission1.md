@@ -170,6 +170,15 @@ Check a street from several angles, not just down its length.
   one hanging over a lower roof is clipped. 189 of them cost about 0.1 ms a
   frame.
 - **Awnings** are thin cloth slabs: you walk under them in their shade.
+- **Plasters and the skirt:** houses come in five plasters (`adobe`,
+  `adobe-pale`, `adobe-ochre`, `adobe-rose`, `adobe-grey`), domes in each.
+  The palette has no golden ochres, so ochre comes out terracotta: use it
+  sparingly, as the accent. Every building wall, rounded corners
+  included, has a dirty skirt along its foot (`adobe-skirt`, a band up to
+  1 tile: `skirt` on the kit).
+- **Sand drifts** (`drifts()`, after `finish()`): pale loose sand along the
+  walls, in patches, only in full sun (pale sand in the shade snaps to
+  olive greys and looks like puddles).
 - **Shadows** (`shadows()`, run by `finish()` after `seal()`): see Light
   and air.
 - **Glyphs:** the painter's glyph pool grows to several thousand for this
@@ -191,10 +200,12 @@ angle unless their sheet has the other views (the villagers do).
   towers (the checkpoint), boulders (the town's edge).
 - **Textures:** Dark Forces textures recoloured by
   `assets/custom/derive.mjs` (Mark, 2026-10-17: DF textures for now, none
-  of our own, so no generated stand-ins). So far: plaster (`adobe`) and
-  whitewash (`adobe-pale`) from the plain top of Gromas' GWANO, weathered
+  of our own, so no generated stand-ins). So far: plaster (`adobe`),
+  whitewash (`adobe-pale`), terracotta (`adobe-ochre`), peach
+  (`adobe-rose`), grey (`adobe-grey`) and the walls' dirty foot
+  (`adobe-skirt`) from the plain top of Gromas' GWANO, weathered
   plaster (`adobe-old`) from ZPMARBY1, mud brick from ZPBRICK1, roofs from
-  IPGREYC2, the street from ZPROCK02, flagstones from IPDET1, planks from
+  IPGREYC2, the street and its drifts from ZPROCK02, flagstones from IPDET1, planks from
   IWGRAN5. To come, the same way: doors and shutters, rusty metal, cloth
   (awnings, hangings), the bay's ribbed duracrete, the cantina's dark
   walls, floor and bar. Gradients use the palette's sand and beige ramps:

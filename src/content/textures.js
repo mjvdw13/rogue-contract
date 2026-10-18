@@ -32,7 +32,10 @@ const DECALS = ['decal-crest', 'decal-hazard', 'decal-sign', 'decal-vent'];
 // Mos Eisley (Mark, 2026-10-17: Dark Forces textures for now, no generated
 // stand-ins): DF textures recoloured by assets/custom/derive.mjs, loaded from
 // there directly.
-const TOWN = ['adobe', 'adobe-pale', 'adobe-old', 'adobe-brick', 'adobe-roof', 'planks', 'street-sand', 'flagstone'];
+const TOWN = [
+  'adobe', 'adobe-pale', 'adobe-ochre', 'adobe-rose', 'adobe-grey', 'adobe-old', 'adobe-brick', 'adobe-skirt', 'adobe-roof',
+  'planks', 'street-sand', 'street-drift', 'flagstone',
+];
 
 const ANIMATED = {
   'imp-computer': { frames: 3, fps: 3 },

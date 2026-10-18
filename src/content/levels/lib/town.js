@@ -12,6 +12,7 @@
 //   list.push(...town.things);  // the domes
 
 import { DOMES } from '../../models/dome.js';
+import { valueNoise } from './noise.js';
 
 /**
  * The suns, low in the south-west: content azimuth (degrees, 0 east,
@@ -28,14 +29,17 @@ export class Town {
    * @param {import('./painter.js').Painter} p
    * @param {{sky?:number, light?:number, wall?:string, roof?:string, floor?:string}} opts
    *   `sky`: the height of the open sky over walkable ground; `light`: sunlight.
+   *   `skirt`: the dirty foot of every building's walls, a band of `tex` up
+   *   to height `to` (null for none).
    */
-  constructor(p, { sky = 24, light = 216, wall = 'adobe', roof = 'adobe-roof', floor = 'street-sand' } = {}) {
+  constructor(p, { sky = 24, light = 216, wall = 'adobe', roof = 'adobe-roof', floor = 'street-sand', skirt = { tex: 'adobe-skirt', to: 1 } } = {}) {
     this.p = p;
     this.sky = sky;
     this.light = light;
     this.wall = wall;
     this.roof = roof;
     this.floor = floor;
+    this.bands = skirt ? [{ to: skirt.to, tex: skirt.tex }] : undefined;
     /** Round props that cast shadows (domes): [x, y, radius, base, height]. */
     this.casters = [];
     /** Things the kit places (domes), for the level's list. */
@@ -44,13 +48,13 @@ export class Town {
 
   /**
    * A dome on a roof at `z`, centred on (x, y): the widest that's no more
-   * than `width` tiles across (3 to 11), in plaster `wall` ('adobe' or
-   * 'adobe-pale'). It casts a shadow. Keep it inside its roof: one hanging
-   * over a lower roof is clipped.
+   * than `width` tiles across (3 to 11), in plaster `wall` (any of the
+   * domes' plasters, else plain 'adobe'). It casts a shadow. Keep it inside
+   * its roof: one hanging over a lower roof is clipped.
    */
   dome(x, y, z, width, { wall = this.wall } = {}) {
-    const pale = wall === 'adobe-pale';
-    const d = DOMES.find((o) => o.id.endsWith('-pale') === pale && o.radius * 2 <= width);
+    const tex = DOMES.some((o) => o.tex === wall) ? wall : 'adobe';
+    const d = DOMES.find((o) => o.tex === tex && o.radius * 2 <= width);
     if (!d) return this;
     this.things.push({ type: d.id, x, y, z });
     return this.caster(x, y, d.radius, z, d.height);
@@ -70,9 +74,41 @@ export class Town {
     return { floor: this.floor, ceiling: 'sky', floorZ, ceilZ: this.sky, light: this.light, side: this.wall, ...extra };
   }
 
-  /** A roof at `h`: a block of raised floor whose sides are the building's walls. */
+  /** A roof at `h`: a block of raised floor whose sides are the building's walls, with the skirt at their foot. */
   roofCell({ h, wall = this.wall, roof = this.roof, light = this.light, extra = {} }) {
-    return { floor: roof, ceiling: 'sky', floorZ: h, ceilZ: this.sky, light, side: wall, ...extra };
+    return { floor: roof, ceiling: 'sky', floorZ: h, ceilZ: this.sky, light, side: wall, ...(this.bands && { bands: this.bands }), ...extra };
+  }
+
+  /**
+   * Sand drifts: loose sand (`tex`) piled against the walls along the
+   * street, on open ground (in the street's own floor) within `reach`
+   * tiles of a building, thinning out in patches by a noise. Only in full
+   * sun: pale sand in the shade snaps to the palette's olive greys and looks
+   * like puddles. Run it after `finish()`.
+   */
+  drifts({ tex = 'street-drift', reach = 2, seed = 7 } = {}) {
+    const { p } = this;
+    const open = (c) => c && !c.wall && !c.door && c.ceiling === 'sky' && !c.slab && c.floor === this.floor && c.light >= this.light;
+    const out = [];
+    for (let y = 0; y < p.h; y++) {
+      for (let x = 0; x < p.w; x++) {
+        const c = p.get(x, y);
+        if (!open(c)) continue;
+        // How close the nearest building's foot is (a tile higher than this one).
+        let near = Infinity;
+        for (let dy = -reach; dy <= reach; dy++) {
+          for (let dx = -reach; dx <= reach; dx++) {
+            const n = p.get(x + dx, y + dy);
+            if (n && (n.floorZ ?? 0) > (c.floorZ ?? 0) + 1) near = Math.min(near, Math.max(Math.abs(dx), Math.abs(dy)));
+          }
+        }
+        if (near > reach) continue;
+        const n = valueNoise(x, y, 3, seed);
+        if (n > 0.35 + (near - 1) * 0.25) out.push([x, y, { ...c, floor: tex }]);
+      }
+    }
+    for (const [x, y, c] of out) p.set(x, y, c);
+    return this;
   }
 
   /** A building (or part of one) over a box: see `roofCell`. */
@@ -115,6 +151,8 @@ export class Town {
    * round building, a pillar) says which side people walk on.
    */
   circle(cx, cy, r, { inside, outside, wall, open = 'in' }) {
+    // (A round building's wall gets the skirt at its foot.)
+    if (open === 'out' && this.bands && wall) wall = { bands: this.bands, ...wall };
     for (let y = Math.floor(cy - r) - 1; y <= Math.ceil(cy + r); y++) {
       for (let x = Math.floor(cx - r) - 1; x <= Math.ceil(cx + r); x++) this._arcTile(x, y, cx, cy, r, { inside, outside, wall, open });
     }
@@ -147,7 +185,7 @@ export class Town {
   _rounded(x0, y0, x1, y1, r, h, opts) {
     const p = this.p;
     const inside = this.roofCell({ ...opts, h });
-    const wall = { wall: opts.wall ?? this.wall, wallTop: h };
+    const wall = { wall: opts.wall ?? this.wall, wallTop: h, ...(this.bands && { bands: this.bands }) };
     for (let y = y0; y < y1; y++) {
       for (let x = x0; x < x1; x++) {
         const cx = x < x0 + r ? x0 + r : x >= x1 - r ? x1 - r : null;

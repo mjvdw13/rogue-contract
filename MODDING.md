@@ -701,8 +701,9 @@ down); the first band that covers a height wins, and the wall's own texture
 fills the rest. A band's texture hangs from its top (from the face's top if
 it runs on up), so it lines up across walls of different heights. On an
 open tile or a doorway, `bands` change the faces of its raised floor and
-lowered ceiling (a gate's lintel) the same way. The map viewer shows a wall
-by its top band.
+lowered ceiling (a gate's lintel) the same way, and on an angled wall its
+face (Mos Eisley's rounded corners carry the skirt round). The map viewer
+shows a wall by its top band.
 
 ### Decals
 

@@ -15,6 +15,8 @@ const SKY = 24;
 const p = new Painter(W, H, { wall: 'adobe' });
 const town = new Town(p, { sky: SKY });
 const at = (type, x, y, extra = {}) => ({ type, x, y, ...extra });
+// The plasters, plain ones the most common.
+const PLASTERS = ['adobe', 'adobe', 'adobe-pale', 'adobe-pale', 'adobe-ochre', 'adobe-rose', 'adobe-grey'];
 const list = [];
 
 // Everything not painted is the rest of the town, out of reach: blocks of
@@ -30,7 +32,7 @@ for (let y = 1; y < H - 1; y += 9) {
   for (let x = 1; x < W - 1; x += 11) {
     const h = 5 + Math.floor(hash(x, y) * 5);
     const box = [x, y, Math.min(x + 11, W - 1), Math.min(y + 9, H - 1)];
-    const wall = h % 2 ? 'adobe' : 'adobe-pale';
+    const wall = PLASTERS[Math.floor(hash(x + 5, y + 2) * PLASTERS.length)];
     p.rect(...box, town.roofCell({ h, wall }));
     blocks.push({ box, h, wall });
   }
@@ -61,14 +63,14 @@ town.arch(20, 62, 24, 66, { h: 4, lintel: 3, wall: 'adobe-pale' });
 // awning over the street.
 // (The lean-to first: the tower's round wall rises from its roof.)
 town.house(30, 59, 42, 63, { h: 4, r: 1 });
-town.circle(35.5, 56.5, 5, { inside: town.roofCell({ h: 9 }), wall: { wall: 'adobe', wallTop: 9 }, open: 'out' });
+town.circle(35.5, 56.5, 5, { inside: town.roofCell({ h: 9, wall: 'adobe-ochre' }), wall: { wall: 'adobe-ochre', wallTop: 9 }, open: 'out' });
 town.awning(31, 63, 41, 66, { z: 3.25 });
-town.dome(35.5, 56.5, 9, 9.5);
+town.dome(35.5, 56.5, 9, 9.5, { wall: 'adobe-ochre' });
 // D: a two-storey house, its upper storey set back from the street, a
 // small dome on top.
 // (The porch's back is the house itself, faced in planks: a shut door.)
-town.house(45, 51, 58, 63, { h: 6, r: 2, tiers: [{ box: [48, 51, 58, 58], h: 10, r: 2 }], dome: true });
-town.arch(50, 61, 53, 63, { h: 6, lintel: 3 });
+town.house(45, 51, 58, 63, { h: 6, r: 2, wall: 'adobe-rose', tiers: [{ box: [48, 51, 58, 58], h: 10, r: 2 }], dome: true });
+town.arch(50, 61, 53, 63, { h: 6, lintel: 3, wall: 'adobe-rose' });
 p.rect(50, 60, 53, 61, town.roofCell({ h: 6, wall: 'planks' }));
 
 // South row.
@@ -79,12 +81,12 @@ town.room(9, 81, 12, 83, { h: 6, light: 160 }); // daylight through the door
 town.arch(9, 78, 12, 81, { h: 6, lintel: 3 });
 town.awning(6, 76, 16, 78, { z: 3.5 });
 // F: a tall house in two steps.
-town.house(20, 79, 30, 92, { h: 7, r: 2, wall: 'adobe-pale', tiers: [{ box: [22, 83, 30, 92], h: 10, r: 2 }], dome: true });
+town.house(20, 79, 30, 92, { h: 7, r: 2, wall: 'adobe-grey', tiers: [{ box: [22, 83, 30, 92], h: 10, r: 2 }], dome: true });
 // A square, with a round house under a dome in it.
-town.circle(41, 86, 4.5, { inside: town.roofCell({ h: 5 }), wall: { wall: 'adobe', wallTop: 5 }, open: 'out' });
-town.dome(41, 86, 5, 8.5);
+town.circle(41, 86, 4.5, { inside: town.roofCell({ h: 5, wall: 'adobe-rose' }), wall: { wall: 'adobe-rose', wallTop: 5 }, open: 'out' });
+town.dome(41, 86, 5, 8.5, { wall: 'adobe-rose' });
 // G: a low house on the square's east side.
-town.house(53, 78, 61, 88, { h: 5, r: 2, wall: 'adobe-pale', dome: true });
+town.house(53, 78, 61, 88, { h: 5, r: 2, wall: 'adobe-ochre', dome: true });
 
 // For now the street ends at an exit (until the town goes on east).
 p.rect(60, 64, 62, 76, town.street(0, { exit: true }));
@@ -98,6 +100,7 @@ for (const { box: [x0, y0, x1, y1], h, wall } of blocks) {
 }
 
 town.finish();
+town.drifts();
 list.push(...town.things);
 
 list.push(

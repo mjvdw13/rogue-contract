@@ -36,13 +36,13 @@ These need Mark to try something, or to decide. Don't start them without him.
   rebuilt with every building a volume: alleys, rounded corners, set-back
   storeys, a porch, a lean-to, a domed tower, a shop to walk into, and dome
   toppers on nearly every roof, sized to it):
-  the recoloured DF textures, the sky and how dark the suns' shade is.
+  the sky and how dark the suns' shade is.
   Dust in the air: 60 soft `glint` specks round you, sinking slowly
   (`dust` was too hard to see, glowing motes too intense, then Mark
   halved the glints twice from 240), a sixth as thick in view as the bench's 100
   (`count` in m1.js).
-  And should both suns be painted onto the DF sky? (It also needs the sky
-  to wrap once round the horizon, a small engine change.)
+  No suns painted on the sky (Mark, 2026-10-17). The textures are fine
+  but a little monochrome: being worked on under Mission 1, "The look".
 
 ## Next up
 
@@ -59,6 +59,17 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
 - [x] **Daylight and the kit:** `sky-day` and a warm haze; DF textures
       recoloured; `lib/town.js`; a bigger glyph pool; `m1` with a first
       stretch of street (`?map=m1`).
+- [ ] **The look** (Mark, 2026-10-17: get the first stretch right before
+      new areas; it's a little monochrome, wants variation and detail such
+      as doors). Snapshots before and after each step.
+  - [x] Colour: more plasters (ochre, rose, grey) spread over the houses,
+        a dirty skirt along every wall's foot (a band), sand drifts.
+  - [ ] Doors and windows: recessed doorways with shut doors in painted
+        metal and old wood, and windows, as decals cut from DF textures;
+        `town.door()` and `town.window()`.
+  - [ ] Awnings in coloured cloth and lean-to roofs in rusty metal; vents
+        and pipes on the walls.
+  - [ ] Waiting on Mark.
 - [ ] **Docking Bay 87**, the lane, the owner's office, the customs house.
       The episode starts in `m1`.
 - [ ] **The main street, the market and the water plaza** (stalls,

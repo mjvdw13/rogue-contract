@@ -3,7 +3,7 @@ import { ModelBuilder } from './lib/build.js';
 // Mos Eisley's domes: the toppers on its roofs. A plaster dome on a short
 // drum, over a lip a little wider than the drum, as on the film's houses.
 // Built at size rather than scaled, so the plaster keeps the walls' texel
-// size: one per width (3 to 11 tiles across) in each of the two plasters.
+// size: one per width (3 to 11 tiles across) in each plaster.
 // The town kit picks the widest that fits a roof (lib/town.js).
 
 /** How high a dome rises for its radius, over its lip and drum. */
@@ -31,13 +31,16 @@ function dome(id, radius, tex) {
   return m.build();
 }
 
-/** Every dome: `id` (`dome-<width>`, `-pale` in whitewash), `radius` and `height`, widest first. */
+/** The plasters domes come in, by the suffix on their ids. */
+export const PLASTERS = { '': 'adobe', '-pale': 'adobe-pale', '-ochre': 'adobe-ochre', '-rose': 'adobe-rose', '-grey': 'adobe-grey' };
+
+/** Every dome: `id` (`dome-<width>`, then its plaster's suffix), `radius`, `height` and `tex`, widest first. */
 export const DOMES = [];
 for (let width = 11; width >= 3; width--) {
   const radius = width / 2;
   const r = radius - 0.25;
   const height = LIP + Math.min(0.5, r * 0.15) + r * RISE;
-  for (const [suffix, tex] of [['', 'adobe'], ['-pale', 'adobe-pale']]) {
+  for (const [suffix, tex] of Object.entries(PLASTERS)) {
     DOMES.push({ id: `dome-${width}${suffix}`, radius, height: Math.round(height * 100) / 100, tex });
   }
 }
