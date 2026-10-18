@@ -58,9 +58,8 @@ These need Mark to try something, or to decide. Don't start them without him.
   each window and smudges by the doors' controls (`town.grime()`, about
   0.2 ms a frame). How dark (the pictures' greys,
   `tools/art/textures/grime.js`) and how much (`town.grime({ amount })`,
-  or a house's own `grime`). Rounded corners and round walls have none:
-  decals can go on angled walls now (`face: 'angled'`, as the bay's
-  scars do), but `grime()` doesn't place any there yet.
+  or a house's own `grime`). Rounded corners and round walls have none
+  (the new slanting fronts past the market have it).
 
 - **Awnings, tin, pipes and clutter in Mos Eisley** (`?map=m1`): cloth
   awnings in stripes and canvas (C teal with a fixed fringe, E red with a
@@ -155,6 +154,18 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
   - [ ] Waiting on Mark.
 - [ ] **The main street, the market and the water plaza** (stalls,
       awnings, the condenser tower).
+  - [x] Town kit: a building with an angled front (`town.slanted()`, a
+        convex outline whose slanting sides are angled walls), for the
+        street's bend.
+  - [x] The street on east to x 136: houses both sides, the frame the
+        blast doors will slide out of (x 104..106), the bend past it, the
+        exit moved to the street's end. The cantina's front, the stable,
+        the garage and the rooftops' first house are plain houses for now.
+  - [ ] The market (x 62..104, y 58..82): its houses, stalls under tarps
+        and awnings, the droid seller's pen, hangings, clutter.
+  - [ ] The water plaza: the condenser tower (a model, the landmark), the
+        water seller's tap and the dewback trough.
+  - [ ] Townsfolk; snapshots and frame time; then Waiting on Mark.
 - [ ] **The cantina:** entrance, steps down, the round room, the bar,
       booths, bandstand, back rooms.
 - [ ] **Bay 86, the dewback stable and the speeder garage.**

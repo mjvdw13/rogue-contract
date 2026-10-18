@@ -63,6 +63,45 @@ test("a building's walls, straight and rounded, have the skirt at their foot", (
   assert.ok(!skirt(p.get(20, 20)), 'not the street');
 });
 
+test('a building with a slanting side stands an angled wall along it, its roof inside and the street outside', () => {
+  const { p, town } = kit();
+  town.slanted([[4, 4], [16, 4], [16, 10], [4, 14]], { h: 6 });
+  assert.equal(p.get(10, 6).floorZ, 6, 'roof inside');
+  assert.equal(p.get(10, 13).floorZ, 0, 'street outside');
+  assert.equal(p.get(17, 6).floorZ, 0, 'street past its straight side');
+  const lines = [];
+  for (let y = 0; y < 40; y++) for (let x = 0; x < 40; x++) if (p.get(x, y).line) lines.push([x, y, p.get(x, y)]);
+  assert.ok(lines.length >= 12, 'every tile along the slant');
+  for (const [x, y, c] of lines) {
+    assert.equal(c.wallTop, 6);
+    assert.equal(c.floorZ, 0, 'the open side is the street');
+    // The solid side is on the right going along the line (y down): into the building, up and left.
+    const [ax, ay, bx, by] = c.line;
+    const mid = [x + (ax + bx) / 2, y + (ay + by) / 2];
+    const right = [-(by - ay), bx - ax];
+    assert.ok(right[1] < 0, `the wall at (${x}, ${y}) faces the street`);
+    assert.ok(mid[1] < 10 + ((16 - mid[0]) * 4) / 12 + 0.01 && mid[1] > 10 + ((16 - mid[0]) * 4) / 12 - 0.01, 'on the slant');
+  }
+});
+
+test("a slanting front's plaster runs on along it, and grime weathers it", () => {
+  const { p, town } = kit();
+  town.slanted([[4, 4], [16, 4], [16, 10], [4, 14]], { h: 6 });
+  town.finish().grime({ amount: 2 });
+  const us = [];
+  for (let x = 4; x < 16; x++) for (let y = 4; y < 15; y++) if (p.get(x, y).line) us.push(p.get(x, y).wallU);
+  assert.equal(new Set(us).size, us.length, 'each tile starts its texture somewhere else along the side');
+  assert.ok(Math.max(...us) > 11, "up to the side's length (12.6)");
+  const angled = town.decals.filter((d) => d.face === 'angled');
+  assert.ok(angled.length > 0, 'grime on the slant');
+  for (const d of angled) assert.ok(Math.abs(d.y - (10 + ((16 - d.x) * 4) / 12)) < 0.02, `(${d.x}, ${d.y}) is on the slant`);
+});
+
+test('two slanting sides through one tile are an error', () => {
+  const { town } = kit();
+  assert.throws(() => town.slanted([[13, 5], [11, 8], [10, 6]], { h: 6 }), /two slanting walls/);
+});
+
 test('sand drifts lie along the walls in the sun, not in the open or the shade', () => {
   const { p, town } = kit();
   town.house(4, 4, 36, 10, { h: 2 });

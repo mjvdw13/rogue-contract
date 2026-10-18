@@ -89,6 +89,8 @@ export class Town {
     this.tarps = [];
     /** Covers over a box at a height, for the shadows (tarps, tin roofs): { box, z }. */
     this.covers = [];
+    /** Slanting walls (`slanted()`), for `grime()`: { a, b, top, inward: a point inside }. */
+    this.slants = [];
   }
 
   /**
@@ -553,6 +555,64 @@ export class Town {
     return this;
   }
 
+  /**
+   * A building whose outline is a convex polygon (`points`, [x, y] on tile
+   * corners, going either way round): its sides along the grid are ordinary
+   * walls and its slanting sides angled walls, so a street can bend. Each
+   * tile can hold one slanting side, so two may only meet at a corner where
+   * they go off into different tiles. Otherwise as `house()` without
+   * `tiers`: `h`, `wall`, `roof`, `skirt`, `light`, `grime`, and `dome`
+   * tops it with the widest dome that fits round its middle. A slanting
+   * wall's plaster runs on from tile to tile (`wallU`), so its decals can
+   * cross tiles, and `grime()` weathers it; it gets no doors, windows or
+   * clutter.
+   */
+  slanted(points, { h, dome, grime, ...opts }) {
+    const p = this.p;
+    const n = points.length;
+    const xs = points.map((q) => q[0]);
+    const ys = points.map((q) => q[1]);
+    const [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
+    if (grime !== undefined) this.grimeBoxes.push([x0, y0, x1, y1, grime]);
+    const inside = this.roofCell({ ...opts, h });
+    const bands = this._bands(opts.skirt);
+    const wall = { wall: opts.wall ?? this.wall, wallTop: h, ...(bands && { bands }) };
+    const cx = xs.reduce((s, v) => s + v, 0) / n;
+    const cy = ys.reduce((s, v) => s + v, 0) / n;
+    const edges = points.map((a, i) => [a, points[(i + 1) % n]]);
+    // Which side of the line a-b a point is on (signed), and inside: the centre's side of every edge.
+    const side = ([ax, ay], [bx, by], x, y) => (bx - ax) * (y - ay) - (by - ay) * (x - ax);
+    const within = (x, y) => edges.every(([a, b]) => side(a, b, x, y) * side(a, b, cx, cy) > 0);
+    const slants = edges.filter(([a, b]) => a[0] !== b[0] && a[1] !== b[1]);
+    const r4 = (v) => Math.round(v * 1000) / 1000;
+    for (let y = y0; y < y1; y++) {
+      for (let x = x0; x < x1; x++) {
+        const cuts = slants.map((edge) => ({ edge, pts: segmentCrossings(...edge, x, y) })).filter((c) => c.pts.length === 2);
+        if (cuts.length > 1) throw new Error(`Town: two slanting walls cross the tile (${x}, ${y})`);
+        if (!cuts.length) {
+          if (within(x + 0.5, y + 0.5)) p.set(x, y, inside);
+          continue;
+        }
+        // The building's side on the right going from the first point to the second (y down).
+        let [a, b] = cuts[0].pts;
+        const right = [-(b[1] - a[1]), b[0] - a[0]];
+        if (right[0] * (cx - (a[0] + b[0]) / 2) + right[1] * (cy - (a[1] + b[1]) / 2) < 0) [a, b] = [b, a];
+        // The texture runs on along the whole side, back from the end the line points to.
+        const [e0, e1] = cuts[0].edge;
+        const end = (b[0] - a[0]) * (e1[0] - e0[0]) + (b[1] - a[1]) * (e1[1] - e0[1]) > 0 ? e1 : e0;
+        const wallU = r4(Math.hypot(end[0] - b[0], end[1] - b[1]));
+        p.set(x, y, { ...p.get(x, y), ...wall, line: [r4(a[0] - x), r4(a[1] - y), r4(b[0] - x), r4(b[1] - y)], wallU });
+      }
+    }
+    for (const [a, b] of slants) this.slants.push({ a, b, top: h, inward: [cx, cy], skirt: bands?.[0]?.to ?? 0 });
+    if (dome) {
+      // As wide as the nearest side is from the middle allows, with a rim.
+      const reach = Math.min(...edges.map(([a, b]) => Math.abs(side(a, b, cx, cy)) / Math.hypot(b[0] - a[0], b[1] - a[1])));
+      this.dome(cx, cy, h, reach * 2 - 1.5, { wall: typeof dome === 'string' ? dome : opts.wall });
+    }
+    return this;
+  }
+
   /** A rounded box of roof at `h`; corner tiles outside the arc keep their cell. */
   _rounded(x0, y0, x1, y1, r, h, opts) {
     const p = this.p;
@@ -622,8 +682,9 @@ export class Town {
    * a drip under each window and smudges by each door's controls. `amount`
    * scales it (0 none, 1 the usual, 2 neglected); a house's own `grime`
    * replaces it on its walls. Placed at random from `seed`, the same every
-   * time. Run it after `finish()`. Rounded corners and round walls get
-   * none: decals go on tile edges.
+   * time. Run it after `finish()`. Slanting walls (`slanted()`) get
+   * streaks, dust, stains and cracks too; rounded corners and round walls
+   * get none.
    */
   grime({ amount = 1, seed = 11 } = {}) {
     const { p } = this;
@@ -649,7 +710,14 @@ export class Town {
       const mid = Math.min(hi - half, Math.max(lo + half, a));
       const zz = z ?? (top !== undefined ? top - (h * scale) / 2 : bottom + (h * scale) / 2);
       const round = (v) => Math.round(v * 100) / 100;
-      const at = ns(face) ? { x: round(mid), y: line } : { x: line, y: round(mid) };
+      // (On a slanting wall, `line` is the slant and `mid` how far along it.)
+      const t = face === 'angled' ? mid / line.len : 0;
+      const at =
+        face === 'angled'
+          ? { x: round(line.a[0] + (line.b[0] - line.a[0]) * t), y: round(line.a[1] + (line.b[1] - line.a[1]) * t) }
+          : ns(face)
+            ? { x: round(mid), y: line }
+            : { x: line, y: round(mid) };
       out.push({ ...at, z: round(zz), face, tex, ...(scale !== 1 && { scale: round(scale) }), ...(flip && { flip }) });
       return w * scale;
     };
@@ -681,6 +749,17 @@ export class Town {
           }
         }
       }
+    }
+
+    // The slanting walls (`slanted()`), each one run along its length.
+    for (const s of this.slants) {
+      const len = Math.hypot(s.b[0] - s.a[0], s.b[1] - s.a[1]);
+      const mid = [(s.a[0] + s.b[0]) / 2, (s.a[1] + s.b[1]) / 2];
+      const d = Math.hypot(s.inward[0] - mid[0], s.inward[1] - mid[1]);
+      const step = (k) => [Math.floor(mid[0] + ((s.inward[0] - mid[0]) / d) * k), Math.floor(mid[1] + ((s.inward[1] - mid[1]) / d) * k)];
+      const front = p.get(...step(-0.7));
+      if (!open(front)) continue;
+      runs.push({ face: 'angled', line: { ...s, len }, a0: 0, a1: len, bot: front.floorZ ?? 0, top: s.top, g: levelAt(step(0.7)), street: front.floor === this.floor, skirt: s.skirt });
     }
 
     for (const { face, line, a0, a1, bot, top, g, street, skirt } of runs) {
@@ -1013,6 +1092,28 @@ export class Town {
 
 const TAU = Math.PI * 2;
 const SAMPLES = [[0.25, 0.25], [0.75, 0.25], [0.25, 0.75], [0.75, 0.75]];
+
+/**
+ * Where the segment a-b crosses the edges of the tile (x, y): the distinct
+ * points (two when it runs through the tile, fewer when it only touches it).
+ */
+function segmentCrossings(a, b, x, y) {
+  const corners = [[x, y], [x + 1, y], [x + 1, y + 1], [x, y + 1]];
+  const d = [b[0] - a[0], b[1] - a[1]];
+  const pts = [];
+  for (let k = 0; k < 4; k++) {
+    const c = corners[k];
+    const e = [corners[(k + 1) % 4][0] - c[0], corners[(k + 1) % 4][1] - c[1]];
+    const den = d[0] * e[1] - d[1] * e[0];
+    if (Math.abs(den) < 1e-9) continue;
+    const t = ((c[0] - a[0]) * e[1] - (c[1] - a[1]) * e[0]) / den;
+    const s = ((c[0] - a[0]) * d[1] - (c[1] - a[1]) * d[0]) / den;
+    if (t < -1e-9 || t > 1 + 1e-9 || s < -1e-9 || s > 1 + 1e-9) continue;
+    const q = [a[0] + t * d[0], a[1] + t * d[1]];
+    if (!pts.some((o) => Math.hypot(o[0] - q[0], o[1] - q[1]) < 1e-6)) pts.push(q);
+  }
+  return pts;
+}
 
 /** Where a circle crosses a tile's edges (its corners in order round it). */
 function crossings(corners, cx, cy, r) {

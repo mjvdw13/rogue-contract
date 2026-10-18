@@ -111,6 +111,84 @@ town.window(53, 83.5, 'W', { z: 3, tex: 'window-louvre' });
 // A stall on the square in front of G, under a tarp that billows.
 town.tarp(46, 80, 50, 84, { z: 2.75, face: 'W', rise: 0.5, cloth: 'red' });
 
+// ---------------------------------------------------------------- 2. the main street (east) and the market
+// East of the first stretch the street widens into the market (y 58..82,
+// x 62..102), the water plaza in its middle. Past the market it narrows
+// between the frame the blast doors slide out of (x 104..106), then bends
+// north a little (angled fronts, `slanted()`), so you never see straight
+// down it, and runs on to the checkpoint (for now an exit at its end).
+p.rect(62, 58, 102, 82, town.street());
+p.rect(102, 58, 136, 80, town.street());
+// Alleys off the market, between its houses.
+p.rect(71, 49, 73, 58, town.street());
+p.rect(86, 49, 88, 58, town.street());
+p.rect(61, 82, 63, 96, town.street());
+p.rect(73, 82, 87, 94, town.street());
+// The back lane behind the cantina, off the street's south side.
+p.rect(126, 73, 130, 92, town.street());
+// Ground under the houses' plots too, for their rounded back corners.
+for (const lot of [[62, 48, 71, 58], [73, 51, 86, 58], [88, 47, 101, 58], [102, 50, 112, 64], [126, 50, 136, 61], [63, 82, 73, 92], [87, 82, 102, 92], [102, 76, 114, 86], [130, 73, 136, 86]]) {
+  p.rect(...lot, town.street());
+}
+
+// The market's north side.
+// H: a house in two steps, the upper storey at the back, a dome on top.
+town.house(62, 48, 71, 58, { h: 6, r: 2, wall: 'adobe-pale', skirt: 'plinth', tiers: [{ box: [62, 48, 71, 54], h: 9, r: 2 }], dome: true });
+town.door(66, 58, 'S', { h: 6, tex: 'door-grey', wall: 'adobe-pale' });
+town.window(68.5, 58, 'S', { z: 3.2 }).window(66.5, 54, 'S', { z: 7.2, tex: 'window-louvre' });
+// I: a long low house, a wide shutter and a door under an awning.
+town.house(73, 51, 86, 58, { h: 4.5, r: 1, skirt: 'plinth', dome: true });
+town.door(76.5, 58, 'S', { h: 4.5, tex: 'shutter', tall: 2.25, width: 3, jamb: false, sign: false, panel: false });
+town.door(82, 58, 'S', { h: 4.5 });
+town.awning(74, 58, 86, 60, { z: 3, face: 'S', cloth: 'olive' });
+// J: a tall house over a garage door, its upper storey at the back.
+town.house(88, 47, 101, 58, { h: 7, r: 2, wall: 'adobe-grey', skirt: null, tiers: [{ box: [90, 47, 101, 53], h: 10, r: 2 }], dome: true });
+town.door(94.5, 58, 'S', { h: 7, tex: 'shutter', tall: 2.25, width: 3, jamb: false, sign: false, panel: false, wall: 'adobe-grey' });
+town.window(90.5, 58, 'S', { z: 4.5 }).window(98.5, 58, 'S', { z: 4.5, tex: 'window-louvre' }).window(96.5, 53, 'S', { z: 8.4 });
+
+// The market's south side.
+// Q: a house with an awning over its door.
+town.house(63, 82, 73, 92, { h: 6, r: 2, dome: true });
+town.awning(65, 80, 71, 82, { z: 3.5, face: 'N', cloth: 'sand' });
+town.door(68, 82, 'N', { h: 6 });
+town.window(65.5, 82, 'N', { z: 2.2 }).window(73, 87.5, 'E');
+// R: a round house under a dome.
+town.circle(80, 88, 5, { inside: town.roofCell({ h: 7, wall: 'adobe-rose', skirt: null }), wall: { wall: 'adobe-rose', wallTop: 7 }, open: 'out', skirt: null });
+town.dome(80, 88, 7, 9.5, { wall: 'adobe-rose' });
+// S: where the cantina's front will be (its own step): a long house, its door shut.
+town.house(87, 82, 102, 92, { h: 6, r: 3, wall: 'adobe-pale', dome: true });
+town.door(94, 82, 'N', { h: 6, tex: 'door-grey', wall: 'adobe-pale' });
+town.window(90.5, 82, 'N', { z: 3.4, tex: 'window-louvre' }).window(98.5, 82, 'N', { z: 3.4, tex: 'window-louvre' });
+
+
+// Past the market. North side: K by the frame, a porch cut into its front
+// and a door at the back of it, L with its front slanting back to the
+// north, M at the street's end.
+town.house(102, 50, 112, 64, { h: 7, r: 2, wall: 'adobe-pale', skirt: null, dome: true });
+town.arch(107, 61, 111, 64, { h: 7, lintel: 3.5, wall: 'adobe-pale' });
+town.door(109, 61, 'S', { h: 7, depth: 0, tex: 'door-grey', wall: 'adobe-pale' });
+town.window(102, 61.5, 'W', { z: 3.4, tex: 'window-louvre' }).window(106.5, 64, 'S', { z: 4.6 });
+// The blast doors' frame: a strip of Imperial steel set into the walls
+// either side of the street, the slots the doors slide out of when the
+// town shuts (the story's switch). Easy to miss while they're open.
+const GATE = { wall: 'imp-panel-dark', roof: 'imp-floor', skirt: { tex: 'imp-stripe', to: 0.5 } };
+town.block(104, 63, 106, 64, { ...GATE, h: 7 });
+town.slanted([[112, 52], [126, 52], [126, 61], [122, 61], [112, 64]], { h: 6, wall: 'adobe-ochre', dome: 'adobe' });
+town.house(126, 50, 136, 61, { h: 8, r: 2, tiers: [{ box: [128, 50, 136, 57], h: 11, r: 2 }], dome: true });
+town.door(130, 61, 'S', { h: 8, tex: 'door-red' });
+town.window(132.5, 61, 'S', { z: 3.4 }).window(133.5, 57, 'S', { z: 9.4, tex: 'window-louvre' });
+// South side: N by the frame, O slanting back to the south, the back lane,
+// then P (the first of the rooftops).
+town.house(102, 76, 114, 86, { h: 6, r: 2, wall: 'adobe-rose', skirt: 'plinth', dome: true });
+town.door(110, 76, 'N', { h: 6, wall: 'adobe-rose' });
+town.awning(107, 74, 113, 76, { z: 3.5, face: 'N', cloth: 'red', valance: 'valance-red' });
+town.window(107.5, 76, 'N', { z: 2.2, tex: 'window-louvre' });
+town.block(104, 76, 106, 77, { ...GATE, h: 6 });
+town.slanted([[114, 76], [124, 73], [126, 73], [126, 86], [114, 86]], { h: 5, wall: 'adobe-grey', skirt: null, dome: true });
+town.house(130, 73, 136, 86, { h: 8, r: 1, wall: 'adobe-pale', tiers: [{ box: [132, 77, 136, 86], h: 11, r: 1 }] });
+town.door(133, 73, 'N', { h: 8, tex: 'door-grey', wall: 'adobe-pale' });
+town.window(130, 79.5, 'W', { z: 4.4, tex: 'window-louvre' });
+
 // ---------------------------------------------------------------- 1. Docking Bay 87
 // South of the south back lane: a round pit 21 m across under the sky, its
 // floor 2.5 m below the street and its duracrete walls 5.5 m tall, braced
@@ -217,8 +295,8 @@ town.vent(23, 79, 'N', { z: 1.1, tex: 'vent-slats' }).vent(55.6, 78, 'N', { z: 3
 town.vent(9, 63, 'S', { z: 4.6, tex: 'vent-grille' });
 town.vent(16, 53.5, 'W', { z: 4, tex: 'vent-round' }).vent(28, 55, 'E', { z: 3.4, tex: 'vent-slats' });
 
-// For now the street ends at an exit (until the town goes on east).
-p.rect(60, 64, 62, 76, town.street(0, { exit: true }));
+// For now the street ends at an exit (until the checkpoint).
+p.rect(134, 61, 136, 73, town.street(0, { exit: true }));
 
 // Domes on the blocks of town the streets left whole, two in three.
 for (const { box: [x0, y0, x1, y1], h, wall } of blocks) {

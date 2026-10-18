@@ -60,9 +60,9 @@ street is at 0. The numbers 1-10 are the story's; 11 on are new.
 |---|------|-----|-------|--------------|
 | 1 | **Docking Bay 87** | 9..56, 100..149 | -5, sky | The start, and the pickup. A round pit open to the sky, 21 m across (centre 32, 125, radius 21), south of the first stretch's south back lane (the design's first box overlapped the south row). Duracrete walls 5.5 m tall, braced by buttresses along their foot (`bay-wall`, `bay-wall-ribbed`, from Talay's TWCAP01), twelve ribs up them every 30 degrees clear of the landing, a lamp on the rim over every other rib, fuel lines over the rim and down to four pumps, eight soot scars (`grime-scorch-1`, `-2`: decals on the angled wall). The bay door (4 wide, 4 high) opens off the back lane into a passage and onto a landing over the pit at street level; stairs go down from it (a step of 0.625 a tile). Hazy and quiet: dust drifting, a power droid shuffling, the bay owner's grumbling, a hum of fuel pumps. A maintenance pit in the middle of the floor where the Crow lands (28..35, 122..125, 2 deep, steel-lined, hazard stripes on its lips, two steps down at its west end); off its east end a crawlspace under the floor (a slab) with a shield unit: the secret. The Moldy Crow hovers just south of the pit, nose east and turned a little off square (until the drop-off flies it in and out); you can walk under it. |
 | 2 | **Main street** | 4..136, 64..76 | 0, sky | 12-14 wide, sand over packed earth, adobe both sides with doorways, awnings, vaporators and signs. It bends a little (angled walls) so you never see straight down it. A sandtrooper patrol, villagers, Jawas arguing over a droid, a probe droid over the market. The prefecture's comm tower is the landmark to walk toward. |
-| 2 | **The market** | 52..104, 58..82 | 0, sky | The street widens into a market: stalls with cloth awnings (shade you walk under), crates, baskets of fruit, a droid seller's pen, hanging cloth. The busiest place in town. |
+| 2 | **The market** | 62..102, 58..82 | 0, sky | The street widens into a market: stalls with cloth awnings (shade you walk under), crates, baskets of fruit, a droid seller's pen, hanging cloth. The busiest place in town. |
 | 13 | **Water plaza** | round, at (78, 70), r 9 | 0, sky | In the market: a moisture condenser tower (a tall 3D model, a landmark), a water seller and the queue at his tap, a dewback trough. |
-| B | **Blast doors** | at x 104..106 | | Two Imperial blast doors across the street, open in the calm half (recessed into the walls, easy to miss). The switch shuts them and splits the town in two. |
+| B | **Blast doors** | at x 104..106 | | Two Imperial blast doors across the street, open in the calm half: slid into slots in the walls either side, strips of dark steel easy to miss. The switch shuts them and splits the town in two. |
 | 3 | **Chalmun's cantina** | 88..126, 84..122 | -2 | The classic. A dark entrance with a droid detector (and a "no droids" sign), steps down into a round main room (about 26 across, a true circle of angled walls). A round bar in the middle with the bartender, booths in alcoves round the edge under lower ceilings, each with a dim lamp. A bandstand with the band (its own music). Smoke hangs in the lamplight. Dark: 96-120, with pools at the bar and the booths. The broker's booth at the back. A back room, a storeroom and the kitchen; the back door opens onto the back lane (19). |
 | 14 | **Bay owner's office** | 44..53, 101..105 | 0 | In the bay's building, east of its door: a red door off the lane and a window (open, at eye height) onto it. A cramped office with a terminal and crates, a desk, a tired owner ("Docking fees doubled. Imperials."), a power droid charging outside. |
 | 16 | **Customs house** | 11..21, 99..106 | 0 | West of the bay door, jutting a tile into the lane: a grey Imperial prefab (corrugated `metal-grey`, its roof at 5, below the bay's) dropped among the adobe, a door and a window onto the lane, impounded cargo inside: the customs officer and his troopers come out of it. A counter, a terminal, a holo-notice of wanted faces (not Dace's yet). |
@@ -150,6 +150,11 @@ Check a street from several angles, not just down its length.
   (each tile's `wallU`) instead of starting it afresh in each tile, so a
   wide texture (the bay's buttresses) isn't cut up; the seam goes where
   it's hidden.
+- **Slanting fronts** (`slanted()`): a building on a convex outline whose
+  slanting sides are angled walls (one to a tile), their plaster running
+  on along the side (`wallU`) so grime can cross tiles. Past the market
+  the street bends north with two of them, so you never see straight down
+  it. They take no doors, windows or clutter.
 - **Doorways and arches in an outside wall are slab tiles** (`arch()`):
   open below the lintel, the slab's top at the roof. A doorway with a plain
   lowered ceiling would show a wall from the lintel up to the street's sky.
@@ -238,8 +243,8 @@ Check a street from several angles, not just down its length.
   street, stains and cracks; a window gets a drip under its sill and a
   door smudges by its controls. `town.grime({ amount })` scales it (0
   none, 1 the usual, 2 neglected) and a house's own `grime` replaces it on
-  its walls. Placed at random from a seed, the same every time. Rounded
-  corners and round walls get none (decals go on tile edges).
+  its walls. Placed at random from a seed, the same every time. Slanting
+  fronts get it too; rounded corners and round walls get none.
 - **Doors and windows** (`door()`, `window()`): a door is a recess a tile
   into a straight wall, 2 wide and 3 high (an arch), and follows the
   film's (Mark's reference, 2026-10-17): the door itself on the back wall
