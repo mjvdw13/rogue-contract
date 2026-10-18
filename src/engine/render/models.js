@@ -97,13 +97,18 @@ export function drawModels(view, things, map, textures, fb, fbW, colormaps, skip
     // faces, a shadow on the ground, stay where they are.)
     const bob = t.bobZ ?? 0;
     const tz = (t.z ?? 0) + bob;
+    // (It rolls `bobRoll` about its long axis, through its base.)
+    const rc = Math.cos(t.bobRoll ?? 0);
+    const rs = Math.sin(t.bobRoll ?? 0);
     const vs = model.verts;
     for (let i = 0; i < nv; i++) {
       const mx = vs[i * 3] * s;
-      const my = vs[i * 3 + 1] * s;
+      const my0 = vs[i * 3 + 1] * s;
+      const mz0 = vs[i * 3 + 2] * s;
+      const my = my0 * rc - mz0 * rs;
       const wx = t.x + mx * c - my * sn;
       const wy = t.y + mx * sn + my * c;
-      const wz = tz + vs[i * 3 + 2] * s;
+      const wz = tz + my0 * rs + mz0 * rc;
       worldX[i] = wx;
       worldY[i] = wy;
       worldZ[i] = wz;

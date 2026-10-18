@@ -419,11 +419,12 @@ export function defineItem(def) {
  * level thing's `z`): props against a wall, fixtures on it, things stacked.
  * `spin` turns it (radians a second). `bob: { height, period }` floats it
  * up and down, `height` either way over `period` seconds (a hovering
- * speeder): drawn only, so it collides where it stands, and a model's grime
+ * speeder), and `roll` sways a model side to side, that many degrees either
+ * way, a quarter swing ahead of the rise: drawn only, so it collides where it stands, and a model's grime
  * faces (its shadow) stay on the ground.
  * @param {{id:string, glyph?:string, sheet:SheetSpec, anims?:Record<string,AnimSpec>, solid?:boolean,
  *   radius?:number, height?:number, z?:number, hanging?:boolean, fixed?:boolean, health?:number,
- *   spin?:number, bob?:{height:number, period:number},
+ *   spin?:number, bob?:{height:number, period:number, roll?:number},
  *   explode?:{radius:number, damage:number, sound?:string}}} def
  */
 export function defineDecoration(def) {

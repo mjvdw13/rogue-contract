@@ -82,8 +82,11 @@ function bobAt(t, time) {
     const k = Math.sin(t.x * 12.9898 + t.y * 78.233) * 43758.5453;
     t.bobPhase = k - Math.floor(k);
   }
-  const { height, period } = t.def.bob;
-  return height * Math.sin((time / period + t.bobPhase) * Math.PI * 2);
+  const { height, period, roll = 0 } = t.def.bob;
+  const a = (time / period + t.bobPhase) * Math.PI * 2;
+  // The roll leads the rise by a quarter swing, so it sways as it floats.
+  t.bobRoll = ((roll * Math.PI) / 180) * Math.cos(a);
+  return height * Math.sin(a);
 }
 
 export class World {

@@ -355,8 +355,14 @@ test('a bobbing model is drawn off its place, but its grime faces stay where the
   assert.deepEqual(raised, shadow, 'the grime stays put');
 });
 
+test('a rolling model is drawn tipped to one side', () => {
+  const still = frame(open, [thing(square(), 5.5, 2.5)]);
+  const rolled = frame(open, [thing(square(), 5.5, 2.5, { bobRoll: 0.3 })]);
+  assert.notDeepEqual(rolled, still);
+});
+
 test('the validator checks a decoration\'s bob', () => {
   const bad = defineDecoration({ id: 'bad-bob', model: 'terminal', bob: { height: 0.1 } });
   const { errors } = validateContent(new Registry({ ...content, things: [...content.things, bad] }));
-  assert.deepEqual(errors.filter((e) => e.includes('bad-bob')), ['decoration "bad-bob": "bob" needs a "height" of 0 or more and a "period" above 0 (seconds)']);
+  assert.deepEqual(errors.filter((e) => e.includes('bad-bob')), ['decoration "bad-bob": "bob" needs a "height" of 0 or more, a "period" above 0 (seconds) and a "roll" of 0 or more (degrees)']);
 });

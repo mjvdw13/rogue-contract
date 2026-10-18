@@ -335,7 +335,8 @@ be added with `definePickup` (see *Custom behaviour*).
   a wall, fixtures on one, things stacked on others. `spin` turns one
   (radians a second), and `bob: { height, period }` floats one up and down
   by `height` either way over `period` seconds, like the hovering
-  `landspeeder`. Bobbing is drawn only: the thing collides and stops shots
+  `landspeeder`; add `roll` (degrees) to sway a model side to side as it
+  floats, like the `moldy-crow`. Bobbing is drawn only: the thing collides and stops shots
   where it stands, each bobs at its own point in the swing, and a model's
   grime faces (its shadow) stay on the ground.
 - **Projectiles** are defined in `src/content/effects.js` with
