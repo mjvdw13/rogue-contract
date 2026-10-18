@@ -728,8 +728,10 @@ decals: [
   a metre) times `scale`. Transparent texels show the wall.
 - `glow: true` ignores the light (a lit screen); `flip: true` mirrors it.
 
-Decal textures are defined with `decal: true` (`src/content/textures.js`) and
-drawn by `tools/art/textures/decals.js`. The map viewer marks decals with a
+Decal textures are defined with `decal: true` (`src/content/textures.js`), any
+size, and drawn by `tools/art/textures/decals.js`; Mos Eisley's doors and
+windows are cut from Dark Forces textures by `assets/custom/derive.mjs`
+(`DECALS`), and the town kit places them (`town.door()`, `town.window()`). The map viewer marks decals with a
 white tick.
 
 ### Backdrop: terrain past the edge of play

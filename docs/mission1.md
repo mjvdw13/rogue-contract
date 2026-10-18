@@ -170,6 +170,13 @@ Check a street from several angles, not just down its length.
   one hanging over a lower roof is clipped. 189 of them cost about 0.1 ms a
   frame.
 - **Awnings** are thin cloth slabs: you walk under them in their shade.
+- **Doors and windows** (`door()`, `window()`): a door is a recess a tile
+  into a straight wall (an arch), a round-topped door on its back wall (a
+  decal: `door-steel`, `door-rust`, `door-teal`, `door-wood`, or the shop
+  `shutter`) and a flagstone step outside; `depth: 0` puts it on the wall
+  itself (the back of a porch). Windows are decals flush on the wall
+  (`window-bars`, `window-louvre`), with a dark rim for the reveal's
+  shadow. Decals only go on straight faces, not round walls.
 - **Plasters and the skirt:** houses come in five plasters (`adobe`,
   `adobe-pale`, `adobe-ochre`, `adobe-rose`, `adobe-grey`), domes in each.
   The palette has no golden ochres, so ochre comes out terracotta: use it
@@ -198,6 +205,10 @@ angle unless their sheet has the other views (the villagers do).
   The Moldy Crow comes with the drop-off (story section 5).
 - **Existing:** barricades, supply crates, terminals, consoles, floodlight
   towers (the checkpoint), boulders (the town's edge).
+- **Doors and windows:** decals cut by `derive.mjs` (`DECALS`): steel
+  and teal doors from ZDMETAL1, rusty iron from IDDOOR1, wood from
+  IWGRAN5, the shutter from a strip of NDCORUG1, barred windows from
+  SPBARS1, louvres from NPVENTS1.
 - **Textures:** Dark Forces textures recoloured by
   `assets/custom/derive.mjs` (Mark, 2026-10-17: DF textures for now, none
   of our own, so no generated stand-ins). So far: plaster (`adobe`),

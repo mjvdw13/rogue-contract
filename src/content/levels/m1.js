@@ -52,6 +52,7 @@ p.rect(7, 53, 12, 59, town.street(0, { secret: true }));
 town.arch(8, 59, 10, 61, { h: 6, lintel: 1.2, light: 120 });
 town.arch(8, 61, 10, 63, { h: 6, lintel: 3 });
 list.push(at('energy-pack', 9.5, 55.5));
+town.window(12, 63, 'S', { tex: 'window-louvre' }).window(4, 57, 'W');
 // B: a house with a porch jutting into the street, a room behind it and a
 // dome over the room.
 town.house(16, 50, 28, 62, { h: 6, r: 3, wall: 'adobe-pale', dome: true });
@@ -59,19 +60,23 @@ town.room(19, 53, 25, 60, { h: 6, wall: 'adobe-pale', light: 128 });
 town.arch(20, 60, 24, 62, { h: 6, lintel: 3, wall: 'adobe-pale' });
 town.house(19, 62, 25, 66, { h: 4, r: 1, wall: 'adobe-pale' });
 town.arch(20, 62, 24, 66, { h: 4, lintel: 3, wall: 'adobe-pale' });
+town.window(16, 56, 'W', { tex: 'window-louvre' });
 // C: a round tower under a big dome, a low lean-to in front of it with an
 // awning over the street.
 // (The lean-to first: the tower's round wall rises from its roof.)
 town.house(30, 59, 42, 63, { h: 4, r: 1 });
 town.circle(35.5, 56.5, 5, { inside: town.roofCell({ h: 9, wall: 'adobe-ochre' }), wall: { wall: 'adobe-ochre', wallTop: 9 }, open: 'out' });
 town.awning(31, 63, 41, 66, { z: 3.25 });
+town.door(33, 63, 'S', { h: 4, tex: 'door-wood' });
+town.door(38.5, 63, 'S', { h: 4, tex: 'shutter', tall: 2.25, width: 3 });
 town.dome(35.5, 56.5, 9, 9.5, { wall: 'adobe-ochre' });
 // D: a two-storey house, its upper storey set back from the street, a
 // small dome on top.
-// (The porch's back is the house itself, faced in planks: a shut door.)
+// (A shut door at the back of its porch.)
 town.house(45, 51, 58, 63, { h: 6, r: 2, wall: 'adobe-rose', tiers: [{ box: [48, 51, 58, 58], h: 10, r: 2 }], dome: true });
 town.arch(50, 61, 53, 63, { h: 6, lintel: 3, wall: 'adobe-rose' });
-p.rect(50, 60, 53, 61, town.roofCell({ h: 6, wall: 'planks' }));
+town.door(51.5, 61, 'S', { h: 6, tex: 'door-teal', depth: 0 });
+town.window(48, 63, 'S', { z: 3.6 }).window(55.5, 63, 'S', { z: 3.6 }).window(53, 58, 'S', { z: 8, tex: 'window-louvre' });
 
 // South row.
 // E: a shop you can walk into, under an awning, with a dome over it.
@@ -80,13 +85,18 @@ town.room(7, 81, 15, 88, { h: 6, light: 128 });
 town.room(9, 81, 12, 83, { h: 6, light: 160 }); // daylight through the door
 town.arch(9, 78, 12, 81, { h: 6, lintel: 3 });
 town.awning(6, 76, 16, 78, { z: 3.5 });
+town.window(7.5, 78, 'N', { z: 2.2 }).window(13.5, 78, 'N', { z: 2.2 });
 // F: a tall house in two steps.
 town.house(20, 79, 30, 92, { h: 7, r: 2, wall: 'adobe-grey', tiers: [{ box: [22, 83, 30, 92], h: 10, r: 2 }], dome: true });
+town.door(25, 79, 'N', { h: 7, wall: 'adobe-grey' });
+town.window(22.75, 79, 'N', { z: 4 }).window(26, 83, 'N', { z: 8.5, tex: 'window-louvre' }).window(20, 86, 'W');
 // A square, with a round house under a dome in it.
 town.circle(41, 86, 4.5, { inside: town.roofCell({ h: 5, wall: 'adobe-rose' }), wall: { wall: 'adobe-rose', wallTop: 5 }, open: 'out' });
 town.dome(41, 86, 5, 8.5, { wall: 'adobe-rose' });
 // G: a low house on the square's east side.
 town.house(53, 78, 61, 88, { h: 5, r: 2, wall: 'adobe-ochre', dome: true });
+town.door(57, 78, 'N', { h: 5, tex: 'door-rust', wall: 'adobe-ochre' });
+town.window(53, 83, 'W', { z: 3, tex: 'window-louvre' });
 
 // For now the street ends at an exit (until the town goes on east).
 p.rect(60, 64, 62, 76, town.street(0, { exit: true }));
@@ -124,6 +134,7 @@ export default defineLevel({
   // view as the 100 on the particle bench (2026-10-15); 240 still
   // distracted, and Mark halved that twice.
   weather: { type: 'glint', count: 60 },
+  decals: town.decals,
   par: 600,
   ...p.build(),
   things: [],

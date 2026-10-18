@@ -37,6 +37,9 @@ const TOWN = [
   'planks', 'street-sand', 'street-drift', 'flagstone',
 ];
 
+// Mos Eisley's doors and windows: decals cut from DF textures by derive.mjs.
+const TOWN_DECALS = ['door-steel', 'door-rust', 'door-teal', 'door-wood', 'shutter', 'window-bars', 'window-louvre'];
+
 const ANIMATED = {
   'imp-computer': { frames: 3, fps: 3 },
 };
@@ -48,6 +51,7 @@ export default [
   ...FENCES.map((id) => defineTexture({ id, src: `assets/textures/${id}.png`, fence: true })),
   ...DECALS.map((id) => defineTexture({ id, src: `assets/textures/${id}.png`, decal: true })),
   ...TOWN.map((id) => defineTexture({ id, src: `assets/custom/textures/${id}.png`, fullbright: false })),
+  ...TOWN_DECALS.map((id) => defineTexture({ id, src: `assets/custom/textures/${id}.png`, decal: true, fullbright: false })),
   defineTexture({ id: 'sky-night', src: 'assets/textures/sky-night.png', sky: true }),
   defineTexture({ id: 'sky-day', src: 'assets/custom/textures/sky-day.png', sky: true }),
 ];

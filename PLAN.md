@@ -64,7 +64,7 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
       as doors). Snapshots before and after each step.
   - [x] Colour: more plasters (ochre, rose, grey) spread over the houses,
         a dirty skirt along every wall's foot (a band), sand drifts.
-  - [ ] Doors and windows: recessed doorways with shut doors in painted
+  - [x] Doors and windows: recessed doorways with shut doors in painted
         metal and old wood, and windows, as decals cut from DF textures;
         `town.door()` and `town.window()`.
   - [ ] Awnings in coloured cloth and lean-to roofs in rusty metal; vents

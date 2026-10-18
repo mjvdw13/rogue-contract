@@ -8,8 +8,10 @@
 //   town.block(10, 56, 20, 64, { h: 6 });
 //   town.arch(14, 63, 16, 64, { h: 6, lintel: 3 });
 //   town.house(24, 50, 36, 62, { h: 6, r: 2, dome: true });
+//   town.door(30, 62, 'S', { h: 6, tex: 'door-teal' });
 //   town.finish();
 //   list.push(...town.things);  // the domes
+//   decals: town.decals,        // the doors and windows
 
 import { DOMES } from '../../models/dome.js';
 import { valueNoise } from './noise.js';
@@ -44,6 +46,8 @@ export class Town {
     this.casters = [];
     /** Things the kit places (domes), for the level's list. */
     this.things = [];
+    /** Decals the kit places (doors, windows), for the level's `decals`. */
+    this.decals = [];
   }
 
   /**
@@ -126,6 +130,50 @@ export class Town {
   arch(x0, y0, x1, y1, { h, lintel = 3, floorZ = 0, wall = this.wall, roof = this.roof, floor = this.floor, light = 152 }) {
     const slab = { bottom: floorZ + lintel, top: h, floor: roof, ceiling: wall, side: wall, light };
     this.p.rect(x0, y0, x1, y1, { floor, ceiling: 'sky', floorZ, ceilZ: this.sky, light: this.light, side: wall, slab });
+    return this;
+  }
+
+  /**
+   * A shut door in a building's straight outside wall: a recess `depth`
+   * tiles into the wall (an `arch()`, open below `lintel`), the door (a
+   * decal, `tex`, `tall` tiles high) on its back wall, and a flagstone step
+   * in front. (x, y) is the middle of the doorway on the wall's edge and
+   * `face` the way the door looks ('N', 'E', 'S' or 'W'): `door(30, 62,
+   * 'S', ...)` is in the south wall of a building ending at row 62. Keep
+   * `width` even with (x, y) on a tile corner, or odd with it halfway along
+   * a tile. `depth: 0` cuts nothing and puts the door on the wall itself
+   * (the back of a porch), without a step.
+   */
+  door(x, y, face, { h, tex = 'door-steel', tall = 3, width = 2, depth = 1, lintel = tall, floorZ = 0, wall = this.wall, step = depth > 0 }) {
+    const along = face === 'N' || face === 'S' ? x : y;
+    const a0 = Math.round(along - width / 2);
+    const a1 = a0 + width;
+    const out = face === 'S' || face === 'E' ? 1 : -1;
+    const line = face === 'N' || face === 'S' ? y : x;
+    const back = line - out * depth;
+    if (depth > 0) {
+      const [b0, b1] = [Math.min(line, back), Math.max(line, back)];
+      if (face === 'N' || face === 'S') this.arch(a0, b0, a1, b1, { h, lintel, floorZ, wall });
+      else this.arch(b0, a0, b1, a1, { h, lintel, floorZ, wall });
+    }
+    if (step) {
+      const s = out > 0 ? line : line - 1;
+      const paint = (c) => (c.floor === this.floor && !c.wall ? { ...c, floor: 'flagstone' } : c);
+      if (face === 'N' || face === 'S') this.p.rect(a0, s, a1, s + 1, (_, __, c) => paint(c));
+      else this.p.rect(s, a0, s + 1, a1, (_, __, c) => paint(c));
+    }
+    const at = face === 'N' || face === 'S' ? { x, y: back } : { x: back, y };
+    this.decals.push({ ...at, z: floorZ + tall / 2, face, tex });
+    return this;
+  }
+
+  /**
+   * A window on a building's straight outside wall: a decal (`tex`) with
+   * its middle at height `z`, at (x, y) on the wall's edge, looking `face`
+   * (as for `door`).
+   */
+  window(x, y, face, { z = 3.5, tex = 'window-bars' } = {}) {
+    this.decals.push({ x, y, z, face, tex });
     return this;
   }
 

@@ -79,6 +79,32 @@ export const TOWN = [
   { out: 'sky-day', df: 'RESKY01', gradient: [[74, 128, 182], [120, 166, 206], [168, 198, 222], [214, 226, 236]], keep: 0.3, contrast: 0.9, tile: [2, 1], fade: { color: [212, 200, 174], from: 0.55 } },
 ];
 
+/**
+ * Mos Eisley's doors and windows: decals (see-through pictures on the
+ * walls), cut from DF textures. `size: [w, h]` scales the source (after
+ * `crop`) to that many texels (32 a tile); `mask` cuts its shape, `'arch'`
+ * (a round top as wide as it) or `'round'` (corners of radius `r`), and
+ * `rim` darkens a border `width` texels wide toward `color`: the shadow of
+ * the opening's reveal, so a flat decal looks set into the wall.
+ */
+const REVEAL = { width: 3, color: [52, 38, 26] };
+const STEEL = [[26, 29, 37], [64, 70, 86], [108, 114, 134], [144, 150, 168], [198, 206, 222]];
+const RUST = [[22, 12, 6], [63, 37, 11], [104, 61, 26], [148, 88, 43], [207, 127, 76]];
+const TEAL = [[4, 16, 18], [16, 58, 62], [44, 116, 118], [110, 190, 188]];
+export const DECALS = [
+  // Doors, 2 tiles wide and 3 high, round-topped: painted steel, rusty iron, teal and old wood.
+  { out: 'door-steel', df: 'ZDMETAL1', size: [64, 96], gradient: STEEL, keep: 0.2, contrast: 0.8, mask: 'arch', rim: REVEAL },
+  { out: 'door-rust', df: 'IDDOOR1', size: [64, 96], gradient: RUST, keep: 0, contrast: 0.9, mask: 'arch', rim: REVEAL },
+  { out: 'door-teal', df: 'ZDMETAL1', size: [64, 96], gradient: TEAL, keep: 0, contrast: 0.8, mask: 'arch', rim: REVEAL },
+  { out: 'door-wood', df: 'IWGRAN5', crop: [0, 0, 64, 96], size: [64, 96], gradient: [[30, 20, 12], [66, 44, 26], [104, 72, 44], [140, 102, 66]], keep: 0, contrast: 1, mask: 'arch', rim: REVEAL },
+  // A shop's roll-down shutter, 3 tiles wide: a strip of Nar Shaddaa's
+  // corrugated door clear of its red sign, stretched sideways.
+  { out: 'shutter', df: 'NDCORUG1', crop: [119, 0, 8, 96], size: [96, 72], gradient: [[30, 26, 22], [74, 66, 56], [118, 108, 92], [160, 150, 132]], keep: 0, contrast: 0.9, mask: 'round', r: 4, rim: REVEAL },
+  // Windows: dark behind rusty bars, and teal louvred shutters.
+  { out: 'window-bars', df: 'SPBARS1', size: [40, 40], gradient: [[8, 6, 4], [30, 22, 14], [80, 58, 36], [136, 98, 60]], keep: 0.2, contrast: 1, mask: 'round', r: 8, rim: REVEAL },
+  { out: 'window-louvre', df: 'NPVENTS1', size: [40, 48], gradient: TEAL, keep: 0, contrast: 0.9, mask: 'arch', rim: REVEAL },
+];
+
 /** Colour at position t (0..1) along a gradient of key colours. */
 function along(keys, t) {
   const f = Math.max(0, Math.min(1, t)) * (keys.length - 1);
@@ -137,6 +163,51 @@ function smoothed(img, n) {
   return { width: w, height: h, data: d };
 }
 
+/** An image scaled to w x h (nearest texel). */
+function resized(img, [w, h]) {
+  const data = new Uint8Array(w * h * 4);
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const s = (Math.floor((y * img.height) / h) * img.width + Math.floor((x * img.width) / w)) * 4;
+      data.set(img.data.subarray(s, s + 4), (y * w + x) * 4);
+    }
+  }
+  return { width: w, height: h, data };
+}
+
+/** Cut a decal's shape out (see DECALS): transparent outside it, the rim darkened inside its edge. */
+function masked(img, { mask, r = 0, rim }) {
+  const { width: w, height: h, data: d } = img;
+  // How far (in texels) a texel's centre is inside the shape; below 0 is outside.
+  const depth = (x, y) => {
+    const px = x + 0.5;
+    const py = y + 0.5;
+    let e = Math.min(px, w - px, h - py, py);
+    const rr = mask === 'arch' ? w / 2 : r;
+    if (py < rr && (px < rr || px > w - rr)) {
+      const cx = px < rr ? rr : w - rr;
+      e = Math.min(e, rr - Math.hypot(px - cx, py - rr));
+    }
+    return e;
+  };
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const i = (y * w + x) * 4;
+      const e = depth(x, y);
+      if (e <= 0) {
+        d[i + 3] = 0;
+        continue;
+      }
+      d[i + 3] = 255;
+      if (rim && e < rim.width) {
+        const t = 0.85 * (1 - e / rim.width) + 0.15;
+        for (let k = 0; k < 3; k++) d[i + k] = Math.round(d[i + k] + (rim.color[k] - d[i + k]) * t);
+      }
+    }
+  }
+  return img;
+}
+
 /** Repeat an image nx by ny times. */
 function tiled(img, [nx, ny]) {
   const w = img.width * nx;
@@ -190,6 +261,15 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     for (let i = 3; i < img.data.length; i += 4) img.data[i] = 255;
     fs.writeFileSync(path.join(texDir, `${spec.out}.png`), encodePNG(img.width, img.height, img.data));
     console.log(`${spec.out}.png from ${spec.df} (${img.width}x${img.height})`);
+  }
+  for (const spec of DECALS) {
+    let img = decodePNG(fs.readFileSync(pack.get(spec.df)));
+    if (spec.crop) img = cropped(img, spec.crop);
+    img = resized(img, spec.size);
+    for (let i = 3; i < img.data.length; i += 4) img.data[i] = 255;
+    img = masked(gradientMap(img, spec), spec);
+    fs.writeFileSync(path.join(texDir, `${spec.out}.png`), encodePNG(img.width, img.height, img.data));
+    console.log(`${spec.out}.png from ${spec.df} (${img.width}x${img.height}, a decal)`);
   }
   const overridesFile = path.join(here, 'overrides.json');
   const overrides = JSON.parse(fs.readFileSync(overridesFile, 'utf8'));

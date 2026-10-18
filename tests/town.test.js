@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { Painter } from '../src/content/levels/lib/painter.js';
 import { Town } from '../src/content/levels/lib/town.js';
+import { buildLevel } from '../src/engine/world/level.js';
 import { registry } from './helpers.js';
 
 // The town kit (Mos Eisley): domes on the roofs, skirts on the walls, sand drifts.
@@ -71,4 +72,22 @@ test('sand drifts lie along the walls in the sun, not in the open or the shade',
   assert.ok(drift(10).length > 0, 'beside the wall');
   assert.equal(drift(30).length, 0, 'out in the open');
   assert.ok(drift(10).every((c) => c.light >= town.light), 'only in full sun');
+});
+
+test('a door is set into its wall: a recess, the door on its back wall and a step outside', () => {
+  const { p, town } = kit();
+  town.house(4, 4, 16, 14, { h: 6 });
+  town.door(10, 14, 'S', { h: 6, tex: 'door-teal' });
+  // The recess: open below the lintel, a slab up to the roof.
+  for (const x of [9, 10]) assert.equal(p.get(x, 13).floorZ, 0);
+  assert.equal(p.get(9, 13).slab.bottom, 3);
+  assert.equal(p.get(8, 13).floorZ, 6, 'wall beside it');
+  // The door: on the recess's back wall (the edge at row 13), looking south, standing on the floor.
+  assert.deepEqual(town.decals, [{ x: 10, y: 13, z: 1.5, face: 'S', tex: 'door-teal' }]);
+  assert.equal(p.get(9, 14).floor, 'flagstone', 'a step outside');
+  // Built into a level, the door is laid on that face.
+  const level = { id: 't', name: 'T', ...p.build(), decals: town.decals, list: [{ type: 'player', x: 20, y: 20 }] };
+  const { map, errors } = buildLevel(registry, level);
+  assert.deepEqual(errors, []);
+  assert.equal(map.decals.length, 1);
 });
