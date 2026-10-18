@@ -163,8 +163,9 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
         blast doors will slide out of (x 104..106), the bend past it, the
         exit moved to the street's end. The cantina's front, the stable,
         the garage and the rooftops' first house are plain houses for now.
-  - [ ] The market (x 62..104, y 58..82): its houses, stalls under tarps
-        and awnings, the droid seller's pen, hangings, clutter.
+  - [x] The market (x 62..102, y 58..82): stalls under awnings that
+        stand free, stallholders who stay put (a placement's `wander`),
+        the droid seller's pen, hangings, clutter.
   - [ ] The water plaza: the condenser tower (a model, the landmark), the
         water seller's tap and the dewback trough.
   - [ ] Townsfolk; snapshots and frame time; then Waiting on Mark.

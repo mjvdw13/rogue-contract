@@ -190,6 +190,13 @@ Check a street from several angles, not just down its length.
   fixed fringe for a swaying one (a hanging, `valance-<cloth>`, or a
   `rag`), which lands in `town.hangings` for the level's `hangings`. The
   two in the first stretch (22 models) cost about 0.15 ms a frame.
+- **Stalls** (`stall()`): a market stall is an awning that stands free
+  (`awning({ wall: false })`: poles at all four corners, the bays' backs
+  closed) over a box 4 or 6 wide and 3 deep, so its underside is the
+  awning's striped slab, lit as shade (a model's roof seen from below
+  came out dark). Under it a counter and a rack of wares
+  (`market-stall`, `models/market.js`), with room between them for a
+  stallholder placed with `wander: 0`. `clutter()` keeps off it.
 - **Tin roofs** (`leanTo()`): sheets of corrugated tin on a lean-to,
   sloping from the taller wall behind it down past its front (0.25 a tile),
   overhanging the street by 0.6, each sheet a hair higher or lower than the
@@ -292,8 +299,9 @@ angle unless their sheet has the other views (the villagers do).
 - **Models (built):** domes, awnings, tarps, tin roofs, pipes and wall
   boxes, the street clutter (above), and an X-34 landspeeder
   (`models/speeder.js`) on the main street by C's awning, bobbing over a
-  soft grime shadow (the garage's can be another of it), and Docking Bay
-  87's ribs, fuel lines, pumps and rim lamps (`models/bay.js`).
+  soft grime shadow (the garage's can be another of it), Docking Bay
+  87's ribs, fuel lines, pumps and rim lamps (`models/bay.js`), and the
+  market's stall counters (`models/market.js`).
 - **Models (new):** moisture condenser tower, swoop bike,
   droid parts, the sandcrawler, the gutted freighter, the comm tower,
   the cantina's round bar and booth tables, a power droid (until a sprite),

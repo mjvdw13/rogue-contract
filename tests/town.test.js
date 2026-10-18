@@ -345,6 +345,24 @@ test('a vent is a decal on the wall', () => {
   assert.ok(registry.textures.get('vent-round')?.decal);
 });
 
+test('a stall is a counter under an awning that stands free: poles at all four corners, its back closed, clutter kept off it', () => {
+  const { p, town } = kit();
+  town.house(4, 4, 36, 10, { h: 6 });
+  town.stall(10, 12, 14, 15, 'S', { cloth: 'red' });
+  assert.equal(p.get(12, 13).slab.bottom, 2.75, 'you walk under its roof');
+  const poles = town.things.filter((t) => t.type.startsWith('awning-pole'));
+  assert.ok(poles.some((t) => t.y < 13) && poles.some((t) => t.y > 14), 'poles at the back and the front');
+  assert.equal(town.things.filter((t) => t.type === 'awning-red-3-back').length, 2, 'a back for each bay');
+  const counter = town.things.find((t) => t.type === 'market-stall');
+  assert.deepEqual([counter.x, counter.y, counter.angle], [12, 13.5, 0], 'the counter in the middle, at the front');
+  for (const t of town.things) assert.ok(registry.things.get(t.type), `${t.type} is a decoration`);
+  town.finish();
+  town.clutter({ amount: 3 });
+  const inside = town.things.filter((t) => t.type !== 'market-stall' && !t.type.startsWith('awning') && t.x >= 10 && t.x <= 14 && t.y >= 12 && t.y <= 15);
+  assert.deepEqual(inside, [], 'no clutter in the stall');
+  assert.throws(() => town.stall(20, 12, 25, 15, 'S'), /4 or 6 wide and 3 deep/);
+});
+
 test('clutter stands along the walls of the open street, off the doors, and leaves narrow alleys clear', () => {
   const make = () => {
     const { p, town } = kit();

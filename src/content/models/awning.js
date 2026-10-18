@@ -6,7 +6,8 @@ import { ModelBuilder } from './lib/build.js';
 // ribs, with a scalloped fringe along the front. Built looking south (+y):
 // the front edge along y = 0, the wall at y = -depth, z = 0 the slab's top.
 // The kit sets them along the front, an end cap at each end, and poles
-// under the front corners.
+// under the front corners; one that stands free (a market stall's) gets
+// poles at the back too and its bays' backs closed.
 
 /** The cloth's rise per tile of depth, from the front up to the wall. */
 export const AWNING_SLOPE = 0.3;
@@ -54,6 +55,17 @@ function end(id, cloth, depth) {
   return m.build();
 }
 
+/**
+ * A bay's back, for an awning that stands free (a stall's): the cloth from
+ * the slab up to the sloped top at y = -depth, seen from both sides.
+ */
+function back(id, cloth, depth) {
+  const m = new ModelBuilder(id);
+  const rise = depth * AWNING_SLOPE;
+  for (const s of [-1, 1]) m.face([[s, -depth, 0], [0, -depth, 0], [0, -depth, rise], [s, -depth, rise + RIB]], { tex: `awning-${cloth}`, twoSided: true });
+  return m.build();
+}
+
 /** A pole from the street up to the slab's bottom: a thin dark post on a stone foot. */
 function pole(id, h) {
   const m = new ModelBuilder(id);
@@ -68,8 +80,8 @@ const models = [];
 for (const cloth of AWNING_CLOTHS) {
   for (const depth of AWNING_DEPTHS) {
     const id = `awning-${cloth}-${depth}`;
-    models.push(bay(id, cloth, depth, false), bay(`${id}-bare`, cloth, depth, true), end(`${id}-end`, cloth, depth));
-    AWNING_MODELS.push(id, `${id}-bare`, `${id}-end`);
+    models.push(bay(id, cloth, depth, false), bay(`${id}-bare`, cloth, depth, true), end(`${id}-end`, cloth, depth), back(`${id}-back`, cloth, depth));
+    AWNING_MODELS.push(id, `${id}-bare`, `${id}-end`, `${id}-back`);
   }
 }
 /** A pole's id for its height. */

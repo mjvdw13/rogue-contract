@@ -91,6 +91,8 @@ export class Town {
     this.covers = [];
     /** Slanting walls (`slanted()`), for `grime()`: { a, b, top, inward: a point inside }. */
     this.slants = [];
+    /** The boxes stalls stand in, kept clear by `clutter()`. */
+    this.stalls = [];
   }
 
   /**
@@ -330,9 +332,11 @@ export class Town {
    * between 2.5 and 5.5. `valance` is the front edge: 'fringe' (a fixed
    * scalloped hem), a hanging type to sway there instead (`valance-<cloth>`
    * for its own hem, or 'rag'), or null for none. Hangings go in
-   * `this.hangings`, for the level's `hangings`.
+   * `this.hangings`, for the level's `hangings`. With `wall: false` it
+   * stands free (a stall's roof): poles under the back corners too, and
+   * the cloth closed at the back.
    */
-  awning(x0, y0, x1, y1, { z = 3.5, face = 'S', cloth = 'red', light = 160, valance = 'fringe', floorZ = 0, poles = 4 } = {}) {
+  awning(x0, y0, x1, y1, { z = 3.5, face = 'S', cloth = 'red', light = 160, valance = 'fringe', floorZ = 0, poles = 4, wall = true } = {}) {
     const ns = face === 'N' || face === 'S';
     const out = face === 'S' || face === 'E' ? 1 : -1;
     const [a0, a1] = ns ? [x0, x1] : [y0, y1];
@@ -355,7 +359,7 @@ export class Town {
       if (c) wallTop = Math.max(wallTop, c.slab ? c.slab.top : c.floorZ ?? 0);
     }
     const backZ = top + 0.1 + depth * AWNING_SLOPE;
-    if (wallTop < backZ) throw new Error(`${where} rises to ${backZ.toFixed(2)} at the back, above the wall behind it (${wallTop}): lower it or make it shallower`);
+    if (wall && wallTop < backZ) throw new Error(`${where} rises to ${backZ.toFixed(2)} at the back, above the wall behind it (${wallTop}): lower it or make it shallower`);
     this.p.rect(x0, y0, x1, y1, (x, y, old) => {
       if (old.wall || old.door || old.slab || old.ceiling !== 'sky') return old;
       return { ...old, slab: { bottom: floorZ + z, top, floor: under, ceiling: under, side: tex, light } };
@@ -369,6 +373,11 @@ export class Town {
     const span = a1 - a0 - 0.4;
     const n = Math.max(1, Math.ceil(span / poles));
     for (let k = 0; k <= n; k++) this.things.push({ type: poleId(z), ...at(a0 + 0.2 + (span * k) / n, front - out * 0.2) });
+    if (!wall) {
+      const rear = front - out * depth;
+      for (const a of [a0 + 0.2, a1 - 0.2]) this.things.push({ type: poleId(z), ...at(a, rear + out * 0.2) });
+      for (let a = a0; a < a1; a += 2) this.things.push({ type: `${tex}-${depth}-back`, ...at(a + 1, front), z: top, angle });
+    }
     if (valance && valance !== 'fringe') {
       const e = front + out * 0.05;
       const tie = (a) => (ns ? [a, e, top - 0.06] : [e, a, top - 0.06]);
@@ -421,6 +430,27 @@ export class Town {
         pole(br, z + rise);
       }
     }
+    return this;
+  }
+
+  /**
+   * A market stall: a counter and a rack of wares (models/market.js) under
+   * a free-standing awning over the box (`awning()` with `wall: false`), its
+   * counter at the front, which looks `face` ('N', 'E', 'S' or 'W'). The box
+   * is 4 or 6 tiles wide and 3 deep; the counter stands in its middle, with
+   * room for a stallholder between it and the rack. `cloth` and `z` are the
+   * awning's (2.75 high by default); `clutter()` keeps off the box.
+   */
+  stall(x0, y0, x1, y1, face, { cloth = 'sand', z = 2.75, valance = 'fringe' } = {}) {
+    const where = `Town: the stall at (${x0}, ${y0})`;
+    const angle = { S: 0, E: 90, N: 180, W: 270 }[face];
+    if (angle === undefined) throw new Error(`${where}: "face" must be N, E, S or W`);
+    const ns = face === 'N' || face === 'S';
+    const [wide, deep] = ns ? [x1 - x0, y1 - y0] : [y1 - y0, x1 - x0];
+    if (deep !== 3 || (wide !== 4 && wide !== 6)) throw new Error(`${where} is ${wide} wide and ${deep} deep: stalls are 4 or 6 wide and 3 deep`);
+    this.awning(x0, y0, x1, y1, { z, face, cloth, valance, wall: false });
+    this.things.push({ type: 'market-stall', x: (x0 + x1) / 2, y: (y0 + y1) / 2, angle });
+    this.stalls.push([x0, y0, x1, y1]);
     return this;
   }
 
@@ -813,11 +843,13 @@ export class Town {
    * street too. `amount` scales how much (1 the usual, 2 a mess); placed at
    * random from `seed`, the same every time. `keep` boxes ([x0, y0, x1, y1])
    * are left clear for things placed by hand (a group with anything in one
-   * is left out, and the rest come out as they would without it). Run it
+   * is left out, and the rest come out as they would without it), and so
+   * are the stalls' (`stall()`). Run it
    * after `finish()` (and after `drifts()`).
    */
-  clutter({ amount = 1, seed = 13, clear = 4, keep = [] } = {}) {
+  clutter({ amount = 1, seed = 13, clear = 4, keep: kept = [] } = {}) {
     const { p } = this;
+    const keep = [...kept, ...this.stalls];
     const r = random(seed);
     const ns = (face) => face === 'N' || face === 'S';
     const street = (c) => c && !c.wall && !c.door && c.ceiling === 'sky' && (!c.slab || c.slab.top - c.slab.bottom <= 0.25) && (c.floor === this.floor || c.floor.startsWith('street-drift'));

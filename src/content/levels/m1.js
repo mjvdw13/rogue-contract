@@ -189,7 +189,15 @@ town.house(130, 73, 136, 86, { h: 8, r: 1, wall: 'adobe-pale', tiers: [{ box: [1
 town.door(133, 73, 'N', { h: 8, tex: 'door-grey', wall: 'adobe-pale' });
 town.window(130, 79.5, 'W', { z: 4.4, tex: 'window-louvre' });
 
-// ---------------------------------------------------------------- 1. Docking Bay 87
+// The market: stalls round its edges (lib/town.js, stall()), so the way
+// across from the street to the blast doors stays open, each a counter
+// and a rack of wares under a canvas roof with the stallholder between
+// them; and in the north-east corner the droid seller's pen, behind a cage.
+town.stall(62, 60, 65, 64, 'E', { cloth: 'red' }).stall(68, 59, 72, 62, 'S', { cloth: 'olive' }).stall(62, 76, 65, 80, 'E', { cloth: 'teal' });
+town.stall(89, 59, 93, 62, 'S', { cloth: 'sand' }).stall(89, 77, 93, 80, 'N', { cloth: 'red', valance: 'valance-red' }).stall(97, 77, 101, 80, 'N', { cloth: 'olive' });
+const CAGE = { tex: 'imp-cage', height: 1.5 };
+p.fence(96, 58, 97, 60, 'W', CAGE).fence(96, 62, 97, 64, 'W', CAGE).fence(96, 63, 102, 64, 'S', CAGE);
+
 // South of the south back lane: a round pit 21 m across under the sky, its
 // floor 2.5 m below the street and its duracrete walls 5.5 m tall, braced
 // at the foot. The bay door (4 wide) opens off the lane into a passage
@@ -332,6 +340,15 @@ list.push(
   at('crate-tan', 49, 81.1, { angle: 95 }), at('barrel-grey', 49.1, 83), at('litter-small', 45, 83, { angle: 40 }),
 );
 
+// The market: wares on the stalls' counters, and in the droid seller's pen
+// droids' domes, parts and power units for sale.
+list.push(
+  at('droid-dome', 64.37, 61.3, { z: 1, angle: 30 }), at('crate-grey-small', 90.3, 61.37, { z: 1, angle: 8 }), at('droid-dome', 98.4, 77.63, { z: 1, angle: 200 }),
+  at('power-unit', 99.5, 58.01, { angle: 0 }), at('scrap', 101.99, 59.6, { angle: 270 }), at('junk-heap', 98.6, 61.4, { angle: 15 }),
+  at('droid-dome', 97.6, 60.3, { angle: 120 }), at('droid-dome', 100.4, 62.5, { angle: 290 }), at('canister-rust', 101.2, 61.2),
+  at('crate-grey-small', 97.3, 62.8, { angle: 20 }), at('droid-dome', 97.3, 62.8, { z: 0.6, angle: 75 }),
+);
+
 // The Moldy Crow, hovering in the bay in front of you, nose east and
 // turned 20 degrees off square (Mark: parked too perfectly), a little south
 // of the maintenance pit: its gun pod (solid) would block the way along the
@@ -358,6 +375,12 @@ list.push(
   at('villager-woman', 34, 47), at('villager-wanderer', 30, 97), at('villager-adventurer', 18.5, 88),
   // Indoors: the shop, B's room and G's.
   at('villager-boy', 12, 84), at('villager-woman', 22, 56), at('villager-man', 57, 84),
+  // The market, and past the blast doors.
+  at('villager-woman', 70, 66), at('villager-adventurer', 85, 63), at('villager-man', 95, 70), at('villager-boy', 66, 74),
+  at('villager-wanderer', 88, 75), at('villager-man', 118, 67),
+  // Stallholders behind their counters, staying there.
+  at('villager-man', 63.43, 62, { angle: 0, wander: 0 }), at('villager-woman', 91, 60.43, { angle: 270, wander: 0 }),
+  at('villager-wanderer', 99, 78.57, { angle: 90, wander: 0 }),
 );
 
 // Cables, ropes and cloth moving in the air (world/hangings.js). Each is
@@ -383,6 +406,15 @@ const hangings = [
   { type: 'rag', from: [52.95, 80.4, 4.8], to: [52.95, 81.8, 4.8], length: 2.4 },
   // A sheet slung across the north back lane, pinned at its corners.
   { type: 'cloth-pale', from: [12, 44.05, 4], to: [12.5, 49.95, 4], length: 1, pin: 'corners' },
+  // Cables across the market and the street past it.
+  { type: 'cable', from: [70, 58.05, 5.4], to: [70.5, 81.95, 5.2], sag: 1.5 },
+  { type: 'cable', from: [97, 58.05, 6.6], to: [96.5, 81.95, 5.6], sag: 1.6 },
+  { type: 'cable', from: [108, 64.05, 6.6], to: [108.5, 75.95, 5.6], sag: 1 },
+  { type: 'cable', from: [128.5, 61.05, 7.5], to: [125, 72.95, 4.6], sag: 1 },
+  // A long banner down J's front, by the garage door.
+  { type: 'rag', from: [91.6, 58.05, 6.2], to: [92.8, 58.05, 6.2], length: 2.6 },
+  // A sheet across the alley between H and I.
+  { type: 'cloth-pale', from: [71.05, 55, 4.1], to: [72.95, 55.6, 4.1], length: 1, pin: 'corners' },
 ];
 
 export default defineLevel({

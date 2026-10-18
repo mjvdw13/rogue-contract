@@ -5,6 +5,7 @@ import { TIN_MODELS } from './models/tin.js';
 import { PIPE_MODELS } from './models/pipes.js';
 import { CLUTTER } from './models/clutter.js';
 import { BAY_WALL } from './models/bay.js';
+import { TOWER_HEIGHT } from './models/market.js';
 
 // Scenery. Solid ones block movement; ones with health can be shot (and
 // `explode`).
@@ -56,6 +57,12 @@ export default [
   defineDecoration({ id: 'bay-fuel-line', model: 'bay-fuel-line', fixed: true }),
   defineDecoration({ id: 'bay-fuel-pump', model: 'bay-fuel-pump', solid: true, height: 1.7, fixed: true }),
   defineDecoration({ id: 'bay-rim-lamp', model: 'bay-rim-lamp', fixed: true }),
+  // Mos Eisley's market (models/market.js): a stall's counter and rack
+  // (colliding, as high as the rack), the condenser tower over the water
+  // plaza (as its plinth) and the dewback trough.
+  defineDecoration({ id: 'market-stall', model: 'market-stall', solid: true, height: 1.45, fixed: true }),
+  defineDecoration({ id: 'condenser-tower', model: 'condenser-tower', solid: true, height: TOWER_HEIGHT, fixed: true }),
+  defineDecoration({ id: 'water-trough', model: 'water-trough', solid: true, height: 0.75, fixed: true }),
   // The Moldy Crow, hovering (models/crow.js), bobbing gently, drawn at 0.8 of
   // canon size: only its gun pod is low enough to collide (as its outline);
   // you walk under the rest.

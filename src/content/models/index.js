@@ -17,5 +17,6 @@ import clutter from './clutter.js';
 import landspeeder from './speeder.js';
 import bay from './bay.js';
 import moldyCrow from './crow.js';
+import market from './market.js';
 
-export default [terminal, reactorRing, coolantTank, shuttle, barricade, boulderLarge, boulderSmall, floodlightTower, sensorMast, sensorDish, ...domes, doorJamb, doorJambThrough, ...awnings, ...tin, ...pipes, ...clutter, landspeeder, ...bay, moldyCrow];
+export default [terminal, reactorRing, coolantTank, shuttle, barricade, boulderLarge, boulderSmall, floodlightTower, sensorMast, sensorDish, ...domes, doorJamb, doorJambThrough, ...awnings, ...tin, ...pipes, ...clutter, landspeeder, ...bay, moldyCrow, ...market];
