@@ -151,7 +151,7 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
         the bay's walls (soot grime).
   - [x] The walls' ribs (models round the circle), fuel lines and pumps,
         gantry lamps on the rim.
-  - [ ] The maintenance pit in the floor where the Crow lands (secret: a
+  - [x] The maintenance pit in the floor where the Crow lands (secret: a
         shield unit).
   - [ ] The owner's office (a window onto the lane) and the customs house
         (a grey prefab) by the bay door.

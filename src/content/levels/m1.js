@@ -136,6 +136,28 @@ town.arch(30, 101, 34, 105, { h: BAY.rim, lintel: 4, wall: 'bay-wall', floor: 'b
 town.door(32, 100, 'N', { h: BAY.rim, tex: 'door-grey', width: 4, tall: 4, wall: 'adobe-grey', jamb: false, opens: true });
 // Stairs down to the floor, a step every tile.
 for (let k = 0; k < 7; k++) p.rect(30, 107 + k, 34, 108 + k, { ...bayFloor, floorZ: (-(k + 1) * 5) / 8 });
+// A maintenance pit in the middle of the floor, where ships set down: 8 by
+// 4 tiles and 2 deep, lined in steel, hazard stripes along its lips and two
+// steps down at its west end. Off its east end a crawlspace runs on under
+// the floor, low and dark, with a shield unit in it: a secret.
+const PIT = { x0: 28, y0: 122, x1: 36, y1: 126, floorZ: -7 };
+const { bands: _, ...pitLip } = { ...bayFloor, side: 'imp-panel-dark' };
+p.rect(PIT.x0 - 1, PIT.y0 - 1, PIT.x1 + 5, PIT.y1 + 1, pitLip);
+p.rect(PIT.x0, PIT.y0, PIT.x1, PIT.y1, { ...pitLip, floor: 'imp-grate', floorZ: PIT.floorZ });
+p.rect(PIT.x0, PIT.y0, PIT.x0 + 1, PIT.y1, { ...pitLip, floorZ: -5.625 });
+p.rect(PIT.x0 + 1, PIT.y0, PIT.x0 + 2, PIT.y1, { ...pitLip, floorZ: -6.25 });
+p.rect(PIT.x1, PIT.y0 + 1, PIT.x1 + 4, PIT.y1 - 1, {
+  ...pitLip,
+  floor: 'imp-grate',
+  floorZ: PIT.floorZ,
+  secret: true,
+  slab: { bottom: BAY.floorZ - 0.2, top: BAY.floorZ, floor: 'bay-floor', ceiling: 'imp-panel-dark', side: 'imp-panel-dark', light: 96 },
+});
+const pitDecals = [29, 31, 33, 35].flatMap((x) => [
+  { x, y: PIT.y0, z: BAY.floorZ - 0.25, face: 'S', tex: 'decal-hazard' },
+  { x, y: PIT.y1, z: BAY.floorZ - 0.25, face: 'N', tex: 'decal-hazard' },
+]);
+
 // Blast scars: soot round the wall where ships' exhausts and blaster fire
 // hit it (degrees round from east, height, picture, size).
 const SCARS = [[18, -1.5, 1, 3.5], [52, 1, 2, 2.2], [138, -2, 2, 3], [171, 1.5, 1, 2.4], [206, -1, 2, 3.4], [247, -2, 1, 3], [292, 0, 2, 2.8], [334, 2, 1, 2.2]];
@@ -207,6 +229,7 @@ list.push(
 list.push(
   at('player', 32, 134, { angle: 90 }),
   at('supply-crate', 14, 86.5),
+  at('shield-unit', 38.5, 124), // secret: the crawlspace off the bay's maintenance pit
   at('jawa', 50, 47), // in the north back lane
 );
 
@@ -265,7 +288,7 @@ export default defineLevel({
   // distracted, and Mark halved that twice to 60. 90 on trial (Mark,
   // 2026-10-18).
   weather: { type: 'glint', count: 90 },
-  decals: [...town.decals, ...bayDecals],
+  decals: [...town.decals, ...bayDecals, ...pitDecals],
   hangings: [...hangings, ...town.hangings],
   par: 600,
   ...p.build(),
