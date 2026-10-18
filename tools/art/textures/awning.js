@@ -1,53 +1,86 @@
-// Awning canvas for Mos Eisley (lib/town.js, awning()): faded stripes and
-// plain canvas, mottled by the suns, stained and patched. 64 x 64 is 2 x 2
-// tiles (32 texels a tile), and every one tiles both ways. Each comes three
-// ways:
-//   awning-<name>      stripes running down the texture (v): the awning
+// Awning canvas for Mos Eisley (lib/town.js, awning()): plain cloth, no
+// stripes, bleached by the suns in blotches, stained, and patched with
+// scraps of other cloth sewn on by hand. Mostly muted (sand, olive, faded
+// rust, dark umber), with a faded teal for a splash. 64 x 64 is 2 x 2
+// tiles (32 texels a tile), and every one tiles both ways. Each comes
+// three ways:
+//   awning-<name>      the dirt running down the texture (v): the awning
 //                      models' tops, and the slab's underside on an awning
 //                      looking north or south (flats are world-aligned)
 //   awning-<name>-x    the same turned a quarter, for one looking east or west
-//   awning-<name>-hem  64 x 16, the front edge: scallops cut along its
+//   awning-<name>-hem  64 x 16, the front edge: torn to tatters along its
 //                      bottom (transparent), for the fixed fringe and a
 //                      swaying valance (a hanging's hem is the bottom row)
 import { PixelCanvas, C, darken, fbm, hash2, rng, seedFrom } from '../lib/tex.js';
 
 const T = (name) => `assets/textures/${name}.png`;
 const S = 64;
-/** The fringe's height, and how wide each scallop is (texels). */
+/** The hem's height (texels): the top few rows stay whole, the rest is torn. */
 const HEM = 16;
-const SCALLOP = 16;
+const WHOLE = 3;
 
 /**
- * The canvas: `stripes` ([ramp, tone] pairs taking turns, `width` texels
- * each) or `plain` ([ramp, tone]); `patches` squares of darker cloth
- * stitched on.
+ * A scrap sewn on: a lumpy four-sided patch round (cx, cy), wrapping
+ * across the texture's edges, `w` by `h` texels give or take.
  */
-function canvas(name, { stripes, plain, width = 8, patches = 0 }) {
-  const r = rng(seedFrom(name));
-  const mottle = fbm(seedFrom(name) + 1, S, { cells: 4 });
-  // Dirt run down the cloth from where rain pools: along the stripes.
-  const streak = fbm(seedFrom(name) + 2, S, { cells: 8, cellsY: 1, octaves: 2 });
-  const stains = fbm(seedFrom(name) + 3, S, { cells: 3, octaves: 3 });
-  const squares = Array.from({ length: patches }, () => ({ x: r.int(0, S), y: r.int(0, S), w: r.int(8, 15), h: r.int(8, 15) }));
-  const inPatch = (x, y) => squares.find((p) => ((x - p.x + S) % S) < p.w && ((y - p.y + S) % S) < p.h);
+function scrap(r, cx, cy, w, h) {
+  // Each side bows in or out a little, and the patch is skewed: cut by hand.
+  const bow = Array.from({ length: 4 }, () => r.range(-1.5, 1.5));
+  const skew = r.range(-0.25, 0.25);
+  return (x, y) => {
+    let dx = x - cx;
+    let dy = y - cy;
+    dx -= Math.round(dx / S) * S;
+    dy -= Math.round(dy / S) * S;
+    dx += dy * skew;
+    const hx = w / 2 + (dx < 0 ? bow[0] : bow[1]) * Math.cos((dy / h) * Math.PI);
+    const hy = h / 2 + (dy < 0 ? bow[2] : bow[3]) * Math.cos((dx / w) * Math.PI);
+    return Math.abs(dx) < hx && Math.abs(dy) < hy;
+  };
+}
+
+/**
+ * The canvas: `ramp` at `tone`, bleached toward `fade` (a [ramp, tone]) in
+ * blotches, `fadeAmount` of it; `scraps` patches of other cloth
+ * ([ramp, tone] each), sewn on with big uneven stitches.
+ */
+function canvas(name, { ramp, tone, fade, fadeAmount = 0.3, scraps = [] }) {
+  const seed = seedFrom(name);
+  const r = rng(seed);
+  const mottle = fbm(seed + 1, S, { cells: 4 });
+  // Dirt run down the cloth from where rain pools, and where the suns have bleached it.
+  const streak = fbm(seed + 2, S, { cells: 8, cellsY: 1, octaves: 2 });
+  const stains = fbm(seed + 3, S, { cells: 3, octaves: 3 });
+  const bleach = fbm(seed + 4, S, { cells: 3, octaves: 3 });
+  const patches = scraps.map(([pr, pt]) => ({
+    at: scrap(r, r.int(0, S - 1), r.int(0, S - 1), r.int(9, 18), r.int(8, 15)),
+    ramp: pr,
+    tone: pt,
+  }));
+  const patchAt = (x, y) => patches.find((p) => p.at(x, y));
   const c = new PixelCanvas(S, S);
   for (let y = 0; y < S; y++) {
     for (let x = 0; x < S; x++) {
-      const [ramp, tone] = stripes ? stripes[Math.floor(x / width) % stripes.length] : plain;
-      // The weave, a shade apart; the suns' fading; dirt and stains.
+      const p = patchAt(x, y);
+      let [rp, t] = p ? [p.ramp, p.tone] : [ramp, tone];
+      // Bleached in blotches where the suns have had it longest, their
+      // edges broken up a texel at a time.
+      const b = bleach(x, y) + (hash2(x, y, seed + 5) - 0.5) * 0.12;
+      if (!p && fade && b > 0.75 - fadeAmount * 0.6) [rp, t] = fade;
+      // The weave, a shade apart; mottled; dirt and stains.
       const weave = ((x + (y >> 1)) & 1 ? 0.012 : -0.012) + (y & 1 ? 0.008 : -0.008);
-      let t = tone + weave + (mottle(x, y) - 0.5) * 0.16 + (streak(x, y) - 0.5) * 0.12;
-      if (stains(x, y) > 0.68) t -= Math.min(0.1, (stains(x, y) - 0.68) * 0.6);
-      const p = inPatch(x, y);
+      t += weave + (mottle(x, y) - 0.5) * 0.14 + (streak(x, y) - 0.5) * 0.12;
+      if (stains(x, y) > 0.66) t -= Math.min(0.12, (stains(x, y) - 0.66) * 0.6);
+      let col = C(rp, Math.min(1, Math.max(0, t)));
       if (p) {
-        t -= 0.1;
-        // Its stitched edge: every other texel darker.
-        const ex = (x - p.x + S) % S;
-        const ey = (y - p.y + S) % S;
-        if ((ex === 0 || ex === p.w - 1 || ey === 0 || ey === p.h - 1) && (x + y) & 1) t -= 0.14;
+        // The patch's edge, darker where it's folded under, and stitches
+        // across it at uneven gaps.
+        const edge = !p.at(x - 1, y) || !p.at(x + 1, y) || !p.at(x, y - 1) || !p.at(x, y + 1);
+        if (edge) col = darken(col, hash2(x, y, seed + 6) < 0.4 ? 0.35 : 0.15);
+      } else if (patchAt(x - 1, y) || patchAt(x + 1, y) || patchAt(x, y - 1) || patchAt(x, y + 1)) {
+        if (hash2(x, y, seed + 7) < 0.5) col = darken(col, 0.3);
       }
-      let col = C(ramp, Math.min(1, Math.max(0, t)));
-      if (hash2(x, y, seedFrom(name) + 9) < 0.03) col = darken(col, 0.12);
+      if (hash2(x, y, seed + 9) < 0.03) col = darken(col, 0.12);
       c.set(x, y, col);
     }
   }
@@ -61,33 +94,53 @@ function turned(c) {
   return out;
 }
 
-/** The front edge: the canvas's top rows with scallops cut out of the bottom, the cut edge darker. */
-function hem(c) {
-  const out = new PixelCanvas(S, HEM);
-  const depth = (x) => {
-    const u = ((x + 0.5) % SCALLOP) / SCALLOP - 0.5;
-    // A round scallop, its lowest point in the middle, 6 texels higher where two meet.
-    return HEM - 6 * (1 - Math.sqrt(Math.max(0, 1 - 4 * u * u)));
+/**
+ * The front edge: the canvas's top rows, torn along the bottom. Strips of
+ * 1 to 6 columns each end at their own length, some hanging down to the
+ * hem as tatters, some torn back nearly to the top; the torn edge darker.
+ * Tiles across, so the bays' fringes meet without a seam.
+ */
+function hem(name, c) {
+  const r = rng(seedFrom(name) + 11);
+  const len = new Float32Array(S);
+  let x = 0;
+  while (x < S) {
+    const w = Math.min(S - x, r.int(1, 6));
+    const d = r.chance(0.25) ? r.range(HEM - 2, HEM) : r.range(WHOLE + 1, HEM - 3);
+    for (let k = 0; k < w; k++) len[x + k] = d;
+    x += w;
+  }
+  // Fray: a texel or two either way, then a few holes just above the tears.
+  const cut = Array.from(len, (d) => Math.min(HEM, Math.max(WHOLE, Math.round(d + r.range(-1.5, 1.5)))));
+  const holes = Array.from({ length: 3 }, () => [r.int(0, S - 1), r.int(WHOLE, WHOLE + 4)]);
+  const gone = (x, y) => {
+    const xx = (x + S) % S;
+    return y >= cut[xx] || holes.some(([hx, hy]) => Math.abs(hx - xx) + Math.abs(hy - y) * 1.5 < 1.6);
   };
+  const out = new PixelCanvas(S, HEM);
   for (let y = 0; y < HEM; y++) {
     for (let x = 0; x < S; x++) {
-      const bottom = depth(x);
-      if (y >= bottom) continue;
-      out.set(x, y, y >= bottom - 1.5 || y < 1 ? darken(c.get(x, y), 0.3) : c.get(x, y));
+      if (gone(x, y)) continue;
+      const frayed = gone(x - 1, y) || gone(x + 1, y) || gone(x, y + 1);
+      // Grubbier toward the bottom, where hands and dust get at it.
+      const col = darken(c.get(x, y), (y / HEM) * 0.15);
+      out.set(x, y, frayed ? darken(col, 0.3) : col);
     }
   }
   return out;
 }
 
 const CLOTHS = {
-  // Rust red and pale canvas, the commonest.
-  red: { stripes: [['rust', 0.5], ['beige', 0.72]], patches: 1 },
-  // Teal and pale.
-  teal: { stripes: [['teal', 0.62], ['beige', 0.7]], patches: 1 },
-  // Plain canvas the colour of the sand, patched.
-  sand: { plain: ['sand', 0.68], patches: 3 },
+  // Faded rust, bleached toward sand, a pale scrap sewn on.
+  red: { ramp: 'rust', tone: 0.42, fade: ['sand', 0.55], fadeAmount: 0.35, scraps: [['beige', 0.6]] },
+  // Teal, the splash of colour, bleached grey in blotches, a rust scrap.
+  teal: { ramp: 'teal', tone: 0.5, fade: ['concrete', 0.55], fadeAmount: 0.4, scraps: [['rust', 0.4]] },
+  // Plain canvas the colour of the sand, patched with whatever was to hand.
+  sand: { ramp: 'sand', tone: 0.66, fade: ['beige', 0.7], fadeAmount: 0.2, scraps: [['rust', 0.42], ['olive', 0.55], ['sand', 0.52]] },
   // Olive drab, army surplus, patched.
-  olive: { plain: ['olive', 0.62], patches: 2 },
+  olive: { ramp: 'olive', tone: 0.58, fade: ['concrete', 0.6], fadeAmount: 0.25, scraps: [['sand', 0.62], ['olive', 0.45]] },
+  // Dark umber, for contrast against the pale walls, a teal scrap.
+  umber: { ramp: 'rust', tone: 0.24, fade: ['sand', 0.3], fadeAmount: 0.3, scraps: [['teal', 0.4], ['rust', 0.32]] },
 };
 
 export const AWNING_CLOTHS = Object.keys(CLOTHS);
@@ -97,6 +150,8 @@ export default Object.entries(CLOTHS).flatMap(([name, spec]) => {
   return [
     { name: id, out: T(id), draw: () => canvas(id, spec) },
     { name: `${id}-x`, out: T(`${id}-x`), draw: () => turned(canvas(id, spec)) },
-    { name: `${id}-hem`, out: T(`${id}-hem`), draw: () => hem(canvas(id, spec)) },
+    // The hem plain, without the blotches and scraps: every bay repeats it,
+    // and a blotch repeated along the front reads as a pattern.
+    { name: `${id}-hem`, out: T(`${id}-hem`), draw: () => hem(id, canvas(id, { ...spec, fade: null, scraps: [] })) },
   ];
 });

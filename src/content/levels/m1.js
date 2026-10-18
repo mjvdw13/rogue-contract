@@ -182,7 +182,7 @@ town.window(132.5, 61, 'S', { z: 3.4 }).window(133.5, 57, 'S', { z: 9.4, tex: 'w
 // then P (the first of the rooftops).
 town.house(102, 76, 114, 86, { h: 6, r: 2, wall: 'adobe-rose', skirt: 'plinth', dome: true });
 town.door(110, 76, 'N', { h: 6, wall: 'adobe-rose' });
-town.awning(107, 74, 113, 76, { z: 3.5, face: 'N', cloth: 'red', valance: 'valance-red' });
+town.awning(107, 74, 113, 76, { z: 3.5, face: 'N', cloth: 'umber', valance: 'valance-umber' });
 town.window(107.5, 76, 'N', { z: 2.2, tex: 'window-louvre' });
 town.block(104, 76, 106, 77, { ...GATE, h: 6 });
 town.slanted([[114, 76], [124, 73], [126, 73], [126, 86], [114, 86]], { h: 5, wall: 'adobe-grey', skirt: null, dome: true });
@@ -194,7 +194,7 @@ town.window(130, 79.5, 'W', { z: 4.4, tex: 'window-louvre' });
 // across from the street to the blast doors stays open, each a counter
 // and a rack of wares under a canvas roof with the stallholder between
 // them; and in the north-east corner the droid seller's pen, behind a cage.
-town.stall(62, 60, 65, 64, 'E', { cloth: 'red' }).stall(68, 59, 72, 62, 'S', { cloth: 'olive' }).stall(62, 76, 65, 80, 'E', { cloth: 'teal' });
+town.stall(62, 60, 65, 64, 'E', { cloth: 'umber' }).stall(68, 59, 72, 62, 'S', { cloth: 'olive' }).stall(62, 76, 65, 80, 'E', { cloth: 'teal' });
 town.stall(89, 59, 93, 62, 'S', { cloth: 'sand' }).stall(89, 77, 93, 80, 'N', { cloth: 'red', valance: 'valance-red' }).stall(97, 77, 101, 80, 'N', { cloth: 'olive' });
 // 13. The water plaza, in the market's middle: a round paving round the
 // moisture condenser tower (models/market.js), the landmark, the water

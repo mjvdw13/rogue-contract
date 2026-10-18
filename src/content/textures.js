@@ -1,4 +1,5 @@
 import { defineTexture } from '../engine/defs.js';
+import { AWNING_CLOTHS } from './models/awning.js';
 
 // Wall, floor, ceiling and sky textures. Walls/flats are 64x64 PNGs in
 // assets/textures/ (animated ones are horizontal strips of 64x64 frames;
@@ -68,8 +69,8 @@ const GRIME = [
 ];
 
 // Awning canvas (tools/art/textures/awning.js): `-x` turned a quarter for
-// an awning looking east or west, `-hem` its scalloped front edge.
-const AWNINGS = ['red', 'teal', 'sand', 'olive'].flatMap((c) => [`awning-${c}`, `awning-${c}-x`, `awning-${c}-hem`]);
+// an awning looking east or west, `-hem` its torn front edge.
+const AWNINGS = AWNING_CLOTHS.flatMap((c) => [`awning-${c}`, `awning-${c}-x`, `awning-${c}-hem`]);
 
 // The landspeeder's windscreen, mostly see-through, and its shadow, grime
 // on the ground (tools/art/textures/speeder.js).

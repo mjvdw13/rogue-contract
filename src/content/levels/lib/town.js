@@ -330,7 +330,7 @@ export class Town {
    * few tiles between. `cloth` is one of AWNING_CLOTHS; the box is 2 or 3
    * tiles deep (from the wall), an even number wide, and `z` a quarter
    * between 2.5 and 5.5. `valance` is the front edge: 'fringe' (a fixed
-   * scalloped hem), a hanging type to sway there instead (`valance-<cloth>`
+   * torn hem), a hanging type to sway there instead (`valance-<cloth>`
    * for its own hem, or 'rag'), or null for none. Hangings go in
    * `this.hangings`, for the level's `hangings`. With `wall: false` it
    * stands free (a stall's roof): poles under the back corners too, and

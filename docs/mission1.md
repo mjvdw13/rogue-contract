@@ -181,11 +181,13 @@ Check a street from several angles, not just down its length.
   one hanging over a lower roof is clipped. 189 of them cost about 0.1 ms a
   frame.
 - **Awnings** (`awning()`): a thin slab of cloth over the street is the
-  shade you walk under and the striped underside you see; on it the cloth
+  shade you walk under and the cloth's underside you see; on it the cloth
   slopes up to the wall (0.3 a tile) in bays 2 tiles wide that sag between
   their ribs (models, `models/awning.js`), with poles under the front and
-  a scalloped fringe along it. Four cloths (`red`, `teal`, `sand`,
-  `olive`: generated, `tools/art/textures/awning.js`), 2 or 3 tiles deep,
+  a torn fringe along it. Five cloths, plain and ragged, bleached and
+  patched, not striped (`red` a faded rust, `teal` the splash of colour,
+  `sand`, `olive`, `umber` dark for contrast: generated,
+  `tools/art/textures/awning.js`), 2 or 3 tiles deep,
   an even number wide, `face` the way the front looks. `valance` swaps the
   fixed fringe for a swaying one (a hanging, `valance-<cloth>`, or a
   `rag`), which lands in `town.hangings` for the level's `hangings`. The
@@ -193,7 +195,7 @@ Check a street from several angles, not just down its length.
 - **Stalls** (`stall()`): a market stall is an awning that stands free
   (`awning({ wall: false })`: poles at all four corners, the bays' backs
   closed) over a box 4 or 6 wide and 3 deep, so its underside is the
-  awning's striped slab, lit as shade (a model's roof seen from below
+  awning's slab, lit as shade (a model's roof seen from below
   came out dark). Under it a counter and a rack of wares
   (`market-stall`, `models/market.js`), with room between them for a
   stallholder placed with `wander: 0`. `clutter()` keeps off it.

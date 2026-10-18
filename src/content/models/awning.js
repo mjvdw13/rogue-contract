@@ -3,7 +3,7 @@ import { ModelBuilder } from './lib/build.js';
 // Mos Eisley's cloth awnings (lib/town.js, awning()). The kit lays a thin
 // slab over the street as an awning's shade and underside; these stand on
 // it: the cloth's sloped top, in bays 2 tiles wide that sag between their
-// ribs, with a scalloped fringe along the front. Built looking south (+y):
+// ribs, with a torn fringe along the front. Built looking south (+y):
 // the front edge along y = 0, the wall at y = -depth, z = 0 the slab's top.
 // The kit sets them along the front, an end cap at each end, and poles
 // under the front corners; one that stands free (a market stall's) gets
@@ -17,7 +17,7 @@ const RIB = 0.1;
 const FRINGE = 0.5;
 
 /** The cloths (tools/art/textures/awning.js) and depths there are models for. */
-export const AWNING_CLOTHS = ['red', 'teal', 'sand', 'olive'];
+export const AWNING_CLOTHS = ['red', 'teal', 'sand', 'olive', 'umber'];
 export const AWNING_DEPTHS = [2, 3];
 /** Pole heights (from the street to the slab's bottom), a quarter tile apart. */
 export const AWNING_POLES = Array.from({ length: 13 }, (_, k) => 2.5 + k * 0.25);

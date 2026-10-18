@@ -63,18 +63,23 @@ These need Mark to try something, or to decide. Don't start them without him.
   (the new slanting fronts past the market have it).
 
 - **Awnings, tin, pipes and clutter in Mos Eisley** (`?map=m1`): cloth
-  awnings in stripes and canvas (C teal with a fixed fringe, E red with a
-  swaying valance), a tarp over a stall on the square, tin on C's lean-to
-  and B's porch, downpipes, tanks, box units, conduits and vents on the
-  walls, and the street clutter: crates, drums, pressure canisters,
-  cargo pods, power units, junk and litter with droid domes, rubble,
-  scrap and a vaporator (no jars or sacks: Mark, 2026-10-18), set along
-  the walls by `town.clutter()` and by hand on the main street (a stall
-  selling droid parts under the tarp). How they look, how
-  much clutter (`amount`), whether the tarp and the valance sway too much,
-  and whether more awnings should sway. All the new models together cost
-  0.44 ms a frame on average over eight views, 0.75 at worst (headless,
-  measured with the machine at about half its usual speed).
+  awnings (C teal with a fixed fringe, E red with a swaying valance), a
+  tarp over a stall on the square, tin on C's lean-to and B's porch,
+  downpipes, tanks, box units, conduits and vents on the walls, and the
+  street clutter: crates, drums, pressure canisters, cargo pods, power
+  units, junk and litter with droid domes, rubble, scrap and a vaporator
+  (no jars or sacks: Mark, 2026-10-18), set along the walls by
+  `town.clutter()` and by hand on the main street (a stall selling droid
+  parts under the tarp). How they look, how much clutter (`amount`),
+  whether the tarp and the valance sway too much, and whether more awnings
+  should sway. The cloth redone (Mark, 2026-10-18: the stripes and
+  scallops looked medieval): plain, muted and ragged, bleached in
+  blotches, patched with scraps of other cloth, the hems torn to tatters;
+  faded teal is the splash, and a dark `umber` for contrast (the awning
+  past the market, a stall). Whether the colours are right and the tears
+  ragged enough. All the new models together cost 0.44 ms a frame on
+  average over eight views, 0.75 at worst (headless, measured with the
+  machine at about half its usual speed).
 
 - **The landspeeder** (`?map=m1`, back on the main street by C's awning,
   nose west, turned 15 degrees off the line of the street): the bob made
