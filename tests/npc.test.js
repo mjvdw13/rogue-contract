@@ -4,7 +4,8 @@ import { wanderArea } from '../src/engine/things/npc.js';
 import { lockOn } from '../src/engine/combat/aim.js';
 import content from '../src/content/index.js';
 import { Registry } from '../src/engine/registry.js';
-import { defineNpc } from '../src/engine/defs.js';
+import { defineNpc, defineLevel } from '../src/engine/defs.js';
+import friendlies from './fixtures/friendlies.js';
 import { validateContent } from '../src/engine/validate.js';
 import { makeWorld, mockInput, room, run, npcRegistry } from './helpers.js';
 
@@ -107,6 +108,23 @@ test('coworkers stay out of doorways, hazards and narrow passages', () => {
     far = Math.max(far, Math.hypot(terry.x - 3.5, terry.y - 2.5));
   });
   assert.ok(far > 0.8, 'and does wander around');
+});
+
+test("a coworker placed with its own wander keeps to that instead of its type's", () => {
+  const level = { ...office, things: undefined, list: [{ type: 'player', x: 10.5, y: 2.5, angle: 180 }, { type: 'terry', x: 3.5, y: 2.5, wander: 0 }, { type: 'terry', x: 3.5, y: 8.5, wander: 1 }] };
+  const w = world(level, { noMonsters: true });
+  const [still, near] = w.things.filter((t) => t.def.id === 'terry');
+  assert.equal(still.area.size, 1, 'wander 0: only the tile it stands on');
+  assert.ok(near.area.size > 1 && near.area.size <= 5, 'wander 1: the tiles next to it');
+  run(w, mockInput(), 30);
+  assert.ok(Math.hypot(still.x - 3.5, still.y - 2.5) < 0.01, 'it stands where it was put');
+
+  const bad = defineLevel({ ...level, id: 'bad', list: [...level.list, { type: 'terry', x: 4.5, y: 3.5, wander: -1 }, { type: 'stormtrooper', x: 4.5, y: 1.5, wander: 2 }] });
+  const { errors } = validateContent(new Registry({ ...content, things: [...content.things, ...friendlies], levels: [bad] }));
+  assert.deepEqual(errors.filter((e) => e.includes('"wander"')), [
+    'Level "bad": a terry at (4.5, 3.5): "wander" must be a number of tiles, 0 or more',
+    'Level "bad": a stormtrooper at (4.5, 1.5) has "wander", which only friendly characters take',
+  ]);
 });
 
 test('monsters never go after coworkers', () => {

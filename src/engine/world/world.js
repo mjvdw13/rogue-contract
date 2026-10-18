@@ -187,6 +187,10 @@ export class World {
       t.tag = s.tag;
       t.drops = s.drops;
       if (s.z !== null && s.z !== undefined) t.z = s.z;
+      if (s.wander !== null && s.wander !== undefined && t.kind === 'npc') {
+        t.wanderReach = s.wander;
+        initNpc(this, t);
+      }
       if (t.kind === 'monster' && t.def.countKill) this.stats.totalKills++;
       if (t.kind === 'item' && t.def.countItem) this.stats.totalItems++;
       // (The renderer stops rays over the skyline: keep tall scenery, a

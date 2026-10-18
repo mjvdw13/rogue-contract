@@ -586,6 +586,9 @@ export function defineSong(def) {
  * tiles each way (10), under the sky only: made `z` ([0.05, 2.5]) above the
  * floor with a random speed of up to `drift` ([0.3, 0.1]: across, up or
  * down), carried by `wind` ([x, y, z] units per second; still by default).
+ * `list` places things at exact spots: `{ type, x, y, angle?, z?, tag?,
+ * skill?, drops?, ambush?, wander? }`; a friendly's `wander` (tiles, 0
+ * stands still) replaces its type's for that one.
  * @param {{id:string, name:string, tiles:string[], things?:string[], legend?:object,
  *   thingLegend?:object, list?:object[], triggers?:object[], music?:string, sky?:string,
  *   fog?:number, haze?:{color:number[], half?:number},

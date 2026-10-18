@@ -18,14 +18,18 @@ const DIRS = [
   [0, -1],
 ];
 
+/** How far an NPC may stroll: its placement's `wander`, else its type's. */
+const reachOf = (t) => t.wanderReach ?? t.def.wander ?? 0;
+
 /**
  * The tiles an NPC may stand on: open floor connected to its starting tile,
- * at most `def.wander` steps away, avoiding doors, hazards, the tiles next to
- * doors and one-tile-wide passages, so it never blocks the way.
+ * at most its `wander` steps away (the placement's, else the type's),
+ * avoiding doors, hazards, the tiles next to doors and one-tile-wide
+ * passages, so it never blocks the way.
  */
 export function wanderArea(world, t) {
   const map = world.map;
-  const radius = t.def.wander ?? 0;
+  const radius = reachOf(t);
   const open = (x, y) => map.inBounds(x, y) && !(map.flags[map.index(x, y)] & (F_SOLID | F_DOOR | F_DAMAGE));
   const roomy = (x, y) => !((!open(x - 1, y) && !open(x + 1, y)) || (!open(x, y - 1) && !open(x, y + 1)));
   const byDoor = (x, y) => DIRS.some(([dx, dy]) => map.inBounds(x + dx, y + dy) && map.flags[map.index(x + dx, y + dy)] & F_DOOR);
@@ -233,7 +237,7 @@ export function npcThink(world, t, dt) {
     default:
       t.timer -= dt;
       if (t.timer > 0) break;
-      if ((t.def.wander ?? 0) > 0 && t.area.size > 1 && t.rng.chance(0.75)) startWalk(world, t);
+      if (reachOf(t) > 0 && t.area.size > 1 && t.rng.chance(0.75)) startWalk(world, t);
       else idle(world, t);
   }
 }

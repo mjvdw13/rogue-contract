@@ -166,7 +166,7 @@ Friendlies are solid, so you bump into them, and monsters never target
 them. Without `health` they can't be hurt: bullets, projectiles and
 explosions pass through them (a `splash.erupt` blast still goes up under
 them, harmlessly). Each one idles and wanders up to `wander` tiles from where it was
-placed. It stays out of doorways, hazards and one-tile passages, so it never
+placed (or its placement's own `wander`: see Things). It stays out of doorways, hazards and one-tile passages, so it never
 blocks the way. When the player bumps into one or presses use on it, it turns to
 them, plays `react`, says one of its `lines` (shown as `NAME: line`), plays
 `sounds.react` and pops up a `bubble` effect.
@@ -1198,7 +1198,10 @@ reachable monster always drops (chance 1) as placed.
 
 You can also place things precisely with
 `list: [{ type: 'med-kit', x: 3.5, y: 7.25 }]`. A `z` there puts a thing (or
-the player start) on top of a slab rather than under it.
+the player start) on top of a slab rather than under it. A friendly
+character's `wander` there replaces its type's for that one (tiles; 0
+stands still): `{ type: 'villager-man', x: 80.5, y: 74.5, wander: 0 }` is
+a shopkeeper behind his counter or someone waiting in a queue.
 
 ### Triggers and actions
 

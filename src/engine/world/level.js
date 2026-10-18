@@ -460,6 +460,8 @@ export function buildLevel(registry, level, opts = {}) {
       // Extra drops for this one monster (on top of its type's): a keycard an officer carries.
       drops: spec.drops ? spec.drops.map((d) => (typeof d === 'string' ? { item: d, chance: 1 } : { chance: 1, ...d })) : null,
       z: spec.z ?? null,
+      // How far this one friendly strolls, instead of its type's `wander`.
+      wander: spec.wander ?? null,
     });
   };
 

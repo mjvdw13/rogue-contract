@@ -285,6 +285,10 @@ export function validateContent(reg) {
           continue;
         }
         if (def.kind === 'item' && def.pickup?.key) keysPlaced.add(def.pickup.key);
+        if (sp.wander !== null && skill === 3) {
+          if (def.kind !== 'npc') err(`${owner}: a ${sp.type} at (${sp.x}, ${sp.y}) has "wander", which only friendly characters take`);
+          else if (!(typeof sp.wander === 'number' && sp.wander >= 0)) err(`${owner}: a ${sp.type} at (${sp.x}, ${sp.y}): "wander" must be a number of tiles, 0 or more`);
+        }
         for (const d of sp.drops ?? []) {
           const item = reg.things.get(d.item);
           if (!item) {
