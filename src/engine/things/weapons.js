@@ -76,6 +76,8 @@ function fire(world, pt, def, ws) {
   const spec = def.charge ? { ...def.fire, power: ws.power } : def.fire;
   performAttack(world, pt, spec, pt.angle, { accurate: def.accurateFirstShot && ws.refire === 0, damageMult: mult });
   if (def.sounds.fire) world.playSound(def.sounds.fire);
+  // Gunfire in a calm town turns it (before the noise, so the calm ones nearby hear it too).
+  if (def.noise && world.calmLeft()) world.turnHostile();
   if (def.noise) world.noiseAlert(pt);
 }
 

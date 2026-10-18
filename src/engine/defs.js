@@ -598,7 +598,8 @@ export function defineSong(def) {
  * skill?, drops?, ambush?, wander?, calm? }`; a friendly's `wander` (tiles, 0
  * stands still) replaces its type's for that one. A monster's `calm` (true,
  * or `{ lines?, speed?, wander?, idleTime?, patrol?, loop? }` over its
- * type's `calm`) places it calm: it never attacks until hurt. `patrol` is a
+ * type's `calm`) places it calm: it never attacks until the town turns
+ * hostile (world.turnHostile: hurt, or gunfire). `patrol` is a
  * list of two or more [x, y] points it walks between in straight lines,
  * pausing at each, there and back, or round with `loop: true`.
  * @param {{id:string, name:string, tiles:string[], things?:string[], legend?:object,

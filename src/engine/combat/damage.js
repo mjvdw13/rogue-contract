@@ -18,8 +18,9 @@ export function damage(world, target, amount, inflictor, source, opts = {}) {
     damagePlayer(world, target, amount, inflictor, source, opts);
     return;
   }
-  // A calm monster that's hurt stops being calm (and wakes, below).
-  if (target.calm) world.endCalm(target);
+  // Hurting a calm monster, or the player hurting anyone while some are
+  // calm, turns the town hostile (and the one hurt wakes, below).
+  if (target.calm || (source?.player && world.calmLeft())) world.turnHostile();
 
   // Knockback.
   if (inflictor && !opts.noThrust) {

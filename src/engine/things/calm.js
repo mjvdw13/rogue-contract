@@ -9,7 +9,8 @@ import { wanderArea } from './npc.js';
  * round its spot as friendly characters do (`wander` tiles), or walks a
  * patrol: straight from point to point, pausing at each, there and back
  * (or round, with `loop`). Bumped or used, it turns to the player and says
- * one of its `lines`. Hurt, it turns normal (endCalm).
+ * one of its `lines`. Hurt, or at gunfire, the whole town turns hostile
+ * (world.turnHostile) and every calm monster turns normal (endCalm).
  *
  * Like friendlies, it rolls its own dice, seeded by where it stands, so
  * calm characters never change the random numbers the rest of the game sees.

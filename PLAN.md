@@ -347,7 +347,7 @@ conversations, then the fob.
       says a line. Hurt, it turns normal.
   - [x] Engine: `things/calm.js`, defs, validator (points in the open and
         in sight of each other), MODDING.md, tests.
-  - [ ] **The town's switch:** a `hostile` action and an `on: 'hostile'`
+  - [x] **The town's switch:** a `hostile` action and an `on: 'hostile'`
         trigger turn every calm monster normal at once; the player firing
         a noisy weapon or hurting anyone runs it.
   - [ ] Mos Eisley: sandtrooper patrols on the main street and the

@@ -11,7 +11,7 @@ import { calmThink } from './calm.js';
  *   pain   -> flinches
  *   dead   -> death animation, then a corpse
  *   calm   -> goes about its business and never attacks (calm.js), until
- *             it's hurt
+ *             it or the town turns hostile (world.turnHostile)
  * Hooks on the definition (onSight, onThink, onAttack, onPain, onDeath,
  * onEvent) allow custom behaviour without changing this file.
  */

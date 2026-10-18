@@ -160,8 +160,14 @@ monster never looks for the player, hears no gunfire and never attacks. It
 stands its post, strolls round its spot as friendly characters do (out of
 doorways and one-tile passages), or walks a patrol. Bumped or used, it
 turns to the player and says one of its `lines` (shown as `NAME: line`).
-Hurt, it turns normal and fights back. Its type's `calm` sets how it
-behaves; a placement can override any of it:
+Hurt, it turns normal and fights back, and so does the rest of the town:
+every calm monster on the level turns at once (the town's switch). The
+player firing a weapon with `noise` (not fists) or hurting anyone while
+some are calm throws it too, and so does the `hostile` action; the
+level's `on: 'hostile'` triggers then run (close the blast doors, spawn
+reinforcements, change the music). Those that hear it come for the
+player; the rest look out for them from then on. Its type's `calm` sets
+how it behaves; a placement can override any of it:
 
 ```js
 calm: {
@@ -1259,6 +1265,8 @@ Events:
 - `use`: the player uses a wall with that tag.
 - `pickup`: the player picks up that item.
 - `killed`: every monster of that type (`thing`) or with that tag is dead.
+- `hostile`: the calm monsters turn (see *Calm* under Monsters), by the
+  `hostile` action or the player's gunfire.
 
 A trigger fires once unless you add `once: false`.
 
@@ -1278,6 +1286,8 @@ Actions:
 - `lift` `{ tag, to }`: starts the lifts with the tag (to stop index `to`, or
   the next stop)
 - `teleport` `{ tag, angle }`: moves the player to the first tile with the tag
+- `hostile`: the town's switch: every calm monster turns normal at once,
+  and the `on: 'hostile'` triggers run (only the first time)
 
 ### Checking a level
 

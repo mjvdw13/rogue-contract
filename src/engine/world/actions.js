@@ -78,6 +78,10 @@ export const BUILTIN_ACTIONS = {
     if (world.registry.things.has('teleport-fog')) world.spawn('teleport-fog', world.player.x, world.player.y);
     world.playSound('teleport');
   },
+  /** The town's switch: every calm monster turns normal, and `on: 'hostile'` triggers run. */
+  hostile(world) {
+    world.turnHostile();
+  },
   /** Change the music. */
   music(world, { id }) {
     world.game?.playMusic?.(id);

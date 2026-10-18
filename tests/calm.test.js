@@ -106,6 +106,69 @@ test('a calm trooper that is shot turns on the player', () => {
   assert.ok(w.player.player.health < 100, 'it fought back');
 });
 
+// The town's switch. A Jawa beside the player, a trooper at the far end of
+// the hall and one shut away behind a door, out of earshot.
+const TOWN = [
+  '################################',
+  '#..............................#',
+  '#..............................#',
+  '#..............................#',
+  '#####################D##########',
+  '#..............................#',
+  '#..............................#',
+  '################################',
+];
+const town = (extra = {}) => ({
+  ...room(TOWN, []),
+  list: [
+    { type: 'player', x: 2.5, y: 2.5, angle: 0 },
+    { type: 'jawa', x: 5.5, y: 2.5, calm: { wander: 0 } },
+    { type: 'sandtrooper', x: 28.5, y: 2.5, angle: 180, calm: { wander: 0 } },
+    { type: 'sandtrooper', x: 28.5, y: 5.5, calm: { wander: 0 } },
+  ],
+  triggers: [{ on: 'hostile', do: [{ action: 'message', text: 'THE TOWN TURNS.' }] }],
+  ...extra,
+});
+const calmOnes = (w) => w.things.filter((t) => t.kind === 'monster' && t.calm);
+
+test('firing a blaster turns every calm monster, and runs the hostile trigger once', () => {
+  const w = makeWorld(town());
+  w.player.angle = Math.PI / 2; // at the wall, hitting no one
+  const input = mockInput();
+  input.hold('fire');
+  run(w, input, 1);
+  input.release('fire');
+  assert.equal(calmOnes(w).length, 0, 'none is calm now');
+  assert.deepEqual(w.messages.filter((m) => m === 'THE TOWN TURNS.'), ['THE TOWN TURNS.']);
+  const [jawa, far, behind] = w.things.filter((t) => t.kind === 'monster');
+  const awake = (m) => ['chase', 'attack', 'pain'].includes(m.state);
+  assert.ok(awake(jawa), `the Jawa beside the player heard it (${jawa.state})`);
+  assert.ok(awake(far), `so did the trooper down the hall (${far.state})`);
+  assert.equal(behind.state, 'idle', 'the one behind the door did not, but is no longer calm');
+  run(w, mockInput(), 5);
+  assert.ok(w.player.player.health < 100, 'and they fight');
+});
+
+test('hurting anyone turns the town; so does the hostile action', () => {
+  const punched = makeWorld(town());
+  const jawa = punched.things.find((t) => t.def.id === 'jawa');
+  punched.damage(jawa, 1, punched.player, punched.player);
+  assert.equal(calmOnes(punched).length, 0);
+
+  const story = makeWorld(town({ triggers: [{ on: 'start', do: ['hostile'] }] }));
+  assert.equal(calmOnes(story).length, 0, 'a trigger can throw the switch');
+  assert.ok(story.hostile);
+});
+
+test('with no calm monsters, gunfire runs no hostile trigger', () => {
+  const w = makeWorld({ ...town(), list: [{ type: 'player', x: 2.5, y: 2.5, angle: 90 }] });
+  const input = mockInput();
+  input.hold('fire');
+  run(w, input, 1);
+  assert.equal(w.hostile, false);
+  assert.equal(w.messages.filter((m) => m === 'THE TOWN TURNS.').length, 0);
+});
+
 test('the validator checks calm placements and patrols', () => {
   const level = defineLevel({
     ...hall([

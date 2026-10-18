@@ -8,7 +8,7 @@ import { PARTICLE_BLENDS, PARTICLE_FLOORS, PARTICLE_SHAPES, PARTICLE_WALLS, POIN
 import { Hangings, HANGING_SHAPES, HANGING_PINS } from './world/hangings.js';
 
 const PICKUP_MODIFIERS = ['maxHealth', 'armorClass', 'maxArmor', 'duration', 'always'];
-const TRIGGER_EVENTS = ['start', 'enter', 'use', 'killed', 'pickup'];
+const TRIGGER_EVENTS = ['start', 'enter', 'use', 'killed', 'pickup', 'hostile'];
 /** Faces per model before the validator warns (render cost). */
 const MODEL_BUDGET = 400;
 

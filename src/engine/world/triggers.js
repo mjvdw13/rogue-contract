@@ -8,6 +8,7 @@ import { runActions } from './actions.js';
  *   { on: 'killed', thing: 'firefly' }     every thing of that type is dead
  *   { on: 'killed', tag: 'ambush' }        every monster spawned with that tag is dead
  *   { on: 'pickup', thing: 'badge-red' }   player picks up that item
+ *   { on: 'hostile' }                      the calm monsters turn (world.turnHostile)
  * Add `once: false` to let a trigger fire repeatedly. Actions go in `do`.
  */
 export class Triggers {
@@ -59,5 +60,9 @@ export class Triggers {
 
   pickup(item) {
     for (const t of this.list) if (t.on === 'pickup' && t.thing === item.def.id) this._fire(t, { thing: item });
+  }
+
+  hostile() {
+    for (const t of this.list) if (t.on === 'hostile') this._fire(t, {});
   }
 }

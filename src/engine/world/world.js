@@ -111,6 +111,8 @@ export class World {
     this.floorTimer = 0;
     /** The friendly NPC the player last walked into (it reacts on its next think). */
     this.playerBumped = null;
+    /** Has the town's switch been thrown (turnHostile)? */
+    this.hostile = false;
 
     const slot = this.assets ? (id) => this.assets.textureSlot(id) : () => 0;
     const built = buildLevel(this.registry, level, { skill, textureSlot: slot });
@@ -528,9 +530,20 @@ export class World {
     wakeMonster(this, m, target);
   }
 
-  /** A calm monster turns normal (calm.js). */
-  endCalm(m) {
-    endCalm(m);
+  /** Are any monsters still calm (calm.js)? */
+  calmLeft() {
+    return !this.hostile && this.things.some((t) => t.calm && !t.dead && !t.removed);
+  }
+
+  /**
+   * The town's switch: every calm monster turns normal at once, and the
+   * level's `on: 'hostile'` triggers run. Only the first time.
+   */
+  turnHostile() {
+    if (this.hostile) return;
+    this.hostile = true;
+    for (const t of this.things) if (t.calm) endCalm(t);
+    this.triggers.hostile();
   }
 
   npcPain(t) {
