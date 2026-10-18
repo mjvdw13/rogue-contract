@@ -669,7 +669,8 @@ chamfers, stairs, lifts), which hands the game an ordinary map. Mos Eisley
 raised floor under the sky (each with its own roofline), with rounded
 corners and storeys set back (low angled walls, `wallTop`), doorways
 through them as slab arches, rooms inside them as the lower storey of a
-slab, cloth awnings, round buildings, domes on the roofs (models in
+slab, doors (pictures, or with `door({ opens: true })` rising doors into a
+room, the wall over them a slab), cloth awnings, round buildings, domes on the roofs (models in
 nine widths, placed by `house({ dome })` or `town.dome()`), and shade from
 two suns (and the domes) worked out from the heights (see docs/mission1.md, "How it's
 built").

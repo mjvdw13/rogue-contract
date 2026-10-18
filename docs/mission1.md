@@ -157,8 +157,9 @@ Check a street from several angles, not just down its length.
   sky in front of it, so `seal()` brings that sky down to the roofline, and
   a low sky hides everything behind it above that height (a notch in the
   building behind). Walls are for the map's edge; a shut door is the
-  building's own raised floor faced in planks. Real doors (which need walls
-  beside them) belong indoors, between rooms.
+  building's own raised floor faced in planks. A real door in an outside
+  wall is an arch with a rising door in it (its tiles carry the slab), and
+  the raised floor beside it counts as its walls.
 - **Domes** are the toppers on the roofs, Tatooine's mark: models
   (`models/dome.js`, a dome on a drum over a lip) in nine widths, 3 to 11
   tiles across, in each plaster (`dome-9`, `dome-9-pale`).
@@ -237,9 +238,12 @@ Check a street from several angles, not just down its length.
   `door-jamb` model, inside the recess), the striped `door-sign` over the
   opening and the `door-panel` controls beside it (on the wall's face),
   and a flagstone step outside. The arch is optional. The lean-to shop has
-  a `shutter`. These doors are pictures and don't open: a real door can't
-  stand under the open sky yet (PLAN.md, "Doors that open under the
-  sky"). `depth: 0` puts it on the wall
+  a `shutter`. Most doors are pictures on houses with nothing inside.
+  `opens: true` makes a real one into a `room()` behind a wall a tile
+  thick: a rising door (`door-red-rising`, `door-grey-rising`) standing
+  halfway through the wall, so the jamb (`door-jamb-through`, lipped on
+  both faces) shows half a tile deep either side, and its panel slides up
+  into the wall over the opening. `depth: 0` puts it on the wall
   itself (the back of a porch). Windows are set in too (Mark: inset
   matters more than their shape): a notch a tile deep, the wall below it
   a sill and a slab over it up to the roof, the window (`window-bars`,
@@ -284,7 +288,8 @@ angle unless their sheet has the other views (the villagers do).
   (navy and orange), their controls ZASWIT04 as it is, the shutter from a
   strip of NDCORUG1, barred windows from SPBARS1, louvres from NPVENTS1.
   The jamb's tiles (`door-jamb`, a texture) are ZPTILE4's bevelled square,
-  shrunk and repeated.
+  shrunk and repeated. Doors that open use the door
+  decals again as 64x128 panels (`RISING`: a panel must be a power of two).
 - **Textures:** Dark Forces textures recoloured by
   `assets/custom/derive.mjs` (Mark, 2026-10-17: DF textures for now, none
   of our own, so no generated stand-ins). So far: plaster (`adobe`),

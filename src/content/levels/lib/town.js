@@ -228,8 +228,15 @@ export class Town {
    * (x, y) on a tile corner for an even `width`, halfway along a tile for an
    * odd one. `depth: 0` cuts nothing and puts the door on the wall itself
    * (the back of a porch), without a jamb or a step.
+   *
+   * `opens: true` makes it a real door into a `room()` behind a wall 1
+   * tile thick: a rising door (its panel `tex` + '-rising', 64x128) standing
+   * halfway through the wall, so the tiled jamb (`door-jamb-through`,
+   * lipped on both faces) shows half a tile deep either side; the wall over
+   * it is a slab up to the roof, as an arch's is. Shut doors stay pictures
+   * on houses with nothing inside.
    */
-  door(x, y, face, { h, tex = 'door-red', tall = 3, width = 2, depth = 1, lintel = tall, jamb = depth > 0, sign = true, panel = true, floorZ = 0, wall = this.wall, step = depth > 0 }) {
+  door(x, y, face, { h, tex = 'door-red', tall = 3, width = 2, depth = 1, lintel = tall, jamb = depth > 0, sign = true, panel = true, floorZ = 0, wall = this.wall, step = depth > 0, opens = false }) {
     const ns = face === 'N' || face === 'S';
     const along = ns ? x : y;
     const a0 = Math.round(along - width / 2);
@@ -238,10 +245,24 @@ export class Town {
     const out = face === 'S' || face === 'E' ? 1 : -1;
     const line = ns ? y : x;
     const back = line - out * depth;
+    if (opens && depth !== 1) throw new Error(`Town: a door that opens at (${x}, ${y}) needs a wall 1 tile thick (depth 1)`);
     if (depth > 0) {
       const [b0, b1] = [Math.min(line, back), Math.max(line, back)];
       if (ns) this.arch(a0, b0, a1, b1, { h, lintel, floorZ, wall });
       else this.arch(b0, a0, b1, a1, { h, lintel, floorZ, wall });
+    }
+    if (opens) {
+      // The arch's tiles become the door's, with a room behind them.
+      const row = out > 0 ? line - 1 : line;
+      for (let a = a0; a < a1; a++) {
+        const [tx, ty] = ns ? [a, row] : [row, a];
+        const [bx, by] = ns ? [a, row - out] : [row - out, a];
+        const inside = this.p.get(bx, by);
+        if (!inside || inside.wall || inside.door || (inside.floorZ ?? 0) > floorZ + 0.5) {
+          throw new Error(`Town: a door that opens at (${x}, ${y}) needs a room behind it, at (${bx}, ${by})`);
+        }
+        this.p.set(tx, ty, { ...this.p.get(tx, ty), floor: 'flagstone', door: `${tex}-rising`, style: 'rise' });
+      }
     }
     if (step) {
       const s = out > 0 ? line : line - 1;
@@ -250,11 +271,11 @@ export class Town {
       else this.p.rect(s, a0, s + 1, a1, (_, __, c) => paint(c));
     }
     const at = (a, edge) => (ns ? { x: a, y: edge } : { x: edge, y: a });
-    this.decals.push({ ...at(mid, back), z: floorZ + tall / 2, face, tex });
+    if (!opens) this.decals.push({ ...at(mid, back), z: floorZ + tall / 2, face, tex });
     if (jamb) {
       // (The model is built looking south; content angles turn it counter-clockwise.)
       const angle = { S: 0, E: 90, N: 180, W: 270 }[face];
-      this.things.push({ type: 'door-jamb', ...at(mid, (line + back) / 2), z: floorZ, angle });
+      this.things.push({ type: opens ? 'door-jamb-through' : 'door-jamb', ...at(mid, (line + back) / 2), z: floorZ, angle });
     }
     // Sign and controls on the wall round the opening (on the back wall without a recess).
     const wallAt = depth > 0 ? line : back;
@@ -622,7 +643,8 @@ export class Town {
     };
     const height = (c) => (c.slab ? c.slab.top : c.floorZ ?? 0);
     const open = (c) => c && !c.wall && !c.door && c.ceiling === 'sky' && (!c.slab || c.slab.top - c.slab.bottom <= 0.25);
-    const building = (c) => c && !c.wall && !c.door && c.ceiling === 'sky';
+    // (A door that opens is an arch with a panel in it: the wall over it weathers.)
+    const building = (c) => c && !c.wall && (!c.door || c.slab) && c.ceiling === 'sky';
 
     // Runs of straight wall: the same face, ground, roofline and grime.
     const runs = [];
@@ -821,7 +843,8 @@ export class Town {
    */
   seal() {
     const { p } = this;
-    const solid = (c) => c && ((c.wall && !c.line && !c.diagonal) || c.door);
+    // (A door with a slab is under the roof, as an arch is: not a wall.)
+    const solid = (c) => c && ((c.wall && !c.line && !c.diagonal) || (c.door && !c.slab));
     const fixes = new Map();
     for (let y = 0; y < p.h; y++) {
       for (let x = 0; x < p.w; x++) {
@@ -904,7 +927,7 @@ export class Town {
     for (let y = 0; y < h; y++) {
       for (let x = 0; x < w; x++) {
         const c = p.get(x, y);
-        if ((c.wall && !c.line && !c.diagonal) || c.door || c.ceiling !== 'sky') continue;
+        if ((c.wall && !c.line && !c.diagonal) || (c.door && !c.slab) || c.ceiling !== 'sky') continue;
         const z = c.slab ? c.slab.top : c.floorZ ?? 0;
         const drop = dropAt(x, y, z, under[y * w + x] ? bare : top);
         if (drop > 0) out.push([x, y, { ...c, light: Math.round((c.light - drop) / 8) * 8 }]);
@@ -919,7 +942,7 @@ export class Town {
     return this;
   }
 
-  /** Each tile's top for shadows: ground, roofs and slabs by their height; walls, doors and interiors as tall as the highest open top beside them. */
+  /** Each tile's top for shadows: ground, roofs and slabs (a door's too) by their height; walls, shut doors and interiors as tall as the highest open top beside them. */
   _tops(domes = true) {
     const { p } = this;
     const { w, h } = p;
@@ -928,7 +951,7 @@ export class Town {
       for (let x = 0; x < w; x++) {
         const c = p.get(x, y);
         if (c.wall && (c.line || c.diagonal)) top[y * w + x] = c.wallTop ?? c.ceilZ;
-        else if (!c.wall && !c.door && c.ceiling === 'sky') top[y * w + x] = c.slab ? Math.max(c.slab.top, c.floorZ ?? 0) : c.floorZ ?? 0;
+        else if (!c.wall && (!c.door || c.slab) && c.ceiling === 'sky') top[y * w + x] = c.slab ? Math.max(c.slab.top, c.floorZ ?? 0) : c.floorZ ?? 0;
       }
     }
     // Indoors and walls: the roof round them, spreading in from the sky tiles.

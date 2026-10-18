@@ -9,10 +9,10 @@ import { boulderLarge, boulderSmall } from './boulder.js';
 import floodlightTower from './floodlight-tower.js';
 import { sensorMast, sensorDish } from './sensor-mast.js';
 import domes from './dome.js';
-import doorJamb from './door-jamb.js';
+import doorJamb, { doorJambThrough } from './door-jamb.js';
 import awnings from './awning.js';
 import tin from './tin.js';
 import pipes from './pipes.js';
 import clutter from './clutter.js';
 
-export default [terminal, reactorRing, coolantTank, shuttle, barricade, boulderLarge, boulderSmall, floodlightTower, sensorMast, sensorDish, ...domes, doorJamb, ...awnings, ...tin, ...pipes, ...clutter];
+export default [terminal, reactorRing, coolantTank, shuttle, barricade, boulderLarge, boulderSmall, floodlightTower, sensorMast, sensorDish, ...domes, doorJamb, doorJambThrough, ...awnings, ...tin, ...pipes, ...clutter];

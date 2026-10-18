@@ -139,6 +139,19 @@ export const DECALS = [
 ];
 
 /**
+ * Doors that open (town.door({ opens: true })): a door decal again as a
+ * rising door's panel, which must be a power-of-two size. The 64x96 door
+ * sits in the bottom of a 64x128 texture (the panel hangs from its bottom
+ * edge, so the top quarter is up in the wall over the opening and never
+ * shows), and what was see-through, round its corners and above it, is
+ * `fill` (the jamb's rounded tiles hide the corners).
+ */
+export const RISING = [
+  { out: 'door-red-rising', from: 'door-red', size: [64, 128], fill: [24, 16, 10] },
+  { out: 'door-grey-rising', from: 'door-grey', size: [64, 128], fill: [24, 16, 10] },
+];
+
+/**
  * The edges of the street's sand drifts: one 64x64 texture for each way a
  * tile's corners can be sand or drift (bit 1 its north-west corner, 2
  * north-east, 4 south-east, 8 south-west), `street-drift-1` to `-14`. Each
@@ -396,8 +409,26 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     img = resized(img, spec.size);
     for (let i = 3; i < img.data.length; i += 4) img.data[i] = 255;
     img = masked(spec.gradient ? gradientMap(img, spec) : img, spec);
+    made.set(spec.out, img);
     fs.writeFileSync(path.join(texDir, `${spec.out}.png`), encodePNG(img.width, img.height, img.data));
     console.log(`${spec.out}.png from ${spec.df} (${img.width}x${img.height}, a decal)`);
+  }
+  for (const spec of RISING) {
+    const src = made.get(spec.from);
+    const [w, h] = spec.size;
+    const data = new Uint8Array(w * h * 4);
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const o = (y * w + x) * 4;
+        const sy = y - (h - src.height);
+        const i = (sy * src.width + x) * 4;
+        const a = sy >= 0 && x < src.width ? src.data[i + 3] / 255 : 0;
+        for (let k = 0; k < 3; k++) data[o + k] = Math.round(a * (a ? src.data[i + k] : 0) + (1 - a) * spec.fill[k]);
+        data[o + 3] = 255;
+      }
+    }
+    fs.writeFileSync(path.join(texDir, `${spec.out}.png`), encodePNG(w, h, data));
+    console.log(`${spec.out}.png from ${spec.from}.png (${w}x${h}, a rising door's panel)`);
   }
   const overridesFile = path.join(here, 'overrides.json');
   const overrides = JSON.parse(fs.readFileSync(overridesFile, 'utf8'));

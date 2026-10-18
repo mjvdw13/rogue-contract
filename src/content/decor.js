@@ -34,6 +34,7 @@ export default [
   ...DOMES.map((d) => defineDecoration({ id: d.id, model: d.id, solid: true, radius: d.radius, height: d.height })),
   // The tiled jamb of a Mos Eisley doorway (inside the wall's recess, so it needn't be solid).
   defineDecoration({ id: 'door-jamb', model: 'door-jamb' }),
+  defineDecoration({ id: 'door-jamb-through', model: 'door-jamb-through' }),
   // Mos Eisley's cloth awnings: their tops and ends over the kit's slab, and the poles under their fronts.
   ...AWNING_MODELS.map((id) => defineDecoration({ id, model: id })),
   ...AWNING_POLES.map((h) => defineDecoration({ id: poleId(h), model: poleId(h), solid: true, radius: 0.12, height: h })),

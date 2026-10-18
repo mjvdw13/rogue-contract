@@ -6,6 +6,8 @@ import { ModelBuilder } from './lib/build.js';
 // tiles wide, 3 high, 1 deep: lib/town.js, door()), with tiled lips filling
 // the front corners round the curve. Built looking south (+y): the wall's
 // face at y 0.5, the door at y -0.5; the kit turns it to face its wall.
+// `door-jamb-through` is the same through a wall 1 tile thick, a door that
+// opens standing in its middle (y 0) and a room behind: lipped on both faces.
 
 const W = 1; // half the opening's width
 const H = 3; // the opening's height
@@ -33,23 +35,30 @@ function outline() {
   return pts;
 }
 
-const m = new ModelBuilder('door-jamb');
-const pts = outline();
-// The lining: one strip per edge of the outline, facing in toward the opening's middle.
-for (let i = 0; i < pts.length; i++) {
-  const [a, b] = [pts[i], pts[(i + 1) % pts.length]];
-  const mid = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
-  // A point behind the strip (away from the opening's middle), for its winding.
-  const out = [mid[0] * 2, 0, mid[1] + (mid[1] - H / 2)];
-  m.face([[a[0], 0.5, a[1]], [b[0], 0.5, b[1]], [b[0], -0.5, b[1]], [a[0], -0.5, a[1]]], tile, out);
-}
-// The lips: in the wall's face, between each rounded corner and the square corner of the recess.
-for (let c = 0; c < 4; c++) {
-  const sq = [[W, H], [-W, H], [-W, 0], [W, 0]][c];
-  for (let k = 0; k < STEPS; k++) {
-    const [a, b] = [pts[c * (STEPS + 1) + k], pts[c * (STEPS + 1) + k + 1]];
-    m.face([[sq[0], 0.49, sq[1]], [a[0], 0.49, a[1]], [b[0], 0.49, b[1]]], tile, [0, 0, H / 2]);
+/** The jamb, with lips on the wall's face and, `through` a wall, on its back too. */
+function jamb(id, through) {
+  const m = new ModelBuilder(id);
+  const pts = outline();
+  // The lining: one strip per edge of the outline, facing in toward the opening's middle.
+  for (let i = 0; i < pts.length; i++) {
+    const [a, b] = [pts[i], pts[(i + 1) % pts.length]];
+    const mid = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+    // A point behind the strip (away from the opening's middle), for its winding.
+    const out = [mid[0] * 2, 0, mid[1] + (mid[1] - H / 2)];
+    m.face([[a[0], 0.5, a[1]], [b[0], 0.5, b[1]], [b[0], -0.5, b[1]], [a[0], -0.5, a[1]]], tile, out);
   }
+  // The lips: in the wall's face, between each rounded corner and the square corner of the recess.
+  for (const y of through ? [0.49, -0.49] : [0.49]) {
+    for (let c = 0; c < 4; c++) {
+      const sq = [[W, H], [-W, H], [-W, 0], [W, 0]][c];
+      for (let k = 0; k < STEPS; k++) {
+        const [a, b] = [pts[c * (STEPS + 1) + k], pts[c * (STEPS + 1) + k + 1]];
+        m.face([[sq[0], y, sq[1]], [a[0], y, a[1]], [b[0], y, b[1]]], tile, [0, 0, H / 2]);
+      }
+    }
+  }
+  return m.build();
 }
 
-export default m.build();
+export default jamb('door-jamb', false);
+export const doorJambThrough = jamb('door-jamb-through', true);

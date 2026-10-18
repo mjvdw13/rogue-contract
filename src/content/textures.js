@@ -39,6 +39,8 @@ const TOWN = [
   'metal-rust', 'metal-grey',
   // Street clutter: crates and junk (models/clutter.js).
   'crate-tan', 'crate-grey', 'crate-rust', 'junk',
+  // Doors that open: the door decals as rising doors' panels (derive.mjs, RISING).
+  'door-red-rising', 'door-grey-rising',
   // The drifts' edges, by which corners are drift (lib/town.js, drifts()).
   ...Array.from({ length: 14 }, (_, k) => `street-drift-${k + 1}`),
 ];

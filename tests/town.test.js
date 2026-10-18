@@ -143,6 +143,34 @@ test('a door turns its jamb to face its wall, and a door on a porch wall has non
   assert.equal(town.things.length, 3);
 });
 
+test('a door that opens stands halfway through a 1-tile wall into the room behind, under the roof', () => {
+  const { p, town } = kit();
+  town.house(4, 4, 16, 14, { h: 6 });
+  town.room(6, 6, 14, 13, { h: 6 });
+  town.door(10, 14, 'S', { h: 6, opens: true }).finish();
+  // The wall's tiles at the opening (row 13) are a rising door with the wall over it as a slab.
+  for (const x of [9, 10]) {
+    const c = p.get(x, 13);
+    assert.deepEqual([c.door, c.style, c.slab.bottom, c.slab.top, c.ceiling], ['door-red-rising', 'rise', 3, 6, 'sky']);
+  }
+  assert.equal(p.get(9, 14).ceilZ, 24, "the street's sky in front isn't brought down to the roof");
+  // No picture on a back wall; the jamb lipped both sides, in the middle of the wall.
+  assert.ok(!town.decals.some((d) => d.tex === 'door-red'));
+  assert.deepEqual(town.things, [{ type: 'door-jamb-through', x: 10, y: 13.5, z: 0, angle: 0 }]);
+  const level = { id: 't', name: 'T', ...p.build(), decals: town.decals, list: [{ type: 'player', x: 20, y: 20 }, ...town.things] };
+  const { map, errors } = buildLevel(registry, level);
+  assert.deepEqual(errors, []);
+  const d = map.doorAt(9, 13);
+  assert.deepEqual([d.axis, d.plane, d.openZ, d.group.length], ['y', 13.5, 3, 2]);
+});
+
+test('a door that opens needs a room behind a wall 1 tile thick', () => {
+  const { town } = kit();
+  town.house(4, 4, 16, 14, { h: 6 });
+  assert.throws(() => town.door(10, 14, 'S', { h: 6, opens: true }), /needs a room behind it/);
+  assert.throws(() => town.door(10, 14, 'S', { h: 6, depth: 2, opens: true }), /1 tile thick/);
+});
+
 test('a window is set into its wall: a notch with a sill and a lintel, the window on its back wall', () => {
   const { p, town } = kit();
   town.house(4, 4, 16, 14, { h: 6, wall: 'adobe-pale', skirt: 'plinth', tiers: [{ box: [6, 4, 14, 10], h: 10 }] });
