@@ -62,20 +62,6 @@ These need Mark to try something, or to decide. Don't start them without him.
   decals can go on angled walls now (`face: 'angled'`, as the bay's
   scars do), but `grime()` doesn't place any there yet.
 
-- **Docking Bay 87** (`?map=m1`, where you start, south of the south
-  back lane): a round pit 21 m across under the sky, duracrete walls
-  braced at the foot, twelve ribs up them, lamps on the rim, fuel lines
-  down to four pumps, eight soot scars, a landing and stairs up to the
-  4-wide bay door. A maintenance pit in the floor (hazard stripes, steel
-  lining) with a crawlspace off it under the floor: the shield unit
-  secret. On the lane either side of the door: the customs house (a
-  grey corrugated prefab jutting into the lane, a terminal and impounded
-  cargo inside) and the owner's office (in the bay's building, a red
-  door and a window you see through). The walls' colours (they shade a
-  bit olive), how big and dark the scars are, the pit's Imperial steel,
-  and whether the customs house reads as a prefab. The owner and the
-  customs officer wait on their sheets.
-
 - **Awnings, tin, pipes and clutter in Mos Eisley** (`?map=m1`): cloth
   awnings in stripes and canvas (C teal with a fixed fringe, E red with a
   swaying valance), a tarp over a stall on the square, tin on C's lean-to
