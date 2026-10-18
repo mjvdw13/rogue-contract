@@ -9,5 +9,6 @@ import { boulderLarge, boulderSmall } from './boulder.js';
 import floodlightTower from './floodlight-tower.js';
 import { sensorMast, sensorDish } from './sensor-mast.js';
 import domes from './dome.js';
+import doorJamb from './door-jamb.js';
 
-export default [terminal, reactorRing, coolantTank, shuttle, barricade, boulderLarge, boulderSmall, floodlightTower, sensorMast, sensorDish, ...domes];
+export default [terminal, reactorRing, coolantTank, shuttle, barricade, boulderLarge, boulderSmall, floodlightTower, sensorMast, sensorDish, ...domes, doorJamb];

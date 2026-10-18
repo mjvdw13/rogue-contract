@@ -64,3 +64,28 @@ test('a decal shows on its face, over the wall, and only there', () => {
   assert.ok(inside > 100, `drawn over the wall (${inside} pixels)`);
   assert.equal(outside, 0, 'nowhere else');
 });
+
+test("a decal shows on a slab's edge too (a sign over a doorway, on its arch's slab)", () => {
+  const cam = { x: 1.5, y: 2.5, angle: 0, z: 1 };
+  // A slab across column 8 from 2.5 to 3.5: its west edge faces the camera, 6.5 away.
+  const slabbed = (decals) =>
+    room(['##########', '#.......S#', '#.......S#', '#.......S#', '##########'], ['', ' >'], {
+      legend: { '.': ROOM, S: { ...ROOM, slab: { bottom: 2.5, top: 3.5, floor: 'imp-floor', ceiling: 'imp-ceiling', side: 'imp-panel' } } },
+      decals,
+    });
+  const plain = shot(slabbed(), cam);
+  const sign = shot(slabbed([{ x: 8, y: 2.5, z: 3, face: 'W', tex: 'decal-crest', scale: 0.4 }]), cam);
+  const { w } = renderer.surface;
+  const { fy, horizon } = renderer.view;
+  const row = (z) => Math.round(horizon + ((cam.z - z) * fy) / 6.5);
+  let inside = 0;
+  let outside = 0;
+  for (let i = 0; i < plain.length; i++) {
+    if (plain[i] === sign[i]) continue;
+    const y = (i / w) | 0;
+    if (y >= row(3.5) - 1 && y <= row(2.5) + 1) inside++;
+    else outside++;
+  }
+  assert.ok(inside > 20, `drawn over the slab's edge (${inside} pixels)`);
+  assert.equal(outside, 0, 'nowhere else');
+});

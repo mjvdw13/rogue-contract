@@ -8,7 +8,7 @@
 //   town.block(10, 56, 20, 64, { h: 6 });
 //   town.arch(14, 63, 16, 64, { h: 6, lintel: 3 });
 //   town.house(24, 50, 36, 62, { h: 6, r: 2, dome: true });
-//   town.door(30, 62, 'S', { h: 6, tex: 'door-teal' });
+//   town.door(30, 62, 'S', { h: 6, tex: 'door-grey' });
 //   town.finish();
 //   list.push(...town.things);  // the domes
 //   decals: town.decals,        // the doors and windows
@@ -186,36 +186,51 @@ export class Town {
   }
 
   /**
-   * A shut door in a building's straight outside wall: a recess `depth`
-   * tiles into the wall (an `arch()`, open below `lintel`), the door (a
-   * decal, `tex`, `tall` tiles high) on its back wall, and a flagstone step
-   * in front. (x, y) is the middle of the doorway on the wall's edge and
-   * `face` the way the door looks ('N', 'E', 'S' or 'W'): `door(30, 62,
+   * A shut door in a building's straight outside wall (after the film's:
+   * Mark's reference, 2026-10-17): a recess `depth` tiles into the wall and
+   * `width` wide (an `arch()`, open below `lintel`), lined with pale tiles
+   * (the `door-jamb` model, for the usual 2 by 3 opening, unless `jamb` is
+   * false), the door (a decal, `tex`, `tall` tiles high) on its back wall
+   * and a flagstone step in front. On the wall's face, a `sign` over the
+   * opening (a striped panel) and a `panel` beside it (its controls), unless
+   * they're false. (x, y) is the middle of the doorway on the wall's edge
+   * and `face` the way the door looks ('N', 'E', 'S' or 'W'): `door(30, 62,
    * 'S', ...)` is in the south wall of a building ending at row 62. Keep
-   * `width` even with (x, y) on a tile corner, or odd with it halfway along
-   * a tile. `depth: 0` cuts nothing and puts the door on the wall itself
-   * (the back of a porch), without a step.
+   * (x, y) on a tile corner for an even `width`, halfway along a tile for an
+   * odd one. `depth: 0` cuts nothing and puts the door on the wall itself
+   * (the back of a porch), without a jamb or a step.
    */
-  door(x, y, face, { h, tex = 'door-steel', tall = 3, width = 2, depth = 1, lintel = tall, floorZ = 0, wall = this.wall, step = depth > 0 }) {
-    const along = face === 'N' || face === 'S' ? x : y;
+  door(x, y, face, { h, tex = 'door-red', tall = 3, width = 2, depth = 1, lintel = tall, jamb = depth > 0, sign = true, panel = true, floorZ = 0, wall = this.wall, step = depth > 0 }) {
+    const ns = face === 'N' || face === 'S';
+    const along = ns ? x : y;
     const a0 = Math.round(along - width / 2);
     const a1 = a0 + width;
+    const mid = (a0 + a1) / 2;
     const out = face === 'S' || face === 'E' ? 1 : -1;
-    const line = face === 'N' || face === 'S' ? y : x;
+    const line = ns ? y : x;
     const back = line - out * depth;
     if (depth > 0) {
       const [b0, b1] = [Math.min(line, back), Math.max(line, back)];
-      if (face === 'N' || face === 'S') this.arch(a0, b0, a1, b1, { h, lintel, floorZ, wall });
+      if (ns) this.arch(a0, b0, a1, b1, { h, lintel, floorZ, wall });
       else this.arch(b0, a0, b1, a1, { h, lintel, floorZ, wall });
     }
     if (step) {
       const s = out > 0 ? line : line - 1;
       const paint = (c) => (c.floor === this.floor && !c.wall ? { ...c, floor: 'flagstone' } : c);
-      if (face === 'N' || face === 'S') this.p.rect(a0, s, a1, s + 1, (_, __, c) => paint(c));
+      if (ns) this.p.rect(a0, s, a1, s + 1, (_, __, c) => paint(c));
       else this.p.rect(s, a0, s + 1, a1, (_, __, c) => paint(c));
     }
-    const at = face === 'N' || face === 'S' ? { x, y: back } : { x: back, y };
-    this.decals.push({ ...at, z: floorZ + tall / 2, face, tex });
+    const at = (a, edge) => (ns ? { x: a, y: edge } : { x: edge, y: a });
+    this.decals.push({ ...at(mid, back), z: floorZ + tall / 2, face, tex });
+    if (jamb) {
+      // (The model is built looking south; content angles turn it counter-clockwise.)
+      const angle = { S: 0, E: 90, N: 180, W: 270 }[face];
+      this.things.push({ type: 'door-jamb', ...at(mid, (line + back) / 2), z: floorZ, angle });
+    }
+    // Sign and controls on the wall round the opening (on the back wall without a recess).
+    const wallAt = depth > 0 ? line : back;
+    if (sign) this.decals.push({ ...at(mid, wallAt), z: floorZ + tall + 0.4, face, tex: 'door-sign' });
+    if (panel) this.decals.push({ ...at(mid + width / 2 + 0.35, wallAt), z: floorZ + 1.6, face, tex: 'door-panel' });
     return this;
   }
 

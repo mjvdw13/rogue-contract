@@ -171,9 +171,16 @@ Check a street from several angles, not just down its length.
   frame.
 - **Awnings** are thin cloth slabs: you walk under them in their shade.
 - **Doors and windows** (`door()`, `window()`): a door is a recess a tile
-  into a straight wall (an arch), a round-topped door on its back wall (a
-  decal: `door-steel`, `door-rust`, `door-teal`, `door-wood`, or the shop
-  `shutter`) and a flagstone step outside; `depth: 0` puts it on the wall
+  into a straight wall, 2 wide and 3 high (an arch), and follows the
+  film's (Mark's reference, 2026-10-17): the door itself on the back wall
+  (a decal: a lattice of braces in red-brown, `door-red`, or grey,
+  `door-grey`), the jamb lined with pale tiles with rounded corners (the
+  `door-jamb` model, inside the recess), the striped `door-sign` over the
+  opening and the `door-panel` controls beside it (on the wall's face),
+  and a flagstone step outside. The arch is optional. The lean-to shop has
+  a `shutter`. These doors are pictures and don't open: a real door can't
+  stand under the open sky yet (PLAN.md, "Doors that open under the
+  sky"). `depth: 0` puts it on the wall
   itself (the back of a porch). Windows are set in too (Mark: inset
   matters more than their shape): a notch a tile deep, the wall below it
   a sill and a slab over it up to the roof, the window (`window-bars`,
@@ -212,10 +219,12 @@ angle unless their sheet has the other views (the villagers do).
   The Moldy Crow comes with the drop-off (story section 5).
 - **Existing:** barricades, supply crates, terminals, consoles, floodlight
   towers (the checkpoint), boulders (the town's edge).
-- **Doors and windows:** decals cut by `derive.mjs` (`DECALS`): steel
-  and teal doors from ZDMETAL1, rusty iron from IDDOOR1, wood from
-  IWGRAN5, the shutter from a strip of NDCORUG1, barred windows from
-  SPBARS1, louvres from NPVENTS1.
+- **Doors and windows:** decals cut by `derive.mjs` (`DECALS`): the
+  doors' lattice from IDDOOR1, the sign over them from NPVENTS1's slats
+  (navy and orange), their controls ZASWIT04 as it is, the shutter from a
+  strip of NDCORUG1, barred windows from SPBARS1, louvres from NPVENTS1.
+  The jamb's tiles (`door-jamb`, a texture) are ZPTILE4's bevelled square,
+  shrunk and repeated.
 - **Textures:** Dark Forces textures recoloured by
   `assets/custom/derive.mjs` (Mark, 2026-10-17: DF textures for now, none
   of our own, so no generated stand-ins). So far: plaster (`adobe`),

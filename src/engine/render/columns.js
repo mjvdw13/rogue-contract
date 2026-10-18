@@ -765,11 +765,16 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
           if (b > clipTop) clipTop = b > clipBot ? clipBot : b;
         }
         if (nextSlab && clipTop < clipBot && slabBot[next] < cC && slabTop[next] > fC) {
-          const a = rowOf(slabTop[next] < cC ? slabTop[next] : cC, tExit);
-          const b = rowOf(slabBot[next] > fC ? slabBot[next] : fC, tExit);
+          const sTop = slabTop[next] < cC ? slabTop[next] : cC;
+          const sBot = slabBot[next] > fC ? slabBot[next] : fC;
+          const a = rowOf(sTop, tExit);
+          const b = rowOf(sBot, tExit);
           if (b > clipTop && a < clipBot) {
             seen[next] = 1;
-            face(tExit, a, b, slabTop[next], slabSideTex[next], wx, faceLevel(s, tExit, contrast, out), hz);
+            const lv = faceLevel(s, tExit, contrast, out);
+            face(tExit, a, b, slabTop[next], slabSideTex[next], wx, lv, hz);
+            // (Decals on the edge too: a sign over a doorway, whose wall is its arch's slab.)
+            if (decals) decalFaces(tExit, sTop, sBot, decals, edgePos, mirrored, lv, hz);
             // Above the edge stays open in this window, and below it in a new one.
             const bot = clipBot;
             if (a < clipBot) clipBot = a < clipTop ? clipTop : a;

@@ -70,15 +70,15 @@ town.window(16, 56.5, 'W', { tex: 'window-louvre' });
 town.house(30, 59, 42, 63, { h: 4, r: 1 });
 town.circle(35.5, 56.5, 5, { inside: town.roofCell({ h: 9, wall: 'adobe-ochre' }), wall: { wall: 'adobe-ochre', wallTop: 9 }, open: 'out' });
 town.awning(31, 63, 41, 66, { z: 3.25 });
-town.door(33, 63, 'S', { h: 4, tex: 'door-wood' });
-town.door(38.5, 63, 'S', { h: 4, tex: 'shutter', tall: 2.25, width: 3 });
+town.door(33, 63, 'S', { h: 4, tex: 'door-grey' });
+town.door(38.5, 63, 'S', { h: 4, tex: 'shutter', tall: 2.25, width: 3, jamb: false, sign: false, panel: false });
 town.dome(35.5, 56.5, 9, 9.5, { wall: 'adobe-ochre' });
 // D: a two-storey house, its upper storey set back from the street, a
 // small dome on top.
 // (A shut door at the back of its porch.)
 town.house(45, 51, 58, 63, { h: 6, r: 2, wall: 'adobe-rose', skirt: 'plinth', tiers: [{ box: [48, 51, 58, 58], h: 10, r: 2 }], dome: true });
-town.arch(50, 61, 53, 63, { h: 6, lintel: 3, wall: 'adobe-rose' });
-town.door(51.5, 61, 'S', { h: 6, tex: 'door-teal', depth: 0 });
+town.arch(50, 61, 53, 63, { h: 6, lintel: 3.75, wall: 'adobe-rose' });
+town.door(51.5, 61, 'S', { h: 6, depth: 0, panel: false });
 town.window(48.5, 63, 'S', { z: 3.6 }).window(55.5, 63, 'S', { z: 3.6 }).window(53.5, 58, 'S', { z: 8, tex: 'window-louvre' });
 
 // South row.
@@ -91,14 +91,14 @@ town.awning(6, 76, 16, 78, { z: 3.5 });
 town.window(7.5, 78, 'N', { z: 2.2 }).window(13.5, 78, 'N', { z: 2.2 });
 // F: a tall house in two steps.
 town.house(20, 79, 30, 92, { h: 7, r: 2, wall: 'adobe-grey', skirt: null, tiers: [{ box: [22, 83, 30, 92], h: 10, r: 2 }], dome: true });
-town.door(25, 79, 'N', { h: 7, wall: 'adobe-grey' });
+town.door(25, 79, 'N', { h: 7, tex: 'door-grey', wall: 'adobe-grey' });
 town.window(22.5, 79, 'N', { z: 4 }).window(26.5, 83, 'N', { z: 8.5, tex: 'window-louvre' }).window(20, 86.5, 'W');
 // A square, with a round house under a dome in it.
 town.circle(41, 86, 4.5, { inside: town.roofCell({ h: 5, wall: 'adobe-rose', skirt: 'plinth' }), wall: { wall: 'adobe-rose', wallTop: 5 }, open: 'out', skirt: 'plinth' });
 town.dome(41, 86, 5, 8.5, { wall: 'adobe-rose' });
 // G: a low house on the square's east side.
 town.house(53, 78, 61, 88, { h: 5, r: 2, wall: 'adobe-ochre', skirt: null, dome: true });
-town.door(57, 78, 'N', { h: 5, tex: 'door-rust', wall: 'adobe-ochre' });
+town.door(57, 78, 'N', { h: 5, wall: 'adobe-ochre' });
 town.window(53, 83.5, 'W', { z: 3, tex: 'window-louvre' });
 
 // For now the street ends at an exit (until the town goes on east).

@@ -64,9 +64,37 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
       as doors). Snapshots before and after each step.
   - [x] Colour: more plasters (ochre, rose, grey) spread over the houses,
         a dirty skirt along every wall's foot (a band), sand drifts.
-  - [x] Doors and windows: recessed doorways with shut doors in painted
-        metal and old wood, and windows, as decals cut from DF textures;
-        `town.door()` and `town.window()`.
+  - [x] Doors and windows, inset: doors after Mark's reference (a
+        lattice door, a tiled jamb, a sign and controls) and windows in
+        notches, cut from DF textures; `town.door()` and `town.window()`.
+  - [ ] **Doors that open under the sky** (engine). Today the town's doors
+        are pictures on solid wall: a door tile has a lowered ceiling, and
+        under the open sky the renderer draws a wall above it all the way
+        up to the sky, so a real door can't stand in an outside wall.
+    - [ ] A door tile can have a `roof`: under the sky, its lowered
+          ceiling (the door's top) shows its `upper` face only up to `roof`,
+          then the roof as a flat top (its own texture), with sky above, as
+          an arch slab does. Movement, sight, sound and shots still see the
+          door's own top as its ceiling; nothing above it changes.
+    - [ ] Rendering: the door tile's faces and top over the opening from
+          every angle (from the street, from above, through the next
+          doorway); the light map and the haze. m3 and sandbox snapshots
+          byte-identical.
+    - [ ] The rest: `defs.js` (default, JSDoc), the level parser,
+          `validate.js` (`roof` above the door's top, below the sky, only
+          on a door under the sky), the level checker, the map viewer,
+          MODDING.md, tests (a door under the sky with a roof shows no wall
+          above its roof; it opens and closes as before; bad values are
+          errors).
+    - [ ] Town kit: `town.door({ opens: true })` puts a real door between
+          the recess and a `room()` behind it: rising, with the
+          `door-jamb` jamb and the door picture as its panel (door
+          textures must be power-of-two, so 64x128, not the decal's
+          64x96). `seal()` and `shadows()` treat it as the roof it's
+          under. Shut doors stay pictures on houses with nothing inside.
+    - [ ] In Mos Eisley: real doors where a building has an inside (Mark
+          to pick which in this first stretch), then snapshots, and Waiting
+          on Mark.
   - [ ] Awnings in coloured cloth and lean-to roofs in rusty metal; vents
         and pipes on the walls.
   - [ ] Waiting on Mark.

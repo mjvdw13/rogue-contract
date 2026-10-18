@@ -28,6 +28,8 @@ export default [
   defineDecoration({ id: 'sensor-dish', model: 'sensor-dish', spin: 0.9 }),
   // Mos Eisley's domes, on roofs and over round buildings.
   ...DOMES.map((d) => defineDecoration({ id: d.id, model: d.id, solid: true, radius: d.radius, height: d.height })),
+  // The tiled jamb of a Mos Eisley doorway (inside the wall's recess, so it needn't be solid).
+  defineDecoration({ id: 'door-jamb', model: 'door-jamb' }),
   defineDecoration({ id: 'ceiling-lamp', glyph: 'l', sheet: S('ceiling-lamp', 48, 16), hanging: true, fullbright: true }),
   defineDecoration({
     id: 'fuel-barrel',

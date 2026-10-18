@@ -34,13 +34,13 @@ const DECALS = ['decal-crest', 'decal-hazard', 'decal-sign', 'decal-vent'];
 // there directly.
 const TOWN = [
   'adobe', 'adobe-pale', 'adobe-ochre', 'adobe-rose', 'adobe-grey', 'adobe-old', 'adobe-brick', 'adobe-skirt', 'adobe-roof',
-  'planks', 'street-sand', 'street-drift', 'flagstone',
+  'planks', 'street-sand', 'street-drift', 'flagstone', 'door-jamb',
   // The drifts' edges, by which corners are drift (lib/town.js, drifts()).
   ...Array.from({ length: 14 }, (_, k) => `street-drift-${k + 1}`),
 ];
 
 // Mos Eisley's doors and windows: decals cut from DF textures by derive.mjs.
-const TOWN_DECALS = ['door-steel', 'door-rust', 'door-teal', 'door-wood', 'shutter', 'window-bars', 'window-louvre'];
+const TOWN_DECALS = ['door-red', 'door-grey', 'door-sign', 'door-panel', 'shutter', 'window-bars', 'window-louvre'];
 
 const ANIMATED = {
   'imp-computer': { frames: 3, fps: 3 },

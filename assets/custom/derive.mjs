@@ -15,10 +15,11 @@
 // (`df`, a texture's name in df-textures/), with no generated stand-in:
 // src/content/textures.js loads them from here directly. `crop: [x, y, w,
 // h]` takes part of the source (the plain top of a busy wall); `smooth: n`
-// softens its grain (n passes of a 3x3 blur, wrapping round); `tile: [nx, ny]`
-// repeats the source first (to widen a sky), and `fade: { color, from }`
-// blends toward `color` from `from` (0 top, 1 bottom) down to the bottom
-// row (a sky's haze at the horizon).
+// softens its grain (n passes of a 3x3 blur, wrapping round); `scale: [w,
+// h]` shrinks it to w x h texels; `tile: [nx, ny]` repeats it (to widen a
+// sky, or tile a shrunk one), and `fade: { color, from }` blends toward
+// `color` from `from` (0 top, 1 bottom) down to the bottom row (a sky's
+// haze at the horizon).
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -74,6 +75,8 @@ export const TOWN = [
   { out: 'street-sand', df: 'ZPROCK02', gradient: [[62, 46, 30], [116, 90, 62], [160, 128, 92], [192, 162, 120], [214, 188, 146]], keep: 0.1, contrast: 0.6 },
   // Loose sand the wind piles against the walls: paler and softer.
   { out: 'street-drift', df: 'ZPROCK02', smooth: 1, gradient: [[150, 120, 82], [199, 172, 129], [216, 193, 152], [232, 214, 176]], keep: 0, contrast: 0.5 },
+  // Small pale tiles lining a doorway's jamb: ZPTILE4's bevelled square, shrunk and repeated.
+  { out: 'door-jamb', df: 'ZPTILE4', scale: [16, 16], tile: [4, 4], gradient: [[90, 80, 62], [172, 160, 128], [209, 198, 168], [236, 226, 198]], keep: 0, contrast: 1 },
   { out: 'flagstone', df: 'IPDET1', gradient: [[44, 32, 22], [100, 78, 56], [150, 122, 90], [190, 162, 124], [220, 198, 160]], keep: 0.1, contrast: 0.9 },
   // A hazy day: Robotics' pale cloudy sky, twice as wide, warming to dust at the horizon.
   { out: 'sky-day', df: 'RESKY01', gradient: [[74, 128, 182], [120, 166, 206], [168, 198, 222], [214, 226, 236]], keep: 0.3, contrast: 0.9, tile: [2, 1], fade: { color: [212, 200, 174], from: 0.55 } },
@@ -88,15 +91,18 @@ export const TOWN = [
  * the opening's reveal, so a flat decal looks set into the wall.
  */
 const REVEAL = { width: 3, color: [52, 38, 26] };
-const STEEL = [[26, 29, 37], [64, 70, 86], [108, 114, 134], [144, 150, 168], [198, 206, 222]];
-const RUST = [[22, 12, 6], [63, 37, 11], [104, 61, 26], [148, 88, 43], [207, 127, 76]];
 const TEAL = [[4, 16, 18], [16, 58, 62], [44, 116, 118], [110, 190, 188]];
 export const DECALS = [
-  // Doors, 2 tiles wide and 3 high, round-topped: painted steel, rusty iron, teal and old wood.
-  { out: 'door-steel', df: 'ZDMETAL1', size: [64, 96], gradient: STEEL, keep: 0.2, contrast: 0.8, mask: 'arch', rim: REVEAL },
-  { out: 'door-rust', df: 'IDDOOR1', size: [64, 96], gradient: RUST, keep: 0, contrast: 0.9, mask: 'arch', rim: REVEAL },
-  { out: 'door-teal', df: 'ZDMETAL1', size: [64, 96], gradient: TEAL, keep: 0, contrast: 0.8, mask: 'arch', rim: REVEAL },
-  { out: 'door-wood', df: 'IWGRAN5', crop: [0, 0, 64, 96], size: [64, 96], gradient: [[30, 20, 12], [66, 44, 26], [104, 72, 44], [140, 102, 66]], keep: 0, contrast: 1, mask: 'arch', rim: REVEAL },
+  // Doors after the film's (Mark's reference, 2026-10-17): a panel with a
+  // lattice of braces (IDDOOR1), red-brown or grey, its corners rounded to
+  // fit the tiled jamb round it (models/door-jamb.js), 2 tiles by 3.
+  { out: 'door-red', df: 'IDDOOR1', size: [64, 96], gradient: [[44, 22, 10], [90, 48, 24], [132, 72, 40], [166, 100, 64]], keep: 0, contrast: 0.9, mask: 'round', r: 11, rim: { width: 1.5, color: [24, 16, 10] } },
+  { out: 'door-grey', df: 'IDDOOR1', size: [64, 96], gradient: [[28, 28, 28], [68, 66, 62], [114, 110, 102], [156, 152, 142]], keep: 0, contrast: 0.9, mask: 'round', r: 11, rim: { width: 1.5, color: [24, 16, 10] } },
+  // Over a door: a little striped panel, navy and orange (Nar Shaddaa's
+  // louvres, their slats mapped dark to navy and light to orange); beside
+  // it, the door's control panel (a DF switch as it is).
+  { out: 'door-sign', df: 'NPVENTS1', crop: [8, 8, 48, 24], size: [32, 10], gradient: [[12, 7, 50], [24, 15, 74], [210, 110, 24], [255, 176, 72]], keep: 0, contrast: 1.3, mask: 'round', r: 1, rim: { width: 1, color: [40, 30, 20] } },
+  { out: 'door-panel', df: 'ZASWIT04_0', size: [8, 16], mask: 'round', r: 1 },
   // A shop's roll-down shutter, 3 tiles wide: a strip of Nar Shaddaa's
   // corrugated door clear of its red sign, stretched sideways.
   { out: 'shutter', df: 'NDCORUG1', crop: [119, 0, 8, 96], size: [96, 72], gradient: [[30, 26, 22], [74, 66, 56], [118, 108, 92], [160, 150, 132]], keep: 0, contrast: 0.9, mask: 'round', r: 4, rim: REVEAL },
@@ -237,10 +243,12 @@ function masked(img, { mask, r = 0, rim }) {
     const px = x + 0.5;
     const py = y + 0.5;
     let e = Math.min(px, w - px, h - py, py);
+    // An arch rounds its top corners into one curve; a rounded box all four.
     const rr = mask === 'arch' ? w / 2 : r;
-    if (py < rr && (px < rr || px > w - rr)) {
+    const cy = py < rr ? rr : mask === 'round' && py > h - rr ? h - rr : null;
+    if (cy !== null && (px < rr || px > w - rr)) {
       const cx = px < rr ? rr : w - rr;
-      e = Math.min(e, rr - Math.hypot(px - cx, py - rr));
+      e = Math.min(e, rr - Math.hypot(px - cx, py - cy));
     }
     return e;
   };
@@ -310,6 +318,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     let img = decodePNG(fs.readFileSync(pack.get(spec.df)));
     if (spec.crop) img = cropped(img, spec.crop);
     if (spec.smooth) img = smoothed(img, spec.smooth);
+    if (spec.scale) img = resized(img, spec.scale);
     if (spec.tile) img = tiled(img, spec.tile);
     img = gradientMap(img, spec);
     if (spec.fade) img = faded(img, spec.fade);
@@ -328,7 +337,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     if (spec.crop) img = cropped(img, spec.crop);
     img = resized(img, spec.size);
     for (let i = 3; i < img.data.length; i += 4) img.data[i] = 255;
-    img = masked(gradientMap(img, spec), spec);
+    img = masked(spec.gradient ? gradientMap(img, spec) : img, spec);
     fs.writeFileSync(path.join(texDir, `${spec.out}.png`), encodePNG(img.width, img.height, img.data));
     console.log(`${spec.out}.png from ${spec.df} (${img.width}x${img.height}, a decal)`);
   }

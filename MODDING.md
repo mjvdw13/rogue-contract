@@ -771,7 +771,8 @@ shows a wall by its top band.
 ### Decals
 
 Signs, crests, hazard stripes and vents go on wall faces as decals: see-through
-pictures over the wall (or a step's face, or a doorway's lintel). A level
+pictures over the wall (or a step's face, a doorway's lintel, or a slab's
+edge, such as the wall over an arch). A level
 lists them in `decals`:
 
 ```js
