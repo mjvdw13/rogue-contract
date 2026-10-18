@@ -91,13 +91,15 @@ These need Mark to try something, or to decide. Don't start them without him.
   4 s, over soft shadows) and JK's textures on it (the cockpit windows
   high on the nose's flanks, the engines glowing cyan along the wings'
   trailing edges, the sponsons' and arms' fronts the grille and lights
-  off the back's texture, no longer plain red). Only
+  off the back's texture, no longer plain red; the pod's barrels
+  thicker and longer after his second look, with collars and wide
+  muzzles, their bores black). Only
   its gun pod collides: you walk under the hull and wings, and shots at
   your height pass under them. Over the pit, the pod would block the way
   along it to the secret (the level checker isn't height-aware), hence
-  the spot. 128 faces; about 1.4 ms a frame on average over eight views
-  round the bay, 3.3 at worst (the start, close up), a quarter of that
-  the shadows (headless). Then it replaces the placeholder shuttle on
+  the spot. 166 faces; about 1.5 ms a frame on average over eight views
+  round the bay, 4 at worst (close up), the new barrels 0.15 and 0.8 of
+  that (headless). Then it replaces the placeholder shuttle on
   m3's pad, and the drop-off flies it.
 
 ## Next up

@@ -237,7 +237,7 @@ test('you walk under the hovering Moldy Crow, but not into its gun pod', () => {
   const under = [[0, -2.8, 'beside the pod'], [12, 0, 'under the nose'], [-12, 0, 'under the back'], [-10, -8, 'under a wing']];
   for (const [x, y, what] of under) assert.equal(w.checkPosition(p, 18 + x * s, 14.5 + y * s), true, `walks ${what}`);
   // Everything off the floor (its shadow) and outside the pod is above your head.
-  const low = registry.models.get('moldy-crow').vertices.filter(([x, y, z]) => z > 0.05 && (Math.abs(y) > 1.25 || x < -1.45 || x > 3.45));
+  const low = registry.models.get('moldy-crow').vertices.filter(([x, y, z]) => z > 0.05 && (Math.abs(y) > 1.25 || x < -1.45 || x > 4.85));
   assert.ok(low.every(([, , z]) => z * s > p.def.height), 'the hull and wings clear you');
 });
 
