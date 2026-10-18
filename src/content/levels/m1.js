@@ -143,6 +143,20 @@ const bayDecals = SCARS.map(([deg, z, k, scale]) => {
   const a = (deg * Math.PI) / 180;
   return { x: BAY.cx + BAY.r * Math.cos(a), y: BAY.cy - BAY.r * Math.sin(a), z, face: 'angled', tex: `grime-scorch-${k}`, scale };
 });
+// Fittings round the wall (models/bay.js), each turned to face the
+// centre: a rib every 30 degrees clear of the landing, a lamp on the rim
+// over every other one, and fuel lines down to pumps in four of the bays
+// between them.
+const onBayWall = (type, deg, z) => {
+  const a = (deg * Math.PI) / 180;
+  const r = BAY.r - 0.02;
+  return at(type, BAY.cx + r * Math.cos(a), BAY.cy - r * Math.sin(a), { z, angle: (deg + 270) % 360 });
+};
+for (let deg = 15; deg < 360; deg += 30) {
+  list.push(onBayWall('bay-rib', deg, BAY.floorZ));
+  if (deg % 60 === 15) list.push(onBayWall('bay-rim-lamp', deg, BAY.rim));
+}
+for (const deg of [30, 150, 240, 300]) list.push(onBayWall('bay-fuel-line', deg, BAY.floorZ), onBayWall('bay-fuel-pump', deg - 5.5, BAY.floorZ));
 
 // Pipes, vents and boxes on the walls (lib/town.js): downpipes off the
 // roofs, a tank and a box unit in the alleys, conduits, vents and a fan.

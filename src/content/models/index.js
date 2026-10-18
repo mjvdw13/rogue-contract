@@ -15,5 +15,6 @@ import tin from './tin.js';
 import pipes from './pipes.js';
 import clutter from './clutter.js';
 import landspeeder from './speeder.js';
+import bay from './bay.js';
 
-export default [terminal, reactorRing, coolantTank, shuttle, barricade, boulderLarge, boulderSmall, floodlightTower, sensorMast, sensorDish, ...domes, doorJamb, doorJambThrough, ...awnings, ...tin, ...pipes, ...clutter, landspeeder];
+export default [terminal, reactorRing, coolantTank, shuttle, barricade, boulderLarge, boulderSmall, floodlightTower, sensorMast, sensorDish, ...domes, doorJamb, doorJambThrough, ...awnings, ...tin, ...pipes, ...clutter, landspeeder, ...bay];

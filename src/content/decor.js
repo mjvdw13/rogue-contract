@@ -4,6 +4,7 @@ import { AWNING_MODELS, AWNING_POLES, poleId } from './models/awning.js';
 import { TIN_MODELS } from './models/tin.js';
 import { PIPE_MODELS } from './models/pipes.js';
 import { CLUTTER } from './models/clutter.js';
+import { BAY_WALL } from './models/bay.js';
 
 // Scenery. Solid ones block movement; ones with health can be shot (and
 // `explode`).
@@ -49,6 +50,12 @@ export default [
   // An X-34 landspeeder parked on the street, hovering (models/speeder.js): it
   // collides as its outline, as high as its windscreen.
   defineDecoration({ id: 'landspeeder', model: 'landspeeder', solid: true, height: 1.22, fixed: true }),
+  // Docking Bay 87's fittings (models/bay.js): ribs up its wall and pumps (colliding as
+  // their outlines), fuel lines down to the pumps, lamps on its rim.
+  defineDecoration({ id: 'bay-rib', model: 'bay-rib', solid: true, height: BAY_WALL, fixed: true }),
+  defineDecoration({ id: 'bay-fuel-line', model: 'bay-fuel-line', fixed: true }),
+  defineDecoration({ id: 'bay-fuel-pump', model: 'bay-fuel-pump', solid: true, height: 1.7, fixed: true }),
+  defineDecoration({ id: 'bay-rim-lamp', model: 'bay-rim-lamp', fixed: true }),
   defineDecoration({ id: 'ceiling-lamp', glyph: 'l', sheet: S('ceiling-lamp', 48, 16), hanging: true, fullbright: true }),
   defineDecoration({
     id: 'fuel-barrel',

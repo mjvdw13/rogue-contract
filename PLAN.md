@@ -149,7 +149,7 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
   - [x] Decals on angled walls (the engine: placed by a point on the
         wall, running on round a curve with `wallU`), and blast scars on
         the bay's walls (soot grime).
-  - [ ] The walls' ribs (models round the circle), fuel lines and pumps,
+  - [x] The walls' ribs (models round the circle), fuel lines and pumps,
         gantry lamps on the rim.
   - [ ] The maintenance pit in the floor where the Crow lands (secret: a
         shield unit).
