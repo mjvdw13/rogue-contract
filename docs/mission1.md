@@ -215,8 +215,7 @@ Check a street from several angles, not just down its length.
   stay clear), off doors, arches and low fixtures, the first group of a
   few tries that fits what's left of the wall; litter lies about the open
   street too. `amount` scales it; placed from a seed; `keep` boxes stay
-  clear for things put there by hand (the parked speeder), and the rest
-  comes out the same. Hand-place the
+  clear for things put there by hand, and the rest comes out the same. Hand-place the
   groups a place wants (the stall's counter, the vaporator on the
   square): the main street's walls are short between their doors and
   arches, so the kit finds little room there. About 160 in the first
@@ -287,7 +286,7 @@ angle unless their sheet has the other views (the villagers do).
 
 - **Models (built):** domes, awnings, tarps, tin roofs, pipes and wall
   boxes, the street clutter (above), and an X-34 landspeeder
-  (`models/speeder.js`), pulled up nose first to D's front, bobbing over a
+  (`models/speeder.js`) on the main street by C's awning, bobbing over a
   soft grime shadow (the garage's can be another of it), and Docking Bay
   87's ribs, fuel lines, pumps and rim lamps (`models/bay.js`).
 - **Models (new):** moisture condenser tower, swoop bike,

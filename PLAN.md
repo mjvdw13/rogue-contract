@@ -90,14 +90,12 @@ These need Mark to try something, or to decide. Don't start them without him.
   0.44 ms a frame on average over eight views, 0.75 at worst (headless,
   measured with the machine at about half its usual speed).
 
-- **The landspeeder** (`?map=m1`, pulled up nose first to D's front, east
-  of its porch): Mark's notes of 2026-10-18 done: a subtler shadow (grime
-  now, taking a third of the light under the hull and fading out, no
-  dither dots), a gentle bob (0.05 up and down every 2.6 s) and parked
-  against a building. How the shadow and the bob look, and whether nose-in
-  is the right way to park it (every straight wall on the street has a
-  door or arch in its middle, so there's no room alongside one). It costs
-  about 0.7 ms a frame near it, 2.1 standing over it (headless).
+- **The landspeeder** (`?map=m1`, back on the main street by C's awning,
+  nose west, turned 15 degrees off the line of the street): the bob made
+  subtler (Mark, 2026-10-18: 0.02 up and down every 3.2 s, was 0.05 every
+  2.6) and the grime shadow, a third of the light under the hull. Whether
+  the bob is right now, and the angle. About 0.7 ms a frame near it, 2.1
+  standing over it (headless).
 
 ## Next up
 
