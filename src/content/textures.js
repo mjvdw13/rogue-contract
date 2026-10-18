@@ -37,6 +37,8 @@ const TOWN = [
   'planks', 'street-sand', 'street-drift', 'flagstone', 'door-jamb',
   // Corrugated tin for lean-to roofs, rusty and galvanised.
   'metal-rust', 'metal-grey',
+  // Docking bays: duracrete walls (buttressed at the foot) and floor.
+  'bay-wall', 'bay-wall-ribbed', 'bay-floor',
   // Street clutter: crates and junk (models/clutter.js).
   'crate-tan', 'crate-grey', 'crate-rust', 'junk',
   // Doors that open: the door decals as rising doors' panels (derive.mjs, RISING).

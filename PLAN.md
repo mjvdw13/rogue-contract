@@ -117,7 +117,22 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
     - [x] In Mos Eisley: snapshots, then Waiting on Mark.
   - [ ] Waiting on Mark.
 - [ ] **Docking Bay 87**, the lane, the owner's office, the customs house.
-      The episode starts in `m1`.
+      The episode starts in `m1`. The design's boxes overlap the first
+      stretch's south row, so the bay goes south of the south back lane
+      (centre 32, 126, 44 tiles across), its door on the lane, and the
+      alleys between the south row's houses are the lane up to the
+      main street.
+  - [x] The pit: floor at -5 under the sky, round walls up to a rim at 6
+        (duracrete, derived from DF), a landing inside the door at street
+        level and stairs down from it, the bay door (4 wide, rising) onto
+        the back lane, the player's start on the bay floor. Snapshots.
+  - [ ] The walls' ribs (models round the circle), fuel lines and pumps,
+        blast scars, gantry lamps on the rim.
+  - [ ] The maintenance pit in the floor where the Crow lands (secret: a
+        shield unit).
+  - [ ] The owner's office (a window onto the lane) and the customs house
+        (a grey prefab) by the bay door.
+  - [ ] `docs/mission1.md` to match, then Waiting on Mark.
 - [ ] **The main street, the market and the water plaza** (stalls,
       awnings, the condenser tower).
 - [ ] **The cantina:** entrance, steps down, the round room, the bar,

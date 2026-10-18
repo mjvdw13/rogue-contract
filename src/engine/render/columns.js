@@ -537,8 +537,9 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
         const t = sl.ray(px, py, rdx, rdy, along);
         if (t >= tEnter - 1e-6 && t <= tExit + 1e-6 && !(low && sl.solidAt(px + rdx * tEnter, py + rdy * tEnter))) {
           seen[cur] = 1;
-          // Texture runs right-to-left from the second point (as seen from the open side).
-          const u = (1 - along[0]) * sl.len;
+          // Texture runs right-to-left from the second point (as seen from the
+          // open side), from `wallU` on.
+          const u = (1 - along[0]) * sl.len + sl.u;
           const lv = faceLevel(0, t, 0, out);
           const top = low ? sl.top : ceilZ[cur];
           const a = rowOf(top, t);

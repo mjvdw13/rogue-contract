@@ -136,3 +136,26 @@ test('"wallTop" must lie between the floor and the ceiling, on an angled wall', 
   assert.ok(tile({ wall: 'imp-panel', diagonal: 'NE', wallTop: 0 }).some((e) => e.includes('wallTop')), 'at the floor');
   assert.ok(tile({ wallTop: 3 }).some((e) => e.includes('only for angled walls')), 'on open floor');
 });
+
+/**
+ * A yard with a wall across it, north to south, solid on its east half, its
+ * texture starting `wallU` along; the view looking east at it from (3.5, 3.5).
+ */
+function wallAlong(wallU) {
+  const row = (m) => `#.......${m}.......#`;
+  const level = room(['#'.repeat(17), ...Array.from({ length: 5 }, () => row('s')), '#'.repeat(17)], [], {
+    legend: { '.': OPEN, s: { ...OPEN, wall: 'imp-panel', line: [0.5, 1, 0.5, 0], wallU } },
+    sky: 'sky-night',
+  });
+  return shot(level, { x: 3.5, y: 3.5, angle: 0, z: 1.25 });
+}
+
+test('an angled wall\'s texture starts where its "wallU" says, so it can run on round a curve', () => {
+  // imp-panel is 64 texels wide: it repeats every 2 tiles.
+  assert.deepEqual(wallAlong(2), wallAlong(undefined), 'a whole texture along looks the same');
+  assert.notDeepEqual(wallAlong(0.5), wallAlong(undefined), 'half a tile along moves the texture');
+  const tile = (extra) => buildLevel(registry, room(['####', '#x.#', '####'], ['', '  ^'], { legend: { '.': OPEN, x: { ...OPEN, ...extra } } })).errors;
+  assert.deepEqual(tile({ wall: 'imp-panel', diagonal: 'NE', wallU: 1.5 }), []);
+  assert.ok(tile({ wall: 'imp-panel', diagonal: 'NE', wallU: 'far' }).some((e) => e.includes('wallU')), 'not a number');
+  assert.ok(tile({ wallU: 1 }).some((e) => e.includes('only for angled walls')), 'on open floor');
+});

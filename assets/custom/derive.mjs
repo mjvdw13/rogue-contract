@@ -50,6 +50,7 @@ const WHITEWASH = [[95, 86, 66], [153, 141, 112], [181, 169, 138], [209, 198, 16
 const OCHRE = [[110, 76, 46], [176, 130, 88], [214, 160, 112], [224, 170, 120], [232, 186, 140], [240, 206, 166]];
 const ROSE = [[110, 80, 60], [186, 150, 120], [226, 190, 156], [236, 200, 166], [240, 214, 184]];
 const GREY = [[80, 76, 68], [124, 118, 106], [164, 156, 142], [180, 172, 156], [196, 188, 170], [214, 206, 188]];
+const DURACRETE = [[56, 44, 32], [108, 92, 70], [156, 136, 106], [192, 172, 138], [216, 200, 168]];
 export const TOWN = [
   // Smooth plaster: Gromas' plain speckled wall.
   { out: 'adobe', df: 'GWANO', crop: [0, 0, 128, 128], smooth: 1, gradient: PLASTER, keep: 0, contrast: 0.35 },
@@ -91,6 +92,11 @@ export const TOWN = [
   { out: 'crate-grey', df: 'IPRMCRT9', gradient: [[40, 40, 38], [86, 84, 78], [130, 126, 116], [170, 166, 154], [204, 198, 184]], keep: 0.4, contrast: 0.85 },
   { out: 'crate-rust', df: 'IPRMCRT8', gradient: [[44, 22, 10], [96, 52, 24], [146, 86, 44], [184, 122, 72], [212, 158, 108]], keep: 0.2, contrast: 0.85 },
   { out: 'junk', df: 'IPTRSHC1', gradient: [[22, 16, 10], [62, 48, 32], [110, 90, 64], [154, 132, 98], [196, 176, 138]], keep: 0.35, contrast: 1.1 },
+  // Docking bays: pale duracrete (Talay's capitol walls), its foot braced by
+  // angled buttresses; the plain panels above them; the floor in bolted slabs.
+  { out: 'bay-wall-ribbed', df: 'TWCAP01', gradient: DURACRETE, keep: 0.1, contrast: 0.8 },
+  { out: 'bay-wall', df: 'TWCAP01', crop: [0, 0, 128, 64], gradient: DURACRETE, keep: 0.1, contrast: 0.8 },
+  { out: 'bay-floor', df: 'ZPCMENT2', scale: [128, 128], gradient: [[62, 46, 30], [116, 90, 62], [160, 128, 92], [192, 162, 120], [214, 188, 146]], keep: 0.1, contrast: 0.6 },
   // A hazy day: Robotics' pale cloudy sky, twice as wide, warming to dust at the horizon.
   { out: 'sky-day', df: 'RESKY01', gradient: [[74, 128, 182], [120, 166, 206], [168, 198, 222], [214, 226, 236]], keep: 0.3, contrast: 0.9, tile: [2, 1], fade: { color: [212, 200, 174], from: 0.55 } },
 ];

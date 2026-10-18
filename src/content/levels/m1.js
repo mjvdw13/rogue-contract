@@ -111,6 +111,32 @@ town.window(53, 83.5, 'W', { z: 3, tex: 'window-louvre' });
 // A stall on the square in front of G, under a tarp that billows.
 town.tarp(46, 80, 50, 84, { z: 2.75, face: 'W', rise: 0.5, cloth: 'red' });
 
+// ---------------------------------------------------------------- 1. Docking Bay 87
+// South of the south back lane: a round pit 21 m across under the sky, its
+// floor 2.5 m below the street and its duracrete walls 5.5 m tall, braced
+// at the foot. The bay door (4 wide) opens off the lane into a passage
+// through the bay's building and onto a landing over the pit, at street
+// level; stairs go down from it. The episode starts on the bay floor.
+const BAY = { cx: 32, cy: 125, r: 21, floorZ: -5, rim: 6 };
+// (The buttresses along the foot of the walls, and of the landing and stairs.)
+const RIBBED = [{ to: 3, tex: 'bay-wall-ribbed' }];
+const bayFloor = town.street(BAY.floorZ, { floor: 'bay-floor', side: 'bay-wall', bands: RIBBED });
+p.rect(9, 100, 56, 149, town.roofCell({ h: BAY.rim, wall: 'bay-wall', skirt: null }));
+// Its front on the lane, in plaster.
+p.rect(9, 100, 56, 101, town.roofCell({ h: BAY.rim, wall: 'adobe-grey' }));
+town.circle(BAY.cx, BAY.cy, BAY.r, {
+  inside: bayFloor,
+  wall: { wall: 'bay-wall', wallTop: BAY.rim, bands: RIBBED },
+  seam: 90, // behind the landing
+});
+// The landing, at street level, and the passage out to the door through
+// the wall over it.
+p.rect(29, 104, 35, 107, (_, __, c) => ({ ...c, floor: 'bay-floor', floorZ: 0 }));
+town.arch(30, 101, 34, 105, { h: BAY.rim, lintel: 4, wall: 'bay-wall', floor: 'bay-floor', light: 144 });
+town.door(32, 100, 'N', { h: BAY.rim, tex: 'door-grey', width: 4, tall: 4, wall: 'adobe-grey', jamb: false, opens: true });
+// Stairs down to the floor, a step every tile.
+for (let k = 0; k < 7; k++) p.rect(30, 107 + k, 34, 108 + k, { ...bayFloor, floorZ: (-(k + 1) * 5) / 8 });
+
 // Pipes, vents and boxes on the walls (lib/town.js): downpipes off the
 // roofs, a tank and a box unit in the alleys, conduits, vents and a fan.
 town.pipe(6.5, 63, 'S').pipe(4, 53, 'W').pipe(47.2, 63, 'S').pipe(27.6, 79, 'N').pipe(53, 85.5, 'W');
@@ -156,7 +182,7 @@ list.push(
 );
 
 list.push(
-  at('player', 4, 70, { angle: 0 }),
+  at('player', 32, 134, { angle: 90 }),
   at('supply-crate', 14, 86.5),
   at('jawa', 50, 47), // in the north back lane
 );

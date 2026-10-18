@@ -58,7 +58,7 @@ street is at 0. The numbers 1-10 are the story's; 11 on are new.
 
 | # | Area | Box | Floor | What's there |
 |---|------|-----|-------|--------------|
-| 1 | **Docking Bay 87** | 10..54, 92..136 | -5, sky | The start, and the pickup. A round pit open to the sky, 22 m across, with ribbed duracrete walls, fuel lines and blast scars. Stairs climb the north side to a 4 × 4 bay door at street level. Hazy and quiet: dust drifting, a power droid shuffling, the bay owner's grumbling, a hum of fuel pumps. A maintenance pit in the floor where the Crow lands (secret: a shield unit). Gantry lamps on the rim. |
+| 1 | **Docking Bay 87** | 9..56, 100..149 | -5, sky | The start, and the pickup. A round pit open to the sky, 21 m across (centre 32, 125, radius 21), south of the first stretch's south back lane (the design's first box overlapped the south row). Duracrete walls 5.5 m tall, braced by buttresses along their foot (`bay-wall`, `bay-wall-ribbed`, from Talay's TWCAP01), fuel lines and blast scars. The bay door (4 wide, 4 high) opens off the back lane into a passage and onto a landing over the pit at street level; stairs go down from it (a step of 0.625 a tile). Hazy and quiet: dust drifting, a power droid shuffling, the bay owner's grumbling, a hum of fuel pumps. A maintenance pit in the floor where the Crow lands (secret: a shield unit). Gantry lamps on the rim. |
 | 2 | **Main street** | 4..136, 64..76 | 0, sky | 12-14 wide, sand over packed earth, adobe both sides with doorways, awnings, vaporators and signs. It bends a little (angled walls) so you never see straight down it. A sandtrooper patrol, villagers, Jawas arguing over a droid, a probe droid over the market. The prefecture's comm tower is the landmark to walk toward. |
 | 2 | **The market** | 52..104, 58..82 | 0, sky | The street widens into a market: stalls with cloth awnings (shade you walk under), crates, baskets of fruit, a droid seller's pen, hanging cloth. The busiest place in town. |
 | 13 | **Water plaza** | round, at (78, 70), r 9 | 0, sky | In the market: a moisture condenser tower (a tall 3D model, a landmark), a water seller and the queue at his tap, a dewback trough. |
@@ -145,6 +145,11 @@ Check a street from several angles, not just down its length.
 - **Rounded corners and round buildings** (`house({ r })`, `circle()`) are
   angled walls along the arc with `wallTop` at the roof: the wall stops
   there and the view goes on over it (an engine feature made for this).
+  A pit is a circle open inside (`open: 'in'`), its floor below the
+  street. `circle({ seam })` runs the wall's texture on round the circle
+  (each tile's `wallU`) instead of starting it afresh in each tile, so a
+  wide texture (the bay's buttresses) isn't cut up; the seam goes where
+  it's hidden.
 - **Doorways and arches in an outside wall are slab tiles** (`arch()`):
   open below the lintel, the slab's top at the roof. A doorway with a plain
   lowered ceiling would show a wall from the lintel up to the street's sky.

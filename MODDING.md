@@ -1043,6 +1043,12 @@ other. Give the entry a `wall` texture plus either a 45° preset or a line:
   hides everything behind. It must lie between the tile's floor and ceiling.
   Bodies, shots and sight still stop at the line at any height, and its top
   isn't drawn as a surface, so keep it out of reach.
+- `wallU`: where along its texture the wall starts, in tiles, at its second
+  point (the texture runs right to left from there, seen from the open
+  side). Without it each tile's wall starts its texture afresh, so a wide
+  texture on a curve of chained tiles comes out cut up; give each tile how
+  far round the curve it is and the texture runs on. The town kit's
+  `circle({ seam })` does this.
 
 The wall texture runs along the line at 32 texels per unit, so it isn't
 stretched. Players and monsters slide along angled walls, and shots, sight

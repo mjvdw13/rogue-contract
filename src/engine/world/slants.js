@@ -6,7 +6,9 @@
  *
  * An angled wall stands up to the tile's ceiling, or stops short of it at
  * `wallTop`: under the sky, a rounded corner as tall as its building, with
- * the view going on over it.
+ * the view going on over it. Its texture starts afresh in each tile unless
+ * `wallU` says how far along it the tile's wall begins (a curve made of
+ * chained tiles, the texture running on round it).
  *
  * The four 45° presets name the corner that is solid:
  *   NE ◥   NW ◤   SE ◢   SW ◣
@@ -28,8 +30,9 @@ export class Slant {
    * @param {number} ty tile y
    * @param {number} tex texture slot of the wall face
    * @param {number} [top] the wall's top, if it stops below the tile's ceiling
+   * @param {number} [u] where along its texture the wall starts, in units
    */
-  constructor(line, tx, ty, tex, top = Infinity) {
+  constructor(line, tx, ty, tex, top = Infinity, u = 0) {
     const [ax, ay, bx, by] = line;
     this.tx = tx;
     this.ty = ty;
@@ -46,6 +49,8 @@ export class Slant {
     this.tex = tex;
     /** Where the wall stops (Infinity: at the tile's ceiling). */
     this.top = top;
+    /** Where along its texture the face starts, at the second point (units). */
+    this.u = u;
     this.poly = clipSquare(tx, ty, this);
   }
 

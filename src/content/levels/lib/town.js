@@ -514,14 +514,17 @@ export class Town {
    * wallTop: 6 }`: under the sky, the wall stops at its building's roof and
    * the view goes on over it). `open: 'in'` (a room, a pit) or `'out'` (a
    * round building, a pillar) says which side people walk on. A round
-   * building's wall gets its `skirt` (see `roofCell`).
+   * building's wall gets its `skirt` (see `roofCell`). With `seam`
+   * (degrees, 0 east, 90 north) the wall's texture runs on round the
+   * circle from there (`wallU`) instead of starting afresh in each tile:
+   * put the seam where it's hidden.
    */
-  circle(cx, cy, r, { inside, outside, wall, open = 'in', skirt }) {
+  circle(cx, cy, r, { inside, outside, wall, open = 'in', skirt, seam }) {
     // (A round building's wall gets its skirt at its foot.)
     const bands = open === 'out' && wall ? this._bands(skirt) : undefined;
     if (bands) wall = { bands, ...wall };
     for (let y = Math.floor(cy - r) - 1; y <= Math.ceil(cy + r); y++) {
-      for (let x = Math.floor(cx - r) - 1; x <= Math.ceil(cx + r); x++) this._arcTile(x, y, cx, cy, r, { inside, outside, wall, open });
+      for (let x = Math.floor(cx - r) - 1; x <= Math.ceil(cx + r); x++) this._arcTile(x, y, cx, cy, r, { inside, outside, wall, open, seam });
     }
     return this;
   }
@@ -568,7 +571,7 @@ export class Town {
   }
 
   /** One tile of a circle (see `circle`). */
-  _arcTile(x, y, cx, cy, r, { inside, outside, wall, open }) {
+  _arcTile(x, y, cx, cy, r, { inside, outside, wall, open, seam }) {
     const p = this.p;
     const corners = [[x, y], [x + 1, y], [x + 1, y + 1], [x, y + 1]];
     const n = corners.filter(([u, v]) => Math.hypot(u - cx, v - cy) < r).length;
@@ -588,7 +591,16 @@ export class Town {
     if ((right[0] * mx + right[1] * my > 0) !== (open === 'in')) [a, b] = [b, a];
     const base = open === 'in' ? inside : outside ?? p.get(x, y);
     const r4 = (v) => Math.round(v * 1000) / 1000;
-    p.set(x, y, { ...base, ...wall, line: [r4(a[0] - x), r4(a[1] - y), r4(b[0] - x), r4(b[1] - y)] });
+    const cell = { ...base, ...wall, line: [r4(a[0] - x), r4(a[1] - y), r4(b[0] - x), r4(b[1] - y)] };
+    if (seam !== undefined) {
+      // The texture runs from the second point back to the first: how far
+      // round from the seam the second point is, going that way.
+      const turn = (q) => (((Math.atan2(cy - q[1], q[0] - cx) - (seam * Math.PI) / 180) % TAU) + TAU) % TAU;
+      const [ta, tb] = [turn(a), turn(b)];
+      const ccw = (ta - tb + TAU) % TAU < Math.PI;
+      cell.wallU = r4(r * (ccw ? tb : TAU - tb));
+    }
+    p.set(x, y, cell);
   }
 
   /**
@@ -993,6 +1005,7 @@ export class Town {
   }
 }
 
+const TAU = Math.PI * 2;
 const SAMPLES = [[0.25, 0.25], [0.75, 0.25], [0.25, 0.75], [0.75, 0.75]];
 
 /** Where a circle crosses a tile's edges (its corners in order round it). */
