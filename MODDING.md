@@ -1233,8 +1233,10 @@ A monster placed with `calm` starts calm (see *Calm* under Monsters):
 some of it (`lines`, `speed`, `wander`, `idleTime`). `patrol` is a list of
 two or more `[x, y]` points: it walks to the nearest, then from point to
 point in straight lines, pausing `idleTime` at each, to the end and back,
-or round and round with `loop: true`. Someone in the way, it steps round
-them.
+or round and round with `loop: true`. Someone in the way, it walks round
+them. Patrols all set off together, half a second in, so two placed side
+by side on parallel routes with a fixed `idleTime` (`[3, 3]`) walk as a
+pair.
 
 ```js
 { type: 'jawa', x: 50.5, y: 47.5, calm: { wander: 6 } },

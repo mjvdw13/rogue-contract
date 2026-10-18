@@ -1,5 +1,5 @@
 import { Rng } from '../core/rng.js';
-import { lineOfSight } from '../world/physics.js';
+import { blockedByMap, lineOfSight } from '../world/physics.js';
 import { wanderArea } from './npc.js';
 
 /**
@@ -33,7 +33,10 @@ export function makeCalm(world, m, spec) {
     mode: 'stand',
     resume: 'stand',
     goal: null,
-    timer: m.rng.range(0.3, 2),
+    // A spot to walk to first, round someone in the way.
+    via: null,
+    // Patrols all set off together, so two on the same timing walk in step.
+    timer: route ? 0.5 : m.rng.range(0.3, 2),
     blocked: 0,
     stuck: 0,
     dodge: 0,
@@ -71,6 +74,8 @@ function stand(m) {
   const [a, b] = c.idleTime;
   c.mode = 'stand';
   c.goal = null;
+  c.via = null;
+  c.blocked = 0;
   c.timer = m.rng.range(a, b);
   if (!m.setAnim('idle', false)) m.setAnim('walk', false);
 }
@@ -80,6 +85,7 @@ function walkTo(m, x, y) {
   if (!m.def.anims.walk) return stand(m);
   c.mode = 'walk';
   c.goal = { x, y };
+  c.via = null;
   c.timer = c.route ? Infinity : 8;
   c.blocked = 0;
   c.stuck = 0;
@@ -162,13 +168,18 @@ function walk(world, m, dt) {
     if (c.route) c.leg = nextLeg(c);
     return stand(m);
   }
-  let a = Math.atan2(dy, dx);
+  // Heading for the goal, or for the spot beside whoever was in the way.
+  if (c.via && Math.hypot(c.via.x - m.x, c.via.y - m.y) < 0.2) c.via = null;
+  const to = c.via ?? c.goal;
+  const tx = to.x - m.x;
+  const ty = to.y - m.y;
+  const td = Math.hypot(tx, ty);
+  let a = Math.atan2(ty, tx);
   if (c.stuck > 0) {
-    // Stepping round whoever is in the way.
     c.stuck -= dt;
     a = c.dodge;
   }
-  const s = Math.min(d, c.speed * dt);
+  const s = Math.min(td, c.speed * dt);
   const { x, y } = m;
   m.angle = a;
   let moved = world.tryMove(m, Math.cos(a) * s, Math.sin(a) * s, true);
@@ -178,14 +189,57 @@ function walk(world, m, dt) {
     m.y = y;
     moved = false;
   }
-  if (moved) {
+  // Sliding along someone in the way by a hair each tick isn't getting
+  // anywhere: count it as blocked unless it gained half a step on where
+  // it's heading (or is stepping aside).
+  const gained = td - Math.hypot(to.x - m.x, to.y - m.y);
+  if (moved && (c.stuck > 0 || gained > s * 0.5)) {
     c.blocked = 0;
     return;
   }
   if ((c.blocked += dt) < 0.4) return;
-  // Blocked for a moment: a stroll gives up; a patrol steps aside and goes on.
+  // Blocked for a moment: a stroll gives up; a patrol walks round.
   if (!c.route) return stand(m);
   c.blocked = 0;
-  c.stuck = m.rng.range(0.3, 0.7);
-  c.dodge = Math.atan2(dy, dx) + (m.rng.chance(0.5) ? 1 : -1) * (Math.PI / 2 + m.rng.range(0, 0.8));
+  c.via = c.via ? null : detour(world, m, Math.atan2(dy, dx));
+  if (!c.via) {
+    // Nobody to walk round (scenery, or the detour was blocked too): a step aside at random.
+    c.stuck = m.rng.range(0.3, 0.7);
+    c.dodge = Math.atan2(dy, dx) + (m.rng.chance(0.5) ? 1 : -1) * (Math.PI / 2 + m.rng.range(0, 0.8));
+  }
+}
+
+/**
+ * The spot beside the body blocking a walk heading `a`, far enough out to
+ * pass it: on the side away from it, or the other side if that's walled,
+ * or null if there's no body in the way.
+ */
+function detour(world, m, a) {
+  const ca = Math.cos(a);
+  const sa = Math.sin(a);
+  let block = null;
+  let nearest = Infinity;
+  for (const o of world.things) {
+    if (o === m || !o.solid || o.removed || o.kind === 'projectile') continue;
+    const ox = o.x - m.x;
+    const oy = o.y - m.y;
+    const along = ox * ca + oy * sa;
+    const across = oy * ca - ox * sa;
+    const reach = m.radius + o.radius;
+    if (along > 0 && along < reach + 0.6 && Math.abs(across) < reach && along < nearest) {
+      block = { o, across };
+      nearest = along;
+    }
+  }
+  if (!block) return null;
+  const { o, across } = block;
+  const clear = m.radius + o.radius + 0.3;
+  const first = across > 0 ? -1 : 1;
+  for (const side of [first, -first]) {
+    // (Left of the heading is +across: perpendicular (-sa, ca).)
+    const vx = o.x - sa * clear * side + ca * 0.2;
+    const vy = o.y + ca * clear * side + sa * 0.2;
+    if (!blockedByMap(world.map, vx, vy, m.radius) && lineOfSight(world.map, m.x, m.y, vx, vy)) return { x: vx, y: vy };
+  }
+  return null;
 }

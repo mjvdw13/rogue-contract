@@ -77,6 +77,19 @@ test('a patrol steps round the player standing in its way, and goes on', () => {
   assert.ok(furthest > 26, `it got past to the far point (reached x ${furthest.toFixed(1)})`);
 });
 
+test('two patrols on the same timing walk side by side, in step', () => {
+  const patrol = [[4.5, 3.5], [26.5, 3.5]];
+  const beside = patrol.map(([x, y]) => [x, y + 1.6]);
+  const w = makeWorld(hall([
+    { type: 'sandtrooper', x: 4.5, y: 3.5, calm: { patrol, idleTime: [2, 2] } },
+    { type: 'sandtrooper', x: 4.5, y: 5.1, calm: { patrol: beside, idleTime: [2, 2] } },
+  ]));
+  const [a, b] = w.things.filter((t) => t.kind === 'monster');
+  let apart = 0;
+  run(w, mockInput(), 40, () => (apart = Math.max(apart, Math.abs(a.x - b.x))));
+  assert.ok(apart < 0.1, `at most ${apart.toFixed(2)} apart along the way`);
+});
+
 test('bumping into or using a calm trooper makes it turn and say a line', () => {
   const lines = ['Move along.', 'Hunter.'];
   const w = makeWorld(hall([{ type: 'sandtrooper', x: 5.5, y: 4.5, angle: 90, calm: { lines, wander: 0 } }]));
