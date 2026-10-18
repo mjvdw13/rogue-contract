@@ -264,8 +264,18 @@ export function drawModels(view, things, map, textures, fb, fbW, colormaps, skip
         const wallT = zbuf[x];
         const sb = x * SEG;
         const ns = segCount[x];
-        let seg = 0; // ledge windows nearer than the pixel: segments [0, seg)
         const dIz = (izB - izA) / span;
+        // Ledge windows nearer than the pixel: segments [0, seg). Found for the
+        // first pixel by a binary search (a town's columns record many), then
+        // moved along pixel by pixel.
+        const d0 = 1 / (izA + dIz * (y0 + 0.5 - yA));
+        let seg = 0;
+        let hi = ns;
+        while (seg < hi) {
+          const mid = (seg + hi) >> 1;
+          if (segDist[sb + mid] < d0) seg = mid + 1;
+          else hi = mid;
+        }
         const dU = (uB - uA) / span;
         const dV = (vB - vA) / span;
         for (let y = y0; y < y1; y++) {
