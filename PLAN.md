@@ -92,8 +92,8 @@ These need Mark to try something, or to decide. Don't start them without him.
   high on the nose's flanks, the engines glowing cyan along the wings'
   trailing edges, the sponsons' and arms' fronts the grille and lights
   off the back's texture, no longer plain red; the pod's barrels
-  thicker and longer after his second look, with collars and wide
-  muzzles, their bores black). Only
+  thicker and longer after his second look, with collars and
+  muzzles a little wider than the tubes, their bores black). Only
   its gun pod collides: you walk under the hull and wings, and shots at
   your height pass under them. Over the pit, the pod would block the way
   along it to the secret (the level checker isn't height-aware), hence

@@ -169,13 +169,14 @@ const podFront = pod.map(([y, z]) => [y * 0.8, ZM + (z - ZM) * 0.75]);
 m.prism(pod, -1.4, 1.3, { axis: 'x', sides: { tex: 'crow-gun' }, bottom: DARK, top: false });
 m.loft(pod, 1.3, podFront, 1.7, { axis: 'x', sides: { tex: 'crow-gun' }, bottom: false, top: DARK });
 m.box([-0.8, -0.5, ZT], [0.6, 0.5, G], { ...METAL, top: false });
-// Each barrel: a collar at the pod, the tube, and a wider muzzle, its black
-// bore standing just proud of its face so it reads from the front.
+// Each barrel: a collar at the pod, the tube, and a muzzle only a little
+// wider (Mark: not too thick), its black bore standing just proud of its
+// face so it reads from the front.
 const BORE = { color: [0, 0, 0] };
 for (const y of [-0.55, 0.55]) {
   m.cylinder([1.7, y, ZM], 0.27, 0.35, { segments: 8, axis: 'x', sides: METAL, bottom: false, top: DARK });
   m.cylinder([2.05, y, ZM], 0.19, 2.25, { segments: 6, axis: 'x', sides: { tex: 'crow-barrel' }, bottom: false, top: false });
-  m.cylinder([4.3, y, ZM], 0.29, 0.5, { segments: 8, axis: 'x', sides: METAL, bottom: DARK, top: DARK });
+  m.cylinder([4.3, y, ZM], 0.23, 0.5, { segments: 8, axis: 'x', sides: METAL, bottom: DARK, top: DARK });
   m.cylinder([4.8, y, ZM], 0.13, 0.02, { segments: 8, axis: 'x', sides: false, bottom: false, top: BORE });
 }
 
@@ -188,6 +189,6 @@ for (const s of [-1, 1]) shadow(-15.6, s * 3.2, -7.8, s * 12.2);
 
 // Collision: round the gun pod and its barrels, the only part as low as
 // you are; you can walk under the hull and wings (2 up and more, drawn at 0.8).
-m.outlineLines([[-1.4, -1.2], [1.3, -1.2], [1.7, -0.96], [4.8, -0.84], [4.8, 0.84], [1.7, 0.96], [1.3, 1.2], [-1.4, 1.2]]);
+m.outlineLines([[-1.4, -1.2], [1.3, -1.2], [1.7, -0.96], [4.8, -0.8], [4.8, 0.8], [1.7, 0.96], [1.3, 1.2], [-1.4, 1.2]]);
 
 export default m.build();
