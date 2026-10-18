@@ -243,8 +243,8 @@ Check a street from several angles, not just down its length.
   thick: a rising door (`door-red-rising`, `door-grey-rising`) standing
   halfway through the wall, so the jamb (`door-jamb-through`, lipped on
   both faces) shows half a tile deep either side, and its panel slides up
-  into the wall over the opening. `depth: 0` puts it on the wall
-  itself (the back of a porch). Windows are set in too (Mark: inset
+  into the wall over the opening. F and G have them. `depth: 0` puts it
+  on the wall itself (the back of a porch). Windows are set in too (Mark: inset
   matters more than their shape): a notch a tile deep, the wall below it
   a sill and a slab over it up to the roof, the window (`window-bars`,
   `window-louvre`) on its back wall. Decals only go on straight faces, not
@@ -288,8 +288,9 @@ angle unless their sheet has the other views (the villagers do).
   (navy and orange), their controls ZASWIT04 as it is, the shutter from a
   strip of NDCORUG1, barred windows from SPBARS1, louvres from NPVENTS1.
   The jamb's tiles (`door-jamb`, a texture) are ZPTILE4's bevelled square,
-  shrunk and repeated. Doors that open use the door
-  decals again as 64x128 panels (`RISING`: a panel must be a power of two).
+  shrunk to a quarter tile (Mark's reference has small ones) and
+  repeated. Doors that open use the door decals again as 64x128 panels
+  (`RISING`: a panel must be a power of two).
 - **Textures:** Dark Forces textures recoloured by
   `assets/custom/derive.mjs` (Mark, 2026-10-17: DF textures for now, none
   of our own, so no generated stand-ins). So far: plaster (`adobe`),

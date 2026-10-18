@@ -91,16 +91,22 @@ town.room(9, 81, 12, 83, { h: 6, light: 160 }); // daylight through the door
 town.arch(9, 78, 12, 81, { h: 6, lintel: 3 });
 town.awning(6, 76, 16, 78, { z: 3.5, face: 'N', cloth: 'red', valance: 'valance-red' });
 town.window(7.5, 78, 'N', { z: 2.2 }).window(13.5, 78, 'N', { z: 2.2 });
-// F: a tall house in two steps.
+// F: a tall house in two steps, a door that opens into a room behind it
+// (the front under the lower roof, the back under the upper storey).
 town.house(20, 79, 30, 92, { h: 7, r: 2, wall: 'adobe-grey', skirt: null, tiers: [{ box: [22, 83, 30, 92], h: 10, r: 2 }], dome: true });
-town.door(25, 79, 'N', { h: 7, tex: 'door-grey', wall: 'adobe-grey' });
+town.room(23, 80, 28, 83, { h: 7, wall: 'adobe-grey', light: 136 });
+// (A passage to the back clear of the upper window over row 83.)
+town.room(24, 83, 26, 84, { h: 10, wall: 'adobe-grey', light: 128 });
+town.room(24, 84, 28, 90, { h: 10, wall: 'adobe-grey', light: 120 });
+town.door(25, 79, 'N', { h: 7, tex: 'door-grey', wall: 'adobe-grey', opens: true });
 town.window(22.5, 79, 'N', { z: 4 }).window(26.5, 83, 'N', { z: 8.5, tex: 'window-louvre' }).window(20, 86.5, 'W');
 // A square, with a round house under a dome in it.
 town.circle(41, 86, 4.5, { inside: town.roofCell({ h: 5, wall: 'adobe-rose', skirt: 'plinth' }), wall: { wall: 'adobe-rose', wallTop: 5 }, open: 'out', skirt: 'plinth' });
 town.dome(41, 86, 5, 8.5, { wall: 'adobe-rose' });
-// G: a low house on the square's east side.
+// G: a low house on the square's east side, its red door opening into a room.
 town.house(53, 78, 61, 88, { h: 5, r: 2, wall: 'adobe-ochre', skirt: null, dome: true });
-town.door(57, 78, 'N', { h: 5, wall: 'adobe-ochre' });
+town.room(55, 79, 59, 87, { h: 5, ceilZ: 4.25, wall: 'adobe-ochre', light: 128 });
+town.door(57, 78, 'N', { h: 5, wall: 'adobe-ochre', opens: true });
 town.window(53, 83.5, 'W', { z: 3, tex: 'window-louvre' });
 // A stall on the square in front of G, under a tarp that billows.
 town.tarp(46, 80, 50, 84, { z: 2.75, face: 'W', rise: 0.5, cloth: 'red' });
