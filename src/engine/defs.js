@@ -405,13 +405,16 @@ export function defineItem(def) {
 
 /**
  * Scenery: lamps, plants, barrels... Solid decorations block movement.
- * Shootable ones with `health` die (and optionally `explode`).
+ * Shootable ones with `health` die (and optionally `explode`). A decoration
+ * settles on the highest floor its `radius` reaches; a `fixed` one stays at
+ * the height it's placed at instead (on the floor under its middle, or a
+ * level thing's `z`): props against a wall, fixtures on it, things stacked.
  * @param {{id:string, glyph?:string, sheet:SheetSpec, anims?:Record<string,AnimSpec>, solid?:boolean,
- *   radius?:number, height?:number, z?:number, hanging?:boolean, health?:number,
+ *   radius?:number, height?:number, z?:number, hanging?:boolean, fixed?:boolean, health?:number,
  *   explode?:{radius:number, damage:number, sound?:string}}} def
  */
 export function defineDecoration(def) {
-  const d = baseThing(def, 'decoration', { radius: 0.5, height: 1.6 });
+  const d = baseThing(def, 'decoration', { radius: 0.5, height: 1.6, fixed: false });
   if (d.health > 0) d.shootable = def.shootable ?? true;
   if (!d.anims.idle) d.anims.idle = normalizeAnim([0], ANIM_DEFAULTS.idle);
   return d;

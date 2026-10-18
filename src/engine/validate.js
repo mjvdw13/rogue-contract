@@ -217,6 +217,7 @@ export function validateContent(reg) {
       if (!(t.fleeDistance > 0)) err(`${owner}: fleeDistance must be above 0`);
       if (t.health > 0 && !t.anims.death) warn(`${owner}: can be hurt but has no "death" animation (it vanishes when killed)`);
     }
+    if (t.kind === 'decoration' && typeof t.fixed !== 'boolean') err(`${owner}: fixed must be true or false`);
     if (t.kind === 'decoration' && t.explode?.effect && !reg.things.has(t.explode.effect)) {
       err(`${owner}: unknown explosion effect "${t.explode.effect}"`);
     }

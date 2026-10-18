@@ -302,9 +302,13 @@ be added with `definePickup` (see *Custom behaviour*).
 ## Scenery, projectiles and effects
 
 - **Decorations** are defined in `src/content/decor.js` with
-  `defineDecoration({ id, glyph, sheet, solid, radius, hanging, anims })`. Give
+  `defineDecoration({ id, glyph, sheet, solid, radius, hanging, fixed, anims })`. Give
   one `health` and `explode: { radius, damage, sound, effect }` to make a
-  barrel that explodes (see `toxic-drum`).
+  barrel that explodes (see `toxic-drum`). A decoration settles on the
+  highest floor its `radius` reaches, so one standing against a raised
+  floor climbs onto it; `fixed: true` keeps it at the height it's placed
+  at (the floor under its middle, or the level thing's `z`): props against
+  a wall, fixtures on one, things stacked on others.
 - **Projectiles** are defined in `src/content/effects.js` with
   `defineProjectile({ id, sheet, anims: { fly, explode }, speed, damage, splash: { radius, damage }, gravity, sounds })`.
   Give one `bounce` to make it bounce instead of bursting on what it hits

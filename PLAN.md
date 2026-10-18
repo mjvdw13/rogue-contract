@@ -113,6 +113,17 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
     - [ ] Bare brick where the plaster has fallen: ordinary decals cut
           from `adobe-brick` with ragged edges.
     - [x] In Mos Eisley: snapshots, then Waiting on Mark.
+  - [ ] **Street props fixes** (Mark, 2026-10-18: crates dangle off the
+        roofs, see-through underneath; and it must feel Star Wars, not a
+        real-world desert village: no jars, only crates and sci-fi props).
+    - [x] Engine: a `fixed` decoration stays at the height it's placed
+          (every decoration settles on the highest floor its radius
+          touches each tick, so props against a wall rose onto its roof,
+          and the wall pipes, tanks and conduits rose above the roofline).
+          Defs, validator, MODDING.md, a test; the town kit's models use it.
+    - [ ] Props: jars, sacks and the stone bench out; sci-fi props in
+          (pressure canisters, a cargo pod, a power unit against a wall,
+          a droid's dome in the junk). Snapshots, then Waiting on Mark.
   - [ ] Waiting on Mark.
 - [ ] **Docking Bay 87**, the lane, the owner's office, the customs house.
       The episode starts in `m1`.

@@ -35,15 +35,17 @@ export default [
   // The tiled jamb of a Mos Eisley doorway (inside the wall's recess, so it needn't be solid).
   defineDecoration({ id: 'door-jamb', model: 'door-jamb' }),
   defineDecoration({ id: 'door-jamb-through', model: 'door-jamb-through' }),
+  // The town kit's models stay where it puts them (`fixed`): against and on
+  // walls their radius reaches the roof, which they'd otherwise climb onto.
   // Mos Eisley's cloth awnings: their tops and ends over the kit's slab, and the poles under their fronts.
-  ...AWNING_MODELS.map((id) => defineDecoration({ id, model: id })),
-  ...AWNING_POLES.map((h) => defineDecoration({ id: poleId(h), model: poleId(h), solid: true, radius: 0.12, height: h })),
+  ...AWNING_MODELS.map((id) => defineDecoration({ id, model: id, fixed: true })),
+  ...AWNING_POLES.map((h) => defineDecoration({ id: poleId(h), model: poleId(h), solid: true, radius: 0.12, height: h, fixed: true })),
   // Tin roofs on Mos Eisley's lean-tos (on the roofs, out of reach).
-  ...TIN_MODELS.map((id) => defineDecoration({ id, model: id })),
+  ...TIN_MODELS.map((id) => defineDecoration({ id, model: id, fixed: true })),
   // Pipes, conduits, a tank and a box unit on Mos Eisley's walls (against the wall, so not solid).
-  ...PIPE_MODELS.map((id) => defineDecoration({ id, model: id })),
-  // Things on Mos Eisley's streets: crates, barrels, jars, sacks, junk, rubble, a vaporator.
-  ...Object.entries(CLUTTER).map(([id, c]) => defineDecoration({ id, model: id, solid: !!c.solid, radius: c.radius, height: c.height })),
+  ...PIPE_MODELS.map((id) => defineDecoration({ id, model: id, fixed: true })),
+  // Things on Mos Eisley's streets: crates, drums, canisters, junk, rubble, scrap, a vaporator.
+  ...Object.entries(CLUTTER).map(([id, c]) => defineDecoration({ id, model: id, solid: !!c.solid, radius: c.radius, height: c.height, fixed: true })),
   defineDecoration({ id: 'ceiling-lamp', glyph: 'l', sheet: S('ceiling-lamp', 48, 16), hanging: true, fullbright: true }),
   defineDecoration({
     id: 'fuel-barrel',

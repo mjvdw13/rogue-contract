@@ -392,7 +392,8 @@ export class World {
    * ceiling; dead ones drop.
    */
   fall(t, dt) {
-    if (t.def.hanging) return;
+    // (A fixed decoration stays where it was put: against a wall, on one, on a stack.)
+    if (t.def.hanging || t.def.fixed) return;
     if (t.def.flying && !t.dead) {
       const reach = this.reach(t);
       const floor = this.map.floorAt(t.x, t.y, t.radius, reach);

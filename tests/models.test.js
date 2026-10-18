@@ -186,6 +186,8 @@ const gameReg = new Registry({
     ...content.things,
     defineDecoration({ id: 'test-wall', model: 'test-wall', solid: true, height: 2 }),
     defineDecoration({ id: 'test-spinner', model: 'terminal', spin: 1 }),
+    defineDecoration({ id: 'test-prop', model: 'terminal', radius: 0.55 }),
+    defineDecoration({ id: 'test-prop-fixed', model: 'terminal', radius: 0.55, fixed: true }),
   ],
 });
 const arena = room(['############', ...Array(9).fill('#..........#'), '############'], [], { legend });
@@ -231,6 +233,21 @@ test('a decoration with `spin` turns', () => {
   const a = s.angle;
   w.tick(0.5, mockInput());
   assert.ok(Math.abs(s.angle - a - 0.5) < 1e-9);
+});
+
+test('a prop against a raised floor climbs onto it, unless it is fixed where it is put', () => {
+  // A block of raised floor (0.8) east of x = 4; the props stand 0.45 west of it.
+  const ledge = room(['#######', '#...hh#', '#...hh#', '#...hh#', '#######'], [], { legend });
+  const w = makeWorld(ledge, { noMonsters: true, registry: gameReg });
+  const loose = w.spawn('test-prop', 3.55, 1.5);
+  const fixed = w.spawn('test-prop-fixed', 3.55, 2.5);
+  const stacked = w.spawn('test-prop-fixed', 2.5, 3.5);
+  stacked.z = 1.5;
+  assert.equal(fixed.z, 0, 'it starts on the floor under its middle');
+  w.tick(0.5, mockInput());
+  assert.ok(Math.abs(loose.z - 0.8) < 1e-6, 'its radius reaches the ledge, so it settles on top');
+  assert.equal(fixed.z, 0);
+  assert.equal(stacked.z, 1.5, 'a fixed thing placed in the air stays there');
 });
 
 test('textured faces show their texture, at the walls\' scale with world-unit uvw', () => {
