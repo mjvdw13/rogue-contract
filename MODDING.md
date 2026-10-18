@@ -154,6 +154,24 @@ steps and ledges, and shots into the sky simply vanish. Explosions measure
 `stepHeight`, `dropHeight`, `flying: true` with `z` and `flySpeed` (see
 *Heights* under Levels).
 
+**Calm.** A level can place a monster calm (see *Things* under Levels): a
+trooper on patrol or a Jawa about town, before the shooting starts. A calm
+monster never looks for the player, hears no gunfire and never attacks. It
+stands its post, strolls round its spot as friendly characters do (out of
+doorways and one-tile passages), or walks a patrol. Bumped or used, it
+turns to the player and says one of its `lines` (shown as `NAME: line`).
+Hurt, it turns normal and fights back. Its type's `calm` sets how it
+behaves; a placement can override any of it:
+
+```js
+calm: {
+  lines: ['Move along.', 'Keep your hands where I can see them.'],
+  speed: 2,          // tiles per second while calm (default 2); its walk plays slower to match
+  wander: 4,         // tiles it may stroll from its spot (default 4; 0 stands its post)
+  idleTime: [2, 5],  // seconds standing between walks, and at each patrol point
+},
+```
+
 **Hooks** run your own code: `onSpawn(world, self)`, `onSight(world, self)`,
 `onThink(world, self, dt)` (return `true` to skip the normal AI that tick),
 `onAttack(world, self, attack)`, `onPain(world, self, source, amount)`,
@@ -1202,6 +1220,24 @@ the player start) on top of a slab rather than under it. A friendly
 character's `wander` there replaces its type's for that one (tiles; 0
 stands still): `{ type: 'villager-man', x: 80.5, y: 74.5, wander: 0 }` is
 a shopkeeper behind his counter or someone waiting in a queue.
+
+A monster placed with `calm` starts calm (see *Calm* under Monsters):
+`calm: true` behaves as its type's `calm` says, and an object overrides
+some of it (`lines`, `speed`, `wander`, `idleTime`). `patrol` is a list of
+two or more `[x, y]` points: it walks to the nearest, then from point to
+point in straight lines, pausing `idleTime` at each, to the end and back,
+or round and round with `loop: true`. Someone in the way, it steps round
+them.
+
+```js
+{ type: 'jawa', x: 50.5, y: 47.5, calm: { wander: 6 } },
+{ type: 'sandtrooper', x: 30.5, y: 70.5, calm: { patrol: [[30.5, 70.5], [60.5, 70.5], [90.5, 68.5]] } },
+{ type: 'sandtrooper', x: 104.5, y: 66.5, angle: 270, calm: { wander: 0, lines: ["Checkpoint's shut."] } },
+```
+
+The validator checks that every patrol point has room for the body and
+that each walk, from the spot to the nearest point too, is a clear
+straight line.
 
 ### Triggers and actions
 

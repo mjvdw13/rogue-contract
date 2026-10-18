@@ -20,6 +20,7 @@ import { Thing } from '../things/thing.js';
 import { overlap } from '../things/shape.js';
 import { PlayerState, playerThink, playerCamera } from '../things/player.js';
 import { monsterThink, wakeMonster, monsterPain, applyMomentum } from '../things/monster.js';
+import { makeCalm, endCalm, calmReact } from '../things/calm.js';
 import { projectileThink, launchProjectile, effectThink } from '../things/projectile.js';
 import { tryPickup } from '../things/pickups.js';
 import { damage, radiusDamage, hitscan, meleeTarget, corpseThink } from '../combat/damage.js';
@@ -191,6 +192,7 @@ export class World {
         t.wanderReach = s.wander;
         initNpc(this, t);
       }
+      if (s.calm && t.kind === 'monster') makeCalm(this, t, s.calm);
       if (t.kind === 'monster' && t.def.countKill) this.stats.totalKills++;
       if (t.kind === 'item' && t.def.countItem) this.stats.totalItems++;
     }
@@ -361,7 +363,7 @@ export class World {
       if (depth > 0) {
         // Allow moving apart if already overlapping.
         if (depth > overlap(o, t.x, t.y, t.radius)) {
-          if (t === this.player && o.kind === 'npc') this.playerBumped = o;
+          if (t === this.player && (o.kind === 'npc' || o.calm)) this.playerBumped = o;
           return false;
         }
       }
@@ -526,6 +528,11 @@ export class World {
     wakeMonster(this, m, target);
   }
 
+  /** A calm monster turns normal (calm.js). */
+  endCalm(m) {
+    endCalm(m);
+  }
+
   npcPain(t) {
     npcPain(this, t);
   }
@@ -579,12 +586,13 @@ export class World {
     const dx = Math.cos(pt.angle);
     const dy = Math.sin(pt.angle);
     const hit = castRay(this.map, pt.x, pt.y, dx, dy, USE_RANGE);
-    // Friendly characters (NPCs) in front of the player get talked to first.
+    // Friendly characters (NPCs) and calm monsters in front of the player get talked to first.
     for (const t of this.things) {
-      if (t.kind !== 'npc' || t.removed || t.dead) continue;
+      if (!(t.kind === 'npc' || t.calm) || t.removed || t.dead) continue;
       const d = rayCircle(pt.x, pt.y, dx, dy, t.x, t.y, t.radius + 0.1);
       if (d >= 0 && d < Math.min(hit.dist, USE_RANGE)) {
-        npcReact(this, t);
+        if (t.calm) calmReact(this, t);
+        else npcReact(this, t);
         return;
       }
     }

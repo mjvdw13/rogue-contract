@@ -1,6 +1,7 @@
 import { buildLevel } from './world/level.js';
 import { F_EXIT, F_SOLID, F_VOID, LIGHT_FX } from './world/tilemap.js';
 import { BUILTIN_ACTION_NAMES } from './world/actions.js';
+import { blockedByMap, lineOfSight } from './world/physics.js';
 import { BUILTIN_ATTACKS } from './combat/attacks.js';
 import { BUILTIN_PICKUPS } from './things/pickups.js';
 import { PARTICLE_BLENDS, PARTICLE_FLOORS, PARTICLE_SHAPES, PARTICLE_WALLS, POINT_CAP, DISC_CAP } from './world/particles.js';
@@ -52,6 +53,46 @@ export function validateContent(reg) {
     if (a.puff && !reg.things.has(a.puff)) err(`${owner}: unknown puff effect "${a.puff}"`);
     if (a.lockOn !== undefined && !(a.lockOn > 0 && a.lockOn <= 90)) err(`${owner}: lockOn is degrees either side, above 0 and up to 90`);
     for (const k of ['sound', 'hitSound', 'missSound']) checkSound(owner, a[k]);
+  };
+  // A monster type's `calm`, or a placement's (which may also have a patrol).
+  const CALM_FIELDS = ['lines', 'speed', 'wander', 'idleTime', 'patrol', 'loop'];
+  const checkCalm = (owner, c, placed) => {
+    if (placed && c === true) return;
+    if (!c || typeof c !== 'object' || Array.isArray(c)) return err(`${owner}: "calm" must be true or an object`);
+    for (const k of Object.keys(c)) {
+      if (!CALM_FIELDS.includes(k)) err(`${owner}: calm has unknown field "${k}" (it takes ${CALM_FIELDS.join(', ')})`);
+    }
+    if (c.lines !== undefined && !(Array.isArray(c.lines) && c.lines.every((l) => typeof l === 'string'))) err(`${owner}: calm lines must be a list of strings`);
+    if (c.speed !== undefined && !(typeof c.speed === 'number' && c.speed > 0)) err(`${owner}: calm speed must be above 0 (tiles a second)`);
+    if (c.wander !== undefined && !(typeof c.wander === 'number' && c.wander >= 0)) err(`${owner}: calm wander must be a number of tiles, 0 or more`);
+    const t = c.idleTime;
+    if (t !== undefined && !(Array.isArray(t) && t.length === 2 && t.every((v) => typeof v === 'number' && v >= 0) && t[0] <= t[1])) {
+      err(`${owner}: calm idleTime must be [min, max] seconds, 0 or more`);
+    }
+    if (c.loop !== undefined && typeof c.loop !== 'boolean') err(`${owner}: calm loop must be true or false`);
+    if (c.patrol === undefined) return undefined;
+    if (!placed) return err(`${owner}: a patrol belongs on a placement in a level, not on the type`);
+    const point = (p) => Array.isArray(p) && p.length === 2 && p.every((v) => typeof v === 'number');
+    if (!(Array.isArray(c.patrol) && c.patrol.length >= 2 && c.patrol.every(point))) err(`${owner}: calm patrol must be a list of two or more [x, y] points`);
+    return undefined;
+  };
+  // A patrol walks straight from point to point (and from its spot to the
+  // nearest), so each point must have room for the body and each walk a
+  // clear line.
+  const checkPatrol = (who, map, sp, def) => {
+    const pts = sp.calm.patrol;
+    const at = ([x, y]) => `(${x}, ${y})`;
+    if (!def.anims.walk) warn(`${who} patrols but its type has no "walk" animation (it will stand still)`);
+    for (const p of pts) {
+      if (!map.inBounds(Math.floor(p[0]), Math.floor(p[1])) || blockedByMap(map, p[0], p[1], def.radius)) err(`${who}: patrol point ${at(p)} has no room for it to stand`);
+    }
+    const walks = pts.slice(1).map((p, i) => [pts[i], p]);
+    if (sp.calm.loop) walks.push([pts[pts.length - 1], pts[0]]);
+    const first = pts.reduce((a, p) => (Math.hypot(p[0] - sp.x, p[1] - sp.y) < Math.hypot(a[0] - sp.x, a[1] - sp.y) ? p : a));
+    walks.push([[sp.x, sp.y], first]);
+    for (const [a, p] of walks) {
+      if (!lineOfSight(map, a[0], a[1], p[0], p[1])) err(`${who}: the patrol's walk from ${at(a)} to ${at(p)} is blocked (each walk is a straight line)`);
+    }
   };
   const checkAnims = (owner, anims) => {
     for (const [name, anim] of Object.entries(anims ?? {})) {
@@ -187,6 +228,7 @@ export function validateContent(reg) {
       checkAttack(owner, t.attack);
       checkAttack(owner, t.melee);
       for (const d of t.drops) if (!reg.things.has(d.item)) err(`${owner}: drops unknown item "${d.item}"`);
+      checkCalm(owner, t.calm, false);
     }
     if (t.kind === 'item') {
       for (const [key, value] of Object.entries(t.pickup ?? {})) {
@@ -288,6 +330,15 @@ export function validateContent(reg) {
         if (sp.wander !== null && skill === 3) {
           if (def.kind !== 'npc') err(`${owner}: a ${sp.type} at (${sp.x}, ${sp.y}) has "wander", which only friendly characters take`);
           else if (!(typeof sp.wander === 'number' && sp.wander >= 0)) err(`${owner}: a ${sp.type} at (${sp.x}, ${sp.y}): "wander" must be a number of tiles, 0 or more`);
+        }
+        if (sp.calm !== null && skill === 3) {
+          const who = `${owner}: a ${sp.type} at (${sp.x}, ${sp.y})`;
+          if (def.kind !== 'monster') err(`${who} is placed "calm", which only monsters take (friendlies are always calm)`);
+          else {
+            const before = errors.length;
+            checkCalm(who, sp.calm, true);
+            if (errors.length === before && sp.calm.patrol) checkPatrol(who, b.map, sp, def);
+          }
         }
         for (const d of sp.drops ?? []) {
           const item = reg.things.get(d.item);

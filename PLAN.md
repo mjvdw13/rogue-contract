@@ -337,11 +337,21 @@ conversations, then the fob.
       for a few seconds, HUD and weapon hidden, input locked; use or fire
       skips. An override of `world.camera()`.
 - [ ] **`wait` in trigger lists:** a trigger's actions can pause.
-- [ ] **Calm monsters:** `calm` skips the idle sight check, stands its post or
-      wanders, and says lines when bumped or used (as NPCs do).
-- [ ] **The town's switch:** a `hostile` action and an `on: 'hostile'`
-      trigger turn every calm monster normal; the player firing or dealing
-      damage runs it.
+- [ ] **Calm monsters** (2026-10-18: Jawas wandering Mos Eisley's
+      streets, sandtroopers on patrol, none attacking): a placement's
+      `calm` (`true`, or `{ lines, wander, patrol, loop, speed, idleTime }`
+      over the type's own `calm`) skips the sight check and noise, and the
+      monster stands its post, strolls like a friendly, or walks `patrol`
+      (a list of points, straight walks between them, there and back
+      unless `loop`), pausing at each. Bumped or used, it turns to you and
+      says a line. Hurt, it turns normal.
+  - [x] Engine: `things/calm.js`, defs, validator (points in the open and
+        in sight of each other), MODDING.md, tests.
+  - [ ] **The town's switch:** a `hostile` action and an `on: 'hostile'`
+        trigger turn every calm monster normal at once; the player firing
+        a noisy weapon or hurting anyone runs it.
+  - [ ] Mos Eisley: sandtrooper patrols on the main street and the
+        market, Jawas strolling; snapshots; then Waiting on Mark.
 - [ ] **Conversations:** an `on: 'talk'` trigger from `npcReact`, lines that
       move on with each use, story flags (`setFlag`, `if` on triggers).
 - [ ] **The tracking fob:** a weapon with no attack, a per-tick weapon hook

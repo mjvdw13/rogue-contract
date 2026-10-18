@@ -1,5 +1,6 @@
 import { performAttack } from '../combat/attacks.js';
 import { canSeeBody } from '../combat/aim.js';
+import { calmThink } from './calm.js';
 
 /**
  * Definition-driven monster AI, in the spirit of Doom's:
@@ -9,6 +10,8 @@ import { canSeeBody } from '../combat/aim.js';
  *   attack -> plays the attack animation; the 'fire' frame event deals damage
  *   pain   -> flinches
  *   dead   -> death animation, then a corpse
+ *   calm   -> goes about its business and never attacks (calm.js), until
+ *             it's hurt
  * Hooks on the definition (onSight, onThink, onAttack, onPain, onDeath,
  * onEvent) allow custom behaviour without changing this file.
  */
@@ -156,7 +159,9 @@ function applyMomentum(world, t, dt) {
 
 export function monsterThink(world, m, dt) {
   applyMomentum(world, m, dt);
-  const finished = m.stepAnim(dt, (ev) => {
+  // A calm stroll is slower than a chase: its walk plays slower to match, so the feet don't slide.
+  const rate = m.calm && m.animName === 'walk' ? m.calm.speed / (m.def.speed || 1) : 1;
+  const finished = m.stepAnim(dt * rate, (ev) => {
     if (ev === 'fire') fireAttack(world, m);
     else if (ev.startsWith('sound:')) world.playSoundFrom(ev.slice(6), m);
     else m.def.hooks?.onEvent?.(world, m, ev);
@@ -165,6 +170,9 @@ export function monsterThink(world, m, dt) {
   if (m.def.hooks?.onThink?.(world, m, dt) === true) return;
 
   switch (m.state) {
+    case 'calm':
+      calmThink(world, m, dt);
+      break;
     case 'idle': {
       m.timer -= dt;
       if (m.timer <= 0) {

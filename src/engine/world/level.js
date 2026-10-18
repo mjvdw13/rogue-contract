@@ -462,6 +462,8 @@ export function buildLevel(registry, level, opts = {}) {
       z: spec.z ?? null,
       // How far this one friendly strolls, instead of its type's `wander`.
       wander: spec.wander ?? null,
+      // A monster that starts calm (things/calm.js): true, or fields over its type's `calm`.
+      calm: spec.calm ?? null,
     });
   };
 
