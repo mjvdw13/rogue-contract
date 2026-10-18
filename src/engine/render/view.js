@@ -26,9 +26,10 @@ export class View {
     /**
      * Per column, the uncovered windows of rows after each tile the ray crossed
      * (for sprite clipping): one batch per boundary, usually a single window,
-     * more where slabs split the view.
+     * more where slabs split the view. 48 of them, and room after for one
+     * last batch where a ray stops at the skyline (columns.js).
      */
-    this.SEG = 48;
+    this.SEG = 48 + 8;
     this.resize(width);
     this.lightStart = new Float32Array(256);
     this.x = 0;

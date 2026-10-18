@@ -193,9 +193,6 @@ export class World {
       }
       if (t.kind === 'monster' && t.def.countKill) this.stats.totalKills++;
       if (t.kind === 'item' && t.def.countItem) this.stats.totalItems++;
-      // (The renderer stops rays over the skyline: keep tall scenery, a
-      // dome on a roof, under it.)
-      this.map.skyline = Math.max(this.map.skyline, t.z + (t.height ?? 0) + 1);
     }
     this.nav.update(Math.floor(start.x), Math.floor(start.y), true, this.reach(this.player));
     this.triggers.start();

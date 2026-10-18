@@ -279,8 +279,9 @@ export class TileMap {
   /**
    * The skyline: the top of every surface the renderer can draw (floors,
    * slabs, angled walls, fences, ceilings indoors, a solid wall as tall as
-   * the ceilings beside it, lifts at their highest stop), plus `margin` for
-   * the things standing on them. The World raises it for taller things.
+   * the ceilings beside it, lifts at their highest stop), plus `margin`.
+   * Things may stand taller: a ray stopped here leaves its depth far, so
+   * they still show over it.
    */
   computeSkyline(margin = 3) {
     let top = -Infinity;

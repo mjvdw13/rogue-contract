@@ -100,6 +100,8 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
   const { W, H, x: px, y: py, dirX, dirY, planeX, planeY, fy, camZ, horizon, zbuf, fog } = view;
   const { segDist, segTop, segBot, segFirst, segCount } = view;
   const SEG = view.SEG;
+  // (The last MAX_WIN slots of a column's windows are kept for the batch at a skyline stop.)
+  const FILL = SEG - MAX_WIN;
   const mw = map.w;
   const mh = map.h;
   const { flags, wallTex, doorIndex, doors, seen, floorZ, ceilZ, floorTex, ceilTex, sideTex, upperTex, slantIndex, slants } = map;
@@ -455,7 +457,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
     };
     // Record the open windows at distance t, as one batch (if it fits).
     const record = (t) => {
-      if (nseg + nw > SEG) return;
+      if (nseg + nw > FILL) return;
       for (let k = 0; k < nw; k++) {
         segDist[segBase + nseg] = t;
         segTop[segBase + nseg] = wTop[k];
@@ -835,7 +837,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
       }
       if (nw === 1) {
         // (The usual case, without slabs: one window.)
-        if (nseg < SEG) {
+        if (nseg < FILL) {
           segDist[segBase + nseg] = tExit;
           segTop[segBase + nseg] = wTop[0];
           segBot[segBase + nseg] = wBot[0];
@@ -865,7 +867,20 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
             clipBot = wBot[k];
             skyFill(clipTop, clipBot);
           }
-          end = tExit;
+          // (No wall further on can cover the open rows, so the depth stays
+          // far: a thing standing beyond, taller than the skyline (a tower),
+          // shows in them, held to them by these windows. They must be the
+          // last batch recorded: if the column's windows are full, in the
+          // room kept for it.)
+          if (!(nseg && segDist[segBase + nseg - 1] === Math.fround(tExit))) {
+            for (let k = 0; k < nw; k++) {
+              segDist[segBase + nseg] = tExit;
+              segTop[segBase + nseg] = wTop[k];
+              segBot[segBase + nseg] = wBot[k];
+              segFirst[segBase + nseg] = k === 0 ? 1 : 0;
+              nseg++;
+            }
+          }
           break;
         }
       }

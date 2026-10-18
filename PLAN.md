@@ -425,6 +425,10 @@ Steps, one commit each:
       sheets: the first replaces each def's inline `sheet` with a `{ ref }` in
       the shared objects. Only tools building two registries hit it; copy the
       defs instead of changing them.
+- [ ] Long views over Mos Eisley fill a column's 48 windows (`view.SEG`),
+      and things further off are then clipped by stale ones: a few hundred
+      pixels a view differ from a renderer with room for all of them,
+      mostly far models showing a pixel or two through nearer walls.
 - [ ] Angled-wall tiles count as fully open for reachability, so a gap
       squeezed between two angled walls isn't checked.
 - [ ] A walker chasing the player round the small rock in the sandbox's
