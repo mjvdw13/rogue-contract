@@ -1,11 +1,14 @@
 import { ModelBuilder } from './lib/build.js';
 
-// Things found on Mos Eisley's streets (lib/town.js, clutter()): crates,
-// barrels, clay jars, sacks, junk and litter, rubble, scrap, a vaporator
-// and a bench. Low-poly, most of them a few faces. Each is listed in
-// CLUTTER with its decoration's size (solid ones block you and your shots).
-// The origin is on the floor under the thing's middle, except for `scrap`
-// and `bench`, built looking south (+y) with their backs on a wall at y = 0.
+// Things found on Mos Eisley's streets (lib/town.js, clutter()): cargo
+// crates, drums, pressure canisters, a cargo pod, a power unit, junk and
+// litter with a droid's dome, rubble, scrap and a vaporator. Spacers' and
+// traders' leftovers: no clay jars or grain sacks (Mark, 2026-10-18: it
+// must feel Star Wars, not a desert village). Low-poly, most of them a few
+// faces. Each is listed in CLUTTER with its decoration's size (solid ones
+// block you and your shots). The origin is on the floor under the thing's
+// middle, except for `scrap` and `power-unit`, built looking south (+y)
+// with their backs on a wall at y = 0.
 
 /** A ring of `n` points of radius `r` (x, y), turned by `turn` radians. */
 const ring = (n, r, turn = 0) => Array.from({ length: n }, (_, i) => [Math.cos(turn + (i / n) * Math.PI * 2) * r, Math.sin(turn + (i / n) * Math.PI * 2) * r]);
@@ -32,33 +35,78 @@ function barrel(id, tex) {
 }
 
 /**
- * A clay jar: a body swelling from its foot and narrowing to a neck and a
- * lip, lofted in rings of 8, `h` tall; terracotta or pale clay.
+ * A pressure canister: a grey or rusty cylinder on a dark foot, its
+ * shoulder narrowing to a valve with a handwheel, a painted band round its
+ * middle. About 1 tall.
  */
-function jar(id, h, ramp, tone) {
+function canister(id, tex, band) {
   const m = new ModelBuilder(id);
-  // [height, radius] going up, as shares of h.
-  const profile = [[0, 0.22], [0.12, 0.34], [0.42, 0.42], [0.72, 0.32], [0.86, 0.17], [0.92, 0.16], [1, 0.21]];
-  for (let i = 0; i + 1 < profile.length; i++) {
-    const [z0, r0] = profile[i];
-    const [z1, r1] = profile[i + 1];
-    m.loft(ring(8, r0 * h), z0 * h, ring(8, r1 * h), z1 * h, {
-      color: [ramp, tone - (i === profile.length - 2 ? 0.12 : 0)],
-      bottom: false,
-      top: i === profile.length - 2 ? { color: [ramp, 0.08] } : false,
-    });
-  }
+  const r = 0.2;
+  m.cylinder([0, 0, 0], r + 0.02, 0.08, { segments: 8, color: ['gray', 0.18], bottom: false, top: false });
+  m.cylinder([0, 0, 0.08], r, 0.72, { segments: 8, tex, top: false, bottom: false });
+  m.cylinder([0, 0, 0.5], r + 0.01, 0.1, { segments: 8, color: band, top: false, bottom: false });
+  m.loft(ring(8, r), 0.8, ring(8, 0.09), 0.92, { color: ['gray', 0.45], bottom: false, top: { color: ['gray', 0.3] } });
+  m.cylinder([0, 0, 0.92], 0.04, 0.08, { segments: 6, color: ['gray', 0.2], bottom: false });
+  m.cylinder([0, 0, 0.98], 0.1, 0.025, { segments: 6, color: ['rust', 0.45] });
   return m.build();
 }
 
-/** A sack of grain or sand: a lumpy pillow, lofted from a squashed ring. */
-function sack(id, [w, d, h], ramp, tone) {
-  const m = new ModelBuilder(id);
-  const base = ring(8, 1).map(([x, y]) => [x * w * 0.48, y * d * 0.48]);
-  const mid = ring(8, 1).map(([x, y]) => [x * w * 0.52, y * d * 0.5]);
-  const top = ring(8, 1).map(([x, y]) => [x * w * 0.36, y * d * 0.3]);
-  m.loft(base, 0, mid, h * 0.45, { color: [ramp, tone - 0.06], bottom: false, top: false });
-  m.loft(mid, h * 0.45, top, h, { color: [ramp, tone], bottom: false, top: { color: [ramp, tone + 0.05] } });
+/**
+ * A cargo pod: a long eight-sided canister lying on two skids, its ends
+ * chamfered, hooped near each end, a status light glowing green on one.
+ */
+function pod() {
+  const m = new ModelBuilder('cargo-pod');
+  const r = 0.38;
+  const z = 0.47;
+  const L = 0.55;
+  const oct = ring(8, r, Math.PI / 8).map(([a, b]) => [a, b + z]);
+  m.prism(oct, -L, L, { axis: 'x', tex: 'metal-grey', top: false, bottom: false });
+  for (const s of [-1, 1]) {
+    const end = ring(8, r * 0.68, Math.PI / 8).map(([a, b]) => [a, b + z]);
+    m.loft(oct, s * L, end, s * (L + 0.14), { axis: 'x', color: ['gray', 0.42], bottom: false, top: { color: ['gray', 0.3] } });
+    m.prism(ring(8, r + 0.025, Math.PI / 8).map(([a, b]) => [a, b + z]), s * (L - 0.16), s * (L - 0.08), { axis: 'x', color: ['orange', 0.35], top: false, bottom: false });
+  }
+  m.box([L + 0.13, -0.05, z - 0.05], [L + 0.15, 0.05, z + 0.05], { color: [70, 230, 60], glow: true, bottom: false });
+  for (const y of [-0.22, 0.22]) m.box([-0.6, y - 0.06, 0], [0.6, y + 0.06, 0.12], { color: ['gray', 0.2], bottom: false });
+  m.outlineLines([[-0.7, -0.38], [0.7, -0.38], [0.7, 0.38], [-0.7, 0.38]]);
+  return m.build();
+}
+
+/**
+ * A power unit against a wall: a metal case with slats on its front, two
+ * status lights, and a cable up out of its lid into the wall.
+ */
+function powerUnit() {
+  const m = new ModelBuilder('power-unit');
+  m.box([-0.6, 0.04, 0], [0.6, 0.6, 1], { tex: 'metal-grey', bottom: false, side: (i) => (i === 2 ? { tex: 'vent-slats', texOffset: [0.4, 0] } : undefined) });
+  m.box([-0.65, 0, 1], [0.65, 0.65, 1.1], { color: ['gray', 0.3] });
+  m.box([-0.45, 0.6, 0.8], [-0.37, 0.62, 0.88], { color: [70, 230, 60], glow: true, bottom: false });
+  m.box([-0.3, 0.6, 0.8], [-0.22, 0.62, 0.88], { color: [255, 40, 30], glow: true, bottom: false });
+  m.cylinder([0.4, 0.3, 1.1], 0.06, 0.5, { segments: 6, color: ['gray', 0.15], bottom: false });
+  m.box([0.33, 0, 1.55], [0.47, 0.37, 1.67], { color: ['gray', 0.15] });
+  m.outlineLines([[-0.65, 0], [0.65, 0], [0.65, 0.65], [-0.65, 0.65]]);
+  return m.build();
+}
+
+/**
+ * An astromech's dome off a scrapped droid: a silver dome lofted in rings,
+ * blue panels round its middle and a red eye.
+ */
+function droidDome() {
+  const m = new ModelBuilder('droid-dome');
+  const tiers = [[0, 0.3], [0.13, 0.28], [0.22, 0.22], [0.29, 0.1]];
+  for (let i = 0; i + 1 < tiers.length; i++) {
+    const [z0, r0] = tiers[i];
+    const [z1, r1] = tiers[i + 1];
+    m.loft(ring(8, r0), z0, ring(8, r1), z1, {
+      color: ['steel', 0.85],
+      bottom: i === 0 ? { color: ['gray', 0.15] } : false,
+      top: i === tiers.length - 2 ? undefined : false,
+      side: (k) => (i === 1 && k % 2 === 0 ? { color: ['steel', 0.35] } : undefined),
+    });
+  }
+  m.box([0.255, -0.05, 0.08], [0.29, 0.05, 0.15], { color: [255, 40, 30], glow: true, bottom: false });
   return m.build();
 }
 
@@ -142,15 +190,6 @@ function vaporator() {
   return m.build();
 }
 
-/** A bench against a wall: planks on two blocks of stone. */
-function bench() {
-  const m = new ModelBuilder('bench');
-  for (const x of [-0.65, 0.45]) m.box([x, 0.05, 0], [x + 0.2, 0.5, 0.38], { tex: 'flagstone', bottom: false });
-  m.box([-0.8, 0.02, 0.38], [0.8, 0.55, 0.46], { tex: 'planks', bottom: { tex: 'planks' } });
-  m.outlineLines([[-0.8, 0], [0.8, 0], [0.8, 0.55], [-0.8, 0.55]]);
-  return m.build();
-}
-
 /**
  * The clutter: model id, its decoration's `solid`, `radius` and `height`
  * (for collision and the level checker), and how deep it stands out from a
@@ -162,18 +201,17 @@ export const CLUTTER = {
   'crate-rust-long': { model: () => crate('crate-rust-long', 'crate-rust', [1.4, 0.8, 0.7]), solid: true, radius: 0.75, height: 0.7, depth: 0.8 },
   'barrel-rust': { model: () => barrel('barrel-rust', 'metal-rust'), solid: true, radius: 0.34, height: 1, depth: 0.7 },
   'barrel-grey': { model: () => barrel('barrel-grey', 'metal-grey'), solid: true, radius: 0.34, height: 1, depth: 0.7 },
-  jar: { model: () => jar('jar', 0.85, 'rust', 0.45), solid: true, radius: 0.36, height: 0.85, depth: 0.75 },
-  'jar-small': { model: () => jar('jar-small', 0.5, 'rust', 0.55), radius: 0.22, height: 0.5, depth: 0.45 },
-  'jar-pale': { model: () => jar('jar-pale', 0.7, 'beige', 0.6), solid: true, radius: 0.3, height: 0.7, depth: 0.6 },
-  sack: { model: () => sack('sack', [0.8, 0.5, 0.35], 'beige', 0.55), radius: 0.4, height: 0.35, depth: 0.5 },
-  'sack-sand': { model: () => sack('sack-sand', [0.7, 0.45, 0.32], 'sand', 0.5), radius: 0.35, height: 0.32, depth: 0.45 },
+  canister: { model: () => canister('canister', 'metal-grey', ['yellow', 0.6]), solid: true, radius: 0.22, height: 1, depth: 0.45 },
+  'canister-rust': { model: () => canister('canister-rust', 'metal-rust', ['gray', 0.6]), solid: true, radius: 0.22, height: 1, depth: 0.45 },
+  'cargo-pod': { model: pod, solid: true, radius: 0.75, height: 0.85, depth: 0.8 },
+  'power-unit': { model: powerUnit, solid: true, radius: 0.7, height: 1.67, depth: 0.65 },
+  'droid-dome': { model: droidDome, radius: 0.3, height: 0.3, depth: 0.6 },
   'junk-heap': { model: heap, radius: 1.1, height: 0.5, depth: 1.6 },
   litter: { model: () => litter('litter', 1.6), radius: 0.8, height: 0, depth: 1.6 },
   'litter-small': { model: () => litter('litter-small', 1), radius: 0.5, height: 0, depth: 1 },
   rubble: { model: rubble, radius: 0.7, height: 0.26, depth: 0.9 },
   scrap: { model: scrap, radius: 0.9, height: 1.6, depth: 0.7 },
   vaporator: { model: vaporator, solid: true, radius: 0.45, height: 3.7, depth: 1.1 },
-  bench: { model: bench, solid: true, radius: 0.8, height: 0.46, depth: 0.55 },
 };
 
 export default Object.values(CLUTTER).map((c) => c.model());

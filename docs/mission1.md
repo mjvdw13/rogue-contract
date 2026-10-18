@@ -197,11 +197,15 @@ Check a street from several angles, not just down its length.
   awning's slab would cut through them).
 - **Clutter** (`clutter()`, after `finish()` and `drifts()`): the things
   found on the street (`models/clutter.js`): cargo crates in three sizes
-  (DF's Ramshed crates in tan, grey and rust), drums, clay jars, sacks, a
-  heap of junk and litter (DF's trash pile), rubble of plaster and brick,
-  scrap tin leaning on a wall, a bench and a moisture vaporator. The kit
-  sets them in groups (a stack of crates, two or three drums, jars,
-  sacks, junk, rubble, scrap, a bench, or one thing alone) against the
+  (DF's Ramshed crates in tan, grey and rust), drums, pressure canisters,
+  a cargo pod on skids, a power unit against a wall, a heap of junk and
+  litter (DF's trash pile) with an astromech's dome, rubble of plaster and
+  brick, scrap tin leaning on a wall and a moisture vaporator. Spacers'
+  and traders' leftovers, never a real-world village's (no clay jars or
+  grain sacks: Mark, 2026-10-18). All `fixed`, so the ones against a wall
+  don't climb onto its roof. The kit sets them in groups (a stack of
+  crates, two or three drums or canisters, a pod, junk, rubble, scrap, a
+  power unit, or one thing alone) against the
   straight walls where the street is open 4 tiles out in front (so alleys
   stay clear), off doors, arches and low fixtures, the first group of a
   few tries that fits what's left of the wall; litter lies about the open

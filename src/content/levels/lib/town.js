@@ -716,8 +716,9 @@ export class Town {
    * Things found on the street (models/clutter.js), set in groups against
    * the buildings' straight walls where the street is open in front of
    * them (`clear` tiles of it, so alleys stay free), clear of doors, low
-   * fixtures and arches: stacks of crates, barrels, clay jars, sacks, junk
-   * with litter, rubble, scrap and benches. Litter lies about the open
+   * fixtures and arches: stacks of crates, drums, pressure canisters, a
+   * cargo pod, junk with litter and a droid's dome, rubble, scrap and power
+   * units. Litter lies about the open
    * street too. `amount` scales how much (1 the usual, 2 a mess); placed at
    * random from `seed`, the same every time. Run it after `finish()` (and
    * after `drifts()`).
@@ -761,13 +762,13 @@ export class Town {
     const GROUPS = [
       ['crates', 3, () => [['crate-tan', 0, 0], ...(r() < 0.6 ? [['crate-grey-small', r.range(-0.15, 0.15), 0, 0.9]] : []), ...(r() < 0.5 ? [['crate-rust-long', 1.35, 0.05]] : [['crate-grey-small', 0.85, 0.1]])]],
       ['barrels', 2, () => [['barrel-rust', 0, 0], [r() < 0.5 ? 'barrel-grey' : 'barrel-rust', 0.7, 0.05], ...(r() < 0.4 ? [['barrel-rust', 0.35, 0.65]] : [])]],
-      ['jars', 2, () => [['jar', 0, 0], ['jar-small', 0.62, 0.1], ...(r() < 0.6 ? [['jar-pale', -0.65, 0.05]] : [])]],
-      ['sacks', 1.5, () => [['sack', 0, 0], ['sack-sand', 0.8, 0.05], ...(r() < 0.5 ? [['sack', 0.4, 0, 0.33]] : []), ['jar-small', -0.6, 0.1]]],
-      ['junk', 1.5, () => [['junk-heap', 0.4, 0.1], ['litter', 1.4, 0.7], ['litter-small', -0.6, 0.8]]],
+      ['canisters', 2, () => [['canister', 0, 0], [r() < 0.5 ? 'canister-rust' : 'canister', 0.48, 0.05], ...(r() < 0.6 ? [['canister-rust', -0.45, 0.12]] : [])]],
+      ['pod', 1.5, () => [['cargo-pod', 0, 0], ...(r() < 0.5 ? [['canister', 1.05, 0.1]] : [['crate-grey-small', 1.15, 0.05]])]],
+      ['junk', 1.5, () => [['junk-heap', 0.4, 0.1], ['litter', 1.4, 0.7], ['litter-small', -0.6, 0.8], ...(r() < 0.6 ? [['droid-dome', -0.95, 0.15]] : [])]],
       ['rubble', 1.5, () => [['rubble', 0, 0], ['litter-small', 0.9, 0.5]]],
       ['scrap', 1, () => [['scrap', 0, 'wall'], ['litter-small', 0.9, 0.6]]],
-      ['bench', 0.8, () => [['bench', 0, 'wall'], ...(r() < 0.5 ? [['jar-small', 1.2, 0.05]] : [])]],
-      ['single', 2, () => [[r.pick(['barrel-rust', 'barrel-grey', 'crate-tan', 'jar', 'jar-pale', 'crate-grey-small']), 0, 0]]],
+      ['power', 0.8, () => [['power-unit', 0, 'wall'], ...(r() < 0.5 ? [['barrel-grey', 1.1, 0.05]] : [])]],
+      ['single', 2, () => [[r.pick(['barrel-rust', 'barrel-grey', 'crate-tan', 'canister', 'canister-rust', 'crate-grey-small']), 0, 0]]],
     ];
     const total = GROUPS.reduce((n, g) => n + g[1], 0);
     const pick = () => {

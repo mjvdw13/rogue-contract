@@ -65,9 +65,11 @@ These need Mark to try something, or to decide. Don't start them without him.
   awnings in stripes and canvas (C teal with a fixed fringe, E red with a
   swaying valance), a tarp over a stall on the square, tin on C's lean-to
   and B's porch, downpipes, tanks, box units, conduits and vents on the
-  walls, and the street clutter: crates, drums, jars, sacks, junk and
-  litter, rubble, scrap, benches and a vaporator, set along the walls by
-  `town.clutter()` and by hand on the main street. How they look, how
+  walls, and the street clutter: crates, drums, pressure canisters,
+  cargo pods, power units, junk and litter with droid domes, rubble,
+  scrap and a vaporator (no jars or sacks: Mark, 2026-10-18), set along
+  the walls by `town.clutter()` and by hand on the main street (a stall
+  selling droid parts under the tarp). How they look, how
   much clutter (`amount`), whether the tarp and the valance sway too much,
   and whether more awnings should sway. All the new models together cost
   0.44 ms a frame on average over eight views, 0.75 at worst (headless,
@@ -113,17 +115,6 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
     - [ ] Bare brick where the plaster has fallen: ordinary decals cut
           from `adobe-brick` with ragged edges.
     - [x] In Mos Eisley: snapshots, then Waiting on Mark.
-  - [ ] **Street props fixes** (Mark, 2026-10-18: crates dangle off the
-        roofs, see-through underneath; and it must feel Star Wars, not a
-        real-world desert village: no jars, only crates and sci-fi props).
-    - [x] Engine: a `fixed` decoration stays at the height it's placed
-          (every decoration settles on the highest floor its radius
-          touches each tick, so props against a wall rose onto its roof,
-          and the wall pipes, tanks and conduits rose above the roofline).
-          Defs, validator, MODDING.md, a test; the town kit's models use it.
-    - [ ] Props: jars, sacks and the stone bench out; sci-fi props in
-          (pressure canisters, a cargo pod, a power unit against a wall,
-          a droid's dome in the junk). Snapshots, then Waiting on Mark.
   - [ ] Waiting on Mark.
 - [ ] **Docking Bay 87**, the lane, the owner's office, the customs house.
       The episode starts in `m1`.

@@ -137,21 +137,21 @@ town.finish();
 town.drifts();
 // Rain streaks, dust and stains on the walls (lib/town.js).
 town.grime();
-// Crates, barrels, jars, sacks, junk and litter along the walls (lib/town.js).
+// Crates, drums, canisters, cargo pods, junk and litter along the walls (lib/town.js).
 town.clutter();
 list.push(...town.things);
 
 // Hand-placed along the main street and on the square (the kit's
-// clutter() fills the rest): crates against the porch, jars by A, a
-// stack by D, sacks by F, a vaporator on the square, and the stall's
-// counter under its tarp.
+// clutter() fills the rest): crates against the porch, canisters by A, a
+// stack by D, a cargo pod by F, a vaporator on the square, and the stall's
+// counter under its tarp, selling droid parts.
 list.push(
-  at('jar', 6.9, 63.5, { angle: 10 }), at('jar-small', 7.55, 63.35),
+  at('canister', 6.85, 63.35, { angle: 10 }), at('canister-rust', 7.35, 63.3, { angle: 40 }),
   at('crate-tan', 18.4, 65.45, { angle: 274 }), at('crate-grey-small', 18.45, 65.4, { z: 0.9, angle: 262 }), at('crate-grey-small', 18.6, 64.45, { angle: 280 }),
   at('crate-rust-long', 48.3, 63.5, { angle: 3 }), at('crate-grey-small', 48.1, 63.45, { z: 0.7, angle: 350 }), at('barrel-rust', 49.6, 64.2),
-  at('sack', 22.6, 78.62, { angle: 175 }), at('sack-sand', 22.65, 78.15, { angle: 190 }), at('sack', 22.7, 78.45, { z: 0.33, angle: 168 }), at('jar-small', 23.4, 78.5),
+  at('cargo-pod', 22.3, 78.5, { angle: 176 }), at('canister', 23.45, 78.6),
   at('vaporator', 34.2, 80.4),
-  at('crate-rust-long', 46.9, 82, { angle: 90 }), at('jar-small', 46.9, 81.5, { z: 0.7 }), at('jar-small', 46.85, 82.55, { z: 0.7 }),
+  at('crate-rust-long', 46.9, 82, { angle: 90 }), at('droid-dome', 46.9, 81.6, { z: 0.7, angle: 200 }), at('crate-grey-small', 46.85, 82.4, { z: 0.7, angle: 85 }),
   at('crate-tan', 49, 81.1, { angle: 95 }), at('barrel-grey', 49.1, 83), at('litter-small', 45, 83, { angle: 40 }),
 );
 
