@@ -75,6 +75,10 @@ const AWNINGS = ['red', 'teal', 'sand', 'olive'].flatMap((c) => [`awning-${c}`, 
 // on the ground (tools/art/textures/speeder.js).
 const SPEEDER = ['speeder-glass'];
 
+// The Moldy Crow (models/crow.js): Jedi Knight's textures, copied by
+// assets/custom/crow.mjs and loaded from there directly. The engines glow.
+const CROW = ['crow-hull-side', 'crow-hull-top', 'crow-side', 'crow-belly', 'crow-rear', 'crow-nose', 'crow-ribs', 'crow-panel', 'crow-gun', 'crow-barrel', 'crow-wing', 'crow-fin', 'crow-grille', 'crow-ladder'];
+
 const ANIMATED = {
   'imp-computer': { frames: 3, fps: 3 },
 };
@@ -89,6 +93,8 @@ export default [
   ...AWNINGS.map((id) => defineTexture({ id, src: `assets/textures/${id}.png`, fullbright: false })),
   ...SPEEDER.map((id) => defineTexture({ id, src: `assets/textures/${id}.png`, fullbright: false })),
   ...TOWN.map((id) => defineTexture({ id, src: `assets/custom/textures/${id}.png`, fullbright: false })),
+  ...CROW.map((id) => defineTexture({ id, src: `assets/custom/textures/${id}.png`, fullbright: false })),
+  defineTexture({ id: 'crow-engine', src: 'assets/custom/textures/crow-engine.png' }),
   ...TOWN_DECALS.map((id) => defineTexture({ id, src: `assets/custom/textures/${id}.png`, decal: true, fullbright: false })),
   defineTexture({ id: 'sky-night', src: 'assets/textures/sky-night.png', sky: true }),
   defineTexture({ id: 'sky-day', src: 'assets/custom/textures/sky-day.png', sky: true }),

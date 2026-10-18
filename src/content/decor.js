@@ -56,6 +56,9 @@ export default [
   defineDecoration({ id: 'bay-fuel-line', model: 'bay-fuel-line', fixed: true }),
   defineDecoration({ id: 'bay-fuel-pump', model: 'bay-fuel-pump', solid: true, height: 1.7, fixed: true }),
   defineDecoration({ id: 'bay-rim-lamp', model: 'bay-rim-lamp', fixed: true }),
+  // The Moldy Crow, hovering (models/crow.js), bobbing gently: only its gun pod is
+  // low enough to collide (as its outline); you walk under the rest.
+  defineDecoration({ id: 'moldy-crow', model: 'moldy-crow', solid: true, height: 9.9, fixed: true, bob: { height: 0.04, period: 4 } }),
   defineDecoration({ id: 'ceiling-lamp', glyph: 'l', sheet: S('ceiling-lamp', 48, 16), hanging: true, fullbright: true }),
   defineDecoration({
     id: 'fuel-barrel',

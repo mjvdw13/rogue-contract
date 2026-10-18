@@ -34,6 +34,9 @@ assets/custom/*
 # (Recolouring the cut sheets, and deriving more textures from the DF ones.)
 !assets/custom/recolour.mjs
 !assets/custom/derive.mjs
+# Jedi Knight's Moldy Crow textures, and the script that names them.
+!assets/custom/jk-crow/
+!assets/custom/crow.mjs
 # Character sheets that aren't rips (the sandtrooper and its commander, the Jawa and the villagers), their
 # cutters and the cutters' shared steps.
 !assets/custom/sandtrooper/

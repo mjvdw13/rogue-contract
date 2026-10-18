@@ -83,6 +83,22 @@ These need Mark to try something, or to decide. Don't start them without him.
   the bob is right now, and the angle. About 0.7 ms a frame near it, 2.1
   standing over it (headless).
 
+- **The Moldy Crow** (`?map=m1`, hovering in Docking Bay 87, nose east, in
+  front of you at the start, a little south of the maintenance pit): its
+  shape against the HWK-290 views (the deep hull and raked bow, the fins,
+  the wings angled down), its size (29 long, 23.6 across the wings, about
+  canon against you; `scale` on the decoration if it should be smaller),
+  how it sits (2.2 off the floor, bobbing 0.04 over 4 s, over soft
+  shadows) and JK's textures on it (the cockpit windows high on the nose's
+  flanks, the engines glowing cyan along the wings' trailing edges). Only
+  its gun pod collides: you walk under the hull and wings, and shots at
+  your height pass under them. Over the pit, the pod would block the way
+  along it to the secret (the level checker isn't height-aware), hence
+  the spot. 128 faces; about 1.4 ms a frame on average over eight views
+  round the bay, 3.3 at worst (the start, close up), a quarter of that
+  the shadows (headless). Then it replaces the placeholder shuttle on
+  m3's pad, and the drop-off flies it.
+
 ## Next up
 
 In this order unless Mark says otherwise.

@@ -254,6 +254,11 @@ list.push(
   at('crate-tan', 49, 81.1, { angle: 95 }), at('barrel-grey', 49.1, 83), at('litter-small', 45, 83, { angle: 40 }),
 );
 
+// The Moldy Crow, hovering in the bay nose east, in front of you, a little
+// south of the maintenance pit: its gun pod (solid) would block the way
+// along the pit to its secret.
+list.push(at('moldy-crow', 34, 128.5, { angle: 0 }));
+
 list.push(
   at('player', 32, 134, { angle: 90 }),
   at('supply-crate', 14, 86.5),

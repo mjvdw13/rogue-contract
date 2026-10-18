@@ -364,11 +364,11 @@ sheets would help (Phase 2's multi-angle stretch goal).
 ## Art and sound this needs
 
 - **The Moldy Crow:** the most important new model, because it opens and
-  closes every mission. Kyle's modified HWK-290, with glowing landing
-  lights and engines, a few hundred faces, made in Blender and brought in
-  with `tools/import-model.mjs`. Dark Forces' cutscenes are the reference.
-  It also needs its engine roar (synthesized) and a dust effect for
-  landings.
+  closes every mission. Kyle's modified HWK-290, hovering, its engines
+  glowing: built in code (`models/crow.js`, 2026-10-18) after HWK-290
+  views and Dark Forces' cutscenes, with Jedi Knight's textures. Still to
+  come: landing lights, its engine roar (synthesized) and a dust effect
+  for landings.
 - **Sprites** (outsourced like the sandtrooper and Jawa sheets):
   - **The prototype:** big, crude and loud, with exposed cabling, a blade
     arm (a nod to Phase I) and a repeating blaster bolted on.

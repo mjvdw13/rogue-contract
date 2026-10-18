@@ -67,6 +67,20 @@ node assets/custom/cut.mjs "<folder with the sheets>"
 Weapon sprites are drawn 1:1, so they have no `scale`; the cutter pads each
 frame so the art lands where Dark Forces put it, given the weapon's `offset`.
 
+## The Moldy Crow
+
+`jk-crow/` holds Jedi Knight's Moldy Crow textures (the "PC _ Computer -
+Star Wars_ Jedi Knight - Dark Forces II - Ships - The Moldy Crow" zip), as
+they came. `crow.mjs` copies them into `textures/` with names that say
+what each covers (`crow-hull-side`, `crow-wing` and so on; its `CROW` table
+has JK's names), and `src/content/textures.js` loads them from there, with
+no generated stand-in, like Mos Eisley's. The model is
+`src/content/models/crow.js`.
+
+```
+node assets/custom/crow.mjs
+```
+
 ## The Dark Forces textures
 
 `textures.mjs` replaces each generated wall, floor, ceiling and sky texture

@@ -15,5 +15,9 @@ They are not part of Rogue Contract and are not covered by its license.
   2026-10-15).
 - **Do not redistribute them.** Don't copy them out of this repository or
   publish them anywhere else.
+- The Moldy Crow's textures (`jk-crow/`, and the `crow-*.png` in
+  `textures/` copied from them) come from *Star Wars Jedi Knight: Dark
+  Forces II* (LucasArts, 1997), on the same terms (the owner's decision,
+  2026-10-18).
 
 The enemy sheets were ripped by Crazy Ivan, the weapons sheet by Dolphman.
