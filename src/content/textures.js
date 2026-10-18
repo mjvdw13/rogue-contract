@@ -35,6 +35,8 @@ const DECALS = ['decal-crest', 'decal-hazard', 'decal-sign', 'decal-vent'];
 const TOWN = [
   'adobe', 'adobe-pale', 'adobe-ochre', 'adobe-rose', 'adobe-grey', 'adobe-old', 'adobe-brick', 'adobe-skirt', 'adobe-roof',
   'planks', 'street-sand', 'street-drift', 'flagstone', 'door-jamb',
+  // Corrugated tin for lean-to roofs, rusty and galvanised.
+  'metal-rust', 'metal-grey',
   // The drifts' edges, by which corners are drift (lib/town.js, drifts()).
   ...Array.from({ length: 14 }, (_, k) => `street-drift-${k + 1}`),
 ];

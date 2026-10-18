@@ -63,13 +63,15 @@ town.room(19, 53, 25, 60, { h: 6, wall: 'adobe-pale', light: 128 });
 town.arch(20, 60, 24, 62, { h: 6, lintel: 3, wall: 'adobe-pale' });
 town.house(19, 62, 25, 66, { h: 4, r: 1, wall: 'adobe-pale', skirt: null });
 town.arch(20, 62, 24, 66, { h: 4, lintel: 3, wall: 'adobe-pale' });
+town.leanTo(19, 62, 25, 66, { h: 4, face: 'S', seed: 9 });
 town.window(16, 56.5, 'W', { tex: 'window-louvre' });
 // C: a round tower under a big dome, a low lean-to in front of it with an
 // awning over the street.
 // (The lean-to first: the tower's round wall rises from its roof.)
 town.house(30, 59, 42, 63, { h: 4, r: 1 });
+town.leanTo(30, 59, 42, 63, { h: 4, face: 'S' });
 town.circle(35.5, 56.5, 5, { inside: town.roofCell({ h: 9, wall: 'adobe-ochre' }), wall: { wall: 'adobe-ochre', wallTop: 9 }, open: 'out' });
-town.awning(31, 63, 41, 66, { z: 3.25, face: 'S', cloth: 'teal' });
+town.awning(31, 63, 41, 65, { z: 3, face: 'S', cloth: 'teal' });
 town.door(33, 63, 'S', { h: 4, tex: 'door-grey' });
 town.door(38.5, 63, 'S', { h: 4, tex: 'shutter', tall: 2.25, width: 3, jamb: false, sign: false, panel: false });
 town.dome(35.5, 56.5, 9, 9.5, { wall: 'adobe-ochre' });
@@ -145,7 +147,7 @@ const hangings = [
   // A rag over B's porch doorway, like a curtain.
   { type: 'rag', from: [20.2, 66.05, 3.9], to: [23.8, 66.05, 3.9], length: 1.5 },
   // A torn rag hanging under C's awning, over its shutter.
-  { type: 'rag', from: [37.2, 65.75, 3.2], to: [39.8, 65.75, 3.2], length: 0.9 },
+  { type: 'rag', from: [37.2, 64.75, 2.95], to: [39.8, 64.75, 2.95], length: 0.9 },
   // A long banner down G's west wall, facing the square.
   { type: 'rag', from: [52.95, 80.4, 4.8], to: [52.95, 81.8, 4.8], length: 2.4 },
   // A sheet slung across the north back lane, pinned at its corners.

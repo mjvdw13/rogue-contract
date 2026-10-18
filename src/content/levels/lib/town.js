@@ -16,7 +16,8 @@
 //   hangings: town.hangings,    // the awnings' valances
 
 import { DOMES } from '../../models/dome.js';
-import { AWNING_CLOTHS, AWNING_DEPTHS, AWNING_POLES, poleId } from '../../models/awning.js';
+import { AWNING_CLOTHS, AWNING_DEPTHS, AWNING_POLES, AWNING_SLOPE, poleId } from '../../models/awning.js';
+import { TIN_DEPTHS, TIN_METALS, TIN_SLOPE } from '../../models/tin.js';
 import { valueNoise, random } from './noise.js';
 
 /**
@@ -82,8 +83,10 @@ export class Town {
     this.grimeBoxes = [];
     /** Hangings the kit places (awnings' valances, tarps), for the level's `hangings`. */
     this.hangings = [];
-    /** Tarps, for their shade and light: { box, z, cx, cy, hanging }. */
+    /** Tarps, for their light: { cx, cy, hanging }. */
     this.tarps = [];
+    /** Covers over a box at a height, for the shadows (tarps, tin roofs): { box, z }. */
+    this.covers = [];
   }
 
   /**
@@ -318,6 +321,16 @@ export class Town {
     const tex = `awning-${cloth}`;
     const under = ns ? tex : `${tex}-x`;
     const top = floorZ + z + 0.125;
+    // The wall it's against must stand above its back edge.
+    // (The row of tiles behind it, a doorway's lintel counting as wall.)
+    const row = front - out * depth - (out > 0 ? 1 : 0);
+    let wallTop = 0;
+    for (let a = a0; a < a1; a++) {
+      const c = this.p.get(...(ns ? [a, row] : [row, a]));
+      if (c) wallTop = Math.max(wallTop, c.slab ? c.slab.top : c.floorZ ?? 0);
+    }
+    const backZ = top + 0.1 + depth * AWNING_SLOPE;
+    if (wallTop < backZ) throw new Error(`${where} rises to ${backZ.toFixed(2)} at the back, above the wall behind it (${wallTop}): lower it or make it shallower`);
     this.p.rect(x0, y0, x1, y1, (x, y, old) => {
       if (old.wall || old.door || old.slab || old.ceiling !== 'sky') return old;
       return { ...old, slab: { bottom: floorZ + z, top, floor: under, ceiling: under, side: tex, light } };
@@ -369,7 +382,8 @@ export class Town {
       pin: 'corners',
     };
     this.hangings.push(hanging);
-    this.tarps.push({ box: [x0, y0, x1, y1], z: front - sag, cx: (x0 + x1) / 2, cy: (y0 + y1) / 2, hanging });
+    this.tarps.push({ cx: (x0 + x1) / 2, cy: (y0 + y1) / 2, hanging });
+    this.covers.push({ box: [x0, y0, x1, y1], z: front - sag });
     const pole = (pt, h) => {
       if (!AWNING_POLES.includes(h)) throw new Error(`${where}: a pole ${h} high (poles are quarters from 2.5 to 5.5)`);
       this.things.push({ type: poleId(h), x: pt[0], y: pt[1], z: floorZ });
@@ -382,6 +396,42 @@ export class Town {
         pole(br, z + rise);
       }
     }
+    return this;
+  }
+
+  /**
+   * A tin roof on a lean-to (a low building against a taller one): sheets of
+   * corrugated tin over the box of its roof (at `h` above `floorZ`),
+   * sloping from the back (against the taller wall) down past its front,
+   * where they overhang the street (models/tin.js). `face` is the way its
+   * front looks. The box is 2 to 6 tiles deep and an even number wide.
+   * `metal` is 'rust', 'grey' or 'mix' (mostly rust, a grey sheet here and
+   * there, from `seed`); each sheet sits a little higher or lower than the
+   * last, so they read as separate sheets.
+   */
+  leanTo(x0, y0, x1, y1, { h, face = 'S', metal = 'mix', floorZ = 0, seed = 5 } = {}) {
+    const ns = face === 'N' || face === 'S';
+    const [a0, a1] = ns ? [x0, x1] : [y0, y1];
+    const depth = ns ? y1 - y0 : x1 - x0;
+    const front = { S: y1, N: y0, E: x1, W: x0 }[face];
+    const where = `Town: the lean-to at (${x0}, ${y0})`;
+    if (front === undefined) throw new Error(`${where}: "face" must be N, E, S or W`);
+    if (!TIN_DEPTHS.includes(depth)) throw new Error(`${where} is ${depth} deep: tin roofs are ${TIN_DEPTHS.join(', ')}`);
+    if ((a1 - a0) % 2) throw new Error(`${where} is ${a1 - a0} wide: tin roofs are an even number of tiles wide`);
+    if (metal !== 'mix' && !TIN_METALS.includes(metal)) throw new Error(`${where} has no metal "${metal}" (${TIN_METALS.join(', ')} or mix)`);
+    const r = random(seed);
+    const angle = { S: 0, E: 90, N: 180, W: 270 }[face];
+    const at = (a) => (ns ? { x: a, y: front } : { x: front, y: a });
+    const z = floorZ + h;
+    let last = null;
+    for (let a = a0; a < a1; a += 2) {
+      const m = metal === 'mix' ? (r() < 0.25 ? 'grey' : 'rust') : metal;
+      this.things.push({ type: `tin-${m}-${depth}`, ...at(a + 1), z: Math.round((z + ((a - a0) / 2) % 2 * 0.03) * 100) / 100, angle });
+      if (a === a0) this.things.push({ type: `tin-${m}-${depth}-end`, ...at(a), z, angle });
+      last = m;
+    }
+    this.things.push({ type: `tin-${last}-${depth}-end`, ...at(a1), z, angle });
+    this.covers.push({ box: [x0, y0, x1, y1], z: z + 0.15 + (depth * TIN_SLOPE) / 2 });
     return this;
   }
 
@@ -736,8 +786,8 @@ export class Town {
       if (!changed) break;
     }
     for (let i = 0; i < top.length; i++) if (top[i] === -Infinity) top[i] = 0;
-    // Tarps: their lowest edge over the ground under them.
-    for (const { box: [x0, y0, x1, y1], z } of this.tarps) {
+    // Covers: a tarp's lowest edge over the ground under it, a tin roof's middle.
+    for (const { box: [x0, y0, x1, y1], z } of this.covers) {
       for (let y = y0; y < y1; y++) for (let x = x0; x < x1; x++) top[y * w + x] = Math.max(top[y * w + x], z);
     }
     // Domes: a hemisphere's height over each tile.

@@ -140,9 +140,10 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
           fixed fringe or a swaying cloth (`town.hangings`).
     - [x] A tarp: a cloth hanging pinned at four corners (`out`), sagging
           and billowing over a stall. Defs, validator, MODDING.md, tests.
-    - [ ] Lean-to roofs in rusty corrugated metal (derived from DF's
-          corrugated door): sloped sheets with an overhang,
-          `town.leanTo()`; C's lean-to, and tin patches on a few roofs.
+    - [x] Lean-to roofs in rusty corrugated metal (derived from DF's
+          ribbed panel): sloped sheets with an overhang, `town.leanTo()`;
+          C's lean-to and B's porch. (Tin patches on flat roofs dropped:
+          nobody in the street sees a roof.)
     - [ ] Vents and pipes: wall decals (grilles, a fan, a junction box)
           cut from DF textures; pipe models (downpipes by height, conduits
           by length, a wall tank, a box unit); `town.pipe()`,

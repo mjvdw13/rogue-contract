@@ -11,5 +11,6 @@ import { sensorMast, sensorDish } from './sensor-mast.js';
 import domes from './dome.js';
 import doorJamb from './door-jamb.js';
 import awnings from './awning.js';
+import tin from './tin.js';
 
-export default [terminal, reactorRing, coolantTank, shuttle, barricade, boulderLarge, boulderSmall, floodlightTower, sensorMast, sensorDish, ...domes, doorJamb, ...awnings];
+export default [terminal, reactorRing, coolantTank, shuttle, barricade, boulderLarge, boulderSmall, floodlightTower, sensorMast, sensorDish, ...domes, doorJamb, ...awnings, ...tin];

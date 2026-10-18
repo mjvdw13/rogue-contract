@@ -19,7 +19,8 @@
 // h]` shrinks it to w x h texels; `tile: [nx, ny]` repeats it (to widen a
 // sky, or tile a shrunk one), and `fade: { color, from }` blends toward
 // `color` from `from` (0 top, 1 bottom) down to the bottom row (a sky's
-// haze at the horizon).
+// haze at the horizon), and `rust: { color, amount, cell, seed }` stains it
+// with blotches of rust that tile.
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -78,6 +79,11 @@ export const TOWN = [
   // Small pale tiles lining a doorway's jamb: ZPTILE4's bevelled square, shrunk and repeated.
   { out: 'door-jamb', df: 'ZPTILE4', scale: [16, 16], tile: [4, 4], gradient: [[90, 80, 62], [172, 160, 128], [209, 198, 168], [236, 226, 198]], keep: 0, contrast: 1 },
   { out: 'flagstone', df: 'IPDET1', gradient: [[44, 32, 22], [100, 78, 56], [150, 122, 90], [190, 162, 124], [220, 198, 160]], keep: 0.1, contrast: 0.9 },
+  // Corrugated tin for lean-to roofs: TestBase's ribbed panel, its ribs
+  // running down the texture, rusted (`rust`: blotches of rust that tile)
+  // or galvanised grey going rusty.
+  { out: 'metal-rust', df: 'ZWGRUV1', crop: [0, 0, 32, 64], tile: [2, 1], gradient: [[30, 16, 8], [74, 40, 18], [120, 66, 32], [160, 96, 52], [190, 130, 82]], keep: 0, contrast: 0.9, rust: { color: [52, 26, 12], amount: 0.6, cell: 16, seed: 1 } },
+  { out: 'metal-grey', df: 'ZWGRUV1', crop: [0, 0, 32, 64], tile: [2, 1], gradient: [[40, 40, 40], [88, 86, 82], [130, 126, 118], [166, 160, 150], [196, 190, 178]], keep: 0, contrast: 0.9, rust: { color: [120, 64, 30], amount: 0.5, cell: 16, seed: 2 } },
   // A hazy day: Robotics' pale cloudy sky, twice as wide, warming to dust at the horizon.
   { out: 'sky-day', df: 'RESKY01', gradient: [[74, 128, 182], [120, 166, 206], [168, 198, 222], [214, 226, 236]], keep: 0.3, contrast: 0.9, tile: [2, 1], fade: { color: [212, 200, 174], from: 0.55 } },
 ];
@@ -298,6 +304,24 @@ function faded(img, { color, from }) {
   return img;
 }
 
+/**
+ * Rust: blotches of `color` where a noise that repeats with the texture
+ * (it must be square) is high, up to `amount` of the way, so it still tiles.
+ */
+function rusted(img, { color, amount, cell, seed }) {
+  const d = img.data;
+  for (let y = 0; y < img.height; y++) {
+    for (let x = 0; x < img.width; x++) {
+      const n = periodicNoise(x, y, cell, img.width, seed) * 0.7 + periodicNoise(x, y, cell / 4, img.width, seed + 1) * 0.3;
+      const t = Math.max(0, Math.min(1, (n - 0.5) * 4)) * amount;
+      if (!t) continue;
+      const i = (y * img.width + x) * 4;
+      for (let k = 0; k < 3; k++) d[i + k] = Math.round(d[i + k] + (color[k] - d[i + k]) * t);
+    }
+  }
+  return img;
+}
+
 /** The pack's textures by upper-case name. */
 function packFiles() {
   const files = new Map();
@@ -322,6 +346,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     if (spec.tile) img = tiled(img, spec.tile);
     img = gradientMap(img, spec);
     if (spec.fade) img = faded(img, spec.fade);
+    if (spec.rust) img = rusted(img, spec.rust);
     for (let i = 3; i < img.data.length; i += 4) img.data[i] = 255;
     made.set(spec.out, img);
     fs.writeFileSync(path.join(texDir, `${spec.out}.png`), encodePNG(img.width, img.height, img.data));

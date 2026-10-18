@@ -228,3 +228,29 @@ test('a tarp is a cloth tied at four corners on poles, shading the ground under 
   assert.ok(p.get(12, 12).light < town.light, 'the ground under it is in its shade');
   assert.equal(h.light, town.light, 'the cloth is in the sun');
 });
+
+test('a lean-to gets tin sheets along its front, an end at each side, and its shadow grows', () => {
+  const light = (tin) => {
+    const { p, town } = kit();
+    town.house(4, 4, 16, 8, { h: 4 });
+    if (tin) town.leanTo(4, 4, 16, 8, { h: 4, face: 'S', seed: 3 });
+    town.finish();
+    let sum = 0;
+    for (let y = 0; y < 40; y++) for (let x = 0; x < 40; x++) sum += p.get(x, y).light ?? 0;
+    return { sum, town };
+  };
+  const { sum, town } = light(true);
+  const sheets = town.things.filter((t) => /^tin-\w+-4$/.test(t.type));
+  const ends = town.things.filter((t) => t.type.endsWith('-end'));
+  assert.equal(sheets.length, 6, 'a sheet every 2 tiles of its 12');
+  assert.equal(ends.length, 2);
+  assert.ok(sheets.every((t) => t.y === 8 && t.z >= 4), 'on its roof, along its front');
+  for (const t of town.things) assert.ok(registry.things.get(t.type), `${t.type} is a decoration`);
+  assert.ok(sum < light(false).sum, 'the tin shades a little more of the street');
+});
+
+test('an awning rising above the wall behind it is an error', () => {
+  const { town } = kit();
+  town.house(4, 4, 16, 10, { h: 4 });
+  assert.throws(() => town.awning(6, 10, 14, 13, { z: 3.25, face: 'S' }), /above the wall behind it/);
+});

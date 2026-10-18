@@ -179,6 +179,13 @@ Check a street from several angles, not just down its length.
   fixed fringe for a swaying one (a hanging, `valance-<cloth>`, or a
   `rag`), which lands in `town.hangings` for the level's `hangings`. The
   two in the first stretch (22 models) cost about 0.15 ms a frame.
+- **Tin roofs** (`leanTo()`): sheets of corrugated tin on a lean-to,
+  sloping from the taller wall behind it down past its front (0.25 a tile),
+  overhanging the street by 0.6, each sheet a hair higher or lower than the
+  last, rusty or galvanised (`metal-rust`, `metal-grey`, from DF's ribbed
+  panel), a triangle of tin closing each end (`models/tin.js`). Seen
+  mostly from down the street, over the roofline. An awning under one
+  has to stay below the wall behind it (the kit says so if not).
 - **Tarps** (`tarp()`): a stall's cover, a cloth tied at its four corners
   to poles (or its back two to a wall), sagging and billowing (a hanging,
   `tarp-<cloth>`, the awning canvas). Its ground is in its shade
