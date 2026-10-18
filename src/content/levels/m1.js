@@ -213,8 +213,9 @@ export default defineLevel({
   // `dust` was lost against the bright sand and glowing motes were too
   // intense (Mark). 360 in the 20 x 20 tiles round you would be as thick in
   // view as the 100 on the particle bench (2026-10-15); 240 still
-  // distracted, and Mark halved that twice.
-  weather: { type: 'glint', count: 60 },
+  // distracted, and Mark halved that twice to 60. 90 on trial (Mark,
+  // 2026-10-18).
+  weather: { type: 'glint', count: 90 },
   decals: town.decals,
   hangings: [...hangings, ...town.hangings],
   par: 600,

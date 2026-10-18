@@ -37,10 +37,10 @@ These need Mark to try something, or to decide. Don't start them without him.
   storeys, a porch, a lean-to, a domed tower, a shop to walk into, and dome
   toppers on nearly every roof, sized to it):
   the sky and how dark the suns' shade is.
-  Dust in the air: 60 soft `glint` specks round you, sinking slowly
+  Dust in the air: 90 soft `glint` specks round you, sinking slowly
   (`dust` was too hard to see, glowing motes too intense, then Mark
-  halved the glints twice from 240), a sixth as thick in view as the bench's 100
-  (`count` in m1.js).
+  halved the glints twice from 240 to 60). 90 is a trial of 50% more
+  (2026-10-18): keep it or go back to 60? (`count` in m1.js).
   No suns painted on the sky (Mark, 2026-10-17). The textures are fine
   but a little monochrome: being worked on under Mission 1, "The look".
 
