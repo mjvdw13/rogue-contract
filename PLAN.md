@@ -73,13 +73,6 @@ These need Mark to try something, or to decide. Don't start them without him.
   0.44 ms a frame on average over eight views, 0.75 at worst (headless,
   measured with the machine at about half its usual speed).
 
-- **Doors that open in Mos Eisley** (`?map=m1`): G's red door and F's
-  grey one now rise into the wall over them, into rooms behind (G's 4 by
-  8, F's a front room and a back room). Which other doors should open (C's
-  lean-to is too shallow for a room, D's door is at the back of a porch),
-  and the jamb: its tiles are now a quarter tile across, but the palette
-  pulls their cream toward grey in the shade under the lintel.
-
 ## Next up
 
 In this order unless Mark says otherwise.
