@@ -33,8 +33,11 @@ export const LIGHT_FX = { none: 0, flicker: 1, strobe: 2, glow: 3, fire: 4, blin
  * through the tile centre. Rising doors (`style: 'rise'`, Dark Forces' kind)
  * stand across the middle of the whole doorway's depth, set back from both
  * faces; the door tiles are an open recess with their ceiling at `openZ`, and
- * the panel rises from the floor into it. `span0`..`span1` is the doorway's
- * extent across (the other axis), so a rising door's texture fits the door.
+ * the panel rises from the floor into it. Under the sky the door's tiles
+ * have a slab instead (the wall over the opening, up to the roof): its
+ * bottom is `openZ`, and the tiles' own ceiling is the sky over it.
+ * `span0`..`span1` is the doorway's extent across (the other axis), so a
+ * rising door's texture fits the door.
  */
 export class Door {
   constructor(spec) {
@@ -285,7 +288,8 @@ export class TileMap {
       const f = this.flags[i];
       if (f & F_VOID) continue;
       let t;
-      if (f & (F_SOLID | F_DOOR)) {
+      // (A door with a slab is in a wall under the sky: its top is the slab's.)
+      if (f & F_SOLID || (f & F_DOOR && !(f & F_SLAB))) {
         // A wall or door stands as tall as the ceilings in front of it.
         const x = i % w;
         t = this.floorZ[i];

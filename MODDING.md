@@ -962,6 +962,19 @@ Door options:
     a tile, so use `imp-jamb` (16 wide); in a wall 2 tiles thick use
     `imp-gate-jamb` (32 wide). `imp-lintel` (lights along its bottom edge,
     for a lintel 1-2 tall) goes above.
+
+    Under the sky (a door in a building's outside wall), give the door's
+    tiles `ceiling: 'sky'` and a `slab` for the wall over the opening: its
+    `bottom` is the top of the opening (the panel rises into it), its `top`
+    the roof, and its `side` the wall. The tile's own `ceilZ` is the sky
+    over the roof, as on the street. Beside such a door, a raised floor at
+    least as high as the opening counts as the doorway's wall, so a door
+    can stand in a building made of raised floor:
+
+    ```js
+    'D': { door: 'door-red-rising', style: 'rise', floor: 'flagstone', ceiling: 'sky', ceilZ: 24,
+           slab: { bottom: 3, top: 6, floor: 'adobe-roof', ceiling: 'adobe', side: 'adobe' } },
+    ```
   - `'slide'` (the default): a panel through the middle of the tile slides
     sideways.
   - `'split'`: an elevator-style panel that opens from the middle.
@@ -1088,8 +1101,10 @@ slab: `{ type: 'stormtrooper', x: 20.5, y: 12, z: 3.5 }` stands on the
 bridge, and so can the player start. A monster's drops land on the storey
 it died on.
 
-Not yet: a slab in a door, lift or angled-wall tile (the validator says
-so), more than one slab per tile, and slabs that stop sound.
+A rising door's tiles can have a slab: the wall over a door under the sky
+(see Door options). Not yet: a slab in any other door, a lift or an
+angled-wall tile (the validator says so), more than one slab per tile, and
+slabs that stop sound.
 
 ### Lifts
 

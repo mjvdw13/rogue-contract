@@ -155,10 +155,13 @@ export function buildLevel(registry, level, opts = {}) {
    * tile i: a solid layer inside the tile's open space, with a storey under it
    * and one on top. Its textures default to the tile's floor (top), ceiling
    * (underside) and side (edges); `light` is the lower storey's light.
+   * A rising door's tile can have one too: the wall over the opening, up to
+   * the roof, the panel rising into its underside (a door under the sky).
    */
   const addSlab = (spec, e, x, y, i, tex) => {
     const where = `Tile (${x}, ${y})`;
-    if (map.flags[i] & (F_SOLID | F_DOOR | F_SLANT) || e.lift) return errors.push(`${where}: a slab needs an open tile, not a wall, door, lift or angled wall`);
+    if (map.flags[i] & F_DOOR && e.style !== 'rise') return errors.push(`${where}: a slab on a door needs a rising door (style "rise")`);
+    if (map.flags[i] & (F_SOLID | F_SLANT) || e.lift) return errors.push(`${where}: a slab needs an open tile, not a wall, lift or angled wall`);
     const { bottom, top } = spec;
     if (typeof bottom !== 'number' || typeof top !== 'number') return errors.push(`${where}: a slab needs "bottom" and "top" heights`);
     if (!(top > bottom)) return errors.push(`${where}: a slab's top must be above its bottom`);
@@ -325,7 +328,9 @@ export function buildLevel(registry, level, opts = {}) {
   }
 
   // Door orientation: the panel spans the gap between the two walls beside the
-  // doorway (looking across the door's other tiles).
+  // doorway (looking across the door's other tiles). Beside a door with a
+  // slab (in a building's outside wall), a floor as high as the opening's
+  // top is a wall too: the building's own volume.
   const isDoorOf = (d, x, y) => d.group.includes(map.doorAt(x, y));
   const wallPast = (d, dx, dy) => {
     let x = d.x + dx;
@@ -334,7 +339,10 @@ export function buildLevel(registry, level, opts = {}) {
       x += dx;
       y += dy;
     }
-    return !map.inBounds(x, y) || (map.flags[map.index(x, y)] & F_SOLID) !== 0;
+    if (!map.inBounds(x, y)) return true;
+    const n = map.index(x, y);
+    const i = map.index(d.x, d.y);
+    return (map.flags[n] & F_SOLID) !== 0 || (map.flags[i] & F_SLAB && !(map.flags[n] & F_DOOR) && map.floorZ[n] >= map.slabBot[i]);
   };
   for (const d of map.doors) {
     if (wallPast(d, 0, -1) && wallPast(d, 0, 1)) d.axis = 'x';
@@ -356,7 +364,8 @@ export function buildLevel(registry, level, opts = {}) {
   // door's tiles are the recess it stands in: their ceiling is the top of the
   // opening, the door's own ceilZ if the legend gave one, else the lowest
   // ceiling beside them (so there's no lintel). The lintel face above the
-  // opening is the tile's `upper` texture.
+  // opening is the tile's `upper` texture. A door with a slab opens up to
+  // the slab, and the tile keeps its own ceiling (the sky) over the slab.
   for (const d of map.doors) {
     const i = map.index(d.x, d.y);
     // (Other door tiles don't count: their ceilings come down as they close.)
@@ -366,6 +375,10 @@ export function buildLevel(registry, level, opts = {}) {
     if (map.floorTex[i] < 0) map.floorTex[i] = around.map((n) => map.floorTex[n]).find((t) => t >= 0) ?? -1;
     d.floorZ = map.floorZ[i];
     if (d.style !== 'rise') continue;
+    if (map.flags[i] & F_SLAB) {
+      d.openZ = map.slabBot[i];
+      continue;
+    }
     // (Beside a slab tile, the ceiling of the storey the doorway opens onto.)
     const ceilBeside = (n) => map.storeyCeil(n, map.storeyAt(n, d.floorZ + 0.5));
     d.openZ = !explicitCeil[i] && around.length ? Math.min(...around.map(ceilBeside)) : map.ceilZ[i];

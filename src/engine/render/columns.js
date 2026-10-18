@@ -527,7 +527,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
       const out = hazeOn && (flags[cur] & F_SKY) !== 0;
 
       // An angled wall in the current tile stops the ray where it crosses the line.
-      // (Angled-wall and door tiles have no slab: their windows are all in storey 0.)
+      // (Angled-wall tiles have no slab: their windows are all in storey 0.)
       // One that stops short of the ceiling (`wallTop`) stops it only up to
       // its top, and the view goes on over it; a ray that came in through
       // its solid side has drawn its back already (below), so carries on.
@@ -573,12 +573,15 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
         if (door.style === 'rise') {
           // A rising door's panel stands back in its doorway (perhaps on the
           // edge between two of its tiles: drawn once). Below its bottom edge
-          // the ray carries on under it.
+          // the ray carries on under it. Under a slab (the wall over a door
+          // under the sky) it rises into the slab, and windows looking over
+          // the slab don't see it.
           const t = door.axis === 'x' ? (rdx !== 0 ? (door.plane - px) / rdx : -1) : rdy !== 0 ? (door.plane - py) / rdy : -1;
           if (door.group !== panelDone && t > 1e-4 && t >= tEnter - 1e-6 && t <= tExit + 1e-6) {
             panelDone = door.group;
             const bz = door.bottomZ;
-            if (bz < ceilZ[cur]) {
+            const top = flags[cur] & F_SLAB ? slabBot[cur] : ceilZ[cur];
+            if (bz < top) {
               seen[cur] = 1;
               // One door texture across the doorway, centred, reading left to right from both sides.
               const along = door.axis === 'x' ? py + rdy * t : px + rdx * t;
@@ -591,9 +594,11 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
               for (let k = 0; k < nw; k++) {
                 clipTop = wTop[k];
                 clipBot = wBot[k];
-                flats(cur, 0, tEnter, t);
-                face(t, rowOf(ceilZ[cur], t), b, bz + texHeight(door.tex), door.tex, u, lv, faceHaze(t, out));
-                if (b > clipTop) clipTop = b > clipBot ? clipBot : b;
+                flats(cur, wSt[k], tEnter, t);
+                if (!wSt[k]) {
+                  face(t, rowOf(top, t), b, bz + texHeight(door.tex), door.tex, u, lv, faceHaze(t, out));
+                  if (b > clipTop) clipTop = b > clipBot ? clipBot : b;
+                }
                 wTop[k] = clipTop;
                 wBot[k] = clipBot;
               }
