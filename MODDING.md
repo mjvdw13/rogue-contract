@@ -589,8 +589,8 @@ defineHanging({
   texture: 'cloth-rag',    // a cloth's weave; its transparent texels are its tears
   color: ['rust', 0.55],   // a palette ramp and a place on it, 0 dark to 1 light
                            // (a rope's colour, or a cloth's with no texture)
-  breeze: 1.6,             // the breeze that comes and goes, units per second
-  drag: 4,                 // how fast it takes up the air's speed, per second
+  breeze: 1.2,             // the breeze that comes and goes, units per second
+  drag: 3.25,              // how fast it takes up the air's speed, per second
 })
 ```
 

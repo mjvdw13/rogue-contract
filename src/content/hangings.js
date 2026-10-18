@@ -15,7 +15,7 @@ export default [
   // A rope: lighter, swings more.
   defineHanging({ id: 'rope', shape: 'rope', color: ['sand', 0.45], width: 0.035, breeze: 0.6 }),
   // A rust-red rag, its hem torn to tatters.
-  defineHanging({ id: 'rag', shape: 'cloth', texture: 'cloth-rag', color: ['rust', 0.55], breeze: 1.6, drag: 4 }),
+  defineHanging({ id: 'rag', shape: 'cloth', texture: 'cloth-rag', color: ['rust', 0.55], breeze: 1.2, drag: 3.25 }),
   // A pale cloth, worn at the hem: a banner, an awning's hanging edge, laundry.
-  defineHanging({ id: 'cloth-pale', shape: 'cloth', texture: 'cloth-pale', color: ['beige', 0.7], breeze: 1.6, drag: 4 }),
+  defineHanging({ id: 'cloth-pale', shape: 'cloth', texture: 'cloth-pale', color: ['beige', 0.7], breeze: 1.2, drag: 3.25 }),
 ];
