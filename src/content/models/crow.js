@@ -7,17 +7,17 @@ import { ModelBuilder } from './lib/build.js';
 // down, its engines glowing along its trailing edge; a gun pod under the
 // belly. Shapes after the HWK-290 views Mark found (2026-10-18), textured
 // with Jedi Knight's Crow (JK's names in assets/custom/crow.mjs): grey
-// paint and orange rust, as in Dark Forces' cutscenes. The nose points +x;
-// it's 29 long and 23.6 across the wings, about canon size against you,
-// and 9.9 tall at its fins, its hull floating 2.2 off the ground.
+// paint and orange rust, as in Dark Forces' cutscenes. The nose points +x.
+// Built at about canon size against you (29 long, 23.6 across the wings),
+// it's drawn at 0.8 (decor.js; Mark: it felt too big), so it's 23.2 long,
+// 18.9 across and 8.2 tall at its fins, its hull floating 2 off the ground.
 const m = new ModelBuilder('moldy-crow');
 
 const METAL = { color: ['gray', 0.35] };
 const DARK = { color: ['gray', 0.16] };
-const RED = { color: ['rust', 0.45] };
 
-/** The hull's bottom: how high it hovers. */
-const G = 2.2;
+/** The hull's bottom: how high it hovers (2 once drawn at 0.8, clear of you at 1.7). */
+const G = 2.5;
 
 /**
  * A face textured with `tex`, its uv worked out from each point by `uvAt`
@@ -101,22 +101,24 @@ const [, tw, th] = STATIONS[STATIONS.length - 1];
 textured(ring(STATIONS[STATIONS.length - 1]), 'crow-nose', ([, y, z]) => [0.5 + y / (4.2 * tw), 1 - (z - G) / (3.6 * th)], [0, 0, G]);
 
 // ---------------------------------------------------------------- sides and back
-// The arms out of the back, which carry the fins and wings; their fronts red.
+// The arms out of the back, which carry the fins and wings; their fronts
+// the lights off the top of the back's texture, the sponsons' its grille.
 const ARM = { x: [-14, -7.6], y: [2, 3.9], z: [G + 0.9, G + 2.5] };
 for (const s of [-1, 1]) {
   // A sponson either side, where the nose begins.
   const sp = { x: [-4.2, -1], y: [2, 3.05], z: [G + 1, G + 2.4] };
+  const front = (b, v0, v1) => ([, y, z]) => [(s * y - b.y[0]) / (b.y[1] - b.y[0]), v0 + ((b.z[1] - z) / (b.z[1] - b.z[0])) * (v1 - v0)];
   const corners = (b, z) => [[b.x[1], s * b.y[0], z], [b.x[1], s * b.y[1], z], [b.x[0], s * b.y[1], z], [b.x[0], s * b.y[0], z]];
   block(corners(sp, sp.z[0]), corners(sp, sp.z[1]), {
     top: ['crow-ribs', ([x, y]) => [(x + 4.2) / 3.2, (s * y - 2) / 1.05]],
     bottom: { tex: 'crow-belly' },
     // (0 the front, 1 the outer face, 2 the back, 3 against the hull.)
-    side: (i) => [RED, ['crow-panel', ([x, , z]) => [(x + 4.2) / 3.2, (sp.z[1] - z) / 1.4]], { tex: 'crow-side' }, false][i],
+    side: (i) => [['crow-rear', front(sp, 0.7, 1)], ['crow-panel', ([x, , z]) => [(x + 4.2) / 3.2, (sp.z[1] - z) / 1.4]], { tex: 'crow-side' }, false][i],
   });
   block(corners(ARM, ARM.z[0]), corners(ARM, ARM.z[1]), {
     top: ['crow-ribs', ([x, y]) => [(x + 14) / 6.4, (s * y - 2) / 1.9]],
     bottom: { tex: 'crow-belly' },
-    side: (i) => [RED, { tex: 'crow-side' }, DARK, false][i],
+    side: (i) => [['crow-rear', front(ARM, 0, 0.36)], { tex: 'crow-side' }, DARK, false][i],
   });
 
   // The fin: tall and thin on the arm, leaning out a little, its top cut back.
@@ -177,7 +179,7 @@ shadow(-15, -2.8, 14.5, 2.8);
 for (const s of [-1, 1]) shadow(-15.6, s * 3.2, -7.8, s * 12.2);
 
 // Collision: round the gun pod and its barrels, the only part as low as
-// you are; you can walk under the hull and wings (2.2 up and more).
+// you are; you can walk under the hull and wings (2 up and more, drawn at 0.8).
 m.outlineLines([[-1.4, -1.2], [1.3, -1.2], [1.7, -0.96], [3.4, -0.67], [3.4, 0.67], [1.7, 0.96], [1.3, 1.2], [-1.4, 1.2]]);
 
 export default m.build();

@@ -83,14 +83,16 @@ These need Mark to try something, or to decide. Don't start them without him.
   the bob is right now, and the angle. About 0.7 ms a frame near it, 2.1
   standing over it (headless).
 
-- **The Moldy Crow** (`?map=m1`, hovering in Docking Bay 87, nose east, in
-  front of you at the start, a little south of the maintenance pit): its
-  shape against the HWK-290 views (the deep hull and raked bow, the fins,
-  the wings angled down), its size (29 long, 23.6 across the wings, about
-  canon against you; `scale` on the decoration if it should be smaller),
-  how it sits (2.2 off the floor, bobbing 0.04 over 4 s, over soft
-  shadows) and JK's textures on it (the cockpit windows high on the nose's
-  flanks, the engines glowing cyan along the wings' trailing edges). Only
+- **The Moldy Crow** (`?map=m1`, hovering in Docking Bay 87, nose east
+  and turned 20 degrees south of it, in front of you at the start, a
+  little south of the maintenance pit): its shape against the HWK-290
+  views (the deep hull and raked bow, the fins, the wings angled down),
+  its size (drawn at 0.8 of canon after Mark's first look: 23.2 long,
+  18.9 across the wings), how it sits (2 off the floor, bobbing 0.04 over
+  4 s, over soft shadows) and JK's textures on it (the cockpit windows
+  high on the nose's flanks, the engines glowing cyan along the wings'
+  trailing edges, the sponsons' and arms' fronts the grille and lights
+  off the back's texture, no longer plain red). Only
   its gun pod collides: you walk under the hull and wings, and shots at
   your height pass under them. Over the pit, the pod would block the way
   along it to the secret (the level checker isn't height-aware), hence

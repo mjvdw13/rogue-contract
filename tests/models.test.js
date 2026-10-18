@@ -228,13 +228,17 @@ test('the parked landspeeder blocks you at its nose, its flanks and its side eng
 test('you walk under the hovering Moldy Crow, but not into its gun pod', () => {
   const bay = room(['####################################', ...Array(28).fill('#..................................#'), '####################################'], [], { legend });
   const w = makeWorld(bay, { noMonsters: true });
-  const crow = w.spawn('moldy-crow', 18, 14.5); // nose east
+  const crow = w.spawn('moldy-crow', 18, 14.5); // nose east, drawn (and colliding) at its scale
   crow.model = new Model(registry.models.get('moldy-crow'), palette, () => 0);
   const p = w.player;
-  const blocked = [[18, 13.4, 'its pod'], [16.4, 14.5, 'the back of the pod'], [21.6, 14.9, 'a barrel']];
-  for (const [x, y, what] of blocked) assert.equal(w.checkPosition(p, x, y), false, `walks into ${what}`);
-  const under = [[18, 12.2, 'beside the pod'], [28, 14.5, 'under the nose'], [8, 14.5, 'under the back'], [10, 5, 'under a wing']];
-  for (const [x, y, what] of under) assert.equal(w.checkPosition(p, x, y), true, `walks ${what}`);
+  const s = crow.def.scale;
+  const blocked = [[0, -1.1, 'its pod'], [-1.3, 0, 'the back of the pod'], [3, 0.4, 'a barrel']];
+  for (const [x, y, what] of blocked) assert.equal(w.checkPosition(p, 18 + x * s, 14.5 + y * s), false, `walks into ${what}`);
+  const under = [[0, -2.8, 'beside the pod'], [12, 0, 'under the nose'], [-12, 0, 'under the back'], [-10, -8, 'under a wing']];
+  for (const [x, y, what] of under) assert.equal(w.checkPosition(p, 18 + x * s, 14.5 + y * s), true, `walks ${what}`);
+  // Everything off the floor (its shadow) and outside the pod is above your head.
+  const low = registry.models.get('moldy-crow').vertices.filter(([x, y, z]) => z > 0.05 && (Math.abs(y) > 1.25 || x < -1.45 || x > 3.45));
+  assert.ok(low.every(([, , z]) => z * s > p.def.height), 'the hull and wings clear you');
 });
 
 test('solid model scenery stops hitscan shots and projectiles', () => {
