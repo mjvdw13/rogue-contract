@@ -146,8 +146,11 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
         (duracrete, derived from DF), a landing inside the door at street
         level and stairs down from it, the bay door (4 wide, rising) onto
         the back lane, the player's start on the bay floor. Snapshots.
+  - [x] Decals on angled walls (the engine: placed by a point on the
+        wall, running on round a curve with `wallU`), and blast scars on
+        the bay's walls (soot grime).
   - [ ] The walls' ribs (models round the circle), fuel lines and pumps,
-        blast scars, gantry lamps on the rim.
+        gantry lamps on the rim.
   - [ ] The maintenance pit in the floor where the Crow lands (secret: a
         shield unit).
   - [ ] The owner's office (a window onto the lane) and the customs house

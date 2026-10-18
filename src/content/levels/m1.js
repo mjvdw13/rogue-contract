@@ -136,6 +136,13 @@ town.arch(30, 101, 34, 105, { h: BAY.rim, lintel: 4, wall: 'bay-wall', floor: 'b
 town.door(32, 100, 'N', { h: BAY.rim, tex: 'door-grey', width: 4, tall: 4, wall: 'adobe-grey', jamb: false, opens: true });
 // Stairs down to the floor, a step every tile.
 for (let k = 0; k < 7; k++) p.rect(30, 107 + k, 34, 108 + k, { ...bayFloor, floorZ: (-(k + 1) * 5) / 8 });
+// Blast scars: soot round the wall where ships' exhausts and blaster fire
+// hit it (degrees round from east, height, picture, size).
+const SCARS = [[18, -1.5, 1, 3.5], [52, 1, 2, 2.2], [138, -2, 2, 3], [171, 1.5, 1, 2.4], [206, -1, 2, 3.4], [247, -2, 1, 3], [292, 0, 2, 2.8], [334, 2, 1, 2.2]];
+const bayDecals = SCARS.map(([deg, z, k, scale]) => {
+  const a = (deg * Math.PI) / 180;
+  return { x: BAY.cx + BAY.r * Math.cos(a), y: BAY.cy - BAY.r * Math.sin(a), z, face: 'angled', tex: `grime-scorch-${k}`, scale };
+});
 
 // Pipes, vents and boxes on the walls (lib/town.js): downpipes off the
 // roofs, a tank and a box unit in the alleys, conduits, vents and a fan.
@@ -244,7 +251,7 @@ export default defineLevel({
   // distracted, and Mark halved that twice to 60. 90 on trial (Mark,
   // 2026-10-18).
   weather: { type: 'glint', count: 90 },
-  decals: town.decals,
+  decals: [...town.decals, ...bayDecals],
   hangings: [...hangings, ...town.hangings],
   par: 600,
   ...p.build(),

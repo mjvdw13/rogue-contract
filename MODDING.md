@@ -816,6 +816,13 @@ decals: [
 - Its size is its texture's (32 texels a tile, so a 64x64 picture is 2 tiles,
   a metre) times `scale`. Transparent texels show the wall.
 - `glow: true` ignores the light (a lit screen); `flip: true` mirrors it.
+- `face: 'angled'` puts it on an angled wall instead (`diagonal` or
+  `line`): the one nearest (`x`, `y`), within a tile, its middle where
+  that point is along the wall. On a curve whose tiles say where their
+  texture starts (`wallU`, as the town kit's `circle({ seam })` does), it
+  runs on round the curve from tile to tile; otherwise it stops at its
+  own tile's edge. A soot mark on a round pit's wall:
+  `{ x: 12.3, y: 120.6, z: 3, face: 'angled', tex: 'grime-scorch-1' }`.
 
 Decal textures are defined with `decal: true` (`src/content/textures.js`), any
 size, and drawn by `tools/art/textures/decals.js`; Mos Eisley's doors and

@@ -135,6 +135,36 @@ function dust(name, { w, h, strength }) {
   };
 }
 
+/**
+ * A blast scar: soot burnt into the wall round where a blast hit (or a
+ * ship's exhaust washed it), darkest in its ragged core, `rays` streaks
+ * fanning out from it at their own lengths, mottled, fading to the rim.
+ */
+function scorch(name, { w, h, strength, rays }) {
+  return () => {
+    const r = rng(seedFrom(name));
+    const n = fbm(seedFrom(name), w, { cells: 4, sizeY: h, octaves: 3 });
+    const fine = fbm(seedFrom(name) + 1, w, { cells: 12, sizeY: h });
+    const fan = Array.from({ length: rays }, () => ({ a: r.range(0, Math.PI * 2), width: r.range(0.06, 0.16), len: r.range(0.55, 1), s: r.range(0.5, 1) }));
+    return grime(w, h, (x, y) => {
+      const dx = (x + 0.5 - w / 2) / (w / 2);
+      const dy = (y + 0.5 - h / 2) / (h / 2);
+      const d = Math.hypot(dx, dy);
+      const a = Math.atan2(dy, dx);
+      // The core, its edge wandering with the noise.
+      const core = Math.max(0, 1 - d / (0.45 + 0.45 * n(x, y))) ** 1.2;
+      let ray = 0;
+      for (const f of fan) {
+        const off = Math.abs(((a - f.a + Math.PI * 3) % (Math.PI * 2)) - Math.PI);
+        if (off > f.width * 2 || d > f.len) continue;
+        ray = Math.max(ray, f.s * (1 - off / (f.width * 2)) * (1 - d / f.len) ** 1.2);
+      }
+      const rim = Math.max(0, 1 - d * d);
+      return strength * Math.max(core, ray * 0.7) * rim * (0.55 + 0.7 * fine(x, y));
+    });
+  };
+}
+
 export default [
   // Off a roofline, 2 tiles wide and 3 down.
   { name: 'grime-streaks-1', out: T('grime-streaks-1'), raw: true, draw: streaks('grime-streaks-1', { w: 64, h: 96, count: 9, band: 8, strength: 0.6 }) },
@@ -153,4 +183,7 @@ export default [
   // Above the skirt, 4 tiles along.
   { name: 'grime-dust-1', out: T('grime-dust-1'), raw: true, draw: dust('grime-dust-1', { w: 128, h: 32, strength: 0.4 }) },
   { name: 'grime-dust-2', out: T('grime-dust-2'), raw: true, draw: dust('grime-dust-2', { w: 128, h: 40, strength: 0.35 }) },
+  // Blast scars on Docking Bay 87's walls: 2 and 3 tiles across.
+  { name: 'grime-scorch-1', out: T('grime-scorch-1'), raw: true, draw: scorch('grime-scorch-1', { w: 64, h: 64, strength: 0.8, rays: 9 }) },
+  { name: 'grime-scorch-2', out: T('grime-scorch-2'), raw: true, draw: scorch('grime-scorch-2', { w: 96, h: 80, strength: 0.75, rays: 14 }) },
 ];

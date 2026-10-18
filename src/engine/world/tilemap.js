@@ -147,12 +147,13 @@ export class TileMap {
     this.bandSets = [];
     /**
      * Decals (see decals.js): all of them, the ones on each tile edge
-     * (tile * 4 + face), and how many each edge has. Laid out by the
-     * renderer when `decalsDirty`.
+     * (tile * 4 + face), how many each edge has, and the ones on each
+     * angled wall's tile. Laid out by the renderer when `decalsDirty`.
      */
     this.decals = [];
     this.edgeDecals = new Map();
     this.decalEdge = new Uint8Array(n * 4);
+    this.slantDecals = new Map();
     this.decalsDirty = false;
     this.damage = new Uint8Array(n);
     this.doorIndex = new Int16Array(n).fill(-1);

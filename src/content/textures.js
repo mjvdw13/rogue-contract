@@ -64,6 +64,7 @@ const TOWN_DECALS = [
 const GRIME = [
   'grime-streaks-1', 'grime-streaks-2', 'grime-streaks-3', 'grime-drip-1', 'grime-drip-2',
   'grime-blotch-1', 'grime-blotch-2', 'grime-smudge', 'grime-crack-1', 'grime-crack-2', 'grime-dust-1', 'grime-dust-2',
+  'grime-scorch-1', 'grime-scorch-2',
 ];
 
 // Awning canvas (tools/art/textures/awning.js): `-x` turned a quarter for

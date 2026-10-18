@@ -234,6 +234,11 @@ function render(level) {
   for (const [k, d] of map.decals.entries()) {
     // (Not grime: there's too much of it to mark.)
     if (reg.textures.get(level.decals?.[k]?.tex)?.grime) continue;
+    // On an angled wall, a dot where it was placed.
+    if (d.face < 0) {
+      rect(Math.floor(d.x * S) - 1, Math.floor(d.y * S) - 1, 2, 2, [255, 255, 255]);
+      continue;
+    }
     // A tick across the decal's edge, on the side it faces.
     const ns = d.face === 0 || d.face === 2;
     const ex = ns ? d.x : Math.round(d.x);

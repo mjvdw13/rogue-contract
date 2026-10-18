@@ -138,3 +138,39 @@ test('the validator checks grime textures', async () => {
   const { errors } = validateContent(new Registry({ ...content, textures }));
   assert.equal(errors.filter((e) => /bad-/.test(e)).length, 2, errors.join('\n'));
 });
+
+// The room's east wall again, as angled walls along x 9 (from tile 8's
+// side), each row's texture running on from the last (`wallU`) or not.
+const angled = (decals, chain = true) =>
+  room(['##########', '#.......a#', '#.......b#', '#.......c#', '##########'], ['', ' >'], {
+    legend: { '.': ROOM, ...Object.fromEntries(['a', 'b', 'c'].map((m, k) => [m, { ...ROOM, wall: 'imp-panel', line: [1, 1, 1, 0], ...(chain && { wallU: k + 1 }) }])) },
+    decals,
+  });
+
+test("a decal on an angled wall goes where the point says along it, and runs on round the wall's chain", () => {
+  const sign = { x: 8.9, y: 2.5, z: 1.5, face: 'angled', tex: 'decal-sign', glow: true };
+  const lay = (level) => {
+    const { map, errors } = buildLevel(registry, level);
+    assert.deepEqual(errors, []);
+    map.decals[0].tex = 1;
+    layoutDecals(map, [null, { w: 64, h: 32 }]); // 2 tiles wide
+    return map;
+  };
+  const map = lay(angled([sign]));
+  const [d] = map.decals;
+  assert.deepEqual([d.a0, d.a1], [1.5, 3.5]);
+  assert.deepEqual(d.edges.sort(), [1, 2, 3].map((y) => map.index(8, y)), 'on the three rows it covers');
+  assert.deepEqual(lay(angled([sign], false)).decals[0].edges, [map.index(8, 2)], 'no chain: only its own tile');
+
+  // Drawn just as the same (unlit) sign on a straight wall there.
+  const cam = { x: 1.5, y: 2.5, angle: 0, z: 1 };
+  const straight = (decals) => shot(level(decals), cam);
+  const diff = (a, b) => a.map((c, i) => (c === b[i] ? -1 : c));
+  const onStraight = diff(straight([{ ...sign, x: 9, face: 'W' }]), straight());
+  const onAngled = diff(shot(angled([sign]), cam), shot(angled(), cam));
+  assert.ok(onStraight.filter((c) => c >= 0).length > 100, 'the sign shows');
+  assert.deepEqual(onAngled, onStraight);
+
+  const { errors } = buildLevel(registry, angled([{ ...sign, x: 4 }]));
+  assert.match(errors.join('\n'), /no angled wall/);
+});

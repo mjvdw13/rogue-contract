@@ -74,7 +74,8 @@ const wSt = new Uint8Array(MAX_WIN);
  * haze step is dithered too.
  *
  * Decals (world/decals.js) are drawn over the wall and step faces they're
- * on, clipped to each face; grime darkens the face's pixels instead.
+ * on (angled walls' too), clipped to each face; grime darkens the face's
+ * pixels instead.
  *
  * Where the sky shows, a level's backdrop (render/backdrop.js) is drawn over
  * it: the sky's rows are marked as they're drawn, and once the column's
@@ -108,7 +109,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
   // Nothing in the level stands higher (TileMap.computeSkyline).
   const skyline = map.skyline;
   if (map.decalsDirty) layoutDecals(map, textures);
-  const { edgeDecals, decalEdge } = map;
+  const { edgeDecals, decalEdge, slantDecals } = map;
   const hasDecals = map.decals.length > 0;
   const hasFences = fences.length > 0;
   const mdepth = view.mdepth;
@@ -544,12 +545,14 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
           const top = low ? sl.top : ceilZ[cur];
           const a = rowOf(top, t);
           const bands = bandIndex[cur] >= 0 ? bandSets[bandIndex[cur]] : null;
+          const sDecals = hasDecals && slantDecals.size ? slantDecals.get(cur) : undefined;
           for (let k = 0; k < nw; k++) {
             clipTop = wTop[k];
             clipBot = wBot[k];
             flats(cur, 0, tEnter, t);
             face(t, a, rowOf(floorZ[cur], t), top, sl.tex, u, lv, faceHaze(t, out));
             if (bands) bandFaces(t, top, floorZ[cur], bands, u, lv, faceHaze(t, out));
+            if (sDecals) decalFaces(t, top, floorZ[cur], sDecals, u, false, lv, faceHaze(t, out));
             if (a < clipBot) clipBot = a < clipTop ? clipTop : a;
             wTop[k] = clipTop;
             wBot[k] = clipBot;
