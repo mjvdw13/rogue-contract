@@ -169,7 +169,16 @@ Check a street from several angles, not just down its length.
   streets get one too, so the skyline is domes. Keep a dome inside its roof:
   one hanging over a lower roof is clipped. 189 of them cost about 0.1 ms a
   frame.
-- **Awnings** are thin cloth slabs: you walk under them in their shade.
+- **Awnings** (`awning()`): a thin slab of cloth over the street is the
+  shade you walk under and the striped underside you see; on it the cloth
+  slopes up to the wall (0.3 a tile) in bays 2 tiles wide that sag between
+  their ribs (models, `models/awning.js`), with poles under the front and
+  a scalloped fringe along it. Four cloths (`red`, `teal`, `sand`,
+  `olive`: generated, `tools/art/textures/awning.js`), 2 or 3 tiles deep,
+  an even number wide, `face` the way the front looks. `valance` swaps the
+  fixed fringe for a swaying one (a hanging, `valance-<cloth>`, or a
+  `rag`), which lands in `town.hangings` for the level's `hangings`. The
+  two in the first stretch (22 models) cost about 0.15 ms a frame.
 - **Hangings** (the level's `hangings`, MODDING.md): cables strung across
   the street, ropes, and torn cloth (curtains, valances on the awnings,
   banners, sheets across the lanes) that sway in the breeze. Tie each

@@ -18,4 +18,9 @@ export default [
   defineHanging({ id: 'rag', shape: 'cloth', texture: 'cloth-rag', color: ['rust', 0.55], breeze: 1.2, drag: 3.25 }),
   // A pale cloth, worn at the hem: a banner, an awning's hanging edge, laundry.
   defineHanging({ id: 'cloth-pale', shape: 'cloth', texture: 'cloth-pale', color: ['beige', 0.7], breeze: 1.2, drag: 3.25 }),
+  // An awning's valance, swaying: its scalloped front edge (64 x 16, half a
+  // tile deep), in each of the awning cloths.
+  ...['red', 'teal', 'sand', 'olive'].map((c) =>
+    defineHanging({ id: `valance-${c}`, shape: 'cloth', texture: `awning-${c}-hem`, color: ['beige', 0.7], breeze: 1.2, drag: 3.25 }),
+  ),
 ];

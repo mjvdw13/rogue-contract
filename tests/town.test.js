@@ -179,3 +179,37 @@ test("grime weathers a house's straight walls and the wall under its window, not
   const level = { id: 't', name: 'T', ...p.build(), decals: town.decals, list: [{ type: 'player', x: 20, y: 20 }, ...town.things] };
   assert.deepEqual(buildLevel(registry, level).errors, []);
 });
+
+test('an awning shades the street under it and stands its cloth, ends and poles along its front', () => {
+  const { p, town } = kit();
+  town.house(4, 4, 16, 10, { h: 6 });
+  town.awning(6, 10, 14, 12, { z: 3.25, face: 'S', cloth: 'teal' });
+  const c = p.get(8, 11);
+  assert.equal(c.slab.bottom, 3.25, 'you walk under it');
+  assert.ok(c.slab.light < c.light, 'in its shade');
+  const types = town.things.map((t) => t.type);
+  assert.equal(types.filter((t) => t === 'awning-teal-2').length, 4, 'a bay every 2 tiles of its 8');
+  assert.equal(types.filter((t) => t === 'awning-teal-2-end').length, 2);
+  const poles = town.things.filter((t) => t.type.startsWith('awning-pole'));
+  assert.ok(poles.length >= 2 && poles.every((t) => t.y > 11 && t.y < 12), 'poles under its front');
+  for (const t of town.things) assert.ok(registry.things.get(t.type), `${t.type} is a decoration`);
+  assert.equal(town.hangings.length, 0, 'a fixed fringe, not a hanging');
+});
+
+test("an awning's valance can sway: bare bays, and a cloth hanging along its front", () => {
+  const { town } = kit();
+  town.house(4, 4, 10, 16, { h: 6 });
+  town.awning(10, 6, 13, 14, { z: 3.5, face: 'E', cloth: 'red', valance: 'valance-red' });
+  assert.ok(town.things.some((t) => t.type === 'awning-red-3-bare'));
+  assert.equal(town.hangings.length, 1);
+  const h = town.hangings[0];
+  assert.equal(h.type, 'valance-red');
+  assert.ok(h.from[0] > 13 && h.to[0] > 13, 'just in front of its front edge');
+});
+
+test('an awning of a size or height there are no models for is an error', () => {
+  const { town } = kit();
+  assert.throws(() => town.awning(6, 10, 13, 12, { z: 3.25 }), /even number/);
+  assert.throws(() => town.awning(6, 10, 14, 14, { z: 3.25 }), /deep/);
+  assert.throws(() => town.awning(6, 10, 14, 12, { z: 3.3 }), /quarter/);
+});

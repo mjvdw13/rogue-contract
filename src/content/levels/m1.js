@@ -69,7 +69,7 @@ town.window(16, 56.5, 'W', { tex: 'window-louvre' });
 // (The lean-to first: the tower's round wall rises from its roof.)
 town.house(30, 59, 42, 63, { h: 4, r: 1 });
 town.circle(35.5, 56.5, 5, { inside: town.roofCell({ h: 9, wall: 'adobe-ochre' }), wall: { wall: 'adobe-ochre', wallTop: 9 }, open: 'out' });
-town.awning(31, 63, 41, 66, { z: 3.25 });
+town.awning(31, 63, 41, 66, { z: 3.25, face: 'S', cloth: 'teal' });
 town.door(33, 63, 'S', { h: 4, tex: 'door-grey' });
 town.door(38.5, 63, 'S', { h: 4, tex: 'shutter', tall: 2.25, width: 3, jamb: false, sign: false, panel: false });
 town.dome(35.5, 56.5, 9, 9.5, { wall: 'adobe-ochre' });
@@ -87,7 +87,7 @@ town.house(4, 78, 17, 91, { h: 6, r: 3, dome: true });
 town.room(7, 81, 15, 88, { h: 6, light: 128 });
 town.room(9, 81, 12, 83, { h: 6, light: 160 }); // daylight through the door
 town.arch(9, 78, 12, 81, { h: 6, lintel: 3 });
-town.awning(6, 76, 16, 78, { z: 3.5 });
+town.awning(6, 76, 16, 78, { z: 3.5, face: 'N', cloth: 'red', valance: 'valance-red' });
 town.window(7.5, 78, 'N', { z: 2.2 }).window(13.5, 78, 'N', { z: 2.2 });
 // F: a tall house in two steps.
 town.house(20, 79, 30, 92, { h: 7, r: 2, wall: 'adobe-grey', skirt: null, tiers: [{ box: [22, 83, 30, 92], h: 10, r: 2 }], dome: true });
@@ -142,10 +142,8 @@ const hangings = [
   { type: 'rope', from: [56, 58.05, 9.5], length: 2 },
   // A rag over B's porch doorway, like a curtain.
   { type: 'rag', from: [20.2, 66.05, 3.9], to: [23.8, 66.05, 3.9], length: 1.5 },
-  // Cloth hanging from the awnings' front edges.
-  { type: 'cloth-pale', from: [32, 66.05, 3.2], to: [35, 66.05, 3.2], length: 0.6 },
-  { type: 'rag', from: [37, 66.05, 3.2], to: [40, 66.05, 3.2], length: 0.9 },
-  { type: 'cloth-pale', from: [7, 75.95, 3.45], to: [11, 75.95, 3.45], length: 0.7 },
+  // A torn rag hanging under C's awning, over its shutter.
+  { type: 'rag', from: [37.2, 65.75, 3.2], to: [39.8, 65.75, 3.2], length: 0.9 },
   // A long banner down G's west wall, facing the square.
   { type: 'rag', from: [52.95, 80.4, 4.8], to: [52.95, 81.8, 4.8], length: 2.4 },
   // A sheet slung across the north back lane, pinned at its corners.
@@ -167,7 +165,7 @@ export default defineLevel({
   // distracted, and Mark halved that twice.
   weather: { type: 'glint', count: 60 },
   decals: town.decals,
-  hangings,
+  hangings: [...hangings, ...town.hangings],
   par: 600,
   ...p.build(),
   things: [],

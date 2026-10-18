@@ -49,6 +49,10 @@ const GRIME = [
   'grime-blotch-1', 'grime-blotch-2', 'grime-smudge', 'grime-crack-1', 'grime-crack-2', 'grime-dust-1', 'grime-dust-2',
 ];
 
+// Awning canvas (tools/art/textures/awning.js): `-x` turned a quarter for
+// an awning looking east or west, `-hem` its scalloped front edge.
+const AWNINGS = ['red', 'teal', 'sand', 'olive'].flatMap((c) => [`awning-${c}`, `awning-${c}-x`, `awning-${c}-hem`]);
+
 const ANIMATED = {
   'imp-computer': { frames: 3, fps: 3 },
 };
@@ -60,6 +64,7 @@ export default [
   ...FENCES.map((id) => defineTexture({ id, src: `assets/textures/${id}.png`, fence: true })),
   ...DECALS.map((id) => defineTexture({ id, src: `assets/textures/${id}.png`, decal: true })),
   ...GRIME.map((id) => defineTexture({ id, src: `assets/textures/${id}.png`, grime: true })),
+  ...AWNINGS.map((id) => defineTexture({ id, src: `assets/textures/${id}.png`, fullbright: false })),
   ...TOWN.map((id) => defineTexture({ id, src: `assets/custom/textures/${id}.png`, fullbright: false })),
   ...TOWN_DECALS.map((id) => defineTexture({ id, src: `assets/custom/textures/${id}.png`, decal: true, fullbright: false })),
   defineTexture({ id: 'sky-night', src: 'assets/textures/sky-night.png', sky: true }),

@@ -11,10 +11,12 @@
 //   town.door(30, 62, 'S', { h: 6, tex: 'door-grey' });
 //   town.finish();
 //   town.grime();
-//   list.push(...town.things);  // the domes
+//   list.push(...town.things);  // the domes, jambs and awnings
 //   decals: town.decals,        // the doors, windows and grime
+//   hangings: town.hangings,    // the awnings' valances
 
 import { DOMES } from '../../models/dome.js';
+import { AWNING_CLOTHS, AWNING_DEPTHS, AWNING_POLES, poleId } from '../../models/awning.js';
 import { valueNoise, random } from './noise.js';
 
 /**
@@ -78,6 +80,8 @@ export class Town {
     this.openings = [];
     /** Houses with their own `grime`: [x0, y0, x1, y1, amount]. */
     this.grimeBoxes = [];
+    /** Hangings the kit places (awnings' valances), for the level's `hangings`. */
+    this.hangings = [];
   }
 
   /**
@@ -285,14 +289,51 @@ export class Town {
   }
 
   /**
-   * A cloth awning (or any thin cover) over the open tiles of a box, at
-   * `z`: you walk under it, in its shade (`light` below it).
+   * A cloth awning over the open tiles of a box against a wall, looking
+   * `face` ('N', 'E', 'S' or 'W': the way its front edge looks, away from
+   * the wall), its underside at `z` above `floorZ`: you walk under it, in
+   * its shade (`light`). A thin slab is its underside and shade; on it the
+   * cloth slopes up to the wall in bays 2 tiles wide that sag between their
+   * ribs (models/awning.js), on poles under the front corners and every
+   * few tiles between. `cloth` is one of AWNING_CLOTHS; the box is 2 or 3
+   * tiles deep (from the wall), an even number wide, and `z` a quarter
+   * between 2.5 and 5.5. `valance` is the front edge: 'fringe' (a fixed
+   * scalloped hem), a hanging type to sway there instead (`valance-<cloth>`
+   * for its own hem, or 'rag'), or null for none. Hangings go in
+   * `this.hangings`, for the level's `hangings`.
    */
-  awning(x0, y0, x1, y1, { z = 4.5, cloth = 'planks', light = 160 } = {}) {
+  awning(x0, y0, x1, y1, { z = 3.5, face = 'S', cloth = 'red', light = 160, valance = 'fringe', floorZ = 0, poles = 4 } = {}) {
+    const ns = face === 'N' || face === 'S';
+    const out = face === 'S' || face === 'E' ? 1 : -1;
+    const [a0, a1] = ns ? [x0, x1] : [y0, y1];
+    const depth = ns ? y1 - y0 : x1 - x0;
+    const front = { S: y1, N: y0, E: x1, W: x0 }[face];
+    const where = `Town: the awning at (${x0}, ${y0})`;
+    if (!AWNING_CLOTHS.includes(cloth)) throw new Error(`${where} has no cloth "${cloth}" (${AWNING_CLOTHS.join(', ')})`);
+    if (!AWNING_DEPTHS.includes(depth)) throw new Error(`${where} is ${depth} deep: awnings are ${AWNING_DEPTHS.join(' or ')}`);
+    if ((a1 - a0) % 2) throw new Error(`${where} is ${a1 - a0} wide: awnings are an even number of tiles wide`);
+    if (!AWNING_POLES.includes(z)) throw new Error(`${where}: "z" must be a quarter from 2.5 to 5.5`);
+    const tex = `awning-${cloth}`;
+    const under = ns ? tex : `${tex}-x`;
+    const top = floorZ + z + 0.125;
     this.p.rect(x0, y0, x1, y1, (x, y, old) => {
       if (old.wall || old.door || old.slab || old.ceiling !== 'sky') return old;
-      return { ...old, slab: { bottom: z, top: z + 0.125, floor: cloth, ceiling: cloth, side: cloth, light } };
+      return { ...old, slab: { bottom: floorZ + z, top, floor: under, ceiling: under, side: tex, light } };
     });
+    const angle = { S: 0, E: 90, N: 180, W: 270 }[face];
+    const at = (a, edge) => (ns ? { x: a, y: edge } : { x: edge, y: a });
+    const bare = valance !== 'fringe' ? '-bare' : '';
+    for (let a = a0; a < a1; a += 2) this.things.push({ type: `${tex}-${depth}${bare}`, ...at(a + 1, front), z: top, angle });
+    for (const a of [a0, a1]) this.things.push({ type: `${tex}-${depth}-end`, ...at(a, front), z: top, angle });
+    // Poles under the front, the ends' inset a little, the rest spread evenly between.
+    const span = a1 - a0 - 0.4;
+    const n = Math.max(1, Math.ceil(span / poles));
+    for (let k = 0; k <= n; k++) this.things.push({ type: poleId(z), ...at(a0 + 0.2 + (span * k) / n, front - out * 0.2) });
+    if (valance && valance !== 'fringe') {
+      const e = front + out * 0.05;
+      const tie = (a) => (ns ? [a, e, top - 0.06] : [e, a, top - 0.06]);
+      this.hangings.push({ type: valance, from: tie(a0 + 0.1), to: tie(a1 - 0.1), length: 0.5 });
+    }
     return this;
   }
 
