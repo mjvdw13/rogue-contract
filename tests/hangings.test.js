@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import content from '../src/content/index.js';
 import { Registry } from '../src/engine/registry.js';
 import { validateContent } from '../src/engine/validate.js';
-import { headlessRenderer, makeWorld, mockInput, room, run } from './helpers.js';
+import { headlessRenderer, makeWorld, mockInput, registry, room, run } from './helpers.js';
 
 // Hangings (PLAN.md section 2): ropes and cloth hanging from fixed points,
 // moving in the air. Cosmetic: these check that they hang, sway, stay
@@ -92,7 +92,7 @@ test('the validator checks a level\'s hangings', () => {
     bad(1, { type: 'washing', from: [1.5, 1.5, 1] }),
     bad(2, { type: 'rope', from: [0.5, 1.5, 1], length: 1 }),
     bad(3, { type: 'rag', from: [1.5, 1.5, 1], length: 1 }),
-    bad(4, { type: 'rag', from: [1.5, 1.5, 1], to: [3.5, 1.5, 1], pin: 'middle', ragged: 2 }),
+    bad(4, { type: 'rag', from: [1.5, 1.5, 1], to: [3.5, 1.5, 1], pin: 'middle' }),
     bad(5, { type: 'rope', from: [1.5, 1.5, -1], length: 1 }),
   ];
   const { errors } = validateContent(new Registry({ ...content, levels: [...content.levels, ...levels] }));
@@ -100,7 +100,7 @@ test('the validator checks a level\'s hangings', () => {
   assert.ok(ours(1).some((e) => e.includes('unknown type "washing"')), ours(1).join('\n'));
   assert.ok(ours(2).some((e) => e.includes('inside a wall')), ours(2).join('\n'));
   assert.ok(ours(3).some((e) => e.includes('"to"')), ours(3).join('\n'));
-  assert.ok(ours(4).some((e) => e.includes('"pin"')) && ours(4).some((e) => e.includes('"ragged"')), ours(4).join('\n'));
+  assert.ok(ours(4).some((e) => e.includes('"pin"')), ours(4).join('\n'));
   assert.ok(ours(5).some((e) => e.includes('below the floor')), ours(5).join('\n'));
 });
 
@@ -124,5 +124,23 @@ test('a cloth draws from either side', () => {
   const cloth = [{ type: 'rag', from: [6.5, 3.5, 2.5], to: [6.5, 5.5, 2.5], length: 1.5 }];
   for (const cam of [{ x: 1.5, y: 4.5, angle: 0, z: 1.25 }, { x: 11.5, y: 4.5, angle: Math.PI, z: 1.25 }]) {
     assert.ok(differs(shot(yard(cloth), cam), shot(yard([]), cam)), `seen looking ${cam.angle ? 'west' : 'east'}`);
+  }
+});
+
+test("the scene shows through a cloth's transparent texels: its tears", () => {
+  const cloth = [{ type: 'rag', from: [6.5, 3.5, 2.5], to: [6.5, 5.5, 2.5], length: 1.5 }];
+  const cam = { x: 1.5, y: 4.5, angle: 0, z: 1.25 };
+  const changed = (a, b) => a.reduce((n, v, i) => n + (v !== b[i]), 0);
+  const empty = shot(yard([]), cam);
+  const torn = changed(shot(yard(cloth), cam), empty);
+  // The same cloth with no texture: plain colour, every cell solid.
+  const def = registry.hangings.get('rag');
+  const texture = def.texture;
+  delete def.texture;
+  try {
+    const plain = changed(shot(yard(cloth), cam), empty);
+    assert.ok(torn > 0 && torn < plain, `${torn} pixels torn, ${plain} plain`);
+  } finally {
+    def.texture = texture;
   }
 });

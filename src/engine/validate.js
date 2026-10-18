@@ -402,6 +402,10 @@ function checkHangingTypes(reg, err) {
       if (h[key] !== undefined && !num(h[key], lo, hi)) err(`${owner}: ${key} (${what}) must be ${lo} to ${hi}`);
     }
     if (h.stiffness !== undefined && !(Number.isInteger(h.stiffness) && h.stiffness >= 1 && h.stiffness <= 8)) err(`${owner}: stiffness (passes a step) must be a whole number, 1 to 8`);
+    if (h.texture !== undefined) {
+      if (h.shape !== 'cloth') err(`${owner}: only a cloth has a texture (a rope is its colour)`);
+      else if (!reg.textures.has(h.texture)) err(`${owner}: unknown texture "${h.texture}"`);
+    }
   }
 }
 
@@ -432,10 +436,7 @@ function checkHangings(reg, level, map, owner, err) {
     if (type.shape === 'rope' && s.to !== undefined) {
       if (s.sag !== undefined && !num(s.sag, 0, 100)) bad('"sag" (how far its middle hangs below the line between its ends) must be 0 or more');
     } else if (s.length !== undefined && !num(s.length, 0.01, 100)) bad('"length" must be above 0');
-    if (type.shape === 'cloth') {
-      if (s.pin !== undefined && !HANGING_PINS.includes(s.pin)) bad(`"pin" must be one of ${HANGING_PINS.join(', ')}`);
-      for (const key of ['ragged', 'holes']) if (s[key] !== undefined && !num(s[key], 0, 1)) bad(`"${key}" must be 0 to 1`);
-    }
+    if (type.shape === 'cloth' && s.pin !== undefined && !HANGING_PINS.includes(s.pin)) bad(`"pin" must be one of ${HANGING_PINS.join(', ')}`);
     return undefined;
   });
   // Room for them all (the level's hangings share one pool).

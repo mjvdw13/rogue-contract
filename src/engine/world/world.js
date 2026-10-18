@@ -117,7 +117,13 @@ export class World {
     /** Dust or sand in the air round the camera, under the sky (world/weather.js); filled on the first tick. */
     this.weather = level.weather ? new Weather(this.particles, this.map, level.weather) : null;
     /** Ropes and cloth hanging from fixed points, moving in the air (world/hangings.js): cosmetic. */
-    this.hangings = new Hangings(this.map, [...this.registry.hangings.values()], level.hangings ?? [], this.registry.paletteDef?.ramps, level.weather?.wind);
+    const texture = (id) => {
+      if (!this.assets) return null;
+      const s = this.assets.textureSlot(id);
+      const t = this.assets.textures[s];
+      return t ? { slot: s, w: t.w, h: t.h } : null;
+    };
+    this.hangings = new Hangings(this.map, [...this.registry.hangings.values()], level.hangings ?? [], this.registry.paletteDef?.ramps, level.weather?.wind, texture);
     this.buildErrors.push(...this.hangings.errors);
     /** Explosions made of particles, a flash and a sound (world/explosions.js), set off with explode(). */
     this.explosions = new Explosions(this);

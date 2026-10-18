@@ -1,4 +1,5 @@
 import { F_SKY } from './tilemap.js';
+import { TEXELS_PER_UNIT } from '../config.js';
 
 /** Hangings further than this from the camera (tiles) hold still. */
 export const SLEEP_RANGE = 40;
@@ -34,7 +35,7 @@ function hangingType(def, ramps) {
     color: r[0] + Math.round(Math.min(1, Math.max(0, t)) * (r[1] - 1)),
     /** A rope's thickness (units); it's never drawn thinner than a pixel. */
     width: def.width ?? 0.04,
-    /** Points about this far apart (units): a cloth's grid is finer, so its hem can be ragged. */
+    /** Points about this far apart (units): a cloth's grid is finer, for its folds. */
     spacing: def.spacing ?? (def.shape === 'cloth' ? 0.4 : 0.5),
     /** A cloth's folds: every other column of points this far forward or back (units), so the light picks out pleats. */
     folds: def.folds ?? 0.08,
@@ -48,6 +49,8 @@ function hangingType(def, ramps) {
     stiffness: def.stiffness ?? 2,
     /** The share of its speed it keeps each sixtieth of a second. */
     damping: def.damping ?? 0.98,
+    /** A cloth's texture (its tears and holes are transparent texels), or null for plain `color`. */
+    texture: def.texture ?? null,
     fullbright: !!def.fullbright,
   };
 }
@@ -67,9 +70,12 @@ export class Hangings {
    * @param {any[]} specs the level's `hangings`
    * @param {Record<string, [number, number]>} [ramps] the palette's ramps
    * @param {number[]} [wind] the level's wind (units per second)
+   * @param {(id:string) => ({slot:number, w:number, h:number}|null)} [texture] a texture's slot and
+   *   size by id (none without assets: cloths are then plain colour)
    */
-  constructor(map, defs = [], specs = [], ramps = {}, wind = null) {
+  constructor(map, defs = [], specs = [], ramps = {}, wind = null, texture = () => null) {
     this.map = map;
+    this.texture = texture;
     this.types = new Map(defs.map((d) => [d.id, hangingType(d, ramps)]));
     this.wind = wind ? [...wind] : [0, 0, 0];
     /** Seconds of its own clock (the breeze's), and ticks run. */
@@ -261,23 +267,6 @@ export class Hangings {
         }
       }
       if (corners) for (let i = 1; i < cols; i++) this._tether(p0 + i, p0, p0 + cols);
-      // The cells it draws: ragged columns at the hem, and holes.
-      let seed = (k * 7919 + Math.round(from[0] * 31 + from[1] * 17)) >>> 0 || 1;
-      const rnd = () => {
-        seed = (seed * 1664525 + 1013904223) >>> 0;
-        return seed / 4294967296;
-      };
-      const ragged = s.ragged ?? 0;
-      const holes = s.holes ?? 0;
-      const cells = [];
-      for (let i = 0; i < cols; i++) {
-        const keep = rows - Math.floor(rnd() * ragged * rows * 0.6);
-        for (let j = 0; j < Math.max(1, keep); j++) {
-          if (j > 0 && rnd() < holes) continue;
-          const a = j * pw + i;
-          cells.push(a, a + pw, a + pw + 1, a + 1);
-        }
-      }
       h.model = {
         verts: new Float32Array(pw * (rows + 1) * 3),
         radius: 0,
@@ -286,8 +275,20 @@ export class Hangings {
       // One quad a cell (half the faces of triangles: the model drawer's cost
       // is mostly per face here). Cells are small and only gently bent, so
       // they stay convex on screen, as the drawer needs.
-      for (let f = 0; f < cells.length; f += 4) {
-        h.model.faces.push({ v: Int32Array.from(cells.slice(f, f + 4)), color: t.color, slot: -1, uv: null, glow: t.fullbright, twoSided: true, nx: 0, ny: 0, nz: 1 });
+      // The texture, at the world's scale (32 texels a tile): its bottom row
+      // on the hem, so the tears are there; across, it repeats. A cloth longer
+      // than the texture stretches it to fit.
+      const tex = t.texture ? this.texture(t.texture) : null;
+      const tw = tex ? tex.w / TEXELS_PER_UNIT : 1;
+      const th = tex ? tex.h / TEXELS_PER_UNIT : 1;
+      const uAt = (i) => (width * i) / cols / tw;
+      const vAt = (j) => Math.min(0.9999, length <= th ? (th - length + (length * j) / rows) / th : j / rows);
+      for (let j = 0; j < rows; j++) {
+        for (let i = 0; i < cols; i++) {
+          const a = j * pw + i;
+          const uv = tex ? Float32Array.of(uAt(i), vAt(j), uAt(i), vAt(j + 1), uAt(i + 1), vAt(j + 1), uAt(i + 1), vAt(j)) : null;
+          h.model.faces.push({ v: Int32Array.of(a, a + pw, a + pw + 1, a + 1), color: tex ? -1 : t.color, slot: tex ? tex.slot : -1, uv, glow: t.fullbright, twoSided: true, nx: 0, ny: 0, nz: 1 });
+        }
       }
       // The model drawer's view of it: a thing at its centre.
       h.thing = { x: 0, y: 0, z: 0, angle: 0, model: h.model };

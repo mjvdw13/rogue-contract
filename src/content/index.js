@@ -17,7 +17,7 @@ import { effects, projectiles } from './effects.js';
 import sounds from './sounds.js';
 import particles from './particles.js';
 import explosions from './explosions.js';
-import hangings from './hangings.js';
+import hangings, { clothTextures } from './hangings.js';
 import songs from './music/index.js';
 import legend from './levels/legend.js';
 import { levels, episodes } from './levels/index.js';
@@ -29,7 +29,7 @@ export default {
   strings,
   config,
   hero,
-  textures,
+  textures: [...textures, ...clothTextures],
   models,
   fonts,
   images,

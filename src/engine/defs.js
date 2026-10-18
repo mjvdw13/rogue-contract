@@ -495,10 +495,12 @@ export function defineParticle(def) {
  * air's speed at `drag` per second; `stiffness` passes a step hold their
  * length, and `damping` is the share of their speed kept each sixtieth of a
  * second. A cloth's `folds` set every other column of points that far
- * forward or back, so the light picks out pleats.
+ * forward or back, so the light picks out pleats. A cloth's `texture` is
+ * drawn at 32 texels a tile with its bottom row on the hem, repeating
+ * across: its transparent texels are the tears and holes.
  * @param {{id:string, shape?:'rope'|'cloth', color?:[string, number], width?:number, spacing?:number,
  *   gravity?:number, drag?:number, wind?:number, breeze?:number, stiffness?:number, damping?:number,
- *   folds?:number, fullbright?:boolean}} def
+ *   folds?:number, texture?:string, fullbright?:boolean}} def
  */
 export function defineHanging(def) {
   requireId(def, 'Hanging');

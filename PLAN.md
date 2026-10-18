@@ -115,23 +115,26 @@ the whole town's under 0.5 ms a frame, simulation and drawing together.
 - **Drawing** (`render/hangings.js`, and the model drawer for cloth): a
   rope segment is one span of rows per screen column, at least 1 px
   thick, clipped like particles and writing `mdepth`. A cloth is a model
-  of one two-sided quad a cell, shaded by its slope.
+  of one two-sided quad a cell, shaded by its slope, textured at 32
+  texels a tile with the texture's bottom row on its hem (Mark,
+  2026-10-17: the tears are transparent texels in the texture, not cut
+  from the shape). `cloth-rag` and `cloth-pale` are generated
+  (`tools/art/textures/cloth.js`).
 - **Content:** `defineHanging` (MODDING.md, Hangings); level `hangings`.
 
 Bench (Chromium, the Mos Eisley start, 504 columns, best of 6 batches of
-60 frames, `renderer.hangingMs`; the machine was busy, frames 12 to 16
-ms, a quiet run about a third less). Cables run right across the street,
-cloths are 1 x 1 m:
+60 frames, `renderer.hangingMs`, frames about 9.3 ms). Cables run right
+across the street, cloths are 1 x 1 m and textured:
 
 | count | cables, draw | cables, move | cloths, draw | cloths, move |
 |-------|--------------|--------------|--------------|--------------|
-| 10    | 0.17         | 0.02         | 0.37         | 0.04         |
-| 20    | 0.32         | 0.05         | 0.46         | 0.07         |
-| 40    | 0.70         | 0.12         | 0.76         | 0.21         |
-| 80    | 1.16         | 0.18         | 1.33         | 0.31         |
+| 10    | 0.12         | 0.02         | 0.32         | 0.03         |
+| 20    | 0.21         | 0.03         | 0.45         | 0.05         |
+| 40    | 0.44         | 0.06         | 0.79         | 0.12         |
+| 80    | 0.89         | 0.13         | 1.32         | 0.22         |
 
-So about 10 cables and 10 cloths in view at once is the budget (0.4 ms on
-the quiet run, 0.6 on this one). Found on
+So about 10 cables and 10 cloths in view at once is the budget (0.48 ms).
+Found on
 the way: the model drawer's per-pixel walk of the ledge windows was its
 hottest line in Mos Eisley (now a binary search per column: models there
 21% faster, byte-identical). The cap is 4096 points a level.
@@ -142,8 +145,7 @@ Steps:
 - [x] The content and level fields: defs, validator, MODDING.md, tests.
 - [ ] In Mos Eisley: cables across the street, a few rags and a banner.
       Snapshots, then Waiting on Mark (the look, how fast they sway, how
-      many; and the cloth grid: 0.4 reads as tabs at the hem, 0.3 as torn
-      strips but costs half as much again).
+      many).
 - [ ] Explosions push the hangings near them (a blast flaps the cloth).
 
 ### 3. Particles into the game (from the particle system, 2026-10-15)
