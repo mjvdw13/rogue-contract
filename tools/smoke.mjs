@@ -5,6 +5,7 @@
 //   2. walks, shoots and opens the automap,
 //   3. warps through every level with ?map=,
 //   4. checks widescreen: the frame width follows the window (16:9, 21:9, 4:3),
+//   5. plays a little at ?res=2 (the 3D view at 640x400),
 // failing on any page error or console error. Screenshots go to .smoke/.
 //
 //   npm run smoke
@@ -163,6 +164,40 @@ for (const level of new Registry(content).levels.values()) {
   const r = await page('index.html?mute&wide=0', { width: 1280, height: 720 });
   check((await r.evaluate(() => window.game.surface.w)) === 320, '?wide=0 keeps the 4:3 frame');
   await r.close();
+}
+
+// 5. 2x resolution: the frame is twice as many pixels each way, the layout the same.
+{
+  const p = await page('index.html?mute&res=2', { width: 1280, height: 720 });
+  await p.waitForTimeout(500);
+  const size = () => p.evaluate(() => [window.game.surface.w, window.game.surface.pw, window.game.surface.ph]);
+  const [w, pw, ph] = await size();
+  check(w === 426 && pw === 852 && ph === 400, `?res=2 at 16:9 draws a 426-column layout into 852x400 (got ${w}, ${pw}x${ph})`);
+  await shot(p, 'res2-title');
+  await p.keyboard.press('Enter'); // main menu
+  await p.waitForTimeout(300);
+  await shot(p, 'res2-menu');
+  await p.keyboard.press('Enter'); // NEW GAME
+  await p.waitForTimeout(300);
+  await p.keyboard.press('Enter'); // default skill
+  const started = await p
+    .waitForFunction(() => window.game.scene.constructor.name === 'LevelScene', null, { timeout: 20000 })
+    .then(() => true, () => false);
+  check(started, 'NEW GAME at ?res=2 starts the first level, through the screen melt');
+  await p.waitForTimeout(1500);
+  await p.keyboard.down('KeyF');
+  await p.waitForTimeout(800);
+  await p.keyboard.up('KeyF');
+  await shot(p, 'res2-playing');
+  await p.keyboard.press('Tab');
+  await p.waitForTimeout(300);
+  await shot(p, 'res2-automap');
+  await p.keyboard.press('Tab');
+  await p.setViewportSize({ width: 960, height: 720 });
+  await p.waitForTimeout(300);
+  const four3 = await size();
+  check(four3[1] === 640 && four3[2] === 400, `?res=2 at 4:3 is 640x400 (got ${four3[1]}x${four3[2]})`);
+  await p.close();
 }
 
 await browser.close();

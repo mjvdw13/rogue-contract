@@ -130,6 +130,7 @@ export function drawParticles(view, ps, map, fb, fbW, colormaps, tables) {
   const n = ps.n;
   if (!n) return;
   const { W, H, x: px, y: py, dirX, dirY, planeX, planeY, fx, fy, camZ, horizon } = view;
+  const maxStreak = MAX_STREAK * view.scale;
   gFb = fb;
   gFbW = fbW;
   gView = view;
@@ -153,7 +154,7 @@ export function drawParticles(view, ps, map, fb, fbW, colormaps, tables) {
     const inv = 1 / depth;
     const sx = halfW * (1 + invDet * (dirY * dx - dirX * dy) * inv);
     const sy = horizon + (camZ - Z[i]) * fy * inv;
-    if (sx < -MAX_STREAK || sx >= W + MAX_STREAK || sy < -MAX_STREAK || sy >= H + MAX_STREAK) continue;
+    if (sx < -maxStreak || sx >= W + maxStreak || sy < -maxStreak || sy >= H + maxStreak) continue;
     const t = types[type[i]];
     const f = age[i] / life[i];
     let c = t.colors[(f * t.colors.length) | 0];
@@ -180,11 +181,11 @@ export function drawParticles(view, ps, map, fb, fbW, colormaps, tables) {
       let lx = ex - sx;
       let ly = ey - sy;
       let steps = Math.max(Math.abs(lx), Math.abs(ly)) | 0;
-      if (steps > MAX_STREAK) {
-        const k = MAX_STREAK / steps;
+      if (steps > maxStreak) {
+        const k = maxStreak / steps;
         lx *= k;
         ly *= k;
-        steps = MAX_STREAK;
+        steps = maxStreak;
       }
       const stepX = steps ? lx / steps : 0;
       const stepY = steps ? ly / steps : 0;

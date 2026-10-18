@@ -58,7 +58,7 @@ npm test                 # ~12 s, all tests (includes a minute of play in every 
 node --test tests/x.test.js   # one file, while iterating
 npm run validate         # ~2 s, content and level checks; must be 0 errors, 0 warnings
 npm run smoke            # ~30 s, headless Chromium (Playwright); CI runs it on every push
-node tools/snapshot.mjs m3 --custom --at X,Y,ANGLE [--pitch P] [--scale 2] --out file.png
+node tools/snapshot.mjs m3 --custom --at X,Y,ANGLE [--pitch P] [--scale 2] [--res 2] --out file.png
 node tools/mapview.mjs m3 [--skill 5]    # top-down map PNG in tools/art/out/maps/
 npm run art -- --only NAME               # regenerate one generated asset
 npm run serve                            # http://localhost:8080/?map=sandbox&god

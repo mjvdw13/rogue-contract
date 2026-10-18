@@ -9,6 +9,7 @@
 //   node tools/snapshot.mjs m3 --custom                   with the art overrides (the Dark Forces art)
 //   node tools/snapshot.mjs m3 --doors 0.5                every door half open
 //   node tools/snapshot.mjs sandbox --at 33.5,8.5,90 --top  on top of a slab (under it by default)
+//   node tools/snapshot.mjs m1 --custom --res 2           the 3D view at 2x (640x400)
 //
 // The default output is tools/art/out/snapshots/<level>.png.
 import fs from 'node:fs';
@@ -17,7 +18,7 @@ import { fileURLToPath } from 'node:url';
 import content from '../src/content/index.js';
 import { Registry } from '../src/engine/registry.js';
 import { Palette } from '../src/engine/gfx/palette.js';
-import { Surface } from '../src/engine/gfx/surface.js';
+import { Surface, ScaledSurface } from '../src/engine/gfx/surface.js';
 import { Assets } from '../src/engine/assets.js';
 import { Renderer } from '../src/engine/render/renderer.js';
 import { World } from '../src/engine/world/world.js';
@@ -32,10 +33,10 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
  * Build the renderer and assets headlessly (PNGs decoded from disk). With
  * `custom`, the art overrides in assets/custom/overrides.json are used, as
  * in the browser.
- * @param {{custom?:boolean}} [opts]
+ * @param {{custom?:boolean, scale?:number}} [opts] scale 2 renders the 3D view at 640x400
  * @returns {Promise<{registry:any, palette:Palette, assets:Assets, surface:Surface, renderer:Renderer}>}
  */
-export async function headless({ custom = false } = {}) {
+export async function headless({ custom = false, scale = 1 } = {}) {
   const registry = new Registry(content);
   const palette = new Palette(registry.paletteDef);
   const assets = new Assets(registry, palette);
@@ -44,7 +45,7 @@ export async function headless({ custom = false } = {}) {
   };
   assets._readPixels = async (src) => decodePNG(fs.readFileSync(path.join(root, src)));
   await assets.loadAll();
-  const surface = new Surface(SCREEN_W, VIEW_H);
+  const surface = scale > 1 ? new ScaledSurface(SCREEN_W, VIEW_H, scale) : new Surface(SCREEN_W, VIEW_H);
   const renderer = new Renderer(surface, assets, palette);
   return { registry, palette, assets, surface, renderer };
 }
@@ -70,16 +71,16 @@ export function snapshot(ctx, levelId, { at, pitch = 0, z, skill = 3, noMonsters
   if (z !== undefined) cam.z = (pt.z ?? 0) + z;
   surface.clear(0);
   renderer.render(world, cam, { skip: pt });
-  const rgba = new Uint8Array(surface.w * surface.h * 4);
+  const rgba = new Uint8Array(surface.pw * surface.ph * 4);
   const pal = palette.rgb;
-  for (let i = 0; i < surface.w * surface.h; i++) {
+  for (let i = 0; i < surface.pw * surface.ph; i++) {
     const c = surface.px[i];
     rgba[i * 4] = pal[c * 3];
     rgba[i * 4 + 1] = pal[c * 3 + 1];
     rgba[i * 4 + 2] = pal[c * 3 + 2];
     rgba[i * 4 + 3] = 255;
   }
-  return { width: surface.w, height: surface.h, data: rgba, world };
+  return { width: surface.pw, height: surface.ph, data: rgba, world };
 }
 
 /** Nearest-neighbour upscale, with the 1.2 pixel aspect when `aspect` is set. */
@@ -105,10 +106,11 @@ export function upscale(img, scale, aspect = true) {
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const args = process.argv.slice(2);
   const opt = (name, def) => (args.includes(name) ? args[args.indexOf(name) + 1] : def);
-  const valued = new Set(['--at', '--pitch', '--z', '--out', '--scale', '--skill', '--doors']);
+  const valued = new Set(['--at', '--pitch', '--z', '--out', '--scale', '--skill', '--doors', '--res']);
   const levelId = args.find((a, i) => !a.startsWith('--') && !valued.has(args[i - 1])) ?? 'sandbox';
   const at = opt('--at') ? opt('--at').split(',').map(Number) : undefined;
-  const ctx = await headless({ custom: args.includes('--custom') });
+  const res = Number(opt('--res', 1));
+  const ctx = await headless({ custom: args.includes('--custom'), scale: res });
   const shot = snapshot(ctx, levelId, {
     at,
     pitch: Number(opt('--pitch', 0)),
@@ -120,7 +122,8 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   });
   const out = path.resolve(opt('--out', path.join(root, 'tools/art/out/snapshots', `${levelId}.png`)));
   fs.mkdirSync(path.dirname(out), { recursive: true });
-  const big = upscale(shot, Number(opt('--scale', 2)));
+  // (At --res 2 the default output is the same size, 640 wide.)
+  const big = upscale(shot, Number(opt('--scale', Math.max(1, 2 / res))));
   fs.writeFileSync(out, encodePNG(big.width, big.height, big.data));
   console.log(`Wrote ${path.relative(process.cwd(), out)}`);
 }

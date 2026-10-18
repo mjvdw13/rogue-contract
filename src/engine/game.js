@@ -2,7 +2,7 @@ import { SCREEN_W, SCREEN_H } from './config.js';
 import { Registry } from './registry.js';
 import { validateContent } from './validate.js';
 import { Palette, PAL_NORMAL } from './gfx/palette.js';
-import { Surface } from './gfx/surface.js';
+import { Surface, ScaledSurface } from './gfx/surface.js';
 import { Presenter } from './gfx/present.js';
 import { MeltWipe } from './gfx/wipe.js';
 import { Assets } from './assets.js';
@@ -48,14 +48,16 @@ export class Game {
       skill: params.has('skill') ? Number(params.get('skill')) : null,
     };
     this.palette = new Palette(this.registry.paletteDef);
-    this.surface = new Surface(SCREEN_W, SCREEN_H);
+    // ?res=2 draws the 3D view at 640x400 (1x and 2x only: see PLAN.md).
+    const res = params.get('res') === '2' ? 2 : 1;
+    this.surface = res > 1 ? new ScaledSurface(SCREEN_W, SCREEN_H, res) : new Surface(SCREEN_W, SCREEN_H);
     this.storage = new Storage(this.registry.game.storagePrefix ?? this.registry.game.id);
     this.settings = this.storage.load('settings', DEFAULT_SETTINGS);
     if (params.has('fps')) this.settings.showFps = true;
     if (params.has('crt')) this.settings.crt = params.get('crt');
     if (params.has('wide')) this.settings.widescreen = params.get('wide') !== '0';
     this.progress = this.storage.load('progress', {});
-    this.presenter = new Presenter(canvas, { preferGL: params.get('gl') !== '0', wide: this.settings.widescreen });
+    this.presenter = new Presenter(canvas, { preferGL: params.get('gl') !== '0', wide: this.settings.widescreen, scale: res });
     this.input = new Input(canvas);
     this.input.onPointerLockChange = (locked) => {
       if (!locked && this.scene?.wantsPointerLock && !this.menu.active) this.pause();
@@ -65,7 +67,7 @@ export class Game {
     if (params.has('mute')) this.audio.setMuted(true);
     this.assets = new Assets(this.registry, this.palette);
     this.rng = new Rng(params.has('seed') ? Number(params.get('seed')) : Date.now() & 0xffffffff);
-    this.wipe = new MeltWipe(SCREEN_W, SCREEN_H);
+    this.wipe = new MeltWipe(SCREEN_W, SCREEN_H, res);
     this.renderer = new Renderer(this.surface, this.assets, this.palette);
     this.hud = new Hud(this);
     this.menu = new MenuSystem(this);
@@ -156,7 +158,7 @@ export class Game {
   /** Follow the presenter to a new framebuffer width (the window's shape changed). */
   _resizeScreen(w) {
     this.surface.resize(w, SCREEN_W);
-    this.wipe = new MeltWipe(w, SCREEN_H);
+    this.wipe = new MeltWipe(w, SCREEN_H, this.surface.scale);
   }
 
   /** Switch scenes with Doom's screen melt. */

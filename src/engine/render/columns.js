@@ -126,6 +126,8 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
 
   // Sky: horizontal texel per column from the view angle; the texture spans 180 degrees.
   let skyOffset = 0;
+  // The sky is a texel per layout row: at scale 2, one per two rows.
+  let skyShift = 0;
   if (sky) {
     for (let x = 0; x < W; x++) {
       const camX = (2 * (x + 0.5)) / W - 1;
@@ -133,7 +135,8 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
       a = ((a % TAU) + TAU) % TAU;
       view.skyU[x] = Math.floor((a / TAU) * sky.w * 2) % sky.w;
     }
-    skyOffset = sky.h - 6 - Math.round(horizon);
+    skyShift = view.scale >> 1;
+    skyOffset = sky.h - 6 - Math.round(horizon / view.scale);
   }
 
   // 1 / (y + 0.5 - horizon) per row: floors and ceilings take their distance from it.
@@ -433,7 +436,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
                 fb[o] = 0;
                 continue;
               }
-              let sy = y + skyOffset;
+              let sy = (y >> skyShift) + skyOffset;
               if (sy < 0) sy = 0;
               else if (sy >= sky.h) sy = sky.h - 1;
               const c = sky.cur[sy * sky.w + skyCol];
@@ -488,7 +491,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
           fb[o] = 0;
           continue;
         }
-        let sy = y + skyOffset;
+        let sy = (y >> skyShift) + skyOffset;
         if (sy < 0) sy = 0;
         else if (sy >= sky.h) sy = sky.h - 1;
         const c = sky.cur[sy * sky.w + skyCol];

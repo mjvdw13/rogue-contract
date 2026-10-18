@@ -85,7 +85,7 @@ export function drawRopes(view, hs, fb, fbW, colormaps) {
       const wpx = t.width * fy;
       let th = wpx * (iza > izb ? iza : izb);
       if (th < 1) th = 1;
-      else if (th > MAX_PX) th = MAX_PX;
+      else if (th > MAX_PX * view.scale) th = MAX_PX * view.scale;
       const half = th * 0.5;
       // One span per column: the rows the line crosses in it, thickened.
       let x0 = Math.floor((sxa < sxb ? sxa : sxb) - half);

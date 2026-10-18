@@ -19,7 +19,7 @@ export class Renderer {
     this.surface = surface;
     this.assets = assets;
     this.palette = palette;
-    this.view = new View();
+    this.view = new View(surface.pw, surface.scale);
     /** Blend tables by particle blend mode, built when first needed. */
     this.blendTables = null;
     /** Last frame's particle drawing time (ms), for benches and debug readouts. */
@@ -48,22 +48,22 @@ export class Renderer {
     const s = this.surface;
     const textures = this.assets.textures;
     const cms = scene.haze ? this.palette.hazeColormaps(scene.haze.color) : this.palette.colormaps;
-    if (view.W !== s.w) view.resize(s.w);
+    if (view.W !== s.pw) view.resize(s.pw);
     view.setup(cam, scene.fog ?? 0.25, scene.haze ?? null);
     view.depthValid = false;
-    drawWorld(view, scene.map, textures, scene.skyTexture ?? null, s.px, s.w, cms, scene.backdrop ?? null);
-    view.depthValid = drawModels(view, scene.things, scene.map, textures, s.px, s.w, cms, extras.skip);
+    drawWorld(view, scene.map, textures, scene.skyTexture ?? null, s.px, s.pw, cms, scene.backdrop ?? null);
+    view.depthValid = drawModels(view, scene.things, scene.map, textures, s.px, s.pw, cms, extras.skip);
     // Hangings: the cloths are models; the ropes write their depth, so what's behind them hides.
     const hangings = scene.hangings?.list.length ? scene.hangings : null;
     if (hangings) {
       const t0 = performance.now();
-      if (hangings.cloths.length) view.depthValid = drawModels(view, hangings.cloths, scene.map, textures, s.px, s.w, cms, null);
+      if (hangings.cloths.length) view.depthValid = drawModels(view, hangings.cloths, scene.map, textures, s.px, s.pw, cms, null);
       if (hangings.cloths.length < hangings.list.length) {
         if (!view.depthValid) {
           view.mdepth.fill(Infinity);
           view.depthValid = true;
         }
-        drawRopes(view, hangings, s.px, s.w, cms);
+        drawRopes(view, hangings, s.px, s.pw, cms);
       }
       this.hangingMs = performance.now() - t0;
     } else this.hangingMs = 0;
@@ -73,11 +73,11 @@ export class Renderer {
       view.mdepth.fill(Infinity);
       view.depthValid = true;
     }
-    drawSprites(view, scene.things, scene.map, s.px, s.w, cms, extras.skip, !!particles);
+    drawSprites(view, scene.things, scene.map, s.px, s.pw, cms, extras.skip, !!particles);
     if (particles) {
       this.prepare();
       const t0 = performance.now();
-      drawParticles(view, particles, scene.map, s.px, s.w, cms, this.blendTables);
+      drawParticles(view, particles, scene.map, s.px, s.pw, cms, this.blendTables);
       this.particleMs = performance.now() - t0;
     } else this.particleMs = 0;
     if (extras.psprites?.length) {

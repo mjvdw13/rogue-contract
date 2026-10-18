@@ -378,51 +378,13 @@ conversations, then the fob.
 
 ### 8. 2x resolution (Mark, 2026-10-18)
 
-The 3D view drawn at 640x400 (twice 320x200 each way): distant walls,
-ceilings and figures resolve, and mid-distance shimmer mostly goes. Near
-surfaces look the same (the textures are 32 texels a tile). A setting,
-1x by default. A prototype proved the shape of it: 11 files, about 165
-lines, 88 of them one new class.
+The 3D view drawn at 640x400 (twice 320x200 each way), the HUD and menus
+as 2x2 blocks. It's in, behind `?res=2` (and `snapshot.mjs --res 2`); 1x
+renders byte-identical to before. It costs 2.3 to 2.8 times the render
+time (headless: Mos Eisley 18 to 45 ms, m3 12 to 28, sandbox 6.5 to 18).
+Time 1x before and after a change here in one process, alternating
+blocks of frames: separate runs on this machine drift by up to 20%.
 
-What 2x costs: 2.3 to 2.8 times the render time (headless: Mos Eisley
-18 to 45 ms, m3 12 to 28, sandbox 6.5 to 18). What 1x must not lose: the
-prototype's 1x renders were byte-identical on 12 views and timed within
-noise (at most about 1% on views full of sky). Time 1x before and after
-in one process, alternating blocks of frames: separate runs on this
-machine drift by up to 20%, more than the change.
-
-How it fits together:
-
-- **Surface:** `pw` and `ph` (the pixel buffer's size) and `scale`, beside
-  `w`, `h` and `ox`, which stay in layout units. `ScaledSurface extends
-  Surface` overrides `pixel`, `fillRect`, `shadeRect` and `blit` to draw
-  each layout pixel as a 2x2 block, so the HUD, menus, fonts and automap
-  don't change, and 1x keeps the old methods untouched.
-- **Renderer:** `View` takes the scale: height and focal length times 2,
-  `horizonOffset` (pitch, in layout pixels) times 2. The renderer draws
-  into `px` at `pw`. Gameplay never sees the scale (aim, pitch and look
-  stay in layout units).
-- **Fixes the scale needs:** the sky is a texel per layout row
-  (`y >> skyShift`, the only per-pixel change); ropes' `MAX_PX` and
-  particles' `MAX_STREAK` scale; the weapon is placed in layout units.
-- **The screen:** the presenter's texture and buffers at `pw` x `ph`; the
-  CRT scanlines stay at 200 rows (a uniform of their own, `u_src` is the
-  texture's size); the melt's columns and speed scale.
-
-Steps, one commit each:
-
-- [ ] `ScaledSurface` and `pw`/`ph`/`scale` on `Surface`; tests (a blit,
-      a fill and a shade land on whole 2x2 blocks; clipping at the edges
-      and with `ox` on widescreen).
-- [ ] The renderer at a scale (`View`, the sky, ropes, particles, the
-      weapon) and `snapshot.mjs --res 2`. Snapshots at 1x before and
-      after, byte-identical; 1x frame time A/B; 2x snapshots of m1, m3
-      and sandbox to look at. Tests: at 2x a wall's top and bottom rows
-      and a sprite's height are twice 1x's (within a row); the horizon
-      moves twice as far for the same pitch.
-- [ ] The screen at 2x: presenter, scanlines at 200 rows, the melt,
-      `game.js` builds the surface, presenter and melt at the scale;
-      `?res=2` in the URL. Smoke test, plus a smoke run at `?res=2`.
 - [ ] A setting in the options menu (1x or 2x, saved with the others),
       switching without a reload: rebuild the surface, the renderer's
       view, the presenter's buffers and the melt.

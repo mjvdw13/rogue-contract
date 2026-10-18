@@ -17,8 +17,8 @@ export function drawPsprites(view, list, surface, colormaps, level) {
     let lv = view.fixedColormap >= 0 ? view.fixedColormap : p.fullbright ? 0 : level;
     if (lv < 0) lv = 0;
     const remap = colormaps.subarray(lv * 256, lv * 256 + 256);
-    const x = Math.round(view.W / 2 - surface.ox - frame.w / 2 + p.x);
-    const y = Math.round(view.H - frame.h + p.y);
+    const x = Math.round(view.W / view.scale / 2 - surface.ox - frame.w / 2 + p.x);
+    const y = Math.round(view.H / view.scale - frame.h + p.y);
     surface.blit(frame, x, y, { remap });
   }
 }
