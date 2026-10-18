@@ -20,7 +20,7 @@
 // sky, or tile a shrunk one), and `fade: { color, from }` blends toward
 // `color` from `from` (0 top, 1 bottom) down to the bottom row (a sky's
 // haze at the horizon), and `rust: { color, amount, cell, seed }` stains it
-// with blotches of rust that tile.
+// with blotches of rust that tile (a list of them stains it with each).
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -97,6 +97,15 @@ export const TOWN = [
   { out: 'bay-wall-ribbed', df: 'TWCAP01', gradient: DURACRETE, keep: 0.1, contrast: 0.8 },
   { out: 'bay-wall', df: 'TWCAP01', crop: [0, 0, 128, 64], gradient: DURACRETE, keep: 0.1, contrast: 0.8 },
   { out: 'bay-floor', df: 'ZPCMENT2', scale: [128, 128], gradient: [[62, 46, 30], [116, 90, 62], [160, 128, 92], [192, 162, 120], [214, 188, 146]], keep: 0.1, contrast: 0.6 },
+  // The X-34 landspeeder (models/speeder.js): Gromas' mottled grey panel
+  // as its peach paint and the rose of its stripes, worn through to rust and
+  // chipped grey-green where the paint has gone (Mark's photo of the prop);
+  // the engines' metal, darker and rustier; and one of the Avenger's round
+  // engine intakes for the front of each engine.
+  { out: 'speeder-paint', df: 'IWGREYC2', gradient: [[110, 72, 54], [176, 128, 102], [212, 164, 136], [228, 186, 158], [238, 204, 180]], keep: 0, contrast: 0.6, rust: [{ color: [120, 62, 34], amount: 0.7, cell: 16, seed: 5, from: 0.64 }, { color: [118, 120, 98], amount: 0.5, cell: 8, seed: 7, from: 0.66 }] },
+  { out: 'speeder-red', df: 'IWGREYC2', gradient: [[74, 32, 24], [130, 58, 46], [168, 84, 68], [188, 104, 86], [204, 124, 104]], keep: 0, contrast: 0.6, rust: { color: [80, 38, 20], amount: 0.6, cell: 16, seed: 6, from: 0.62 } },
+  { out: 'speeder-metal', df: 'IWGREYC2', gradient: [[28, 24, 20], [66, 60, 54], [104, 98, 90], [134, 128, 118], [160, 154, 142]], keep: 0, contrast: 0.8, rust: { color: [112, 54, 28], amount: 0.6, cell: 16, seed: 8, from: 0.56 } },
+  { out: 'speeder-intake', df: 'IWENGBAC', crop: [16, 12, 104, 104], scale: [32, 32], gradient: [[8, 8, 8], [34, 32, 30], [76, 72, 66], [128, 122, 112], [170, 164, 152]], keep: 0.2, contrast: 1 },
   // A hazy day: Robotics' pale cloudy sky, twice as wide, warming to dust at the horizon.
   { out: 'sky-day', df: 'RESKY01', gradient: [[74, 128, 182], [120, 166, 206], [168, 198, 222], [214, 226, 236]], keep: 0.3, contrast: 0.9, tile: [2, 1], fade: { color: [212, 200, 174], from: 0.55 } },
 ];
@@ -140,6 +149,9 @@ export const DECALS = [
   { out: 'vent-round', df: 'SPGRATE1', size: [32, 32], gradient: RUSTY_GREY, keep: 0.5, contrast: 1, mask: 'round', r: 16, rim: { width: 2, color: [30, 24, 18] } },
   { out: 'wall-fan', df: 'IATRKDEV', crop: [0, 0, 64, 64], size: [32, 32], gradient: [[24, 20, 16], [70, 62, 52], [120, 110, 94], [170, 160, 140]], keep: 0.4, contrast: 1, mask: 'round', r: 3 },
   { out: 'wall-meter', df: 'SWSWITCH', size: [8, 32], mask: 'round', r: 1 },
+  // The landspeeder's intakes (models/speeder.js): Nar Shaddaa's slatted
+  // vent, dark and rusty, framed in the hull's peach paint.
+  { out: 'speeder-grille', df: 'NPVENTS2', size: [64, 32], gradient: [[14, 12, 10], [40, 34, 28], [76, 66, 56], [112, 100, 86]], keep: 0.3, contrast: 1, rim: { width: 2.5, color: [212, 164, 136] } },
   // Litter on the ground (the `litter` models' texture): the junk pile cut
   // to a ragged blob, see-through round it and through its gaps.
   { out: 'litter', df: 'IPTRSHC1', size: [64, 64], gradient: [[22, 16, 10], [62, 48, 32], [110, 90, 64], [154, 132, 98], [196, 176, 138]], keep: 0.35, contrast: 1.1, mask: 'blob', seed: 4 },
@@ -359,14 +371,15 @@ function faded(img, { color, from }) {
 
 /**
  * Rust: blotches of `color` where a noise that repeats with the texture
- * (it must be square) is high, up to `amount` of the way, so it still tiles.
+ * (it must be square) is above `from` (0.5, half the texture), up to
+ * `amount` of the way, so it still tiles.
  */
-function rusted(img, { color, amount, cell, seed }) {
+function rusted(img, { color, amount, cell, seed, from = 0.5 }) {
   const d = img.data;
   for (let y = 0; y < img.height; y++) {
     for (let x = 0; x < img.width; x++) {
       const n = periodicNoise(x, y, cell, img.width, seed) * 0.7 + periodicNoise(x, y, cell / 4, img.width, seed + 1) * 0.3;
-      const t = Math.max(0, Math.min(1, (n - 0.5) * 4)) * amount;
+      const t = Math.max(0, Math.min(1, (n - from) * 4)) * amount;
       if (!t) continue;
       const i = (y * img.width + x) * 4;
       for (let k = 0; k < 3; k++) d[i + k] = Math.round(d[i + k] + (color[k] - d[i + k]) * t);
@@ -399,7 +412,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     if (spec.tile) img = tiled(img, spec.tile);
     img = gradientMap(img, spec);
     if (spec.fade) img = faded(img, spec.fade);
-    if (spec.rust) img = rusted(img, spec.rust);
+    for (const r of [spec.rust ?? []].flat()) img = rusted(img, r);
     for (let i = 3; i < img.data.length; i += 4) img.data[i] = 255;
     made.set(spec.out, img);
     fs.writeFileSync(path.join(texDir, `${spec.out}.png`), encodePNG(img.width, img.height, img.data));

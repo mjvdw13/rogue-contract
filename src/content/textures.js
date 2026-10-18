@@ -41,6 +41,9 @@ const TOWN = [
   'bay-wall', 'bay-wall-ribbed', 'bay-floor',
   // Street clutter: crates and junk (models/clutter.js).
   'crate-tan', 'crate-grey', 'crate-rust', 'junk',
+  // The X-34 landspeeder (models/speeder.js): paint, stripes, engine metal,
+  // the engines' intakes and the flanks' (derive.mjs, DECALS: framed).
+  'speeder-paint', 'speeder-red', 'speeder-metal', 'speeder-intake', 'speeder-grille',
   // Doors that open: the door decals as rising doors' panels (derive.mjs, RISING).
   'door-red-rising', 'door-grey-rising',
   // The drifts' edges, by which corners are drift (lib/town.js, drifts()).
@@ -67,6 +70,10 @@ const GRIME = [
 // an awning looking east or west, `-hem` its scalloped front edge.
 const AWNINGS = ['red', 'teal', 'sand', 'olive'].flatMap((c) => [`awning-${c}`, `awning-${c}-x`, `awning-${c}-hem`]);
 
+// The landspeeder's windscreen and shadow, mostly see-through
+// (tools/art/textures/speeder.js).
+const SPEEDER = ['speeder-glass', 'speeder-shadow'];
+
 const ANIMATED = {
   'imp-computer': { frames: 3, fps: 3 },
 };
@@ -79,6 +86,7 @@ export default [
   ...DECALS.map((id) => defineTexture({ id, src: `assets/textures/${id}.png`, decal: true })),
   ...GRIME.map((id) => defineTexture({ id, src: `assets/textures/${id}.png`, grime: true })),
   ...AWNINGS.map((id) => defineTexture({ id, src: `assets/textures/${id}.png`, fullbright: false })),
+  ...SPEEDER.map((id) => defineTexture({ id, src: `assets/textures/${id}.png`, fullbright: false })),
   ...TOWN.map((id) => defineTexture({ id, src: `assets/custom/textures/${id}.png`, fullbright: false })),
   ...TOWN_DECALS.map((id) => defineTexture({ id, src: `assets/custom/textures/${id}.png`, decal: true, fullbright: false })),
   defineTexture({ id: 'sky-night', src: 'assets/textures/sky-night.png', sky: true }),

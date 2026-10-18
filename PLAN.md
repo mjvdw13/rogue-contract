@@ -75,6 +75,15 @@ These need Mark to try something, or to decide. Don't start them without him.
   0.44 ms a frame on average over eight views, 0.75 at worst (headless,
   measured with the machine at about half its usual speed).
 
+- **The landspeeder** (`?map=m1`, on the main street by C's awning, nose
+  west): how it looks against your references (its size, about 1.25 times
+  life against you, 4.2 long; how pink the paint comes out once the
+  palette has it, as it leans terracotta; how much rust), its dithered
+  shadow, and where it's parked. 289 faces. It costs about 1 ms a frame
+  to draw when it's near (2.4 at worst, standing over it; headless, the
+  machine busy), 0.3 of that the shadow: say if the shadow should go.
+  Should it bob as it hovers (a new decoration field)?
+
 ## Next up
 
 In this order unless Mark says otherwise.
@@ -115,6 +124,17 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
     - [ ] Bare brick where the plaster has fallen: ordinary decals cut
           from `adobe-brick` with ragged edges.
     - [x] In Mos Eisley: snapshots, then Waiting on Mark.
+  - [ ] Waiting on Mark.
+- [ ] **An X-34 landspeeder on the main street** (Mark, 2026-10-18, after
+      his schematic and the weathered prop): a model, hovering, textured
+      like the town.
+  - [x] Textures: peach and rose paint and rusty engine metal from DF's
+        IWGREYC2, the engines' intakes from IWENGBAC (derive.mjs); glass
+        glints and a dithered shadow, generated.
+  - [x] The model (`models/speeder.js`): the hull, the open cockpit with
+        its seats and windscreen, the side intakes, three engines on
+        their pylons. Collision lines; under the face budget.
+  - [x] Parked on the main street; snapshots.
   - [ ] Waiting on Mark.
 - [ ] **Docking Bay 87**, the lane, the owner's office, the customs house.
       The episode starts in `m1`. The design's boxes overlap the first

@@ -46,6 +46,9 @@ export default [
   ...PIPE_MODELS.map((id) => defineDecoration({ id, model: id, fixed: true })),
   // Things on Mos Eisley's streets: crates, drums, canisters, junk, rubble, scrap, a vaporator.
   ...Object.entries(CLUTTER).map(([id, c]) => defineDecoration({ id, model: id, solid: !!c.solid, radius: c.radius, height: c.height, fixed: true })),
+  // An X-34 landspeeder parked on the street, hovering (models/speeder.js): it
+  // collides as its outline, as high as its windscreen.
+  defineDecoration({ id: 'landspeeder', model: 'landspeeder', solid: true, height: 1.22, fixed: true }),
   defineDecoration({ id: 'ceiling-lamp', glyph: 'l', sheet: S('ceiling-lamp', 48, 16), hanging: true, fullbright: true }),
   defineDecoration({
     id: 'fuel-barrel',

@@ -210,6 +210,18 @@ test('model scenery with lines collides as those walls, not as its cylinder', ()
   assert.equal(w.checkPosition(p, 6, 2.2), true, 'passes beyond its end');
 });
 
+test('the parked landspeeder blocks you at its nose, its flanks and its side engines, but not round it', () => {
+  const lot = room(['################', ...Array(10).fill('#..............#'), '################'], [], { legend });
+  const w = makeWorld(lot, { noMonsters: true });
+  const speeder = w.spawn('landspeeder', 7, 5.5); // nose east
+  speeder.model = new Model(registry.models.get('landspeeder'), palette, () => 0);
+  const p = w.player;
+  const blocked = [[9.4, 5.5, 'its nose'], [6.5, 4.6, 'its flank'], [7, 6.4, 'its other flank'], [6.2, 6.9, 'a side engine'], [6.2, 4.1, 'the other']];
+  for (const [x, y, what] of blocked) assert.equal(w.checkPosition(p, x, y), false, `walks into ${what}`);
+  const clear = [[10.4, 5.5], [6.5, 3.6], [6.2, 2.6], [6.2, 8.4], [3.4, 5.5]];
+  for (const [x, y] of clear) assert.equal(w.checkPosition(p, x, y), true, `stands clear at (${x}, ${y})`);
+});
+
 test('solid model scenery stops hitscan shots and projectiles', () => {
   const { w } = wallWorld();
   const p = w.player;

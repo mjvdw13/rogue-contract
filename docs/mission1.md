@@ -284,8 +284,10 @@ angle unless their sheet has the other views (the villagers do).
 ## Props and models
 
 - **Models (built):** domes, awnings, tarps, tin roofs, pipes and wall
-  boxes, and the street clutter (above).
-- **Models (new):** moisture condenser tower, landspeeder, swoop bike,
+  boxes, the street clutter (above), and an X-34 landspeeder
+  (`models/speeder.js`, parked on the main street; the garage's can be
+  another of it).
+- **Models (new):** moisture condenser tower, swoop bike,
   droid parts, the sandcrawler, the gutted freighter, the comm tower,
   the cantina's round bar and booth tables, a power droid (until a sprite),
   water tanks, blast doors in their recesses, gantry lamps for the bay rim.
