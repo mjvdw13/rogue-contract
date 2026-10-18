@@ -80,7 +80,6 @@ export async function headlessRenderer() {
   const { fileURLToPath } = await import('node:url');
   const { Palette } = await import('../src/engine/gfx/palette.js');
   const { Surface } = await import('../src/engine/gfx/surface.js');
-  const { quantize } = await import('../src/engine/gfx/image.js');
   const { Assets } = await import('../src/engine/assets.js');
   const { Renderer } = await import('../src/engine/render/renderer.js');
   const { SCREEN_W, VIEW_H } = await import('../src/engine/config.js');
@@ -91,13 +90,7 @@ export async function headlessRenderer() {
   assets._loadOverrides = async () => {
     assets.overrides = {};
   };
-  assets._loadImage = async (src, opts = {}) => {
-    try {
-      return quantize(decodePNG(fs.readFileSync(path.join(root, src))), palette, opts);
-    } catch {
-      return null;
-    }
-  };
+  assets._readPixels = async (src) => decodePNG(fs.readFileSync(path.join(root, src)));
   await assets.loadAll();
   const renderer = new Renderer(new Surface(SCREEN_W, VIEW_H), assets, palette);
   /** Render `level` from a camera; the frame's palette indices. */

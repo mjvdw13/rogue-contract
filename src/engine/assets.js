@@ -2,10 +2,17 @@ import { IndexedImage, quantize, loadImageElement, readPixels } from './gfx/imag
 import { Sheet } from './gfx/sheet.js';
 import { BitmapFont } from './gfx/font.js';
 import { Model } from './gfx/model.js';
+import { LIGHT_LEVELS, SHADE_STEP } from './config.js';
 
-/** A wall/flat/sky texture ready for the renderer. Animated textures cycle frames. */
+/**
+ * A wall/flat/sky texture ready for the renderer. Animated textures cycle
+ * frames. A grime texture (`grime: true`) also has `shade`, from its
+ * picture's own pixels (`raw`, before the palette): per texel, column-major
+ * like `curCM`, how many light levels (times SHADE_STEP) it darkens the wall
+ * under it, 0 for none.
+ */
 export class Texture {
-  constructor(id, image, { frames = 1, fps = 4, sky = false } = {}) {
+  constructor(id, image, { frames = 1, fps = 4, sky = false, grime = false } = {}, raw = null) {
     this.id = id;
     this.sky = sky;
     this.fps = fps;
@@ -29,6 +36,9 @@ export class Texture {
     }
     this.cur = this.frames[0].px;
     this.curCM = this.frames[0].cm;
+    this.shade = grime && raw && raw.width === fw && raw.height === this.h ? grimeShade(raw) : null;
+    /** Per texel column of grime, the rows [first, end) that darken anything. */
+    this.shadeSpan = this.shade && shadeSpans(this.shade, fw, this.h);
   }
 
   animate(time) {
@@ -38,6 +48,42 @@ export class Texture {
     this.cur = f.px;
     this.curCM = f.cm;
   }
+}
+
+/**
+ * The darkening of each texel of a grime picture, from its RGBA pixels: a
+ * pixel's brightness is the share of light it leaves (white all of it,
+ * black none), turned into light levels the way the colormaps darken
+ * (gfx/palette.js). Transparent pixels darken nothing.
+ */
+function grimeShade({ width: w, height: h, data }) {
+  const shade = new Uint8Array(w * h);
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const o = (y * w + x) * 4;
+      if (data[o + 3] < 128) continue;
+      const f = (data[o] * 0.3 + data[o + 1] * 0.59 + data[o + 2] * 0.11) / 255;
+      shade[x * h + y] = Math.min(255, Math.round(LIGHT_LEVELS * (1 - Math.pow(f, 1 / 1.2)) * SHADE_STEP));
+    }
+  }
+  return shade;
+}
+
+/** Each column's first and end row of non-zero `shade` (0, 0 when it has none). */
+function shadeSpans(shade, w, h) {
+  const span = new Uint16Array(w * 2);
+  for (let x = 0; x < w; x++) {
+    let first = -1;
+    let end = 0;
+    for (let y = 0; y < h; y++) {
+      if (!shade[x * h + y]) continue;
+      if (first < 0) first = y;
+      end = y + 1;
+    }
+    span[x * 2] = Math.max(0, first);
+    span[x * 2 + 1] = end;
+  }
+  return span;
 }
 
 /**
@@ -60,6 +106,7 @@ export class Assets {
     this.fonts = new Map(); // id -> BitmapFont
     this.ui = new Map(); // id -> IndexedImage
     this.models = new Map(); // id -> Model
+    this.raw = new Map(); // src -> RGBA pixels, for grime textures
     this.problems = [];
     this.animated = [];
   }
@@ -68,10 +115,17 @@ export class Assets {
     return IndexedImage.placeholder(w, h, this.palette.ramp('flesh', 0.7), this.palette.ramp('gray', 0.1));
   }
 
+  /** An image's RGBA pixels (tools and tests read the files instead). */
+  async _readPixels(src) {
+    return readPixels(await loadImageElement(src));
+  }
+
   async _loadImage(src, opts = {}) {
     try {
-      const img = await loadImageElement(src);
-      return quantize(readPixels(img), this.palette, opts);
+      const rgba = await this._readPixels(src);
+      // (Grime keeps its own pixels: its greys are finer than the palette's.)
+      if (opts.grime) this.raw.set(opts.grime, rgba);
+      return quantize(rgba, this.palette, opts);
     } catch (err) {
       this.problems.push(String(err.message ?? err));
       console.warn(err);
@@ -111,7 +165,9 @@ export class Assets {
     const litOnly = new Set([...reg.textures.values()].filter((t) => t.fullbright === false).map((t) => t.src));
     // Sprite sheets can list glint and glow colours (an override's replace the sheet's).
     const sheetOf = new Map([...reg.sheets.values()].filter((s) => s.src).map((s) => [s.src, s]));
-    const opts = (src, o) => ({ litOnly: litOnly.has(src), glint: o?.glint, glow: o?.glow });
+    // Grime textures keep their pixels as well (see Texture).
+    const grime = new Set([...reg.textures.values()].filter((t) => t.grime).map((t) => t.src));
+    const opts = (src, o) => ({ litOnly: litOnly.has(src), glint: o?.glint, glow: o?.glow, grime: grime.has(src) && src });
     let done = 0;
     const total = list.length;
     onProgress(0, total);
@@ -158,7 +214,7 @@ export class Assets {
       // An override can change the frame count (a still picture over an animated texture).
       const t = { ...t0, ...this.overrides?.[t0.src] };
       const img = this.images.get(t0.src) ?? this.placeholder(64 * (t.frames ?? 1), 64);
-      const tex = new Texture(t.id, img, t);
+      const tex = new Texture(t.id, img, t, this.raw.get(t0.src));
       if (!t.sky && (tex.wMask < 0 || tex.hMask < 0)) {
         this.problems.push(`Texture "${t.id}" must be a power-of-two size (is ${tex.w}x${tex.h})`);
       }

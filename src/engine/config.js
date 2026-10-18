@@ -43,6 +43,9 @@ export const TEXELS_PER_UNIT = 32;
 /** Number of light levels in the colormap (0 = full bright, 31 = black). */
 export const LIGHT_LEVELS = 32;
 
+/** A grime texel's darkening is kept in steps of 1/SHADE_STEP of a light level. */
+export const SHADE_STEP = 8;
+
 /** Palette index reserved for "transparent" in every indexed image. */
 export const TRANSPARENT = 255;
 

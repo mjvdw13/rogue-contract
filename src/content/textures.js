@@ -42,6 +42,13 @@ const TOWN = [
 // Mos Eisley's doors and windows: decals cut from DF textures by derive.mjs.
 const TOWN_DECALS = ['door-red', 'door-grey', 'door-sign', 'door-panel', 'shutter', 'window-bars', 'window-louvre'];
 
+// Grime: darkens the walls it's on (tools/art/textures/grime.js); the town
+// kit weathers Mos Eisley's walls with it (lib/town.js, grime()).
+const GRIME = [
+  'grime-streaks-1', 'grime-streaks-2', 'grime-streaks-3', 'grime-drip-1', 'grime-drip-2',
+  'grime-blotch-1', 'grime-blotch-2', 'grime-smudge', 'grime-crack-1', 'grime-crack-2', 'grime-dust-1', 'grime-dust-2',
+];
+
 const ANIMATED = {
   'imp-computer': { frames: 3, fps: 3 },
 };
@@ -52,6 +59,7 @@ export default [
   ...Object.entries(ANIMATED).map(([id, a]) => defineTexture({ id, src: `assets/textures/${id}.png`, ...a })),
   ...FENCES.map((id) => defineTexture({ id, src: `assets/textures/${id}.png`, fence: true })),
   ...DECALS.map((id) => defineTexture({ id, src: `assets/textures/${id}.png`, decal: true })),
+  ...GRIME.map((id) => defineTexture({ id, src: `assets/textures/${id}.png`, grime: true })),
   ...TOWN.map((id) => defineTexture({ id, src: `assets/custom/textures/${id}.png`, fullbright: false })),
   ...TOWN_DECALS.map((id) => defineTexture({ id, src: `assets/custom/textures/${id}.png`, decal: true, fullbright: false })),
   defineTexture({ id: 'sky-night', src: 'assets/textures/sky-night.png', sky: true }),

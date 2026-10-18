@@ -19,8 +19,8 @@
 // blue lines on their edges (dashed for a low railing). A tile with a slab
 // (two storeys) shows the slab's top, as seen from above, in a dotted white
 // frame: there's a storey under it. Light sources are orange-ringed white
-// dots (their light shows in the floor round them); decals are short white
-// ticks on the edges they're on.
+// dots (their light shows in the floor round them); decals (not grime) are
+// short white ticks on the edges they're on.
 // Areas the player can never reach are cross-hatched.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -231,7 +231,9 @@ function render(level) {
       rect(x - 1, y - 1, 2, 2, [150, 150, 150]);
     }
   }
-  for (const d of map.decals) {
+  for (const [k, d] of map.decals.entries()) {
+    // (Not grime: there's too much of it to mark.)
+    if (reg.textures.get(level.decals?.[k]?.tex)?.grime) continue;
     // A tick across the decal's edge, on the side it faces.
     const ns = d.face === 0 || d.face === 2;
     const ex = ns ? d.x : Math.round(d.x);

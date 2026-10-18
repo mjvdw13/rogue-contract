@@ -62,7 +62,11 @@ export function validateContent(reg) {
     }
   };
 
-  for (const t of reg.textures.values()) if (!t.src) err(`Texture "${t.id}": missing src`);
+  for (const t of reg.textures.values()) {
+    if (!t.src) err(`Texture "${t.id}": missing src`);
+    if (typeof t.grime !== 'boolean') err(`Texture "${t.id}": "grime" must be true or false`);
+    else if (t.grime && (t.sky || t.fence || t.frames !== 1)) err(`Texture "${t.id}": grime is a still decal, not a sky, a fence or animated`);
+  }
 
   for (const m of reg.models?.values() ?? []) {
     const owner = `model "${m.id}"`;

@@ -799,8 +799,19 @@ decals: [
 Decal textures are defined with `decal: true` (`src/content/textures.js`), any
 size, and drawn by `tools/art/textures/decals.js`; Mos Eisley's doors and
 windows are cut from Dark Forces textures by `assets/custom/derive.mjs`
-(`DECALS`), and the town kit places them (`town.door()`, `town.window()`). The map viewer marks decals with a
-white tick.
+(`DECALS`), and the town kit places them (`town.door()`, `town.window()`).
+The map viewer marks decals with a white tick.
+
+**Grime** is a decal that darkens the wall under it instead of covering
+it: rain streaks, stains, cracks, dust. Its texture is defined with
+`grime: true` (which makes it a decal too) and is a grey picture: each
+pixel's brightness is the share of light it leaves, white none taken and
+black all of it, so the same streak dirties a rose wall darker rose and an
+ochre one darker ochre. Grime keeps the picture's own greys (finer than
+the palette's), and fades out with the haze in the distance. Place it like
+any decal. The generated ones (`grime-streaks-1` and so on) are drawn by
+`tools/art/textures/grime.js`, and `town.grime()` weathers a whole town
+with them (docs/mission1.md). The map viewer doesn't mark grime.
 
 ### Backdrop: terrain past the edge of play
 

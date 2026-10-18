@@ -151,11 +151,17 @@ export function normalizeAttack(spec) {
  * square frames. `fence: true` marks a see-through texture for fences
  * (transparent pixels are holes); it may be any size, as it is never a floor.
  * `decal: true` marks one for decals (world/decals.js), likewise.
- * @param {{id:string, src:string, frames?:number, fps?:number, sky?:boolean, fence?:boolean, decal?:boolean}} def
+ * `grime: true` makes a decal texture grime (and a decal): instead of
+ * covering the wall, it darkens what's under it. A texel's brightness is the
+ * share of light it leaves, white (the palette's brightest lit colour)
+ * leaving it all, so one grime picture dirties any wall in its own colour.
+ * @param {{id:string, src:string, frames?:number, fps?:number, sky?:boolean, fence?:boolean, decal?:boolean, grime?:boolean}} def
  */
 export function defineTexture(def) {
   requireId(def, 'Texture');
-  return { frames: 1, fps: 4, sky: false, ...def, type: 'texture' };
+  const t = { frames: 1, fps: 4, sky: false, grime: false, ...def, type: 'texture' };
+  if (t.grime === true) t.decal = true;
+  return t;
 }
 
 /**

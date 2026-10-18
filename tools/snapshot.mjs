@@ -18,7 +18,6 @@ import content from '../src/content/index.js';
 import { Registry } from '../src/engine/registry.js';
 import { Palette } from '../src/engine/gfx/palette.js';
 import { Surface } from '../src/engine/gfx/surface.js';
-import { quantize } from '../src/engine/gfx/image.js';
 import { Assets } from '../src/engine/assets.js';
 import { Renderer } from '../src/engine/render/renderer.js';
 import { World } from '../src/engine/world/world.js';
@@ -43,13 +42,7 @@ export async function headless({ custom = false } = {}) {
   assets._loadOverrides = async () => {
     assets.overrides = custom ? JSON.parse(fs.readFileSync(path.join(root, 'assets/custom/overrides.json'), 'utf8')) : {};
   };
-  assets._loadImage = async (src, opts = {}) => {
-    try {
-      return quantize(decodePNG(fs.readFileSync(path.join(root, src))), palette, opts);
-    } catch {
-      return null;
-    }
-  };
+  assets._readPixels = async (src) => decodePNG(fs.readFileSync(path.join(root, src)));
   await assets.loadAll();
   const surface = new Surface(SCREEN_W, VIEW_H);
   const renderer = new Renderer(surface, assets, palette);

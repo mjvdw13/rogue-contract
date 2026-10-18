@@ -1,10 +1,10 @@
 import { F_SOLID, F_DOOR, F_SKY, F_SLANT, F_SLAB } from '../world/tilemap.js';
 import { DIMINISH, MAX_BRIGHTEN, LIGHT_BLACK, HAZE_RES, HAZE_LEN } from './view.js';
-import { HAZE_ROW } from '../gfx/palette.js';
+import { HAZE_ROW, HAZE_STEPS } from '../gfx/palette.js';
 import { LightMap } from '../world/lightmap.js';
 import { layoutDecals } from '../world/decals.js';
 import { drawBackdropColumn } from './backdrop.js';
-import { TEXELS_PER_UNIT as TPU, TRANSPARENT } from '../config.js';
+import { TEXELS_PER_UNIT as TPU, TRANSPARENT, SHADE_STEP } from '../config.js';
 
 const MAX_STEPS = 320;
 const TAU = Math.PI * 2;
@@ -74,7 +74,7 @@ const wSt = new Uint8Array(MAX_WIN);
  * haze step is dithered too.
  *
  * Decals (world/decals.js) are drawn over the wall and step faces they're
- * on, clipped to each face.
+ * on, clipped to each face; grime darkens the face's pixels instead.
  *
  * Where the sky shows, a level's backdrop (render/backdrop.js) is drawn over
  * it: the sky's rows are marked as they're drawn, and once the column's
@@ -269,7 +269,8 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
     /**
      * Decals on a face from height `faceBot` to `faceTop` the ray meets at
      * distance t, at `pos` along the edge (mirrored when seen from the side that
-     * reads backward), in the face's light (or unlit if they glow).
+     * reads backward), in the face's light (or unlit if they glow). Grime
+     * (a texture with `shade`) darkens what's drawn there instead.
      */
     const decalFaces = (t, faceTop, faceBot, list, pos, mirrored, lv, hz) => {
       for (let j = 0; j < list.length; j++) {
@@ -287,12 +288,38 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
         const th = tex.h;
         let tx = (((mirrored !== d.flip ? d.a1 - pos : pos - d.a0) / (d.a1 - d.a0)) * tex.w) | 0;
         if (tx >= tex.w) tx = tex.w - 1;
-        const col = tex.curCM;
         const colBase = tx * th;
-        setFaceCm(d.glow ? 0 : lv, d.glow ? 0 : hz);
         const scale = th / (d.z1 - d.z0);
         const stepV = (t / fy) * scale;
         let v = (d.z1 - camZ + ((a + 0.5 - horizon) * t) / fy) * scale;
+        const shade = tex.shade;
+        if (shade) {
+          // Grime: darken what's there by the texel's levels, dithered,
+          // less in haze (the haze in the pixel isn't the wall's to darken).
+          const f = hz > 0 ? (1 - hz / (HAZE_STEPS - 1)) / SHADE_STEP : 1 / SHADE_STEP;
+          const k0 = tex.shadeSpan[tx * 2];
+          const k1 = tex.shadeSpan[tx * 2 + 1];
+          if (f <= 0 || k1 <= k0) continue;
+          // Only the rows over this texel column's grime (streaks are mostly bare).
+          let y0 = a;
+          if (v < k0) y0 = a + Math.ceil((k0 - v) / stepV);
+          const y1 = Math.min(b, a + Math.ceil((k1 - v) / stepV));
+          v += (y0 - a) * stepV;
+          for (let y = y0, o = y0 * fbW + x; y < y1; y++, o += fbW, v += stepV) {
+            let k = v | 0;
+            if (k >= th) k = th - 1;
+            else if (k < 0) k = 0;
+            const s = shade[colBase + k];
+            if (s === 0) continue;
+            let l = (s * f + thr[y & 3] + 0.5) | 0;
+            if (l <= 0) continue;
+            if (l > 31) l = 31;
+            fb[o] = colormaps[l * 256 + fb[o]];
+          }
+          continue;
+        }
+        const col = tex.curCM;
+        setFaceCm(d.glow ? 0 : lv, d.glow ? 0 : hz);
         for (let y = a, o = a * fbW + x; y < b; y++, o += fbW, v += stepV) {
           let k = v | 0;
           if (k >= th) k = th - 1;
