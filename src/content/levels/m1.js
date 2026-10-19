@@ -58,6 +58,8 @@ town.arch(8, 59, 10, 61, { h: 6, lintel: 1.2, light: 120 });
 town.arch(8, 61, 10, 63, { h: 6, lintel: 3 });
 list.push(at('energy-pack', 9.5, 55.5));
 town.window(12.5, 63, 'S', { tex: 'window-louvre' }).window(4, 57.5, 'W');
+// A kerb along its front either side of the porch.
+town.kerb(6, 63, 8, 64, { skirt: 'plinth' }).kerb(10, 63, 12, 64, { skirt: 'plinth' });
 // B: a house with a porch jutting into the street under a rounded arch, a
 // room behind it and a dome over the room.
 town.house(16, 50, 28, 62, { h: 6, r: 3, wall: 'adobe-pale', skirt: null, dome: true });
@@ -72,7 +74,7 @@ town.window(16, 56.5, 'W', { tex: 'window-louvre' });
 town.house(30, 59, 42, 63, { h: 4, r: 1 });
 town.leanTo(30, 59, 42, 63, { h: 4, face: 'S' });
 town.circle(35.5, 56.5, 5, { inside: town.roofCell({ h: 9, wall: 'adobe-ochre' }), wall: { wall: 'adobe-ochre', wallTop: 9 }, open: 'out' });
-town.door(33, 63, 'S', { h: 4, tex: 'door-grey' });
+town.door(33, 63, 'S', { h: 4, tex: 'door-grey', floorZ: 0.375 });
 town.door(38.5, 63, 'S', { h: 4, tex: 'shutter', tall: 2.25, width: 3, jamb: false, sign: false, panel: false });
 town.dome(35.5, 56.5, 9, 9.5, { wall: 'adobe-ochre' });
 // D: a two-storey house, its upper storey set back from the street, a
@@ -84,8 +86,11 @@ town.door(51.5, 61, 'S', { h: 6, depth: 0, panel: false });
 town.window(48.5, 63, 'S', { z: 3.6 }).window(55.5, 63, 'S', { z: 3.6 }).window(53.5, 58, 'S', { z: 8, tex: 'window-louvre' });
 
 // South row.
-// E: a shop you can walk into, with a dome over it.
+// E: a shop you can walk into, with a dome over it, and a yard in front
+// inside knee-high walls, its gate before the door. (The side walls meet
+// the house's rounded corners, too close to squeeze past.)
 town.house(4, 78, 17, 91, { h: 6, r: 3, dome: true });
+town.lowWall(4, 74, 9, 75).lowWall(12, 74, 17, 75).lowWall(4, 75, 5, 79).lowWall(16, 75, 17, 79);
 town.room(7, 81, 15, 88, { h: 6, light: 128 });
 town.room(9, 81, 12, 83, { h: 6, light: 160 }); // daylight through the door
 town.arch(9, 78, 12, 81, { h: 6, lintel: 3 });
@@ -134,7 +139,7 @@ for (const lot of [[62, 48, 71, 58], [73, 51, 86, 58], [88, 47, 101, 58], [102, 
 // The market's north side.
 // H: a house in two steps, the upper storey at the back, a dome on top.
 town.house(62, 48, 71, 58, { h: 6, r: 2, wall: 'adobe-pale', skirt: 'plinth', tiers: [{ box: [62, 48, 71, 54], h: 9, r: 2 }], dome: true });
-town.door(66, 58, 'S', { h: 6, tex: 'door-grey', wall: 'adobe-pale' });
+town.door(66, 58, 'S', { h: 6, tex: 'door-grey', wall: 'adobe-pale', floorZ: 0.375 });
 town.hood(66, 58, 'S', { h: 6, wall: 'adobe-pale' });
 town.window(68.5, 58, 'S', { z: 3.2 }).window(66.5, 54, 'S', { z: 7.2, tex: 'window-louvre' });
 // I: a long low house, a wide shutter and a door under an awning.
@@ -148,9 +153,10 @@ town.door(94.5, 58, 'S', { h: 7, tex: 'shutter', tall: 2.25, width: 3, jamb: fal
 town.window(90.5, 58, 'S', { z: 4.5 }).window(98.5, 58, 'S', { z: 4.5, tex: 'window-louvre' }).window(96.5, 53, 'S', { z: 8.4 });
 
 // The market's south side.
-// Q: a house facing the market.
+// Q: a house facing the market, a kerb along its front and its door on it.
 town.house(63, 82, 73, 92, { h: 6, r: 2, dome: true });
-town.door(68, 82, 'N', { h: 6 });
+town.kerb(65, 81, 71, 82);
+town.door(68, 82, 'N', { h: 6, floorZ: 0.375 });
 town.window(65.5, 82, 'N', { z: 2.2 }).window(73, 87.5, 'E');
 // R: a round house under a dome.
 town.circle(80, 88, 5, { inside: town.roofCell({ h: 7, wall: 'adobe-rose', skirt: null }), wall: { wall: 'adobe-rose', wallTop: 7 }, open: 'out', skirt: null });
@@ -179,9 +185,10 @@ town.door(130, 61, 'S', { h: 8, tex: 'door-red' });
 town.hood(130, 61, 'S', { h: 8 });
 town.window(132.5, 61, 'S', { z: 3.4 }).window(133.5, 57, 'S', { z: 9.4, tex: 'window-louvre' });
 // South side: N by the frame, O slanting back to the south, the back lane,
-// then P (the first of the rooftops).
+// then P (the first of the rooftops). N stands on a platform three steps up.
 town.house(102, 76, 114, 86, { h: 6, r: 2, wall: 'adobe-rose', skirt: 'plinth', dome: true });
-town.door(110, 76, 'N', { h: 6, wall: 'adobe-rose' });
+town.platform(106, 74, 112, 76, { h: 0.75, steps: 'N' });
+town.door(110, 76, 'N', { h: 6, wall: 'adobe-rose', floorZ: 0.75 });
 town.window(107.5, 76, 'N', { z: 2.2, tex: 'window-louvre' });
 town.block(104, 76, 106, 77, { ...GATE, h: 6 });
 town.slanted([[114, 76], [124, 73], [126, 73], [126, 86], [114, 86]], { h: 5, wall: 'adobe-grey', skirt: null, dome: true });

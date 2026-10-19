@@ -213,6 +213,48 @@ export class Town {
   }
 
   /**
+   * A knee-high wall round a yard (after the film's): a run of raised
+   * floor over the box, `h` tall, in plaster `wall` with the roof's coping
+   * on top. Paint each run as its own box and leave a gap for the gate. At
+   * 0.9 it's just too tall to walk up (monsters go round) but low enough to
+   * jump; clutter and grime leave it alone (they want a wall 1.2 and 2 tall).
+   */
+  lowWall(x0, y0, x1, y1, { h = 0.9, skirt = null, ...opts } = {}) {
+    return this.block(x0, y0, x1, y1, { h, skirt, ...opts });
+  }
+
+  /**
+   * A kerb along a wall's foot (the film's walls are thicker there): a strip
+   * of raised floor over the box, `h` high, in the wall's plaster (or a
+   * `skirt`, to match the wall's) with the roof's coping on top. You walk
+   * up onto it. Clutter keeps off it.
+   */
+  kerb(x0, y0, x1, y1, { h = 0.375, skirt = null, ...opts } = {}) {
+    return this.block(x0, y0, x1, y1, { h, skirt, ...opts });
+  }
+
+  /**
+   * A platform raised `h` over the box under the sky, paved in `floor`, its
+   * faces `side`, with steps down each of its sides in `steps` ('N', 'E',
+   * 'S', 'W', or several: 'NE'): a tile each, `rise` apart, running the
+   * side's whole length outside the box. A door on it takes its `floorZ`.
+   */
+  platform(x0, y0, x1, y1, { h = 0.75, steps = '', rise = 0.25, floor = 'flagstone', side = 'adobe-brick' } = {}) {
+    const n = Math.round(h / rise) - 1;
+    if (n < 0 || Math.abs((n + 1) * rise - h) > 1e-6) throw new Error(`Town: a platform at (${x0}, ${y0}) is ${h} high, not a whole number of ${rise} steps`);
+    this.p.rect(x0, y0, x1, y1, this.street(h, { floor, side }));
+    for (const face of steps) {
+      for (let k = 1; k <= n; k++) {
+        const z = h - k * rise;
+        const box = { N: [x0, y0 - k, x1, y0 - k + 1], S: [x0, y1 + k - 1, x1, y1 + k], W: [x0 - k, y0, x0 - k + 1, y1], E: [x1 + k - 1, y0, x1 + k, y1] }[face];
+        if (!box) throw new Error(`Town: a platform's steps face N, E, S or W, not "${face}"`);
+        this.p.rect(...box, this.street(z, { floor, side }));
+      }
+    }
+    return this;
+  }
+
+  /**
    * A doorway or arch through a building's outside wall: open below
    * `lintel`, the wall over it up to the roof at `h` (a slab, so the street's
    * sky doesn't put a wall above the roofline). A door panel, if any, goes
@@ -295,6 +337,9 @@ export class Town {
    * lipped on both faces) shows half a tile deep either side; the wall over
    * it is a slab up to the roof, as an arch's is. Shut doors stay pictures
    * on houses with nothing inside.
+   *
+   * `floorZ` puts the doorway a step up (the film's doors often are): its
+   * step outside rises to that height, off the street or a kerb.
    */
   door(x, y, face, { h, tex = 'door-red', tall = 3, width = 2, depth = 1, lintel = tall, jamb = depth > 0, sign = true, panel = true, floorZ = 0, wall = this.wall, step = depth > 0, opens = false }) {
     const ns = face === 'N' || face === 'S';
@@ -326,7 +371,12 @@ export class Town {
     }
     if (step) {
       const s = out > 0 ? line : line - 1;
-      const paint = (c) => (c.floor === this.floor && !c.wall ? { ...c, floor: 'flagstone' } : c);
+      // (A door a step up, `floorZ` over the street or a kerb: its step rises to it.)
+      const paint = (c) => {
+        const z = c.floorZ ?? 0;
+        if (c.wall || (floorZ > 0 ? z > floorZ : c.floor !== this.floor)) return c;
+        return { ...c, floor: 'flagstone', ...(z < floorZ && { floorZ, side: 'flagstone' }) };
+      };
       if (ns) this.p.rect(a0, s, a1, s + 1, (_, __, c) => paint(c));
       else this.p.rect(s, a0, s + 1, a1, (_, __, c) => paint(c));
     }

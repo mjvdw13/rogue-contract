@@ -415,3 +415,36 @@ test('a rounded arch fills the corners under its lintel, a model a tile through 
   assert.throws(() => town.arch(8, 11, 13, 14, { h: 6, lintel: 3.5, round: 'S' }), /models for 3 and 4/);
   assert.throws(() => town.arch(8, 11, 12, 14, { h: 6, lintel: 3, round: 'S' }), /head room/);
 });
+
+test("a platform stands over its box with steps down its sides, a rise apart, and a door on it is at its top", () => {
+  const { p, town } = kit();
+  town.house(4, 4, 16, 14, { h: 6 });
+  town.platform(6, 14, 14, 16, { h: 0.75, steps: 'S' });
+  town.door(10, 14, 'S', { h: 6, floorZ: 0.75 });
+  assert.equal(p.get(8, 15).floorZ, 0.75);
+  assert.equal(p.get(8, 15).floor, 'flagstone');
+  assert.deepEqual([16, 17, 18].map((y) => p.get(8, y).floorZ), [0.5, 0.25, 0], 'two steps down, then the street');
+  assert.equal(p.get(5, 15).floorZ, 0, 'no steps at its ends');
+  assert.equal(p.get(9, 13).floorZ, 0.75, 'the doorway at its top');
+  assert.throws(() => town.platform(20, 20, 24, 22, { h: 0.6 }), /whole number/);
+});
+
+test('a door a step up raises its step outside off the street, or sits on a kerb, and clutter keeps off the kerb', () => {
+  const { p, town } = kit();
+  town.house(4, 4, 16, 14, { h: 6 });
+  town.door(10, 14, 'S', { h: 6, floorZ: 0.375 });
+  assert.equal(p.get(9, 13).floorZ, 0.375, 'the doorway');
+  assert.equal(p.get(9, 14).floorZ, 0.375, 'its step');
+  assert.equal(p.get(9, 14).floor, 'flagstone');
+  assert.equal(p.get(9, 15).floorZ, 0, 'the street');
+  town.house(20, 4, 36, 14, { h: 6 });
+  town.kerb(20, 14, 36, 15);
+  town.door(28, 14, 'S', { h: 6, floorZ: 0.375 });
+  assert.deepEqual([p.get(27, 14).floorZ, p.get(27, 14).floor], [0.375, 'flagstone'], 'its step on the kerb');
+  assert.equal(p.get(24, 14).floor, 'adobe-roof', 'the kerb either side');
+  town.finish();
+  town.clutter({ amount: 2 });
+  const placed = town.things.filter((t) => !t.type.startsWith('door') && !t.type.startsWith('litter'));
+  assert.ok(placed.some((t) => t.x < 16), 'clutter along the house without a kerb');
+  assert.ok(!placed.some((t) => t.x > 20 && t.y < 17), 'none along the kerb');
+});

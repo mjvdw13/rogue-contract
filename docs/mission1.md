@@ -212,6 +212,14 @@ Mandalorian, Outlaws, and the Special Edition's wide shots):
   streets get one too, so the skyline is domes. Keep a dome inside its roof:
   one hanging over a lower roof is clipped. 189 of them cost about 0.1 ms a
   frame.
+- **Low walls, kerbs and steps** (the film's street isn't flat):
+  `lowWall()` is a yard wall of raised floor a tile thick, 0.9 tall: just
+  over the 0.8 anyone walks up, so monsters go round by the gate, but low
+  enough to jump. `kerb()` is a strip 0.375 high along a wall's foot, in
+  its plaster or its skirt (A's in brick). `platform()` raises a paved box
+  with steps down its sides, 0.25 apart (N is three steps up). A door
+  with `floorZ` is a step up, its step outside raised to it, or on the
+  kerb (C, H, Q). Clutter and grime keep off all three.
 - **Awnings** (`awning()`, on the market only, see above): a thin slab of cloth over the street is the
   shade you walk under and the cloth's underside you see; on it the cloth
   slopes up to the wall (0.3 a tile) in bays 2 tiles wide that sag between

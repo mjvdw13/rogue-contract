@@ -214,7 +214,8 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
   - [x] Notes; awnings off the houses (I's on the market stays).
   - [x] Round-topped arches: a hood standing out round a door, and
         rounded openings on porches.
-  - [ ] Low walls, kerbs and steps.
+  - [x] Low walls, kerbs and steps: E's yard, kerbs on A and Q, N up
+        three steps, doors a step up on C, H and Q.
   - [ ] Sloping buttresses and a stair up a house's side.
   - [ ] Hitching rings on walls; perforated canisters and engine rings
         in the clutter.
