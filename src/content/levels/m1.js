@@ -2,7 +2,7 @@ import { defineLevel } from '../../engine/defs.js';
 import { Painter } from './lib/painter.js';
 import { Town } from './lib/town.js';
 import { CISTERN } from '../models/market.js';
-import { BAY_DOOR, BAY_HOSES } from '../models/bay.js';
+import { BAY_HOSES } from '../models/bay.js';
 
 // MISSION 1: MOS EISLEY. The layout, route and numbers are in
 // docs/mission1.md (area numbers below match its table). Painted in code on
@@ -215,9 +215,9 @@ p.fence(96, 58, 97, 60, 'W', CAGE).fence(96, 62, 97, 64, 'W', CAGE).fence(96, 63
 
 // South of the south back lane: a round pit 21 m across under the sky, its
 // floor 2.5 m below the street and its duracrete walls 5.5 m tall, braced
-// at the foot. The bay door (4 wide) opens off the lane into a short dark
-// hallway, and a second door at its end onto a landing over the pit, at
-// street level; stairs go down from it. The episode starts on the bay floor.
+// at the foot. The bay door (4 wide) opens off the lane into a passage
+// through the bay's building and onto a landing over the pit, at street
+// level; stairs go down from it. The episode starts on the bay floor.
 const BAY = { cx: 32, cy: 125, r: 21, floorZ: -5, rim: 6 };
 // (The buttresses along the foot of the walls, and of the landing and stairs.)
 const RIBBED = [{ to: 3, tex: 'bay-wall-ribbed' }];
@@ -256,31 +256,13 @@ town.circle(BAY.cx, BAY.cy, BAY.r, {
   wall: { wall: 'bay-wall', wallTop: BAY.rim, bands: RIBBED },
   seam: 90, // behind the landing
 });
-// The way out: a short dark hallway (2.5 m) through a block jutting into
-// the pit, buttressed like its wall, a door at each end, so you pass two
-// between the bay and the town. Each door is in a steel frame on its face
-// (models/bay.js). Then a landing at street level, and stairs down from it.
-// (Its walls two thick: the inner ones as dark as the hallway, so the
-// light outside doesn't seep into it, and the outer ones in the sun.)
-const HALL_LIGHT = 64;
-p.rect(28, 101, 36, 107, town.roofCell({ h: BAY.rim, wall: 'bay-wall', skirt: null, extra: { bands: RIBBED } }));
-p.rect(29, 101, 35, 106, town.roofCell({ h: BAY.rim, wall: 'bay-wall', skirt: null, light: HALL_LIGHT, extra: { bands: RIBBED } }));
-town.room(30, 101, 34, 106, { h: BAY.rim, floor: 'bay-floor', ceiling: 'imp-panel-dark', wall: 'bay-wall', light: HALL_LIGHT });
-const bayDoor = { h: BAY.rim, tex: 'door-grey', ...BAY_DOOR, jamb: false, sign: false, panel: false, opens: true };
-town.door(32, 100, 'N', { ...bayDoor, wall: 'adobe-grey' }).door(32, 107, 'S', { ...bayDoor, wall: 'bay-wall' });
-list.push(at('bay-door-frame', 32, 99.99, { angle: 180 }), at('bay-door-frame', 32, 107.01, { angle: 0 }));
-p.rect(28, 107, 36, 110, (_, __, c) => ({ ...c, floor: 'bay-floor', floorZ: 0 }));
+// The landing, at street level, and the passage out to the door through
+// the wall over it.
+p.rect(29, 104, 35, 107, (_, __, c) => ({ ...c, floor: 'bay-floor', floorZ: 0 }));
+town.arch(30, 101, 34, 105, { h: BAY.rim, lintel: 4, wall: 'bay-wall', floor: 'bay-floor', light: 144 });
+town.door(32, 100, 'N', { h: BAY.rim, tex: 'door-grey', width: 4, tall: 4, wall: 'adobe-grey', jamb: false, opens: true });
 // Stairs down to the floor, a step every tile.
-for (let k = 0; k < 7; k++) p.rect(30, 110 + k, 34, 111 + k, { ...bayFloor, floorZ: (-(k + 1) * 5) / 8 });
-// Round the outer door on the lane: a sign over it, its controls, lamps
-// on the roofline either side, a box unit wired to the frame and a downpipe.
-const gateDecals = [
-  { x: 32, y: 100, z: 5.25, face: 'N', tex: 'door-sign', scale: 2 },
-  { x: 35.05, y: 100, z: 1.6, face: 'N', tex: 'door-panel' },
-];
-town.fixture('wall-unit', 37.5, 100, 'N', { z: 2.6 }).fixture('conduit-3', 36.5, 100, 'N', { z: 4.5 }).pipe(26.4, 100, 'N');
-town.vent(27.6, 100, 'N', { z: 3.2, tex: 'vent-grille' });
-list.push(at('bay-rim-lamp', 28.6, 100, { z: BAY.rim, angle: 180 }), at('bay-rim-lamp', 35.4, 100, { z: BAY.rim, angle: 180 }));
+for (let k = 0; k < 7; k++) p.rect(30, 107 + k, 34, 108 + k, { ...bayFloor, floorZ: (-(k + 1) * 5) / 8 });
 // A maintenance pit in the middle of the floor, where ships set down: 8 by
 // 4 tiles and 2 deep, lined in steel, hazard stripes along its lips and two
 // steps down at its west end. Off its east end a crawlspace runs on under
@@ -513,7 +495,7 @@ export default defineLevel({
   // distracted, and Mark halved that twice to 60. 90 on trial (Mark,
   // 2026-10-18).
   weather: { type: 'glint', count: 90 },
-  decals: [...town.decals, ...gateDecals, ...bayDecals, ...pitDecals],
+  decals: [...town.decals, ...bayDecals, ...pitDecals],
   hangings: [...hangings, ...town.hangings],
   par: 600,
   ...p.build(),

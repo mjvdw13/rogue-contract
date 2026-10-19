@@ -61,9 +61,6 @@ export default [
   defineDecoration({ id: 'bay-fuel-line', model: 'bay-fuel-line', fixed: true }),
   defineDecoration({ id: 'bay-fuel-pump', model: 'bay-fuel-pump', solid: true, height: 1.7, fixed: true }),
   defineDecoration({ id: 'bay-rim-lamp', model: 'bay-rim-lamp', fixed: true }),
-  // The frame round its doors, on the wall's face (so it never stands in
-  // the door's way as it shuts): its posts collide, as their outlines.
-  defineDecoration({ id: 'bay-door-frame', model: 'bay-door-frame', solid: true, radius: 0.25, height: 4.7, fixed: true }),
   // On its floor: big crates (they stack: place one 2 up on another),
   // colliding as their outlines; hoses out from the pumps, underfoot.
   defineDecoration({ id: 'bay-crate-grey', model: 'bay-crate-grey', solid: true, height: 2, fixed: true }),

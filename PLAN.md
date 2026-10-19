@@ -97,15 +97,6 @@ These need Mark to try something, or to decide. Don't start them without him.
   first notes (2026-10-18) took out the hose into the Crow, the tool
   cart, the container and the repulsor pallet.
 
-- **Docking Bay 87's doors** (`?map=m1`, 2026-10-18): both bay doors in
-  a steel frame (`bay-door-frame`, models/bay.js: posts with hazard
-  stripes, a lintel with an amber lamp, a lined opening), and a short
-  dark hallway (2.5 m, light 64) between them, so you go through two
-  doors between the bay and the lane. Round the outer door: a sign, its
-  controls, lamps on the roofline, a box unit and a downpipe. The landing
-  and stairs moved 3 tiles further into the bay. How dark the hallway is,
-  and whether the frame's steel wants to be lighter or rustier.
-
 - **The Moldy Crow** (`?map=m1`, hovering in Docking Bay 87, nose east
   and turned 20 degrees south of it, in front of you at the start, a
   little south of the maintenance pit): its shape against the HWK-290
