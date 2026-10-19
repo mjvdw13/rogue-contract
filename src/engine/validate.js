@@ -327,6 +327,7 @@ export function validateContent(reg) {
           continue;
         }
         if (def.kind === 'item' && def.pickup?.key) keysPlaced.add(def.pickup.key);
+        if (sp.lit !== null && skill === 3 && !(typeof sp.lit === 'number' && sp.lit >= 0 && sp.lit <= 255)) err(`${owner}: a ${sp.type} at (${sp.x}, ${sp.y}): "lit" must be a light from 0 to 255`);
         if (sp.wander !== null && skill === 3) {
           if (def.kind !== 'npc') err(`${owner}: a ${sp.type} at (${sp.x}, ${sp.y}) has "wander", which only friendly characters take`);
           else if (!(typeof sp.wander === 'number' && sp.wander >= 0)) err(`${owner}: a ${sp.type} at (${sp.x}, ${sp.y}): "wander" must be a number of tiles, 0 or more`);

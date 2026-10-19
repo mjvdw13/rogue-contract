@@ -180,7 +180,17 @@ Mandalorian, Outlaws, and the Special Edition's wide shots):
 - **Doorways and arches in an outside wall are slab tiles** (`arch()`):
   open below the lintel, the slab's top at the roof. A doorway with a plain
   lowered ceiling would show a wall from the lintel up to the street's sky.
-  A low lintel makes a crawl gap.
+  A low lintel makes a crawl gap. `round` rounds its top (Mark's stills,
+  2026-10-18): models fill the corners under the lintel down to a half
+  ellipse 1.5 tall (`arch-round-3`, `-4`, `models/arch.js`), one a tile
+  through, so the lintel must be 3.3 or more up. B's, D's and K's porches.
+- **Hoods** (`hood()`): the film's deep round-topped arch standing out
+  from a wall round a door, taller than it (`arch-hood-3` and `-4`, 4.7 and
+  5.2 tall, inside the wall's roofline; the door's sign and controls sit
+  inside it). F, H and M have one. The faces flush with the wall are
+  `flat` (MODDING.md, Models) and lit as the wall is (`lit`, set by
+  `finish()` from the wall's tile and the street's), so a hood reads by
+  the shade under its curve, not by a change of colour.
 - **Rooms** (`room()`) are the lower storey of a slab: the ceiling below,
   the roof on top, so a dome can stand on it and it shades the street like
   the rest of the building. Their walls are the building's raised floor

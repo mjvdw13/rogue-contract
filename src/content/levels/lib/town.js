@@ -15,12 +15,16 @@
 //   decals: town.decals,        // the doors, windows and grime
 //   hangings: town.hangings,    // the awnings' valances
 
-import { DOMES } from '../../models/dome.js';
+import { DOMES, PLASTERS } from '../../models/dome.js';
+import { HOOD, ROUND, hoodTop } from '../../models/arch.js';
 import { AWNING_CLOTHS, AWNING_DEPTHS, AWNING_POLES, AWNING_SLOPE, poleId } from '../../models/awning.js';
 import { TIN_DEPTHS, TIN_METALS, TIN_SLOPE } from '../../models/tin.js';
 import { PIPE_HEIGHTS } from '../../models/pipes.js';
 import { CLUTTER } from '../../models/clutter.js';
 import { valueNoise, random } from './noise.js';
+
+/** The models' suffix for a plaster (`-pale`), plain for any other wall. */
+const plaster = (wall) => Object.keys(PLASTERS).find((k) => PLASTERS[k] === wall) ?? '';
 
 /**
  * The suns, low in the south-west: content azimuth (degrees, 0 east,
@@ -93,6 +97,8 @@ export class Town {
     this.slants = [];
     /** The boxes stalls stand in, kept clear by `clutter()`. */
     this.stalls = [];
+    /** Models flush with a wall (arches), lit as it in `finish()`: { thing, wall, street } tiles. */
+    this.wallLit = [];
   }
 
   /**
@@ -212,9 +218,59 @@ export class Town {
    * sky doesn't put a wall above the roofline). A door panel, if any, goes
    * a tile further in.
    */
-  arch(x0, y0, x1, y1, { h, lintel = 3, floorZ = 0, wall = this.wall, roof = this.roof, floor = this.floor, light = 152 }) {
+  arch(x0, y0, x1, y1, { h, lintel = 3, floorZ = 0, wall = this.wall, roof = this.roof, floor = this.floor, light = 152, round }) {
     const slab = { bottom: floorZ + lintel, top: h, floor: roof, ceiling: wall, side: wall, light };
     this.p.rect(x0, y0, x1, y1, { floor, ceiling: 'sky', floorZ, ceilZ: this.sky, light: this.light, side: wall, slab });
+    if (round) {
+      // `round` ('N', 'E', 'S' or 'W', the way the opening looks): its top
+      // rounded (models/arch.js), one model a tile through it.
+      const ns = round === 'N' || round === 'S';
+      const width = ns ? x1 - x0 : y1 - y0;
+      if (!ROUND.widths.includes(width)) throw new Error(`Town: a rounded arch at (${x0}, ${y0}) is ${width} wide; there are models for ${ROUND.widths.join(' and ')}`);
+      if (lintel - ROUND.rise < 1.8) throw new Error(`Town: a rounded arch at (${x0}, ${y0}) needs its lintel at least ${1.8 + ROUND.rise} up, to keep head room at its sides`);
+      // Each on its tile's outer edge; the front one in the light of the
+      // wall beside the opening, so its face matches the wall's.
+      const type = `arch-round-${width}${plaster(wall)}`;
+      const angle = { S: 0, E: 90, N: 180, W: 270 }[round];
+      const z = floorZ + lintel - ROUND.rise;
+      const out = round === 'S' || round === 'E' ? 1 : -1;
+      const [lo, hi] = ns ? [y0, y1] : [x0, x1];
+      const front = out > 0 ? hi : lo;
+      const row = out > 0 ? hi - 1 : lo;
+      for (let k = 0; k < hi - lo; k++) {
+        const edge = front - out * k;
+        const thing = { type, ...(ns ? { x: (x0 + x1) / 2, y: edge } : { x: edge, y: (y0 + y1) / 2 }), z, angle };
+        this.things.push(thing);
+        if (k === 0) this.wallLit.push({ thing, wall: ns ? [x0 - 1, row] : [row, y0 - 1], street: ns ? [x0 - 1, row + out] : [row + out, y0 - 1] });
+      }
+    }
+    return this;
+  }
+
+  /**
+   * A round-topped hood standing out from a building's straight wall
+   * (models/arch.js), framing a door or a blank stretch: `width` tiles
+   * inside (3 or 4), its middle at (x, y) on the wall's edge, looking
+   * `face` (as for `door`). It needs the wall's height `h`, and must stay
+   * under it. Clutter keeps clear of its legs.
+   */
+  hood(x, y, face, { h, width = 3, floorZ = 0, wall = this.wall }) {
+    const angle = { S: 0, E: 90, N: 180, W: 270 }[face];
+    if (angle === undefined) throw new Error(`Town: a hood at (${x}, ${y}) needs a face (N, E, S or W)`);
+    if (!HOOD.widths.includes(width)) throw new Error(`Town: a hood at (${x}, ${y}) is ${width} wide; there are models for ${HOOD.widths.join(' and ')}`);
+    if (floorZ + hoodTop(width) > h) throw new Error(`Town: a hood at (${x}, ${y}) stands ${hoodTop(width)} tall, above the wall's ${h - floorZ}`);
+    const ns = face === 'N' || face === 'S';
+    const out = face === 'S' || face === 'E' ? 0.01 : -0.01;
+    const along = ns ? x : y;
+    const half = width / 2 + HOOD.band;
+    const thing = { type: `arch-hood-${width}${plaster(wall)}`, x: ns ? x : x + out, y: ns ? y + out : y, z: floorZ, angle };
+    this.things.push(thing);
+    // Lit as the wall is behind its leg, by the tiles either side of it.
+    const line = ns ? y : x;
+    const leg = Math.floor(along + half - HOOD.band / 2);
+    const [inside, street] = out > 0 ? [line - 1, line] : [line, line - 1];
+    this.wallLit.push({ thing, wall: ns ? [leg, inside] : [inside, leg], street: ns ? [leg, street] : [street, leg] });
+    this.openings.push({ kind: 'fixture', face, line: ns ? y : x, a0: along - half, a1: along + half, floorZ });
     return this;
   }
 
@@ -962,7 +1018,11 @@ export class Town {
    * Finish the town once everything is painted: `seal()`, then `shadows()`.
    */
   finish(suns = SUNS) {
-    return this.seal().shadows(suns);
+    this.seal().shadows(suns);
+    // Models flush with a wall take the light the wall is drawn in where
+    // they stand: halfway between its tile's and the street's in front.
+    for (const { thing, wall, street } of this.wallLit) thing.lit = Math.round(((this.p.get(...wall)?.light ?? this.light) + (this.p.get(...street)?.light ?? this.light)) / 2);
+    return this;
   }
 
   /**

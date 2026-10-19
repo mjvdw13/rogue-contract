@@ -79,6 +79,26 @@ test('faces pointing away are culled, unless two-sided', () => {
   assert.notDeepEqual(frame(open, [thing(square({ twoSided: true }), 5.5, 2.5, { angle: Math.PI })]), empty);
 });
 
+test('a flat face is lit as the walls are, whichever way it faces', () => {
+  // The square and the camera turned right round together: the same view,
+  // but the square faces the light (from the north-west) in one and away in
+  // the other.
+  const y = rowAt(0.5, 3.5);
+  const west = (extra) => frame(open, [thing(square(extra), 5, 2.5)], { ...CAM, x: 1.5 })[at(mid, y)];
+  const east = (extra) => frame(open, [thing(square(extra), 5, 2.5, { angle: Math.PI })], { ...CAM, x: 8.5, angle: Math.PI })[at(mid, y)];
+  assert.notEqual(west({}), east({}), 'shaded faces differ');
+  assert.equal(west({ flat: true }), east({ flat: true }), 'flat ones match');
+});
+
+test('a model placed with `lit` takes that light, not the light map where it stands; the validator wants 0 to 255', () => {
+  const list = [{ type: 'player', x: 2.5, y: 1.5 }, { type: 'door-jamb', x: 5.5, y: 2.5, lit: 200 }];
+  const w = makeWorld(room(['##########', '#........#', '#........#', '#........#', '##########'], [], { legend, list }));
+  assert.equal(w.things.find((t) => t.def.id === 'door-jamb').fixedLight, 200);
+  const bad = room(['#####', '#...#', '#####'], [], { id: 'bad', list: [{ type: 'player', x: 1.5, y: 1.5 }, { type: 'door-jamb', x: 3.5, y: 1.5, lit: 300 }] });
+  const { errors } = validateContent(new Registry({ ...content, levels: [bad] }));
+  assert.deepEqual(errors.filter((e) => e.includes('"lit"')), ['Level "bad": a door-jamb at (3.5, 1.5): "lit" must be a light from 0 to 255']);
+});
+
 test('walls hide models behind them', () => {
   const walled = room(['##########', '#....#...#', '#....#...#', '#....#...#', '##########'], [], { legend });
   assert.deepEqual(frame(walled, [thing(square(), 7.5, 2.5)]), frame(walled, []));

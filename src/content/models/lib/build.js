@@ -12,7 +12,7 @@
 // [r, g, b]) or `{ tex }` (a texture, projected onto the face at the walls'
 // scale and kept upright; `texScale` enlarges it, `texOffset: [u, v]` shifts
 // it, in world units; or `uv`, one [u, v] per point of a face(), in repeats
-// of the texture), plus `glow` and `twoSided`. `false` leaves the face out.
+// of the texture), plus `glow`, `flat` and `twoSided`. `false` leaves the face out.
 import { defineModel } from '../../../engine/defs.js';
 
 const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
@@ -62,6 +62,7 @@ export class ModelBuilder {
     } else f.color = style.color;
     if (style.glow) f.glow = true;
     if (style.twoSided) f.twoSided = true;
+    if (style.flat) f.flat = true;
     this.faces.push(f);
     return this;
   }

@@ -426,7 +426,9 @@ defineDecoration({ id: 'reactor-ring', model: 'reactor-ring', spin: 0.5 }) // ra
   Each has a `color` (`[ramp, 0..1]` or `[r, g, b]`) or a `tex` with `uv`
   (texture repeats) or `uvw` (world units, at the walls' scale). `glow`
   makes a face fullbright (animated textures keep animating), and `twoSided`
-  draws it from behind too. Faces are shaded by a fixed light from above.
+  draws it from behind too. Faces are shaded by a fixed light from above,
+  north-west, unless `flat`: then they take the light as the walls do (for
+  a face flush with a wall, such as the front of a rounded arch).
   A face in a grime texture (`grime: true`, see Decals) darkens what's
   behind it instead of covering it and hides nothing: a soft shadow on the
   ground (`speeder-shadow`, a grey oval).
@@ -1227,6 +1229,9 @@ the player start) on top of a slab rather than under it. A friendly
 character's `wander` there replaces its type's for that one (tiles; 0
 stands still): `{ type: 'villager-man', x: 80.5, y: 74.5, wander: 0 }` is
 a shopkeeper behind his counter or someone waiting in a queue.
+`lit` (0-255) draws a model at that light whatever the light map says
+where it stands: a model on a wall, lit as the wall is (the town kit's
+arch hoods), when the ground in front of it is in shade.
 
 A monster placed with `calm` starts calm (see *Calm* under Monsters):
 `calm: true` behaves as its type's `calm` says, and an object overrides

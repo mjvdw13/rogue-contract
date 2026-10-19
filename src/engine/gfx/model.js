@@ -46,6 +46,7 @@ export class Model {
         uv: f.tex ? uv : null,
         glow: !!f.glow,
         twoSided: !!f.twoSided,
+        flat: !!f.flat,
         grime: !!textures[slot]?.shade,
         nx,
         ny,

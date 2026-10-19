@@ -176,13 +176,15 @@ export function defineTexture(def) {
  * or a `tex` (texture id) with one coordinate per vertex: `uv` in texture
  * repeats (as OBJ files have them), or `uvw` in world units, mapped at the
  * walls' 32 texels per unit whatever the texture's size. `glow` faces are
- * fullbright (an animated texture keeps animating); `twoSided` faces are
+ * fullbright (an animated texture keeps animating); `flat` faces are lit as
+ * the walls are, without the shading by the way they face (for a face flush
+ * with a wall); `twoSided` faces are
  * drawn from behind too.
  *
  * `lines` ([x0, y0, x1, y1] in model space) are optional wall segments for
  * collision; without them a solid model collides as its thing's cylinder.
  * @param {{id:string, vertices:number[][], faces:{v:number[], color?:any[], tex?:string,
- *   uv?:number[][], uvw?:number[][], glow?:boolean, twoSided?:boolean}[], lines?:number[][]}} def
+ *   uv?:number[][], uvw?:number[][], glow?:boolean, flat?:boolean, twoSided?:boolean}[], lines?:number[][]}} def
  */
 export function defineModel(def) {
   requireId(def, 'Model');

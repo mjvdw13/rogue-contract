@@ -134,6 +134,14 @@ These need Mark to try something, or to decide. Don't start them without him.
   than fight when the town turns (the story has civilians run; Jawas are
   monsters, so they fight).
 
+- **Round-topped arches in Mos Eisley** (`?map=m1`, after Mark's film
+  stills): hoods standing out round F's, H's and M's doors (a half circle
+  on two legs, 0.45 deep, taller than the door, its sign and controls
+  inside), and B's, D's and K's porches rounded under their lintels. The
+  hoods' fronts take the wall's light, so they read by the shade under the
+  curve, as in the film; whether they want to be deeper or stand out more,
+  and which other doors want one.
+
 ## Next up
 
 In this order unless Mark says otherwise.
@@ -190,7 +198,7 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
       are in `docs/mission1.md`, "What the film shows"). A step at a time,
       checking in with Mark after each.
   - [x] Notes; awnings off the houses (I's on the market stays).
-  - [ ] Round-topped arches: a hood standing out round a door, and
+  - [x] Round-topped arches: a hood standing out round a door, and
         rounded openings on porches.
   - [ ] Low walls, kerbs and steps.
   - [ ] Sloping buttresses and a stair up a house's side.

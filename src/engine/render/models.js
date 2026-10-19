@@ -206,7 +206,7 @@ export function drawModels(view, things, map, textures, fb, fbW, colormaps, skip
       // the light. The shading wraps all the way round, so faces turned away
       // still differ from each other.
       const lit = (nx * LIGHT[0] + ny * LIGHT[1] + nz * LIGHT[2] + 1) / 2;
-      const shade = Math.round(SHADE * (1 - lit));
+      const shade = f.flat ? 0 : Math.round(SHADE * (1 - lit));
       const glow = f.glow;
       const color = f.color;
       const tex = f.slot >= 0 ? textures[f.slot] : null;

@@ -387,3 +387,31 @@ test('clutter stands along the walls of the open street, off the doors, and leav
   }
   assert.deepEqual(make().town.things, town.things, 'the same every time');
 });
+
+test("a hood stands out round a door in the wall's plaster, lit as the wall is, and must fit under the roof", () => {
+  const { town } = kit();
+  town.house(4, 4, 16, 14, { h: 6, wall: 'adobe-pale' });
+  town.door(10, 14, 'S', { h: 6, wall: 'adobe-pale' });
+  town.hood(10, 14, 'S', { h: 6, wall: 'adobe-pale' });
+  const hood = town.things.find((t) => t.type.startsWith('arch-hood'));
+  assert.deepEqual([hood.type, hood.x, hood.angle], ['arch-hood-3-pale', 10, 0]);
+  assert.ok(Math.abs(hood.y - 14) < 0.05, 'on the wall');
+  assert.ok(registry.things.get(hood.type), 'a decoration');
+  town.finish();
+  assert.ok(hood.lit > 0, 'lit as the wall');
+  assert.throws(() => town.hood(10, 14, 'S', { h: 4 }), /above the wall/);
+  assert.throws(() => town.hood(10, 14, 'S', { h: 6, width: 5 }), /models for 3 and 4/);
+});
+
+test('a rounded arch fills the corners under its lintel, a model a tile through it, the front one lit as the wall', () => {
+  const { town } = kit();
+  town.house(4, 4, 16, 14, { h: 6 });
+  town.arch(8, 11, 12, 14, { h: 6, lintel: 3.5, round: 'S' });
+  const rounds = town.things.filter((t) => t.type === 'arch-round-4');
+  assert.deepEqual(rounds.map((t) => t.y), [14, 13, 12], 'from the front back');
+  assert.ok(rounds.every((t) => t.x === 10 && t.z === 2 && t.angle === 0), 'springing 1.5 under the lintel');
+  town.finish();
+  assert.ok(rounds[0].lit > 0 && rounds.slice(1).every((t) => t.lit === undefined), 'only the front one lit as the wall');
+  assert.throws(() => town.arch(8, 11, 13, 14, { h: 6, lintel: 3.5, round: 'S' }), /models for 3 and 4/);
+  assert.throws(() => town.arch(8, 11, 12, 14, { h: 6, lintel: 3, round: 'S' }), /head room/);
+});

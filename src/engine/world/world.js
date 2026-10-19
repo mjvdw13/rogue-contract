@@ -193,6 +193,7 @@ export class World {
       t.tag = s.tag;
       t.drops = s.drops;
       if (s.z !== null && s.z !== undefined) t.z = s.z;
+      if (s.lit !== null && s.lit !== undefined) t.fixedLight = s.lit;
       if (s.wander !== null && s.wander !== undefined && t.kind === 'npc') {
         t.wanderReach = s.wander;
         initNpc(this, t);

@@ -1,5 +1,6 @@
 import { defineDecoration } from '../engine/defs.js';
 import { DOMES } from './models/dome.js';
+import { ARCH_MODELS } from './models/arch.js';
 import { AWNING_MODELS, AWNING_POLES, poleId } from './models/awning.js';
 import { TIN_MODELS } from './models/tin.js';
 import { PIPE_MODELS } from './models/pipes.js';
@@ -37,6 +38,9 @@ export default [
   // The tiled jamb of a Mos Eisley doorway (inside the wall's recess, so it needn't be solid).
   defineDecoration({ id: 'door-jamb', model: 'door-jamb' }),
   defineDecoration({ id: 'door-jamb-through', model: 'door-jamb-through' }),
+  // Round-topped arches: hoods standing out round doors (their legs collide)
+  // and the rounded tops of openings, overhead.
+  ...ARCH_MODELS.map((d) => defineDecoration({ id: d.id, model: d.id, solid: d.kind === 'hood', fixed: true })),
   // The town kit's models stay where it puts them (`fixed`): against and on
   // walls their radius reaches the roof, which they'd otherwise climb onto.
   // Mos Eisley's cloth awnings: their tops and ends over the kit's slab, and the poles under their fronts.
