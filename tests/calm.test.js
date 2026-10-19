@@ -68,7 +68,7 @@ test('a patrol walks its points there and back, pausing at each', () => {
 });
 
 test('a patrol steps round the player standing in its way, and goes on', () => {
-  const w = makeWorld(hall([{ type: 'sandtrooper', x: 4.5, y: 4.5, calm: { patrol: [[4.5, 4.5], [26.5, 4.5]], idleTime: [0.5, 0.5] } }]));
+  const w = makeWorld(hall([{ type: 'sandtrooper', x: 4.5, y: 4.5, calm: { patrol: [[4.5, 4.5], [26.5, 4.5]], speed: 2, idleTime: [0.5, 0.5] } }]));
   const trooper = w.things.find((t) => t.kind === 'monster');
   w.player.x = 14.5;
   w.player.y = 4.5;
@@ -101,6 +101,26 @@ test('a calm monster that has stopped stands rather than walking on the spot', (
     });
   });
   assert.ok(stopped > 0, 'they did stop');
+});
+
+test('a calm walk with a stride plays one walk cycle for each stride it covers', () => {
+  for (const stride of [1, 2.5]) {
+    const w = makeWorld(hall([{ type: 'sandtrooper', x: 4.5, y: 2.5, calm: { patrol: [[4.5, 2.5], [26.5, 2.5]], speed: 1.5, stride } }]));
+    const trooper = w.things.find((t) => t.kind === 'monster');
+    let walked = 0;
+    let frames = 0;
+    let { x, y, animPos } = trooper;
+    run(w, mockInput(), 12, () => {
+      if (trooper.animName === 'walk') {
+        walked += Math.hypot(trooper.x - x, trooper.y - y);
+        frames += (trooper.animPos - animPos + 6) % 6;
+      }
+      ({ x, y, animPos } = trooper);
+    });
+    const cycles = frames / 6;
+    assert.ok(walked > 8, `it walked (${walked.toFixed(1)} tiles)`);
+    assert.ok(Math.abs(cycles * stride - walked) < walked * 0.1, `stride ${stride}: ${cycles.toFixed(1)} cycles over ${walked.toFixed(1)} tiles`);
+  }
 });
 
 test('two patrols on the same timing walk side by side, in step', () => {
@@ -214,6 +234,7 @@ test('the validator checks calm placements and patrols', () => {
       { type: 'sandtrooper', x: 4.5, y: 2.5, calm: { patrol: [[4.5, 2.5], [40.5, 2.5]] } },
       { type: 'sandtrooper', x: 6.5, y: 2.5, calm: { patrol: [[6.5, 2.5]], walk: true } },
       { type: 'jawa', x: 8.5, y: 2.5, calm: 'yes' },
+      { type: 'jawa', x: 10.5, y: 2.5, calm: { stride: 0 } },
       { type: 'med-kit', x: 9.5, y: 2.5, calm: true },
     ]),
     id: 'bad',
@@ -222,9 +243,10 @@ test('the validator checks calm placements and patrols', () => {
   assert.deepEqual(errors.filter((e) => e.includes('calm') || e.includes('patrol')), [
     'Level "bad": a sandtrooper at (4.5, 2.5): patrol point (40.5, 2.5) has no room for it to stand',
     'Level "bad": a sandtrooper at (4.5, 2.5): the patrol\'s walk from (4.5, 2.5) to (40.5, 2.5) is blocked (each walk is a straight line)',
-    'Level "bad": a sandtrooper at (6.5, 2.5): calm has unknown field "walk" (it takes lines, speed, wander, idleTime, patrol, loop)',
+    'Level "bad": a sandtrooper at (6.5, 2.5): calm has unknown field "walk" (it takes lines, speed, stride, wander, idleTime, patrol, loop)',
     'Level "bad": a sandtrooper at (6.5, 2.5): calm patrol must be a list of two or more [x, y] points',
     'Level "bad": a jawa at (8.5, 2.5): "calm" must be true or an object',
+    'Level "bad": a jawa at (10.5, 2.5): calm stride must be above 0 (tiles a walk cycle covers)',
     'Level "bad": a med-kit at (9.5, 2.5) is placed "calm", which only monsters take (friendlies are always calm)',
   ]);
 });

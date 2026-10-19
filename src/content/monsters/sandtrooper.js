@@ -34,5 +34,5 @@ export default defineMonster({
   sounds: { sight: 'trooper-sight', pain: 'trooper-pain', death: 'trooper-death' },
   drops: [{ item: 'power-cell', chance: 0.8 }],
   // Placed calm (Mos Eisley before the shooting): a patrol that warns you off.
-  calm: { lines: ['Move along.', 'Hunter.', 'Keep that blaster holstered in town.', 'Nothing here for you. Move along.'] },
+  calm: { lines: ['Move along.', 'Hunter.', 'Keep that blaster holstered in town.', 'Nothing here for you. Move along.'], speed: 1.2, stride: 1.4 },
 });

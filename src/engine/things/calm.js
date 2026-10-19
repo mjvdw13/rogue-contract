@@ -24,6 +24,7 @@ export function makeCalm(world, m, spec) {
   m.calm = {
     lines: c.lines ?? [],
     speed: c.speed,
+    stride: c.stride,
     idleTime: c.idleTime,
     route,
     loop: !!c.loop,

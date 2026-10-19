@@ -320,9 +320,10 @@ function baseThing(def, kind, defaults) {
  * random (shootable decorations take both too).
  * `calm` is how it behaves when a level places it calm (things/calm.js):
  * the `lines` it says when bumped or used, its strolling `speed` (tiles a
- * second, default 2), how far it may `wander` from its spot (tiles, default
- * 4; 0 stands its post) and `idleTime` ([min, max] seconds standing between
- * walks, default [2, 5]). A placement's own `calm` fields override these.
+ * second, default 2), its `stride` (tiles a walk cycle covers: the walk plays
+ * as fast as its feet need; unset, it plays at `speed` over the chase speed),
+ * how far it may `wander` from its spot (tiles, default 4; 0 stands its post)
+ * and `idleTime` ([min, max] seconds standing between walks, default [2, 5]). A placement's own `calm` fields override these.
  * @param {{id:string, name?:string, glyph?:string, sheet:SheetSpec, anims:Record<string,AnimSpec>,
  *   health:number, speed?:number, radius?:number, height?:number, painChance?:number,
  *   stepHeight?:number, dropHeight?:number, flying?:boolean, flySpeed?:number, z?:number,
@@ -331,7 +332,7 @@ function baseThing(def, kind, defaults) {
  *   splashImmune?:boolean, boss?:boolean, sounds?:Record<string,string>,
  *   death?:{particles?:BurstSpec[], explosion?:string}, corpse?:{particles:BurstSpec[], bursts?:number|[number,number],
  *   every?:number|[number,number], z?:number},
- *   calm?:{lines?:string[], speed?:number, wander?:number, idleTime?:[number,number]},
+ *   calm?:{lines?:string[], speed?:number, stride?:number, wander?:number, idleTime?:[number,number]},
  *   hooks?:Record<string,Function>}} def
  */
 export function defineMonster(def) {

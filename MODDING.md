@@ -172,7 +172,9 @@ how it behaves; a placement can override any of it:
 ```js
 calm: {
   lines: ['Move along.', 'Keep your hands where I can see them.'],
-  speed: 2,          // tiles per second while calm (default 2); its walk plays slower to match
+  speed: 2,          // tiles per second while calm (default 2)
+  stride: 1.4,       // tiles one walk cycle covers, so the feet keep pace (unset: the walk
+                     // plays at speed over the chase speed, the chase's stride)
   wander: 4,         // tiles it may stroll from its spot (default 4; 0 stands its post)
   idleTime: [2, 5],  // seconds standing between walks, and at each patrol point
 },

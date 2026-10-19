@@ -157,10 +157,18 @@ function applyMomentum(world, t, dt) {
   if (Math.abs(t.vy) < 0.02) t.vy = 0;
 }
 
+function calmWalkRate(m) {
+  const { speed, stride } = m.calm;
+  if (!stride) return speed / (m.def.speed || 1);
+  // Cycles a second to cover `speed`, times how long a cycle takes at rate 1.
+  return (speed / stride) * m.def.anims.walk.durations.reduce((t, d) => t + d, 0);
+}
+
 export function monsterThink(world, m, dt) {
   applyMomentum(world, m, dt);
-  // A calm stroll is slower than a chase: its walk plays slower to match, so the feet don't slide.
-  const rate = m.calm && m.animName === 'walk' ? m.calm.speed / (m.def.speed || 1) : 1;
+  // A calm stroll is slower than a chase: its walk plays to match, so the feet
+  // don't slide. With a stride, one cycle covers that many tiles.
+  const rate = m.calm && m.animName === 'walk' ? calmWalkRate(m) : 1;
   const finished = m.stepAnim(dt * rate, (ev) => {
     if (ev === 'fire') fireAttack(world, m);
     else if (ev.startsWith('sound:')) world.playSoundFrom(ev.slice(6), m);

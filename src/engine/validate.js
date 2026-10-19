@@ -55,7 +55,7 @@ export function validateContent(reg) {
     for (const k of ['sound', 'hitSound', 'missSound']) checkSound(owner, a[k]);
   };
   // A monster type's `calm`, or a placement's (which may also have a patrol).
-  const CALM_FIELDS = ['lines', 'speed', 'wander', 'idleTime', 'patrol', 'loop'];
+  const CALM_FIELDS = ['lines', 'speed', 'stride', 'wander', 'idleTime', 'patrol', 'loop'];
   const checkCalm = (owner, c, placed) => {
     if (placed && c === true) return;
     if (!c || typeof c !== 'object' || Array.isArray(c)) return err(`${owner}: "calm" must be true or an object`);
@@ -64,6 +64,7 @@ export function validateContent(reg) {
     }
     if (c.lines !== undefined && !(Array.isArray(c.lines) && c.lines.every((l) => typeof l === 'string'))) err(`${owner}: calm lines must be a list of strings`);
     if (c.speed !== undefined && !(typeof c.speed === 'number' && c.speed > 0)) err(`${owner}: calm speed must be above 0 (tiles a second)`);
+    if (c.stride !== undefined && !(typeof c.stride === 'number' && c.stride > 0)) err(`${owner}: calm stride must be above 0 (tiles a walk cycle covers)`);
     if (c.wander !== undefined && !(typeof c.wander === 'number' && c.wander >= 0)) err(`${owner}: calm wander must be a number of tiles, 0 or more`);
     const t = c.idleTime;
     if (t !== undefined && !(Array.isArray(t) && t.length === 2 && t.every((v) => typeof v === 'number' && v >= 0) && t[0] <= t[1])) {
