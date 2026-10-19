@@ -35,7 +35,7 @@ function stall() {
     [0.7, -0.95, 1.45, 0.35, 0.3, 0.38, ['rust', 0.45]],
   ];
   for (const [x, y, z, w, d, h, color] of wares) m.box([x - w / 2, y - d / 2, z], [x + w / 2, y + d / 2, z + h], { color, bottom: false });
-  for (const [x, color] of [[0.55, ['yellow', 0.6]], [0.75, ['steel', 0.6]], [0.95, ['red', 0.45]]]) {
+  for (const [x, color] of [[0.55, ['yellow', 0.6]], [0.75, ['steel', 0.6]], [0.95, ['blood', 0.6]]]) {
     m.cylinder([x, hd - 0.33, 1], 0.07, 0.22, { segments: 6, color, bottom: false });
   }
   m.outlineLines(counter).outlineLines(rack);
@@ -87,7 +87,7 @@ function condenserTower() {
   // spout down over a stone basin of water.
   m.cylinder([0, 2.25, 1.45], 0.08, 0.6, { axis: 'y', segments: 6, color: PIPE });
   m.cylinder([0, 2.8, 1.05], 0.07, 0.45, { segments: 6, color: PIPE, bottom: false });
-  m.cylinder([0, 2.55, 1.55], 0.18, 0.05, { segments: 8, color: ['red', 0.45] });
+  m.cylinder([0, 2.55, 1.55], 0.18, 0.05, { segments: 8, color: ['blood', 0.6] });
   m.box([-0.45, 2.45, 0], [0.45, 3.2, 0.5], { tex: 'flagstone', top: false, bottom: false });
   m.face([[-0.4, 2.5, 0.42], [0.4, 2.5, 0.42], [0.4, 3.15, 0.42], [-0.4, 3.15, 0.42]], { color: WATER }, [0, 2.8, 0]);
   m.outlineLines(ring(12, CISTERN.radius, turn));

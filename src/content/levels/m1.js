@@ -2,6 +2,7 @@ import { defineLevel } from '../../engine/defs.js';
 import { Painter } from './lib/painter.js';
 import { Town } from './lib/town.js';
 import { CISTERN } from '../models/market.js';
+import { BAY_HOSES } from '../models/bay.js';
 
 // MISSION 1: MOS EISLEY. The layout, route and numbers are in
 // docs/mission1.md (area numbers below match its table). Painted in code on
@@ -298,6 +299,28 @@ for (let deg = 15; deg < 360; deg += 30) {
   if (deg % 60 === 15) list.push(onBayWall('bay-rim-lamp', deg, BAY.rim));
 }
 for (const deg of [30, 150, 240, 300]) list.push(onBayWall('bay-fuel-line', deg, BAY.floorZ), onBayWall('bay-fuel-pump', deg - 5.5, BAY.floorZ));
+// On the floor, round the edge where ships don't set down (none of it in
+// the way of the stairs, the pit or the Crow's nose and wings): a container
+// by the stairs, crates stacked two high on the west and south sides, more
+// on the east with a repulsor pallet loaded with cargo, a tool cart and drums by the
+// south-west pump, and hoses out from three pumps: one into the Crow's
+// belly, one left lying by it, one coiled (models/bay.js, BAY_HOSES).
+const onBayFloor = (type, x, y, extra = {}) => at(type, x, y, { ...extra, z: BAY.floorZ + (extra.z ?? 0) });
+list.push(
+  onBayFloor('bay-container', 23.5, 110.3, { angle: 34 }),
+  onBayFloor('barrel-rust', 18.4, 115.4), onBayFloor('barrel-rust', 19.1, 116.1), onBayFloor('canister', 18.2, 116.4, { angle: 30 }),
+  onBayFloor('bay-crate-grey', 14.6, 124.6, { angle: 8 }), onBayFloor('bay-crate-tan', 14.3, 127.1, { angle: 356 }),
+  onBayFloor('bay-crate-grey', 14.7, 124.8, { z: 2, angle: 21 }), onBayFloor('bay-crate-rust-long', 17.6, 125.6, { angle: 92 }),
+  onBayFloor('barrel-grey', 17.3, 122.7), onBayFloor('canister-rust', 18.2, 128.1, { angle: 50 }),
+  onBayFloor('bay-crate-tan', 48.9, 129.6, { angle: 342 }), onBayFloor('crate-tan', 49, 129.5, { z: 2, angle: 330 }),
+  onBayFloor('bay-hover-pallet', 46.6, 123.6, { angle: 98 }),
+  onBayFloor('bay-crate-grey', 45.4, 137.4, { angle: 48 }), onBayFloor('cargo-pod', 43, 140.3, { angle: 60 }),
+  onBayFloor('bay-crate-tan', 30.5, 143.3, { angle: 4 }), onBayFloor('bay-crate-grey', 30.4, 143.4, { z: 2, angle: 352 }),
+  onBayFloor('bay-crate-rust-long', 33.9, 143.1, { angle: 359 }), onBayFloor('crate-grey-small', 34.6, 143.2, { z: 1.6, angle: 20 }),
+  onBayFloor('bay-tool-cart', 25.5, 141.5, { angle: 38 }),
+  onBayFloor('barrel-rust', 17.8, 137), onBayFloor('barrel-grey', 18.5, 136.3), onBayFloor('crate-grey-small', 17.5, 135.6, { angle: 15 }),
+  ...BAY_HOSES.map(({ id, path: [[x, y]] }) => onBayFloor(id, BAY.cx + x, BAY.cy + y, { angle: 0 })),
+);
 
 // Pipes, vents and boxes on the walls (lib/town.js): downpipes off the
 // roofs, a tank and a box unit in the alleys, conduits, vents and a fan.
