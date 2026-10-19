@@ -126,8 +126,8 @@ export const DECALS = [
   // Doors after the film's (Mark's reference, 2026-10-17): a panel with a
   // lattice of braces (IDDOOR1), red-brown or grey, its corners rounded to
   // fit the tiled jamb round it (models/door-jamb.js), 2 tiles by 3.
-  { out: 'door-red', df: 'IDDOOR1', size: [64, 96], gradient: [[44, 22, 10], [90, 48, 24], [132, 72, 40], [166, 100, 64]], keep: 0, contrast: 0.9, mask: 'round', r: 11, rim: { width: 1.5, color: [24, 16, 10] } },
-  { out: 'door-grey', df: 'IDDOOR1', size: [64, 96], gradient: [[28, 28, 28], [68, 66, 62], [114, 110, 102], [156, 152, 142]], keep: 0, contrast: 0.9, mask: 'round', r: 11, rim: { width: 1.5, color: [24, 16, 10] } },
+  { out: 'door-red', df: 'IDDOOR1', crop: [0, 12, 64, 52], size: [64, 96], gradient: [[44, 22, 10], [90, 48, 24], [132, 72, 40], [166, 100, 64]], keep: 0, contrast: 0.9, mask: 'round', r: 11, rim: { width: 1.5, color: [24, 16, 10] } },
+  { out: 'door-grey', df: 'IDDOOR1', crop: [0, 12, 64, 52], size: [64, 96], gradient: [[28, 28, 28], [68, 66, 62], [114, 110, 102], [156, 152, 142]], keep: 0, contrast: 0.9, mask: 'round', r: 11, rim: { width: 1.5, color: [24, 16, 10] } },
   // Over a door: a little striped panel, navy and orange (Nar Shaddaa's
   // louvres, their slats mapped dark to navy and light to orange); beside
   // it, the door's control panel (a DF switch as it is).
