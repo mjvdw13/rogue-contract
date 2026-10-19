@@ -94,6 +94,80 @@ function rimLamp() {
   return m.build();
 }
 
+/** The opening a bay door's frame goes round: 4 wide, 4 high, through a wall 1 thick. */
+export const BAY_DOOR = { width: 4, tall: 4 };
+
+/**
+ * The part of the rectangle `[u0, z0, u1, z1]` where u * dir + z lies
+ * between c0 and c1: one diagonal stripe of a hazard band, as [u, z] points.
+ */
+function stripe([u0, z0, u1, z1], dir, c0, c1) {
+  let pts = [[u0, z0], [u1, z0], [u1, z1], [u0, z1]];
+  // (Clipped by each side of the stripe in turn.)
+  for (const [c, keep] of [[c0, 1], [c1, -1]]) {
+    const out = [];
+    for (let i = 0; i < pts.length; i++) {
+      const [a, b] = [pts[i], pts[(i + 1) % pts.length]];
+      const [da, db] = [a, b].map(([u, z]) => (u * dir + z - c) * keep);
+      if (da >= 0) out.push(a);
+      if ((da >= 0) !== (db >= 0)) {
+        const t = da / (da - db);
+        out.push([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]);
+      }
+    }
+    pts = out;
+  }
+  return pts;
+}
+
+/**
+ * The frame round one of the bay's doors (BAY_DOOR), which stand in the
+ * middle of the wall: steel lining the opening back through the wall, a
+ * sill plate with a yellow edge, braces across its top corners in front of
+ * the door; and standing out from the wall's face, two heavy posts with
+ * hazard stripes up their feet, a deep lintel over them and an amber lamp
+ * in its middle. Built looking south: the origin on the wall's face (y 0)
+ * at the opening's foot, the door at y -0.5. Only this face is framed: the
+ * hallway behind is no wider than the door. It collides as its posts.
+ */
+function doorFrame() {
+  const m = new ModelBuilder('bay-door-frame');
+  const w = BAY_DOOR.width / 2;
+  const h = BAY_DOOR.tall;
+  const e = 0.02; // inset from the opening's walls, so the steel draws over them
+  const post = 0.6; // wide
+  const out = 0.25; // how far the posts stand out
+  const steel = { color: ['steel', 0.58] };
+  const dark = { color: ['steel', 0.4] };
+  // The lining, facing into the opening, and the sill.
+  for (const s of [-1, 1]) m.face([[s * (w - e), -1, 0], [s * (w - e), 0, 0], [s * (w - e), 0, h], [s * (w - e), -1, h]], dark, [0, -0.5, h / 2]);
+  m.face([[-w, -1, h - e], [w, -1, h - e], [w, 0, h - e], [-w, 0, h - e]], dark, [0, -0.5, 0]);
+  m.box([-w + e, -1, 0], [w - e, 0, 0.03], { color: ['gray', 0.22], bottom: false });
+  m.box([-w + e, -0.2, 0], [w - e, 0, 0.035], { color: ['yellow', 0.7], bottom: false });
+  // The corner braces, from the wall's face back to just in front of the door.
+  for (const s of [-1, 1]) {
+    const x = s * (w - e);
+    m.prism([[x, h - e], [x, h - 0.5], [x - s * 0.5, h - e]], -0.4, 0, { ...steel, axis: 'y', sides: dark });
+  }
+  // The posts: the hazard band at the foot, then plain steel; stripes leaning in toward the door.
+  const band = 1.2;
+  for (const s of [-1, 1]) {
+    const [x0, x1] = s > 0 ? [w, w + post] : [-w - post, -w];
+    m.box([x0, 0, 0], [x1, out, band], { color: ['gray', 0.1], top: false, bottom: false });
+    m.box([x0, 0, band], [x1, out, h], { ...steel, sides: dark, top: false, bottom: false });
+    for (let c = w - 0.4; c < w + post + band; c += 0.36) {
+      const pts = stripe([x0, 0, x1, band], s, c, c + 0.18);
+      if (pts.length >= 3) m.face(pts.map(([u, z]) => [u, out + 0.005, z]), { color: ['yellow', 0.72] }, [0, 0, band / 2]);
+    }
+    m.outlineLines([[x0, 0], [x1, 0], [x1, out], [x0, out]]);
+  }
+  // The lintel across the posts, standing out further, and its lamp.
+  m.box([-w - post, 0, h], [w + post, out + 0.1, h + 0.7], { ...steel, bottom: dark });
+  m.box([-0.35, out + 0.1, h + 0.15], [0.35, out + 0.2, h + 0.55], { color: ['gray', 0.15], bottom: false });
+  m.box([-0.27, out + 0.2, h + 0.22], [0.27, out + 0.22, h + 0.48], { color: [255, 170, 40], glow: true, bottom: false });
+  return m.build();
+}
+
 /**
  * A box `w` x `d` x `h` in a crate texture, one crate picture (square, `h`
  * high) per `h` along each face, its edges on the box's: so a face as long
@@ -231,7 +305,7 @@ function hose({ id, end, color, path }) {
 }
 
 export default [
-  rib(), fuelLine(), fuelPump(), rimLamp(),
+  rib(), fuelLine(), fuelPump(), rimLamp(), doorFrame(),
   bigCrate('bay-crate-grey', 'crate-grey', [2, 2, 2]), bigCrate('bay-crate-tan', 'crate-tan', [2, 2, 2]), bigCrate('bay-crate-rust-long', 'crate-rust', [3.2, 1.6, 1.6]),
   ...BAY_HOSES.map(hose),
 ];
