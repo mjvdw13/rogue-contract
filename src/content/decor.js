@@ -61,15 +61,11 @@ export default [
   defineDecoration({ id: 'bay-fuel-line', model: 'bay-fuel-line', fixed: true }),
   defineDecoration({ id: 'bay-fuel-pump', model: 'bay-fuel-pump', solid: true, height: 1.7, fixed: true }),
   defineDecoration({ id: 'bay-rim-lamp', model: 'bay-rim-lamp', fixed: true }),
-  // On its floor: big crates (they stack: place one 2 up on another), a
-  // container, a tool cart and a repulsor pallet with its load, bobbing,
-  // all colliding as their outlines; hoses out from the pumps, underfoot.
+  // On its floor: big crates (they stack: place one 2 up on another),
+  // colliding as their outlines; hoses out from the pumps, underfoot.
   defineDecoration({ id: 'bay-crate-grey', model: 'bay-crate-grey', solid: true, height: 2, fixed: true }),
   defineDecoration({ id: 'bay-crate-tan', model: 'bay-crate-tan', solid: true, height: 2, fixed: true }),
   defineDecoration({ id: 'bay-crate-rust-long', model: 'bay-crate-rust-long', solid: true, height: 1.6, fixed: true }),
-  defineDecoration({ id: 'bay-container', model: 'bay-container', solid: true, height: 3.25, fixed: true }),
-  defineDecoration({ id: 'bay-tool-cart', model: 'bay-tool-cart', solid: true, height: 1.33, fixed: true }),
-  defineDecoration({ id: 'bay-hover-pallet', model: 'bay-hover-pallet', solid: true, height: 1.38, fixed: true, bob: { height: 0.03, period: 2.6 } }),
   ...BAY_HOSES.map(({ id }) => defineDecoration({ id, model: id, fixed: true })),
   // Mos Eisley's market (models/market.js): a stall's counter and rack
   // (colliding, as high as the rack), the condenser tower over the water

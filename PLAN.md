@@ -91,13 +91,11 @@ These need Mark to try something, or to decide. Don't start them without him.
 
 - **Docking Bay 87's floor** (`?map=m1`, round you at the start, Mark
   2026-10-18: more detail, big crates, hoses): crates 2 tall (above you)
-  stacked two high on the west and south, a long rust crate, a rusty
-  container (6.8 by 2.8, 3.2 tall) by the stairs, a repulsor pallet
-  bobbing with its load, a tool cart and drums, and hoses from three pumps:
-  one rising into the Crow's belly to a coupling, one with its nozzle on
-  the floor, one coiled. All round the edge, clear of the stairs, the pit
-  and the Crow. How much, where, and whether the container's rust is too
-  orange against the bay's pale walls.
+  stacked two high on the west and south, a long rust crate, drums, and
+  hoses from two pumps: one with its nozzle on the floor, one coiled.
+  All round the edge, clear of the stairs, the pit and the Crow. Mark's
+  first notes (2026-10-18) took out the hose into the Crow, the tool
+  cart, the container and the repulsor pallet.
 
 - **The Moldy Crow** (`?map=m1`, hovering in Docking Bay 87, nose east
   and turned 20 degrees south of it, in front of you at the start, a
