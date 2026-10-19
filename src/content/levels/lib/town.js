@@ -17,6 +17,7 @@
 
 import { DOMES, PLASTERS } from '../../models/dome.js';
 import { HOOD, ROUND, hoodTop } from '../../models/arch.js';
+import { BUTTRESS } from '../../models/buttress.js';
 import { AWNING_CLOTHS, AWNING_DEPTHS, AWNING_POLES, AWNING_SLOPE, poleId } from '../../models/awning.js';
 import { TIN_DEPTHS, TIN_METALS, TIN_SLOPE } from '../../models/tin.js';
 import { PIPE_HEIGHTS } from '../../models/pipes.js';
@@ -255,6 +256,32 @@ export class Town {
   }
 
   /**
+   * A flight of steps up a building's side (after the film's), over the
+   * box: rising toward `up` ('N', 'E', 'S' or 'W') a tile at a time, the
+   * first step `rise` up, until `top`, where the rest of the box is the
+   * landing. Solid underneath, its treads in `floor` and its faces in
+   * `side` (the building's roof and plaster), under the sky. Keep the
+   * landing more than a jump (1.56) below any roof beside it, or it's a way
+   * onto the rooftops.
+   */
+  stair(x0, y0, x1, y1, { up, top, rise = 0.5, floor = this.roof, side = this.wall }) {
+    const n = Math.round(top / rise);
+    if (Math.abs(n * rise - top) > 1e-6) throw new Error(`Town: a stair at (${x0}, ${y0}) climbs to ${top}, not a whole number of ${rise} steps`);
+    const ns = up === 'N' || up === 'S';
+    if (!ns && up !== 'E' && up !== 'W') throw new Error(`Town: a stair at (${x0}, ${y0}) goes up toward N, E, S or W, not "${up}"`);
+    const len = ns ? y1 - y0 : x1 - x0;
+    if (len < n) throw new Error(`Town: a stair at (${x0}, ${y0}) is ${len} long, too short for its ${n} steps`);
+    for (let k = 0; k < len; k++) {
+      // (Row k from the foot; up north or west, the foot is the far side.)
+      const a = up === 'N' || up === 'W' ? (ns ? y1 : x1) - 1 - k : (ns ? y0 : x0) + k;
+      const cell = this.street(Math.min(top, (k + 1) * rise), { floor, side });
+      if (ns) this.p.rect(x0, a, x1, a + 1, cell);
+      else this.p.rect(a, y0, a + 1, y1, cell);
+    }
+    return this;
+  }
+
+  /**
    * A doorway or arch through a building's outside wall: open below
    * `lintel`, the wall over it up to the roof at `h` (a slab, so the street's
    * sky doesn't put a wall above the roofline). A door panel, if any, goes
@@ -313,6 +340,27 @@ export class Town {
     const [inside, street] = out > 0 ? [line - 1, line] : [line, line - 1];
     this.wallLit.push({ thing, wall: ns ? [leg, inside] : [inside, leg], street: ns ? [leg, street] : [street, leg] });
     this.openings.push({ kind: 'fixture', face, line: ns ? y : x, a0: along - half, a1: along + half, floorZ });
+    return this;
+  }
+
+  /**
+   * A sloping buttress against a building's straight wall (models/buttress.js):
+   * its middle at (x, y) on the wall's edge, looking `face` (as for `door`),
+   * `top` tall at the wall (one of the models' heights; the tallest under
+   * the wall's height `h` unless given), sloping down to the street. It's
+   * solid. Clutter keeps clear of its foot.
+   */
+  buttress(x, y, face, { h, top, floorZ = 0, wall = this.wall }) {
+    const angle = { S: 0, E: 90, N: 180, W: 270 }[face];
+    if (angle === undefined) throw new Error(`Town: a buttress at (${x}, ${y}) needs a face (N, E, S or W)`);
+    const t = top ?? Math.max(...BUTTRESS.tops.filter((v) => floorZ + v <= h));
+    if (!BUTTRESS.tops.includes(t)) throw new Error(`Town: a buttress at (${x}, ${y}) is ${top ?? `under ${h - floorZ}`} tall; there are models ${BUTTRESS.tops.join(', ')} tall`);
+    if (floorZ + t > h) throw new Error(`Town: a buttress at (${x}, ${y}) stands ${t} tall, above the wall's ${h - floorZ}`);
+    const ns = face === 'N' || face === 'S';
+    const out = face === 'S' || face === 'E' ? 0.01 : -0.01;
+    const along = ns ? x : y;
+    this.things.push({ type: `buttress-${t}${plaster(wall)}`, x: ns ? x : x + out, y: ns ? y + out : y, z: floorZ, angle });
+    this.openings.push({ kind: 'fixture', face, line: ns ? y : x, a0: along - BUTTRESS.foot / 2, a1: along + BUTTRESS.foot / 2, floorZ });
     return this;
   }
 

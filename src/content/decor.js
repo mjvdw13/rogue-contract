@@ -1,6 +1,7 @@
 import { defineDecoration } from '../engine/defs.js';
 import { DOMES } from './models/dome.js';
 import { ARCH_MODELS } from './models/arch.js';
+import { BUTTRESS_MODELS } from './models/buttress.js';
 import { AWNING_MODELS, AWNING_POLES, poleId } from './models/awning.js';
 import { TIN_MODELS } from './models/tin.js';
 import { PIPE_MODELS } from './models/pipes.js';
@@ -41,6 +42,8 @@ export default [
   // Round-topped arches: hoods standing out round doors (their legs collide)
   // and the rounded tops of openings, overhead.
   ...ARCH_MODELS.map((d) => defineDecoration({ id: d.id, model: d.id, solid: d.kind === 'hood', fixed: true })),
+  // Sloping buttresses against walls (they collide as their footprints).
+  ...BUTTRESS_MODELS.map((d) => defineDecoration({ id: d.id, model: d.id, solid: true, fixed: true })),
   // The town kit's models stay where it puts them (`fixed`): against and on
   // walls their radius reaches the roof, which they'd otherwise climb onto.
   // Mos Eisley's cloth awnings: their tops and ends over the kit's slab, and the poles under their fronts.

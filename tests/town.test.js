@@ -448,3 +448,30 @@ test('a door a step up raises its step outside off the street, or sits on a kerb
   assert.ok(placed.some((t) => t.x < 16), 'clutter along the house without a kerb');
   assert.ok(!placed.some((t) => t.x > 20 && t.y < 17), 'none along the kerb');
 });
+
+test('a stair rises a step a tile toward its top, from a step up at its foot to a landing, and must fit its box', () => {
+  const { p, town } = kit();
+  town.house(4, 4, 16, 14, { h: 8 });
+  town.stair(16, 4, 18, 12, { up: 'N', top: 2 });
+  assert.deepEqual([11, 10, 9, 8, 7, 6, 5, 4].map((y) => p.get(17, y).floorZ), [0.5, 1, 1.5, 2, 2, 2, 2, 2], 'four steps, then the landing');
+  assert.equal(p.get(17, 12).floorZ, 0, 'the street at its foot');
+  assert.equal(p.get(17, 8).ceiling, 'sky');
+  town.stair(20, 20, 26, 21, { up: 'W', top: 1 });
+  assert.deepEqual([25, 24, 23, 22].map((x) => p.get(x, 20).floorZ), [0.5, 1, 1, 1], 'up toward the west');
+  assert.throws(() => town.stair(20, 30, 22, 32, { up: 'N', top: 2 }), /too short/);
+  assert.throws(() => town.stair(20, 30, 22, 38, { up: 'N', top: 1.2 }), /whole number/);
+});
+
+test("a buttress stands against its wall in the wall's plaster, the tallest under the roof, solid, and must fit under it", () => {
+  const { town } = kit();
+  town.house(4, 4, 16, 14, { h: 5.5 });
+  town.buttress(10, 14, 'S', { h: 5.5, wall: 'adobe-pale' });
+  const b = town.things.find((t) => t.type.startsWith('buttress'));
+  assert.deepEqual([b.type, b.x, b.angle], ['buttress-5-pale', 10, 0]);
+  assert.ok(Math.abs(b.y - 14) < 0.05, 'on the wall');
+  const deco = registry.things.get(b.type);
+  assert.ok(deco?.solid, 'a solid decoration');
+  assert.ok(registry.models.get(b.type).lines.length > 0, 'it collides as its footprint');
+  assert.throws(() => town.buttress(10, 14, 'S', { h: 3 }), /under 3/);
+  assert.throws(() => town.buttress(10, 14, 'S', { h: 5.5, top: 6 }), /above the wall/);
+});

@@ -84,6 +84,10 @@ town.house(45, 51, 58, 63, { h: 6, r: 2, wall: 'adobe-rose', skirt: 'plinth', ti
 town.arch(50, 61, 53, 63, { h: 6, lintel: 3.75, wall: 'adobe-rose', round: 'S' });
 town.door(51.5, 61, 'S', { h: 6, depth: 0, panel: false });
 town.window(48.5, 63, 'S', { z: 3.6 }).window(55.5, 63, 'S', { z: 3.6 }).window(53.5, 58, 'S', { z: 8, tex: 'window-louvre' });
+// A stair up its east side from the street to a shut door on a landing,
+// 3.5 up: too far under the roofs either side to climb onto them.
+town.stair(58, 53, 60, 61, { up: 'N', top: 3.5, side: 'adobe-rose' });
+town.door(58, 54, 'E', { h: 10, wall: 'adobe-rose', floorZ: 3.5 });
 
 // South row.
 // E: a shop you can walk into, with a dome over it, and a yard in front
@@ -105,6 +109,8 @@ town.room(24, 84, 28, 90, { h: 10, wall: 'adobe-grey', light: 120 });
 town.door(25, 79, 'N', { h: 7, tex: 'door-grey', wall: 'adobe-grey', opens: true });
 town.hood(25, 79, 'N', { h: 7, wall: 'adobe-grey' });
 town.window(22.5, 79, 'N', { z: 4 }).window(26.5, 83, 'N', { z: 8.5, tex: 'window-louvre' }).window(20, 86.5, 'W');
+// Two sloping buttresses down its blank east wall onto the square.
+town.buttress(30, 82.5, 'E', { h: 7, wall: 'adobe-grey' }).buttress(30, 88, 'E', { h: 10, wall: 'adobe-grey' });
 // A square, with a round house under a dome in it.
 town.circle(41, 86, 4.5, { inside: town.roofCell({ h: 5, wall: 'adobe-rose', skirt: 'plinth' }), wall: { wall: 'adobe-rose', wallTop: 5 }, open: 'out', skirt: 'plinth' });
 town.dome(41, 86, 5, 8.5, { wall: 'adobe-rose' });
@@ -113,6 +119,7 @@ town.house(53, 78, 61, 88, { h: 5, r: 2, wall: 'adobe-ochre', skirt: null, dome:
 town.room(55, 79, 59, 87, { h: 5, ceilZ: 4.25, wall: 'adobe-ochre', light: 128 });
 town.door(57, 78, 'N', { h: 5, wall: 'adobe-ochre', opens: true });
 town.window(53, 83.5, 'W', { z: 3, tex: 'window-louvre' });
+town.buttress(53, 85, 'W', { h: 5, wall: 'adobe-ochre' });
 // A stall on the square in front of G, under a tarp that billows.
 town.tarp(46, 80, 50, 84, { z: 2.75, face: 'W', rise: 0.5, cloth: 'red' });
 
