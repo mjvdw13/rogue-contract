@@ -373,10 +373,10 @@ list.push(
   at('crate-rust-long', 48.3, 63.5, { angle: 3 }), at('crate-grey-small', 48.1, 63.45, { z: 0.7, angle: 350 }), at('barrel-rust', 49.6, 64.2),
   at('cargo-pod', 22.3, 78.5, { angle: 176 }), at('canister', 23.45, 78.6),
   at('vaporator', 34.2, 80.4),
-  // An X-34 landspeeder left in the square's quiet south-east corner, out of
-  // the way against the back wall, nose west and a little askew (Mark: not
-  // square to the houses).
-  at('landspeeder', 54.5, 97.7, { angle: 174 }),
+  // An X-34 landspeeder left in the middle of the square's quiet south-east
+  // corner, out of the way, nose north-west at about 40 degrees to the walls
+  // (Mark: near 45, but not exactly).
+  at('landspeeder', 56.5, 93.8, { angle: 141 }),
   at('crate-rust-long', 46.9, 82, { angle: 90 }), at('droid-dome', 46.9, 81.6, { z: 0.7, angle: 200 }), at('crate-grey-small', 46.85, 82.4, { z: 0.7, angle: 85 }),
   at('crate-tan', 49, 81.1, { angle: 95 }), at('barrel-grey', 49.1, 83), at('litter-small', 45, 83, { angle: 40 }),
 );
