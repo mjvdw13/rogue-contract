@@ -11,7 +11,8 @@ sharper T-21 and the black pauldron and writes
 assets/sprites/monsters/sandtrooper.png. The frame order is the one in
 src/content/monsters/sandtrooper.js: 0-5 walk, 6 aim, 7 fire, 8 pain,
 9-12 death; then the walk from the other views, six frames each (13-18
-front three-quarter, 19-24 side, 25-30 back three-quarter, 31-36 back).
+front three-quarter, 19-24 side, 25-30 back three-quarter, 31-36 back);
+37-41 standing, from the same five views (the sheet's turnaround).
 `--preview` also writes the sheet 4x on grey, for checking.
 
 Every one of the sheet's 48 poses is cut apart and restyled together, into
@@ -81,10 +82,13 @@ GROUPS = [
     dict(box=(870, 640, 1100, 835), figures=3, base=829, thin=True),
 ]
 # Sheet frame -> (row, pose) in the layout: the walk, aim, fire, pain, the
-# death; the walk's front three-quarter, side, back three-quarter and back.
+# death; the walk's front three-quarter, side, back three-quarter and back;
+# the turnaround, standing (front, front three-quarter, side, back
+# three-quarter, back).
 FRAMES = [
     *[(0, i) for i in range(6)], (1, 6), (1, 7), (3, 0), *[(1, i) for i in range(9, 13)],
     *[(0, i) for i in range(6, 12)], *[(2, i) for i in range(12)], *[(1, i) for i in range(6)],
+    *[(3, i) for i in range(6, 11)],
 ]
 FIRE = (1, 7)
 MUZZLE = (648, 291)  # the fire pose's muzzle, on the sheet

@@ -8,7 +8,8 @@ The shared steps are in ../sheetcut.py. Writes
 assets/sprites/monsters/jawa.png, in the frame order of
 src/content/monsters/jawa.js: 0-5 walk, 6 aim, 7 fire, 8 pain, 9-12 death;
 then the walk from the other views, six frames each (13-18 front
-three-quarter, 19-24 side, 25-30 back three-quarter, 31-36 back).
+three-quarter, 19-24 side, 25-30 back three-quarter, 31-36 back); 37-41
+standing, from the same five views (the sheet's turnaround).
 
 Every pose stands apart on the sheet, so each is cut on its own, with its
 lowest pixel (feet, or body lying down) on the frame's bottom row. The
@@ -46,8 +47,9 @@ FRAMES = [
 ]
 
 # The walk's other views, as (row, pose): front three-quarter (row 1), side
-# and back three-quarter (row 3), back (row 2).
-VIEWS = [*[(0, i) for i in range(6, 12)], *[(2, i) for i in range(12)], *[(1, i) for i in range(6)]]
+# and back three-quarter (row 3), back (row 2); then the turnaround,
+# standing (row 4: front, front three-quarter, side, back three-quarter, back).
+VIEWS = [*[(0, i) for i in range(6, 12)], *[(2, i) for i in range(12)], *[(1, i) for i in range(6)], *[(3, i) for i in range(6, 11)]]
 
 
 def main():

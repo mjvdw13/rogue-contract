@@ -85,7 +85,7 @@ test('every monster and friendly is placed in some level, so the minute of play 
 });
 
 test('every villager, sandtrooper, commander and Jawa sheet holds all its frames and views, and a villager says a line when used', () => {
-  const cut = [...villagers.map((def) => [def, 42]), ...['sandtrooper', 'sandtrooper-commander', 'jawa'].map((id) => [registry.things.get(id), 37])];
+  const cut = [...villagers, ...['sandtrooper', 'sandtrooper-commander', 'jawa'].map((id) => registry.things.get(id))].map((def) => [def, 42]);
   for (const [def, count] of cut) {
     const id = def.id;
     const sheet = registry.sheets.get(def.sheet.ref);

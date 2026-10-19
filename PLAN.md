@@ -142,8 +142,9 @@ These need Mark to try something, or to decide. Don't start them without him.
   (nothing else happens yet: m1 has no `on: 'hostile'` trigger). After
   Mark's notes (2026-10-18): they stroll slower (troopers 1.2 tiles a
   second, Jawas 1.5), their legs keep pace (the new calm `stride`: 1.4
-  tiles a walk cycle for a trooper, 0.9 for a Jawa), and they stand with
-  their feet together when stopped. To check by eye: the leg speed, and
+  tiles a walk cycle for a trooper, 0.9 for a Jawa), and they stand in
+  the sheets' turnaround poses when stopped (the Jawa's has no side view,
+  so side-on it shows the front turned a little). To check by eye: the leg speed, and
   the commanders' lines. Still open: the
   lines (the Jawaese is made up), and whether Jawas should run rather
   than fight when the town turns (the story has civilians run; Jawas are

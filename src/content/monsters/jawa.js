@@ -8,7 +8,7 @@ export default defineMonster({
   id: 'jawa',
   name: 'Jawa',
   glyph: 'j',
-  sheet: { src: 'assets/sprites/monsters/jawa.png', frameWidth: 50, frameHeight: 50 },
+  sheet: { src: 'assets/sprites/monsters/jawa.png', frameWidth: 50, frameHeight: 52 },
   scale: 0.85,
   health: 12,
   speed: 5.5,
@@ -22,8 +22,9 @@ export default defineMonster({
   light: { radius: 3.5, light: 64 }, // the muzzle flash, on the attack's fullbright frames
   anims: {
     // The walk's views are 13-36 (front three-quarter, side, back three-quarter, back).
-    // Standing: the walk's frame with the robe narrowest at the feet in each view.
-    idle: { frames: [3], fps: 1, loop: true, views: { frontSide: [13], side: [22], backSide: [28], back: [34] } },
+    // Standing: the turnaround (37-41). It has no side view: the side shows
+    // the front turned a little (39).
+    idle: { frames: [37], fps: 1, loop: true, views: { frontSide: [38], side: [39], backSide: [40], back: [41] } },
     walk: { frames: [0, 1, 2, 3, 4, 5], fps: 10, views: { frontSide: [13, 14, 15, 16, 17, 18], side: [19, 20, 21, 22, 23, 24], backSide: [25, 26, 27, 28, 29, 30], back: [31, 32, 33, 34, 35, 36] } },
     attack: { frames: [6, 7, 6], durations: [0.4, 0.12, 0.25], fireAt: 1, fullbright: [1] },
     pain: { frames: [8], durations: [0.2] },
