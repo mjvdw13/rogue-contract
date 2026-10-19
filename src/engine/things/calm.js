@@ -38,6 +38,8 @@ export function makeCalm(world, m, spec) {
     // Patrols all set off together, so two on the same timing walk in step.
     timer: route ? 0.5 : m.rng.range(0.3, 2),
     blocked: 0,
+    // How long a walk has been held up on the spot.
+    still: 0,
     stuck: 0,
     dodge: 0,
     reactCooldown: 0,
@@ -48,7 +50,7 @@ export function makeCalm(world, m, spec) {
     m.area = wanderArea(world, m);
   }
   m.state = 'calm';
-  if (!m.setAnim('idle', false)) m.setAnim('walk', false);
+  standPose(m);
 }
 
 /** Turn a calm monster into a normal one: from now on it looks for the player. */
@@ -58,7 +60,7 @@ export function endCalm(m) {
   if (m.dead) return;
   m.state = 'idle';
   m.timer = 0;
-  if (!m.setAnim('idle', false)) m.setAnim('walk', false);
+  standPose(m);
 }
 
 function nearest(m, route) {
@@ -69,6 +71,11 @@ function nearest(m, route) {
   return best;
 }
 
+/** Its standing pose (the walk's first frame if it has no idle). */
+function standPose(m) {
+  if (!m.setAnim('idle', false)) m.setAnim('walk', false);
+}
+
 function stand(m) {
   const c = m.calm;
   const [a, b] = c.idleTime;
@@ -77,7 +84,7 @@ function stand(m) {
   c.via = null;
   c.blocked = 0;
   c.timer = m.rng.range(a, b);
-  if (!m.setAnim('idle', false)) m.setAnim('walk', false);
+  standPose(m);
 }
 
 function walkTo(m, x, y) {
@@ -89,7 +96,8 @@ function walkTo(m, x, y) {
   c.timer = c.route ? Infinity : 8;
   c.blocked = 0;
   c.stuck = 0;
-  m.setAnim('walk', false);
+  c.still = 0;
+  // (walk() starts the walk once it's moving: a patrol already at its point stands on.)
 }
 
 /** The next patrol point after the one just reached: on along the route, back at its end (or round). */
@@ -121,7 +129,7 @@ export function calmReact(world, m) {
   c.timer = 1.8;
   c.reactCooldown = 2.5;
   m.angle = m.angleTo(world.player);
-  if (!m.setAnim('idle', false)) m.setAnim('walk', false);
+  standPose(m);
   if (c.lines.length) {
     let k = m.rng.int(0, c.lines.length - 1);
     if (k === c.lastLine && c.lines.length > 1) k = (k + 1) % c.lines.length;
@@ -189,6 +197,11 @@ function walk(world, m, dt) {
     m.y = y;
     moved = false;
   }
+  // Held up (pressed against someone, or waiting to walk round), it stands
+  // rather than walking on the spot.
+  c.still = moved ? 0 : c.still + dt;
+  if (c.still > 0.1) standPose(m);
+  else m.setAnim('walk', false);
   // Sliding along someone in the way by a hair each tick isn't getting
   // anywhere: count it as blocked unless it gained half a step on where
   // it's heading (or is stepping aside).

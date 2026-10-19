@@ -22,7 +22,8 @@ export default defineMonster({
   light: { radius: 3.5, light: 64 }, // the muzzle flash, on the attack's fullbright frames
   anims: {
     // The walk's views are 13-36 (front three-quarter, side, back three-quarter, back).
-    idle: { frames: [1], fps: 1, loop: true, views: { frontSide: [14], side: [20], backSide: [26], back: [32] } },
+    // Standing: the walk's frame with the robe narrowest at the feet in each view.
+    idle: { frames: [3], fps: 1, loop: true, views: { frontSide: [13], side: [22], backSide: [28], back: [34] } },
     walk: { frames: [0, 1, 2, 3, 4, 5], fps: 10, views: { frontSide: [13, 14, 15, 16, 17, 18], side: [19, 20, 21, 22, 23, 24], backSide: [25, 26, 27, 28, 29, 30], back: [31, 32, 33, 34, 35, 36] } },
     attack: { frames: [6, 7, 6], durations: [0.4, 0.12, 0.25], fireAt: 1, fullbright: [1] },
     pain: { frames: [8], durations: [0.2] },

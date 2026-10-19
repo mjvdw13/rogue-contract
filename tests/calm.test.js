@@ -77,6 +77,32 @@ test('a patrol steps round the player standing in its way, and goes on', () => {
   assert.ok(furthest > 26, `it got past to the far point (reached x ${furthest.toFixed(1)})`);
 });
 
+test('a calm monster that has stopped stands rather than walking on the spot', () => {
+  // A Jawa strolling, and a patrol along the wall held up by a pillar in its way.
+  const tiles = HALL.map((row, y) => (y === 1 ? row.slice(0, 12) + '#' + row.slice(13) : row));
+  const w = makeWorld({ ...room(tiles, []), list: [
+    { type: 'player', x: 2.5, y: 6.5, angle: 0 },
+    { type: 'jawa', x: 16.5, y: 4.5, calm: { wander: 3 } },
+    { type: 'sandtrooper', x: 4.5, y: 1.5, calm: { patrol: [[4.5, 1.5], [26.5, 1.5]], idleTime: [0.5, 0.5] } },
+  ] });
+  const calm = w.things.filter((t) => t.kind === 'monster');
+  const last = calm.map((m) => ({ x: m.x, y: m.y, still: 0 }));
+  let stopped = 0;
+  run(w, mockInput(), 20, () => {
+    calm.forEach((m, i) => {
+      const p = last[i];
+      p.still = Math.hypot(m.x - p.x, m.y - p.y) < 1e-6 ? p.still + 1 : 0;
+      p.x = m.x;
+      p.y = m.y;
+      if (p.still > 15) {
+        stopped++;
+        assert.notEqual(m.animName, 'walk', `${m.def.id} stopped at ${m.x.toFixed(2)},${m.y.toFixed(2)} in its walk`);
+      }
+    });
+  });
+  assert.ok(stopped > 0, 'they did stop');
+});
+
 test('two patrols on the same timing walk side by side, in step', () => {
   const patrol = [[4.5, 3.5], [26.5, 3.5]];
   const beside = patrol.map(([x, y]) => [x, y + 1.6]);
