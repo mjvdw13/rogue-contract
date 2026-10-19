@@ -66,13 +66,11 @@ town.house(19, 62, 25, 66, { h: 4, r: 1, wall: 'adobe-pale', skirt: null });
 town.arch(20, 62, 24, 66, { h: 4, lintel: 3, wall: 'adobe-pale' });
 town.leanTo(19, 62, 25, 66, { h: 4, face: 'S', seed: 9 });
 town.window(16, 56.5, 'W', { tex: 'window-louvre' });
-// C: a round tower under a big dome, a low lean-to in front of it with an
-// awning over the street.
+// C: a round tower under a big dome, a low lean-to in front of it.
 // (The lean-to first: the tower's round wall rises from its roof.)
 town.house(30, 59, 42, 63, { h: 4, r: 1 });
 town.leanTo(30, 59, 42, 63, { h: 4, face: 'S' });
 town.circle(35.5, 56.5, 5, { inside: town.roofCell({ h: 9, wall: 'adobe-ochre' }), wall: { wall: 'adobe-ochre', wallTop: 9 }, open: 'out' });
-town.awning(31, 63, 41, 65, { z: 3, face: 'S', cloth: 'teal' });
 town.door(33, 63, 'S', { h: 4, tex: 'door-grey' });
 town.door(38.5, 63, 'S', { h: 4, tex: 'shutter', tall: 2.25, width: 3, jamb: false, sign: false, panel: false });
 town.dome(35.5, 56.5, 9, 9.5, { wall: 'adobe-ochre' });
@@ -85,12 +83,11 @@ town.door(51.5, 61, 'S', { h: 6, depth: 0, panel: false });
 town.window(48.5, 63, 'S', { z: 3.6 }).window(55.5, 63, 'S', { z: 3.6 }).window(53.5, 58, 'S', { z: 8, tex: 'window-louvre' });
 
 // South row.
-// E: a shop you can walk into, under an awning, with a dome over it.
+// E: a shop you can walk into, with a dome over it.
 town.house(4, 78, 17, 91, { h: 6, r: 3, dome: true });
 town.room(7, 81, 15, 88, { h: 6, light: 128 });
 town.room(9, 81, 12, 83, { h: 6, light: 160 }); // daylight through the door
 town.arch(9, 78, 12, 81, { h: 6, lintel: 3 });
-town.awning(6, 76, 16, 78, { z: 3.5, face: 'N', cloth: 'red', valance: 'valance-red' });
 town.window(7.5, 78, 'N', { z: 2.2 }).window(13.5, 78, 'N', { z: 2.2 });
 // F: a tall house in two steps, a door that opens into a room behind it
 // (the front under the lower roof, the back under the upper storey).
@@ -148,9 +145,8 @@ town.door(94.5, 58, 'S', { h: 7, tex: 'shutter', tall: 2.25, width: 3, jamb: fal
 town.window(90.5, 58, 'S', { z: 4.5 }).window(98.5, 58, 'S', { z: 4.5, tex: 'window-louvre' }).window(96.5, 53, 'S', { z: 8.4 });
 
 // The market's south side.
-// Q: a house with an awning over its door.
+// Q: a house facing the market.
 town.house(63, 82, 73, 92, { h: 6, r: 2, dome: true });
-town.awning(65, 80, 71, 82, { z: 3.5, face: 'N', cloth: 'sand' });
 town.door(68, 82, 'N', { h: 6 });
 town.window(65.5, 82, 'N', { z: 2.2 }).window(73, 87.5, 'E');
 // R: a round house under a dome.
@@ -182,7 +178,6 @@ town.window(132.5, 61, 'S', { z: 3.4 }).window(133.5, 57, 'S', { z: 9.4, tex: 'w
 // then P (the first of the rooftops).
 town.house(102, 76, 114, 86, { h: 6, r: 2, wall: 'adobe-rose', skirt: 'plinth', dome: true });
 town.door(110, 76, 'N', { h: 6, wall: 'adobe-rose' });
-town.awning(107, 74, 113, 76, { z: 3.5, face: 'N', cloth: 'umber', valance: 'valance-umber' });
 town.window(107.5, 76, 'N', { z: 2.2, tex: 'window-louvre' });
 town.block(104, 76, 106, 77, { ...GATE, h: 6 });
 town.slanted([[114, 76], [124, 73], [126, 73], [126, 86], [114, 86]], { h: 5, wall: 'adobe-grey', skirt: null, dome: true });
@@ -342,7 +337,7 @@ list.push(
   at('crate-rust-long', 48.3, 63.5, { angle: 3 }), at('crate-grey-small', 48.1, 63.45, { z: 0.7, angle: 350 }), at('barrel-rust', 49.6, 64.2),
   at('cargo-pod', 22.3, 78.5, { angle: 176 }), at('canister', 23.45, 78.6),
   at('vaporator', 34.2, 80.4),
-  // An X-34 landspeeder left on the main street by C's awning, nose west,
+  // An X-34 landspeeder left on the main street in front of C, nose west,
   // turned a little off the line of the street (Mark: not square to the houses).
   at('landspeeder', 37.5, 74.4, { angle: 165 }),
   at('crate-rust-long', 46.9, 82, { angle: 90 }), at('droid-dome', 46.9, 81.6, { z: 0.7, angle: 200 }), at('crate-grey-small', 46.85, 82.4, { z: 0.7, angle: 85 }),
@@ -437,8 +432,8 @@ const hangings = [
   { type: 'rope', from: [56, 58.05, 9.5], length: 2 },
   // A rag over B's porch doorway, like a curtain.
   { type: 'rag', from: [20.2, 66.05, 3.9], to: [23.8, 66.05, 3.9], length: 1.5 },
-  // A torn rag hanging under C's awning, over its shutter.
-  { type: 'rag', from: [37.2, 64.75, 2.95], to: [39.8, 64.75, 2.95], length: 0.9 },
+  // A torn rag hanging over C's shutter.
+  { type: 'rag', from: [37.2, 63.05, 2.95], to: [39.8, 63.05, 2.95], length: 0.9 },
   // A long banner down G's west wall, facing the square.
   { type: 'rag', from: [52.95, 80.4, 4.8], to: [52.95, 81.8, 4.8], length: 2.4 },
   // A sheet slung across the north back lane, pinned at its corners.

@@ -47,7 +47,7 @@ These need Mark to try something, or to decide. Don't start them without him.
 
 - **Hangings in Mos Eisley** (`?map=m1`): five cables (one high, from
   C's tower to F's upper storey), two ropes, a rag curtain over B's porch
-  doorway, valances on both awnings, a long banner on G's west wall and a
+  doorway, valances on the market stalls, a long banner on G's west wall and a
   sheet slung across the north back lane. The look (the generated
   `cloth-rag` and `cloth-pale`, their tears about 1 unit deep, so short
   cloths are mostly tatters), how fast and far they sway (`breeze`), and
@@ -63,7 +63,8 @@ These need Mark to try something, or to decide. Don't start them without him.
   (the new slanting fronts past the market have it).
 
 - **Awnings, tin, pipes and clutter in Mos Eisley** (`?map=m1`): cloth
-  awnings (C teal with a fixed fringe, E red with a swaying valance), a
+  awnings on the market (I olive, and the stalls; off the houses since
+  Mark's film stills, 2026-10-18), a
   tarp over a stall on the square, tin on C's lean-to and B's porch,
   downpipes, tanks, box units, conduits and vents on the walls, and the
   street clutter: crates, drums, pressure canisters, cargo pods, power
@@ -71,17 +72,17 @@ These need Mark to try something, or to decide. Don't start them without him.
   (no jars or sacks: Mark, 2026-10-18), set along the walls by
   `town.clutter()` and by hand on the main street (a stall selling droid
   parts under the tarp). How they look, how much clutter (`amount`),
-  whether the tarp and the valance sway too much, and whether more awnings
+  whether the tarp and the valance sway too much, and whether more stalls
   should sway. The cloth redone (Mark, 2026-10-18: the stripes and
   scallops looked medieval): plain, muted and ragged, bleached in
   blotches, patched with scraps of other cloth, the hems torn to tatters;
-  faded teal is the splash, and a dark `umber` for contrast (the awning
-  past the market, a stall). Whether the colours are right and the tears
+  faded teal is the splash, and a dark `umber` for contrast (a
+  stall). Whether the colours are right and the tears
   ragged enough. All the new models together cost 0.44 ms a frame on
   average over eight views, 0.75 at worst (headless, measured with the
   machine at about half its usual speed).
 
-- **The landspeeder** (`?map=m1`, back on the main street by C's awning,
+- **The landspeeder** (`?map=m1`, back on the main street in front of C,
   nose west, turned 15 degrees off the line of the street): the bob made
   subtler (Mark, 2026-10-18: 0.02 up and down every 3.2 s, was 0.05 every
   2.6) and the grime shadow, a third of the light under the hull. Whether
@@ -185,6 +186,16 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
         their pylons. Collision lines; under the face budget.
   - [x] Parked on the main street; snapshots.
   - [ ] Waiting on Mark.
+- [ ] **Buildings after the film** (Mark's stills, 2026-10-18; the shapes
+      are in `docs/mission1.md`, "What the film shows"). A step at a time,
+      checking in with Mark after each.
+  - [x] Notes; awnings off the houses (I's on the market stays).
+  - [ ] Round-topped arches: a hood standing out round a door, and
+        rounded openings on porches.
+  - [ ] Low walls, kerbs and steps.
+  - [ ] Sloping buttresses and a stair up a house's side.
+  - [ ] Hitching rings on walls; perforated canisters and engine rings
+        in the clutter.
 - [ ] **The cantina:** entrance, steps down, the round room, the bar,
       booths, bandstand, back rooms.
 - [ ] **Bay 86, the dewback stable and the speeder garage.**

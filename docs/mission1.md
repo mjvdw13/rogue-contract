@@ -63,7 +63,7 @@ street is at 0. The numbers 1-10 are the story's; 11 on are new.
 | 2 | **The market** | 62..102, 58..82 | 0, sky | The street widens into a market: stalls with cloth awnings (shade you walk under), crates, baskets of fruit, a droid seller's pen, hanging cloth. The busiest place in town. |
 | 13 | **Water plaza** | round, at (78, 70), r 9 | 0, sky | In the market: a moisture condenser tower (a tall 3D model, a landmark), a water seller and the queue at his tap, a dewback trough. |
 | B | **Blast doors** | at x 104..106 | | Two Imperial blast doors across the street, open in the calm half: slid into slots in the walls either side, strips of dark steel easy to miss. The switch shuts them and splits the town in two. |
-| 3 | **Chalmun's cantina** | 88..126, 84..122 | -2 | The classic. A dark entrance with a droid detector (and a "no droids" sign), steps down into a round main room (about 26 across, a true circle of angled walls). A round bar in the middle with the bartender, booths in alcoves round the edge under lower ceilings, each with a dim lamp. A bandstand with the band (its own music). Smoke hangs in the lamplight. Dark: 96-120, with pools at the bar and the booths. The broker's booth at the back. A back room, a storeroom and the kitchen; the back door opens onto the back lane (19). |
+| 3 | **Chalmun's cantina** | 88..126, 84..122 | -2 | The classic (Mark's still, 2026-10-18: the bar a pale ring under a big oval opening in a low, heavy ceiling, lit from above with its taps and pipes behind it; arched alcoves round the walls; grey, dim and hazy). A dark entrance with a droid detector (and a "no droids" sign), steps down into a round main room (about 26 across, a true circle of angled walls). A round bar in the middle with the bartender, booths in alcoves round the edge under lower ceilings, each with a dim lamp. A bandstand with the band (its own music). Smoke hangs in the lamplight. Dark: 96-120, with pools at the bar and the booths. The broker's booth at the back. A back room, a storeroom and the kitchen; the back door opens onto the back lane (19). |
 | 14 | **Bay owner's office** | 44..53, 101..105 | 0 | In the bay's building, east of its door: a red door off the lane and a window (open, at eye height) onto it. A cramped office with a terminal and crates, a desk, a tired owner ("Docking fees doubled. Imperials."), a power droid charging outside. |
 | 16 | **Customs house** | 11..21, 99..106 | 0 | West of the bay door, jutting a tile into the lane: a grey Imperial prefab (corrugated `metal-grey`, its roof at 5, below the bay's) dropped among the adobe, a door and a window onto the lane, impounded cargo inside: the customs officer and his troopers come out of it. A counter, a terminal, a holo-notice of wanted faces (not Dace's yet). |
 | 17 | **Docking Bay 86** | 58..86, 94..130 | -5, sky | Next door, shut. Through its barred gate you look down on customs troopers inspecting a battered freighter, crates opened on the floor. Atmosphere only; you can't get in. |
@@ -137,6 +137,28 @@ Buildings may touch, share walls and back onto each other or the town's
 edge; the player needn't be able to get behind them (Mark, the same day).
 Check a street from several angles, not just down its length.
 
+**What the film shows** (Mark's stills, 2026-10-18: A New Hope, The
+Mandalorian, Outlaws, and the Special Edition's wide shots):
+
+- **Plain walls, few openings.** Long runs of cream plaster, a door or two,
+  a small window high up. Variety comes from the shapes and the shade,
+  not from decoration.
+- **Round-topped arches** are the town's mark. A deep hood that stands out
+  from the wall, taller than the door it frames, its top a half circle; and
+  round-topped openings into dark porches and niches. Doors themselves are
+  the lattice doors with the tiled jamb, sign and panel (built).
+- **Walls lean in** and are thicker at the foot; sloping buttresses and
+  stairs run down a wall from the roof to the street.
+- **The street isn't flat.** Knee-high walls round yards, raised
+  platforms a few steps up, a kerb along a wall's foot, doors a step up.
+- **Hitching rings** (big hoops) on the walls by doors; junk against the
+  walls: perforated canisters, engine rings, old drums.
+- **Hardly any awnings** on buildings. Awnings are the market's, the
+  stalls' and the free-standing tents'. A building gets one only where it
+  fronts the market.
+- **Pipes, cables and junk:** the film has fewer than we do. Ours stay
+  (Mark: he likes them).
+
 - **A building is a block of raised floor** (`house()`): tiles at the
   roof's height under the full sky, their `side` texture as the walls. From
   the street you see the wall up to the roofline and sky above it, and
@@ -180,7 +202,7 @@ Check a street from several angles, not just down its length.
   streets get one too, so the skyline is domes. Keep a dome inside its roof:
   one hanging over a lower roof is clipped. 189 of them cost about 0.1 ms a
   frame.
-- **Awnings** (`awning()`): a thin slab of cloth over the street is the
+- **Awnings** (`awning()`, on the market only, see above): a thin slab of cloth over the street is the
   shade you walk under and the cloth's underside you see; on it the cloth
   slopes up to the wall (0.3 a tile) in bays 2 tiles wide that sag between
   their ribs (models, `models/awning.js`), with poles under the front and
