@@ -462,7 +462,7 @@ test('a stair rises a step a tile toward its top, from a step up at its foot to 
   assert.throws(() => town.stair(20, 30, 22, 38, { up: 'N', top: 1.2 }), /whole number/);
 });
 
-test("a buttress stands against its wall in the wall's plaster, the tallest under the roof, solid, and must fit under it", () => {
+test("a buttress stands against its wall in the wall's plaster, the tallest just under the roof, solid, and must fit under it", () => {
   const { town } = kit();
   town.house(4, 4, 16, 14, { h: 5.5 });
   town.buttress(10, 14, 'S', { h: 5.5, wall: 'adobe-pale' });
@@ -472,6 +472,6 @@ test("a buttress stands against its wall in the wall's plaster, the tallest unde
   const deco = registry.things.get(b.type);
   assert.ok(deco?.solid, 'a solid decoration');
   assert.ok(registry.models.get(b.type).lines.length > 0, 'it collides as its footprint');
-  assert.throws(() => town.buttress(10, 14, 'S', { h: 3 }), /under 3/);
+  assert.throws(() => town.buttress(10, 14, 'S', { h: 3 }), /under 2.5/);
   assert.throws(() => town.buttress(10, 14, 'S', { h: 5.5, top: 6 }), /above the wall/);
 });

@@ -109,8 +109,8 @@ town.room(24, 84, 28, 90, { h: 10, wall: 'adobe-grey', light: 120 });
 town.door(25, 79, 'N', { h: 7, tex: 'door-grey', wall: 'adobe-grey', opens: true });
 town.hood(25, 79, 'N', { h: 7, wall: 'adobe-grey' });
 town.window(22.5, 79, 'N', { z: 4 }).window(26.5, 83, 'N', { z: 8.5, tex: 'window-louvre' }).window(20, 86.5, 'W');
-// Two sloping buttresses down its blank east wall onto the square.
-town.buttress(30, 82.5, 'E', { h: 7, wall: 'adobe-grey' }).buttress(30, 88, 'E', { h: 10, wall: 'adobe-grey' });
+// Buttresses along its blank east wall onto the square.
+town.buttress(30, 82.5, 'E', { h: 7, wall: 'adobe-grey' }).buttress(30, 86.5, 'E', { h: 10, wall: 'adobe-grey' }).buttress(30, 89.2, 'E', { h: 10, wall: 'adobe-grey' });
 // A square, with a round house under a dome in it.
 town.circle(41, 86, 4.5, { inside: town.roofCell({ h: 5, wall: 'adobe-rose', skirt: 'plinth' }), wall: { wall: 'adobe-rose', wallTop: 5 }, open: 'out', skirt: 'plinth' });
 town.dome(41, 86, 5, 8.5, { wall: 'adobe-rose' });
@@ -119,7 +119,7 @@ town.house(53, 78, 61, 88, { h: 5, r: 2, wall: 'adobe-ochre', skirt: null, dome:
 town.room(55, 79, 59, 87, { h: 5, ceilZ: 4.25, wall: 'adobe-ochre', light: 128 });
 town.door(57, 78, 'N', { h: 5, wall: 'adobe-ochre', opens: true });
 town.window(53, 83.5, 'W', { z: 3, tex: 'window-louvre' });
-town.buttress(53, 85, 'W', { h: 5, wall: 'adobe-ochre' });
+town.buttress(53, 85.2, 'W', { h: 5, wall: 'adobe-ochre' });
 // A stall on the square in front of G, under a tarp that billows.
 town.tarp(46, 80, 50, 84, { z: 2.75, face: 'W', rise: 0.5, cloth: 'red' });
 

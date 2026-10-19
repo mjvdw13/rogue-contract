@@ -221,11 +221,13 @@ Mandalorian, Outlaws, and the Special Edition's wide shots):
   with `floorZ` is a step up, its step outside raised to it, or on the
   kerb (C, H, Q). Clutter and grime keep off all three.
 - **Buttresses and stairs** (the film's walls lean on them):
-  `buttress()` is a wedge of the wall's plaster (`buttress-4`, `-5`, `-6`,
-  `models/buttress.js`), as tall as the roof allows, out from the wall 0.4
-  of its height, 1.5 wide at the foot and 1 at the top. It collides as its
-  footprint, so you can't climb it. F has two on its blank east wall onto
-  the square, G one on its west. `stair()` is a flight of raised floor, a
+  `buttress()` is a pier of the wall's plaster hugging it (Mark: the
+  first, long wedges, were too triangular): 0.9 deep at the foot, leaning
+  in to 0.3, then a short cap back to the wall, 1.25 wide narrowing to 1.
+  Heights 3.5 to 9.5 half a tile apart (`models/buttress.js`), so one ends
+  half a tile under any roof. It collides as its footprint, so you can't
+  climb it. F has three along its blank east wall onto the square, G one
+  on its west. `stair()` is a flight of raised floor, a
   step a tile 0.5 apart, up to a landing: D's runs up its east side to a
   shut door 3.5 up. A landing must be more than a jump (1.56) under the
   roofs beside it, or it's a way onto them (the rooftops are their own step).

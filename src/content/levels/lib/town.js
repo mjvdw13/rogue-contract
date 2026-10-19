@@ -344,23 +344,23 @@ export class Town {
   }
 
   /**
-   * A sloping buttress against a building's straight wall (models/buttress.js):
-   * its middle at (x, y) on the wall's edge, looking `face` (as for `door`),
-   * `top` tall at the wall (one of the models' heights; the tallest under
-   * the wall's height `h` unless given), sloping down to the street. It's
-   * solid. Clutter keeps clear of its foot.
+   * A buttress against a building's straight wall (models/buttress.js): a
+   * pier leaning in from a thicker foot, its middle at (x, y) on the wall's
+   * edge, looking `face` (as for `door`), `top` tall at the wall (one of the
+   * models' heights; unless given, the tallest at least half a tile under
+   * the wall's height `h`). It's solid. Clutter keeps clear of its foot.
    */
   buttress(x, y, face, { h, top, floorZ = 0, wall = this.wall }) {
     const angle = { S: 0, E: 90, N: 180, W: 270 }[face];
     if (angle === undefined) throw new Error(`Town: a buttress at (${x}, ${y}) needs a face (N, E, S or W)`);
-    const t = top ?? Math.max(...BUTTRESS.tops.filter((v) => floorZ + v <= h));
-    if (!BUTTRESS.tops.includes(t)) throw new Error(`Town: a buttress at (${x}, ${y}) is ${top ?? `under ${h - floorZ}`} tall; there are models ${BUTTRESS.tops.join(', ')} tall`);
+    const t = top ?? Math.max(...BUTTRESS.tops.filter((v) => floorZ + v <= h - 0.5));
+    if (!BUTTRESS.tops.includes(t)) throw new Error(`Town: a buttress at (${x}, ${y}) is ${top ?? `under ${h - floorZ - 0.5}`} tall; there are models ${BUTTRESS.tops[0]} to ${BUTTRESS.tops.at(-1)} tall, half a tile apart`);
     if (floorZ + t > h) throw new Error(`Town: a buttress at (${x}, ${y}) stands ${t} tall, above the wall's ${h - floorZ}`);
     const ns = face === 'N' || face === 'S';
     const out = face === 'S' || face === 'E' ? 0.01 : -0.01;
     const along = ns ? x : y;
     this.things.push({ type: `buttress-${t}${plaster(wall)}`, x: ns ? x : x + out, y: ns ? y + out : y, z: floorZ, angle });
-    this.openings.push({ kind: 'fixture', face, line: ns ? y : x, a0: along - BUTTRESS.foot / 2, a1: along + BUTTRESS.foot / 2, floorZ });
+    this.openings.push({ kind: 'fixture', face, line: ns ? y : x, a0: along - BUTTRESS.wide / 2, a1: along + BUTTRESS.wide / 2, floorZ });
     return this;
   }
 
