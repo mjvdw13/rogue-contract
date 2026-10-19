@@ -1,13 +1,23 @@
 import { ModelBuilder } from './lib/build.js';
+import { PLASTERS } from './dome.js';
 
 // The jamb of a Mos Eisley doorway (Mark's reference, 2026-10-17): pale
 // tiles lining the opening from the wall's face back to the door, its
 // corners rounded. A thin tube just inside the town kit's door recess (2
-// tiles wide, 3 high, 1 deep: lib/town.js, door()), with tiled lips filling
-// the front corners round the curve. Built looking south (+y): the wall's
-// face at y 0.5, the door at y -0.5; the kit turns it to face its wall.
-// `door-jamb-through` is the same through a wall 1 tile thick, a door that
-// opens standing in its middle (y 0) and a room behind: lipped on both faces.
+// tiles wide, 3 high, 1 deep: lib/town.js, door()). Built looking south
+// (+y): the wall's face at y 0.5, the wall's back (or the recess's) at y
+// -0.5; the kit turns it to face its wall.
+//
+// `door-lips-<wall>`: the bevelled corners round the curve on the wall's
+// face, filling the square corners of the recess down to the rounded
+// lining, in the wall's own texture. The faces are `flat` and the kit gives
+// them the wall's light (`lit`), so the opening reads as rounded in the
+// wall rather than framed in tiles. Built looking south with the wall's
+// face at y 0; a door through a wall has a pair, one on each face. The top
+// corners are one model per plaster (`door-lips-pale`, as the domes) and
+// `door-lips-metal` for grey metal walls; the bottom ones
+// (`door-lips-foot-pale`) come in those and in the skirts' textures too
+// (`door-lips-foot-plinth`), as the wall's foot is.
 
 const W = 1; // half the opening's width
 const H = 3; // the opening's height
@@ -15,7 +25,10 @@ const R = 0.35; // the corners' radius
 const E = 0.02; // inset from the recess's walls, so the tiles draw over them
 const STEPS = 4; // segments per corner
 
-const tile = { tex: 'door-jamb' };
+/** The walls doors' lips come in, by the models' suffix. */
+export const LIP_WALLS = { ...PLASTERS, '-metal': 'metal-grey' };
+/** And their feet: the walls, and the skirts along their foot (lib/town.js, SKIRTS). */
+export const LIP_FEET = { ...LIP_WALLS, '-dirt': 'adobe-skirt', '-plinth': 'adobe-brick' };
 
 /** The opening's outline, [x, z] round it: rounded corners inset by E. */
 function outline() {
@@ -35,11 +48,11 @@ function outline() {
   return pts;
 }
 
-/** The jamb, with lips on the wall's face and, `through` a wall, on its back too. */
-function jamb(id, through) {
-  const m = new ModelBuilder(id);
+/** The lining: one strip per edge of the outline, facing in toward the opening's middle. */
+function jamb() {
+  const m = new ModelBuilder('door-jamb');
+  const tile = { tex: 'door-jamb' };
   const pts = outline();
-  // The lining: one strip per edge of the outline, facing in toward the opening's middle.
   for (let i = 0; i < pts.length; i++) {
     const [a, b] = [pts[i], pts[(i + 1) % pts.length]];
     const mid = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
@@ -47,18 +60,26 @@ function jamb(id, through) {
     const out = [mid[0] * 2, 0, mid[1] + (mid[1] - H / 2)];
     m.face([[a[0], 0.5, a[1]], [b[0], 0.5, b[1]], [b[0], -0.5, b[1]], [a[0], -0.5, a[1]]], tile, out);
   }
-  // The lips: in the wall's face, between each rounded corner and the square corner of the recess.
-  for (const y of through ? [0.49, -0.49] : [0.49]) {
-    for (let c = 0; c < 4; c++) {
-      const sq = [[W, H], [-W, H], [-W, 0], [W, 0]][c];
-      for (let k = 0; k < STEPS; k++) {
-        const [a, b] = [pts[c * (STEPS + 1) + k], pts[c * (STEPS + 1) + k + 1]];
-        m.face([[sq[0], y, sq[1]], [a[0], y, a[1]], [b[0], y, b[1]]], tile, [0, 0, H / 2]);
-      }
+  return m.build();
+}
+
+/** The lips: in the wall's face, between each rounded corner (`corners`, of the outline's) and the square corner of the recess. */
+function lips(id, tex, corners) {
+  const m = new ModelBuilder(id);
+  const pts = outline();
+  const y = -0.01; // a hair inside the wall's face, over the recess's sides
+  for (const c of corners) {
+    const sq = [[W, H], [-W, H], [-W, 0], [W, 0]][c];
+    for (let k = 0; k < STEPS; k++) {
+      const [a, b] = [pts[c * (STEPS + 1) + k], pts[c * (STEPS + 1) + k + 1]];
+      m.face([[sq[0], y, sq[1]], [a[0], y, a[1]], [b[0], y, b[1]]], { tex, flat: true }, [0, y - 1, H / 2]);
     }
   }
   return m.build();
 }
 
-export default jamb('door-jamb', false);
-export const doorJambThrough = jamb('door-jamb-through', true);
+export default jamb();
+export const doorLips = [
+  ...Object.entries(LIP_WALLS).map(([suffix, tex]) => lips(`door-lips${suffix}`, tex, [0, 1])),
+  ...Object.entries(LIP_FEET).map(([suffix, tex]) => lips(`door-lips-foot${suffix}`, tex, [2, 3])),
+];

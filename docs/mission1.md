@@ -310,14 +310,16 @@ Mandalorian, Outlaws, and the Special Edition's wide shots):
   film's (Mark's reference, 2026-10-17): the door itself on the back wall
   (a decal: a lattice of braces in red-brown, `door-red`, or grey,
   `door-grey`), the jamb lined with pale tiles with rounded corners (the
-  `door-jamb` model, inside the recess), the striped `door-sign` over the
+  `door-jamb` model, inside the recess; its bevelled corners on the wall's
+  face are `door-lips` in the wall's plaster and light, the bottom pair in
+  its skirt, so the opening reads as rounded in the wall), the striped `door-sign` over the
   opening and the `door-panel` controls beside it (on the wall's face),
   and a flagstone step outside. The arch is optional. The lean-to shop has
   a `shutter`. Most doors are pictures on houses with nothing inside.
   `opens: true` makes a real one into a `room()` behind a wall a tile
   thick: a rising door (`door-red-rising`, `door-grey-rising`) standing
-  halfway through the wall, so the jamb (`door-jamb-through`, lipped on
-  both faces) shows half a tile deep either side, and its panel slides up
+  halfway through the wall, so the jamb (its bevelled corners on both
+  faces) shows half a tile deep either side, and its panel slides up
   into the wall over the opening. F and G have them. `depth: 0` puts it
   on the wall itself (the back of a porch). Windows are set in too (Mark: inset
   matters more than their shape): a notch a tile deep, the wall below it

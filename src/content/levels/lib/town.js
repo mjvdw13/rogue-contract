@@ -18,6 +18,7 @@
 import { DOMES, PLASTERS } from '../../models/dome.js';
 import { HOOD, ROUND, hoodTop } from '../../models/arch.js';
 import { BUTTRESS } from '../../models/buttress.js';
+import { LIP_WALLS, LIP_FEET } from '../../models/door-jamb.js';
 import { AWNING_CLOTHS, AWNING_DEPTHS, AWNING_POLES, AWNING_SLOPE, poleId } from '../../models/awning.js';
 import { TIN_DEPTHS, TIN_METALS, TIN_SLOPE } from '../../models/tin.js';
 import { PIPE_HEIGHTS } from '../../models/pipes.js';
@@ -369,7 +370,8 @@ export class Town {
    * Mark's reference, 2026-10-17): a recess `depth` tiles into the wall and
    * `width` wide (an `arch()`, open below `lintel`), lined with pale tiles
    * (the `door-jamb` model, for the usual 2 by 3 opening, unless `jamb` is
-   * false), the door (a decal, `tex`, `tall` tiles high) on its back wall
+   * false; its bevelled corners on the wall's face, `door-lips`, in the
+   * wall's plaster and skirt), the door (a decal, `tex`, `tall` tiles high) on its back wall
    * and a flagstone step in front. On the wall's face, a `sign` over the
    * opening (a striped panel) and a `panel` beside it (its controls), unless
    * they're false. (x, y) is the middle of the doorway on the wall's edge
@@ -381,8 +383,8 @@ export class Town {
    *
    * `opens: true` makes it a real door into a `room()` behind a wall 1
    * tile thick: a rising door (its panel `tex` + '-rising', 64x128) standing
-   * halfway through the wall, so the tiled jamb (`door-jamb-through`,
-   * lipped on both faces) shows half a tile deep either side; the wall over
+   * halfway through the wall, so the tiled jamb shows half a tile deep
+   * either side (its bevelled corners on both faces); the wall over
    * it is a slab up to the roof, as an arch's is. Shut doors stay pictures
    * on houses with nothing inside.
    *
@@ -433,7 +435,28 @@ export class Town {
     if (jamb) {
       // (The model is built looking south; content angles turn it counter-clockwise.)
       const angle = { S: 0, E: 90, N: 180, W: 270 }[face];
-      this.things.push({ type: opens ? 'door-jamb-through' : 'door-jamb', ...at(mid, (line + back) / 2), z: floorZ, angle });
+      this.things.push({ type: 'door-jamb', ...at(mid, (line + back) / 2), z: floorZ, angle });
+      // Its bevelled corners on the wall's face (and on the room's side,
+      // through a wall), in the wall's plaster, the bottom ones in its skirt
+      // if it has one, and lit as the wall is: by the wall beside the
+      // opening and the street in front, or by the room.
+      const row = (edge, dir) => (dir > 0 ? edge : edge - 1); // the tile past an edge, going `dir`
+      const tile = (a, r) => (ns ? [a, r] : [r, a]);
+      const beside = tile(a0 - 1, row(line, -out));
+      const suffix = (set, tex) => Object.keys(set).find((k) => set[k] === tex) ?? '';
+      const foot = this.p.get(...beside)?.bands?.[0]?.tex ?? wall;
+      const lit = [[line, angle, { wall: beside, street: tile(a0, row(line, out)) }]];
+      if (opens) {
+        const room = tile(a0, row(back, -out));
+        lit.push([back, (angle + 180) % 360, { wall: room, street: room }]);
+      }
+      for (const [edge, turn, by] of lit) {
+        for (const type of [`door-lips${suffix(LIP_WALLS, wall)}`, `door-lips-foot${suffix(LIP_FEET, foot)}`]) {
+          const thing = { type, ...at(mid, edge), z: floorZ, angle: turn };
+          this.things.push(thing);
+          this.wallLit.push({ thing, ...by });
+        }
+      }
     }
     // Sign and controls on the wall round the opening (on the back wall without a recess).
     const wallAt = depth > 0 ? line : back;

@@ -9,7 +9,7 @@ import { boulderLarge, boulderSmall } from './boulder.js';
 import floodlightTower from './floodlight-tower.js';
 import { sensorMast, sensorDish } from './sensor-mast.js';
 import domes from './dome.js';
-import doorJamb, { doorJambThrough } from './door-jamb.js';
+import doorJamb, { doorLips } from './door-jamb.js';
 import arches from './arch.js';
 import buttresses from './buttress.js';
 import awnings from './awning.js';
@@ -21,4 +21,4 @@ import bay from './bay.js';
 import moldyCrow from './crow.js';
 import market from './market.js';
 
-export default [terminal, reactorRing, coolantTank, shuttle, barricade, boulderLarge, boulderSmall, floodlightTower, sensorMast, sensorDish, ...domes, doorJamb, doorJambThrough, ...arches, ...buttresses, ...awnings, ...tin, ...pipes, ...clutter, landspeeder, ...bay, moldyCrow, ...market];
+export default [terminal, reactorRing, coolantTank, shuttle, barricade, boulderLarge, boulderSmall, floodlightTower, sensorMast, sensorDish, ...domes, doorJamb, ...doorLips, ...arches, ...buttresses, ...awnings, ...tin, ...pipes, ...clutter, landspeeder, ...bay, moldyCrow, ...market];

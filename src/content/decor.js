@@ -1,6 +1,7 @@
 import { defineDecoration } from '../engine/defs.js';
 import { DOMES } from './models/dome.js';
 import { ARCH_MODELS } from './models/arch.js';
+import { LIP_WALLS, LIP_FEET } from './models/door-jamb.js';
 import { BUTTRESS_MODELS } from './models/buttress.js';
 import { AWNING_MODELS, AWNING_POLES, poleId } from './models/awning.js';
 import { TIN_MODELS } from './models/tin.js';
@@ -38,7 +39,8 @@ export default [
   ...DOMES.map((d) => defineDecoration({ id: d.id, model: d.id, solid: true, radius: d.radius, height: d.height })),
   // The tiled jamb of a Mos Eisley doorway (inside the wall's recess, so it needn't be solid).
   defineDecoration({ id: 'door-jamb', model: 'door-jamb' }),
-  defineDecoration({ id: 'door-jamb-through', model: 'door-jamb-through' }),
+  // Its bevelled corners on the wall's face, in the wall's plaster (on the wall, so `fixed`).
+  ...[...Object.keys(LIP_WALLS).map((s) => `door-lips${s}`), ...Object.keys(LIP_FEET).map((s) => `door-lips-foot${s}`)].map((id) => defineDecoration({ id, model: id, fixed: true })),
   // Round-topped arches: hoods standing out round doors (their legs collide)
   // and the rounded tops of openings, overhead.
   ...ARCH_MODELS.map((d) => defineDecoration({ id: d.id, model: d.id, solid: d.kind === 'hood', fixed: true })),

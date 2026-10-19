@@ -220,6 +220,16 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
         a stair up D's east side to a door on a landing.
   - [ ] Hitching rings on walls; perforated canisters and engine rings
         in the clutter.
+- [ ] **Real doors** (Mark, 2026-10-18): every door in Mos Eisley a door.
+  - [x] The jamb's bevelled front corners in the wall's plaster and
+        light (a `door-lips` model per wall), so the opening reads as
+        rounded in the wall.
+  - [ ] Every door a rising door: shut ones locked (`lock: 'remote'`),
+        the panel half a tile back; shop shutters roll up (a
+        `shutter-rising` panel); the porch doors (D, M) set into the
+        wall behind the porch, D's porch 4 wide so its door is centred;
+        a 4x4 bay door from DF's RDBIG4 in place of the repeated
+        2-wide one.
 - [ ] **The cantina:** entrance, steps down, the round room, the bar,
       booths, bandstand, back rooms.
 - [ ] **Bay 86, the dewback stable and the speeder garage.**

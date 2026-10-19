@@ -163,8 +163,8 @@ test('a door is set into its wall: a recess lined with tiles, the door on its ba
   assert.ok(sign.z > 3, 'over the opening');
   assert.deepEqual([panel.tex, panel.y], ['door-panel', 14]);
   assert.ok(panel.x > 11, 'beside the opening');
-  // The jamb: in the recess, turned to face the street.
-  assert.deepEqual(town.things, [{ type: 'door-jamb', x: 10, y: 13.5, z: 0, angle: 0 }]);
+  // The jamb: in the recess, turned to face the street, its bevelled corners on the wall's face.
+  assert.deepEqual(town.things.map((t) => [t.type, t.x, t.y, t.angle]), [['door-jamb', 10, 13.5, 0], ['door-lips', 10, 14, 0], ['door-lips-foot-dirt', 10, 14, 0]]);
   assert.equal(p.get(9, 14).floor, 'flagstone', 'a step outside');
   // Built into a level, the door, sign and controls are all laid on faces.
   const level = { id: 't', name: 'T', ...p.build(), decals: town.decals, list: [{ type: 'player', x: 20, y: 20 }, ...town.things] };
@@ -177,9 +177,10 @@ test('a door turns its jamb to face its wall, and a door on a porch wall has non
   const { town } = kit();
   town.house(4, 4, 16, 14, { h: 6 });
   town.door(10, 4, 'N', { h: 6 }).door(4, 9, 'W', { h: 6 }).door(16, 9, 'E', { h: 6 });
-  assert.deepEqual(town.things.map((t) => [t.x, t.y, t.angle]), [[10, 4.5, 180], [4.5, 9, 270], [15.5, 9, 90]]);
+  const jambs = () => town.things.filter((t) => t.type === 'door-jamb');
+  assert.deepEqual(jambs().map((t) => [t.x, t.y, t.angle]), [[10, 4.5, 180], [4.5, 9, 270], [15.5, 9, 90]]);
   town.door(10, 14, 'S', { h: 6, depth: 0 });
-  assert.equal(town.things.length, 3);
+  assert.equal(jambs().length, 3);
 });
 
 test('a door that opens stands halfway through a 1-tile wall into the room behind, under the roof', () => {
@@ -193,14 +194,29 @@ test('a door that opens stands halfway through a 1-tile wall into the room behin
     assert.deepEqual([c.door, c.style, c.slab.bottom, c.slab.top, c.ceiling], ['door-red-rising', 'rise', 3, 6, 'sky']);
   }
   assert.equal(p.get(9, 14).ceilZ, 24, "the street's sky in front isn't brought down to the roof");
-  // No picture on a back wall; the jamb lipped both sides, in the middle of the wall.
+  // No picture on a back wall; the jamb in the middle of the wall, its bevelled corners on both faces.
   assert.ok(!town.decals.some((d) => d.tex === 'door-red'));
-  assert.deepEqual(town.things, [{ type: 'door-jamb-through', x: 10, y: 13.5, z: 0, angle: 0 }]);
+  assert.deepEqual(town.things.map((t) => [t.type, t.y, t.angle]), [
+    ['door-jamb', 13.5, 0], ['door-lips', 14, 0], ['door-lips-foot-dirt', 14, 0], ['door-lips', 13, 180], ['door-lips-foot-dirt', 13, 180],
+  ]);
   const level = { id: 't', name: 'T', ...p.build(), decals: town.decals, list: [{ type: 'player', x: 20, y: 20 }, ...town.things] };
   const { map, errors } = buildLevel(registry, level);
   assert.deepEqual(errors, []);
   const d = map.doorAt(9, 13);
   assert.deepEqual([d.axis, d.plane, d.openZ, d.group.length], ['y', 13.5, 3, 2]);
+});
+
+test("a door's bevelled corners are in the wall's plaster, the bottom ones in its skirt, lit as the wall is", () => {
+  const { p, town } = kit();
+  town.house(4, 4, 16, 14, { h: 6, wall: 'adobe-pale', skirt: 'plinth' });
+  town.house(20, 4, 30, 14, { h: 6, wall: 'metal-grey', skirt: null });
+  town.door(10, 14, 'S', { h: 6, wall: 'adobe-pale' }).door(25, 14, 'S', { h: 6, wall: 'metal-grey' }).finish();
+  const lips = town.things.filter((t) => t.type.startsWith('door-lips'));
+  assert.deepEqual(lips.map((t) => t.type), ['door-lips-pale', 'door-lips-foot-plinth', 'door-lips-metal', 'door-lips-foot-metal']);
+  for (const t of lips) assert.ok(registry.things.get(t.type), `${t.type} is a decoration`);
+  assert.ok(lips.every((t) => t.lit > 0), 'lit as the wall');
+  const level = { id: 't', name: 'T', ...p.build(), decals: town.decals, list: [{ type: 'player', x: 20, y: 20 }, ...town.things] };
+  assert.deepEqual(buildLevel(registry, level).errors, []);
 });
 
 test('a door that opens needs a room behind a wall 1 tile thick', () => {
