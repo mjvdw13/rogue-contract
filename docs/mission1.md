@@ -307,21 +307,22 @@ Mandalorian, Outlaws, and the Special Edition's wide shots):
   fronts get it too; rounded corners and round walls get none.
 - **Doors and windows** (`door()`, `window()`): a door is a recess a tile
   into a straight wall, 2 wide and 3 high (an arch), and follows the
-  film's (Mark's reference, 2026-10-17): the door itself on the back wall
-  (a decal: a lattice of braces in red-brown, `door-red`, or grey,
-  `door-grey`), the jamb lined with pale tiles with rounded corners (the
-  `door-jamb` model, inside the recess; its bevelled corners on the wall's
-  face are `door-lips` in the wall's plaster and light, the bottom pair in
-  its skirt, so the opening reads as rounded in the wall), the striped `door-sign` over the
-  opening and the `door-panel` controls beside it (on the wall's face),
-  and a flagstone step outside. The arch is optional. The lean-to shop has
-  a `shutter`. Most doors are pictures on houses with nothing inside.
-  `opens: true` makes a real one into a `room()` behind a wall a tile
-  thick: a rising door (`door-red-rising`, `door-grey-rising`) standing
-  halfway through the wall, so the jamb (its bevelled corners on both
-  faces) shows half a tile deep either side, and its panel slides up
-  into the wall over the opening. F and G have them. `depth: 0` puts it
-  on the wall itself (the back of a porch). Windows are set in too (Mark: inset
+  film's (Mark's reference, 2026-10-17): a rising door standing halfway
+  through the recess (a lattice of braces in red-brown, `door-red-rising`,
+  or grey, `door-grey-rising`, the panel sliding up into the wall over
+  the opening), the jamb lined with pale tiles with rounded corners (the
+  `door-jamb` model; its bevelled corners on the wall's face are
+  `door-lips` in the wall's plaster and light, the bottom pair in its
+  skirt, so the opening reads as rounded in the wall), the striped
+  `door-sign` over the opening and the `door-panel` controls beside it
+  (on the wall's face), and a flagstone step outside. Every door is a
+  real one (Mark, 2026-10-18): most have nothing behind them and are
+  locked (`lock: 'remote'`, the locked sound on use); `opens: true` opens
+  into a `room()` behind the wall, the jamb showing on both faces (F, G,
+  the customs house, the bay owner's office). Variants: the shops'
+  roll-down `shutter-rising` (3 wide, 2.25 high, no jamb) and Docking Bay
+  87's 4x4 `door-bay-rising` (DF's X-braced RDBIG4). A door at the back
+  of a porch is set into the wall behind it (D, M). Windows are set in too (Mark: inset
   matters more than their shape): a notch a tile deep, the wall below it
   a sill and a slab over it up to the roof, the window (`window-bars`,
   `window-louvre`) on its back wall. Decals only go on straight faces, not

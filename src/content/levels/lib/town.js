@@ -366,32 +366,30 @@ export class Town {
   }
 
   /**
-   * A shut door in a building's straight outside wall (after the film's:
-   * Mark's reference, 2026-10-17): a recess `depth` tiles into the wall and
-   * `width` wide (an `arch()`, open below `lintel`), lined with pale tiles
-   * (the `door-jamb` model, for the usual 2 by 3 opening, unless `jamb` is
+   * A door in a building's straight outside wall (after the film's: Mark's
+   * reference, 2026-10-17): a recess a tile into the wall and `width` wide
+   * (an `arch()`, open below `lintel`), lined with pale tiles (the
+   * `door-jamb` model, for the usual 2 by 3 opening, unless `jamb` is
    * false; its bevelled corners on the wall's face, `door-lips`, in the
-   * wall's plaster and skirt), the door (a decal, `tex`, `tall` tiles high) on its back wall
-   * and a flagstone step in front. On the wall's face, a `sign` over the
-   * opening (a striped panel) and a `panel` beside it (its controls), unless
-   * they're false. (x, y) is the middle of the doorway on the wall's edge
-   * and `face` the way the door looks ('N', 'E', 'S' or 'W'): `door(30, 62,
-   * 'S', ...)` is in the south wall of a building ending at row 62. Keep
-   * (x, y) on a tile corner for an even `width`, halfway along a tile for an
-   * odd one. `depth: 0` cuts nothing and puts the door on the wall itself
-   * (the back of a porch), without a jamb or a step.
+   * wall's plaster and skirt), and a flagstone step in front. The door is a
+   * rising door (its panel `tex` + '-rising', `tall` tiles high) standing
+   * halfway through the recess, the wall over it a slab up to the roof, as
+   * an arch's is. On the wall's face, a `sign` over the opening (a striped
+   * panel) and a `panel` beside it (its controls), unless they're false.
+   * (x, y) is the middle of the doorway on the wall's edge and `face` the
+   * way the door looks ('N', 'E', 'S' or 'W'): `door(30, 62, 'S', ...)` is
+   * in the south wall of a building ending at row 62. Keep (x, y) on a tile
+   * corner for an even `width`, halfway along a tile for an odd one.
    *
-   * `opens: true` makes it a real door into a `room()` behind a wall 1
-   * tile thick: a rising door (its panel `tex` + '-rising', 64x128) standing
-   * halfway through the wall, so the tiled jamb shows half a tile deep
-   * either side (its bevelled corners on both faces); the wall over
-   * it is a slab up to the roof, as an arch's is. Shut doors stay pictures
-   * on houses with nothing inside.
+   * Most doors have nothing behind them, so they're locked (only a trigger
+   * opens them). `opens: true` makes one that opens into a `room()` behind
+   * the wall, the jamb showing half a tile deep either side of the panel
+   * (its bevelled corners on both faces).
    *
    * `floorZ` puts the doorway a step up (the film's doors often are): its
    * step outside rises to that height, off the street or a kerb.
    */
-  door(x, y, face, { h, tex = 'door-red', tall = 3, width = 2, depth = 1, lintel = tall, jamb = depth > 0, sign = true, panel = true, floorZ = 0, wall = this.wall, step = depth > 0, opens = false }) {
+  door(x, y, face, { h, tex = 'door-red', tall = 3, width = 2, lintel = tall, jamb = true, sign = true, panel = true, floorZ = 0, wall = this.wall, step = true, opens = false }) {
     const ns = face === 'N' || face === 'S';
     const along = ns ? x : y;
     const a0 = Math.round(along - width / 2);
@@ -399,25 +397,22 @@ export class Town {
     const mid = (a0 + a1) / 2;
     const out = face === 'S' || face === 'E' ? 1 : -1;
     const line = ns ? y : x;
-    const back = line - out * depth;
-    if (opens && depth !== 1) throw new Error(`Town: a door that opens at (${x}, ${y}) needs a wall 1 tile thick (depth 1)`);
-    if (depth > 0) {
-      const [b0, b1] = [Math.min(line, back), Math.max(line, back)];
-      if (ns) this.arch(a0, b0, a1, b1, { h, lintel, floorZ, wall });
-      else this.arch(b0, a0, b1, a1, { h, lintel, floorZ, wall });
-    }
-    if (opens) {
-      // The arch's tiles become the door's, with a room behind them.
-      const row = out > 0 ? line - 1 : line;
-      for (let a = a0; a < a1; a++) {
-        const [tx, ty] = ns ? [a, row] : [row, a];
+    const back = line - out;
+    const [b0, b1] = [Math.min(line, back), Math.max(line, back)];
+    if (ns) this.arch(a0, b0, a1, b1, { h, lintel, floorZ, wall });
+    else this.arch(b0, a0, b1, a1, { h, lintel, floorZ, wall });
+    // The arch's tiles become the door's (with a room behind them, if it opens).
+    const row = out > 0 ? line - 1 : line;
+    for (let a = a0; a < a1; a++) {
+      const [tx, ty] = ns ? [a, row] : [row, a];
+      if (opens) {
         const [bx, by] = ns ? [a, row - out] : [row - out, a];
         const inside = this.p.get(bx, by);
         if (!inside || inside.wall || inside.door || (inside.floorZ ?? 0) > floorZ + 0.5) {
           throw new Error(`Town: a door that opens at (${x}, ${y}) needs a room behind it, at (${bx}, ${by})`);
         }
-        this.p.set(tx, ty, { ...this.p.get(tx, ty), floor: 'flagstone', door: `${tex}-rising`, style: 'rise' });
       }
+      this.p.set(tx, ty, { ...this.p.get(tx, ty), floor: 'flagstone', door: `${tex}-rising`, style: 'rise', ...(!opens && { lock: 'remote' }) });
     }
     if (step) {
       const s = out > 0 ? line : line - 1;
@@ -431,7 +426,6 @@ export class Town {
       else this.p.rect(s, a0, s + 1, a1, (_, __, c) => paint(c));
     }
     const at = (a, edge) => (ns ? { x: a, y: edge } : { x: edge, y: a });
-    if (!opens) this.decals.push({ ...at(mid, back), z: floorZ + tall / 2, face, tex });
     if (jamb) {
       // (The model is built looking south; content angles turn it counter-clockwise.)
       const angle = { S: 0, E: 90, N: 180, W: 270 }[face];
@@ -458,11 +452,10 @@ export class Town {
         }
       }
     }
-    // Sign and controls on the wall round the opening (on the back wall without a recess).
-    const wallAt = depth > 0 ? line : back;
-    if (sign) this.decals.push({ ...at(mid, wallAt), z: floorZ + tall + 0.4, face, tex: 'door-sign' });
-    if (panel) this.decals.push({ ...at(mid + width / 2 + 0.35, wallAt), z: floorZ + 1.6, face, tex: 'door-panel' });
-    this.openings.push({ kind: 'door', face, line: wallAt, a0, a1, floorZ, panel: panel ? mid + width / 2 + 0.35 : null });
+    // Sign and controls on the wall round the opening.
+    if (sign) this.decals.push({ ...at(mid, line), z: floorZ + tall + 0.4, face, tex: 'door-sign' });
+    if (panel) this.decals.push({ ...at(mid + width / 2 + 0.35, line), z: floorZ + 1.6, face, tex: 'door-panel' });
+    this.openings.push({ kind: 'door', face, line, a0, a1, floorZ, panel: panel ? mid + width / 2 + 0.35 : null });
     return this;
   }
 

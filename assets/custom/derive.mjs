@@ -136,6 +136,9 @@ export const DECALS = [
   // A shop's roll-down shutter, 3 tiles wide: a strip of Nar Shaddaa's
   // corrugated door clear of its red sign, stretched sideways.
   { out: 'shutter', df: 'NDCORUG1', crop: [119, 0, 8, 96], size: [96, 72], gradient: [[30, 26, 22], [74, 66, 56], [118, 108, 92], [160, 150, 132]], keep: 0, contrast: 0.9, mask: 'round', r: 4, rim: REVEAL },
+  // Docking Bay 87's door, 4 tiles by 4: Dark Forces' X-braced cargo door,
+  // in the town's rusty grey.
+  { out: 'door-bay', df: 'RDBIG4', size: [128, 128], gradient: [[22, 20, 18], [58, 54, 48], [98, 92, 82], [138, 130, 116]], keep: 0.2, contrast: 1, mask: 'round', r: 6, rim: { width: 1.5, color: [24, 16, 10] } },
   // Windows, a tile wide and 1.25 high to fill their notch (town.window()):
   // dark behind rusty bars, and teal louvred shutters.
   { out: 'window-bars', df: 'SPBARS1', size: [32, 40], gradient: [[8, 6, 4], [30, 22, 14], [80, 58, 36], [136, 98, 60]], keep: 0.2, contrast: 1, mask: 'round', r: 8, rim: REVEAL },
@@ -158,16 +161,19 @@ export const DECALS = [
 ];
 
 /**
- * Doors that open (town.door({ opens: true })): a door decal again as a
- * rising door's panel, which must be a power-of-two size. The 64x96 door
- * sits in the bottom of a 64x128 texture (the panel hangs from its bottom
- * edge, so the top quarter is up in the wall over the opening and never
- * shows), and what was see-through, round its corners and above it, is
- * `fill` (the jamb's rounded tiles hide the corners).
+ * Mos Eisley's doors (town.door()): a door decal again as a rising door's
+ * panel, which must be a power-of-two size. The 64x96 door sits in the
+ * bottom of a 64x128 texture (the panel hangs from its bottom edge, so the
+ * top quarter is up in the wall over the opening and never shows), centred
+ * across it (the engine centres a panel in its doorway: the 96-wide shutter
+ * in a 128-wide one), and what was see-through, round its corners and
+ * above it, is `fill` (the jamb's rounded tiles hide the corners).
  */
 export const RISING = [
   { out: 'door-red-rising', from: 'door-red', size: [64, 128], fill: [24, 16, 10] },
   { out: 'door-grey-rising', from: 'door-grey', size: [64, 128], fill: [24, 16, 10] },
+  { out: 'shutter-rising', from: 'shutter', size: [128, 128], fill: [52, 38, 26] },
+  { out: 'door-bay-rising', from: 'door-bay', size: [128, 128], fill: [24, 16, 10] },
 ];
 
 /**
@@ -441,8 +447,9 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
       for (let x = 0; x < w; x++) {
         const o = (y * w + x) * 4;
         const sy = y - (h - src.height);
-        const i = (sy * src.width + x) * 4;
-        const a = sy >= 0 && x < src.width ? src.data[i + 3] / 255 : 0;
+        const sx = x - (w - src.width) / 2;
+        const i = (sy * src.width + sx) * 4;
+        const a = sy >= 0 && sx >= 0 && sx < src.width ? src.data[i + 3] / 255 : 0;
         for (let k = 0; k < 3; k++) data[o + k] = Math.round(a * (a ? src.data[i + k] : 0) + (1 - a) * spec.fill[k]);
         data[o + 3] = 255;
       }

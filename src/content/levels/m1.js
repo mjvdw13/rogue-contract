@@ -79,10 +79,10 @@ town.door(38.5, 63, 'S', { h: 4, tex: 'shutter', tall: 2.25, width: 3, jamb: fal
 town.dome(35.5, 56.5, 9, 9.5, { wall: 'adobe-ochre' });
 // D: a two-storey house, its upper storey set back from the street, a
 // small dome on top, and a rounded porch.
-// (A shut door at the back of its porch.)
+// (A locked door in the wall at the back of its porch.)
 town.house(45, 51, 58, 63, { h: 6, r: 2, wall: 'adobe-rose', skirt: 'plinth', tiers: [{ box: [48, 51, 58, 58], h: 10, r: 2 }], dome: true });
-town.arch(50, 61, 53, 63, { h: 6, lintel: 3.75, wall: 'adobe-rose', round: 'S' });
-town.door(51.5, 61, 'S', { h: 6, depth: 0, panel: false });
+town.arch(50, 61, 54, 63, { h: 6, lintel: 3.75, wall: 'adobe-rose', round: 'S' });
+town.door(52, 61, 'S', { h: 6, wall: 'adobe-rose', panel: false });
 town.window(48.5, 63, 'S', { z: 3.6 }).window(55.5, 63, 'S', { z: 3.6 }).window(53.5, 58, 'S', { z: 8, tex: 'window-louvre' });
 // A stair up its east side from the street to a shut door on a landing,
 // 3.5 up: too far under the roofs either side to climb onto them.
@@ -179,7 +179,7 @@ town.window(90.5, 82, 'N', { z: 3.4, tex: 'window-louvre' }).window(98.5, 82, 'N
 // north, M at the street's end under a hood.
 town.house(102, 50, 112, 64, { h: 7, r: 2, wall: 'adobe-pale', skirt: null, dome: true });
 town.arch(107, 61, 111, 64, { h: 7, lintel: 3.5, wall: 'adobe-pale', round: 'S' });
-town.door(109, 61, 'S', { h: 7, depth: 0, tex: 'door-grey', wall: 'adobe-pale' });
+town.door(109, 61, 'S', { h: 7, tex: 'door-grey', wall: 'adobe-pale' });
 town.window(102, 61.5, 'W', { z: 3.4, tex: 'window-louvre' }).window(106.5, 64, 'S', { z: 4.6 });
 // The blast doors' frame: a strip of Imperial steel set into the walls
 // either side of the street, the slots the doors slide out of when the
@@ -267,7 +267,7 @@ town.circle(BAY.cx, BAY.cy, BAY.r, {
 // the wall over it.
 p.rect(29, 104, 35, 107, (_, __, c) => ({ ...c, floor: 'bay-floor', floorZ: 0 }));
 town.arch(30, 101, 34, 105, { h: BAY.rim, lintel: 4, wall: 'bay-wall', floor: 'bay-floor', light: 144 });
-town.door(32, 100, 'N', { h: BAY.rim, tex: 'door-grey', width: 4, tall: 4, wall: 'adobe-grey', jamb: false, opens: true });
+town.door(32, 100, 'N', { h: BAY.rim, tex: 'door-bay', width: 4, tall: 4, wall: 'adobe-grey', jamb: false, opens: true });
 // Stairs down to the floor, a step every tile.
 for (let k = 0; k < 7; k++) p.rect(30, 107 + k, 34, 108 + k, { ...bayFloor, floorZ: (-(k + 1) * 5) / 8 });
 // A maintenance pit in the middle of the floor, where ships set down: 8 by
