@@ -376,21 +376,23 @@ list.push(
 );
 
 // Calm until the town turns (things/calm.js, docs/story.md): sandtroopers
-// on patrol and Jawas about town, none of them after you yet. A pair walks
-// the main street side by side, from the west end to the blast doors and
-// back, passing north of the condenser tower; one more walks round the
-// market; a guard stands at the blast doors, looking down the street. Two
-// Jawas haggle at the droid seller's pen, and others wander the street,
-// the market and the north back lane.
+// and Jawas about town, none of them after you yet. Most stand about. One
+// patrol, a commander and a trooper side by side, walks the main street
+// from the west end to the blast doors and back, passing north of the
+// condenser tower. A second commander stands talking to a trooper in the
+// market, and a guard stands at the blast doors, looking down the street.
+// Two Jawas haggle at the droid seller's pen and two more stand by the
+// street; one strolls the street and one the north back lane.
 const STREET_PATROL = [[12.5, 67], [60.5, 67], [101.5, 66]];
 list.push(
-  at('sandtrooper', 14.5, 67, { calm: { patrol: STREET_PATROL, idleTime: [3, 3] } }),
+  at('sandtrooper-commander', 14.5, 67, { calm: { patrol: STREET_PATROL, idleTime: [3, 3] } }),
   at('sandtrooper', 14.5, 68.6, { calm: { patrol: STREET_PATROL.map(([x, y]) => [x, y + 1.6]), idleTime: [3, 3] } }),
-  at('sandtrooper', 86.5, 61, { calm: { patrol: [[74.5, 61], [86.5, 61], [100.5, 70], [86.5, 75.5]], loop: true } }),
+  at('sandtrooper-commander', 86.5, 61, { angle: 180, calm: { wander: 0 } }),
+  at('sandtrooper', 84.5, 61, { angle: 0, calm: { wander: 0 } }),
   at('sandtrooper', 103, 71, { angle: 180, calm: { wander: 0 } }),
-  at('jawa', 95, 60.6, { angle: 0, calm: { wander: 1 } }), at('jawa', 99.2, 61, { angle: 180, calm: { wander: 1 } }),
-  at('jawa', 22, 70, { calm: true }), at('jawa', 68, 70, { calm: true }), at('jawa', 116, 68, { calm: true }),
-  at('jawa', 50, 47, { calm: { wander: 6 } }),
+  at('jawa', 95, 60.6, { angle: 0, calm: { wander: 0 } }), at('jawa', 99.2, 61, { angle: 180, calm: { wander: 0 } }),
+  at('jawa', 22, 70, { angle: 90, calm: { wander: 0 } }), at('jawa', 116, 68, { angle: 180, calm: { wander: 0 } }),
+  at('jawa', 68, 70, { calm: { wander: 3 } }), at('jawa', 50, 47, { calm: { wander: 4 } }),
 );
 
 // Townsfolk (npcs/villagers.js), all five kinds, each strolling up to 5

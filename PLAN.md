@@ -122,14 +122,19 @@ These need Mark to try something, or to decide. Don't start them without him.
   maybe drop the tarp or make it smaller).
 
 - **Calm troopers and Jawas in Mos Eisley** (`?map=m1`, 2026-10-18,
-  `things/calm.js`): a pair of sandtroopers walking the main street from
-  the west end to the blast doors and back, one walking round the
-  market, a guard at the blast doors, and six Jawas (two haggling at the
-  droid seller's pen, three about the street and market, one in the north
-  back lane). Bump into one or press use to hear a line. Firing a blaster
-  or hitting anyone turns the whole town at once (nothing else happens
-  yet: m1 has no `on: 'hostile'` trigger). Mark's notes on the walk,
-  the numbers and commanders are to-dos under Mission 1. Still open: the
+  `things/calm.js`): most stand about. A commander and a trooper walk the
+  main street side by side, from the west end to the blast doors and
+  back; a second commander stands talking to a trooper in the market; a
+  guard stands at the blast doors. Six Jawas: two haggling at the droid
+  seller's pen, two standing by the street, one strolling the street and
+  one the north back lane. Bump into one or press use to hear a line.
+  Firing a blaster or hitting anyone turns the whole town at once
+  (nothing else happens yet: m1 has no `on: 'hostile'` trigger). After
+  Mark's notes (2026-10-18): they stroll slower (troopers 1.2 tiles a
+  second, Jawas 1.5), their legs keep pace (the new calm `stride`: 1.4
+  tiles a walk cycle for a trooper, 0.9 for a Jawa), and they stand with
+  their feet together when stopped. To check by eye: the leg speed, and
+  the commanders' lines. Still open: the
   lines (the Jawaese is made up), and whether Jawas should run rather
   than fight when the town turns (the story has civilians run; Jawas are
   monsters, so they fight).
@@ -204,26 +209,6 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
   - [ ] Sloping buttresses and a stair up a house's side.
   - [ ] Hitching rings on walls; perforated canisters and engine rings
         in the clutter.
-- [ ] **Calm troopers and Jawas, Mark's notes** (2026-10-18, after
-      trying `?map=m1`). One commit a step.
-  - [ ] Commanders: make one or two of m1's sandtroopers
-        `sandtrooper-commander`s. Always fewer commanders than plain
-        troopers, but more than one is fine. Check the commander has a
-        calm walk and idle, and give it its own lines if it needs them.
-  - [ ] Legs stuck mid-stride: they often stop but keep a walking pose.
-        Find out when (a blocked patrol waiting with the walk still set,
-        turning to the player in `calmReact`, or `idle` using a walk frame
-        that's mid-stride), then show a standing frame whenever they're
-        still. A test: a calm monster that has stopped isn't in its walk.
-  - [ ] Slower: a slow patrol stroll, 50-75% of now (troopers 2 tiles a
-        second, Jawas 2.4). Try about 1.2 and 1.5.
-  - [ ] Faster legs: the walk plays too slowly for how fast they move,
-        and will still after the slow-down. The rate is now `calm.speed /
-        def.speed`; pick the rate by the stride instead (tiles per walk
-        cycle), so feet keep pace at any speed. Check with Mark by eye.
-  - [ ] More standing about: most troopers and Jawas stand (`wander: 0`,
-        facing something sensible), a few stroll and only a few patrol.
-        Then back under Waiting on Mark.
 - [ ] **The cantina:** entrance, steps down, the round room, the bar,
       booths, bandstand, back rooms.
 - [ ] **Bay 86, the dewback stable and the speeder garage.**

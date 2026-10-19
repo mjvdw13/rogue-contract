@@ -35,4 +35,6 @@ export default defineMonster({
   },
   sounds: { sight: 'trooper-sight', pain: 'trooper-pain', death: 'trooper-death' },
   drops: [{ item: 'power-cell', chance: 1 }],
+  // Placed calm: leads a patrol or keeps an eye on the street, at the sandtrooper's stroll.
+  calm: { lines: ['Keep moving.', 'Papers are checked at the prefecture, not here. Move along.', 'Mind your business, hunter.'], speed: 1.2, stride: 1.4 },
 });
