@@ -222,7 +222,8 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
         pack, a commit and a check-in with Mark after each.
     - [x] Fuel pump (FuelStat's gauge panel, hazard band, louvres, ribbed
           hose on the reel).
-    - [ ] Fuel line: its manifold, pipes and valve.
+    - [x] Fuel line: chrome pipes, FuelStat's brass elbow and gauge on
+          the manifold, a valve wheel.
     - [ ] Rim lamp.
     - [ ] Rib: its iron band and cap.
     - [ ] Big crates' iron straps.

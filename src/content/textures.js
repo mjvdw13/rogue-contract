@@ -42,6 +42,8 @@ const TOWN = [
   'bay-wall', 'bay-wall-ribbed', 'bay-floor', 'bay-step',
   // The bay's fuel pumps (models/bay.js).
   'pump-front', 'pump-side', 'pump-hazard', 'pump-hose', 'bay-plate',
+  // Its fuel lines.
+  'bay-pipe', 'bay-pipe-x', 'line-front', 'valve-wheel',
   // Street clutter: crates and junk (models/clutter.js).
   'crate-tan', 'crate-grey', 'crate-rust', 'junk',
   // The X-34 landspeeder (models/speeder.js): paint, stripes, engine metal,

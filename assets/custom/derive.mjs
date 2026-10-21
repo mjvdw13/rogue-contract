@@ -21,7 +21,8 @@
 // `color` from `from` (0 top, 1 bottom) down to the bottom row (a sky's
 // haze at the horizon), and `rust: { color, amount, cell, seed }` stains it
 // with blotches of rust that tile (a list of them stains it with each).
-// `lip: [{ rows, color, amount }, ...]` paints bands down from the top row,
+// `turn: true` turns it a quarter (a pipe's picture for a pipe lying across the
+// other way). `lip: [{ rows, color, amount }, ...]` paints bands down from the top row,
 // each `rows` tall, `amount` of the way to `color` (a step's nosing and the
 // shadow under it). With no `gradient` a texture keeps the source's own
 // colours (the bay's fuel pump panels).
@@ -115,6 +116,13 @@ export const TOWN = [
   { out: 'pump-side', df: 'IWFUEL9', crop: [36, 26, 56, 102], scale: [32, 64] },
   { out: 'pump-hazard', df: 'NWWARN1', crop: [0, 8, 64, 16] },
   { out: 'bay-plate', df: 'ZPGREYP1' },
+  // Its fuel lines (models/bay.js): a chrome pipe ring (and turned, for a
+  // pipe lying along), a manifold's front of brass elbow, truss and gauge,
+  // and the valve wheel from the pump's panel.
+  { out: 'bay-pipe', df: 'IPDETPIP', crop: [32, 0, 16, 16] },
+  { out: 'bay-pipe-x', df: 'IPDETPIP', crop: [32, 0, 16, 16], turn: true },
+  { out: 'line-front', df: 'IWFUEL1', crop: [0, 32, 64, 96], scale: [64, 128] },
+  { out: 'valve-wheel', df: 'IWFUEL2', crop: [20, 49, 18, 18], scale: [16, 16] },
   { out: 'pump-hose', df: 'IWFUEL3', crop: [0, 32, 64, 64], gradient: [[6, 6, 6], [26, 26, 24], [52, 52, 48], [84, 84, 78]], keep: 0, contrast: 1 },
   // The X-34 landspeeder (models/speeder.js): Gromas' mottled grey panel
   // as its peach paint and the rose of its stripes, worn through to rust and
@@ -306,6 +314,14 @@ function smoothed(img, n) {
   return { width: w, height: h, data: d };
 }
 
+/** An image turned a quarter, clockwise. */
+function turned(img) {
+  const { width: w, height: h } = img;
+  const data = new Uint8Array(w * h * 4);
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) data.set(img.data.subarray((y * w + x) * 4, (y * w + x) * 4 + 4), (x * h + (h - 1 - y)) * 4);
+  return { width: h, height: w, data };
+}
+
 /** An image scaled to w x h (nearest texel). */
 function resized(img, [w, h]) {
   const data = new Uint8Array(w * h * 4);
@@ -450,6 +466,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     if (spec.crop) img = cropped(img, spec.crop);
     if (spec.smooth) img = smoothed(img, spec.smooth);
     if (spec.scale) img = resized(img, spec.scale);
+    if (spec.turn) img = turned(img);
     if (spec.tile) img = tiled(img, spec.tile);
     if (spec.gradient) img = gradientMap(img, spec);
     if (spec.fade) img = faded(img, spec.fade);

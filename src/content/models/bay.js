@@ -9,7 +9,6 @@ import { ModelBuilder } from './lib/build.js';
 
 const WALL = { tex: 'bay-wall' };
 const IRON = ['gray', 0.22];
-const PIPE = ['rust', 0.32];
 
 /** How tall the pit's wall is, floor to rim. */
 export const BAY_WALL = 11;
@@ -32,25 +31,37 @@ function rib() {
 }
 
 /**
- * Fuel lines down the wall from the rim: two pipes clamped to it, coming
- * over the rim and down into a manifold block on the floor, a red valve wheel on
- * its front and a pipe off its side along the floor to a pump.
+ * Fuel lines down the wall from the rim: two chrome pipes clamped to it,
+ * coming over the rim and down into a manifold block on the floor (its
+ * front FuelStat's brass elbow and gauge, a valve wheel on it) and a pipe
+ * off its side along the floor to a pump.
  */
 function fuelLine() {
   const m = new ModelBuilder('bay-fuel-line');
   const h = BAY_WALL;
+  // A pipe's picture is as wide as the pipe: its ring is every 0.08.
+  const PIPE = { tex: 'bay-pipe', texScale: 0.16 };
+  const PIPE_ALONG = { tex: 'bay-pipe-x', texScale: 0.16 };
+  const CLAMP = { tex: 'pump-hose' };
+  const BOX_SIDE = [[1, 1], [0, 1], [0, 0], [1, 0]];
   for (const x of [-0.22, 0.22]) {
-    m.cylinder([x, 0.2, 1.3], 0.08, h - 1.05, { segments: 6, color: PIPE, top: false, bottom: false });
+    m.cylinder([x, 0.2, 1.3], 0.08, h - 1.05, { segments: 6, ...PIPE, top: false, bottom: false });
     // Over the rim and back across its top.
-    m.box([x - 0.09, -0.7, h + 0.16], [x + 0.09, 0.29, h + 0.34], { color: PIPE, bottom: false });
+    m.box([x - 0.09, -0.7, h + 0.16], [x + 0.09, 0.29, h + 0.34], { ...PIPE_ALONG, top: PIPE, bottom: false });
   }
-  for (let z = 2.8; z < h - 0.5; z += 1.6) m.box([-0.4, 0, z], [0.4, 0.32, z + 0.08], { color: IRON, bottom: false });
-  // The manifold, the valve and the pipe off to the pump.
-  m.box([-0.5, 0, 0], [0.5, 0.5, 1.4], { color: ['gray', 0.3], top: { color: ['gray', 0.4] }, bottom: false });
-  m.box([-0.5, 0.5, 1.2], [0.5, 0.53, 1.32], { color: ['yellow', 0.7] });
-  m.cylinder([0, 0.5, 0.95], 0.2, 0.06, { axis: 'y', segments: 8, color: ['blood', 0.6] });
-  m.cylinder([0, 0.56, 0.95], 0.05, 0.12, { axis: 'y', segments: 6, color: IRON });
-  m.cylinder([0.5, 0.25, 0.85], 0.07, 0.9, { axis: 'x', segments: 6, color: PIPE });
+  for (let z = 2.8; z < h - 0.5; z += 1.6) m.box([-0.4, 0, z], [0.4, 0.32, z + 0.08], { ...CLAMP, bottom: false });
+  // The manifold (its back is against the wall), the valve and the pipe off to the pump.
+  m.box([-0.5, 0, 0], [0.5, 0.5, 1.4], {
+    top: { tex: 'bay-plate' },
+    bottom: false,
+    side: (i) => (i === 0 ? false : { tex: i === 2 ? 'line-front' : 'pump-side', uv: BOX_SIDE }),
+  });
+  m.box([-0.5, 0.5, 1.2], [0.5, 0.53, 1.32], { tex: 'pump-hazard', texScale: 0.5 });
+  // The wheel's face is the picture of one, drawn on a twelve-sided disc.
+  const wheel = Array.from({ length: 12 }, (_, i) => [0.5 + 0.5 * Math.cos((i / 12) * Math.PI * 2), 0.5 - 0.5 * Math.sin((i / 12) * Math.PI * 2)]);
+  m.cylinder([0, 0.5, 0.95], 0.2, 0.06, { axis: 'y', segments: 12, ...CLAMP, top: { tex: 'valve-wheel', uv: wheel } });
+  m.cylinder([0, 0.56, 0.95], 0.05, 0.12, { axis: 'y', segments: 6, tex: 'bay-plate' });
+  m.cylinder([0.5, 0.25, 0.85], 0.07, 0.9, { axis: 'x', segments: 6, ...PIPE_ALONG, texScale: 0.14 });
   return m.build();
 }
 
