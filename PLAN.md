@@ -165,10 +165,10 @@ These need Mark to try something, or to decide. Don't start them without him.
   and which other doors want one.
 
 - **The dewback** (`?map=sandbox`, in the start room, a decoration that
-  stands and breathes, solid, radius 1): its size (2.1 tall to the saddle's
+  stands about, solid, radius 1): its size (2.1 tall to the saddle's
   horn, about 4.4 long), the colours (the palette's olive ramp makes the
-  hide greyer than the sheet's green), the breathing (the head up and the tail down a pixel, 2.7 s a
-  breath), and where it goes in Mos Eisley (the stable, the plaza, the
+  hide greyer than the sheet's green), the idle (the head up and the tail down two pixels, in two
+  slices, and back every 2 s), and where it goes in Mos Eisley (the stable, the plaza, the
   patrol). Place it with `at('dewback', x, y, { angle })`.
 
 ## Next up

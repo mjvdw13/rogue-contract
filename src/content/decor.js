@@ -26,7 +26,8 @@ export default [
   }),
   // A dewback, standing about with its saddle on (cut from Mark's sheet by
   // assets/custom/dewback/cut.py). Frames 0-4 stand, seen from the front,
-  // front three-quarter, side, back three-quarter and back; 5-9 the same views a pixel higher.
+  // front three-quarter, side, back three-quarter and back; 5-9 the same views with the
+  // head raised and the tail lowered; it swaps between them every two seconds.
   // It faces its placed angle and never moves.
   defineDecoration({
     id: 'dewback',
@@ -38,10 +39,10 @@ export default [
     height: 1.9,
     anims: {
       idle: {
-        frames: [0, 0, 5, 5],
-        fps: 1.5,
+        frames: [0, 5],
+        fps: 0.5,
         loop: true,
-        views: { frontSide: [1, 1, 6, 6], side: [2, 2, 7, 7], backSide: [3, 3, 8, 8], back: [4, 4, 9, 9] },
+        views: { frontSide: [1, 6], side: [2, 7], backSide: [3, 8], back: [4, 9] },
       },
     },
   }),

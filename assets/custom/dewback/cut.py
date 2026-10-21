@@ -8,11 +8,11 @@ The shared steps are in ../sheetcut.py. Writes
 assets/sprites/decor/dewback.png, in the frame order of the `dewback` in
 src/content/decor.js: 0-4 standing, seen from the front, the front
 three-quarter, the side, the back three-quarter and the back; then 5-9 the
-same five views breathing in.
+same five views with the head raised and the tail lowered.
 
-The sheet has eight poses and no animation, so the breathing is made here:
-the head lifts a pixel and the tail drops a pixel, and the body and legs stay
-still. The game plays the standing frame, then the breath.
+The sheet has eight poses and no animation, so the second pose is made here:
+the head rises two pixels and the tail drops two (in two slices each), and the
+body and legs stay still. The game swaps between the two every couple of seconds.
 
 The views face left (the game mirrors them for the other side): the sheet's
 front three-quarter faces right, so it's flipped.
@@ -58,15 +58,20 @@ RAMPS = ['olive', 'sand', 'rust', 'beige', 'concrete', 'gray', 'flesh']
 # The restyle mutes colour; the hide's green is pushed back up first.
 SATURATION = 1.25
 
-# The breath moves only the head and the tail, a pixel each: the head up and
-# the tail down, as if swinging on the hips. The body and legs stay put (moving
-# them looked like the whole sprite bobbing). Per view (front three-quarter,
-# side, back three-quarter), the columns of the head (before the neck) and of
-# the tail (from the rump). The front and back views stay still: the head and
-# tail point at or away from the camera. Columns where a foot reaches the
-# ground (within FOOT_REACH rows) stay still too.
-SWING = 1
-MOVES = {1: dict(head=(0, 92), tail=(148, 224)), 2: dict(head=(0, 80), tail=(152, 224)), 3: dict(head=(0, 72), tail=(138, 224))}
+# The idle shifts between two poses: the sheet's own (head down, tail up) and
+# one with the head raised and the tail lowered, as if it were swinging on its
+# hips. The body and legs never move (moving them looked like the whole sprite
+# bobbing). The head and tail move in two slices each, a pixel nearer the body
+# and two further out, so the step where they join the body is smaller. Per
+# view (front three-quarter, side, back three-quarter): the slices as
+# (first column, end column, rows down), head first. The front and back views
+# stay still: the head and tail point at or away from the camera. Columns where
+# a foot reaches the ground (within FOOT_REACH rows) stay still too.
+MOVES = {
+    1: [(0, 72, -2), (72, 92, -1), (148, 168, 1), (168, 224, 2)],
+    2: [(0, 62, -2), (62, 80, -1), (152, 185, 1), (185, 224, 2)],
+    3: [(0, 56, -2), (56, 72, -1), (138, 160, 1), (160, 224, 2)],
+}
 FOOT_REACH = 10
 
 
@@ -74,15 +79,13 @@ def mirror(p, width):
     return dict(mask=p['mask'][:, ::-1], alpha=p['alpha'][:, ::-1], rgb=p['rgb'][:, ::-1], centre=width - p['centre'], base=p['base'])
 
 
-def breathe(frame, move):
-    """The frame with its head `SWING` pixels higher and its tail `SWING`
-    lower, everything else as it was. A column moves whole, so the head and
-    tail don't stretch; the one-pixel step where they join the body falls in
-    the neck's harness and the rump's curve."""
+def raise_head(frame, slices):
+    """The frame with its head and tail moved by the slices' rows (negative is
+    up), everything else as it was. A column moves whole, so neither stretches."""
     h, w = frame.shape[:2]
     out = frame.copy()
     solid = frame[..., 3] > 0
-    for (x0, x1), dy in ((move['head'], -SWING), (move['tail'], SWING)):
+    for x0, x1, dy in slices:
         for x in range(x0, x1):
             rows = np.nonzero(solid[:, x])[0]
             if not len(rows) or h - 1 - rows.max() <= FOOT_REACH:
@@ -109,7 +112,7 @@ def main():
     n = len(poses)
     fw = strip.shape[1] // n
     frames = [strip[:, i * fw:(i + 1) * fw] for i in range(n)]
-    sheet = [*frames, *[breathe(f, MOVES[i]) if i in MOVES else f for i, f in enumerate(frames)]]
+    sheet = [*frames, *[raise_head(f, MOVES[i]) if i in MOVES else f for i, f in enumerate(frames)]]
     save(np.concatenate(sheet, 1), OUT, len(sheet))
 
 
