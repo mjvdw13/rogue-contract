@@ -26,8 +26,8 @@ export default [
   }),
   // A dewback, standing about with its saddle on (cut from Mark's sheet by
   // assets/custom/dewback/cut.py). Frames 0-4 stand, seen from the front,
-  // front three-quarter, side, back three-quarter and back; 5-9 and 10-14
-  // breathe in. It faces its placed angle and never moves.
+  // front three-quarter, side, back three-quarter and back; 5-9 the same views a pixel higher.
+  // It faces its placed angle and never moves.
   defineDecoration({
     id: 'dewback',
     glyph: 'D',
