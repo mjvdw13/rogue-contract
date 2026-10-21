@@ -130,12 +130,12 @@ paste into `sound-overrides.json`.
 
 `dewback/sheet.jpg` is Mark's dewback sheet (eight poses on a blue backdrop).
 `dewback/cut.py` writes `assets/sprites/decor/dewback.png`: five views
-(front, front three-quarter, side, back three-quarter, back) in two poses,
+(front, front three-quarter, side, back three-quarter, back) in four poses,
 at the Dark Forces sprites' pixel size, in the palette's olive, sand, rust
 and beige ramps. The second pose is made in the cutter (the sheet has no
-animation): the head rises two pixels and the tail drops two, in two slices
-each, while the body and legs stay still. The game swaps between the poses
-every two seconds. It's a decoration (`dewback` in `src/content/decor.js`): it stands
+animation): the head rises three pixels and the tail drops three, in three slices
+each, while the body and legs stay still, with two poses in between. The game
+holds each end pose four seconds. It's a decoration (`dewback` in `src/content/decor.js`): it stands
 at the angle it's placed at and doesn't move.
 
 ```

@@ -7,12 +7,14 @@ Needs Python 3 with Pillow and numpy, and Node (to read the game's palette).
 The shared steps are in ../sheetcut.py. Writes
 assets/sprites/decor/dewback.png, in the frame order of the `dewback` in
 src/content/decor.js: 0-4 standing, seen from the front, the front
-three-quarter, the side, the back three-quarter and the back; then 5-9 the
-same five views with the head raised and the tail lowered.
+three-quarter, the side, the back three-quarter and the back; then 5-9,
+10-14 and 15-19 the same five views a third, two thirds and all the way to
+the head raised and the tail lowered.
 
 The sheet has eight poses and no animation, so the second pose is made here:
-the head rises two pixels and the tail drops two (in two slices each), and the
-body and legs stay still. The game swaps between the two every couple of seconds.
+the head rises three pixels and the tail drops three (in three slices each),
+and the body and legs stay still, with two poses in between. The game holds
+each end pose for four seconds and passes through the others.
 
 The views face left (the game mirrors them for the other side): the sheet's
 front three-quarter faces right, so it's flipped.
@@ -60,18 +62,21 @@ SATURATION = 1.25
 
 # The idle shifts between two poses: the sheet's own (head down, tail up) and
 # one with the head raised and the tail lowered, as if it were swinging on its
-# hips. The body and legs never move (moving them looked like the whole sprite
-# bobbing). The head and tail move in two slices each, a pixel nearer the body
-# and two further out, so the step where they join the body is smaller. Per
+# hips, with two poses in between. The body and legs never move (moving them
+# looked like the whole sprite bobbing). The head and tail move in three
+# slices each, one, two and three pixels out from the body, so the step where
+# they join it is small. Per
 # view (front three-quarter, side, back three-quarter): the slices as
 # (first column, end column, rows down), head first. The front and back views
 # stay still: the head and tail point at or away from the camera. Columns where
 # a foot reaches the ground (within FOOT_REACH rows) stay still too.
 MOVES = {
-    1: [(0, 72, -2), (72, 92, -1), (148, 168, 1), (168, 224, 2)],
-    2: [(0, 62, -2), (62, 80, -1), (152, 185, 1), (185, 224, 2)],
-    3: [(0, 56, -2), (56, 72, -1), (138, 160, 1), (160, 224, 2)],
+    1: [(0, 60, -3), (60, 76, -2), (76, 92, -1), (148, 162, 1), (162, 176, 2), (176, 224, 3)],
+    2: [(0, 52, -3), (52, 66, -2), (66, 80, -1), (152, 172, 1), (172, 195, 2), (195, 224, 3)],
+    3: [(0, 48, -3), (48, 60, -2), (60, 72, -1), (138, 152, 1), (152, 166, 2), (166, 224, 3)],
 }
+# The poses in between: the share of the full move, in thirds.
+STEPS = 3
 FOOT_REACH = 10
 
 
@@ -79,16 +84,18 @@ def mirror(p, width):
     return dict(mask=p['mask'][:, ::-1], alpha=p['alpha'][:, ::-1], rgb=p['rgb'][:, ::-1], centre=width - p['centre'], base=p['base'])
 
 
-def raise_head(frame, slices):
+def raise_head(frame, slices, step):
     """The frame with its head and tail moved by the slices' rows (negative is
-    up), everything else as it was. A column moves whole, so neither stretches."""
+    up) `step` thirds of the way, everything else as it was. A column moves
+    whole, so neither stretches."""
     h, w = frame.shape[:2]
     out = frame.copy()
     solid = frame[..., 3] > 0
-    for x0, x1, dy in slices:
+    for x0, x1, full in slices:
+        dy = int(np.sign(full)) * int(abs(full) * step / STEPS + 0.5)
         for x in range(x0, x1):
             rows = np.nonzero(solid[:, x])[0]
-            if not len(rows) or h - 1 - rows.max() <= FOOT_REACH:
+            if not dy or not len(rows) or h - 1 - rows.max() <= FOOT_REACH:
                 continue
             out[:, x] = 0
             if dy < 0:
@@ -112,7 +119,9 @@ def main():
     n = len(poses)
     fw = strip.shape[1] // n
     frames = [strip[:, i * fw:(i + 1) * fw] for i in range(n)]
-    sheet = [*frames, *[raise_head(f, MOVES[i]) if i in MOVES else f for i, f in enumerate(frames)]]
+    sheet = [*frames]
+    for step in range(1, STEPS + 1):
+        sheet += [raise_head(f, MOVES[i], step) if i in MOVES else f for i, f in enumerate(frames)]
     save(np.concatenate(sheet, 1), OUT, len(sheet))
 
 

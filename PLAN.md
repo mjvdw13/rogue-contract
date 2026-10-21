@@ -167,8 +167,8 @@ These need Mark to try something, or to decide. Don't start them without him.
 - **The dewback** (`?map=sandbox`, in the start room, a decoration that
   stands about, solid, radius 1): its size (2.1 tall to the saddle's
   horn, about 4.4 long), the colours (the palette's olive ramp makes the
-  hide greyer than the sheet's green), the idle (the head up and the tail down two pixels, in two
-  slices, and back every 2 s), and where it goes in Mos Eisley (the stable, the plaza, the
+  hide greyer than the sheet's green), the idle (the head up and the tail down three pixels, in three
+  slices, with two in-between poses, and back every 4 s), and where it goes in Mos Eisley (the stable, the plaza, the
   patrol). Place it with `at('dewback', x, y, { angle })`.
 
 ## Next up

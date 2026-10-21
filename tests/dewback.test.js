@@ -19,7 +19,7 @@ test('a dewback stays where it is placed and shifts between its poses', () => {
   const w = world();
   const d = w.spawn('dewback', 8.5, 3.5, 0);
   const frames = new Set();
-  run(w, mockInput(), 5, () => frames.add(d.frame));
+  run(w, mockInput(), 6, () => frames.add(d.frame));
   assert.equal(d.x, 8.5);
   assert.equal(d.y, 3.5);
   assert.ok(frames.size > 1, 'its idle animation plays');
