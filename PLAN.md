@@ -232,8 +232,10 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
     - [ ] Big crates' iron straps (thin: last, maybe skip).
     - [x] The astromech dome (`models/clutter.js`, in the droid seller's
           pen and on the street: white paint, blue panels, scorched).
-    - [ ] Barrels, canisters and the cargo pod (`models/clutter.js`, shared
-          with the town).
+    - [x] The cargo pod (`models/clutter.js`, shared with the town):
+          scorched tin, plate ends, rusty hoops, rubber skids.
+    - [ ] Barrels and canisters: their bodies are textured already, so
+          just soot (a dirtier tin), not their hoops and lids.
   - [ ] Waiting on Mark.
 - [ ] **An X-34 landspeeder on the main street** (Mark, 2026-10-18, after
       his schematic and the weathered prop): a model, hovering, textured

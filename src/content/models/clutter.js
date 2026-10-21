@@ -54,6 +54,7 @@ function canister(id, tex, band) {
 /**
  * A cargo pod: a long eight-sided canister lying on two skids, its ends
  * chamfered, hooped near each end, a status light glowing green on one.
+ * Scorched tin, worn plate on its ends, rusty hoops, rubber skids.
  */
 function pod() {
   const m = new ModelBuilder('cargo-pod');
@@ -61,14 +62,14 @@ function pod() {
   const z = 0.47;
   const L = 0.55;
   const oct = ring(8, r, Math.PI / 8).map(([a, b]) => [a, b + z]);
-  m.prism(oct, -L, L, { axis: 'x', tex: 'metal-grey', top: false, bottom: false });
+  m.prism(oct, -L, L, { axis: 'x', tex: 'pod-hull', top: false, bottom: false });
   for (const s of [-1, 1]) {
     const end = ring(8, r * 0.68, Math.PI / 8).map(([a, b]) => [a, b + z]);
-    m.loft(oct, s * L, end, s * (L + 0.14), { axis: 'x', color: ['gray', 0.42], bottom: false, top: { color: ['gray', 0.3] } });
-    m.prism(ring(8, r + 0.025, Math.PI / 8).map(([a, b]) => [a, b + z]), s * (L - 0.16), s * (L - 0.08), { axis: 'x', color: ['orange', 0.35], top: false, bottom: false });
+    m.loft(oct, s * L, end, s * (L + 0.14), { axis: 'x', tex: 'bay-plate', bottom: false });
+    m.prism(ring(8, r + 0.025, Math.PI / 8).map(([a, b]) => [a, b + z]), s * (L - 0.16), s * (L - 0.08), { axis: 'x', tex: 'metal-rust', top: false, bottom: false });
   }
   m.box([L + 0.13, -0.05, z - 0.05], [L + 0.15, 0.05, z + 0.05], { color: [70, 230, 60], glow: true, bottom: false });
-  for (const y of [-0.22, 0.22]) m.box([-0.6, y - 0.06, 0], [0.6, y + 0.06, 0.12], { color: ['gray', 0.2], bottom: false });
+  for (const y of [-0.22, 0.22]) m.box([-0.6, y - 0.06, 0], [0.6, y + 0.06, 0.12], { tex: 'pump-hose', bottom: false });
   m.outlineLines([[-0.7, -0.38], [0.7, -0.38], [0.7, 0.38], [-0.7, 0.38]]);
   return m.build();
 }

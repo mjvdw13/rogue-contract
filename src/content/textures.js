@@ -46,6 +46,8 @@ const TOWN = [
   'bay-pipe', 'bay-pipe-x', 'line-front', 'valve-wheel', 'hose-orange',
   // A scrapped astromech's dome (models/clutter.js).
   'dome-white', 'dome-blue',
+  // The cargo pod's hull.
+  'pod-hull',
   // Street clutter: crates and junk (models/clutter.js).
   'crate-tan', 'crate-grey', 'crate-rust', 'junk',
   // The X-34 landspeeder (models/speeder.js): paint, stripes, engine metal,
