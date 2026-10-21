@@ -271,16 +271,16 @@ town.door(32, 100, 'N', { h: BAY.rim, tex: 'door-bay', width: 4, tall: 4, wall: 
 // A round-topped hood round the bay door, and a buttress either side of it.
 town.hood(32, 100, 'N', { h: BAY.rim, width: 4, wall: 'adobe-grey' });
 town.buttress(28.4, 100, 'N', { h: BAY.rim, wall: 'adobe-grey' }).buttress(35.6, 100, 'N', { h: BAY.rim, wall: 'adobe-grey' });
-// Stairs down to the floor, a step every tile: dark steel faces over sandy
-// treads, so each step reads against the sandy floor and walls.
-const { bands: _stairBands, ...stairCell } = { ...bayFloor, side: 'imp-panel-dark' };
+// Stairs down to the floor, a step every tile: mud-brick faces under flagstone
+// treads (as Mos Eisley's own steps are), so each step reads.
+const { bands: _stairBands, ...stairCell } = { ...bayFloor, floor: 'flagstone', side: 'adobe-brick' };
 for (let k = 0; k < 7; k++) p.rect(30, 107 + k, 34, 108 + k, { ...stairCell, floorZ: (-(k + 1) * 5) / 8 });
 // A maintenance pit in the middle of the floor, where ships set down: 8 by
 // 4 tiles and 2 deep, lined in steel, hazard stripes along its lips and two
 // steps down at its west end. Off its east end a crawlspace runs on under
 // the floor, low and dark, with a shield unit in it: a secret.
 const PIT = { x0: 28, y0: 122, x1: 36, y1: 126, floorZ: -7 };
-const { bands: _, ...pitLip } = { ...bayFloor, side: 'imp-panel-dark' };
+const { bands: _, ...pitLip } = { ...bayFloor, floor: 'flagstone', side: 'adobe-brick' };
 p.rect(PIT.x0 - 1, PIT.y0 - 1, PIT.x1 + 5, PIT.y1 + 1, pitLip);
 p.rect(PIT.x0, PIT.y0, PIT.x1, PIT.y1, { ...pitLip, floor: 'imp-grate', floorZ: PIT.floorZ });
 p.rect(PIT.x0, PIT.y0, PIT.x0 + 1, PIT.y1, { ...pitLip, floorZ: -5.625 });
