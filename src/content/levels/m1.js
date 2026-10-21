@@ -271,8 +271,10 @@ town.door(32, 100, 'N', { h: BAY.rim, tex: 'door-bay', width: 4, tall: 4, wall: 
 // A round-topped hood round the bay door, and a buttress either side of it.
 town.hood(32, 100, 'N', { h: BAY.rim, width: 4, wall: 'adobe-grey' });
 town.buttress(28.4, 100, 'N', { h: BAY.rim, wall: 'adobe-grey' }).buttress(35.6, 100, 'N', { h: BAY.rim, wall: 'adobe-grey' });
-// Stairs down to the floor, a step every tile.
-for (let k = 0; k < 7; k++) p.rect(30, 107 + k, 34, 108 + k, { ...bayFloor, floorZ: (-(k + 1) * 5) / 8 });
+// Stairs down to the floor, a step every tile: dark steel faces over sandy
+// treads, so each step reads against the sandy floor and walls.
+const { bands: _stairBands, ...stairCell } = { ...bayFloor, side: 'imp-panel-dark' };
+for (let k = 0; k < 7; k++) p.rect(30, 107 + k, 34, 108 + k, { ...stairCell, floorZ: (-(k + 1) * 5) / 8 });
 // A maintenance pit in the middle of the floor, where ships set down: 8 by
 // 4 tiles and 2 deep, lined in steel, hazard stripes along its lips and two
 // steps down at its west end. Off its east end a crawlspace runs on under
