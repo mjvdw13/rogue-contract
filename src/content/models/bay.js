@@ -254,7 +254,7 @@ function hose({ id, end, tex, path }) {
     }
   }
   const curve = smooth(pts, 2);
-  tube(m, curve, r, { tex, pitch: 0.5 });
+  tube(m, curve, r, { tex, pitch: 0.5, cap: true });
   // Where it leaves the pump, a collar.
   tube(m, curve.slice(0, 2), r * 1.5, { tex: 'bay-plate', cap: true });
   const [a, b] = curve.slice(-2);
