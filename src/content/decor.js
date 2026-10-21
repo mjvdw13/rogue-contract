@@ -31,17 +31,17 @@ export default [
   defineDecoration({
     id: 'dewback',
     glyph: 'D',
-    sheet: S('dewback', 224, 83),
+    sheet: S('dewback', 224, 82),
     scale: 0.85,
     solid: true,
     radius: 1,
     height: 1.9,
     anims: {
       idle: {
-        frames: [0, 5, 10, 5],
-        fps: 2.5,
+        frames: [0, 0, 5, 5],
+        fps: 1.5,
         loop: true,
-        views: { frontSide: [1, 6, 11, 6], side: [2, 7, 12, 7], backSide: [3, 8, 13, 8], back: [4, 9, 14, 9] },
+        views: { frontSide: [1, 1, 6, 6], side: [2, 2, 7, 7], backSide: [3, 3, 8, 8], back: [4, 4, 9, 9] },
       },
     },
   }),

@@ -7,13 +7,12 @@ Needs Python 3 with Pillow and numpy, and Node (to read the game's palette).
 The shared steps are in ../sheetcut.py. Writes
 assets/sprites/decor/dewback.png, in the frame order of the `dewback` in
 src/content/decor.js: 0-4 standing, seen from the front, the front
-three-quarter, the side, the back three-quarter and the back; then 5-9 and
-10-14 the same five views breathing in, a little and then a lot.
+three-quarter, the side, the back three-quarter and the back; then 5-9 the
+same five views breathing in.
 
 The sheet has eight poses and no animation, so the breathing is made here:
-the body above the legs lifts one pixel, then two, by repeating the row at
-the belly line (the feet stay where they are). The game plays the standing
-frame, the two lifts and back.
+the whole body (head and tail too) lifts one pixel, and the legs lengthen to
+keep the feet on the ground. The game plays the standing frame, then the lift.
 
 The views face left (the game mirrors them for the other side): the sheet's
 front three-quarter faces right, so it's flipped.
@@ -59,10 +58,12 @@ RAMPS = ['olive', 'sand', 'rust', 'beige', 'concrete', 'gray', 'flesh']
 # The restyle mutes colour; the hide's green is pushed back up first.
 SATURATION = 1.25
 
-# How far the body lifts at the top of each breath, and the share of the
-# frame's height (from the top) where the legs begin.
-LIFTS = (1, 2)
-BELLY = 0.7
+# How far the body lifts at the top of a breath (one pixel is plenty at this
+# size), and how many rows at the bottom are the feet.
+LIFT = 1
+FEET = 3
+# Columns this close to a foot's belong to its leg.
+LEG_REACH = 6
 
 
 def mirror(p, width):
@@ -70,12 +71,22 @@ def mirror(p, width):
 
 
 def breathe(frame, lift, headroom):
-    """The frame with its body above the belly line lifted `lift` pixels:
-    the rows above it move up, and the belly row repeats to close the gap."""
-    out = frame.copy()
-    belly = headroom + int((frame.shape[0] - headroom) * BELLY)
-    out[: belly - lift + 1] = frame[lift : belly + 1]
-    out[belly - lift + 1 : belly + 1] = frame[belly]
+    """The frame with its body `lift` pixels higher. Everything moves as one
+    piece, so the head and tail rise whole. The feet stay on the ground: in
+    the columns of the legs, the row just above the feet repeats to close the
+    gap, so the legs lengthen by `lift`. `headroom` rows of blank at the top
+    take the lift."""
+    h = frame.shape[0]
+    out = np.zeros_like(frame)
+    out[: h - lift] = frame[lift:]
+    feet = frame[h - 1, :, 3] > 0
+    legs = feet.copy()
+    for d in range(1, LEG_REACH + 1):
+        legs[d:] |= feet[:-d]
+        legs[:-d] |= feet[d:]
+    r0 = h - FEET - 1
+    out[r0 - lift + 1 : r0 + 1, legs] = frame[r0, legs]
+    out[r0 + 1 :, legs] = frame[r0 + 1 :, legs]
     return out
 
 
@@ -93,10 +104,10 @@ def main():
     n = len(poses)
     fw = strip.shape[1] // n
     # Headroom for the lift, on every frame.
-    top = max(LIFTS)
+    top = LIFT
     strip = np.concatenate([np.zeros((top, strip.shape[1], 4), np.uint8), strip])
     frames = [strip[:, i * fw:(i + 1) * fw] for i in range(n)]
-    sheet = [*frames, *[breathe(f, lift, top) for lift in LIFTS for f in frames]]
+    sheet = [*frames, *[breathe(f, LIFT, top) for f in frames]]
     save(np.concatenate(sheet, 1), OUT, len(sheet))
 
 

@@ -8,7 +8,7 @@ import { registry, room, mockInput, run } from './helpers.js';
 
 const OPEN = ['#############', '#...........#', '#...........#', '#...........#', '#...........#', '#...........#', '#############'];
 const FRAME_W = 224; // the sheet's frame size, as decor.js has it
-const FRAME_H = 83;
+const FRAME_H = 82;
 const ROOM = { floor: 'imp-floor', ceiling: 'imp-ceiling', ceilZ: 4, light: 200 };
 
 function world() {
