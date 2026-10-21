@@ -117,6 +117,12 @@ only way to check visual work without a browser.
 
 ## Art and sound pipeline
 
+**Look (a guideline, not enforced):** texture everything. Walls, floors,
+ceilings, model faces and sprites shouldn't be flat colour unless it's
+deliberate (a light source, a glow). Take the texture from the Dark Forces
+pack (`assets/custom/df-textures/`, see its `INDEX.md`), as it is or
+recoloured or adjusted. Generated art is a stand-in, not the finished look.
+
 - `tools/art/` generates every committed PNG (`npm run art`). These are
   stand-ins: the tests and smoke test see them.
 - `assets/custom/overrides.json` swaps in Dark Forces art (cut by
