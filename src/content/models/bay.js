@@ -55,25 +55,41 @@ function fuelLine() {
 }
 
 /**
- * A fuel pump standing on the floor against the wall: a cabinet with a
- * hazard band, a lit gauge, a hose wound on a reel at its side and a
- * nozzle in a holster on its front. It collides as its outline.
+ * A fuel pump standing on the floor against the wall: a cabinet in
+ * FuelStat's panels (the gauges and valve wheel on its front over a hazard
+ * band, louvres and a brass plate down its sides), a hose wound on a reel
+ * at its side and a nozzle in a holster on its front. It collides as its
+ * outline.
  */
 function fuelPump() {
   const m = new ModelBuilder('bay-fuel-pump');
-  m.box([-0.6, 0, 0], [0.6, 0.85, 0.15], { color: ['gray', 0.2], bottom: false });
-  m.box([-0.55, 0, 0.15], [0.55, 0.75, 1.55], { color: ['gray', 0.42], top: false, bottom: false });
-  m.box([-0.58, 0, 1.55], [0.58, 0.8, 1.7], { color: ['gray', 0.3], bottom: { color: ['gray', 0.15] } });
-  m.box([-0.56, 0, 0.3], [0.56, 0.76, 0.5], { color: ['yellow', 0.75], top: false, bottom: false });
-  // The gauge and a status lamp, lit.
-  m.box([-0.3, 0.75, 1.05], [0.1, 0.77, 1.35], { color: ['gray', 0.08] });
-  m.box([-0.26, 0.77, 1.1], [0.06, 0.78, 1.3], { color: [255, 190, 60], glow: true });
-  m.box([0.22, 0.75, 1.2], [0.34, 0.8, 1.32], { color: [90, 255, 90], glow: true });
+  const PLATE = { tex: 'bay-plate' };
+  const RUBBER = { tex: 'pump-hose' };
+  // A picture across a whole face: a box's sides run right to left as seen
+  // from outside, so its corners are right-bottom first; a quad drawn
+  // left-bottom first takes them the other way.
+  const BOX_SIDE = [[1, 1], [0, 1], [0, 0], [1, 0]];
+  const QUAD = [[0, 1], [1, 1], [1, 0], [0, 0]];
+  m.box([-0.6, 0, 0], [0.6, 0.85, 0.15], { ...PLATE, bottom: false });
+  m.box([-0.55, 0, 0.15], [0.55, 0.75, 1.55], {
+    top: false,
+    bottom: false,
+    side: (i) => (i === 2 ? false : { tex: 'pump-side', uv: BOX_SIDE }),
+  });
+  m.box([-0.58, 0, 1.55], [0.58, 0.8, 1.7], { ...PLATE });
+  // The front, in three: plate, hazard band, then the gauges and valve wheel.
+  const front = (y, hw, z0, z1, style) => m.face([[-hw, y, z0], [hw, y, z0], [hw, y, z1], [-hw, y, z1]], { ...style, uv: QUAD }, [0, y - 1, (z0 + z1) / 2]);
+  front(0.75, 0.55, 0.15, 0.3, PLATE);
+  front(0.76, 0.56, 0.3, 0.5, { tex: 'pump-hazard' });
+  front(0.75, 0.55, 0.5, 1.55, { tex: 'pump-front' });
+  // A status lamp each, lit, on the cap's front.
+  m.box([0.2, 0.8, 1.58], [0.32, 0.82, 1.66], { color: [90, 255, 90], glow: true });
+  m.box([0, 0.8, 1.58], [0.12, 0.82, 1.66], { color: [255, 190, 60], glow: true });
   // The reel and its hose, and the nozzle.
-  m.cylinder([0.55, 0.38, 0.95], 0.3, 0.12, { axis: 'x', segments: 10, color: ['gray', 0.3] });
-  m.cylinder([0.67, 0.38, 0.95], 0.22, 0.14, { axis: 'x', segments: 10, color: ['gray', 0.1] });
-  m.box([0.1, 0.75, 0.6], [0.3, 0.9, 0.95], { color: IRON, bottom: false });
-  m.box([0.15, 0.78, 0.9], [0.25, 0.98, 1.0], { color: ['blood', 0.55] });
+  m.cylinder([0.55, 0.38, 0.95], 0.3, 0.12, { axis: 'x', segments: 10, ...PLATE });
+  m.cylinder([0.67, 0.38, 0.95], 0.22, 0.14, { axis: 'x', segments: 10, ...RUBBER });
+  m.box([0.25, 0.75, 0.6], [0.45, 0.9, 0.95], { ...PLATE, bottom: false });
+  m.box([0.3, 0.78, 0.9], [0.4, 0.98, 1.0], { ...RUBBER });
   m.outlineLines([[-0.6, 0], [0.6, 0], [0.6, 0.85], [-0.6, 0.85]]);
   return m.build();
 }

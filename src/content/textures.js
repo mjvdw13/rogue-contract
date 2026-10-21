@@ -40,6 +40,8 @@ const TOWN = [
   'metal-rust', 'metal-grey',
   // Docking bays: duracrete walls (buttressed at the foot), floor and stair risers.
   'bay-wall', 'bay-wall-ribbed', 'bay-floor', 'bay-step',
+  // The bay's fuel pumps (models/bay.js).
+  'pump-front', 'pump-side', 'pump-hazard', 'pump-hose', 'bay-plate',
   // Street clutter: crates and junk (models/clutter.js).
   'crate-tan', 'crate-grey', 'crate-rust', 'junk',
   // The X-34 landspeeder (models/speeder.js): paint, stripes, engine metal,

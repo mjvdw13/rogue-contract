@@ -96,6 +96,8 @@ These need Mark to try something, or to decide. Don't start them without him.
   All round the edge, clear of the stairs, the pit and the Crow. Mark's
   first notes (2026-10-18) took out the hose into the Crow, the tool
   cart, the container and the repulsor pallet.
+  The fuel pumps now wear DF's FuelStat panels (2026-10-20): whether the
+  front's gauges, the hazard band and the dark rubber hose read right.
 
 - **The Moldy Crow** (`?map=m1`, hovering in Docking Bay 87, nose east
   and turned 20 degrees south of it, in front of you at the start, a
@@ -215,6 +217,18 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
     - [ ] Bare brick where the plaster has fallen: ordinary decals cut
           from `adobe-brick` with ragged edges.
     - [x] In Mos Eisley: snapshots, then Waiting on Mark.
+  - [ ] **Docking Bay 87's fittings, textured** (Mark, 2026-10-20, the
+        look guideline in CLAUDE.md): one object at a time from the DF
+        pack, a commit and a check-in with Mark after each.
+    - [x] Fuel pump (FuelStat's gauge panel, hazard band, louvres, ribbed
+          hose on the reel).
+    - [ ] Fuel line: its manifold, pipes and valve.
+    - [ ] Rim lamp.
+    - [ ] Rib: its iron band and cap.
+    - [ ] Big crates' iron straps.
+    - [ ] The two hoses.
+    - [ ] Barrels, canisters and the cargo pod (`models/clutter.js`, shared
+          with the town).
   - [ ] Waiting on Mark.
 - [ ] **An X-34 landspeeder on the main street** (Mark, 2026-10-18, after
       his schematic and the weathered prop): a model, hovering, textured

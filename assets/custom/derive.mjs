@@ -23,7 +23,8 @@
 // with blotches of rust that tile (a list of them stains it with each).
 // `lip: [{ rows, color, amount }, ...]` paints bands down from the top row,
 // each `rows` tall, `amount` of the way to `color` (a step's nosing and the
-// shadow under it).
+// shadow under it). With no `gradient` a texture keeps the source's own
+// colours (the bay's fuel pump panels).
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -106,6 +107,15 @@ export const TOWN = [
   // row sits at the step's edge, so every step gets the lip and reads
   // against the lit treads above and below it.
   { out: 'bay-step', df: 'TWCAP01', crop: [0, 0, 128, 32], gradient: [[62, 46, 28], [104, 80, 52], [128, 100, 68], [150, 120, 82]], keep: 0, contrast: 0.7, fade: { color: [62, 46, 28], from: 0.3 }, lip: [{ rows: 3, color: [232, 214, 176], amount: 0.7 }, { rows: 2, color: [28, 20, 12], amount: 0.7 }] },
+  // Docking Bay 87's fuel pump (models/bay.js), cut from FuelStat's panels
+  // and left in their own colours: the gauges and valve wheel for its front,
+  // a hazard band, the louvres and brass plate of its sides, a grey machine
+  // plate and, dark, the ribbed hose wound on its reel.
+  { out: 'pump-front', df: 'IWFUEL2', crop: [2, 28, 54, 50], scale: [32, 32] },
+  { out: 'pump-side', df: 'IWFUEL9', crop: [36, 26, 56, 102], scale: [32, 64] },
+  { out: 'pump-hazard', df: 'NWWARN1', crop: [0, 8, 64, 16] },
+  { out: 'bay-plate', df: 'ZPGREYP1' },
+  { out: 'pump-hose', df: 'IWFUEL3', crop: [0, 32, 64, 64], gradient: [[6, 6, 6], [26, 26, 24], [52, 52, 48], [84, 84, 78]], keep: 0, contrast: 1 },
   // The X-34 landspeeder (models/speeder.js): Gromas' mottled grey panel
   // as its peach paint and the rose of its stripes, worn through to rust and
   // chipped grey-green where the paint has gone (Mark's photo of the prop);
@@ -441,7 +451,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     if (spec.smooth) img = smoothed(img, spec.smooth);
     if (spec.scale) img = resized(img, spec.scale);
     if (spec.tile) img = tiled(img, spec.tile);
-    img = gradientMap(img, spec);
+    if (spec.gradient) img = gradientMap(img, spec);
     if (spec.fade) img = faded(img, spec.fade);
     for (const r of [spec.rust ?? []].flat()) img = rusted(img, r);
     if (spec.lip) img = lipped(img, spec.lip);
