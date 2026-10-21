@@ -297,7 +297,9 @@ def snap(rgb, colours):
 
 def resample(arr, box, size, pad=64, filter=Image.LANCZOS):
     """Scales a box of `arr` to `size`; the box may run off the sheet's edges."""
-    padded = np.pad(arr.astype(np.float32), pad)
+    h, w = arr.shape[:2]
+    pad = max(pad, int(np.ceil(max(-box[0], -box[1], box[2] - w, box[3] - h))) + 1)
+    padded = np.pad(arr.astype(np.float32), [(pad, pad), (pad, pad)] + [(0, 0)] * (arr.ndim - 2))
     box = tuple(v + pad for v in box)
     return np.asarray(Image.fromarray(padded).resize(size, filter, box=box))
 

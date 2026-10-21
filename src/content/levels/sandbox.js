@@ -223,7 +223,7 @@ export default defineLevel({
     '        n                                9',
     '',
     '   > 4 R                         h       o',
-    '',
+    '           D',
     '            m                    l',
     '               e',
     '     x                       C             c',

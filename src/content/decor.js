@@ -24,6 +24,27 @@ export default [
     solid: true,
     radius: 0.6,
   }),
+  // A dewback, standing about with its saddle on (cut from Mark's sheet by
+  // assets/custom/dewback/cut.py). Frames 0-4 stand, seen from the front,
+  // front three-quarter, side, back three-quarter and back; 5-9 and 10-14
+  // breathe in. It faces its placed angle and never moves.
+  defineDecoration({
+    id: 'dewback',
+    glyph: 'D',
+    sheet: S('dewback', 224, 83),
+    scale: 0.85,
+    solid: true,
+    radius: 1,
+    height: 1.9,
+    anims: {
+      idle: {
+        frames: [0, 5, 10, 5],
+        fps: 2.5,
+        loop: true,
+        views: { frontSide: [1, 6, 11, 6], side: [2, 7, 12, 7], backSide: [3, 8, 13, 8], back: [4, 9, 14, 9] },
+      },
+    },
+  }),
   // 3D models (src/content/models).
   defineDecoration({ id: 'terminal', model: 'terminal', solid: true, radius: 0.55, height: 1.1 }),
   defineDecoration({ id: 'reactor-ring', model: 'reactor-ring', spin: 0.5 }),

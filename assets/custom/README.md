@@ -126,6 +126,21 @@ To try other files or volumes, serve the repo (`npm run serve`) and open
 by side, lets you pick another file and volume, and gives you the JSON to
 paste into `sound-overrides.json`.
 
+## The dewback
+
+`dewback/sheet.jpg` is Mark's dewback sheet (eight poses on a blue backdrop).
+`dewback/cut.py` writes `assets/sprites/decor/dewback.png`: five views
+(front, front three-quarter, side, back three-quarter, back) standing and
+breathing in two steps, at the Dark Forces sprites' pixel size, in the
+palette's olive, sand, rust and beige ramps. The breathing is made in the
+cutter (the sheet has no animation): the body above the legs lifts a pixel,
+then two. It's a decoration (`dewback` in `src/content/decor.js`): it stands
+at the angle it's placed at and doesn't move.
+
+```
+python assets/custom/dewback/cut.py [--preview preview.png]
+```
+
 ## The sandtrooper
 
 `sandtrooper/sheet.jpg` is an AI-generated asset sheet (not ripped art), so
