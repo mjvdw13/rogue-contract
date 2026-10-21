@@ -90,8 +90,8 @@ function powerUnit() {
 }
 
 /**
- * An astromech's dome off a scrapped droid: a silver dome lofted in rings,
- * blue panels round its middle and a red eye.
+ * An astromech's dome off a scrapped droid: a dome lofted in rings in dirty
+ * white paint, blue panels round its middle and a red eye.
  */
 function droidDome() {
   const m = new ModelBuilder('droid-dome');
@@ -100,10 +100,11 @@ function droidDome() {
     const [z0, r0] = tiers[i];
     const [z1, r1] = tiers[i + 1];
     m.loft(ring(8, r0), z0, ring(8, r1), z1, {
-      color: ['steel', 0.85],
-      bottom: i === 0 ? { color: ['gray', 0.15] } : false,
+      tex: 'dome-white',
+      texScale: 0.3,
+      bottom: i === 0 ? { tex: 'pump-hose' } : false,
       top: i === tiers.length - 2 ? undefined : false,
-      side: (k) => (i === 1 && k % 2 === 0 ? { color: ['steel', 0.35] } : undefined),
+      side: (k) => (i === 1 && k % 2 === 0 ? { tex: 'dome-blue' } : undefined),
     });
   }
   m.box([0.255, -0.05, 0.08], [0.29, 0.05, 0.15], { color: [255, 40, 30], glow: true, bottom: false });

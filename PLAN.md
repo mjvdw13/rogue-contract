@@ -230,6 +230,8 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
           the manifold, a valve wheel.
     - [x] The two hoses: ribbed rubber, orange and black, nozzle capped.
     - [ ] Big crates' iron straps (thin: last, maybe skip).
+    - [x] The astromech dome (`models/clutter.js`, in the droid seller's
+          pen and on the street: white paint, blue panels, scorched).
     - [ ] Barrels, canisters and the cargo pod (`models/clutter.js`, shared
           with the town).
   - [ ] Waiting on Mark.

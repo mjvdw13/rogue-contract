@@ -145,6 +145,11 @@ export const TOWN = [
   { out: 'speeder-red', df: 'IWGREYC2', gradient: [[74, 32, 24], [130, 58, 46], [168, 84, 68], [188, 104, 86], [204, 124, 104]], keep: 0, contrast: 0.6, rust: { color: [80, 38, 20], amount: 0.6, cell: 16, seed: 6, from: 0.62 } },
   { out: 'speeder-metal', df: 'IWGREYC2', gradient: [[28, 24, 20], [66, 60, 54], [104, 98, 90], [134, 128, 118], [160, 154, 142]], keep: 0, contrast: 0.8, rust: { color: [112, 54, 28], amount: 0.6, cell: 16, seed: 8, from: 0.56 } },
   { out: 'speeder-intake', df: 'IWENGBAC', crop: [16, 12, 104, 104], scale: [32, 32], gradient: [[8, 8, 8], [34, 32, 30], [76, 72, 66], [128, 122, 112], [170, 164, 152]], keep: 0.2, contrast: 1 },
+  // A scrapped astromech's dome (models/clutter.js, droid-dome): the
+  // landspeeder's mottled panel in dirty white paint and in faded blue,
+  // scorched and rusted through.
+  { out: 'dome-white', df: 'IWGREYC2', scale: [32, 32], gradient: [[96, 94, 88], [150, 148, 140], [196, 194, 186], [224, 222, 214], [240, 238, 230]], keep: 0, contrast: 0.7, rust: WORN(16, 51, 0.9) },
+  { out: 'dome-blue', df: 'IWGREYC2', scale: [32, 32], gradient: [[10, 22, 54], [28, 56, 112], [58, 100, 168], [96, 140, 196]], keep: 0, contrast: 0.7, rust: WORN(16, 53, 0.7) },
   // A hazy day: Robotics' pale cloudy sky, twice as wide, warming to dust at the horizon.
   { out: 'sky-day', df: 'RESKY01', gradient: [[74, 128, 182], [120, 166, 206], [168, 198, 222], [214, 226, 236]], keep: 0.3, contrast: 0.9, tile: [2, 1], fade: { color: [212, 200, 174], from: 0.55 } },
 ];

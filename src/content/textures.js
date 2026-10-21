@@ -44,6 +44,8 @@ const TOWN = [
   'pump-front', 'pump-side', 'pump-hazard', 'pump-hose', 'bay-plate',
   // Its fuel lines.
   'bay-pipe', 'bay-pipe-x', 'line-front', 'valve-wheel', 'hose-orange',
+  // A scrapped astromech's dome (models/clutter.js).
+  'dome-white', 'dome-blue',
   // Street clutter: crates and junk (models/clutter.js).
   'crate-tan', 'crate-grey', 'crate-rust', 'junk',
   // The X-34 landspeeder (models/speeder.js): paint, stripes, engine metal,
