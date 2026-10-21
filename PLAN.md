@@ -154,7 +154,9 @@ These need Mark to try something, or to decide. Don't start them without him.
   The shops' shutters are doors too, D's porch is 4 wide so its door is
   centred, and Docking Bay 87's door is DF's X-braced cargo door, 4x4.
   Whether the bay door's grey is right, and whether any locked door
-  should open into a room.
+  should open into a room. The bay door now has a 4-wide round hood and a
+  buttress either side of it (2026-10-20): whether it feels like Mos
+  Eisley now (the hood hides the controls panel beside the door).
 
 - **Round-topped arches in Mos Eisley** (`?map=m1`, after Mark's film
   stills): hoods standing out round F's, H's and M's doors (a half circle
