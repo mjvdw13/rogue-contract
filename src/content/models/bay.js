@@ -189,7 +189,9 @@ function smooth(pts, steps) {
 /**
  * A tube of `radius` with `sides` sides along the points `path`, its rings
  * carried along the path without twisting (so it can bend from lying on
- * the floor to standing up). Open at its ends.
+ * the floor to standing up). With a `tex` and a `pitch` the picture wraps
+ * once round it and repeats every `pitch` along it (a hose's ribs); `cap`
+ * closes its ends.
  */
 function tube(m, path, radius, style, sides = 6) {
   const rings = [];
@@ -204,12 +206,21 @@ function tube(m, path, radius, style, sides = 6) {
       return [0, 1, 2].map((j) => path[i][j] + n[j] * cu + b[j] * cv);
     }));
   }
+  let t0 = 0;
   for (let i = 0; i < path.length - 1; i++) {
     const inside = [0, 1, 2].map((j) => (path[i][j] + path[i + 1][j]) / 2);
+    const t1 = t0 + Math.hypot(...vsub(path[i + 1], path[i]));
     for (let k = 0; k < sides; k++) {
       const l = (k + 1) % sides;
-      m.face([rings[i][k], rings[i][l], rings[i + 1][l], rings[i + 1][k]], style, inside);
+      const around = style.pitch ? { ...style, uv: [[k / sides, t0 / style.pitch], [(k + 1) / sides, t0 / style.pitch], [(k + 1) / sides, t1 / style.pitch], [k / sides, t1 / style.pitch]] } : style;
+      m.face([rings[i][k], rings[i][l], rings[i + 1][l], rings[i + 1][k]], around, inside);
     }
+    t0 = t1;
+  }
+  if (style.cap) {
+    const { pitch, cap, ...end } = style;
+    m.face(rings[0], end, path[1]);
+    m.face(rings[rings.length - 1], end, path[path.length - 2]);
   }
 }
 
@@ -221,11 +232,11 @@ function tube(m, path, radius, style, sides = 6) {
  * on the floor with its nozzle, 'coil' is wound in a loose coil.
  */
 export const BAY_HOSES = [
-  { id: 'bay-hose-nozzle', end: 'nozzle', color: ['orange', 0.32], path: [[-11.69, 16.39, 0.5], [-11.25, 15.7, 0.1], [-9.6, 14.1, 0.1], [-9.9, 11.6, 0.1], [-8.1, 9.7, 0.1], [-6.3, 9.4, 0.1], [-5.3, 8.7, 0.1]] },
-  { id: 'bay-hose-coil', end: 'coil', color: ['gray', 0.12], path: [[18.32, -8.35, 0.5], [17.6, -8, 0.1], [16.4, -7.2, 0.1], [15.9, -6.2, 0.1]] },
+  { id: 'bay-hose-nozzle', end: 'nozzle', tex: 'hose-orange', path: [[-11.69, 16.39, 0.5], [-11.25, 15.7, 0.1], [-9.6, 14.1, 0.1], [-9.9, 11.6, 0.1], [-8.1, 9.7, 0.1], [-6.3, 9.4, 0.1], [-5.3, 8.7, 0.1]] },
+  { id: 'bay-hose-coil', end: 'coil', tex: 'pump-hose', path: [[18.32, -8.35, 0.5], [17.6, -8, 0.1], [16.4, -7.2, 0.1], [15.9, -6.2, 0.1]] },
 ];
 
-function hose({ id, end, color, path }) {
+function hose({ id, end, tex, path }) {
   const m = new ModelBuilder(id);
   const r = 0.1;
   const [ox, oy] = path[0];
@@ -243,16 +254,16 @@ function hose({ id, end, color, path }) {
     }
   }
   const curve = smooth(pts, 2);
-  tube(m, curve, r, { color });
+  tube(m, curve, r, { tex, pitch: 0.5 });
   // Where it leaves the pump, a collar.
-  tube(m, curve.slice(0, 2), r * 1.5, { color: IRON });
+  tube(m, curve.slice(0, 2), r * 1.5, { tex: 'bay-plate', cap: true });
   const [a, b] = curve.slice(-2);
   const dir = unit(vsub(b, a));
   const along = (p, d) => [0, 1, 2].map((j) => p[j] + dir[j] * d);
   if (end === 'nozzle') {
     // The nozzle: a fat steel grip, then a thin spout.
-    tube(m, [b, along(b, 0.35)], r * 1.6, { color: ['steel', 0.45] });
-    tube(m, [along(b, 0.35), along(b, 0.6)], r * 0.6, { color: ['steel', 0.3] });
+    tube(m, [b, along(b, 0.35)], r * 1.6, { tex: 'bay-plate', cap: true });
+    tube(m, [along(b, 0.35), along(b, 0.6)], r * 0.6, { tex: 'bay-plate', cap: true });
   }
   return m.build();
 }

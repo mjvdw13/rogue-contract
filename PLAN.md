@@ -222,14 +222,14 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
         pack, a commit and a check-in with Mark after each. Everything
         should look broken-down and dirty (Mark, 2026-10-20): rusty pipes,
         rust and soot on the panels (`WORN` in derive.mjs), dead lamps.
+        Skipped as too far or too small to see (Mark, 2026-10-20): the
+        rim lamps, the ribs' iron band and cap.
     - [x] Fuel pump (FuelStat's gauge panel, hazard band, louvres, ribbed
           hose on the reel).
     - [x] Fuel line: chrome pipes, FuelStat's brass elbow and gauge on
           the manifold, a valve wheel.
-    - [ ] Rim lamp.
-    - [ ] Rib: its iron band and cap.
-    - [ ] Big crates' iron straps.
-    - [ ] The two hoses.
+    - [x] The two hoses: ribbed rubber, orange and black, nozzle capped.
+    - [ ] Big crates' iron straps (thin: last, maybe skip).
     - [ ] Barrels, canisters and the cargo pod (`models/clutter.js`, shared
           with the town).
   - [ ] Waiting on Mark.

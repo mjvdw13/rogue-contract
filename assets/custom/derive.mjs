@@ -133,7 +133,9 @@ export const TOWN = [
   { out: 'bay-pipe-x', df: 'IPDETPIP', crop: [32, 0, 16, 16], turn: true, gradient: RUSTY_PIPE, keep: 0, contrast: 1, rust: WORN(8, 29, 0.6) },
   { out: 'line-front', df: 'IWFUEL1', crop: [0, 32, 64, 96], scale: [64, 128], rust: WORN(16, 31) },
   { out: 'valve-wheel', df: 'IWFUEL2', crop: [20, 49, 18, 18], scale: [16, 16], rust: WORN(8, 33, 0.7) },
-  { out: 'pump-hose', df: 'IWFUEL3', crop: [0, 32, 64, 64], gradient: [[6, 6, 6], [26, 26, 24], [52, 52, 48], [84, 84, 78]], keep: 0, contrast: 1 },
+  { out: 'pump-hose', df: 'IWFUEL3', crop: [0, 32, 64, 64], gradient: [[6, 6, 6], [26, 26, 24], [52, 52, 48], [84, 84, 78]], keep: 0, contrast: 1, rust: WORN(16, 43, 0.5) },
+  // The hoses on the floor: the same ribs in perished orange rubber.
+  { out: 'hose-orange', df: 'IWFUEL3', crop: [0, 32, 64, 64], gradient: [[40, 18, 6], [96, 48, 18], [150, 80, 30], [190, 112, 50]], keep: 0, contrast: 1, rust: WORN(16, 45, 0.8) },
   // The X-34 landspeeder (models/speeder.js): Gromas' mottled grey panel
   // as its peach paint and the rose of its stripes, worn through to rust and
   // chipped grey-green where the paint has gone (Mark's photo of the prop);
