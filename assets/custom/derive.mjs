@@ -47,6 +47,16 @@ export const DERIVED = [
   { out: 'desert-gravel', from: 'sand', gradient: [[40, 30, 22], [86, 68, 48], [124, 100, 72], [158, 130, 96], [190, 164, 126]], keep: 0.2, contrast: 1.15 },
 ];
 
+/**
+ * A bay fitting's wear: blotches of orange rust and of dark soot and oil,
+ * `amount` of the way to full (they tile on a square texture).
+ */
+const WORN = (cell, seed, amount = 1) => [
+  { color: [128, 64, 28], amount: 0.7 * amount, cell, seed },
+  { color: [18, 14, 10], amount: 0.65 * amount, cell, seed: seed + 10, from: 0.45 },
+];
+const RUSTY_PIPE = [[30, 16, 8], [74, 40, 18], [120, 66, 32], [160, 96, 52], [190, 130, 82]];
+
 /** Mos Eisley's walls, roofs, streets and sky: warm plaster and packed sand under a pale, dusty sky. */
 // (Key colours from the palette's sand and beige ramps: pale tones between
 // them snap to olive greys in the game.)
@@ -112,17 +122,17 @@ export const TOWN = [
   // and left in their own colours: the gauges and valve wheel for its front,
   // a hazard band, the louvres and brass plate of its sides, a grey machine
   // plate and, dark, the ribbed hose wound on its reel.
-  { out: 'pump-front', df: 'IWFUEL2', crop: [2, 28, 54, 50], scale: [32, 32] },
-  { out: 'pump-side', df: 'IWFUEL9', crop: [36, 26, 56, 102], scale: [32, 64] },
-  { out: 'pump-hazard', df: 'NWWARN1', crop: [0, 8, 64, 16] },
-  { out: 'bay-plate', df: 'ZPGREYP1' },
+  { out: 'pump-front', df: 'IWFUEL2', crop: [2, 28, 54, 50], scale: [32, 32], rust: WORN(16, 21) },
+  { out: 'pump-side', df: 'IWFUEL9', crop: [36, 26, 56, 102], scale: [32, 64], rust: WORN(16, 23) },
+  { out: 'pump-hazard', df: 'NWWARN1', crop: [0, 8, 64, 16], rust: WORN(16, 25, 1.2) },
+  { out: 'bay-plate', df: 'ZPGREYP1', rust: WORN(16, 27) },
   // Its fuel lines (models/bay.js): a chrome pipe ring (and turned, for a
   // pipe lying along), a manifold's front of brass elbow, truss and gauge,
   // and the valve wheel from the pump's panel.
-  { out: 'bay-pipe', df: 'IPDETPIP', crop: [32, 0, 16, 16] },
-  { out: 'bay-pipe-x', df: 'IPDETPIP', crop: [32, 0, 16, 16], turn: true },
-  { out: 'line-front', df: 'IWFUEL1', crop: [0, 32, 64, 96], scale: [64, 128] },
-  { out: 'valve-wheel', df: 'IWFUEL2', crop: [20, 49, 18, 18], scale: [16, 16] },
+  { out: 'bay-pipe', df: 'IPDETPIP', crop: [32, 0, 16, 16], gradient: RUSTY_PIPE, keep: 0, contrast: 1, rust: WORN(8, 29, 0.6) },
+  { out: 'bay-pipe-x', df: 'IPDETPIP', crop: [32, 0, 16, 16], turn: true, gradient: RUSTY_PIPE, keep: 0, contrast: 1, rust: WORN(8, 29, 0.6) },
+  { out: 'line-front', df: 'IWFUEL1', crop: [0, 32, 64, 96], scale: [64, 128], rust: WORN(16, 31) },
+  { out: 'valve-wheel', df: 'IWFUEL2', crop: [20, 49, 18, 18], scale: [16, 16], rust: WORN(8, 33, 0.7) },
   { out: 'pump-hose', df: 'IWFUEL3', crop: [0, 32, 64, 64], gradient: [[6, 6, 6], [26, 26, 24], [52, 52, 48], [84, 84, 78]], keep: 0, contrast: 1 },
   // The X-34 landspeeder (models/speeder.js): Gromas' mottled grey panel
   // as its peach paint and the rose of its stripes, worn through to rust and
@@ -417,9 +427,11 @@ function faded(img, { color, from }) {
  */
 function rusted(img, { color, amount, cell, seed, from = 0.5 }) {
   const d = img.data;
+  // (A texture that isn't square wraps at its longer side, so it only tiles that way.)
+  const period = Math.max(img.width, img.height);
   for (let y = 0; y < img.height; y++) {
     for (let x = 0; x < img.width; x++) {
-      const n = periodicNoise(x, y, cell, img.width, seed) * 0.7 + periodicNoise(x, y, cell / 4, img.width, seed + 1) * 0.3;
+      const n = periodicNoise(x, y, cell, period, seed) * 0.7 + periodicNoise(x, y, cell / 4, period, seed + 1) * 0.3;
       const t = Math.max(0, Math.min(1, (n - from) * 4)) * amount;
       if (!t) continue;
       const i = (y * img.width + x) * 4;

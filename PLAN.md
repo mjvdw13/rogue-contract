@@ -219,7 +219,9 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
     - [x] In Mos Eisley: snapshots, then Waiting on Mark.
   - [ ] **Docking Bay 87's fittings, textured** (Mark, 2026-10-20, the
         look guideline in CLAUDE.md): one object at a time from the DF
-        pack, a commit and a check-in with Mark after each.
+        pack, a commit and a check-in with Mark after each. Everything
+        should look broken-down and dirty (Mark, 2026-10-20): rusty pipes,
+        rust and soot on the panels (`WORN` in derive.mjs), dead lamps.
     - [x] Fuel pump (FuelStat's gauge panel, hazard band, louvres, ribbed
           hose on the reel).
     - [x] Fuel line: chrome pipes, FuelStat's brass elbow and gauge on

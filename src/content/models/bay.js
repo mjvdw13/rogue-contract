@@ -93,9 +93,9 @@ function fuelPump() {
   front(0.75, 0.55, 0.15, 0.3, PLATE);
   front(0.76, 0.56, 0.3, 0.5, { tex: 'pump-hazard' });
   front(0.75, 0.55, 0.5, 1.55, { tex: 'pump-front' });
-  // A status lamp each, lit, on the cap's front.
+  // A status lamp each on the cap's front: the green one still lit, the amber one dead.
   m.box([0.2, 0.8, 1.58], [0.32, 0.82, 1.66], { color: [90, 255, 90], glow: true });
-  m.box([0, 0.8, 1.58], [0.12, 0.82, 1.66], { color: [255, 190, 60], glow: true });
+  m.box([0, 0.8, 1.58], [0.12, 0.82, 1.66], { color: ['gray', 0.12] });
   // The reel and its hose, and the nozzle.
   m.cylinder([0.55, 0.38, 0.95], 0.3, 0.12, { axis: 'x', segments: 10, ...PLATE });
   m.cylinder([0.67, 0.38, 0.95], 0.22, 0.14, { axis: 'x', segments: 10, ...RUBBER });
