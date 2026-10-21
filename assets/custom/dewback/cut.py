@@ -11,8 +11,8 @@ three-quarter, the side, the back three-quarter and the back; then 5-9 the
 same five views breathing in.
 
 The sheet has eight poses and no animation, so the breathing is made here:
-the whole body (head and tail too) lifts one pixel with the legs held still: each leg keeps its bottom 22 rows, and its top row repeats under the belly to
-close the gap. The game plays the standing frame, then the lift.
+the head lifts a pixel and the tail drops a pixel, and the body and legs stay
+still. The game plays the standing frame, then the breath.
 
 The views face left (the game mirrors them for the other side): the sheet's
 front three-quarter faces right, so it's flipped.
@@ -58,13 +58,15 @@ RAMPS = ['olive', 'sand', 'rust', 'beige', 'concrete', 'gray', 'flesh']
 # The restyle mutes colour; the hide's green is pushed back up first.
 SATURATION = 1.25
 
-# How far the body lifts at the top of a breath (one pixel is plenty at this
-# size); how many rows of each leg stay still (about the leg's length: up to
-# where it meets the belly); and how near the ground a column's lowest pixel
-# must be for it to be a leg's. Head and tail columns end higher up, so they
-# rise whole.
-LIFT = 1
-LEG_ROWS = 22
+# The breath moves only the head and the tail, a pixel each: the head up and
+# the tail down, as if swinging on the hips. The body and legs stay put (moving
+# them looked like the whole sprite bobbing). Per view (front three-quarter,
+# side, back three-quarter), the columns of the head (before the neck) and of
+# the tail (from the rump). The front and back views stay still: the head and
+# tail point at or away from the camera. Columns where a foot reaches the
+# ground (within FOOT_REACH rows) stay still too.
+SWING = 1
+MOVES = {1: dict(head=(0, 92), tail=(148, 224)), 2: dict(head=(0, 80), tail=(152, 224)), 3: dict(head=(0, 72), tail=(138, 224))}
 FOOT_REACH = 10
 
 
@@ -72,26 +74,24 @@ def mirror(p, width):
     return dict(mask=p['mask'][:, ::-1], alpha=p['alpha'][:, ::-1], rgb=p['rgb'][:, ::-1], centre=width - p['centre'], base=p['base'])
 
 
-def breathe(frame, lift):
-    """The frame with its body `lift` pixels higher and its legs still. Each
-    column that reaches the ground keeps its bottom LEG_ROWS rows (the leg, up
-    to a gap, where the head or tail starts) and repeats the leg's top row
-    under the lifted body, so the stretch is in the belly. The other columns,
-    the head and tail among them, move whole."""
+def breathe(frame, move):
+    """The frame with its head `SWING` pixels higher and its tail `SWING`
+    lower, everything else as it was. A column moves whole, so the head and
+    tail don't stretch; the one-pixel step where they join the body falls in
+    the neck's harness and the rump's curve."""
     h, w = frame.shape[:2]
-    out = np.zeros_like(frame)
-    out[: h - lift] = frame[lift:]
+    out = frame.copy()
     solid = frame[..., 3] > 0
-    for x in range(w):
-        rows = np.nonzero(solid[:, x])[0]
-        if not len(rows) or h - 1 - rows.max() > FOOT_REACH:
-            continue
-        low = rows.max()
-        top = low
-        while top > 0 and solid[top - 1, x] and low - top + 1 < LEG_ROWS:
-            top -= 1
-        out[top - lift : top, x] = frame[top, x]
-        out[top:, x] = frame[top:, x]
+    for (x0, x1), dy in ((move['head'], -SWING), (move['tail'], SWING)):
+        for x in range(x0, x1):
+            rows = np.nonzero(solid[:, x])[0]
+            if not len(rows) or h - 1 - rows.max() <= FOOT_REACH:
+                continue
+            out[:, x] = 0
+            if dy < 0:
+                out[: h + dy, x] = frame[-dy:, x]
+            else:
+                out[dy:, x] = frame[: h - dy, x]
     return out
 
 
@@ -108,11 +108,8 @@ def main():
     strip = assemble(poses, SCALE, style=STYLE, ramps=RAMPS)
     n = len(poses)
     fw = strip.shape[1] // n
-    # Headroom for the lift, on every frame.
-    top = LIFT
-    strip = np.concatenate([np.zeros((top, strip.shape[1], 4), np.uint8), strip])
     frames = [strip[:, i * fw:(i + 1) * fw] for i in range(n)]
-    sheet = [*frames, *[breathe(f, LIFT) for f in frames]]
+    sheet = [*frames, *[breathe(f, MOVES[i]) if i in MOVES else f for i, f in enumerate(frames)]]
     save(np.concatenate(sheet, 1), OUT, len(sheet))
 
 

@@ -31,7 +31,7 @@ export default [
   defineDecoration({
     id: 'dewback',
     glyph: 'D',
-    sheet: S('dewback', 224, 82),
+    sheet: S('dewback', 224, 81),
     scale: 0.85,
     solid: true,
     radius: 1,
