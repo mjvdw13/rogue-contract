@@ -21,6 +21,9 @@
 // `color` from `from` (0 top, 1 bottom) down to the bottom row (a sky's
 // haze at the horizon), and `rust: { color, amount, cell, seed }` stains it
 // with blotches of rust that tile (a list of them stains it with each).
+// `lip: [{ rows, color, amount }, ...]` paints bands down from the top row,
+// each `rows` tall, `amount` of the way to `color` (a step's nosing and the
+// shadow under it).
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -97,6 +100,12 @@ export const TOWN = [
   { out: 'bay-wall-ribbed', df: 'TWCAP01', gradient: DURACRETE, keep: 0.1, contrast: 0.8 },
   { out: 'bay-wall', df: 'TWCAP01', crop: [0, 0, 128, 64], gradient: DURACRETE, keep: 0.1, contrast: 0.8 },
   { out: 'bay-floor', df: 'ZPCMENT2', scale: [128, 128], gradient: [[62, 46, 30], [116, 90, 62], [160, 128, 92], [192, 162, 120], [214, 188, 146]], keep: 0.1, contrast: 0.6 },
+  // The bay's stair risers: the same duracrete in shade (the palette's sand
+  // ramp, so it stays brown once lit), darker toward the
+  // foot, under a pale worn nosing and its shadow line (`lip`). A face's top
+  // row sits at the step's edge, so every step gets the lip and reads
+  // against the lit treads above and below it.
+  { out: 'bay-step', df: 'TWCAP01', crop: [0, 0, 128, 32], gradient: [[62, 46, 28], [104, 80, 52], [128, 100, 68], [150, 120, 82]], keep: 0, contrast: 0.7, fade: { color: [62, 46, 28], from: 0.3 }, lip: [{ rows: 3, color: [232, 214, 176], amount: 0.7 }, { rows: 2, color: [28, 20, 12], amount: 0.7 }] },
   // The X-34 landspeeder (models/speeder.js): Gromas' mottled grey panel
   // as its peach paint and the rose of its stripes, worn through to rust and
   // chipped grey-green where the paint has gone (Mark's photo of the prop);
@@ -394,6 +403,22 @@ function rusted(img, { color, amount, cell, seed, from = 0.5 }) {
   return img;
 }
 
+/** Bands painted down from the top row, one after another (see above). */
+function lipped(img, bands) {
+  const d = img.data;
+  let y0 = 0;
+  for (const { rows, color, amount } of bands) {
+    for (let y = y0; y < Math.min(img.height, y0 + rows); y++) {
+      for (let x = 0; x < img.width; x++) {
+        const i = (y * img.width + x) * 4;
+        for (let k = 0; k < 3; k++) d[i + k] = Math.round(d[i + k] + (color[k] - d[i + k]) * amount);
+      }
+    }
+    y0 += rows;
+  }
+  return img;
+}
+
 /** The pack's textures by upper-case name. */
 function packFiles() {
   const files = new Map();
@@ -419,6 +444,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     img = gradientMap(img, spec);
     if (spec.fade) img = faded(img, spec.fade);
     for (const r of [spec.rust ?? []].flat()) img = rusted(img, r);
+    if (spec.lip) img = lipped(img, spec.lip);
     for (let i = 3; i < img.data.length; i += 4) img.data[i] = 255;
     made.set(spec.out, img);
     fs.writeFileSync(path.join(texDir, `${spec.out}.png`), encodePNG(img.width, img.height, img.data));

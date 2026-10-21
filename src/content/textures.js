@@ -38,8 +38,8 @@ const TOWN = [
   'planks', 'street-sand', 'street-drift', 'flagstone', 'door-jamb',
   // Corrugated tin for lean-to roofs, rusty and galvanised.
   'metal-rust', 'metal-grey',
-  // Docking bays: duracrete walls (buttressed at the foot) and floor.
-  'bay-wall', 'bay-wall-ribbed', 'bay-floor',
+  // Docking bays: duracrete walls (buttressed at the foot), floor and stair risers.
+  'bay-wall', 'bay-wall-ribbed', 'bay-floor', 'bay-step',
   // Street clutter: crates and junk (models/clutter.js).
   'crate-tan', 'crate-grey', 'crate-rust', 'junk',
   // The X-34 landspeeder (models/speeder.js): paint, stripes, engine metal,
