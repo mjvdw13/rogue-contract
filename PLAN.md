@@ -164,12 +164,14 @@ These need Mark to try something, or to decide. Don't start them without him.
   curve, as in the film; whether they want to be deeper or stand out more,
   and which other doors want one.
 
-- **The dewback** (`?map=sandbox`, in the start room, a decoration that
-  stands about, solid, radius 1): its size (2.1 tall to the saddle's
-  horn, about 4.4 long), the colours (the palette's olive ramp makes the
-  hide greyer than the sheet's green), the idle (the head up and the tail down three pixels, in three
-  slices, with two in-between poses, and back every 4 s), and where it goes in Mos Eisley (the stable, the plaza, the
-  patrol). Place it with `at('dewback', x, y, { angle })`.
+- **The dewback** (`?map=m1`, at the main street's north edge, at (44.5, 64.5)
+  facing west, against blank wall between two doors; also in `?map=sandbox`):
+  a decoration that stands about, solid, radius 1. Its size (2.1 tall to the
+  saddle's horn, about 4.4 long), the colours (the palette's olive ramp makes
+  the hide greyer than the sheet's green), the idle (the head up and the tail
+  down three pixels, in three slices, with two in-between poses, and back
+  every 4 s), and where it stands: it's only placed once so far, and the stable
+  and the patrol want more. Place one with `at('dewback', x, y, { angle })`.
 
 ## Next up
 

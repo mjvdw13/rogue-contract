@@ -373,6 +373,7 @@ list.push(
   at('crate-rust-long', 48.3, 63.5, { angle: 3 }), at('crate-grey-small', 48.1, 63.45, { z: 0.7, angle: 350 }), at('barrel-rust', 49.6, 64.2),
   at('cargo-pod', 22.3, 78.5, { angle: 176 }), at('canister', 23.45, 78.6),
   at('vaporator', 34.2, 80.4),
+  at('dewback', 44.5, 64.5, { angle: 180 }),
   // An X-34 landspeeder left in the middle of the square's quiet south-east
   // corner, out of the way, nose north-west at about 40 degrees to the walls
   // (Mark: near 45, but not exactly).
