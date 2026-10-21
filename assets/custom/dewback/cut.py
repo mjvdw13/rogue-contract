@@ -59,9 +59,10 @@ RAMPS = ['olive', 'sand', 'rust', 'beige', 'concrete', 'gray', 'flesh']
 SATURATION = 1.25
 
 # How far the body lifts at the top of a breath (one pixel is plenty at this
-# size), and how many rows at the bottom are the feet.
+# size), and how far up the legs (rows above the ground) the stretch is
+# hidden: in the shin, which is narrow, rather than the spread toes.
 LIFT = 1
-FEET = 3
+STRETCH_AT = 9
 # Columns this close to a foot's belong to its leg.
 LEG_REACH = 6
 
@@ -73,8 +74,8 @@ def mirror(p, width):
 def breathe(frame, lift, headroom):
     """The frame with its body `lift` pixels higher. Everything moves as one
     piece, so the head and tail rise whole. The feet stay on the ground: in
-    the columns of the legs, the row just above the feet repeats to close the
-    gap, so the legs lengthen by `lift`. `headroom` rows of blank at the top
+    the columns of the legs, a row of the shin (STRETCH_AT up) repeats to close
+    the gap, so the legs lengthen by `lift` there, out of sight. `headroom` rows of blank at the top
     take the lift."""
     h = frame.shape[0]
     out = np.zeros_like(frame)
@@ -84,7 +85,7 @@ def breathe(frame, lift, headroom):
     for d in range(1, LEG_REACH + 1):
         legs[d:] |= feet[:-d]
         legs[:-d] |= feet[d:]
-    r0 = h - FEET - 1
+    r0 = h - STRETCH_AT - 1
     out[r0 - lift + 1 : r0 + 1, legs] = frame[r0, legs]
     out[r0 + 1 :, legs] = frame[r0 + 1 :, legs]
     return out
