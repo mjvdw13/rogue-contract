@@ -275,6 +275,9 @@ town.buttress(28.4, 100, 'N', { h: BAY.rim, wall: 'adobe-grey' }).buttress(35.6,
 // under a pale nosing (bay-step), between the lit floor's treads.
 const { bands: _stairBands, ...stairCell } = { ...bayFloor, side: 'bay-step' };
 for (let k = 0; k < 7; k++) p.rect(30, 107 + k, 34, 108 + k, { ...stairCell, floorZ: (-(k + 1) * 5) / 8 });
+// A cheek either side, a step above the treads beside it and as wide as the
+// landing: the stair's sides are bay wall, not a stack of risers.
+for (let k = 0; k < 7; k++) for (const x of [29, 34]) p.set(x, 107 + k, { ...bayFloor, floorZ: (-k * 5) / 8 });
 // A maintenance pit in the middle of the floor, where ships set down: 8 by
 // 4 tiles and 2 deep, lined in steel, hazard stripes along its lips and two
 // steps down at its west end. Off its east end a crawlspace runs on under
