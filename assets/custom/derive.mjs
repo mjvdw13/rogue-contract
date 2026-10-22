@@ -121,8 +121,8 @@ export const TOWN = [
   // The condenser tower's pipes (models/market.js): one column of the bay's
   // rusty pipe repeated across, so only its rings show and each facet of a
   // pipe wears the same (the whole pipe's picture repeats its dark edges on
-  // every facet).
-  { out: 'pipe-rings', df: 'IPDETPIP', crop: [38, 0, 2, 16], tile: [8, 1], gradient: RUSTY_PIPE, keep: 0, contrast: 1, rust: WORN(8, 91, 0.4) },
+  // every facet); four rings tall so the rust isn't the same on every ring.
+  { out: 'pipe-rings', df: 'IPDETPIP', crop: [39, 0, 1, 16], tile: [16, 4], gradient: RUSTY_PIPE, keep: 0, contrast: 1, rust: WORN(8, 91, 0.6) },
   // The market stalls' wares (models/market.js): the landspeeder's mottled
   // panel in fresher paints than the bay's, lightly worn: goods for sale are
   // cared for, but this is still Tatooine.
@@ -166,7 +166,7 @@ export const TOWN = [
   // a checkerboard; four rings tall so the rust isn't the same on every
   // ring), a manifold's front of brass elbow, truss and gauge, and the
   // valve wheel from the pump's panel.
-  { out: 'bay-pipe', df: 'IPDETPIP', crop: [38, 0, 2, 16], tile: [8, 4], gradient: RUSTY_PIPE, keep: 0, contrast: 1, rust: WORN(8, 29, 0.8) },
+  { out: 'bay-pipe', df: 'IPDETPIP', crop: [39, 0, 1, 16], tile: [16, 4], gradient: RUSTY_PIPE, keep: 0, contrast: 1, rust: WORN(8, 29, 0.8) },
   { out: 'line-front', df: 'IWFUEL1', crop: [0, 32, 64, 96], scale: [64, 128], rust: WORN(16, 31) },
   { out: 'valve-wheel', df: 'IWFUEL2', crop: [20, 49, 18, 18], scale: [16, 16], rust: WORN(8, 33, 0.7) },
   { out: 'pump-hose', df: 'IWFUEL3', crop: [0, 32, 64, 64], gradient: [[6, 6, 6], [26, 26, 24], [52, 52, 48], [84, 84, 78]], keep: 0, contrast: 1, rust: WORN(16, 43, 0.5) },

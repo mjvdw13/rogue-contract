@@ -10,9 +10,10 @@ const ring = (n, r, turn = 0) => Array.from({ length: n }, (_, i) => [Math.cos(t
 
 /**
  * A rusty pipe `len` long (a cylinder's style): its rings run round it
- * whichever way it lies, one every `period`, the same on every facet.
+ * whichever way it lies, one every `period` (four to the picture), the
+ * same on every facet.
  */
-const pipe = (len, period = 0.16) => ({ tex: 'pipe-rings', sides: { uv: [[0, len / period], [1, len / period], [1, 0], [0, 0]] } });
+const pipe = (len, period = 0.16) => ({ tex: 'pipe-rings', sides: { uv: [[0, len / (4 * period)], [1, len / (4 * period)], [1, 0], [0, 0]] } });
 /** A round picture's uv on an `n`-sided disc turned by `turn` (a cylinder's end). */
 const disc = (n, turn = 0) => Array.from({ length: n }, (_, i) => [0.5 + 0.5 * Math.cos(turn + (i / n) * Math.PI * 2), 0.5 - 0.5 * Math.sin(turn + (i / n) * Math.PI * 2)]);
 // A valve wheel's picture, drawn on a twelve-sided disc.
@@ -142,7 +143,7 @@ function condenserTower() {
   }
   // The tap on the south side: a pipe out of the tank, a valve wheel, a
   // spout down over a basin of water walled in large stones like the plinth.
-  m.cylinder([0, 2.25, 1.45], 0.08, 0.6, { axis: 'y', segments: 6, ...pipe(0.6) });
+  m.cylinder([0, 2.25, 1.45], 0.08, 0.6, { axis: 'y', segments: 6, ...pipe(0.6), top: { tex: 'bay-plate' } });
   m.cylinder([0, 2.8, 1.05], 0.07, 0.45, { segments: 6, ...pipe(0.45), bottom: false });
   m.cylinder([0, 2.55, 1.55], 0.18, 0.05, { segments: 12, tex: 'pump-hose', top: { tex: 'valve-wheel', uv: WHEEL } });
   const [bx, by0, by1, bh, bt] = [0.45, 2.45, 3.2, 0.5, 0.1];
