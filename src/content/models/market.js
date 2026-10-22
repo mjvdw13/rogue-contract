@@ -19,7 +19,30 @@ const WHEEL = disc(12);
  * side: the picture follows the side's edges, so a tapering side tapers it.
  */
 const panels = (tex, rows = 1) => ({ tex, side: () => ({ tex, uv: [[1, rows], [0, rows], [0, 0], [1, 0]] }) });
-const WATER = [70, 112, 128];
+// Still, murky water (the trough and the tap's basin).
+const WATER = { tex: 'water-murky' };
+// Large stones: the brick texture's second course and its mortar (v from the
+// mortar above to the course's foot), stretched to a stone wall's height,
+// two stones to a repeat; and the course without its mortar, for their tops.
+const STONE = [15 / 64, 32 / 64];
+const STONE_TOP = [16 / 64, 32 / 64];
+
+/**
+ * A box of large stones, one course as tall as the box, the stones `len`
+ * long, their joints starting from each side's corner and their tops on its
+ * top (laid along its longer way).
+ */
+function stoneBox(m, [x0, y0, z0], [x1, y1, z1], len = 0.8) {
+  const edges = [x1 - x0, y1 - y0, x1 - x0, y1 - y0].map((l) => l / (2 * len));
+  const [a, b] = STONE_TOP;
+  const n = Math.max(x1 - x0, y1 - y0) / (2 * len);
+  const top = x1 - x0 >= y1 - y0 ? [[0, a], [n, a], [n, b], [0, b]] : [[0, a], [0, b], [n, b], [n, a]];
+  m.box([x0, y0, z0], [x1, y1, z1], {
+    bottom: false,
+    top: { tex: 'adobe-brick', uv: top },
+    side: (i) => ({ tex: 'adobe-brick', uv: [[0, STONE[1]], [edges[i], STONE[1]], [edges[i], STONE[0]], [0, STONE[0]]] }),
+  });
+}
 
 /**
  * A market stall's counter and rack, under the kit's free-standing awning
@@ -69,7 +92,7 @@ export const CISTERN = { radius: 2.6, height: 4 };
 
 /**
  * The moisture condenser tower over the water plaza, the market's landmark
- * (about 10 m): a round duracrete cistern on a brick plinth, banded in
+ * (about 10 m): a round duracrete cistern on a stone plinth, banded in
  * steel and lidded in riveted panels; a tapering column out of it with
  * rings, and near its top the condenser, a stack of wide thin plates with
  * radial fins; a collar and a pointed panelled cap, an antenna with a red
@@ -80,16 +103,14 @@ export const CISTERN = { radius: 2.6, height: 4 };
 function condenserTower() {
   const m = new ModelBuilder('condenser-tower');
   const turn = Math.PI / 12;
-  // The plinth: one course of large stones, two to a facet (the brick
-  // texture's second course and its mortar, stretched to the plinth's
-  // height), joints on the corners and in the middle, carried over its rim.
-  const STONE = [15 / 64, 32 / 64];
+  // The plinth: one course of large stones, two to a facet, joints on the
+  // corners and in the middle, carried over its rim.
   m.prism(ring(12, CISTERN.radius, turn), 0, 0.4, { top: false, bottom: false, side: () => ({ tex: 'adobe-brick', uv: [[1, STONE[1]], [0, STONE[1]], [0, STONE[0]], [1, STONE[0]]] }) });
   const [rimOut, rimIn] = [ring(12, CISTERN.radius, turn), ring(12, 2.3, turn)];
   for (let i = 0; i < 12; i++) {
     const j = (i + 1) % 12;
     const at = ([x, y]) => [x, y, 0.4];
-    m.face([at(rimOut[i]), at(rimOut[j]), at(rimIn[j]), at(rimIn[i])], { tex: 'adobe-brick', uv: [[1, 32 / 64], [0, 32 / 64], [0, 16 / 64], [1, 16 / 64]] }, [0, 0, 0]);
+    m.face([at(rimOut[i]), at(rimOut[j]), at(rimIn[j]), at(rimIn[i])], { tex: 'adobe-brick', uv: [[1, STONE_TOP[1]], [0, STONE_TOP[1]], [0, STONE_TOP[0]], [1, STONE_TOP[0]]] }, [0, 0, 0]);
   }
   m.cylinder([0, 0, 0.4], 2.3, 3, { segments: 12, turn, tex: 'bay-wall', top: false, bottom: false });
   for (const z of [1.2, 2.6]) m.cylinder([0, 0, z], 2.36, 0.12, { segments: 12, turn, tex: 'band-steel', texScale: 0.16, top: false, bottom: false });
@@ -122,25 +143,25 @@ function condenserTower() {
   m.cylinder([0, 2.8, 1.05], 0.07, 0.45, { segments: 6, tex: 'bay-pipe', texScale: 0.14, bottom: false });
   m.cylinder([0, 2.55, 1.55], 0.18, 0.05, { segments: 12, tex: 'pump-hose', top: { tex: 'valve-wheel', uv: WHEEL } });
   m.box([-0.45, 2.45, 0], [0.45, 3.2, 0.5], { tex: 'flagstone', top: false, bottom: false });
-  m.face([[-0.4, 2.5, 0.42], [0.4, 2.5, 0.42], [0.4, 3.15, 0.42], [-0.4, 3.15, 0.42]], { color: WATER }, [0, 2.8, 0]);
+  m.face([[-0.4, 2.5, 0.42], [0.4, 2.5, 0.42], [0.4, 3.15, 0.42], [-0.4, 3.15, 0.42]], WATER, [0, 2.8, 0]);
   m.outlineLines(ring(12, CISTERN.radius, turn));
   m.outlineLines([[-0.45, 2.2], [0.45, 2.2], [0.45, 3.2], [-0.45, 3.2]]);
   return m.build();
 }
 
 /**
- * A dewback trough: a long stone trough full of water, 3.2 by 0.9, its
- * walls a hand thick. It collides as its outline.
+ * A dewback trough: a long trough of large stones like the tower's plinth,
+ * full of murky water, 3.2 by 0.9, its walls a hand thick. It collides as
+ * its outline.
  */
 function trough() {
   const m = new ModelBuilder('water-trough');
   const [hl, hw, h, t] = [1.6, 0.45, 0.75, 0.1];
-  const stone = { tex: 'adobe-brick', top: { color: ['tan', 0.5] }, bottom: false };
-  m.box([-hl, -hw, 0], [hl, -hw + t, h], stone);
-  m.box([-hl, hw - t, 0], [hl, hw, h], stone);
-  m.box([-hl, -hw + t, 0], [-hl + t, hw - t, h], stone);
-  m.box([hl - t, -hw + t, 0], [hl, hw - t, h], stone);
-  m.face([[-hl + t, -hw + t, h - 0.07], [hl - t, -hw + t, h - 0.07], [hl - t, hw - t, h - 0.07], [-hl + t, hw - t, h - 0.07]], { color: WATER }, [0, 0, 0]);
+  stoneBox(m, [-hl, -hw, 0], [hl, -hw + t, h]);
+  stoneBox(m, [-hl, hw - t, 0], [hl, hw, h]);
+  stoneBox(m, [-hl, -hw + t, 0], [-hl + t, hw - t, h]);
+  stoneBox(m, [hl - t, -hw + t, 0], [hl, hw - t, h]);
+  m.face([[-hl + t, -hw + t, h - 0.07], [hl - t, -hw + t, h - 0.07], [hl - t, hw - t, h - 0.07], [-hl + t, hw - t, h - 0.07]], WATER, [0, 0, 0]);
   m.outlineLines([[-hl, -hw], [hl, -hw], [hl, hw], [-hl, hw]]);
   return m.build();
 }

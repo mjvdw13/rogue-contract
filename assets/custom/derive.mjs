@@ -115,6 +115,9 @@ export const TOWN = [
   // each plate's faces, and a pale steel lip round each edge.
   { out: 'fin-disc', df: 'JPCIRCL2', gradient: [[26, 26, 28], [64, 64, 64], [112, 110, 104], [160, 156, 146], [196, 192, 180]], keep: 0, contrast: 1.3 },
   { out: 'fin-edge', df: 'IPDETPIP', crop: [32, 0, 16, 16], gradient: [[64, 64, 62], [110, 108, 104], [150, 146, 138], [182, 178, 168]], keep: 0, contrast: 0.8 },
+  // Still water in the plaza's trough and basin (models/market.js): Talay's
+  // rippled water, murky green-blue, glinting pale on the ripples.
+  { out: 'water-murky', df: 'CFWATER4', gradient: [[16, 30, 32], [30, 56, 58], [50, 86, 88], [84, 120, 118], [146, 170, 160]], keep: 0, contrast: 1 },
   // The market stalls' wares (models/market.js): the landspeeder's mottled
   // panel in fresher paints than the bay's, lightly worn: goods for sale are
   // cared for, but this is still Tatooine.

@@ -244,7 +244,8 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
           plinth.
     - [x] The condenser tower: plates, rings, collar, cap, pipes, tap,
           in the bay's worn plate, rusty pipe and valve wheel.
-    - [ ] The dewback trough's rim.
+    - [x] The dewback trough: large stones like the tower's plinth, murky
+          water (the tap's basin too).
     - [ ] The droid seller's power unit, scrap and junk heap (check what
           is still flat).
 - [ ] **An X-34 landspeeder on the main street** (Mark, 2026-10-18, after

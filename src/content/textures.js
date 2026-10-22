@@ -54,6 +54,8 @@ const TOWN = [
   'band-steel',
   // Its lid and cap panels and its condenser plates' fins and edges.
   'cone-panel', 'fin-disc', 'fin-edge',
+  // Still water in the plaza's trough and basin.
+  'water-murky',
   // The market stalls' wares, in bright paints (models/market.js).
   'ware-red', 'ware-blue', 'ware-yellow', 'ware-teal', 'ware-orange', 'ware-white',
   // Street clutter: crates and junk (models/clutter.js).
