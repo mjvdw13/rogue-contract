@@ -43,7 +43,7 @@ const TOWN = [
   // The bay's fuel pumps (models/bay.js).
   'pump-front', 'pump-side', 'pump-hazard', 'pump-hose', 'bay-plate',
   // Its fuel lines.
-  'bay-pipe', 'bay-pipe-x', 'line-front', 'valve-wheel', 'hose-orange',
+  'bay-pipe','line-front', 'valve-wheel', 'hose-orange',
   // A scrapped astromech's dome (models/clutter.js).
   'dome-white', 'dome-blue',
   // The cargo pod's hull.

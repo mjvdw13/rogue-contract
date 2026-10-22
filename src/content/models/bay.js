@@ -39,15 +39,15 @@ function rib() {
 function fuelLine() {
   const m = new ModelBuilder('bay-fuel-line');
   const h = BAY_WALL;
-  // A pipe's picture is as wide as the pipe: its ring is every 0.08.
-  const PIPE = { tex: 'bay-pipe', texScale: 0.16 };
-  const PIPE_ALONG = { tex: 'bay-pipe-x', texScale: 0.16 };
+  // A pipe `len` long: its picture wraps round it, the same on every facet
+  // whichever way it lies, a ring every 0.16 along it (four to a picture).
+  const pipe = (len) => ({ tex: 'bay-pipe', sides: { uv: [[0, len / 0.64], [1, len / 0.64], [1, 0], [0, 0]] } });
   const CLAMP = { tex: 'pump-hose' };
   const BOX_SIDE = [[1, 1], [0, 1], [0, 0], [1, 0]];
   for (const x of [-0.22, 0.22]) {
-    m.cylinder([x, 0.2, 1.3], 0.08, h - 1.05, { segments: 6, ...PIPE, top: false, bottom: false });
-    // Over the rim and back across its top.
-    m.box([x - 0.09, -0.7, h + 0.16], [x + 0.09, 0.29, h + 0.34], { ...PIPE_ALONG, top: PIPE, bottom: false });
+    m.cylinder([x, 0.2, 1.3], 0.08, h - 1.05, { segments: 6, ...pipe(h - 1.05), top: false, bottom: false });
+    // Over the rim and back across its top, its end capped over the pit.
+    m.cylinder([x, -0.7, h + 0.25], 0.09, 0.99, { axis: 'y', segments: 6, ...pipe(0.99), top: { tex: 'bay-plate' }, bottom: false });
   }
   for (let z = 2.8; z < h - 0.5; z += 1.6) m.box([-0.4, 0, z], [0.4, 0.32, z + 0.08], { ...CLAMP, bottom: false });
   // The manifold (its back is against the wall), the valve and the pipe off to the pump.
@@ -63,7 +63,7 @@ function fuelLine() {
   m.cylinder([0, 0.56, 0.95], 0.05, 0.12, { axis: 'y', segments: 6, tex: 'bay-plate' });
   // The pump stands 5.5 degrees round the wall (levels/m1.js), its side
   // 1.45 along: the pipe runs on into it, a flange where it leaves.
-  m.cylinder([0.5, 0.25, 0.85], 0.07, 1.0, { axis: 'x', segments: 6, ...PIPE_ALONG, texScale: 0.14 });
+  m.cylinder([0.5, 0.25, 0.85], 0.07, 1.0, { axis: 'x', segments: 6, ...pipe(1.0) });
   m.cylinder([0.5, 0.25, 0.85], 0.11, 0.07, { axis: 'x', segments: 8, tex: 'bay-plate' });
   return m.build();
 }

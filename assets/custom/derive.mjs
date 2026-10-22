@@ -161,11 +161,12 @@ export const TOWN = [
   { out: 'pump-side', df: 'IWFUEL9', crop: [36, 26, 56, 102], scale: [32, 64], rust: WORN(16, 23) },
   { out: 'pump-hazard', df: 'NWWARN1', crop: [0, 8, 64, 16], rust: WORN(16, 25, 1.2) },
   { out: 'bay-plate', df: 'ZPGREYP1', rust: WORN(16, 27) },
-  // Its fuel lines (models/bay.js): a chrome pipe ring (and turned, for a
-  // pipe lying along), a manifold's front of brass elbow, truss and gauge,
-  // and the valve wheel from the pump's panel.
-  { out: 'bay-pipe', df: 'IPDETPIP', crop: [32, 0, 16, 16], gradient: RUSTY_PIPE, keep: 0, contrast: 1, rust: WORN(8, 29, 0.6) },
-  { out: 'bay-pipe-x', df: 'IPDETPIP', crop: [32, 0, 16, 16], turn: true, gradient: RUSTY_PIPE, keep: 0, contrast: 1, rust: WORN(8, 29, 0.6) },
+  // Its fuel lines (models/bay.js): rusty pipe rings, as the condenser
+  // tower's but rustier (the whole pipe's picture on every facet came out
+  // a checkerboard; four rings tall so the rust isn't the same on every
+  // ring), a manifold's front of brass elbow, truss and gauge, and the
+  // valve wheel from the pump's panel.
+  { out: 'bay-pipe', df: 'IPDETPIP', crop: [38, 0, 2, 16], tile: [8, 4], gradient: RUSTY_PIPE, keep: 0, contrast: 1, rust: WORN(8, 29, 0.8) },
   { out: 'line-front', df: 'IWFUEL1', crop: [0, 32, 64, 96], scale: [64, 128], rust: WORN(16, 31) },
   { out: 'valve-wheel', df: 'IWFUEL2', crop: [20, 49, 18, 18], scale: [16, 16], rust: WORN(8, 33, 0.7) },
   { out: 'pump-hose', df: 'IWFUEL3', crop: [0, 32, 64, 64], gradient: [[6, 6, 6], [26, 26, 24], [52, 52, 48], [84, 84, 78]], keep: 0, contrast: 1, rust: WORN(16, 43, 0.5) },
