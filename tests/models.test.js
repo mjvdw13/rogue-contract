@@ -233,6 +233,14 @@ test('model scenery with lines collides as those walls, not as its cylinder', ()
   assert.equal(w.checkPosition(p, 6, 2.2), true, 'passes beyond its end');
 });
 
+test('model scenery with lines stays where it is put against a wall; it is not moved clear by its radius', () => {
+  const w = makeWorld(arena, { noMonsters: true, registry: gameReg });
+  w.assets = { sheetFor: () => null, modelFor: (def) => (def.model === 'test-wall' ? new Model(wallDef, palette, () => 0) : null) };
+  const wall = w.spawn('test-wall', 1.2, 5); // its radius (0.5) reaches into the west wall, its line doesn't
+  assert.equal(wall.x, 1.2);
+  assert.equal(wall.y, 5);
+});
+
 test('the parked landspeeder blocks you at its nose, its flanks and its side engines, but not round it', () => {
   const lot = room(['################', ...Array(10).fill('#..............#'), '################'], [], { legend });
   const w = makeWorld(lot, { noMonsters: true });

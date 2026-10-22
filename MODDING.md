@@ -444,8 +444,10 @@ defineDecoration({ id: 'reactor-ring', model: 'reactor-ring', spin: 0.5 }) // ra
   400).
 - **Collision:** a solid model collides as its cylinder (`radius`,
   `height`), or as its `lines` (wall segments in model space) when it has
-  them, for long shapes like a ship. Solid models stop shots and
-  projectiles. The level checker treats the tiles under the lines as
+  them, for long shapes like a ship. A solid thing whose cylinder starts
+  in a wall is nudged clear of it, but one with `lines` stays where it is
+  put (back to a wall, say). Solid models stop shots and projectiles.
+  The level checker treats the tiles under the lines as
   blocked, and the map viewer draws them in pink.
 
 ### Particles

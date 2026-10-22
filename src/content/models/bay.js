@@ -237,8 +237,8 @@ function tube(m, path, radius, style, sides = 6) {
  * on the floor with its nozzle, 'coil' is wound in a loose coil.
  */
 export const BAY_HOSES = [
-  { id: 'bay-hose-nozzle', end: 'nozzle', tex: 'hose-orange', path: [[-11.69, 16.39, 0.5], [-11.25, 15.7, 0.1], [-9.6, 14.1, 0.1], [-9.9, 11.6, 0.1], [-8.1, 9.7, 0.1], [-6.3, 9.4, 0.1], [-5.3, 8.7, 0.1]] },
-  { id: 'bay-hose-coil', end: 'coil', tex: 'pump-hose', path: [[18.32, -8.35, 0.5], [17.6, -8, 0.1], [16.4, -7.2, 0.1], [15.9, -6.2, 0.1]] },
+  { id: 'bay-hose-nozzle', end: 'nozzle', tex: 'hose-orange', path: [[-11.75, 16.48, 0.5], [-11.25, 15.7, 0.1], [-9.6, 14.1, 0.1], [-9.9, 11.6, 0.1], [-8.1, 9.7, 0.1], [-6.3, 9.4, 0.1], [-5.3, 8.7, 0.1]] },
+  { id: 'bay-hose-coil', end: 'coil', tex: 'pump-hose', path: [[18.42, -8.4, 0.5], [17.6, -8, 0.1], [16.4, -7.2, 0.1], [15.9, -6.2, 0.1]] },
 ];
 
 function hose({ id, end, tex, path }) {

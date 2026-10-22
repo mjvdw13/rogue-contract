@@ -254,7 +254,9 @@ export class World {
     } else if (!t.setAnim('idle')) {
       t.setAnim('walk');
     }
-    if (t.solid) this.unstick(t);
+    // (Model scenery with lines collides as them, drawn to fit where it's
+    // put, often back to a wall: its radius says nothing, so it stays.)
+    if (t.solid && !t.model?.lines?.length) this.unstick(t);
     if (def.kind === 'monster') t.timer = this.rng.range(0, 0.3);
     if (def.kind === 'npc') initNpc(this, t);
     const reach = (z ?? -Infinity) + 0.5;
