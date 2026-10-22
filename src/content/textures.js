@@ -50,6 +50,8 @@ const TOWN = [
   'pod-hull',
   // Sooted drums and canisters.
   'drum-rust', 'drum-grey',
+  // The condenser tower's plain dark bands (models/market.js).
+  'band-steel',
   // The market stalls' wares, in bright paints (models/market.js).
   'ware-red', 'ware-blue', 'ware-yellow', 'ware-teal', 'ware-orange', 'ware-white',
   // Street clutter: crates and junk (models/clutter.js).
