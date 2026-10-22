@@ -109,13 +109,14 @@ export const TOWN = [
   { out: 'drum-rust', df: 'ZWGRUV1', crop: [0, 0, 32, 64], tile: [2, 1], gradient: [[30, 16, 8], [74, 40, 18], [120, 66, 32], [160, 96, 52], [190, 130, 82]], keep: 0, contrast: 0.9, rust: [{ color: [52, 26, 12], amount: 0.6, cell: 16, seed: 1 }, { color: [18, 14, 10], amount: 0.45, cell: 16, seed: 71, from: 0.5 }] },
   { out: 'drum-grey', df: 'ZWGRUV1', crop: [0, 0, 32, 64], tile: [2, 1], gradient: [[40, 40, 40], [88, 86, 82], [130, 126, 118], [166, 160, 150], [196, 190, 178]], keep: 0, contrast: 0.9, rust: [{ color: [120, 64, 30], amount: 0.5, cell: 16, seed: 2 }, { color: [18, 14, 10], amount: 0.55, cell: 16, seed: 73, from: 0.45 }] },
   // The market stalls' wares (models/market.js): the landspeeder's mottled
-  // panel in clean, bright paints, for goods meant to catch the eye.
-  { out: 'ware-red', df: 'IWGREYC2', scale: [32, 32], gradient: [[70, 12, 10], [150, 30, 24], [200, 52, 40], [226, 90, 72]], keep: 0, contrast: 0.7 },
-  { out: 'ware-blue', df: 'IWGREYC2', scale: [32, 32], gradient: [[10, 26, 70], [24, 64, 150], [48, 104, 200], [100, 160, 232]], keep: 0, contrast: 0.7 },
-  { out: 'ware-yellow', df: 'IWGREYC2', scale: [32, 32], gradient: [[120, 84, 6], [196, 150, 14], [236, 196, 30], [250, 224, 96]], keep: 0, contrast: 0.7 },
-  { out: 'ware-teal', df: 'IWGREYC2', scale: [32, 32], gradient: [[8, 56, 60], [20, 110, 112], [40, 158, 156], [110, 206, 200]], keep: 0, contrast: 0.7 },
-  { out: 'ware-orange', df: 'IWGREYC2', scale: [32, 32], gradient: [[110, 44, 6], [190, 84, 12], [232, 120, 28], [248, 160, 80]], keep: 0, contrast: 0.7 },
-  { out: 'ware-white', df: 'IWGREYC2', scale: [32, 32], gradient: [[110, 112, 116], [176, 178, 182], [220, 222, 224], [242, 244, 246]], keep: 0, contrast: 0.7 },
+  // panel in fresher paints than the bay's, lightly worn: goods for sale are
+  // cared for, but this is still Tatooine.
+  { out: 'ware-red', df: 'IWGREYC2', scale: [32, 32], gradient: [[66, 18, 14], [134, 34, 26], [176, 54, 42], [204, 88, 70]], keep: 0, contrast: 0.7, rust: WORN(16, 61, 0.25) },
+  { out: 'ware-blue', df: 'IWGREYC2', scale: [32, 32], gradient: [[18, 28, 56], [38, 62, 112], [66, 98, 148], [112, 146, 186]], keep: 0, contrast: 0.7, rust: WORN(16, 63, 0.25) },
+  { out: 'ware-yellow', df: 'IWGREYC2', scale: [32, 32], gradient: [[92, 72, 16], [154, 126, 32], [190, 162, 58], [216, 196, 110]], keep: 0, contrast: 0.7, rust: WORN(16, 65, 0.25) },
+  { out: 'ware-teal', df: 'IWGREYC2', scale: [32, 32], gradient: [[16, 50, 50], [34, 92, 90], [62, 128, 122], [112, 164, 158]], keep: 0, contrast: 0.7, rust: WORN(16, 67, 0.25) },
+  { out: 'ware-orange', df: 'IWGREYC2', scale: [32, 32], gradient: [[88, 44, 14], [150, 78, 28], [188, 110, 50], [212, 146, 98]], keep: 0, contrast: 0.7, rust: WORN(16, 69, 0.25) },
+  { out: 'ware-white', df: 'IWGREYC2', scale: [32, 32], gradient: [[100, 98, 92], [160, 158, 150], [200, 198, 188], [224, 222, 212]], keep: 0, contrast: 0.7, rust: WORN(16, 71, 0.25) },
   // Street clutter (models/clutter.js): cargo crates from Ramshed's, in
   // tan, grey and rust, and a heap of junk from TestBase's trash pile.
   { out: 'crate-tan', df: 'IPRMCRT3', gradient: [[56, 44, 28], [112, 90, 60], [160, 134, 96], [196, 172, 130], [222, 202, 162]], keep: 0.15, contrast: 0.85 },
