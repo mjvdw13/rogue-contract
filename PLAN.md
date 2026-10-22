@@ -242,7 +242,8 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
     - [x] Market stall (`models/market.js`): crates for wares, textured
           power cells, worn plate on the counter and rack tops, a rubber
           plinth.
-    - [ ] The condenser tower: plates, rings, collar, cap, pipes, tap.
+    - [x] The condenser tower: plates, rings, collar, cap, pipes, tap,
+          in the bay's worn plate, rusty pipe and valve wheel.
     - [ ] The dewback trough's rim.
     - [ ] The droid seller's power unit, scrap and junk heap (check what
           is still flat).

@@ -8,7 +8,10 @@ import { ModelBuilder } from './lib/build.js';
 /** A ring of `n` points of radius `r` (x, y), turned by `turn` radians. */
 const ring = (n, r, turn = 0) => Array.from({ length: n }, (_, i) => [Math.cos(turn + (i / n) * Math.PI * 2) * r, Math.sin(turn + (i / n) * Math.PI * 2) * r]);
 
-const PIPE = ['rust', 0.32];
+// A pipe's picture is as wide as the pipe: its ring is every 0.08 (as in bay.js).
+const PIPE_TEX = { tex: 'bay-pipe', texScale: 0.2 };
+// A valve wheel's picture, drawn on a twelve-sided disc.
+const WHEEL = Array.from({ length: 12 }, (_, i) => [0.5 + 0.5 * Math.cos((i / 12) * Math.PI * 2), 0.5 - 0.5 * Math.sin((i / 12) * Math.PI * 2)]);
 const WATER = [70, 112, 128];
 
 /**
@@ -71,33 +74,33 @@ function condenserTower() {
   const turn = Math.PI / 12;
   m.prism(ring(12, CISTERN.radius, turn), 0, 0.4, { tex: 'adobe-brick', bottom: false });
   m.cylinder([0, 0, 0.4], 2.3, 3, { segments: 12, turn, tex: 'bay-wall', top: false, bottom: false });
-  for (const z of [1.2, 2.6]) m.cylinder([0, 0, z], 2.36, 0.12, { segments: 12, turn, color: ['gray', 0.25], top: false, bottom: false });
-  m.loft(ring(12, 2.35, turn), 3.4, ring(12, 1.3, turn), CISTERN.height, { color: ['gray', 0.4], bottom: false, top: false });
+  for (const z of [1.2, 2.6]) m.cylinder([0, 0, z], 2.36, 0.12, { segments: 12, turn, tex: 'bay-plate', top: false, bottom: false });
+  m.loft(ring(12, 2.35, turn), 3.4, ring(12, 1.3, turn), CISTERN.height, { tex: 'metal-grey', bottom: false, top: false });
   // The column, tapering, and its rings.
   const [z0, z1, r0, r1] = [CISTERN.height, 17, 1.0, 0.6];
   const rAt = (z) => r0 + ((z - z0) / (z1 - z0)) * (r1 - r0);
   m.loft(ring(10, r0, turn), z0, ring(10, r1, turn), z1, { tex: 'metal-grey', top: false, bottom: false });
-  for (const z of [6.5, 9.5]) m.cylinder([0, 0, z], rAt(z) + 0.08, 0.2, { segments: 10, turn, color: ['gray', 0.22] });
+  for (const z of [6.5, 9.5]) m.cylinder([0, 0, z], rAt(z) + 0.08, 0.2, { segments: 10, turn, tex: 'bay-plate' });
   // The condenser: wide thin plates stacked up the top of the column.
   for (let k = 0; k < 6; k++) {
     const z = 11.6 + k * 0.85;
-    m.cylinder([0, 0, z], 1.75 - k * 0.07, 0.12, { segments: 10, turn, color: ['steel', 0.5], bottom: { color: ['gray', 0.2] } });
+    m.cylinder([0, 0, z], 1.75 - k * 0.07, 0.12, { segments: 10, turn, tex: 'bay-plate', texScale: 2, bottom: { tex: 'bay-plate', texScale: 2 } });
   }
   // The collar, the cap and the antenna with its beacon.
-  m.cylinder([0, 0, z1 - 0.2], 1.25, 0.3, { segments: 10, turn, color: ['gray', 0.35] });
-  m.loft(ring(10, 1.05, turn), z1 + 0.1, ring(10, 0.22, turn), 18.6, { color: ['gray', 0.5], bottom: false });
-  m.cylinder([0, 0, 18.6], 0.05, 2.1, { segments: 5, color: ['steel', 0.5], bottom: false, top: false });
+  m.cylinder([0, 0, z1 - 0.2], 1.25, 0.3, { segments: 10, turn, tex: 'bay-plate', texScale: 2 });
+  m.loft(ring(10, 1.05, turn), z1 + 0.1, ring(10, 0.22, turn), 18.6, { tex: 'metal-grey', bottom: false });
+  m.cylinder([0, 0, 18.6], 0.05, 2.1, { segments: 5, ...PIPE_TEX, texScale: 0.1, bottom: false, top: false });
   m.box([-0.1, -0.1, 20.7], [0.1, 0.1, TOWER_HEIGHT], { color: [255, 60, 40], glow: true });
   // Pipes from the column down into the cistern's lid.
   for (const x of [-1.15, 1.15]) {
-    m.cylinder([x, 0, 3.7], 0.1, 4.6, { segments: 6, color: PIPE, bottom: false });
-    m.box([x * 0.95 - 0.12, -0.12, 8.1], [x * 0.95 + 0.12, 0.12, 8.3], { color: ['gray', 0.2] });
+    m.cylinder([x, 0, 3.7], 0.1, 4.6, { segments: 6, ...PIPE_TEX, bottom: false });
+    m.box([x * 0.95 - 0.12, -0.12, 8.1], [x * 0.95 + 0.12, 0.12, 8.3], { tex: 'bay-plate' });
   }
   // The tap on the south side: a pipe out of the tank, a valve wheel, a
   // spout down over a stone basin of water.
-  m.cylinder([0, 2.25, 1.45], 0.08, 0.6, { axis: 'y', segments: 6, color: PIPE });
-  m.cylinder([0, 2.8, 1.05], 0.07, 0.45, { segments: 6, color: PIPE, bottom: false });
-  m.cylinder([0, 2.55, 1.55], 0.18, 0.05, { segments: 8, color: ['blood', 0.6] });
+  m.cylinder([0, 2.25, 1.45], 0.08, 0.6, { axis: 'y', segments: 6, tex: 'bay-pipe-x', texScale: 0.16 });
+  m.cylinder([0, 2.8, 1.05], 0.07, 0.45, { segments: 6, tex: 'bay-pipe', texScale: 0.14, bottom: false });
+  m.cylinder([0, 2.55, 1.55], 0.18, 0.05, { segments: 12, tex: 'pump-hose', top: { tex: 'valve-wheel', uv: WHEEL } });
   m.box([-0.45, 2.45, 0], [0.45, 3.2, 0.5], { tex: 'flagstone', top: false, bottom: false });
   m.face([[-0.4, 2.5, 0.42], [0.4, 2.5, 0.42], [0.4, 3.15, 0.42], [-0.4, 3.15, 0.42]], { color: WATER }, [0, 2.8, 0]);
   m.outlineLines(ring(12, CISTERN.radius, turn));
