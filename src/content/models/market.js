@@ -15,7 +15,7 @@ const WATER = [70, 112, 128];
  * A market stall's counter and rack, under the kit's free-standing awning
  * (lib/town.js, stall()): a counter at the front in tin with a worn plate
  * top on a rubber plinth, power cells on it, and a rack at the back with
- * crates for wares on its shelf, 3
+ * bright wares on its shelf (cloth, a droid's head, a scanner, cells), 3
  * wide and 2.4 deep. The counter and the rack collide; between them is
  * room for the stallholder (1.35, a villager's width and a bit), open at
  * the ends.
@@ -28,16 +28,25 @@ function stall() {
   m.prism(counter, 0, 1, { tex: 'metal-grey', top: { tex: 'bay-plate' }, bottom: false });
   m.box([-hw + 0.08, hd - 0.63, 0], [hw - 0.08, hd - 0.02, 0.18], { tex: 'pump-hose', top: false, bottom: false });
   m.prism(rack, 0, 1.45, { tex: 'metal-rust', top: { tex: 'bay-plate' }, bottom: false });
-  // Wares: boxes on the rack, power cells on the counter.
-  const wares = [
-    [-1.1, -0.95, 1.45, 0.4, 0.3, 0.3, 'crate-grey'],
-    [-0.55, -0.95, 1.45, 0.3, 0.3, 0.45, 'crate-tan'],
-    [0.05, -0.97, 1.45, 0.5, 0.25, 0.22, 'crate-grey'],
-    [0.7, -0.95, 1.45, 0.35, 0.3, 0.38, 'crate-rust'],
-  ];
-  for (const [x, y, z, w, d, h, tex] of wares) m.box([x - w / 2, y - d / 2, z], [x + w / 2, y + d / 2, z + h], { tex, texScale: Math.max(w, h) / 2, bottom: false });
-  for (const [x, tex] of [[0.55, 'hose-orange'], [0.75, 'drum-grey'], [0.95, 'drum-rust']]) {
-    m.cylinder([x, hd - 0.33, 1], 0.07, 0.22, { segments: 6, tex, texScale: 0.15, bottom: false });
+  // Wares, each its own kind of thing in bright, clean colours: on the rack
+  // folded bolts of cloth, a droid's head, a scanner with a lit screen and a
+  // cluster of coloured cells; on the counter more power cells.
+  const [wy, wz] = [-0.95, 1.45];
+  [['ware-red', -0.04, 0.46], ['ware-teal', 0.03, 0.42], ['ware-yellow', -0.02, 0.38]].forEach(([tex, dx, w], i) => {
+    m.box([-1.05 + dx - w / 2, wy - 0.14, wz + i * 0.1], [-1.05 + dx + w / 2, wy + 0.14, wz + i * 0.1 + 0.1], { tex, texScale: 0.25, bottom: false });
+  });
+  const dome = (r) => ring(8, r).map(([a, b]) => [a - 0.55, b + wy]);
+  m.loft(dome(0.17), wz, dome(0.15), wz + 0.1, { tex: 'ware-white', texScale: 0.25, bottom: false, top: false, side: (k) => (k % 2 === 0 ? { tex: 'ware-blue' } : undefined) });
+  m.loft(dome(0.15), wz + 0.1, dome(0.06), wz + 0.22, { tex: 'ware-white', texScale: 0.25, bottom: false });
+  m.box([-0.58, wy + 0.1, wz + 0.04], [-0.52, wy + 0.18, wz + 0.1], { color: [255, 50, 40], glow: true, bottom: false });
+  m.box([-0.2, wy - 0.12, wz], [0.3, wy + 0.12, wz + 0.2], { tex: 'ware-orange', texScale: 0.25, bottom: false });
+  m.box([-0.12, wy + 0.12, wz + 0.05], [0.22, wy + 0.14, wz + 0.17], { color: [90, 235, 190], glow: true, bottom: false });
+  m.cylinder([0.25, wy - 0.06, wz + 0.2], 0.015, 0.16, { segments: 4, color: ['steel', 0.6], bottom: false });
+  for (const [x, y, h, tex] of [[0.62, wy - 0.05, 0.34, 'ware-blue'], [0.78, wy + 0.04, 0.42, 'ware-red'], [0.7, wy + 0.1, 0.26, 'ware-yellow']]) {
+    m.cylinder([x, y, wz], 0.07, h, { segments: 6, tex, texScale: 0.15, top: { color: ['steel', 0.6] }, bottom: false });
+  }
+  for (const [x, tex] of [[0.55, 'ware-yellow'], [0.75, 'ware-teal'], [0.95, 'ware-red']]) {
+    m.cylinder([x, hd - 0.33, 1], 0.07, 0.22, { segments: 6, tex, texScale: 0.15, top: { color: ['steel', 0.6] }, bottom: false });
   }
   m.outlineLines(counter).outlineLines(rack);
   return m.build();
