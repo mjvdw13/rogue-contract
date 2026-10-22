@@ -108,6 +108,13 @@ export const TOWN = [
   // soot and oil blotched over them.
   { out: 'drum-rust', df: 'ZWGRUV1', crop: [0, 0, 32, 64], tile: [2, 1], gradient: [[30, 16, 8], [74, 40, 18], [120, 66, 32], [160, 96, 52], [190, 130, 82]], keep: 0, contrast: 0.9, rust: [{ color: [52, 26, 12], amount: 0.6, cell: 16, seed: 1 }, { color: [18, 14, 10], amount: 0.45, cell: 16, seed: 71, from: 0.5 }] },
   { out: 'drum-grey', df: 'ZWGRUV1', crop: [0, 0, 32, 64], tile: [2, 1], gradient: [[40, 40, 40], [88, 86, 82], [130, 126, 118], [166, 160, 150], [196, 190, 178]], keep: 0, contrast: 0.9, rust: [{ color: [120, 64, 30], amount: 0.5, cell: 16, seed: 2 }, { color: [18, 14, 10], amount: 0.55, cell: 16, seed: 73, from: 0.45 }] },
+  // The condenser tower's lid and cap (models/market.js): Generic's riveted
+  // plate in weathered steel, one panel a facet, bolts at its corners.
+  { out: 'cone-panel', df: 'ZPPANEL1', gradient: [[38, 36, 32], [84, 80, 74], [128, 124, 114], [164, 158, 146], [192, 186, 172]], keep: 0, contrast: 1.25, rust: WORN(16, 81, 0.25) },
+  // Its condenser plates: JabShip's ring of radial fins, in steel, drawn on
+  // each plate's faces, and a pale steel lip round each edge.
+  { out: 'fin-disc', df: 'JPCIRCL2', gradient: [[26, 26, 28], [64, 64, 64], [112, 110, 104], [160, 156, 146], [196, 192, 180]], keep: 0, contrast: 1.3 },
+  { out: 'fin-edge', df: 'IPDETPIP', crop: [32, 0, 16, 16], gradient: [[64, 64, 62], [110, 108, 104], [150, 146, 138], [182, 178, 168]], keep: 0, contrast: 0.8 },
   // The market stalls' wares (models/market.js): the landspeeder's mottled
   // panel in fresher paints than the bay's, lightly worn: goods for sale are
   // cared for, but this is still Tatooine.

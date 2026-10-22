@@ -52,6 +52,8 @@ const TOWN = [
   'drum-rust', 'drum-grey',
   // The condenser tower's plain dark bands (models/market.js).
   'band-steel',
+  // Its lid and cap panels and its condenser plates' fins and edges.
+  'cone-panel', 'fin-disc', 'fin-edge',
   // The market stalls' wares, in bright paints (models/market.js).
   'ware-red', 'ware-blue', 'ware-yellow', 'ware-teal', 'ware-orange', 'ware-white',
   // Street clutter: crates and junk (models/clutter.js).

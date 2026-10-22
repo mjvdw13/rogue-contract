@@ -10,8 +10,15 @@ const ring = (n, r, turn = 0) => Array.from({ length: n }, (_, i) => [Math.cos(t
 
 // A pipe's picture is as wide as the pipe: its ring is every 0.08 (as in bay.js).
 const PIPE_TEX = { tex: 'bay-pipe', texScale: 0.2 };
+/** A round picture's uv on an `n`-sided disc turned by `turn` (a cylinder's end). */
+const disc = (n, turn = 0) => Array.from({ length: n }, (_, i) => [0.5 + 0.5 * Math.cos(turn + (i / n) * Math.PI * 2), 0.5 - 0.5 * Math.sin(turn + (i / n) * Math.PI * 2)]);
 // A valve wheel's picture, drawn on a twelve-sided disc.
-const WHEEL = Array.from({ length: 12 }, (_, i) => [0.5 + 0.5 * Math.cos((i / 12) * Math.PI * 2), 0.5 - 0.5 * Math.sin((i / 12) * Math.PI * 2)]);
+const WHEEL = disc(12);
+/**
+ * A loft's sides with one panel picture each, `rows` of them stacked up the
+ * side: the picture follows the side's edges, so a tapering side tapers it.
+ */
+const panels = (tex, rows = 1) => ({ tex, side: () => ({ tex, uv: [[1, rows], [0, rows], [0, 0], [1, 0]] }) });
 const WATER = [70, 112, 128];
 
 /**
@@ -63,32 +70,45 @@ export const CISTERN = { radius: 2.6, height: 4 };
 /**
  * The moisture condenser tower over the water plaza, the market's landmark
  * (about 10 m): a round duracrete cistern on a brick plinth, banded in
- * steel and lidded; a tapering column out of it with rings, and near its
- * top the condenser, a stack of wide thin plates; a collar and a pointed
- * cap, an antenna with a red beacon; two pipes down
+ * steel and lidded in riveted panels; a tapering column out of it with
+ * rings, and near its top the condenser, a stack of wide thin plates with
+ * radial fins; a collar and a pointed panelled cap, an antenna with a red
+ * beacon; two pipes down
  * into the cistern; and the water seller's tap on its south side over a
  * basin. It collides as its plinth and the basin.
  */
 function condenserTower() {
   const m = new ModelBuilder('condenser-tower');
   const turn = Math.PI / 12;
-  m.prism(ring(12, CISTERN.radius, turn), 0, 0.4, { tex: 'adobe-brick', bottom: false });
+  // The plinth: one course of large stones, two to a facet (the brick
+  // texture's second course and its mortar, stretched to the plinth's
+  // height), joints on the corners and in the middle, carried over its rim.
+  const STONE = [15 / 64, 32 / 64];
+  m.prism(ring(12, CISTERN.radius, turn), 0, 0.4, { top: false, bottom: false, side: () => ({ tex: 'adobe-brick', uv: [[1, STONE[1]], [0, STONE[1]], [0, STONE[0]], [1, STONE[0]]] }) });
+  const [rimOut, rimIn] = [ring(12, CISTERN.radius, turn), ring(12, 2.3, turn)];
+  for (let i = 0; i < 12; i++) {
+    const j = (i + 1) % 12;
+    const at = ([x, y]) => [x, y, 0.4];
+    m.face([at(rimOut[i]), at(rimOut[j]), at(rimIn[j]), at(rimIn[i])], { tex: 'adobe-brick', uv: [[1, 32 / 64], [0, 32 / 64], [0, 16 / 64], [1, 16 / 64]] }, [0, 0, 0]);
+  }
   m.cylinder([0, 0, 0.4], 2.3, 3, { segments: 12, turn, tex: 'bay-wall', top: false, bottom: false });
   for (const z of [1.2, 2.6]) m.cylinder([0, 0, z], 2.36, 0.12, { segments: 12, turn, tex: 'band-steel', texScale: 0.16, top: false, bottom: false });
-  m.loft(ring(12, 2.35, turn), 3.4, ring(12, 1.3, turn), CISTERN.height, { tex: 'metal-grey', bottom: false, top: false });
+  m.loft(ring(12, 2.35, turn), 3.4, ring(12, 1.3, turn), CISTERN.height, { ...panels('cone-panel'), bottom: false, top: false });
   // The column, tapering, and its rings.
   const [z0, z1, r0, r1] = [CISTERN.height, 17, 1.0, 0.6];
   const rAt = (z) => r0 + ((z - z0) / (z1 - z0)) * (r1 - r0);
   m.loft(ring(10, r0, turn), z0, ring(10, r1, turn), z1, { tex: 'metal-grey', top: false, bottom: false });
   for (const z of [6.5, 9.5]) m.cylinder([0, 0, z], rAt(z) + 0.08, 0.2, { segments: 10, turn, tex: 'band-steel', texScale: 0.16 });
-  // The condenser: wide thin plates stacked up the top of the column.
+  // The condenser: wide thin plates stacked up the top of the column, a
+  // ring of radial fins drawn on each face and a pale lip round the edge.
+  const fins = { tex: 'fin-disc', uv: disc(10, turn) };
   for (let k = 0; k < 6; k++) {
     const z = 11.6 + k * 0.85;
-    m.cylinder([0, 0, z], 1.75 - k * 0.07, 0.12, { segments: 10, turn, tex: 'bay-plate', texScale: 2, bottom: { tex: 'bay-plate', texScale: 2 } });
+    m.cylinder([0, 0, z], 1.75 - k * 0.07, 0.12, { segments: 10, turn, tex: 'fin-edge', texScale: 0.16, top: fins, bottom: fins });
   }
   // The collar, the cap and the antenna with its beacon.
   m.cylinder([0, 0, z1 - 0.2], 1.25, 0.3, { segments: 10, turn, tex: 'band-steel', texScale: 0.16 });
-  m.loft(ring(10, 1.05, turn), z1 + 0.1, ring(10, 0.22, turn), 18.6, { tex: 'metal-grey', bottom: false });
+  m.loft(ring(10, 1.05, turn), z1 + 0.1, ring(10, 0.22, turn), 18.6, { ...panels('cone-panel', 2), bottom: false, top: { tex: 'cone-panel' } });
   m.cylinder([0, 0, 18.6], 0.05, 2.1, { segments: 5, ...PIPE_TEX, texScale: 0.1, bottom: false, top: false });
   m.box([-0.1, -0.1, 20.7], [0.1, 0.1, TOWER_HEIGHT], { color: [255, 60, 40], glow: true });
   // Pipes from the column down into the cistern's lid.
