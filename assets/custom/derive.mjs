@@ -118,6 +118,11 @@ export const TOWN = [
   // Still water in the plaza's trough and basin (models/market.js): Talay's
   // rippled water, murky green-blue, glinting pale on the ripples.
   { out: 'water-murky', df: 'CFWATER4', gradient: [[16, 30, 32], [30, 56, 58], [50, 86, 88], [84, 120, 118], [146, 170, 160]], keep: 0, contrast: 1 },
+  // The condenser tower's pipes (models/market.js): one column of the bay's
+  // rusty pipe repeated across, so only its rings show and each facet of a
+  // pipe wears the same (the whole pipe's picture repeats its dark edges on
+  // every facet).
+  { out: 'pipe-rings', df: 'IPDETPIP', crop: [38, 0, 2, 16], tile: [8, 1], gradient: RUSTY_PIPE, keep: 0, contrast: 1, rust: WORN(8, 91, 0.4) },
   // The market stalls' wares (models/market.js): the landspeeder's mottled
   // panel in fresher paints than the bay's, lightly worn: goods for sale are
   // cared for, but this is still Tatooine.

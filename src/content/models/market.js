@@ -8,8 +8,11 @@ import { ModelBuilder } from './lib/build.js';
 /** A ring of `n` points of radius `r` (x, y), turned by `turn` radians. */
 const ring = (n, r, turn = 0) => Array.from({ length: n }, (_, i) => [Math.cos(turn + (i / n) * Math.PI * 2) * r, Math.sin(turn + (i / n) * Math.PI * 2) * r]);
 
-// A pipe's picture is as wide as the pipe: its ring is every 0.08 (as in bay.js).
-const PIPE_TEX = { tex: 'bay-pipe', texScale: 0.2 };
+/**
+ * A rusty pipe `len` long (a cylinder's style): its rings run round it
+ * whichever way it lies, one every `period`, the same on every facet.
+ */
+const pipe = (len, period = 0.16) => ({ tex: 'pipe-rings', sides: { uv: [[0, len / period], [1, len / period], [1, 0], [0, 0]] } });
 /** A round picture's uv on an `n`-sided disc turned by `turn` (a cylinder's end). */
 const disc = (n, turn = 0) => Array.from({ length: n }, (_, i) => [0.5 + 0.5 * Math.cos(turn + (i / n) * Math.PI * 2), 0.5 - 0.5 * Math.sin(turn + (i / n) * Math.PI * 2)]);
 // A valve wheel's picture, drawn on a twelve-sided disc.
@@ -130,20 +133,24 @@ function condenserTower() {
   // The collar, the cap and the antenna with its beacon.
   m.cylinder([0, 0, z1 - 0.2], 1.25, 0.3, { segments: 10, turn, tex: 'band-steel', texScale: 0.16 });
   m.loft(ring(10, 1.05, turn), z1 + 0.1, ring(10, 0.22, turn), 18.6, { ...panels('cone-panel', 2), bottom: false, top: { tex: 'cone-panel' } });
-  m.cylinder([0, 0, 18.6], 0.05, 2.1, { segments: 5, ...PIPE_TEX, texScale: 0.1, bottom: false, top: false });
+  m.cylinder([0, 0, 18.6], 0.05, 2.1, { segments: 5, ...pipe(2.1, 0.1), bottom: false, top: false });
   m.box([-0.1, -0.1, 20.7], [0.1, 0.1, TOWER_HEIGHT], { color: [255, 60, 40], glow: true });
   // Pipes from the column down into the cistern's lid.
   for (const x of [-1.15, 1.15]) {
-    m.cylinder([x, 0, 3.7], 0.1, 4.6, { segments: 6, ...PIPE_TEX, bottom: false });
+    m.cylinder([x, 0, 3.7], 0.1, 4.6, { segments: 6, ...pipe(4.6), bottom: false });
     m.box([x * 0.95 - 0.12, -0.12, 8.1], [x * 0.95 + 0.12, 0.12, 8.3], { tex: 'bay-plate' });
   }
   // The tap on the south side: a pipe out of the tank, a valve wheel, a
-  // spout down over a stone basin of water.
-  m.cylinder([0, 2.25, 1.45], 0.08, 0.6, { axis: 'y', segments: 6, tex: 'bay-pipe-x', texScale: 0.16 });
-  m.cylinder([0, 2.8, 1.05], 0.07, 0.45, { segments: 6, tex: 'bay-pipe', texScale: 0.14, bottom: false });
+  // spout down over a basin of water walled in large stones like the plinth.
+  m.cylinder([0, 2.25, 1.45], 0.08, 0.6, { axis: 'y', segments: 6, ...pipe(0.6) });
+  m.cylinder([0, 2.8, 1.05], 0.07, 0.45, { segments: 6, ...pipe(0.45), bottom: false });
   m.cylinder([0, 2.55, 1.55], 0.18, 0.05, { segments: 12, tex: 'pump-hose', top: { tex: 'valve-wheel', uv: WHEEL } });
-  m.box([-0.45, 2.45, 0], [0.45, 3.2, 0.5], { tex: 'flagstone', top: false, bottom: false });
-  m.face([[-0.4, 2.5, 0.42], [0.4, 2.5, 0.42], [0.4, 3.15, 0.42], [-0.4, 3.15, 0.42]], WATER, [0, 2.8, 0]);
+  const [bx, by0, by1, bh, bt] = [0.45, 2.45, 3.2, 0.5, 0.1];
+  stoneBox(m, [-bx, by0, 0], [bx, by0 + bt, bh], 0.45);
+  stoneBox(m, [-bx, by1 - bt, 0], [bx, by1, bh], 0.45);
+  stoneBox(m, [-bx, by0 + bt, 0], [-bx + bt, by1 - bt, bh], 0.45);
+  stoneBox(m, [bx - bt, by0 + bt, 0], [bx, by1 - bt, bh], 0.45);
+  m.face([[-bx + bt, by0 + bt, bh - 0.07], [bx - bt, by0 + bt, bh - 0.07], [bx - bt, by1 - bt, bh - 0.07], [-bx + bt, by1 - bt, bh - 0.07]], WATER, [0, 2.8, 0]);
   m.outlineLines(ring(12, CISTERN.radius, turn));
   m.outlineLines([[-0.45, 2.2], [0.45, 2.2], [0.45, 3.2], [-0.45, 3.2]]);
   return m.build();
