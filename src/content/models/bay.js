@@ -61,7 +61,10 @@ function fuelLine() {
   const wheel = Array.from({ length: 12 }, (_, i) => [0.5 + 0.5 * Math.cos((i / 12) * Math.PI * 2), 0.5 - 0.5 * Math.sin((i / 12) * Math.PI * 2)]);
   m.cylinder([0, 0.5, 0.95], 0.2, 0.06, { axis: 'y', segments: 12, ...CLAMP, top: { tex: 'valve-wheel', uv: wheel } });
   m.cylinder([0, 0.56, 0.95], 0.05, 0.12, { axis: 'y', segments: 6, tex: 'bay-plate' });
-  m.cylinder([0.5, 0.25, 0.85], 0.07, 0.9, { axis: 'x', segments: 6, ...PIPE_ALONG, texScale: 0.14 });
+  // The pump stands 5.5 degrees round the wall (levels/m1.js), its side
+  // 1.45 along: the pipe runs on into it, a flange where it leaves.
+  m.cylinder([0.5, 0.25, 0.85], 0.07, 1.0, { axis: 'x', segments: 6, ...PIPE_ALONG, texScale: 0.14 });
+  m.cylinder([0.5, 0.25, 0.85], 0.11, 0.07, { axis: 'x', segments: 8, tex: 'bay-plate' });
   return m.build();
 }
 
@@ -101,6 +104,8 @@ function fuelPump() {
   m.cylinder([0.67, 0.38, 0.95], 0.22, 0.14, { axis: 'x', segments: 10, ...RUBBER });
   m.box([0.25, 0.75, 0.6], [0.45, 0.9, 0.95], { ...PLATE, bottom: false });
   m.box([0.3, 0.78, 0.9], [0.4, 0.98, 1.0], { ...RUBBER });
+  // A flange on its other side where the fuel line's pipe comes in.
+  m.cylinder([-0.62, 0.21, 0.85], 0.11, 0.07, { axis: 'x', segments: 8, ...PLATE });
   m.outlineLines([[-0.6, 0], [0.6, 0], [0.6, 0.85], [-0.6, 0.85]]);
   return m.build();
 }
