@@ -117,9 +117,10 @@ export const TOWN = [
   { out: 'ware-teal', df: 'IWGREYC2', scale: [32, 32], gradient: [[16, 50, 50], [34, 92, 90], [62, 128, 122], [112, 164, 158]], keep: 0, contrast: 0.7, rust: WORN(16, 67, 0.25) },
   { out: 'ware-orange', df: 'IWGREYC2', scale: [32, 32], gradient: [[88, 44, 14], [150, 78, 28], [188, 110, 50], [212, 146, 98]], keep: 0, contrast: 0.7, rust: WORN(16, 69, 0.25) },
   { out: 'ware-white', df: 'IWGREYC2', scale: [32, 32], gradient: [[100, 98, 92], [160, 158, 150], [200, 198, 188], [224, 222, 212]], keep: 0, contrast: 0.7, rust: WORN(16, 71, 0.25) },
-  // The condenser tower's bands and rings (models/market.js): plain dark
-  // steel, nearly flat, so a thin band reads as one band.
-  { out: 'band-steel', df: 'IWGREYC2', scale: [32, 32], gradient: [[34, 34, 36], [50, 50, 52], [64, 64, 64], [78, 77, 75]], keep: 0, contrast: 0.25 },
+  // The condenser tower's bands and rings (models/market.js): the bay's
+  // ribbed pipe in dark steel, unrusted, so a thin band has fine ribs and
+  // reads as one band.
+  { out: 'band-steel', df: 'IPDETPIP', crop: [32, 0, 16, 16], gradient: [[34, 34, 36], [54, 54, 56], [72, 72, 72], [92, 91, 88]], keep: 0, contrast: 0.8 },
   // Street clutter (models/clutter.js): cargo crates from Ramshed's, in
   // tan, grey and rust, and a heap of junk from TestBase's trash pile.
   { out: 'crate-tan', df: 'IPRMCRT3', gradient: [[56, 44, 28], [112, 90, 60], [160, 134, 96], [196, 172, 130], [222, 202, 162]], keep: 0.15, contrast: 0.85 },

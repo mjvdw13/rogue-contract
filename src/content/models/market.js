@@ -74,20 +74,20 @@ function condenserTower() {
   const turn = Math.PI / 12;
   m.prism(ring(12, CISTERN.radius, turn), 0, 0.4, { tex: 'adobe-brick', bottom: false });
   m.cylinder([0, 0, 0.4], 2.3, 3, { segments: 12, turn, tex: 'bay-wall', top: false, bottom: false });
-  for (const z of [1.2, 2.6]) m.cylinder([0, 0, z], 2.36, 0.12, { segments: 12, turn, tex: 'band-steel', top: false, bottom: false });
+  for (const z of [1.2, 2.6]) m.cylinder([0, 0, z], 2.36, 0.12, { segments: 12, turn, tex: 'band-steel', texScale: 0.16, top: false, bottom: false });
   m.loft(ring(12, 2.35, turn), 3.4, ring(12, 1.3, turn), CISTERN.height, { tex: 'metal-grey', bottom: false, top: false });
   // The column, tapering, and its rings.
   const [z0, z1, r0, r1] = [CISTERN.height, 17, 1.0, 0.6];
   const rAt = (z) => r0 + ((z - z0) / (z1 - z0)) * (r1 - r0);
   m.loft(ring(10, r0, turn), z0, ring(10, r1, turn), z1, { tex: 'metal-grey', top: false, bottom: false });
-  for (const z of [6.5, 9.5]) m.cylinder([0, 0, z], rAt(z) + 0.08, 0.2, { segments: 10, turn, tex: 'band-steel' });
+  for (const z of [6.5, 9.5]) m.cylinder([0, 0, z], rAt(z) + 0.08, 0.2, { segments: 10, turn, tex: 'band-steel', texScale: 0.16 });
   // The condenser: wide thin plates stacked up the top of the column.
   for (let k = 0; k < 6; k++) {
     const z = 11.6 + k * 0.85;
     m.cylinder([0, 0, z], 1.75 - k * 0.07, 0.12, { segments: 10, turn, tex: 'bay-plate', texScale: 2, bottom: { tex: 'bay-plate', texScale: 2 } });
   }
   // The collar, the cap and the antenna with its beacon.
-  m.cylinder([0, 0, z1 - 0.2], 1.25, 0.3, { segments: 10, turn, tex: 'band-steel' });
+  m.cylinder([0, 0, z1 - 0.2], 1.25, 0.3, { segments: 10, turn, tex: 'band-steel', texScale: 0.16 });
   m.loft(ring(10, 1.05, turn), z1 + 0.1, ring(10, 0.22, turn), 18.6, { tex: 'metal-grey', bottom: false });
   m.cylinder([0, 0, 18.6], 0.05, 2.1, { segments: 5, ...PIPE_TEX, texScale: 0.1, bottom: false, top: false });
   m.box([-0.1, -0.1, 20.7], [0.1, 0.1, TOWER_HEIGHT], { color: [255, 60, 40], glow: true });
