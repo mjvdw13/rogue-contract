@@ -229,7 +229,7 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
     - [x] Fuel line: chrome pipes, FuelStat's brass elbow and gauge on
           the manifold, a valve wheel.
     - [x] The two hoses: ribbed rubber, orange and black, nozzle capped.
-    - [ ] Big crates' iron straps (thin: last, maybe skip).
+    - [x] Big crates' iron straps: skipped (Mark, 2026-10-21).
     - [x] The astromech dome (`models/clutter.js`, in the droid seller's
           pen and on the street: white paint, blue panels, scorched).
     - [x] The cargo pod (`models/clutter.js`, shared with the town):
@@ -237,6 +237,15 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
     - [x] Barrels and canisters: soot blotched over their tin bodies
           (`drum-rust`, `drum-grey`), not their hoops and lids.
   - [ ] Waiting on Mark.
+  - [ ] **The market's fittings, textured** (Mark, 2026-10-21): the same
+        way, one object at a time, a commit and a check-in after each.
+    - [x] Market stall (`models/market.js`): crates for wares, textured
+          power cells, worn plate on the counter and rack tops, a rubber
+          plinth.
+    - [ ] The condenser tower: plates, rings, collar, cap, pipes, tap.
+    - [ ] The dewback trough's rim.
+    - [ ] The droid seller's power unit, scrap and junk heap (check what
+          is still flat).
 - [ ] **An X-34 landspeeder on the main street** (Mark, 2026-10-18, after
       his schematic and the weathered prop): a model, hovering, textured
       like the town.

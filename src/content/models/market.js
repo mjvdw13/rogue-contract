@@ -13,8 +13,9 @@ const WATER = [70, 112, 128];
 
 /**
  * A market stall's counter and rack, under the kit's free-standing awning
- * (lib/town.js, stall()): a counter at the front in tin with a worn top,
- * power cells on it, and a rack at the back with wares on its shelf, 3
+ * (lib/town.js, stall()): a counter at the front in tin with a worn plate
+ * top on a rubber plinth, power cells on it, and a rack at the back with
+ * crates for wares on its shelf, 3
  * wide and 2.4 deep. The counter and the rack collide; between them is
  * room for the stallholder (1.35, a villager's width and a bit), open at
  * the ends.
@@ -24,19 +25,19 @@ function stall() {
   const [hw, hd] = [1.5, 1.2];
   const counter = [[-hw + 0.1, hd - 0.6], [hw - 0.1, hd - 0.6], [hw - 0.1, hd - 0.05], [-hw + 0.1, hd - 0.05]];
   const rack = [[-hw + 0.1, -hd + 0.05], [hw - 0.1, -hd + 0.05], [hw - 0.1, -hd + 0.45], [-hw + 0.1, -hd + 0.45]];
-  m.prism(counter, 0, 1, { tex: 'metal-grey', top: { color: ['tan', 0.42] }, bottom: false });
-  m.box([-hw + 0.08, hd - 0.63, 0], [hw - 0.08, hd - 0.02, 0.18], { color: ['gray', 0.18], top: false, bottom: false });
-  m.prism(rack, 0, 1.45, { tex: 'metal-rust', top: { color: ['gray', 0.3] }, bottom: false });
+  m.prism(counter, 0, 1, { tex: 'metal-grey', top: { tex: 'bay-plate' }, bottom: false });
+  m.box([-hw + 0.08, hd - 0.63, 0], [hw - 0.08, hd - 0.02, 0.18], { tex: 'pump-hose', top: false, bottom: false });
+  m.prism(rack, 0, 1.45, { tex: 'metal-rust', top: { tex: 'bay-plate' }, bottom: false });
   // Wares: boxes on the rack, power cells on the counter.
   const wares = [
-    [-1.1, -0.95, 1.45, 0.4, 0.3, 0.3, ['steel', 0.5]],
-    [-0.55, -0.95, 1.45, 0.3, 0.3, 0.45, ['tan', 0.6]],
-    [0.05, -0.97, 1.45, 0.5, 0.25, 0.22, ['gray', 0.45]],
-    [0.7, -0.95, 1.45, 0.35, 0.3, 0.38, ['rust', 0.45]],
+    [-1.1, -0.95, 1.45, 0.4, 0.3, 0.3, 'crate-grey'],
+    [-0.55, -0.95, 1.45, 0.3, 0.3, 0.45, 'crate-tan'],
+    [0.05, -0.97, 1.45, 0.5, 0.25, 0.22, 'crate-grey'],
+    [0.7, -0.95, 1.45, 0.35, 0.3, 0.38, 'crate-rust'],
   ];
-  for (const [x, y, z, w, d, h, color] of wares) m.box([x - w / 2, y - d / 2, z], [x + w / 2, y + d / 2, z + h], { color, bottom: false });
-  for (const [x, color] of [[0.55, ['yellow', 0.6]], [0.75, ['steel', 0.6]], [0.95, ['blood', 0.6]]]) {
-    m.cylinder([x, hd - 0.33, 1], 0.07, 0.22, { segments: 6, color, bottom: false });
+  for (const [x, y, z, w, d, h, tex] of wares) m.box([x - w / 2, y - d / 2, z], [x + w / 2, y + d / 2, z + h], { tex, texScale: Math.max(w, h) / 2, bottom: false });
+  for (const [x, tex] of [[0.55, 'hose-orange'], [0.75, 'drum-grey'], [0.95, 'drum-rust']]) {
+    m.cylinder([x, hd - 0.33, 1], 0.07, 0.22, { segments: 6, tex, texScale: 0.15, bottom: false });
   }
   m.outlineLines(counter).outlineLines(rack);
   return m.build();
