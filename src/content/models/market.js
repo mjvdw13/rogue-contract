@@ -9,11 +9,10 @@ import { ModelBuilder } from './lib/build.js';
 const ring = (n, r, turn = 0) => Array.from({ length: n }, (_, i) => [Math.cos(turn + (i / n) * Math.PI * 2) * r, Math.sin(turn + (i / n) * Math.PI * 2) * r]);
 
 /**
- * A rusty pipe `len` long (a cylinder's style): its rings run round it
- * whichever way it lies, one every `period` (four to the picture), the
- * same on every facet.
+ * A rusty pipe `len` long (a cylinder's style): its picture wraps round it
+ * whichever way it lies, the same on every facet, once every 0.64 along it.
  */
-const pipe = (len, period = 0.16) => ({ tex: 'pipe-rings', sides: { uv: [[0, len / (4 * period)], [1, len / (4 * period)], [1, 0], [0, 0]] } });
+const pipe = (len) => ({ tex: 'pipe-rust', sides: { uv: [[0, len / 0.64], [1, len / 0.64], [1, 0], [0, 0]] } });
 /** A round picture's uv on an `n`-sided disc turned by `turn` (a cylinder's end). */
 const disc = (n, turn = 0) => Array.from({ length: n }, (_, i) => [0.5 + 0.5 * Math.cos(turn + (i / n) * Math.PI * 2), 0.5 - 0.5 * Math.sin(turn + (i / n) * Math.PI * 2)]);
 // A valve wheel's picture, drawn on a twelve-sided disc.
@@ -134,7 +133,7 @@ function condenserTower() {
   // The collar, the cap and the antenna with its beacon.
   m.cylinder([0, 0, z1 - 0.2], 1.25, 0.3, { segments: 10, turn, tex: 'band-steel', texScale: 0.16 });
   m.loft(ring(10, 1.05, turn), z1 + 0.1, ring(10, 0.22, turn), 18.6, { ...panels('cone-panel', 2), bottom: false, top: { tex: 'cone-panel' } });
-  m.cylinder([0, 0, 18.6], 0.05, 2.1, { segments: 5, ...pipe(2.1, 0.1), bottom: false, top: false });
+  m.cylinder([0, 0, 18.6], 0.05, 2.1, { segments: 5, ...pipe(2.1), bottom: false, top: false });
   m.box([-0.1, -0.1, 20.7], [0.1, 0.1, TOWER_HEIGHT], { color: [255, 60, 40], glow: true });
   // Pipes from the column down into the cistern's lid.
   for (const x of [-1.15, 1.15]) {

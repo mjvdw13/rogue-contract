@@ -53,7 +53,7 @@ const TOWN = [
   // The condenser tower's plain dark bands (models/market.js).
   'band-steel',
   // Its lid and cap panels and its condenser plates' fins and edges.
-  'cone-panel', 'fin-disc', 'fin-edge', 'pipe-rings',
+  'cone-panel', 'fin-disc', 'fin-edge', 'pipe-rust',
   // Still water in the plaza's trough and basin.
   'water-murky',
   // The market stalls' wares, in bright paints (models/market.js).

@@ -40,7 +40,7 @@ function fuelLine() {
   const m = new ModelBuilder('bay-fuel-line');
   const h = BAY_WALL;
   // A pipe `len` long: its picture wraps round it, the same on every facet
-  // whichever way it lies, a ring every 0.16 along it (four to a picture).
+  // whichever way it lies, once every 0.64 along it.
   const pipe = (len) => ({ tex: 'bay-pipe', sides: { uv: [[0, len / 0.64], [1, len / 0.64], [1, 0], [0, 0]] } });
   const CLAMP = { tex: 'pump-hose' };
   const BOX_SIDE = [[1, 1], [0, 1], [0, 0], [1, 0]];

@@ -55,7 +55,8 @@ const WORN = (cell, seed, amount = 1) => [
   { color: [128, 64, 28], amount: 0.7 * amount, cell, seed },
   { color: [18, 14, 10], amount: 0.65 * amount, cell, seed: seed + 10, from: 0.45 },
 ];
-const RUSTY_PIPE = [[30, 16, 8], [74, 40, 18], [120, 66, 32], [160, 96, 52], [190, 130, 82]];
+/** A pipe's plain copper (a gradient of one colour: the source's grain is dropped). */
+const COPPER = [164, 102, 59];
 
 /** Mos Eisley's walls, roofs, streets and sky: warm plaster and packed sand under a pale, dusty sky. */
 // (Key colours from the palette's sand and beige ramps: pale tones between
@@ -118,11 +119,10 @@ export const TOWN = [
   // Still water in the plaza's trough and basin (models/market.js): Talay's
   // rippled water, murky green-blue, glinting pale on the ripples.
   { out: 'water-murky', df: 'CFWATER4', gradient: [[16, 30, 32], [30, 56, 58], [50, 86, 88], [84, 120, 118], [146, 170, 160]], keep: 0, contrast: 1 },
-  // The condenser tower's pipes (models/market.js): one column of the bay's
-  // rusty pipe repeated across, so only its rings show and each facet of a
-  // pipe wears the same (the whole pipe's picture repeats its dark edges on
-  // every facet); four rings tall so the rust isn't the same on every ring.
-  { out: 'pipe-rings', df: 'IPDETPIP', crop: [39, 0, 1, 16], tile: [16, 4], gradient: RUSTY_PIPE, keep: 0, contrast: 1, rust: WORN(8, 91, 0.6) },
+  // The condenser tower's pipes (models/market.js): plain copper, rust and
+  // soot blotched over it, no rings (Mark, 2026-10-21: too many of them).
+  // The facets' light makes them round.
+  { out: 'pipe-rust', df: 'IPDETPIP', crop: [39, 0, 1, 8], tile: [16, 8], gradient: [COPPER, COPPER], rust: WORN(8, 91, 0.6) },
   // The market stalls' wares (models/market.js): the landspeeder's mottled
   // panel in fresher paints than the bay's, lightly worn: goods for sale are
   // cared for, but this is still Tatooine.
@@ -161,12 +161,10 @@ export const TOWN = [
   { out: 'pump-side', df: 'IWFUEL9', crop: [36, 26, 56, 102], scale: [32, 64], rust: WORN(16, 23) },
   { out: 'pump-hazard', df: 'NWWARN1', crop: [0, 8, 64, 16], rust: WORN(16, 25, 1.2) },
   { out: 'bay-plate', df: 'ZPGREYP1', rust: WORN(16, 27) },
-  // Its fuel lines (models/bay.js): rusty pipe rings, as the condenser
-  // tower's but rustier (the whole pipe's picture on every facet came out
-  // a checkerboard; four rings tall so the rust isn't the same on every
-  // ring), a manifold's front of brass elbow, truss and gauge, and the
-  // valve wheel from the pump's panel.
-  { out: 'bay-pipe', df: 'IPDETPIP', crop: [39, 0, 1, 16], tile: [16, 4], gradient: RUSTY_PIPE, keep: 0, contrast: 1, rust: WORN(8, 29, 0.8) },
+  // Its fuel lines (models/bay.js): plain copper pipe, as the condenser
+  // tower's but rustier, a manifold's front of brass elbow, truss and
+  // gauge, and the valve wheel from the pump's panel.
+  { out: 'bay-pipe', df: 'IPDETPIP', crop: [39, 0, 1, 8], tile: [16, 8], gradient: [COPPER, COPPER], rust: WORN(8, 29, 0.8) },
   { out: 'line-front', df: 'IWFUEL1', crop: [0, 32, 64, 96], scale: [64, 128], rust: WORN(16, 31) },
   { out: 'valve-wheel', df: 'IWFUEL2', crop: [20, 49, 18, 18], scale: [16, 16], rust: WORN(8, 33, 0.7) },
   { out: 'pump-hose', df: 'IWFUEL3', crop: [0, 32, 64, 64], gradient: [[6, 6, 6], [26, 26, 24], [52, 52, 48], [84, 84, 78]], keep: 0, contrast: 1, rust: WORN(16, 43, 0.5) },
