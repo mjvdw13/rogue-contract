@@ -234,8 +234,8 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
           pen and on the street: white paint, blue panels, scorched).
     - [x] The cargo pod (`models/clutter.js`, shared with the town):
           scorched tin, plate ends, rusty hoops, rubber skids.
-    - [ ] Barrels and canisters: their bodies are textured already, so
-          just soot (a dirtier tin), not their hoops and lids.
+    - [x] Barrels and canisters: soot blotched over their tin bodies
+          (`drum-rust`, `drum-grey`), not their hoops and lids.
   - [ ] Waiting on Mark.
 - [ ] **An X-34 landspeeder on the main street** (Mark, 2026-10-18, after
       his schematic and the weathered prop): a model, hovering, textured

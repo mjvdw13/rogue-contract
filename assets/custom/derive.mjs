@@ -104,6 +104,10 @@ export const TOWN = [
   // The cargo pod's hull (models/clutter.js): the galvanised tin again, rusty
   // and scorched with soot.
   { out: 'pod-hull', df: 'ZWGRUV1', crop: [0, 0, 32, 64], tile: [2, 1], gradient: [[40, 40, 40], [88, 86, 82], [130, 126, 118], [166, 160, 150], [196, 190, 178]], keep: 0, contrast: 0.9, rust: [{ color: [120, 64, 30], amount: 0.5, cell: 16, seed: 2 }, ...WORN(16, 61, 0.8)] },
+  // The drums' and canisters' bodies (models/clutter.js): the same tins with
+  // soot and oil blotched over them.
+  { out: 'drum-rust', df: 'ZWGRUV1', crop: [0, 0, 32, 64], tile: [2, 1], gradient: [[30, 16, 8], [74, 40, 18], [120, 66, 32], [160, 96, 52], [190, 130, 82]], keep: 0, contrast: 0.9, rust: [{ color: [52, 26, 12], amount: 0.6, cell: 16, seed: 1 }, { color: [18, 14, 10], amount: 0.45, cell: 16, seed: 71, from: 0.5 }] },
+  { out: 'drum-grey', df: 'ZWGRUV1', crop: [0, 0, 32, 64], tile: [2, 1], gradient: [[40, 40, 40], [88, 86, 82], [130, 126, 118], [166, 160, 150], [196, 190, 178]], keep: 0, contrast: 0.9, rust: [{ color: [120, 64, 30], amount: 0.5, cell: 16, seed: 2 }, { color: [18, 14, 10], amount: 0.55, cell: 16, seed: 73, from: 0.45 }] },
   // Street clutter (models/clutter.js): cargo crates from Ramshed's, in
   // tan, grey and rust, and a heap of junk from TestBase's trash pile.
   { out: 'crate-tan', df: 'IPRMCRT3', gradient: [[56, 44, 28], [112, 90, 60], [160, 134, 96], [196, 172, 130], [222, 202, 162]], keep: 0.15, contrast: 0.85 },

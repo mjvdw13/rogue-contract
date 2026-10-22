@@ -48,6 +48,8 @@ const TOWN = [
   'dome-white', 'dome-blue',
   // The cargo pod's hull.
   'pod-hull',
+  // Sooted drums and canisters.
+  'drum-rust', 'drum-grey',
   // Street clutter: crates and junk (models/clutter.js).
   'crate-tan', 'crate-grey', 'crate-rust', 'junk',
   // The X-34 landspeeder (models/speeder.js): paint, stripes, engine metal,
