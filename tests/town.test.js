@@ -472,6 +472,21 @@ test('a rounded arch fills the corners under its lintel, a model a tile through 
   assert.throws(() => town.arch(8, 11, 12, 14, { h: 6, lintel: 3, round: 'S' }), /head room/);
 });
 
+test('a grimy rounded arch (a vault indoors) takes the two sooty kinds in turns along it, the same arch with soot on', () => {
+  const { town } = kit();
+  town.house(4, 4, 16, 14, { h: 6, wall: 'adobe-pale' });
+  town.arch(8, 10, 12, 14, { h: 6, lintel: 3.5, wall: 'adobe-pale', round: 'S', grimy: true });
+  const rounds = town.things.filter((t) => t.type.startsWith('arch-round'));
+  assert.deepEqual(rounds.map((t) => t.type), ['arch-round-4-pale-grimy-1', 'arch-round-4-pale-grimy-2', 'arch-round-4-pale-grimy-1', 'arch-round-4-pale-grimy-2']);
+  const clean = registry.models.get('arch-round-4-pale');
+  for (const id of ['arch-round-4-pale-grimy-1', 'arch-round-4-pale-grimy-2']) {
+    const faces = registry.models.get(id).faces;
+    const grime = faces.filter((f) => registry.textures.get(f.tex)?.grime);
+    assert.ok(grime.length > 0, `${id} has soot`);
+    assert.equal(faces.length - grime.length, clean.faces.length, `${id} is the same arch under it`);
+  }
+});
+
 test("a platform stands over its box with steps down its sides, a rise apart, and a door on it is at its top", () => {
   const { p, town } = kit();
   town.house(4, 4, 16, 14, { h: 6 });

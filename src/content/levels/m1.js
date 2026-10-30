@@ -556,9 +556,10 @@ const roofOver = (x0, y0, x1, y1, ceilZ, h) => p.rect(x0, y0, x1, y1, (_, __, c)
   town.things.push(at('cantina-stool', 93.5, 102.5, { z: F }), at('cantina-stool', 93.5, 104.75, { z: F }), at('cantina-stool', 103.5, 102.25, { z: F }));
   // Ceilings: the room's, and the booths' alcoves vaulted (round-topped
   // arches through their depth, models/arch.js) in the walls' plaster, 3.5
-  // over the floor. Three along the sides, two at the back.
+  // over the floor, sooty as the walls are. Three along the sides, two at
+  // the back.
   roofOver(88, 90, 110, 110, ceilZ, h);
-  const VAULT = { h, lintel: 3.5, floorZ: F, wall, floor: 'flagstone', light };
+  const VAULT = { h, lintel: 3.5, floorZ: F, wall, floor: 'flagstone', light, grimy: true };
   town.arch(88, 96, 92, 99, { ...VAULT, round: 'E' }).arch(88, 102, 92, 105, { ...VAULT, round: 'E' }).arch(106, 96, 110, 99, { ...VAULT, round: 'W' });
   town.arch(90, 107, 94, 110, { ...VAULT, round: 'N' }).arch(103, 107, 107, 110, { ...VAULT, round: 'N' });
   // A booth in each alcove and on each cut corner (models/cantina.js), its
