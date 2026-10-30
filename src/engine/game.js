@@ -62,6 +62,7 @@ export class Game {
     this.input.onPointerLockChange = (locked) => {
       if (!locked && this.scene?.wantsPointerLock && !this.menu.active) this.pause();
     };
+    this.input.wantsPointerLock = () => !!this.scene?.wantsPointerLock;
     this.gamepad = new GamepadPoller(this.input);
     this.audio = new AudioSystem(this.registry, this.settings);
     if (params.has('mute')) this.audio.setMuted(true);
