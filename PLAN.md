@@ -1073,6 +1073,90 @@ unknown actions), documented in MODDING.md and covered by tests.
 14. [ ] The headless play test runs every level, so it skips opening
         cutscenes.
 
+**Mission 1: from the flow review (2026-10-30)**
+
+A review of Mos Eisley's flow and guidance (Map A in `docs/story.md`)
+found gaps between the calm half's steps, ways round the story, and
+systems that work against each other. The fixes to the design go into Map
+A. The rest wait for the engine pieces above.
+
+*In the design (Map A):*
+
+15. [ ] **Story order along the street.** The calm half's steps sit west to
+        east in the order you need them (bay, cantina, junk yard, alleys,
+        checkpoint), so you never walk back on yourself. The first sketch
+        put the junk yard beside the bay, west of the cantina, where players
+        reach it before they have the contract.
+16. [ ] **The fob guides from the start.** The broker tunes it to the Jawa
+        trader's transponder, so it leads the short way to the junk yard and
+        teaches itself there. The trader re-tunes it to Dace's part. Before,
+        it was handed over dark, with nothing pointing to the Jawas.
+17. [ ] **No way round the story.** Dace is in the freighter's hold only
+        once the fob has his signal, so going over the roofs early can't
+        reach him. The trader's lines wait for the contract.
+18. [ ] **Every step still works after an early flip.** The fob is an item
+        in the broker's booth, and the Jawas' code is also on a terminal in
+        the junk yard, because the Jawas bolt when the town turns.
+19. [ ] **Fewer errands.** The thug's debt goes: the pass is a dead drop in
+        the alleys that the informant sells you the place of. Collecting a
+        debt with no shooting or punching allowed was only a conversation.
+20. [ ] **Tell the player the rule.** Kyle starts with his fists up, and the
+        customs officer says it: "Keep that blaster holstered in my town,
+        hunter."
+21. [ ] **The detours connect.** The blast doors close just west of the
+        cantina's door. The cantina's back room opens onto a service passage
+        to Bay 87, and the alleys run behind the street from the junk yard
+        to the bay. Both are walked or seen in the calm half, past blast
+        doors standing open. The alleys are lit at their mouths and turns,
+        because they become a fight.
+22. [ ] **Combat starts small.** The flip sends 2 or 3 troopers through the
+        derelict bay's door, at ground level. The fights grow on the way
+        back: the old quarter, the checkpoint's barricades, the detour, then
+        the bay.
+23. [ ] **Troopers stay where you passed them.** Gunfire wakes every monster
+        within 52 steps (`noise.js`), and they chase, which would empty the
+        streets toward the first shots. Troopers posted along the way back
+        are placed with `ambush`, and the closed blast doors split the town
+        into separate fights.
+24. [ ] **A beacon in the west.** Bay 87 sits below the street, so the way
+        back has nothing to aim for. After the flip the Crow circles over
+        the bay, and the bay has a control tower you can see from the old
+        quarter.
+25. [ ] **Dace's capture.** It happens while Kyle is pinned in the hold, in
+        a short cutscene, and the squad's transport lifts off, so the old
+        quarter's fight isn't a chase you can't win. The objective says:
+        get back to Bay 87.
+26. [ ] **Roof jumps a step under the limit.** Gaps on the roof route are 2
+        or 3 tiles, not 4 (the most a running jump clears). The climb is in
+        sight of the checkpoint gate, in the sun, and a fall lands on the
+        street west of the gate.
+
+*In the engine and the build:*
+
+27. [ ] **A click that captures the mouse doesn't fire** (small). `input.js`
+        counts a mouse button as held while the mouse is free, and the mouse
+        is only captured on the click (`game.js`), so that click fires a
+        shot, and so does clicking RESUME in the pause menu. In Mos Eisley
+        the shot turns the town. In a level, mouse buttons count only once
+        the mouse is captured.
+28. [ ] **A level's starting weapon** (small, with 4): a level
+        `startWeapon`, so Mission 1 starts with fists up, not the blaster
+        (`hero.js`). Fists make no noise, so a punch at the air doesn't turn
+        the town.
+29. [ ] **The switch leaves troopers at their posts** (with 5): calm
+        troopers turn into idle monsters, which wake when they see or hear
+        Kyle, not chasing ones. A headless test fires in the derelict bay
+        and checks that the troopers at the checkpoint and in the cantina
+        are still at their posts.
+30. [ ] **`fly` can loop** (with 1), for the Crow circling over the bay
+        until the pickup.
+31. [ ] **Build order:** a current objective on screen (Phase 2's
+        objectives: one line that changes at each step, shown when it
+        changes and on the automap), and the smarter enemies around heights,
+        both before Map A is painted. The free roam leans on objectives more
+        than any other mission, and the derelict bay's rim and the roof
+        snipers need the ledge AI.
+
 **Already above, and these maps lean on them:** briefings and objectives
 (Jan and Kyle's briefings; the exit waits for objectives), and smarter
 enemies around heights (Mission 1's rooftop snipers and the troopers on the
@@ -1908,3 +1992,12 @@ update the smoke test.
   are no sloped floors or slabs, so the surfaces step rather than slope.)
 - 2026-10-15: the overhang taken out (Mark: he doesn't like it). The start
   bowl's east wall is a plain cliff again. Step 14 has no overhang.
+- 2026-10-30: Mos Eisley flow review. Map A's loop (calm out, loud back
+  over the same streets) holds up, but the calm half doubles back (the junk
+  yard sat beside the bay, west of the cantina), the fob guided nothing
+  until halfway, the roofs could skip the story, and four nested errands
+  came before the first shot. On the way back the cantina's detour didn't
+  connect, gunfire would pull every trooper toward the first shots, the
+  first fight was the whole town at once, and nothing marked the west. In
+  the engine, the click that captures the mouse fires a shot, which would
+  turn the town. To-dos 15 to 31 under "For the story".
