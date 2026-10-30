@@ -9,6 +9,7 @@ import { PIPE_MODELS } from './models/pipes.js';
 import { CLUTTER } from './models/clutter.js';
 import { BAY_WALL, BAY_HOSES } from './models/bay.js';
 import { TOWER_HEIGHT } from './models/market.js';
+import { BAR, TAPS } from './models/cantina.js';
 
 // Scenery. Solid ones block movement; ones with health can be shot (and
 // `explode`).
@@ -106,6 +107,15 @@ export default [
   defineDecoration({ id: 'market-stall', model: 'market-stall', solid: true, height: 1.45, fixed: true }),
   defineDecoration({ id: 'condenser-tower', model: 'condenser-tower', solid: true, height: TOWER_HEIGHT, fixed: true }),
   defineDecoration({ id: 'water-trough', model: 'water-trough', solid: true, height: 0.75, fixed: true }),
+  // Chalmun's cantina (models/cantina.js): the bar (colliding as its
+  // counter's lines, only as high as the counter, so shots go over it), the
+  // taps' column inside it (as tall as its pipes), stools round it, the
+  // back-bar's shelves, and the canopy ring round the well over the bar, hanging from the ceiling.
+  defineDecoration({ id: 'cantina-bar', model: 'cantina-bar', solid: true, height: BAR.top, fixed: true }),
+  defineDecoration({ id: 'cantina-taps', model: 'cantina-taps', solid: true, radius: TAPS.r + 0.05, height: TAPS.pipes, fixed: true }),
+  defineDecoration({ id: 'cantina-stool', model: 'cantina-stool', solid: true, radius: 0.26, height: 0.7, fixed: true }),
+  defineDecoration({ id: 'cantina-shelves', model: 'cantina-shelves', solid: true, height: 2.2, fixed: true }),
+  defineDecoration({ id: 'cantina-canopy', model: 'cantina-canopy', fixed: true }),
   // The Moldy Crow, hovering (models/crow.js), bobbing gently, drawn at 0.8 of
   // canon size: only its gun pod is low enough to collide (as its outline);
   // you walk under the rest.

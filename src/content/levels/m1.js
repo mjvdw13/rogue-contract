@@ -1,4 +1,5 @@
 import { defineLevel } from '../../engine/defs.js';
+import { TAPS, CANOPY } from '../models/cantina.js';
 import { Painter } from './lib/painter.js';
 import { Town } from './lib/town.js';
 import { CISTERN } from '../models/market.js';
@@ -494,10 +495,13 @@ tagTile(143, 110, 'roof-sniper');
 // steps go down into a wide main room: its front corners cut at a slant,
 // booth niches between buttress walls along its sides, a stage two steps
 // up in an alcove on the east, two alcoves at the back. The bar is a long
-// U, its round end to the door and the taps on an island inside it, open
-// at the back into the back-bar, under an opening to the sky (lit from
-// above). The back-bar's door leads to a back room and a passage up two
-// steps to the back door on the back lane, east of the blast doors.
+// U, its round end to the door and the taps' column inside it, open at the
+// back into the back-bar, under a shallow well in the ceiling lit from
+// inside (no sky: Mark, 2026-10-30). The back-bar's door leads to a back
+// room and a passage up two steps to the back door on the back lane, east
+// of the blast doors.
+/** Light sources (lamps), added area by area. */
+const lights = [];
 const CANTINA = { floorZ: -0.5, ceilZ: 3.5, h: 6, wall: 'adobe-pale', light: 104 };
 // A ceiling at `ceilZ` over the open floor in a box, the roof at `h` on
 // it (as room() paints), for floors painted some other way: steps, a room
@@ -522,34 +526,41 @@ const roofOver = (x0, y0, x1, y1, ceilZ, h) => p.rect(x0, y0, x1, y1, (_, __, c)
   town.block(94, 106, 95, 110, MASS).block(102, 106, 103, 110, MASS);
   p.rect(105, 102, 106, 106, town.street(F + 0.25, { floor: 'planks', side: wall }));
   p.rect(106, 101, 110, 106, town.street(F + 0.5, { floor: 'planks', side: wall }));
-  // The bar: a U of counter (round at the door's end, centre 98.5, 100),
-  // its east arm stopping short for the bartender's way in, and the taps'
-  // island inside it.
-  const counter = town.street(F + 0.9, { floor: 'flagstone', side: 'adobe-brick' });
-  const top = { wall: 'adobe-brick', wallTop: F + 0.9 };
-  town.circle(98.5, 100, 4.5, { inside: counter, wall: top, open: 'out' }).circle(98.5, 100, 3.5, { inside: floor, wall: top });
-  p.rect(94, 100, 103, 106, floor).rect(94, 100, 95, 106, counter).rect(102, 100, 103, 104, counter);
-  const TAPS = { h: F + 1.6, wall: 'metal-grey', roof: 'metal-grey', skirt: null };
-  town.circle(98.5, 102, 1.5, { inside: town.roofCell(TAPS), wall: { wall: TAPS.wall, wallTop: TAPS.h }, open: 'out' });
-  town.block(97, 102, 100, 106, TAPS);
-  // Ceilings: the room's, lower in the niches and alcoves, and none over
-  // the bar, under the opening.
+  // The bar (models/cantina.js): a pale U of counter round at the door's
+  // end (centre 98.5, 100), its east arm stopping short for the bartender,
+  // the taps' column inside it, and the back-bar's shelves on its back wall.
+  town.things.push(
+    at('cantina-bar', 98.5, 100, { z: F, angle: 0 }),
+    at('cantina-taps', 98.5, 100 + TAPS.y, { z: F, angle: 0 }),
+    at('cantina-shelves', 98.5, 110, { z: F, angle: 0 }),
+  );
+  // Stools round the round end and along the arms, half a tile out.
+  for (const deg of [200, 235, 270, 305, 340]) {
+    const a = (deg * Math.PI) / 180;
+    town.things.push(at('cantina-stool', 98.5 + Math.cos(a) * 5, 100 + Math.sin(a) * 5, { z: F }));
+  }
+  town.things.push(at('cantina-stool', 93.5, 102.5, { z: F }), at('cantina-stool', 93.5, 104.75, { z: F }), at('cantina-stool', 103.5, 102.25, { z: F }));
+  // Ceilings: the room's, lower in the niches and alcoves.
   roofOver(88, 90, 110, 110, ceilZ, h);
   for (const box of [[88, 96, 92, 99], [88, 102, 92, 107], [106, 95, 110, 99], [90, 107, 94, 110], [103, 107, 107, 110]]) roofOver(...box, F + 3, h);
-  p.rect(92, 93, 106, 107, (x, y, c) => {
-    if (((x + 0.5 - 98.5) / 5.5) ** 2 + ((y + 0.5 - 100.5) / 6.5) ** 2 > 1) return c;
-    const { slab: _, ...open } = c;
-    return { ...open, light: 150 };
+  // Over the bar a shallow well in the ceiling, lit from inside, the canopy
+  // ring hanging round it (models/cantina.js): every tile its oval reaches
+  // into is the well, so the tiles' steps round the well's edge are behind
+  // the ring. The well's top is the ring's; it glows (the model's), and the
+  // tiles keep the room's light, so none spills in steps onto the ceiling
+  // round it. A lamp in the well lights the bar.
+  const WELL = { x: 98.5, y: 100.75, z: ceilZ - CANOPY.drop };
+  const wellTop = WELL.z + CANOPY.band;
+  if (F + TAPS.pipes !== wellTop) throw new Error(`m1: the taps' pipes reach ${F + TAPS.pipes}, the well's top is ${wellTop}`);
+  p.rect(92, 93, 106, 108, (x, y, c) => {
+    if (!c.slab || c.line) return c;
+    const qx = Math.min(Math.max(WELL.x, x), x + 1);
+    const qy = Math.min(Math.max(WELL.y, y), y + 1);
+    if (((qx - WELL.x) / CANOPY.rx) ** 2 + ((qy - WELL.y) / CANOPY.ry) ** 2 >= 1) return c;
+    return { ...c, slab: { ...c.slab, bottom: wellTop, ceiling: 'adobe-pale' } };
   });
-  // A drum round the opening, its roof at 9, so the opening is a shaft
-  // that hides the roofs round it. (Only round it: the suns are in the
-  // south-west, and a taller building would shade the roof under S's dome.)
-  p.rect(90, 91, 108, 111, (x, y, c) => {
-    const e = ((x + 0.5 - 98.5) / 5.5) ** 2 + ((y + 0.5 - 100.5) / 6.5) ** 2;
-    if (e <= 1 || e > 1.9 || c.line) return c;
-    if (c.slab) return { ...c, slab: { ...c.slab, top: 9 } };
-    return c.floorZ === h ? { ...c, floorZ: 9 } : c;
-  });
+  town.things.push(at('cantina-canopy', WELL.x, WELL.y, { z: WELL.z, angle: 0, lit: light + 16 }));
+  lights.push({ x: WELL.x, y: WELL.y, z: wellTop - 0.25, radius: 6, light: 72 });
   // The way in: the door, an entry turning east into the vestibule, and
   // two steps down.
   town.room(92, 83, 98, 86, { h, ceilZ: 3.5, wall, light });
@@ -829,6 +840,7 @@ export default defineLevel({
   // 2026-10-18).
   weather: { type: 'glint', count: 90 },
   decals: [...town.decals, ...bayDecals, ...pitDecals],
+  lights,
   hangings: [...hangings, ...town.hangings],
   par: 600,
   // Stand-ins for the story until conversations, the fob and the drop-off
