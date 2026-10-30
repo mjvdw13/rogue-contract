@@ -47,6 +47,28 @@ These need Mark to try something, or to decide. Don't start them without him.
   clutter now take a seed per wall, so building elsewhere no longer
   moves them, which re-rolled them all once (same look, other spots).
 
+- **Mos Eisley's middle, blocked out** (`?map=m1`, 2026-10-29): the
+  cantina, the junk yard, the alleys and Bay 86, as plain volumes. The
+  cantina: in by S's door on the market, a dark entrance that turns, steps
+  down into the round room (2 below the street, a low ceiling), the bar a
+  ring of counter under an opening to the sky, and a passage up to the
+  back door on the back lane, past the blast doors. The junk yard: up the
+  alley between H and I, through a gate and two steps down; a slanting
+  heap of scrap, stand-ins for the crane and furnace, the sandcrawler
+  (a block) over the low north wall. The alleys: up the alley between I
+  and J (or through the junk yard's side gate) to a yard behind J, a
+  slanting lane up to a second yard (the hostel's room off it), another
+  up to a square under the prefecture's wall (the thug's room off it),
+  and six steps down to the mouth by the checkpoint. Bay 86: the yard
+  past R ends at bars over the pit, customs troopers by a stand-in hull.
+  Each way round the blast doors works on its own (checked with the
+  street shut there). To judge: the cantina's size and the bar under the
+  opening, the alleys' length and bends, whether the sandcrawler shows
+  enough from the market. Known: the round room's edge is open to the
+  sky in a thin ring (angled walls can't take a ceiling), seen only
+  looking up at the wall, and the opening's edge is stepped; both go
+  with the cantina's detail.
+
 - **Character sheets for Mos Eisley** (`docs/mission1.md`, Characters):
   cantina aliens (4-6 kinds), the band, the bartender, the broker, the
   informant, the thug, the customs officer, the bay owner, the water
@@ -305,7 +327,7 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
   - [x] The east third: the checkpoint, the rooftops, the old quarter
         and the dry wash, the derelict bay, the prefecture's wall and
         tower.
-  - [ ] The middle: the cantina's shell (its back door on the back lane,
+  - [x] The middle: the cantina's shell (its back door on the back lane,
         built with the rooftops), the alleys (on to the mouth by the
         checkpoint), the junk yard, Bay 86 to look into.
   - [ ] Play both halves (rough troopers for the loud half), then

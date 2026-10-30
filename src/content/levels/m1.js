@@ -128,7 +128,7 @@ town.tarp(46, 80, 50, 84, { z: 2.75, face: 'W', rise: 0.5, cloth: 'red' });
 // x 62..102), the water plaza in its middle. Past the market it narrows
 // between the frame the blast doors slide out of (x 104..106), then bends
 // north a little (angled fronts, `slanted()`), so you never see straight
-// down it, and runs on to the checkpoint (for now an exit at its end).
+// down it, and runs on to the checkpoint.
 p.rect(62, 58, 102, 82, town.street());
 p.rect(102, 58, 136, 80, town.street());
 // Alleys off the market, between its houses.
@@ -168,9 +168,9 @@ town.window(65.5, 82, 'N', { z: 2.2 }).window(73, 87.5, 'E');
 // R: a round house under a dome.
 town.circle(80, 88, 5, { inside: town.roofCell({ h: 7, wall: 'adobe-rose', skirt: null }), wall: { wall: 'adobe-rose', wallTop: 7 }, open: 'out', skirt: null });
 town.dome(80, 88, 7, 9.5, { wall: 'adobe-rose' });
-// S: where the cantina's front will be (its own step): a long house, its door shut.
+// S: the cantina's front, a long house (its door and the cantina behind
+// it are with the middle, below).
 town.house(87, 82, 102, 92, { h: 6, r: 3, wall: 'adobe-pale', dome: true });
-town.door(94, 82, 'N', { h: 6, tex: 'door-grey', wall: 'adobe-pale' });
 town.window(90.5, 82, 'N', { z: 3.4, tex: 'window-louvre' }).window(98.5, 82, 'N', { z: 3.4, tex: 'window-louvre' });
 
 
@@ -392,8 +392,8 @@ town.block(147, 61, 148, 64, { ...GATE, h: 7 }).block(147, 70, 148, 73, { ...GAT
 town.door(147, 67, 'W', { h: 7, tex: 'door-grey', width: 6, tall: 4, jamb: false, sign: false, panel: false, floorZ: OQ, wall: GATE.wall });
 gateTag(147, 64, 148, 70, 'checkpoint');
 town.block(145, 70, 147, 73, { ...GATE, h: OQ + 3 });
-// North of it the alleys' east mouth (the alleys behind it are the next
-// step) and the informant's den, open to it.
+// North of it the alleys' east mouth (the alleys come down into it, with
+// the middle, below) and the informant's den, open to it.
 p.rect(136, 48, 139, 61, town.street());
 town.house(139, 48, 148, 61, { h: 7, r: 1, wall: 'adobe-grey', skirt: null });
 town.room(140, 52, 146, 59, { h: 7, wall: 'adobe-grey', light: 128 });
@@ -482,6 +482,131 @@ tagTile(205, 128, 'derelict-rim');
 tagTile(186, 107, 'derelict-gate');
 tagTile(143, 110, 'roof-sniper');
 
+// ---------------------------------------------------------------- the middle (blockout)
+// Roughed out as the east third is: the cantina south of the market, the
+// Jawa junk yard north of it, the back alleys from the market round behind
+// the north side's houses to the mouth by the checkpoint, and Bay 86 beside
+// the cantina, seen through its gate. The cantina and the alleys are the
+// two ways round the blast doors.
+
+// 3. The cantina. Its front is S, on the market. A dark entrance turns so
+// the street can't see in, then steps go down into a round main room 2
+// below the street under a low ceiling, the round bar in its middle under
+// an opening to the sky (Mark's still: lit from above). A passage from the
+// room's east side climbs to the back door, on the back lane east of the
+// blast doors.
+const CANTINA = { cx: 103, cy: 105, r: 13, floorZ: -2, ceilZ: 2.5, h: 6, wall: 'adobe-pale', light: 104 };
+// A ceiling at `ceilZ` over the open floor in a box, the roof at `h` on
+// it (as room() paints), for floors painted some other way: steps, a round
+// room. Angled walls can't take one, so they stay open to the sky, in the
+// room's light: a slit round the round room's edge until the detail.
+const roofOver = (x0, y0, x1, y1, ceilZ, h) => p.rect(x0, y0, x1, y1, (_, __, c) => {
+  if (c.line) return { ...c, light: CANTINA.light };
+  if (c.wall || (c.floorZ ?? 0) >= ceilZ) return c;
+  return { ...c, ceiling: 'sky', ceilZ: SKY, light: town.light, slab: { bottom: ceilZ, top: h, floor: town.roof, ceiling: 'planks', side: CANTINA.wall, light: CANTINA.light } };
+});
+{
+  const { cx, cy, r, floorZ, ceilZ, h, wall, light } = CANTINA;
+  town.block(87, 88, 118, 121, { h, wall, light, skirt: null });
+  town.circle(cx, cy, r, { inside: town.street(floorZ, { floor: 'flagstone', side: wall }), wall: { wall, wallTop: h }, seam: 270 });
+  roofOver(cx - r - 1, cy - r - 1, cx + r + 1, cy + r + 1, ceilZ, h);
+  // The bar: a ring of counter round the bartender's well, under the opening.
+  const COUNTER = floorZ + 0.9;
+  town.circle(cx, cy, 4.5, { inside: town.street(COUNTER, { floor: 'flagstone', side: 'adobe-brick' }), wall: { wall: 'adobe-brick', wallTop: COUNTER }, open: 'out' });
+  town.circle(cx, cy, 2.5, { inside: town.street(floorZ, { floor: 'flagstone' }), wall: { wall: 'adobe-brick', wallTop: COUNTER } });
+  p.rect(cx - 6, cy - 6, cx + 6, cy + 6, (x, y, c) => {
+    if (Math.hypot(x + 0.5 - cx, y + 0.5 - cy) > 6) return c;
+    const { slab: _, ...open } = c;
+    return { ...open, light: 150 };
+  });
+  // The entrance: in from the market, a turn east, and steps down.
+  town.room(92, 83, 97, 85, { h, ceilZ: 3.5, wall, light });
+  town.room(97, 84, 100, 86, { h, ceilZ: 3.5, wall, light });
+  town.stair(97, 86, 100, 94, { up: 'N', from: floorZ, top: 0, floor: 'flagstone', side: wall });
+  roofOver(97, 86, 100, 94, 3.5, h);
+  town.door(94, 82, 'N', { h, tex: 'door-grey', wall, opens: true });
+  // (The entrance's walls in the room's light, so it's dark inside; S's
+  // outer walls and its dome, which takes the light of the roof under it,
+  // keep the sun.)
+  p.light(91, 83, 98, 86, light).light(96, 83, 101, 92, light);
+  // The way out the back: up eight steps to a door on the back lane.
+  town.room(113, 99, 118, 101, { h, floorZ, ceilZ, wall, light });
+  town.stair(118, 99, 126, 101, { up: 'E', from: floorZ, top: 0, rise: 0.25, floor: 'flagstone', side: wall });
+  roofOver(118, 99, 126, 101, 3.5, 8);
+  town.door(126, 100, 'E', { h: 8, tex: 'door-grey', opens: true });
+  p.light(113, 98, 125, 102, light);
+}
+
+// 17. Docking Bay 86, next door: a pit like Bay 87, its door at the end of
+// the yard past R. The door is a barred gate: through it you look down on
+// customs troopers going through a battered freighter's cargo (a stand-in
+// hull). You can't get in.
+const BAY86 = { cx: 72, cy: 113, r: 14, floorZ: -5, rim: 6 };
+const BAY86_WALL = { h: BAY86.rim, wall: 'bay-wall', skirt: null };
+town.block(62, 94, 87, 100, BAY86_WALL).block(57, 100, 87, 130, BAY86_WALL);
+town.circle(BAY86.cx, BAY86.cy, BAY86.r, {
+  inside: town.street(BAY86.floorZ, { floor: 'bay-floor', side: 'bay-wall' }),
+  wall: { wall: 'bay-wall', wallTop: BAY86.rim },
+  seam: 90,
+});
+town.arch(73, 94, 77, 98, { h: BAY86.rim, lintel: 4, wall: 'bay-wall', floor: 'bay-floor' });
+p.rect(73, 98, 77, 100, town.street(0, { floor: 'bay-floor', side: 'bay-wall' }));
+p.fence(73, 98, 77, 99, 'N', { tex: 'imp-bars', height: 4 });
+town.house(64, 107, 80, 117, { h: BAY86.floorZ + 3, r: 2, ...HULL });
+
+// 4. The Jawa junk yard, north of the market: in by the alley between H and
+// I, through a gate and two steps down to -1. A heap of scrap slants across
+// its west side (the cage fence goes along it with the detail), a crane
+// (a stand-in post) and the furnace (a stand-in block). A side gate east
+// into the back alleys. Over its low north wall, the town's edge: the
+// sandcrawler (a stand-in block) parked in the desert, seen from the
+// market over I's low roof.
+const JUNK = -1;
+const SCRAP = { wall: 'metal-rust', roof: 'metal-rust', skirt: null };
+p.rect(54, 1, 101, 16, town.street(0, { floor: 'desert-sand' }));
+town.block(62, 4, 98, 14, { ...SCRAP, h: 20 });
+town.block(54, 16, 88, 46, { h: 5, wall: 'adobe-brick', skirt: null });
+town.block(56, 16, 84, 18, { h: 2, wall: 'adobe-brick', skirt: null });
+p.rect(56, 18, 84, 41, town.street(JUNK));
+p.rect(71, 44, 73, 49, town.street());
+town.arch(71, 41, 73, 44, { h: 5, wall: 'adobe-brick' });
+town.stair(71, 39, 73, 41, { up: 'S', from: JUNK, top: 0, floor: 'flagstone', side: 'adobe-brick' });
+town.arch(84, 37, 86, 40, { h: 5, wall: 'adobe-brick' });
+town.stair(82, 37, 84, 40, { up: 'E', from: JUNK, top: 0, floor: 'flagstone', side: 'adobe-brick' });
+town.slanted([[56, 18], [74, 18], [62, 32], [56, 32]], { ...SCRAP, h: JUNK + 2.5 });
+town.block(77, 21, 78, 22, { ...SCRAP, h: 14 });
+town.block(78, 29, 82, 33, { ...SCRAP, h: JUNK + 2 });
+
+// 7. The back alleys: from the market between I and J into a yard behind J
+// (the junk yard's side gate off it), a lane slanting north-east to a
+// second yard a step up (the spacers' hostel off it), another slanting
+// south-east and up again to a square under the prefecture's wall (the
+// thug's back room off it), and six steps down into the mouth by the
+// checkpoint. Narrow and bending: the quiet way round the blast doors.
+// (A slanting lane: between its edges, k0 and k1 at x0 with `slope`, and a
+// tile beyond them, for the houses to cut their walls into.)
+const lane = (x0, y0, x1, y1, slope, k0, k1, floorZ) => p.rect(x0, y0, x1, y1, (x, y, c) => {
+  const k = y + 0.5 - slope * (x + 0.5 - x0);
+  return k > k0 - 1 && k < k1 + 1 ? town.street(floorZ) : c;
+});
+p.rect(86, 36, 98, 49, town.street());
+lane(98, 29, 112, 45, -0.5, 38, 43, 0);
+town.slanted([[98, 26], [112, 26], [112, 31], [98, 38]], { h: 6, wall: 'adobe-grey' });
+town.slanted([[98, 43], [112, 36], [112, 47], [98, 47]], { h: 5, wall: 'adobe-ochre' });
+p.rect(112, 22, 126, 36, town.street(0.5, { side: 'adobe-brick' }));
+town.house(112, 12, 126, 22, { h: 8, r: 1, wall: 'adobe-rose' });
+town.room(113, 13, 125, 21, { h: 8, floorZ: 0.5, ceilZ: 5, wall: 'adobe-rose', light: 120 });
+town.arch(118, 21, 120, 22, { h: 8, lintel: 3.5, floorZ: 0.5, wall: 'adobe-rose' });
+lane(126, 23, 136, 39, 0.5, 26, 31, 0.5);
+town.slanted([[126, 18], [136, 18], [136, 31], [126, 26]], { h: 7 });
+town.slanted([[126, 31], [136, 36], [136, 44], [126, 44]], { h: 6, wall: 'adobe-pale' });
+p.rect(136, 30, 146, 42, town.street(OQ));
+town.stair(136, 30, 138, 42, { up: 'E', from: 0.5, top: OQ, floor: 'flagstone', side: 'adobe-brick' });
+town.house(136, 20, 146, 30, { h: 8, r: 1, wall: 'adobe-grey' });
+town.room(137, 21, 145, 29, { h: 8, floorZ: OQ, ceilZ: 5.5, wall: 'adobe-grey', light: 112 });
+town.arch(140, 29, 143, 30, { h: 8, lintel: 3, floorZ: OQ, wall: 'adobe-grey' });
+town.stair(136, 42, 139, 48, { up: 'N', top: OQ, rise: 0.25, floor: 'flagstone', side: 'adobe-brick' });
+
 // Domes on the blocks of town the streets left whole, two in three.
 for (const { box: [x0, y0, x1, y1], h, wall } of blocks) {
   if (hash(x0 + 3, y0 + 7) > 0.67) continue;
@@ -495,8 +620,8 @@ town.drifts();
 // Rain streaks, dust and stains on the walls (lib/town.js).
 town.grime();
 // Crates, drums, canisters, cargo pods, junk and litter along the walls
-// (lib/town.js), but none yet in the blocked-out east third.
-town.clutter({ keep: [[126, 92, 130, 122], [130, 86, 150, 122], [136, 44, W, H]] });
+// (lib/town.js), but none yet in the blocked-out middle and east third.
+town.clutter({ keep: [[126, 92, 130, 122], [130, 86, 150, 122], [136, 44, W, H], [54, 1, 146, 49], [57, 94, 87, 131], [87, 82, 126, 122]] });
 list.push(...town.things);
 
 // Hand-placed along the main street and on the square (the kit's
@@ -581,6 +706,8 @@ list.push(
   at('sandtrooper', 153.5, 68, { calm: { patrol: QUARTER_PATROL, idleTime: [3, 3] } }),
   at('sandtrooper', 155, 66.6, { calm: { patrol: QUARTER_PATROL.map(([x, y]) => [x + 1.5, y - 1.4]), idleTime: [3, 3] } }),
   at('sandtrooper', 171, 57.5, { angle: 270, calm: { wander: 0, lines: ['The prefecture is closed.'] } }),
+  // Two customs troopers in Bay 86, either side of the freighter.
+  at('sandtrooper', 82.5, 113, { angle: 180, calm: { wander: 0 } }), at('sandtrooper', 61.5, 116, { angle: 0, calm: { wander: 0 } }),
   at('sandtrooper', 15.2, 102.4, { angle: 90, tag: 'bay-customs', calm: { wander: 0, lines: ['Your papers check out, hunter.', 'Move along.'] } }),
   at('sandtrooper', 18.2, 102.2, { angle: 90, tag: 'bay-customs', calm: { wander: 0, lines: ['Your papers check out, hunter.', 'Move along.'] } }),
   at('villager-wanderer', 143, 55.5, { angle: 180, wander: 0 }),

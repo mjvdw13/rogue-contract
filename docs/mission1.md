@@ -23,34 +23,34 @@ don't, and a dozen places that each look and sound different.
 
 Fitted to what's built on 2026-10-29 (the paper pass before the blockout,
 Mark's OK the same day: the junk yard north of the market, the old quarter
-on a rise). The east third is blocked out; the middle (the junk yard, the
-alleys, the cantina) is still on paper.
+on a rise). The whole town is blocked out: the east third and the middle
+(the cantina, the junk yard, the alleys, Bay 86).
 
 ```
   x 0          30        60        90       120       150       180
 y    +----------------------------------------------------------------------+
-   0 |                    SSSSSSSSSSSSS                                     |
-   6 |                    SSSSSSSSSSSSS                88888888888888888888 |
-  12 |                    SSSSSSSSS7777777777777777777788888888888888888888 |
-  18 |                  444444444447777777777777777777788888888888888888888 |
-  24 |                  444444444447777777777777777777788888888888888888888 |
-  30 |       ttttttttttt444444444447777777777777777777788888888888888888888 |
-  36 |       ttttttttttt444444444447777777777777777777788888888888888888888 |
-  42 | 22222222222222222444444444447777777777777777777788888888888T88888888 |
-  48 | 222222222222222222222222222222222222777777777   88888888888888888888 |
-  54 | 222222222222222222222222222222222222222222227   9999999999999999ww   |
+   0 |                                                                      |
+   6 |                     SSSSSSSSSSSS                88888888888888888888 |
+  12 |                                     77777       88888888888888888888 |
+  18 |                   444444444         77777   777788888888888888888888 |
+  24 |                   444444444         777777  777788888888888888888888 |
+  30 |       ttttttttttt 444444444        777777 77777788888888888888888888 |
+  36 |       ttttttttttt 444444444 777777          777788888888888888888888 |
+  42 | 22222222222222222222        7777            7   88888888888T88888888 |
+  48 | 222222222222222222222222222277772222222222227   88888888888888888888 |
+  54 | 222222222222222222222222222277772222222222227   9999999999999999ww   |
   60 | 2222222222222222222222222222222222222222222255559999999999999999ww   |
   66 | 2222222222222222222222222*22222222B2222222225555G9999\9999999999ww   |
   72 | 22222222222222222222222222222222222222222L22    99999\\\99999999ww   |
   78 | 22222222222222222222222222222222222222222L22    9999999\\9999999ww   |
   84 | 222222222222222222222222222222222        L66666699999999\\\99999ww   |
-  90 | 22222222222222222222222222223333333333   L6666669999999999\\9999ww   |
-  96 | 222ccc222222222222xxxxxxxxxx3333333333   L666666999999999999\999ww   |
- 102 |    ccc  1111  ooo xxxxxxxxxx3333333333   L6666666               ww   |
- 108 |     11111111111   xxxxxxxxxx3333333333   L6666666          0000 ww   |
- 114 |    1111111111111  xxxxxxxxxx3333333333   L6666666       0000000000   |
- 120 |    11111111111111 xxxxxxxxxx                           000000000000  |
- 126 |    11111111111111 xxxxxxxxxx                           000000000000  |
+  90 | 22222222222222222222222222222222333      L6666669999999999\\9999ww   |
+  96 | 222ccc22222222222222         333333333333L666666999999999999\999ww   |
+ 102 |    ccc  1111  ooo  xxxxxxxx  333333333   L6666666               ww   |
+ 108 |     11111111111   xxxxxxxxxx 33333333    L6666666          0000 ww   |
+ 114 |    1111111111111   xxxxxxxx     333      L6666666       0000000000   |
+ 120 |    11111111111111   xxxxxx                             000000000000  |
+ 126 |    11111111111111                                      000000000000  |
  132 |     111111111111                                       000000000000  |
  138 |      111111111                                           00000000    |
  144 |                                                                      |
@@ -123,17 +123,17 @@ street is at 0. The numbers 1-10 are the story's; 11 on are new.
 | 2 | **The market** | 62..102, 58..82 | 0, sky | The street widens into a market: stalls with cloth awnings (shade you walk under), crates, baskets of fruit, a droid seller's pen, hanging cloth. The busiest place in town. |
 | 13 | **Water plaza** | round, at (78, 70), r 9 | 0, sky | In the market: a moisture condenser tower (a tall 3D model, a landmark), a water seller and the queue at his tap, a dewback trough. |
 | B | **Blast doors** | at x 104..106 | | Two Imperial blast doors across the street, open in the calm half: slid into slots in the walls either side, strips of dark steel easy to miss. The switch shuts them and splits the town in two. |
-| 3 | **Chalmun's cantina** | 87..126, 82..122 | -2 | The classic (Mark's still, 2026-10-18: the bar a pale ring under a big oval opening in a low, heavy ceiling, lit from above with its taps and pipes behind it; arched alcoves round the walls; grey, dim and hazy). Its front is S, on the market's south side west of the blast doors, and its back door opens onto the back lane (19) east of them: one of the two ways round them when they shut. A dark entrance with a droid detector (and a "no droids" sign) that turns as it goes in, so the street can't see the room, then steps down into a round main room (about 26 across, a true circle of angled walls). A round bar in the middle with the bartender, booths in alcoves round the edge under lower ceilings, each with a dim lamp. A bandstand with the band (its own music). Smoke hangs in the lamplight. Dark: 96-120, with pools at the bar and the booths. The broker's booth at the back. A back room, a storeroom and the kitchen. |
+| 3 | **Chalmun's cantina** (blocked out) | 87..126, 82..122 | -2 | The classic (Mark's still, 2026-10-18: the bar a pale ring under a big oval opening in a low, heavy ceiling, lit from above with its taps and pipes behind it; arched alcoves round the walls; grey, dim and hazy). Its front is S, on the market's south side west of the blast doors, and its back door opens onto the back lane (19) east of them: one of the two ways round them when they shut. A dark entrance with a droid detector (and a "no droids" sign) that turns as it goes in, so the street can't see the room, then steps down into a round main room (about 26 across, a true circle of angled walls). A round bar in the middle with the bartender, booths in alcoves round the edge under lower ceilings, each with a dim lamp. A bandstand with the band (its own music). Smoke hangs in the lamplight. Dark: 96-120, with pools at the bar and the booths. The broker's booth at the back. A back room, a storeroom and the kitchen. Blocked out: S's door (94, 82) opens on a dark entrance that turns east, and four steps of 0.5 go down into the round room (centre 103, 105, r 13) under a ceiling 4.5 up; the bar is a ring of counter 0.9 high (r 2.5 to 4.5) under an opening to the sky (r 6). A passage from the room's east side climbs eight steps of 0.25 to the back door (126, 100). Until the detail, the tiles the round wall crosses are open to the sky (angled walls can't take a ceiling): a slit you see only looking up at the wall. The opening's edge is stepped by the tiles. To come: the alcoves and booths, the bandstand, the back rooms, the dome. |
 | 14 | **Bay owner's office** (built) | 44..54, 101..106 | 0 | In the bay's building, east of its door: a red door off the lane and a window (open, at eye height) onto it. A cramped office with a terminal and crates, a desk, a tired owner ("Docking fees doubled. Imperials."), a power droid charging outside. |
 | 16 | **Customs house** (built) | 11..22, 99..107 | 0 | West of the bay door, jutting a tile into the lane: a grey Imperial prefab (corrugated `metal-grey`, its roof at 5, below the bay's) dropped among the adobe, a door and a window onto the lane, impounded cargo inside: the customs officer and his troopers come out of it. A counter, a terminal, a holo-notice of wanted faces (not Rusk's yet). |
-| 17 | **Docking Bay 86** | 58..86, 96..130 | -5, sky | Next door, shut, at the end of the yard past R (73..87, 82..94). Through its barred gate you look down on customs troopers inspecting a battered freighter, crates opened on the floor. Atmosphere only; you can't get in. |
-| 4 | **Jawa junk yard** | 54..86, 18..48 | -1, sky | North of the market, facing the cantina across it (moved from the far west, Mark's OK 2026-10-29). In from the market by the alley between H and I (71..73), through a gate and two steps down. Piles of droid parts and scrap behind a cage fence that runs on a slant across the yard, a crane, a scrap furnace glowing, Jawa traders and their droids for sale. The trader who sold Rusk the coupling. A side gate east into the back alleys. |
-| 15 | **The sandcrawler** | 60..100, 2..16 | out of reach | The Jawas' sandcrawler parked outside the town wall behind the junk yard: a huge 3D model (about 20 tall), seen from the market over I's low roof, so it points the way to the Jawas. |
+| 17 | **Docking Bay 86** (blocked out) | round, at (72, 113), r 14 | -5, sky | Next door, shut, at the end of the yard past R (73..87, 82..94): a passage 4 wide (73..77) through its building, and bars 4 high (`imp-bars`) across it at the edge of a landing over the pit. Through them you look down on customs troopers either side of a battered freighter (a stand-in hull for now, 64..80, 107..117), crates opened on the floor (to come). Atmosphere only; you can't get in. |
+| 4 | **Jawa junk yard** (blocked out) | 56..84, 18..41 | -1, sky | North of the market, facing the cantina across it (moved from the far west, Mark's OK 2026-10-29). In from the market by the alley between H and I (71..73), through a gate and two steps down. Its north wall is low (3 over the yard), with the desert and the sandcrawler over it. Blocked out: a heap of scrap slanting across its west side (the fence goes along it with the detail), a stand-in post for the crane and a block for the furnace. Piles of droid parts and scrap behind a cage fence that runs on a slant across the yard, a crane, a scrap furnace glowing, Jawa traders and their droids for sale. The trader who sold Rusk the coupling. A side gate east into the back alleys (84..86, 37..40, two steps up to the yard behind J). |
+| 15 | **The sandcrawler** | 62..98, 4..14 | out of reach | The Jawas' sandcrawler parked in the desert outside the town wall behind the junk yard: a huge 3D model (about 20 tall), seen from the market over I's low roof, so it points the way to the Jawas. A stand-in block 20 tall for now: from the market's south half its top shows over I. |
 | 11 | **Dewback stable** | 20..54, 28..44 | 0 | Later, a side area. An open-fronted stable off the north back lane, behind A to D: stalls, hay and water, a dewback or two, the patrol's spare mounts. Dim and dusty, shafts of light through the slatted roof. |
 | 12 | **Speeder garage** | J, 88..101, 47..58 | 0 | Later, a side area. J's garage door is on the market (built). Inside, a mechanic's garage: a landspeeder on blocks, a swoop on a hoist, tools, a pit droid. A back door into the alleys. |
-| 7 | **Back alleys** | 86..146, 14..52 | 0 to 1.5, sky | Narrow (3-6 wide), dark (120-136), with laundry lines and awnings overhead. From the market between I and J (86..88), north behind J, then east behind K, L and M along the prefecture's wall, rising a step at a time to 1.5, and down steps onto the street just west of the checkpoint (136..140). They bend at slants, never two straight walls for long, with small yards. The informant's den near the east mouth, the thug's back room deeper in (the debt), a spacers' hostel (a flophouse with bunks), the shut gun shop (a secret: its back room). The quiet way past the blast doors, and an ambush when loud. |
+| 7 | **Back alleys** (blocked out) | 86..146, 12..58 | 0 to 1.5, sky | Narrow (3-6 wide), dark (120-136), with laundry lines and awnings overhead. From the market between I and J (86..88) into a yard behind J (86..98, 36..47, the junk yard's side gate on its west), a lane slanting north-east between two slanted houses to a second yard a step up at 0.5 (112..126, 22..36, the spacers' hostel off its north side), a lane slanting south-east and up again to a square at 1.5 under the prefecture's wall (136..146, 30..42, the thug's back room off its north side), and six steps of 0.25 down into the mouth by the checkpoint (136..139). They bend at slants, never two straight walls for long, with small yards. The informant's den near the east mouth, the thug's back room deeper in (the debt), a spacers' hostel (a flophouse with bunks), the shut gun shop (a secret: its back room). The quiet way past the blast doors, and an ambush when loud. |
 | 19 | **The back lane** (blocked out) | 126..130, 73..118 | 0, sky | A narrow service lane behind the cantina, straight south off the street just west of the checkpoint, so the rubble at its end shows from its mouth. The cantina's back door about halfway (y 100). At its end rubble where a wall fell climbs in four jumps of 1 (0.75 to 3.75) onto the rooftops; crates come with the detail. |
-| 5 | **Checkpoint** (blocked out) | 136..148, 61..73 | 0 to 1.5, sky | The street climbs six steps of 0.25 (139..145) to the old quarter's rise, to a gate 6 wide in a steel wall across it (x 147, tag `checkpoint`: the pass or the switch opens it, for good), a guard booth beside it, barricades at a slant at the foot of the steps, floodlights. Two troopers and a commander on the steps: "Old quarter's sealed, hunter." From the steps both ways round are in sight: the alleys' mouth to the north, and behind you the back lane. North of the street the informant's den, open to the alleys' mouth (136..139, 48..61, a dead end until the alleys are built). When loud, the troopers hold the top of the steps. |
+| 5 | **Checkpoint** (blocked out) | 136..148, 61..73 | 0 to 1.5, sky | The street climbs six steps of 0.25 (139..145) to the old quarter's rise, to a gate 6 wide in a steel wall across it (x 147, tag `checkpoint`: the pass or the switch opens it, for good), a guard booth beside it, barricades at a slant at the foot of the steps, floodlights. Two troopers and a commander on the steps: "Old quarter's sealed, hunter." From the steps both ways round are in sight: the alleys' mouth to the north, and behind you the back lane. North of the street the informant's den, open to the alleys' mouth (136..139, 48..61), where the alleys come down six steps. When loud, the troopers hold the top of the steps. |
 | 6 | **Rooftops** (blocked out) | 126..149, 86..118 | 4.75-5.75, sky | Four flat roofs east of the back lane's end: from the rubble onto the first (4.75), a running jump north over a light well 3 wide to the second (4.75), one east over another to the third (5.25), which drops into a yard in the old quarter (149..157, 86..96); a stair up the yard's side (to 4) climbs back, so the roofs work both ways. The fourth (5.75, a jump up from the first) is for the cache (secret: a better weapon). The wells' floors open onto the lane, so a fall walks back; the roofs stand more than a jump under everything round them, so they lead nowhere else. To come: a moisture tank, vaporators, washing on lines, a plank across a wider gap. A sniper when loud. |
 | 8 | **Prefecture** (blocked out) | 146..206, 6..53 | 3 | A walled Imperial compound on the highest ground, square on purpose; its gate (6 wide, tag `prefecture-gate`) three steps up from the old quarter's north street, its west wall closing the alleys' east end. Out of reach but for the courtyard behind the gate (162..180, 36..52), where the reinforcements gather. To come: a garage with a speeder bike, barracks, and the comm tower (the landmark, a stand-in block at 178..182, 42..46 for now; about 30 tall, a red beacon on top). Shut in the calm half. A terminal by the gate shows Rusk's wanted file: "Jundland Range security". Its doors open at the switch and the reinforcements come out. |
 | 9 | **Old quarter** (blocked out) | 148..194, 53..104 | 1.5, sky | On a rise past the checkpoint (Mark's OK 2026-10-29). A square inside the gate (148..160, 60..76), a north street along the prefecture's wall (53..60), and the main street, about 8 wide, slanting south-east from the square to the derelict bay's gate (its edges y = 64 + 1.2 (x - 160) and 12 further south); six houses follow the slant, their doors (to come) on their short straight faces. The yard the roofs drop into opens onto the main street by an alley (157..174, 88..92). Half-empty, sand drifting through broken walls, a collapsed dome, a few squatters and a hermit, a small shrine with candles. Quieter: wind instead of the market's noise. |
@@ -536,7 +536,8 @@ snapshots. The steps are in PLAN.md section 1.
    real ways between them and stand-ins for the landmarks, the east third
    first (the checkpoint, the rooftops and the back lane, the old quarter
    and the wash, the derelict bay, the prefecture: done 2026-10-29), then
-   the middle (the cantina's shell, the alleys, the junk yard, Bay 86).
+   the middle (the cantina's shell, the alleys, the junk yard, Bay 86:
+   done 2026-10-29).
    Both halves played end to end, with message triggers standing in for
    the story.
 5. **Each area in detail**, in the order the blockout suggests: the
