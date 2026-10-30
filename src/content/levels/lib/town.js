@@ -329,7 +329,7 @@ export class Town {
    * sky doesn't put a wall above the roofline). A door panel, if any, goes
    * a tile further in.
    */
-  arch(x0, y0, x1, y1, { h, lintel = 3, floorZ = 0, wall = this.wall, roof = this.roof, floor = this.floor, light = 152, round }) {
+  arch(x0, y0, x1, y1, { h, lintel = 3, floorZ = 0, wall = this.wall, roof = this.roof, floor = this.floor, light = 152, round, grimy = false }) {
     const slab = { bottom: floorZ + lintel, top: h, floor: roof, ceiling: wall, side: wall, light };
     this.p.rect(x0, y0, x1, y1, { floor, ceiling: 'sky', floorZ, ceilZ: this.sky, light: this.light, side: wall, slab });
     if (round) {
@@ -340,7 +340,8 @@ export class Town {
       if (!ROUND.widths.includes(width)) throw new Error(`Town: a rounded arch at (${x0}, ${y0}) is ${width} wide; there are models for ${ROUND.widths.join(' and ')}`);
       if (lintel - ROUND.rise < 1.8) throw new Error(`Town: a rounded arch at (${x0}, ${y0}) needs its lintel at least ${1.8 + ROUND.rise} up, to keep head room at its sides`);
       // Each on its tile's outer edge. Its faces are flat, lit as the walls
-      // round it (models/arch.js).
+      // round it (models/arch.js). `grimy`: sooty ones (a vault indoors),
+      // the two kinds taking turns along it.
       const type = `arch-round-${width}${plaster(wall)}`;
       const angle = { S: 0, E: 90, N: 180, W: 270 }[round];
       const z = floorZ + lintel - ROUND.rise;
@@ -349,7 +350,7 @@ export class Town {
       const front = out > 0 ? hi : lo;
       for (let k = 0; k < hi - lo; k++) {
         const edge = front - out * k;
-        this.things.push({ type, ...(ns ? { x: (x0 + x1) / 2, y: edge } : { x: edge, y: (y0 + y1) / 2 }), z, angle });
+        this.things.push({ type: grimy ? `${type}-grimy-${(k % 2) + 1}` : type, ...(ns ? { x: (x0 + x1) / 2, y: edge } : { x: edge, y: (y0 + y1) / 2 }), z, angle });
       }
     }
     return this;

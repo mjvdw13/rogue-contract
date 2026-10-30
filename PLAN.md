@@ -55,8 +55,9 @@ These need Mark to try something, or to decide. Don't start them without him.
   (Boba Fett has 200 health), which makes the cantina's way round the
   blast doors a hard fight; and whether a sitting pose for Jawas and
   customers is worth a sheet. Then filthy inside, floor and walls, and
-  three Jawas at the bar and a booth (2026-10-30): how dirty, and whether
-  the alcoves' vaults (clean: decals can't go on models) want grime too.
+  three Jawas at the bar and a booth (2026-10-30): how dirty. The alcoves'
+  vaults are sooty too (Mark): their own grimy arches, a smoky stain along
+  each crown and streaks hanging from the lintel at the mouth.
 
 - **Mos Eisley's east third, blocked out** (`?map=m1`, 2026-10-29; the
   areas in `docs/mission1.md`): plain volumes to try the route, no detail.
