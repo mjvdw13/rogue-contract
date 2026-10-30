@@ -51,8 +51,9 @@ These need Mark to try something, or to decide. Don't start them without him.
   cantina (relaid 2026-10-30 after Mark's references): in by S's door
   on the market, an entry that turns into the vestibule, two steps down
   into a wide room with its front corners cut at a slant, niches along
-  the sides, a stage on the east; the U-shaped bar under an opening lit
-  from above, open at the back into the back-bar, whose door leads
+  the sides, a stage on the east; the U-shaped bar (now a model) under
+  a well in the ceiling that glows, no sky (2026-10-30), open at the back
+  into the back-bar, whose door leads
   through a back room and up two steps to the back door on the back
   lane, past the blast doors (go round the bar's east end, where the
   counter stops short). The junk yard: up the
@@ -65,13 +66,11 @@ These need Mark to try something, or to decide. Don't start them without him.
   and two steps down to the mouth by the checkpoint. Bay 86: the yard
   past R ends at bars over the pit, customs troopers by a stand-in hull.
   Each way round the blast doors works on its own (checked with the
-  street shut there). To judge: the cantina's size and the bar under the
-  opening, the alleys' length and bends, whether the sandcrawler shows
-  enough from the market. Known: the cantina's angled walls (its cut
-  corners, the bar's round end) are open to the sky along a thin strip
-  (angled walls can't take a ceiling), and the opening's edge is
-  stepped; both go
-  with the cantina's detail.
+  street shut there). To judge: the cantina's size, the alleys' length
+  and bends, whether the sandcrawler shows enough from the market. Known:
+  the cantina's cut corners are open to the sky along a thin strip
+  (angled walls can't take a ceiling) until their panels, next in the
+  cantina's detail.
 
 - **Character sheets for Mos Eisley** (`docs/mission1.md`, Characters):
   cantina aliens (4-6 kinds), the band, the bartender, the broker, the
@@ -337,7 +336,24 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
         Waiting on Mark.
 - [ ] **Then each area in detail**, in the order the blockout suggests:
   - [ ] The cantina: entrance, steps down, the main room, the bar,
-        booths, bandstand, back rooms.
+        booths, bandstand, back rooms. In detail after Mark's references
+        (2026-10-30; no skylight, Mark), a step at a time:
+    - [x] The ceiling closed: no opening to the sky and no drum. Over the
+          bar a shallow oval well whose top glows, a canopy ring in the
+          ceiling's planks round its edge hiding the tiles' steps.
+    - [x] The bar, the taps and stools as models (`models/cantina.js`):
+          the pale U, round at the door's end, its east arm short; the
+          taps' column with pipes up into the well; the back-bar's shelves
+          of bottles. No angled walls under the ceiling, so no sky along
+          the bar.
+    - [ ] The cut front corners as flat wall panels (models lit as the
+          walls) over square tiles, so their slits of sky go.
+    - [ ] Booths: round-topped arches over the niches, benches and round
+          tables in them and along the cut corners, a lamp at each table.
+    - [ ] The way in: a hood round the street door, the vestibule's droid
+          detector. The bandstand's lamps; the kitchen and storeroom
+          stocked. Grey plaster, a darker floor, and the light pass: dim,
+          with pools under the lamps.
   - [ ] Bay 86, the dewback stable and the speeder garage.
   - [ ] The Jawa junk yard and the sandcrawler.
   - [ ] The back alleys and the back lane.
