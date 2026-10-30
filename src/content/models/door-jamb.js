@@ -48,13 +48,15 @@ function outline() {
   return pts;
 }
 
-// The lining's tiles: a quarter tile along the opening's edge, and
-// stretched to half a tile across its depth, so one row runs from the
-// wall's face back to the door on each side of it (Mark, 2026-10-30: two
-// did). They run on round the corners from the middle of the sill.
+// The lining's tiles: a quarter tile along the opening's edge, and half a
+// tile across its depth, so one row runs from the wall's face back to the
+// door on each side of it (Mark, 2026-10-30: two did). The picture's tiles
+// are drawn that shape (8 x 16 texels), so they're 32 texels a tile both
+// ways, as the walls are. They run on round the corners from the middle of
+// the sill.
 const ALONG = 0.25;
 const DEEP = 0.5;
-const SQUARES = 8; // the jamb picture's squares each way (derive.mjs)
+const TILES = [8, 4]; // the jamb picture's tiles along and across (derive.mjs)
 
 /** The lining: one strip per edge of the outline, facing in toward the opening's middle. */
 function jamb() {
@@ -68,8 +70,8 @@ function jamb() {
     if (Math.abs(a[1] - E) < 1e-9 && Math.abs(b[1] - E) < 1e-9 && a[0] < 0 && b[0] > 0) sill = s[i] - a[0];
     s.push(s[i] + Math.hypot(b[0] - a[0], b[1] - a[1]));
   }
-  const u = (k) => (s[k] - sill) / (ALONG * SQUARES);
-  const front = 1 / (DEEP * SQUARES); // the wall's face; the back's 0
+  const u = (k) => (s[k] - sill) / (ALONG * TILES[0]);
+  const front = 1 / (DEEP * TILES[1]); // the wall's face; the back's 0
   for (let i = 0; i < pts.length; i++) {
     const [a, b] = [pts[i], pts[(i + 1) % pts.length]];
     const mid = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
