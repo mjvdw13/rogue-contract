@@ -345,7 +345,7 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
           the bar.
     - [x] The cut front corners as flat wall panels (models lit as the
           walls) over square tiles, so their slits of sky go.
-    - [ ] Booths: round-topped arches over the niches, benches and round
+    - [x] Booths: round-topped arches over the niches, benches and round
           tables in them and along the cut corners, a lamp at each table.
     - [ ] The way in: a hood round the street door, the vestibule's droid
           detector. The bandstand's lamps; the kitchen and storeroom

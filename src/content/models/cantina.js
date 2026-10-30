@@ -14,11 +14,17 @@ import { ModelBuilder } from './lib/build.js';
 // and its pipes up into the well over the bar. The origin on the floor at
 // its middle (TAPS.y south of the bar's).
 //
-// `cantina-shelves`: the back-bar's shelves of bottles, against its back
-// wall. Built looking north (-y), its back on y 0, the origin on the floor
-// at its middle.
+// `cantina-shelves`: a unit of shelves of bottles, 2 wide, against the
+// back-bar's back wall (one each side of its door). Built looking north
+// (-y), its back on y 0, the origin on the floor at its middle.
 //
 // `cantina-stool`: a bar stool, a seat on a post on a round foot.
+//
+// `cantina-booth`: a booth, a half ring of bench in the walls' plaster with
+// a worn red seat, round a table with a lamp on it, its back to a wall.
+// Built looking south, its back on y 0, the origin on the floor at its
+// middle; the table's centre is BOOTH.table out from the wall. It collides
+// round its bench's ends and the table's front.
 //
 // `cantina-corner`: a front corner of the room, cut at 45 degrees: a flat
 // stretch of the walls' plaster, floor to ceiling, standing on the
@@ -39,6 +45,8 @@ import { ModelBuilder } from './lib/build.js';
 export const WALL = 'adobe-pale';
 /** A cut corner's panel: its length (6 tiles each way) and height (the room's). */
 export const CORNER = { len: 6 * Math.SQRT2, h: 4 };
+/** A booth: how far out from the wall its table stands, and its bench's outer radius round it. */
+export const BOOTH = { table: 1.5, r: 1.45 };
 /** The counter: radii of its round end, its arms' lengths south, its top. */
 export const BAR = { outer: 4.5, inner: 3.5, west: 6, east: 4, top: 0.97 };
 /**
@@ -119,6 +127,33 @@ function stool() {
   return m.build();
 }
 
+const SEAT = { tex: 'ware-red' };
+const GLOW = { color: [255, 210, 140], glow: true };
+
+function booth() {
+  const m = new ModelBuilder('cantina-booth');
+  const C = BOOTH.table;
+  const [ro, rb, ri] = [BOOTH.r, BOOTH.r - 0.15, 0.95]; // the back's outside and inside, the seat's front
+  const N = 8;
+  const P = (r, a) => [Math.cos(a) * r, C + Math.sin(a) * r];
+  for (let k = 0; k < N; k++) {
+    const [a0, a1] = [Math.PI + (k / N) * Math.PI, Math.PI + ((k + 1) / N) * Math.PI];
+    // The seat, and the back behind it up to shoulder height; their
+    // joints, outsides (to the walls) and undersides hidden, but the ends.
+    const end = (i) => (i === 3 && k === 0) || (i === 1 && k === N - 1);
+    m.prism([P(rb, a0), P(rb, a1), P(ri, a1), P(ri, a0)], 0, 0.45, { ...SEAT, bottom: false, side: (i) => (i === 2 || end(i) ? SEAT : false) });
+    m.prism([P(ro, a0), P(ro, a1), P(rb, a1), P(rb, a0)], 0, 1.1, { tex: WALL, bottom: false, side: (i) => (i === 2 || end(i) ? { tex: WALL } : false) });
+  }
+  // The table: a foot, a post and a round top, a lamp glowing on it.
+  m.cylinder([0, C, 0], 0.3, 0.05, { ...TRIM, segments: 8, bottom: false });
+  m.cylinder([0, C, 0.05], 0.08, 0.63, { ...TRIM, segments: 6, top: false, bottom: false });
+  m.cylinder([0, C, 0.68], 0.55, 0.06, { ...WOOD, segments: 10 });
+  m.cylinder([0.2, C - 0.15, 0.74], 0.07, 0.16, { ...GLOW, segments: 6, bottom: false });
+  m.cylinder([0.2, C - 0.15, 0.9], 0.1, 0.03, { ...TRIM, segments: 6 });
+  m.line(-ro, 0, -ro, C).line(-ro, C, -0.6, C + 0.6).line(-0.6, C + 0.6, 0.6, C + 0.6).line(0.6, C + 0.6, ro, C).line(ro, C, ro, 0);
+  return m.build();
+}
+
 function corner() {
   const m = new ModelBuilder('cantina-corner');
   const [a, h] = [CORNER.len / 2, CORNER.h];
@@ -132,7 +167,7 @@ const GLASS = [[60, 110, 70], [120, 70, 40], [70, 90, 130], [150, 140, 90], [110
 
 function shelves() {
   const m = new ModelBuilder('cantina-shelves');
-  const [w, d, h] = [3, 0.9, 2.2]; // half its width, its depth, its height
+  const [w, d, h] = [0.95, 0.9, 2.2]; // half its width, its depth, its height
   // The back and sides, and the shelf boards across.
   m.box([-w, 0, 0], [w, 0.1, h], { ...WOOD, bottom: false });
   for (const sx of [-1, 1]) m.box([sx * w - 0.1, -d, 0], [sx * w + 0.1, 0.1, h], { ...WOOD, bottom: false });
@@ -141,7 +176,7 @@ function shelves() {
   // Bottles along the three shelves, spaced unevenly.
   let n = 0;
   for (const z of boards.slice(0, 3)) {
-    for (let x = -w + 0.45; x < w - 0.3; x += 0.42 + ((n * 7) % 5) * 0.06) {
+    for (let x = -w + 0.35; x < w - 0.2; x += 0.38 + ((n * 7) % 5) * 0.06) {
       const tall = 0.32 + ((n * 3) % 4) * 0.06;
       const color = GLASS[n % GLASS.length];
       const y = -0.35 - ((n * 5) % 3) * 0.12;
@@ -176,4 +211,4 @@ function canopy() {
   return m.build();
 }
 
-export default [bar(), taps(), stool(), corner(), shelves(), canopy()];
+export default [bar(), taps(), stool(), booth(), corner(), shelves(), canopy()];
