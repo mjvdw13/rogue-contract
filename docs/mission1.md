@@ -351,8 +351,10 @@ Mandalorian, Outlaws, and the Special Edition's wide shots):
   straight walls where the street is open 4 tiles out in front (so alleys
   stay clear), off doors, arches and low fixtures, the first group of a
   few tries that fits what's left of the wall; litter lies about the open
-  street too. `amount` scales it; placed from a seed; `keep` boxes stay
-  clear for things put there by hand, and the rest comes out the same. Hand-place the
+  street too. `amount` scales it; placed from a seed, each wall and tile
+  from its own (mixed from where it is), so building elsewhere leaves the
+  rest as it was; `keep` boxes stay clear for things put there by hand,
+  and the rest comes out the same. Hand-place the
   groups a place wants (the stall's counter, the vaporator on the
   square): the main street's walls are short between their doors and
   arches, so the kit finds little room there. About 160 in the first
@@ -375,7 +377,9 @@ Mandalorian, Outlaws, and the Special Edition's wide shots):
   street, stains and cracks; a window gets a drip under its sill and a
   door smudges by its controls. `town.grime({ amount })` scales it (0
   none, 1 the usual, 2 neglected) and a house's own `grime` replaces it on
-  its walls. Placed at random from a seed, the same every time. Slanting
+  its walls. Placed at random from a seed, the same every time, each wall
+  and opening from its own (mixed from where it is), so building elsewhere
+  leaves the rest as it was. Slanting
   fronts get it too; rounded corners and round walls get none.
 - **Doors and windows** (`door()`, `window()`): a door is a recess a tile
   into a straight wall, 2 wide and 3 high (an arch), and follows the

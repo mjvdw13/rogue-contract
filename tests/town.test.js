@@ -402,6 +402,24 @@ test('clutter stands along the walls of the open street, off the doors, and leav
   assert.deepEqual(make().town.things, town.things, 'the same every time');
 });
 
+test("a wall's grime and clutter stay as they were when a building goes up elsewhere", () => {
+  const make = (more) => {
+    const { p, town } = kit();
+    town.house(4, 4, 36, 12, { h: 6 });
+    town.window(10.5, 12, 'S').door(20, 12, 'S', { h: 6 });
+    if (more) town.house(4, 28, 36, 36, { h: 6 }).window(20.5, 28, 'N');
+    town.finish();
+    town.grime({ amount: 2 });
+    town.clutter({ amount: 2 });
+    const near = (t) => t.y < 20;
+    return { decals: town.decals.filter(near), things: town.things.filter(near) };
+  };
+  const [alone, beside] = [make(false), make(true)];
+  assert.ok(alone.decals.length > 4 && alone.things.length > 2, 'something to compare');
+  assert.deepEqual(beside.decals, alone.decals, 'the same grime');
+  assert.deepEqual(beside.things, alone.things, 'the same clutter');
+});
+
 test("a hood stands out round a door in the wall's plaster, lit as the wall is, and must fit under the roof", () => {
   const { town } = kit();
   town.house(4, 4, 16, 14, { h: 6, wall: 'adobe-pale' });

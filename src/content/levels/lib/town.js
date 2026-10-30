@@ -25,6 +25,15 @@ import { PIPE_HEIGHTS } from '../../models/pipes.js';
 import { CLUTTER } from '../../models/clutter.js';
 import { valueNoise, random } from './noise.js';
 
+/**
+ * A seed for one place in the town (a run of wall, an opening, a tile): the
+ * level's `seed` mixed with numbers that say where it is. Grime and clutter
+ * draw each place's from its own, so a building put up elsewhere leaves the
+ * rest of the town as it was.
+ */
+const placeSeed = (seed, ...where) => where.reduce((h, v) => Math.imul(h ^ Math.round(v * 1000), 2654435761) >>> 0, Math.imul(seed, 0x9e3779b1) >>> 0) || 1;
+const FACES = 'NESW';
+
 /** The models' suffix for a plaster (`-pale`), plain for any other wall. */
 const plaster = (wall) => Object.keys(PLASTERS).find((k) => PLASTERS[k] === wall) ?? '';
 
@@ -882,13 +891,14 @@ export class Town {
    * a drip under each window and smudges by each door's controls. `amount`
    * scales it (0 none, 1 the usual, 2 neglected); a house's own `grime`
    * replaces it on its walls. Placed at random from `seed`, the same every
-   * time. Run it after `finish()`. Slanting walls (`slanted()`) get
-   * streaks, dust, stains and cracks too; rounded corners and round walls
-   * get none.
+   * time, each wall and opening from its own seed (so building elsewhere
+   * leaves it alone). Run it after `finish()`. Slanting walls (`slanted()`)
+   * get streaks, dust, stains and cracks too; rounded corners and round
+   * walls get none.
    */
   grime({ amount = 1, seed = 11 } = {}) {
     const { p } = this;
-    const r = random(seed);
+    let r = random(seed);
     const out = [];
     const ns = (face) => face === 'N' || face === 'S';
     // The tile a face belongs to (behind it), and the one in front, at tile `a` along its edge `line`.
@@ -964,6 +974,7 @@ export class Town {
 
     for (const { face, line, a0, a1, bot, top, g, street, skirt } of runs) {
       if (g <= 0) continue;
+      r = random(face === 'angled' ? placeSeed(seed, 4, ...line.a, ...line.b) : placeSeed(seed, FACES.indexOf(face), line, a0));
       const len = a1 - a0;
       const tall = top - bot;
       const [lo, hi] = [a0 + 0.15, a1 - 0.15];
@@ -990,6 +1001,7 @@ export class Town {
     for (const o of this.openings) {
       const g = levelAt(behind(o.face, o.line, Math.floor((o.a0 + o.a1) / 2)));
       if (g <= 0) continue;
+      r = random(placeSeed(seed, 5, FACES.indexOf(o.face), o.line, o.a0));
       const mid = (o.a0 + o.a1) / 2;
       if (o.kind === 'window' && r() < 0.6 + 0.2 * g) {
         put('drip', o.face, o.line, mid + r.range(-0.15, 0.15), o.a0 - 0.5, o.a1 + 0.5, { scale: r.range(0.75, 1.1), top: o.floorZ });
@@ -1011,7 +1023,8 @@ export class Town {
    * cargo pod, junk with litter and a droid's dome, rubble, scrap and power
    * units. Litter lies about the open
    * street too. `amount` scales how much (1 the usual, 2 a mess); placed at
-   * random from `seed`, the same every time. `keep` boxes ([x0, y0, x1, y1])
+   * random from `seed`, the same every time, each wall and tile from its own
+   * seed (so building elsewhere leaves it alone). `keep` boxes ([x0, y0, x1, y1])
    * are left clear for things placed by hand (a group with anything in one
    * is left out, and the rest come out as they would without it), and so
    * are the stalls' (`stall()`). Run it
@@ -1020,7 +1033,7 @@ export class Town {
   clutter({ amount = 1, seed = 13, clear = 4, keep: kept = [] } = {}) {
     const { p } = this;
     const keep = [...kept, ...this.stalls];
-    const r = random(seed);
+    let r = random(seed);
     const ns = (face) => face === 'N' || face === 'S';
     const street = (c) => c && !c.wall && !c.door && c.ceiling === 'sky' && (!c.slab || c.slab.top - c.slab.bottom <= 0.25) && (c.floor === this.floor || c.floor.startsWith('street-drift'));
     // (A raised floor: not an arch or an awning, whose slabs stand over open ground; a window's sill is.)
@@ -1075,6 +1088,7 @@ export class Town {
       this.openings.some((o) => o.face === face && o.line === line && o.kind !== 'window' && o.a1 + 0.6 > lo && o.a0 - 0.6 < hi);
     const round = (v) => Math.round(v * 100) / 100;
     for (const { face, line, a0, a1 } of runs) {
+      r = random(placeSeed(seed, FACES.indexOf(face), line, a0));
       const out = face === 'S' || face === 'E' ? 1 : -1;
       const angle = { S: 0, E: 90, N: 180, W: 270 }[face];
       // Along the run: now and then a group (the first of a few tries that
@@ -1117,6 +1131,7 @@ export class Town {
     // Litter about the open street, away from the walls.
     for (let y = 0; y < p.h; y++) {
       for (let x = 0; x < p.w; x++) {
+        r = random(placeSeed(seed, 6, x, y));
         if (r() > 0.006 * amount) continue;
         let open = true;
         for (let dy = -2; dy <= 2 && open; dy++) for (let dx = -2; dx <= 2 && open; dx++) open = street(p.get(x + dx, y + dy)) && (p.get(x + dx, y + dy).floorZ ?? 0) === 0;
