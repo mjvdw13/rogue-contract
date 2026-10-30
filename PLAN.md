@@ -37,9 +37,8 @@ These need Mark to try something, or to decide. Don't start them without him.
   roofs, two running jumps and a drop into a yard in the old quarter.
   Then the slanting main street (or the dry wash, down steps at the north
   street's end) to the derelict bay; stepping into the stand-in hull's
-  hold (Rusk) turns the town: the gate and the prefecture's open,
-  troopers come over the bay's rim, out of the prefecture and onto a
-  roof. The stand-in ending: clear customs' two troopers in their office
+  hold (Rusk) turns the town: the gate opens, troopers come over the
+  bay's rim, in at the old quarter's north street and onto a roof. The stand-in ending: clear customs' two troopers in their office
   by Bay 87. To judge: the distances and the climb, the slant, whether
   the roofs read as a way over from the checkpoint, the derelict bay's
   depth. The comm tower stand-in (22 tall) is hidden from the market by
@@ -58,7 +57,7 @@ These need Mark to try something, or to decide. Don't start them without him.
   (a block) over the low north wall. The alleys: up the alley between I
   and J (or through the junk yard's side gate) to a yard behind J, a
   slanting lane up to a second yard (the hostel's room off it), another
-  up to a square under the prefecture's wall (the thug's room off it),
+  up to a square at their east end (the thug's room off it),
   and two steps down to the mouth by the checkpoint. Bay 86: the yard
   past R ends at bars over the pit, customs troopers by a stand-in hull.
   Each way round the blast doors works on its own (checked with the
@@ -181,7 +180,7 @@ These need Mark to try something, or to decide. Don't start them without him.
   one the north back lane. Bump into one or press use to hear a line.
   Firing a blaster or hitting anyone turns the whole town at once (and
   since the east third's blockout, the `on: 'hostile'` trigger opens the
-  checkpoint and the prefecture and brings stand-in troopers). After
+  checkpoint and brings stand-in troopers). After
   Mark's notes (2026-10-18): they stroll slower (troopers 1.2 tiles a
   second, Jawas 1.5), their legs keep pace (the new calm `stride`: 1.4
   tiles a walk cycle for a trooper, 0.9 for a Jawa), and they stand in
@@ -325,23 +324,31 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
         junk yard goes, the two ways round the blast doors, the way past
         the checkpoint, the landmarks.
   - [x] The east third: the checkpoint, the rooftops, the old quarter
-        and the dry wash, the derelict bay, the prefecture's wall and
-        tower.
+        and the dry wash, the derelict bay, the comm tower.
   - [x] The middle: the cantina's shell (its back door on the back lane,
         built with the rooftops), the alleys (on to the mouth by the
         checkpoint), the junk yard, Bay 86 to look into.
   - [ ] Mark's notes on the blockout (2026-10-30):
     - [x] Flatter: Mos Eisley is flat, so areas sit a couple of steps
           (0.5) up or down from their neighbours, no more. The cantina
-          -0.5, the junk yard -0.5, the old quarter 0.5, the prefecture
-          1, the wash 0; the alleys rise a step at a time to 0.5. The
+          -0.5, the junk yard -0.5, the old quarter 0.5, the wash 0; the alleys rise a step at a time to 0.5. The
           docking bays stay pits, as in the film.
     - [x] The checkpoint: set up by the Imperials in the town, not built
           by them: no steel walls or booth. The street goes through an
           adobe gatehouse into the old quarter, its heavy door shut;
           barricades, floodlights and a guard post under a tarp.
-    - [ ] The cantina's layout from Mark's references (the map: waiting
-          for an image I can read).
+    - [x] The prefecture goes (Mark, 2026-10-30: no Imperial
+          architecture in town; the blast doors stay). Its ground is the
+          town's again; the reinforcements come in at the old quarter's
+          north street; the comm tower stays as the town's landmark.
+    - [ ] The cantina from Mark's references (2026-10-30: a fan floor
+          plan, film stills, the diorama): the slanting door into a
+          vestibule, a couple of steps down, a wide room with its front
+          corners cut at 45 degrees, booth niches along the sides, a
+          stage alcove, corner alcoves at the back; a U-shaped bar, its
+          round end to the door, the taps on an island inside it, open at
+          the back into the back-bar; the back door behind the bar, a back
+          room, and a hall to the back lane.
   - [ ] Play both halves (rough troopers for the loud half), then
         Waiting on Mark.
 - [ ] **Then each area in detail**, in the order the blockout suggests:
@@ -351,7 +358,7 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
   - [ ] The Jawa junk yard and the sandcrawler.
   - [ ] The back alleys and the back lane.
   - [ ] The checkpoint and the rooftops.
-  - [ ] The prefecture and its comm tower.
+  - [ ] The comm tower.
   - [ ] The old quarter and the dry wash.
   - [ ] The derelict bay and the gutted freighter.
   - [ ] The skyline: dunes and mesas in the backdrop, the town's edges.

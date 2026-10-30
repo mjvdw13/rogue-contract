@@ -358,30 +358,20 @@ town.vent(16, 53.5, 'W', { z: 4, tex: 'vent-round' }).vent(28, 55, 'E', { z: 3.4
 // conversations and the fob exist. Mos Eisley is flat (Mark), so each
 // part of town is a couple of steps (0.5) up or down from the next: the
 // street climbs two steps to the checkpoint's gate and the old quarter,
-// the prefecture is two more up, and the dry wash two down from the old
-// quarter. Only the derelict bay, a docking bay, is a pit.
+// and the dry wash is two down from the old quarter. Only the derelict
+// bay, a docking bay, is a pit.
 const OQ = 0.5;
-const PREF = 1;
 const WASH = 0;
 // A gate's door tiles: shut until a trigger opens them by `tag`, then open for good.
 const gateTag = (x0, y0, x1, y1, tag) => p.rect(x0, y0, x1, y1, (_, __, c) => ({ ...c, tag, stayOpen: true }));
 // A tile tagged for a trigger (where a spawn appears).
 const tagTile = (x, y, tag) => p.rect(x, y, x + 1, y + 1, (_, __, c) => ({ ...c, tag }));
 
-// 8. The prefecture: a walled Imperial compound on the highest ground,
-// square on purpose (the Empire's grid on the old town). Out of reach but
-// for the courtyard behind its gate, where the reinforcements gather. The
-// comm tower (a stand-in block, 11 m) stands where the street's bend
-// points, so it shows over M from the market.
-town.block(146, 6, 206, 53, { ...GATE, h: 9 });
-town.block(150, 10, 164, 32, { ...GATE, h: 11 }).block(186, 12, 204, 30, { ...GATE, h: 12 });
-p.rect(162, 36, 180, 52, town.street(PREF, { floor: 'imp-floor', side: GATE.wall }));
-town.block(178, 42, 182, 46, { ...GATE, h: 22 });
-town.stair(167, 53, 175, 56, { up: 'N', from: OQ, top: PREF, rise: 0.25, floor: 'flagstone', side: 'adobe-brick' });
-town.door(171, 53, 'S', { h: 9, tex: 'door-bay', width: 6, tall: 4, jamb: false, sign: false, panel: false, floorZ: PREF, wall: GATE.wall });
-gateTag(168, 52, 174, 53, 'prefecture-gate');
-tagTile(168, 46, 'prefecture-yard');
-tagTile(174, 46, 'prefecture-yard');
+// The comm tower, the town's landmark (a stand-in block, 11 m), stands
+// where the street's bend points, among the houses north of the old
+// quarter. (The Imperial prefecture that stood here is gone: Mos Eisley
+// has no Imperial buildings, Mark 2026-10-30.)
+town.block(178, 42, 182, 46, { h: 22, wall: 'adobe-grey', skirt: null });
 
 // 5. The checkpoint: the street climbs two steps to the old quarter's rise
 // and its gatehouse, the town's own adobe arch across the street, its
@@ -427,7 +417,7 @@ town.house(143, 86, 149, 102, { h: 5.25, wall: 'adobe-rose' });
 town.block(126, 118, 150, 122, { h: 8 }).block(149, 96, 162, 118, { h: 8 });
 
 // 9. The old quarter, on its rise: a square inside the gate, a north
-// street along the prefecture's wall, and the main street slanting
+// street along its north side, and the main street slanting
 // south-east from the square to the derelict bay's gate, its houses
 // following the slant. The yard the roofs drop into opens onto the main
 // street by an alley.
@@ -451,11 +441,15 @@ town.slanted([[186, 60], [194, 60], [194, 104], [193, 104], [186, 95]], { h: OQ 
 town.slanted([[157, 76], [160, 76], [170, 88], [157, 88]], { h: OQ + 5.5, wall: 'adobe-ochre' });
 town.slanted([[157, 92], [173, 92], [175, 94], [183, 104], [157, 104]], { h: OQ + 6, wall: 'adobe-pale', dome: true });
 
-// 18. The dry wash, two steps below the old quarter: from the prefecture's wall
-// south into the derelict bay. Steps go down into it at the north
+// 18. The dry wash, two steps below the old quarter: from the houses
+// north of it south into the derelict bay. Steps go down into it at the north
 // street's east end; it's the low way to the bay.
 p.rect(194, 53, 202, 116, town.street(WASH, { floor: 'desert-sand' }));
 town.stair(188, 53, 194, 60, { up: 'W', from: WASH, top: OQ, rise: 0.25, floor: 'flagstone', side: 'adobe-brick' });
+// Where the loud half's reinforcements come in: the north street's east
+// end and the wash's north end.
+tagTile(186, 55, 'quarter-north');
+tagTile(198, 55, 'quarter-north');
 
 // 10. The derelict bay: an old docking bay half full of sand, a pit like
 // Bay 87. Its gate is at the main street's end: a
@@ -585,7 +579,7 @@ town.block(78, 29, 82, 33, { ...SCRAP, h: JUNK + 2 });
 // 7. The back alleys: from the market between I and J into a yard behind J
 // (the junk yard's side gate off it), a lane slanting north-east to a
 // second yard a step up (the spacers' hostel off it), another slanting
-// south-east and up again to a square under the prefecture's wall (the
+// south-east and up again to a square at the alleys' east end (the
 // thug's back room off it), and two steps down into the mouth by the
 // checkpoint. Narrow and bending: the quiet way round the blast doors.
 // (A slanting lane: between its edges, k0 and k1 at x0 with `slope`, and a
@@ -698,7 +692,7 @@ list.push(
 
 // The east third's calm troopers, and the stand-ins for its people. The
 // checkpoint's guards on its steps; a patrol walking the old quarter's main
-// street; a guard at the prefecture's gate. The informant (a villager until
+// street; a guard on its north street. The informant (a villager until
 // his sheet exists) in his den, a squatter in the gate square, and Rusk (a
 // villager too) in the freighter's hold. Customs' two troopers stand in
 // their office: clearing them at the end is the stand-in pickup.
@@ -710,7 +704,7 @@ list.push(
   at('sandtrooper-commander', 141.5, 66, { angle: 180, calm: { wander: 0, lines: CHECKPOINT_LINES } }),
   at('sandtrooper', 153.5, 68, { calm: { patrol: QUARTER_PATROL, idleTime: [3, 3] } }),
   at('sandtrooper', 155, 66.6, { calm: { patrol: QUARTER_PATROL.map(([x, y]) => [x + 1.5, y - 1.4]), idleTime: [3, 3] } }),
-  at('sandtrooper', 171, 57.5, { angle: 270, calm: { wander: 0, lines: ['The prefecture is closed.'] } }),
+  at('sandtrooper', 171, 57.5, { angle: 270, calm: { wander: 0, lines: ['Move along.'] } }),
   // Two customs troopers in Bay 86, either side of the freighter.
   at('sandtrooper', 82.5, 113, { angle: 180, calm: { wander: 0 } }), at('sandtrooper', 61.5, 116, { angle: 0, calm: { wander: 0 } }),
   at('sandtrooper', 15.2, 102.4, { angle: 90, tag: 'bay-customs', calm: { wander: 0, lines: ['Your papers check out, hunter.', 'Move along.'] } }),
@@ -812,10 +806,9 @@ export default defineLevel({
       on: 'hostile',
       do: [
         { action: 'openDoors', tag: 'checkpoint' },
-        { action: 'openDoors', tag: 'prefecture-gate' },
         { action: 'spawn', thing: 'sandtrooper', tag: 'derelict-rim' },
         { action: 'spawn', thing: 'sandtrooper', tag: 'derelict-gate' },
-        { action: 'spawn', thing: 'sandtrooper', tag: 'prefecture-yard' },
+        { action: 'spawn', thing: 'sandtrooper', tag: 'quarter-north' },
         { action: 'spawn', thing: 'sandtrooper', tag: 'roof-sniper' },
       ],
     },

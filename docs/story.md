@@ -165,7 +165,7 @@ engine has today.
   him becomes a fight.
 
 When it flips, every calm trooper becomes a normal monster, blast doors
-close across the main street, reinforcements come out of the prefecture,
+close across the main street, reinforcements come in from the edge of town,
 and civilians run for cover. The music switches to the combat track.
 
 **The tracking fob.** Taken from the tracking fob in *The Mandalorian*: a
@@ -207,7 +207,7 @@ sketch (a bigger map, more areas), is `docs/mission1.md`.
 
 ```
  west                                        ║                         east
-  [4 Jawa junk yard]  [7 alleys]             ║  [8 prefecture]
+  [4 Jawa junk yard]  [7 alleys]             ║  [8 comm tower]
           |                 |                ║        |
   ======= 2 main street (market) =======  [5 checkpoint] == 9 old quarter == [10 derelict bay: Rusk]
           |                 |                ║
@@ -226,13 +226,13 @@ the back alleys → the bay, where the Crow lands.
 | # | Area | Calm | Loud |
 |---|------|------|------|
 | 1 | Docking Bay 87 | The start: a round bay sunk 3 below the street and open to the sky, the drop-off's stage. Stairs go up to a 4 × 4 bay door. A power droid and the bay owner ("Docking fees doubled. Imperials."). Customs checks Kyle's licence. | The pickup. Customs troopers hold the bay. Clear them, and the Crow comes down. |
-| 2 | Main street | Wide (10-14 tiles), sand, adobe walls. Market stalls with awnings (3D models) and crates. A sandtrooper patrol with a dewback, Jawas arguing over a droid, a probe droid hovering over the market. The prefecture's comm tower above the roofs is the landmark. | Blast doors close across it, splitting it in two. Troopers behind the stalls, the probe droid on the hunt. |
+| 2 | Main street | Wide (10-14 tiles), sand, adobe walls. Market stalls with awnings (3D models) and crates. A sandtrooper patrol with a dewback, Jawas arguing over a droid, a probe droid hovering over the market. The comm tower above the roofs is the landmark. | Blast doors close across it, splitting it in two. Troopers behind the stalls, the probe droid on the hunt. |
 | 3 | The cantina | A dark entrance, then steps down into a round main room (an octagon about 24 across). A round bar stands in the middle (a 3D model or an angled-wall island). Booths sit round the edge under lower ceilings. The band has its own music, which starts when you walk in (the existing `music` action). There's a bartender, other customers, and two troopers whose patrol passes through. The broker's booth is at the back: the contract and the fob. | The way round the blast doors: in by the front, out through a back room to the alleys. The customers have gone, and troopers come down the steps. |
 | 4 | Jawa junk yard | A yard of droid parts behind a cage fence, with Jawa traders. A trader remembers selling Rusk a power coupling, and for a price gives Kyle its transponder code. The fob lights up. | The Jawas have bolted. A side gate leads round to the alleys. |
 | 5 | Checkpoint | Barricades across the street (low railings and 3D barrier models) and a closed gate. "Old quarter's sealed, hunter." | The gate is open, and the checkpoint's troopers fight from behind the barricades. |
 | 6 | Rooftops | Crates and a collapsed wall let you climb onto flat roofs. You cross them with running jumps (up to 4 tiles) and drop down past the checkpoint. | Snipers on the roofs. |
 | 7 | Back alleys | Narrow, angled and dark (light 120). An informant sells a pass for the checkpoint, if Kyle collects a debt from a thug in a back room first. | The quiet way past the blast doors, and an ambush. |
-| 8 | Prefecture | A walled Imperial compound, closed, with the comm tower. A terminal by its door shows Rusk's wanted file: "Jundland Range security", the first hint of the garrison. | Its doors open, and the reinforcements come out. |
+| 8 | Comm tower | The town's landmark. The Empire has no buildings in town (Mark, 2026-10-30: the prefecture was dropped): a terminal at the checkpoint's guard post shows Rusk's wanted file, "Jundland Range security", the first hint of the garrison. | Reinforcements come in at the old quarter's north street. |
 | 9 | Old quarter | Half-empty streets, sand drifting through broken walls, a few squatters. | A running fight with the squad that took Rusk. |
 | 10 | Derelict bay | An abandoned docking bay with a gutted freighter (a 3D model). Rusk is hiding in its hold. | The flip happens here: troopers come in over the rim and through the bay door. |
 
@@ -348,7 +348,7 @@ triggers: [
   { on: 'talk', npc: 'rusk', do: ['hostile', { action: 'remove', thing: 'rusk' }] },
   { on: 'hostile', do: [
     { action: 'closeDoors', tag: 'street-blast' },
-    { action: 'spawn', thing: 'stormtrooper', tag: 'prefecture-door' },
+    { action: 'spawn', thing: 'stormtrooper', tag: 'quarter-north' },
     { action: 'music', id: 'combat' },
   ] },
 ],
