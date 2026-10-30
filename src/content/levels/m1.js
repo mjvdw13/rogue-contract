@@ -1,5 +1,5 @@
 import { defineLevel } from '../../engine/defs.js';
-import { WALL, TAPS, CANOPY } from '../models/cantina.js';
+import { WALL, BOOTH, TAPS, CANOPY } from '../models/cantina.js';
 import { Painter } from './lib/painter.js';
 import { Town } from './lib/town.js';
 import { CISTERN } from '../models/market.js';
@@ -528,16 +528,21 @@ const roofOver = (x0, y0, x1, y1, ceilZ, h) => p.rect(x0, y0, x1, y1, (_, __, c)
   for (let y = 90; y < 95; y++) town.block(88, y, 183 - y, y + 1, MASS).block(y + 15, y, 110, y + 1, MASS);
   town.things.push(at('cantina-corner', 91, 93, { z: F, angle: 45 }), at('cantina-corner', 107, 93, { z: F, angle: 315 }));
   town.block(88, 99, 92, 102, MASS).block(106, 99, 110, 101, MASS).block(106, 106, 110, 107, MASS);
+  // Short walls closing the niches' ends, so each booth's alcove is walled
+  // on three sides (and the corners' panels end in them).
+  town.block(88, 95, 92, 96, MASS).block(106, 95, 110, 96, MASS).block(88, 105, 92, 106, MASS).block(88, 106, 90, 107, MASS);
   town.block(94, 106, 95, 110, MASS).block(102, 106, 103, 110, MASS);
   p.rect(105, 102, 106, 106, town.street(F + 0.25, { floor: 'planks', side: wall }));
   p.rect(106, 101, 110, 106, town.street(F + 0.5, { floor: 'planks', side: wall }));
   // The bar (models/cantina.js): a pale U of counter round at the door's
   // end (centre 98.5, 100), its east arm stopping short for the bartender,
-  // the taps' column inside it, and the back-bar's shelves on its back wall.
+  // the taps' column inside it, and the back-bar's shelves on its back wall,
+  // either side of its door.
   town.things.push(
     at('cantina-bar', 98.5, 100, { z: F, angle: 0 }),
     at('cantina-taps', 98.5, 100 + TAPS.y, { z: F, angle: 0 }),
-    at('cantina-shelves', 98.5, 110, { z: F, angle: 0 }),
+    at('cantina-shelves', 96.5, 110, { z: F, angle: 0 }),
+    at('cantina-shelves', 101, 110, { z: F, angle: 0 }),
   );
   // Stools round the round end and along the arms, half a tile out.
   for (const deg of [200, 235, 270, 305, 340]) {
@@ -545,9 +550,24 @@ const roofOver = (x0, y0, x1, y1, ceilZ, h) => p.rect(x0, y0, x1, y1, (_, __, c)
     town.things.push(at('cantina-stool', 98.5 + Math.cos(a) * 5, 100 + Math.sin(a) * 5, { z: F }));
   }
   town.things.push(at('cantina-stool', 93.5, 102.5, { z: F }), at('cantina-stool', 93.5, 104.75, { z: F }), at('cantina-stool', 103.5, 102.25, { z: F }));
-  // Ceilings: the room's, lower in the niches and alcoves.
+  // Ceilings: the room's, and the booths' alcoves vaulted (round-topped
+  // arches through their depth, models/arch.js) in the walls' plaster, 3.5
+  // over the floor. Three along the sides, two at the back.
   roofOver(88, 90, 110, 110, ceilZ, h);
-  for (const box of [[88, 96, 92, 99], [88, 102, 92, 107], [106, 95, 110, 99], [90, 107, 94, 110], [103, 107, 107, 110]]) roofOver(...box, F + 3, h);
+  const VAULT = { h, lintel: 3.5, floorZ: F, wall, floor: 'flagstone', light };
+  town.arch(88, 96, 92, 99, { ...VAULT, round: 'E' }).arch(88, 102, 92, 105, { ...VAULT, round: 'E' }).arch(106, 96, 110, 99, { ...VAULT, round: 'W' });
+  town.arch(90, 107, 94, 110, { ...VAULT, round: 'N' }).arch(103, 107, 107, 110, { ...VAULT, round: 'N' });
+  // A booth in each alcove and on each cut corner (models/cantina.js), its
+  // back to the wall, a lamp on its table lighting it.
+  const booths = [
+    [88, 97.5, 90], [88, 103.5, 90], [110, 97.5, 270], [92, 110, 180], [105, 110, 180],
+    [91.28, 92.72, 45], [106.72, 92.72, 315],
+  ];
+  for (const [x, y, angle] of booths) {
+    const a = ((angle - 90) * Math.PI) / 180;
+    town.things.push(at('cantina-booth', x, y, { z: F, angle }));
+    lights.push({ x: x + Math.cos(a) * BOOTH.table, y: y - Math.sin(a) * BOOTH.table, z: F + 1, radius: 3, light: 56 });
+  }
   // Over the bar a shallow well in the ceiling, lit from inside, the canopy
   // ring hanging round it (models/cantina.js): every tile its oval reaches
   // into is the well, so the tiles' steps round the well's edge are behind
