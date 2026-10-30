@@ -137,6 +137,23 @@ Buildings may touch, share walls and back onto each other or the town's
 edge; the player needn't be able to get behind them (Mark, the same day).
 Check a street from several angles, not just down its length.
 
+**Off the grid, and up and down** (Mark, 2026-10-29). Look everywhere for
+small chances to break the right angle and the flat street, so the town
+doesn't feel rigid. Neither needs to be dramatic.
+
+- **Angles:** buildings turned a little off the grid, streets and alleys
+  that bend or run on a slant, a square that isn't square, a lane leaving
+  the street at a slant (`slanted()`). A slanting side takes no door or
+  window, so an off-angle building keeps a straight stretch for its door.
+- **Heights:** parts of town a few steps up or down from the street: a
+  quarter on higher ground, a lane dropping into a lower yard, a terrace
+  over a square (`platform()`, `stair()`, or ground painted at its own
+  `floorZ`). There are no slopes, so a change of level is steps, 0.25 to
+  0.5 each, and each under the 0.8 anyone walks up where monsters must
+  follow.
+- Check each area for both: somewhere you look along a slant, and
+  somewhere you step up or down.
+
 **What the film shows** (Mark's stills, 2026-10-18: A New Hope, The
 Mandalorian, Outlaws, and the Special Edition's wide shots):
 
