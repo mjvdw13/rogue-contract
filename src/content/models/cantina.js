@@ -33,6 +33,12 @@ import { ModelBuilder } from './lib/build.js';
 // looking south, the origin on the floor at its middle; it collides along
 // its face. Its face is lit as the walls are.
 //
+// `cantina-detector`: the droid detector on the vestibule's wall, a steel
+// box with a red lens. Built looking south, its back on y 0 (a fixture).
+//
+// `cantina-lamp`: a bare bulb glowing on a cord, hung from a ceiling: the
+// origin at the bulb's foot, the cord LAMP_CORD up to the ceiling.
+//
 // `cantina-canopy`: the ring round the well in the ceiling over the bar, an
 // oval band in the ceiling's planks hanging below it and rising to the
 // well's top, so the well's edge, stepped by the tiles, is hidden behind
@@ -45,6 +51,8 @@ import { ModelBuilder } from './lib/build.js';
 export const WALL = 'adobe-pale';
 /** A cut corner's panel: its length (6 tiles each way) and height (the room's). */
 export const CORNER = { len: 6 * Math.SQRT2, h: 4 };
+/** How far a `cantina-lamp`'s cord runs up from its bulb's foot to the ceiling. */
+export const LAMP_CORD = 0.75;
 /** A booth: how far out from the wall its table stands, and its bench's outer radius round it. */
 export const BOOTH = { table: 1.5, r: 1.45 };
 /** The counter: radii of its round end, its arms' lengths south, its top. */
@@ -154,6 +162,23 @@ function booth() {
   return m.build();
 }
 
+function detector() {
+  const m = new ModelBuilder('cantina-detector');
+  m.box([-0.25, 0, 0], [0.25, 0.22, 0.55], { ...STEEL, side: (i) => (i === 0 ? false : STEEL) });
+  m.box([-0.18, 0.22, 0.08], [0.18, 0.24, 0.26], { tex: 'vent-grille', side: (i) => (i === 0 ? false : TRIM) });
+  m.box([-0.08, 0.22, 0.36], [0.08, 0.27, 0.46], { color: [255, 40, 30], glow: true, side: (i) => (i === 0 ? false : { color: [255, 40, 30], glow: true }) });
+  m.cylinder([0.18, 0.11, 0.55], 0.015, 0.25, { ...TRIM, segments: 4, bottom: false });
+  return m.build();
+}
+
+function lamp() {
+  const m = new ModelBuilder('cantina-lamp');
+  m.cylinder([0, 0, 0.2], 0.015, LAMP_CORD - 0.2, { ...TRIM, segments: 4, top: false, bottom: false });
+  m.box([-0.07, -0.07, 0.06], [0.07, 0.07, 0.2], { ...TRIM, top: false });
+  m.box([-0.06, -0.06, 0], [0.06, 0.06, 0.06], GLOW);
+  return m.build();
+}
+
 function corner() {
   const m = new ModelBuilder('cantina-corner');
   const [a, h] = [CORNER.len / 2, CORNER.h];
@@ -211,4 +236,4 @@ function canopy() {
   return m.build();
 }
 
-export default [bar(), taps(), stool(), booth(), corner(), shelves(), canopy()];
+export default [bar(), taps(), stool(), booth(), corner(), detector(), lamp(), shelves(), canopy()];
