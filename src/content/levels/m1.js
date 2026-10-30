@@ -927,6 +927,13 @@ list.push(
   list.push(at('floor-dirt-2', 98.5, 90.62, { z: CANTINA.floorZ, angle: 180 }), at('floor-dirt-1', 92, 86.5, { z: 0, angle: 180 }));
 }
 
+// Jawas in the cantina too (Mark): two at the bar's east side and one by the
+// east corner's booth, calm until the town turns.
+list.push(
+  at('jawa', 103.6, 100.6, { angle: 180, calm: { wander: 0 } }), at('jawa', 103.7, 103.6, { angle: 170, calm: { wander: 0 } }),
+  at('jawa', 104.3, 94.6, { angle: 45, calm: { wander: 0 } }),
+);
+
 // Cables, ropes and cloth moving in the air (world/hangings.js). Each is
 // tied 0.05 out from a straight stretch of wall, clear of the rounded
 // corners.
