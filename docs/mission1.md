@@ -461,9 +461,10 @@ angle unless their sheet has the other views (the villagers do).
   (navy and orange), their controls ZASWIT04 as it is, the shutter from a
   strip of NDCORUG1, barred windows from SPBARS1, louvres from NPVENTS1.
   The jamb's tiles (`door-jamb`, a texture) are ZPTILE4's bevelled square,
-  shrunk to half a tile and repeated,
-  so one row runs from the wall's face back to the door on each side of it
-  (Mark, 2026-10-30: a quarter tile, after his reference, made two). Doors that open use the door decals again as 64x128 panels
+  shrunk to a quarter tile (Mark's reference has small ones) and
+  repeated; the jamb stretches them to half a tile across the doorway's
+  depth, so one row runs from the wall's face back to the door on each
+  side of it (Mark, 2026-10-30), running on round its corners. Doors that open use the door decals again as 64x128 panels
   (`RISING`: a panel must be a power of two).
 - **Textures:** Dark Forces textures recoloured by
   `assets/custom/derive.mjs` (Mark, 2026-10-17: DF textures for now, none

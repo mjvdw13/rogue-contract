@@ -48,17 +48,35 @@ function outline() {
   return pts;
 }
 
+// The lining's tiles: a quarter tile along the opening's edge, and
+// stretched to half a tile across its depth, so one row runs from the
+// wall's face back to the door on each side of it (Mark, 2026-10-30: two
+// did). They run on round the corners from the middle of the sill.
+const ALONG = 0.25;
+const DEEP = 0.5;
+const SQUARES = 8; // the jamb picture's squares each way (derive.mjs)
+
 /** The lining: one strip per edge of the outline, facing in toward the opening's middle. */
 function jamb() {
   const m = new ModelBuilder('door-jamb');
-  const tile = { tex: 'door-jamb' };
   const pts = outline();
+  // How far round the outline each point is, and where the sill's middle is.
+  const s = [0];
+  let sill = 0;
+  for (let i = 0; i < pts.length; i++) {
+    const [a, b] = [pts[i], pts[(i + 1) % pts.length]];
+    if (Math.abs(a[1] - E) < 1e-9 && Math.abs(b[1] - E) < 1e-9 && a[0] < 0 && b[0] > 0) sill = s[i] - a[0];
+    s.push(s[i] + Math.hypot(b[0] - a[0], b[1] - a[1]));
+  }
+  const u = (k) => (s[k] - sill) / (ALONG * SQUARES);
+  const front = 1 / (DEEP * SQUARES); // the wall's face; the back's 0
   for (let i = 0; i < pts.length; i++) {
     const [a, b] = [pts[i], pts[(i + 1) % pts.length]];
     const mid = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
     // A point behind the strip (away from the opening's middle), for its winding.
     const out = [mid[0] * 2, 0, mid[1] + (mid[1] - H / 2)];
-    m.face([[a[0], 0.5, a[1]], [b[0], 0.5, b[1]], [b[0], -0.5, b[1]], [a[0], -0.5, a[1]]], tile, out);
+    const uv = [[u(i), front], [u(i + 1), front], [u(i + 1), 0], [u(i), 0]];
+    m.face([[a[0], 0.5, a[1]], [b[0], 0.5, b[1]], [b[0], -0.5, b[1]], [a[0], -0.5, a[1]]], { tex: 'door-jamb', uv }, out);
   }
   return m.build();
 }
