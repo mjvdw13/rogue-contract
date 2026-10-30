@@ -494,6 +494,15 @@ test('a stair rises a step a tile toward its top, from a step up at its foot to 
   assert.throws(() => town.stair(20, 30, 22, 38, { up: 'N', top: 1.2 }), /whole number/);
 });
 
+test('a stair can climb from ground above or below the street', () => {
+  const { p, town } = kit();
+  town.stair(4, 4, 8, 6, { up: 'E', from: 1.5, top: 3 });
+  assert.deepEqual([4, 5, 6, 7].map((x) => p.get(x, 4).floorZ), [2, 2.5, 3, 3], 'from a rise at 1.5');
+  town.stair(10, 10, 12, 16, { up: 'N', from: -2, top: 0, rise: 1 });
+  assert.deepEqual([15, 14, 13].map((y) => p.get(10, y).floorZ), [-1, 0, 0], 'out of a pit at -2');
+  assert.throws(() => town.stair(20, 20, 24, 21, { up: 'E', from: 2, top: 2 }), /whole number/);
+});
+
 test("a buttress stands against its wall in the wall's plaster, the tallest just under the roof, solid, and must fit under it", () => {
   const { town } = kit();
   town.house(4, 4, 16, 14, { h: 5.5 });

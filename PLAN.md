@@ -28,16 +28,24 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
-- **Mos Eisley's layout** (`docs/mission1.md`, The map, 2026-10-29): the
-  paper pass before the blockout, which waits on it. Two proposals: the
-  junk yard moved north of the market, facing the cantina across it (so
-  the calm half walks the main street once each way, not three times),
-  and the old quarter on a rise past the checkpoint (1.5 up, the
-  prefecture at 3, the gate at the top of a flight of steps), its main
-  street on a slant down to the derelict bay. Also new: the alleys run
-  from between I and J to a mouth by the checkpoint, the back lane runs
-  straight so its climb shows from the street, and the freighter's hold
-  stays shut until the fob has the signal.
+- **Mos Eisley's east third, blocked out** (`?map=m1`, 2026-10-29; the
+  areas in `docs/mission1.md`): plain volumes to try the route, no detail.
+  Walk east past the blast doors: the street climbs six steps to the
+  checkpoint's gate. Two ways past it: the informant's den, open to the
+  alleys' mouth north of the street (stepping in is a stand-in pass that
+  opens the gate), or the back lane to the rubble at its end, up onto the
+  roofs, two running jumps and a drop into a yard in the old quarter.
+  Then the slanting main street (or the dry wash, down steps at the north
+  street's end) to the derelict bay; stepping into the stand-in hull's
+  hold (Rusk) turns the town: the gate and the prefecture's open,
+  troopers come over the bay's rim, out of the prefecture and onto a
+  roof. The stand-in ending: clear customs' two troopers in their office
+  by Bay 87. To judge: the distances and the climb, the slant, whether
+  the roofs read as a way over from the checkpoint, the derelict bay's
+  depth. The comm tower stand-in (22 tall) is hidden from the market by
+  K; the real one is a model and can stand taller. Also: grime and
+  clutter now take a seed per wall, so building elsewhere no longer
+  moves them, which re-rolled them all once (same look, other spots).
 
 - **Character sheets for Mos Eisley** (`docs/mission1.md`, Characters):
   cantina aliens (4-6 kinds), the band, the bartender, the broker, the
@@ -293,7 +301,7 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
         to what's built, and the open questions answered there: where the
         junk yard goes, the two ways round the blast doors, the way past
         the checkpoint, the landmarks.
-  - [ ] The east third: the checkpoint, the rooftops, the old quarter
+  - [x] The east third: the checkpoint, the rooftops, the old quarter
         and the dry wash, the derelict bay, the prefecture's wall and
         tower.
   - [ ] The middle: the cantina's shell, the back lane, the alleys, the

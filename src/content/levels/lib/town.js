@@ -267,16 +267,17 @@ export class Town {
 
   /**
    * A flight of steps up a building's side (after the film's), over the
-   * box: rising toward `up` ('N', 'E', 'S' or 'W') a tile at a time, the
-   * first step `rise` up, until `top`, where the rest of the box is the
+   * box: rising toward `up` ('N', 'E', 'S' or 'W') a tile at a time from
+   * ground at `from` (the street's 0, or a part of town higher or lower),
+   * the first step `rise` up, until `top`, where the rest of the box is the
    * landing. Solid underneath, its treads in `floor` and its faces in
    * `side` (the building's roof and plaster), under the sky. Keep the
    * landing more than a jump (1.56) below any roof beside it, or it's a way
    * onto the rooftops.
    */
-  stair(x0, y0, x1, y1, { up, top, rise = 0.5, floor = this.roof, side = this.wall }) {
-    const n = Math.round(top / rise);
-    if (Math.abs(n * rise - top) > 1e-6) throw new Error(`Town: a stair at (${x0}, ${y0}) climbs to ${top}, not a whole number of ${rise} steps`);
+  stair(x0, y0, x1, y1, { up, top, from = 0, rise = 0.5, floor = this.roof, side = this.wall }) {
+    const n = Math.round((top - from) / rise);
+    if (n < 1 || Math.abs(n * rise - (top - from)) > 1e-6) throw new Error(`Town: a stair at (${x0}, ${y0}) climbs from ${from} to ${top}, not a whole number of ${rise} steps`);
     const ns = up === 'N' || up === 'S';
     if (!ns && up !== 'E' && up !== 'W') throw new Error(`Town: a stair at (${x0}, ${y0}) goes up toward N, E, S or W, not "${up}"`);
     const len = ns ? y1 - y0 : x1 - x0;
@@ -284,7 +285,7 @@ export class Town {
     for (let k = 0; k < len; k++) {
       // (Row k from the foot; up north or west, the foot is the far side.)
       const a = up === 'N' || up === 'W' ? (ns ? y1 : x1) - 1 - k : (ns ? y0 : x0) + k;
-      const cell = this.street(Math.min(top, (k + 1) * rise), { floor, side });
+      const cell = this.street(Math.min(top, from + (k + 1) * rise), { floor, side });
       if (ns) this.p.rect(x0, a, x1, a + 1, cell);
       else this.p.rect(a, y0, a + 1, y1, cell);
     }

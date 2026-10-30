@@ -351,8 +351,136 @@ town.vent(22.2, 79, 'N', { z: 1.1, tex: 'vent-slats' }).vent(55.6, 78, 'N', { z:
 town.vent(9, 63, 'S', { z: 4.6, tex: 'vent-grille' });
 town.vent(16, 53.5, 'W', { z: 4, tex: 'vent-round' }).vent(28, 55, 'E', { z: 3.4, tex: 'vent-slats' });
 
-// For now the street ends at an exit (until the checkpoint).
-p.rect(134, 61, 136, 73, town.street(0, { exit: true }));
+// ---------------------------------------------------------------- the east third (blockout)
+// Roughed out to try the route before any detail (docs/mission1.md, the
+// map): plain volumes at their final heights, the gates the only doors,
+// stand-ins for the landmarks, and stand-in messages for the story until
+// conversations and the fob exist. The town rises to the east: the street
+// climbs six steps to the checkpoint's gate, the old quarter stands at 1.5
+// and the prefecture at 3; the dry wash runs 4.5 below the old quarter and
+// the derelict bay's floor 7.5 below it.
+const OQ = 1.5;
+const PREF = 3;
+const WASH = -3;
+// A gate's door tiles: shut until a trigger opens them by `tag`, then open for good.
+const gateTag = (x0, y0, x1, y1, tag) => p.rect(x0, y0, x1, y1, (_, __, c) => ({ ...c, tag, stayOpen: true }));
+// A tile tagged for a trigger (where a spawn appears).
+const tagTile = (x, y, tag) => p.rect(x, y, x + 1, y + 1, (_, __, c) => ({ ...c, tag }));
+
+// 8. The prefecture: a walled Imperial compound on the highest ground,
+// square on purpose (the Empire's grid on the old town). Out of reach but
+// for the courtyard behind its gate, where the reinforcements gather. The
+// comm tower (a stand-in block, 11 m) stands where the street's bend
+// points, so it shows over M from the market.
+town.block(146, 6, 206, 53, { ...GATE, h: 9 });
+town.block(150, 10, 164, 32, { ...GATE, h: 11 }).block(186, 12, 204, 30, { ...GATE, h: 12 });
+p.rect(162, 36, 180, 52, town.street(PREF, { floor: 'imp-floor', side: GATE.wall }));
+town.block(178, 42, 182, 46, { ...GATE, h: 22 });
+town.stair(167, 53, 175, 56, { up: 'N', from: OQ, top: PREF, floor: 'flagstone', side: 'adobe-brick' });
+town.door(171, 53, 'S', { h: 9, tex: 'door-bay', width: 6, tall: 4, jamb: false, sign: false, panel: false, floorZ: PREF, wall: GATE.wall });
+gateTag(168, 52, 174, 53, 'prefecture-gate');
+tagTile(168, 46, 'prefecture-yard');
+tagTile(174, 46, 'prefecture-yard');
+
+// 5. The checkpoint: the street climbs six steps to the old quarter's rise,
+// to a gate in a steel wall across it, a guard booth beside the gate. From
+// the top both ways round are in sight: the alleys' mouth to the north and
+// the back lane behind you.
+p.rect(136, 61, 139, 73, town.street());
+town.stair(139, 61, 147, 73, { up: 'E', top: OQ, rise: 0.25, floor: 'flagstone', side: 'adobe-brick' });
+town.block(147, 61, 148, 64, { ...GATE, h: 7 }).block(147, 70, 148, 73, { ...GATE, h: 7 });
+town.door(147, 67, 'W', { h: 7, tex: 'door-grey', width: 6, tall: 4, jamb: false, sign: false, panel: false, floorZ: OQ, wall: GATE.wall });
+gateTag(147, 64, 148, 70, 'checkpoint');
+town.block(145, 70, 147, 73, { ...GATE, h: OQ + 3 });
+// North of it the alleys' east mouth (the alleys behind it are the next
+// step) and the informant's den, open to it.
+p.rect(136, 48, 139, 61, town.street());
+town.house(139, 48, 148, 61, { h: 7, r: 1, wall: 'adobe-grey', skirt: null });
+town.room(140, 52, 146, 59, { h: 7, wall: 'adobe-grey', light: 128 });
+town.arch(139, 54, 140, 57, { h: 7, lintel: 3, wall: 'adobe-grey' });
+p.rect(140, 52, 146, 59, (_, __, c) => ({ ...c, tag: 'informant' }));
+// South of it, too tall to climb from the roofs behind.
+p.rect(136, 73, 148, 86, town.street());
+town.house(136, 73, 141, 86, { h: 8, r: 1, skirt: 'plinth' });
+town.house(141, 73, 148, 86, { h: 9.5, r: 1, wall: 'adobe-pale' });
+
+// 6. The rooftops, the way over the checkpoint. The back lane runs on
+// south to rubble where a wall fell, which climbs onto the first roof.
+// Running jumps over light wells 3 wide (their floors open to the lane, so
+// a fall walks back) lead east to the last roof, which drops into a yard
+// in the old quarter; a stair climbs back up from the yard. The roofs stand
+// clear of anything within a jump, so they lead nowhere else.
+p.rect(126, 92, 130, 118, town.street());
+p.rect(130, 86, 149, 118, town.street());
+town.house(118, 92, 126, 120, { h: 8 });
+const RUBBLE = { wall: 'adobe-brick', skirt: null };
+[0.75, 1.75, 2.75, 3.75].forEach((h, k) => town.block(126, 110 + k * 2, 130, 112 + k * 2, { ...RUBBLE, h }));
+town.house(130, 102, 138, 118, { h: 4.75 });
+town.house(138, 102, 149, 118, { h: 5.75, wall: 'adobe-ochre' });
+town.house(130, 86, 140, 99, { h: 4.75, wall: 'adobe-pale' });
+town.house(143, 86, 149, 102, { h: 5.25, wall: 'adobe-rose' });
+town.block(126, 118, 150, 122, { h: 8 }).block(149, 96, 162, 118, { h: 8 });
+
+// 9. The old quarter, on its rise: a square inside the gate, a north
+// street along the prefecture's wall, and the main street slanting
+// south-east from the square to the derelict bay's gate, its houses
+// following the slant. The yard the roofs drop into opens onto the main
+// street by an alley.
+p.rect(148, 53, 188, 60, town.street(OQ));
+p.rect(148, 60, 160, 76, town.street(OQ));
+// (Between its two edges, y = 64 + 1.2 (x - 160) and 12 further south,
+// and a tile beyond them: the houses cut their slanting walls into it.)
+p.rect(160, 60, 196, 104, (x, y, c) => {
+  const k = y + 0.5 - 1.2 * (x + 0.5 - 160);
+  return k > 62 && k < 78 ? town.street(OQ) : c;
+});
+p.rect(149, 86, 157, 96, town.street(OQ));
+p.rect(157, 88, 174, 92, town.street(OQ));
+town.stair(149, 86, 151, 96, { up: 'N', from: OQ, top: 4 });
+town.house(148, 76, 157, 86, { h: 8, r: 1, wall: 'adobe-grey' });
+town.house(149, 96, 157, 104, { h: 7.5, wall: 'adobe-ochre' });
+town.slanted([[160, 60], [170, 60], [170, 76], [160, 64]], { h: OQ + 5 });
+town.slanted([[170, 60], [180, 60], [180, 88], [170, 76]], { h: OQ + 6.5, wall: 'adobe-pale', dome: true });
+town.slanted([[180, 60], [186, 60], [186, 95], [180, 88]], { h: OQ + 5.5, wall: 'adobe-rose' });
+town.slanted([[186, 60], [194, 60], [194, 104], [193, 104], [186, 95]], { h: OQ + 7.5, dome: true });
+town.slanted([[157, 76], [160, 76], [170, 88], [157, 88]], { h: OQ + 5.5, wall: 'adobe-ochre' });
+town.slanted([[157, 92], [173, 92], [175, 94], [183, 104], [157, 104]], { h: OQ + 6, wall: 'adobe-pale', dome: true });
+
+// 18. The dry wash, 4.5 below the old quarter: from the prefecture's wall
+// south into the derelict bay. Steps go down into it at the north
+// street's east end; it's the low way to the bay.
+p.rect(194, 53, 202, 116, town.street(WASH, { floor: 'desert-sand' }));
+town.stair(188, 53, 194, 60, { up: 'W', from: WASH, top: OQ, rise: 0.75, floor: 'flagstone', side: 'adobe-brick' });
+
+// 10. The derelict bay: an old docking bay half full of sand, its floor
+// 7.5 below the old quarter. Its gate is at the main street's end: a
+// passage through its building onto a landing at the old quarter's height,
+// and stairs down. The wash breaks in on the north-east, down sand steps.
+// A stand-in hull for the freighter (its hold open at the stern: Rusk),
+// and a stand-in crane on the rim, seen down the street.
+const DERELICT = { cx: 186, cy: 128, r: 18, floorZ: -6, rim: 7 };
+p.rect(162, 104, W - 1, H - 1, town.roofCell({ h: DERELICT.rim, wall: 'bay-wall', skirt: null }));
+town.circle(DERELICT.cx, DERELICT.cy, DERELICT.r, {
+  inside: town.street(DERELICT.floorZ, { floor: 'desert-sand', side: 'bay-wall' }),
+  wall: { wall: 'bay-wall', wallTop: DERELICT.rim },
+  seam: 90,
+});
+town.arch(183, 104, 189, 110, { h: DERELICT.rim, lintel: 4, floorZ: OQ, wall: 'bay-wall', floor: 'bay-floor' });
+p.rect(183, 110, 189, 113, (_, __, c) => ({ ...c, floor: 'bay-floor', floorZ: OQ }));
+town.stair(183, 113, 189, 125, { up: 'N', from: DERELICT.floorZ, top: OQ, rise: 0.625, floor: 'bay-floor', side: 'bay-wall' });
+p.rect(194, 104, 202, 116, town.street(WASH, { floor: 'desert-sand', side: 'bay-wall' }));
+town.stair(194, 116, 202, 122, { up: 'N', from: DERELICT.floorZ, top: WASH, floor: 'desert-sand', side: 'bay-wall' });
+town.block(191, 106, 192, 107, { h: 18, wall: 'metal-rust', roof: 'metal-rust', skirt: null });
+const HULL = { wall: 'metal-grey', roof: 'metal-grey', skirt: null };
+town.house(172, 130, 190, 139, { h: -1, r: 2, ...HULL });
+town.room(174, 131, 188, 138, { h: -1, floorZ: DERELICT.floorZ, ceilZ: -2.75, floor: 'imp-floor', ceiling: 'imp-panel-dark', wall: 'metal-grey', light: 120 });
+town.arch(188, 132, 190, 137, { h: -1, lintel: 3, floorZ: DERELICT.floorZ, wall: 'metal-grey', floor: 'imp-floor' });
+p.rect(174, 131, 188, 138, (_, __, c) => ({ ...c, tag: 'hold' }));
+// Where the loud half's troopers come in: over the rim, and through the gate.
+tagTile(170, 112, 'derelict-rim');
+tagTile(205, 128, 'derelict-rim');
+tagTile(186, 107, 'derelict-gate');
+tagTile(143, 110, 'roof-sniper');
 
 // Domes on the blocks of town the streets left whole, two in three.
 for (const { box: [x0, y0, x1, y1], h, wall } of blocks) {
@@ -367,8 +495,8 @@ town.drifts();
 // Rain streaks, dust and stains on the walls (lib/town.js).
 town.grime();
 // Crates, drums, canisters, cargo pods, junk and litter along the walls
-// (lib/town.js).
-town.clutter();
+// (lib/town.js), but none yet in the blocked-out east third.
+town.clutter({ keep: [[126, 92, 130, 122], [130, 86, 150, 122], [136, 44, W, H]] });
 list.push(...town.things);
 
 // Hand-placed along the main street and on the square (the kit's
@@ -436,6 +564,30 @@ list.push(
   at('jawa', 95, 60.6, { angle: 0, calm: { wander: 0 } }), at('jawa', 99.2, 61, { angle: 180, calm: { wander: 0 } }),
   at('jawa', 22, 70, { angle: 90, calm: { wander: 0 } }), at('jawa', 116, 68, { angle: 180, calm: { wander: 0 } }),
   at('jawa', 68, 70, { calm: { wander: 3 } }), at('jawa', 50, 47, { calm: { wander: 4 } }),
+);
+
+// The east third's calm troopers, and the stand-ins for its people. The
+// checkpoint's guards on its steps; a patrol walking the old quarter's main
+// street; a guard at the prefecture's gate. The informant (a villager until
+// his sheet exists) in his den, a squatter in the gate square, and Rusk (a
+// villager too) in the freighter's hold. Customs' two troopers stand in
+// their office: clearing them at the end is the stand-in pickup.
+const CHECKPOINT_LINES = ["Old quarter's sealed, hunter.", 'No pass, no way through.'];
+const QUARTER_PATROL = [[153.5, 68], [165.5, 79], [178.5, 94]];
+list.push(
+  at('sandtrooper', 145.5, 63, { angle: 180, calm: { wander: 0, lines: CHECKPOINT_LINES } }),
+  at('sandtrooper', 145.5, 68.5, { angle: 180, calm: { wander: 0, lines: CHECKPOINT_LINES } }),
+  at('sandtrooper-commander', 141.5, 66, { angle: 180, calm: { wander: 0, lines: CHECKPOINT_LINES } }),
+  at('sandtrooper', 153.5, 68, { calm: { patrol: QUARTER_PATROL, idleTime: [3, 3] } }),
+  at('sandtrooper', 155, 66.6, { calm: { patrol: QUARTER_PATROL.map(([x, y]) => [x + 1.5, y - 1.4]), idleTime: [3, 3] } }),
+  at('sandtrooper', 171, 57.5, { angle: 270, calm: { wander: 0, lines: ['The prefecture is closed.'] } }),
+  at('sandtrooper', 15.2, 102.4, { angle: 90, tag: 'bay-customs', calm: { wander: 0, lines: ['Your papers check out, hunter.', 'Move along.'] } }),
+  at('sandtrooper', 18.2, 102.2, { angle: 90, tag: 'bay-customs', calm: { wander: 0, lines: ['Your papers check out, hunter.', 'Move along.'] } }),
+  at('villager-wanderer', 143, 55.5, { angle: 180, wander: 0 }),
+  at('villager-man', 152, 73),
+  at('villager-man', 180, 134.5, { angle: 0, wander: 0 }),
+  at('barricade', 137.6, 63.6, { angle: 20 }), at('barricade', 137.6, 69.8, { angle: 335 }),
+  at('floodlight-tower', 145.6, 61.6), at('floodlight-tower', 144.4, 72.4),
 );
 
 // Townsfolk (npcs/villagers.js), all five kinds, each strolling up to 5
@@ -515,6 +667,25 @@ export default defineLevel({
   decals: [...town.decals, ...bayDecals, ...pitDecals],
   hangings: [...hangings, ...town.hangings],
   par: 600,
+  // Stand-ins for the story until conversations, the fob and the drop-off
+  // exist (docs/story.md): the informant's pass opens the checkpoint,
+  // finding Rusk turns the town, and clearing customs is the pickup.
+  triggers: [
+    { on: 'enter', tag: 'informant', do: [{ action: 'message', text: 'INFORMANT (STAND-IN): HERE IS A PASS. THE CHECKPOINT WILL LET YOU THROUGH.' }, { action: 'openDoors', tag: 'checkpoint' }] },
+    { on: 'enter', tag: 'hold', do: [{ action: 'message', text: "RUSK (STAND-IN): THAT FOB IS IMPERIAL. THEY'RE ALREADY HERE." }, { action: 'hostile' }] },
+    {
+      on: 'hostile',
+      do: [
+        { action: 'openDoors', tag: 'checkpoint' },
+        { action: 'openDoors', tag: 'prefecture-gate' },
+        { action: 'spawn', thing: 'sandtrooper', tag: 'derelict-rim' },
+        { action: 'spawn', thing: 'sandtrooper', tag: 'derelict-gate' },
+        { action: 'spawn', thing: 'sandtrooper', tag: 'prefecture-yard' },
+        { action: 'spawn', thing: 'sandtrooper', tag: 'roof-sniper' },
+      ],
+    },
+    { on: 'killed', tag: 'bay-customs', do: [{ action: 'message', text: "JAN: CUSTOMS WON'T BE CHECKING PAPERS NOW." }, { action: 'exit' }] },
+  ],
   ...p.build(),
   things: [],
   list,
