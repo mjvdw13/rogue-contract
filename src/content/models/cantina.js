@@ -36,6 +36,10 @@ import { ModelBuilder } from './lib/build.js';
 // `cantina-detector`: the droid detector on the vestibule's wall, a steel
 // box with a red lens. Built looking south, its back on y 0 (a fixture).
 //
+// `cantina-sign`: the little lit sign up on the front by the arch's
+// shoulder (Mark's stills), a box glowing orange. Built looking south, its
+// back on y 0 (a fixture).
+//
 // `cantina-lamp`: a bare bulb glowing on a cord, hung from a ceiling: the
 // origin at the bulb's foot, the cord LAMP_CORD up to the ceiling.
 //
@@ -171,6 +175,13 @@ function detector() {
   return m.build();
 }
 
+function sign() {
+  const m = new ModelBuilder('cantina-sign');
+  const lit = { color: [255, 150, 60], glow: true };
+  m.box([-0.22, 0, 0], [0.22, 0.1, 0.32], { ...TRIM, side: (i) => (i === 0 ? false : i === 2 ? lit : TRIM) });
+  return m.build();
+}
+
 function lamp() {
   const m = new ModelBuilder('cantina-lamp');
   m.cylinder([0, 0, 0.2], 0.015, LAMP_CORD - 0.2, { ...TRIM, segments: 4, top: false, bottom: false });
@@ -236,4 +247,4 @@ function canopy() {
   return m.build();
 }
 
-export default [bar(), taps(), stool(), booth(), corner(), detector(), lamp(), shelves(), canopy()];
+export default [bar(), taps(), stool(), booth(), corner(), detector(), sign(), lamp(), shelves(), canopy()];

@@ -21,5 +21,7 @@ import bay from './bay.js';
 import moldyCrow from './crow.js';
 import market from './market.js';
 import cantina from './cantina.js';
+import hitching from './ring.js';
+import pod from './pod.js';
 
-export default [terminal, reactorRing, coolantTank, shuttle, barricade, boulderLarge, boulderSmall, floodlightTower, sensorMast, sensorDish, ...domes, doorJamb, ...doorLips, ...arches, ...buttresses, ...awnings, ...tin, ...pipes, ...clutter, landspeeder, ...bay, moldyCrow, ...market, ...cantina];
+export default [terminal, reactorRing, coolantTank, shuttle, barricade, boulderLarge, boulderSmall, floodlightTower, sensorMast, sensorDish, ...domes, doorJamb, ...doorLips, ...arches, ...buttresses, ...awnings, ...tin, ...pipes, ...clutter, landspeeder, ...bay, moldyCrow, ...market, ...cantina, ...hitching, ...pod];
