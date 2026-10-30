@@ -44,6 +44,17 @@ These need Mark to try something, or to decide. Don't start them without him.
   film; committing them (say `docs/references/`) would let later passes
   check against them. To judge: the well's size and glow, the booths'
   light, whether the walls should go grey, and the alcoves' changed shapes.
+  Then (2026-10-30, after Mark's stills of the front): a tall arch cut
+  into S's front with the door at its back, a smaller door, a hitching
+  ring and a lit sign, no windows; the dome pod, three Jawas against the
+  wall (standing: no sheet sits), a dewback at a trough and a drum out
+  front, the two stalls there gone. Inside: Bossk and Boba Fett, two
+  troopers at the steps, villagers standing in for the bartender, the
+  broker (a stand-in message), customers and the band. To decide: Bossk
+  and Boba Fett are calm monsters, so they fight when the town turns
+  (Boba Fett has 200 health), which makes the cantina's way round the
+  blast doors a hard fight; and whether a sitting pose for Jawas and
+  customers is worth a sheet.
 
 - **Mos Eisley's east third, blocked out** (`?map=m1`, 2026-10-29; the
   areas in `docs/mission1.md`): plain volumes to try the route, no detail.
@@ -328,8 +339,9 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
         three steps, doors a step up on C, H and Q.
   - [x] Sloping buttresses and a stair up a house's side: F and G,
         a stair up D's east side to a door on a landing.
-  - [ ] Hitching rings on walls; perforated canisters and engine rings
-        in the clutter.
+  - [ ] Hitching rings on walls (the model is made, `models/ring.js`: one
+        by the cantina's door so far); perforated canisters and engine
+        rings in the clutter.
 - [ ] **Block out the whole town first** (Mark, 2026-10-29: level design
       before details). Every area as plain volumes at their final
       heights, with the real ways between them and stand-ins for the
@@ -369,6 +381,14 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
           the back room and storeroom stocked, a bulb in each. The walls
           stay pale plaster (the back building's outside is the same
           texture; dim, it reads grey): pools of light under the lamps.
+    - [x] The entrance after Mark's stills (2026-10-30): a tall arch cut
+          into S's front, its door in shade at the back; a smaller door
+          beside it, a hitching ring, a glowing sign; no windows or hood.
+          Out front the dome pod, Jawas against the wall, a dewback at a
+          stone trough and a drum (the two stalls there go).
+    - [x] Characters: Bossk at the bar, Boba Fett in the east alcove;
+          villagers standing in for the bartender, the broker (a stand-in
+          message), customers and the band; two calm troopers by the steps.
     - [ ] Waiting on Mark.
   - [ ] Bay 86, the dewback stable and the speeder garage.
   - [ ] The Jawa junk yard and the sandcrawler.

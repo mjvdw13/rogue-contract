@@ -10,6 +10,7 @@ import { CLUTTER } from './models/clutter.js';
 import { BAY_WALL, BAY_HOSES } from './models/bay.js';
 import { TOWER_HEIGHT } from './models/market.js';
 import { BAR, TAPS, CORNER } from './models/cantina.js';
+import { POD } from './models/pod.js';
 
 // Scenery. Solid ones block movement; ones with health can be shot (and
 // `explode`).
@@ -120,9 +121,16 @@ export default [
   defineDecoration({ id: 'cantina-corner', model: 'cantina-corner', solid: true, height: CORNER.h, fixed: true }),
   defineDecoration({ id: 'cantina-shelves', model: 'cantina-shelves', solid: true, height: 2.2, fixed: true }),
   defineDecoration({ id: 'cantina-canopy', model: 'cantina-canopy', fixed: true }),
-  // The vestibule's droid detector on its wall, and bare bulbs hung from ceilings.
+  // The vestibule's droid detector on its wall, the lit sign on the front, and
+  // bare bulbs hung from ceilings.
   defineDecoration({ id: 'cantina-detector', model: 'cantina-detector', fixed: true }),
+  defineDecoration({ id: 'cantina-sign', model: 'cantina-sign', fixed: true }),
   defineDecoration({ id: 'cantina-lamp', model: 'cantina-lamp', fixed: true }),
+  // On Mos Eisley's walls and streets after Mark's film stills: a hitching
+  // ring (models/ring.js), and the white dome pod by the cantina
+  // (models/pod.js), colliding as its cylinder.
+  defineDecoration({ id: 'hitching-ring', model: 'hitching-ring', fixed: true }),
+  defineDecoration({ id: 'dome-pod', model: 'dome-pod', solid: true, radius: POD.r, height: POD.h, fixed: true }),
   // The Moldy Crow, hovering (models/crow.js), bobbing gently, drawn at 0.8 of
   // canon size: only its gun pod is low enough to collide (as its outline);
   // you walk under the rest.

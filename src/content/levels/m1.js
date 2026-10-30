@@ -169,10 +169,11 @@ town.window(65.5, 82, 'N', { z: 2.2 }).window(73, 87.5, 'E');
 // R: a round house under a dome.
 town.circle(80, 88, 5, { inside: town.roofCell({ h: 7, wall: 'adobe-rose', skirt: null }), wall: { wall: 'adobe-rose', wallTop: 7 }, open: 'out', skirt: null });
 town.dome(80, 88, 7, 9.5, { wall: 'adobe-rose' });
-// S: the cantina's front, a long house (its door and the cantina behind
-// it are with the middle, below).
-town.house(87, 82, 102, 92, { h: 6, r: 3, wall: 'adobe-pale', dome: true });
-town.window(90.5, 82, 'N', { z: 3.4, tex: 'window-louvre' }).window(98.5, 82, 'N', { z: 3.4, tex: 'window-louvre' });
+// S: the cantina's front, a long plain house with no windows on the
+// market (Mark's stills, 2026-10-30), its corners rounded tighter so its
+// straight front (89..100) takes the arch, a smaller door and the hitching
+// ring; they and the cantina behind are with the middle, below.
+town.house(87, 82, 102, 92, { h: 6, r: 2, wall: 'adobe-pale', dome: true });
 
 
 // Past the market. North side: K by the frame, a rounded porch cut into its
@@ -208,8 +209,9 @@ town.window(130, 79.5, 'W', { z: 4.4, tex: 'window-louvre' });
 // across from the street to the blast doors stays open, each a counter
 // and a rack of wares under a canvas roof with the stallholder between
 // them; and in the north-east corner the droid seller's pen, behind a cage.
+// None in front of the cantina: that's open ground in Mark's stills.
 town.stall(62, 60, 65, 64, 'E', { cloth: 'umber' }).stall(68, 59, 72, 62, 'S', { cloth: 'olive' }).stall(62, 76, 65, 80, 'E', { cloth: 'teal' });
-town.stall(89, 59, 93, 62, 'S', { cloth: 'sand' }).stall(89, 77, 93, 80, 'N', { cloth: 'red', valance: 'valance-red' }).stall(97, 77, 101, 80, 'N', { cloth: 'olive' });
+town.stall(89, 59, 93, 62, 'S', { cloth: 'sand' });
 // 13. The water plaza, in the market's middle: a round paving round the
 // moisture condenser tower (models/market.js), the landmark, the water
 // seller's tap on its south side with a tarp over the queue, and a
@@ -588,21 +590,27 @@ const roofOver = (x0, y0, x1, y1, ceilZ, h) => p.rect(x0, y0, x1, y1, (_, __, c)
   });
   town.things.push(at('cantina-canopy', WELL.x, WELL.y, { z: WELL.z, angle: 0, lit: light + 16 }));
   lights.push({ x: WELL.x, y: WELL.y, z: wellTop - 0.25, radius: 6, light: 72 });
-  // The way in: the door, an entry turning east into the vestibule, and
-  // two steps down.
-  town.room(92, 83, 98, 86, { h, ceilZ: 3.5, wall, light });
+  // The way in, after Mark's stills (2026-10-30): a tall round-topped arch
+  // cut 3 deep into S's front, in shade, its door at the back; behind it an
+  // entry turning east into the vestibule, so the street can't see in, and
+  // two steps down. On S's front east of the arch, in the street's plaster:
+  // a little lit sign up by the arch's shoulder, a smaller door (shut) and a
+  // hitching ring.
+  town.arch(90, 82, 94, 85, { h, lintel: 4.75, wall: 'adobe-pale', round: 'N', light: 136 });
+  town.room(90, 86, 98, 88, { h, ceilZ: 3.5, wall, light });
   town.room(96, 85, 101, 88, { h, ceilZ: 3.5, wall, light });
   town.stair(96, 88, 101, 90, { up: 'N', from: F, top: 0, rise: 0.25, floor: 'flagstone', side: wall });
   roofOver(96, 88, 101, 90, 3.5, h);
-  town.door(94, 82, 'N', { h, tex: 'door-grey', wall: 'adobe-pale', opens: true });
-  // A round-topped hood round it on S's front (the street's plaster), the
-  // droid detector on the vestibule's wall, and a bulb over the steps.
-  town.hood(94, 82, 'N', { h, width: 4, wall: 'adobe-pale' });
+  town.door(92, 85, 'N', { h, tex: 'door-grey', wall: 'adobe-pale', opens: true });
+  town.door(97, 82, 'N', { h, tex: 'shutter', wall: 'adobe-pale', sign: false, panel: false });
+  town.fixture('cantina-sign', 94.4, 82, 'N', { z: 4.2 }).fixture('hitching-ring', 99.1, 82, 'N', { z: 1.1 });
+  // The droid detector on the vestibule's wall, and a bulb over the steps.
   town.fixture('cantina-detector', 101, 86.5, 'W', { z: 1 });
   town.things.push(at('cantina-lamp', 98.5, 87.5, { z: 3.5 - LAMP_CORD }));
   lights.push({ x: 98.5, y: 87.5, z: 2.5, radius: 4, light: 40 });
-  // (S's walls round them in the room's light, all but the roof under the dome.)
-  p.light(91, 83, 99, 86, light).light(95, 84, 102, 88, light);
+  // (S's walls round them in the room's light; the rooms' own tiles keep the
+  // sun on the roof over them, under S's dome, which takes its light.)
+  p.rect(89, 84, 102, 89, (_, __, c) => (c.slab || c.door ? c : { ...c, light }));
   // The way out: the back-bar's door, a back room, and a passage up two
   // steps to the back door.
   town.door(99, 111, 'S', { h, tex: 'door-grey', wall, opens: true, floorZ: F });
@@ -612,6 +620,9 @@ const roofOver = (x0, y0, x1, y1, ceilZ, h) => p.rect(x0, y0, x1, y1, (_, __, c)
   town.stair(118, 105, 126, 107, { up: 'E', from: F, top: 0, rise: 0.25, floor: 'flagstone', side: wall });
   roofOver(118, 105, 126, 107, ceilZ, 8);
   town.door(126, 106, 'E', { h: 8, tex: 'door-grey', opens: true });
+  // In front of the broker's alcove (the west one at the back): stepping up
+  // to him gets his stand-in message.
+  p.rect(90, 106, 94, 107, (_, __, c) => ({ ...c, tag: 'broker' }));
   // The back room: kegs, crates and canisters along its walls, a power unit
   // in the far corner, the storeroom's crates and a cargo pod out of the
   // way to the back door; a bulb over each.
@@ -712,7 +723,7 @@ town.drifts();
 town.grime();
 // Crates, drums, canisters, cargo pods, junk and litter along the walls
 // (lib/town.js), but none yet in the blocked-out middle and east third.
-town.clutter({ keep: [[126, 92, 130, 122], [130, 86, 150, 122], [136, 44, W, H], [54, 1, 146, 49], [57, 94, 87, 131], [87, 82, 126, 122]] });
+town.clutter({ keep: [[126, 92, 130, 122], [130, 86, 150, 122], [136, 44, W, H], [54, 1, 146, 49], [57, 94, 87, 131], [87, 82, 126, 122], [85, 76, 102, 82]] });
 list.push(...town.things);
 
 // Hand-placed along the main street and on the square (the kit's
@@ -829,11 +840,40 @@ list.push(
   at('villager-wanderer', 88, 75), at('villager-man', 118, 67),
   // Stallholders behind their counters, staying there.
   at('villager-man', 63.43, 62, { angle: 0, wander: 0 }), at('villager-woman', 91, 60.43, { angle: 270, wander: 0 }),
-  at('villager-wanderer', 99, 78.57, { angle: 90, wander: 0 }),
   // The water seller by his tap (a villager until his sheet exists), and the queue waiting for it.
   at('villager-man', 79.6, 73, { angle: 180, wander: 0 }),
   at('villager-woman', 78, 74.3, { angle: 90, wander: 0 }), at('villager-boy', 78.2, 75.5, { angle: 90, wander: 0 }),
   at('villager-wanderer', 77.9, 76.7, { angle: 100, wander: 0 }),
+);
+
+// The cantina's front, after Mark's stills (2026-10-30): the white dome pod
+// by its west corner, three Jawas against the wall between the arch and the
+// smaller door, and in the nook by its east corner a dewback at a stone
+// trough, the hitching ring behind it, and a drum.
+list.push(
+  at('dome-pod', 87.6, 79.4, { angle: 60 }),
+  at('jawa', 94.35, 81.45, { angle: 80, calm: { wander: 0 } }), at('jawa', 95, 81.45, { angle: 95, calm: { wander: 0 } }), at('jawa', 95.65, 81.45, { angle: 100, calm: { wander: 0 } }),
+  at('dewback', 100.3, 78.4, { angle: 180 }), at('water-trough', 99.9, 80.85, { angle: 0 }), at('barrel-grey', 97.6, 79.3),
+);
+
+// The cantina's people. Bossk drinking at the bar and Boba Fett watching
+// the room from the east alcove, calm until the town turns (then they fight
+// with the troopers). Two sandtroopers just in from the street at the foot
+// of the steps. Villagers stand in, staying put, until Mark's sheets exist
+// (docs/mission1.md, Characters): the bartender inside the bar, the broker
+// in the west back alcove (a stand-in message when you step up to him),
+// customers at the bar and the booths, and the band on the stage.
+list.push(
+  at('bossk', 94.3, 96.8, { angle: 322, calm: { wander: 0, lines: ['Hsss. Find your own bounty.', 'This one is mine, hunter.'] } }),
+  at('boba-fett', 106.9, 97.5, { angle: 180, calm: { wander: 0, lines: ['...', 'Not interested.'] } }),
+  at('sandtrooper', 96.4, 91.2, { angle: 290, calm: { wander: 0 } }), at('sandtrooper', 100.6, 91.2, { angle: 250, calm: { wander: 0 } }),
+  at('villager-man', 98.5, 104, { angle: 90, wander: 0 }),
+  at('villager-adventurer', 92, 107.3, { angle: 90, wander: 0 }),
+  at('villager-woman', 96.83, 94.86, { angle: 288, wander: 0 }), at('villager-wanderer', 100.17, 94.86, { angle: 252, wander: 0 }),
+  at('villager-man', 93.3, 103.6, { angle: 0, wander: 0 }),
+  at('villager-adventurer', 90.9, 97.5, { angle: 180, wander: 0 }), at('villager-woman', 93.6, 95, { angle: 135, wander: 0 }),
+  at('villager-man', 104, 106.5, { angle: 0, wander: 0 }), at('villager-woman', 105.4, 106.5, { angle: 180, wander: 0 }),
+  at('villager-man', 108.4, 102.4, { angle: 180, wander: 0 }), at('villager-wanderer', 108.9, 103.5, { angle: 180, wander: 0 }), at('villager-adventurer', 108.4, 104.6, { angle: 180, wander: 0 }),
 );
 
 // Cables, ropes and cloth moving in the air (world/hangings.js). Each is
@@ -893,6 +933,14 @@ export default defineLevel({
   // exist (docs/story.md): the informant's pass opens the checkpoint,
   // finding Rusk turns the town, and clearing customs is the pickup.
   triggers: [
+    {
+      on: 'enter',
+      tag: 'broker',
+      do: [
+        { action: 'message', text: "BROKER (STAND-IN): THE GUILD'S CONTRACT ON RUSK, AND A TRACKING FOB." },
+        { action: 'message', text: 'BROKER: HE WIPED HIS CODE. THE JAWAS TAG WHAT THEY SELL: TRY THE JUNK YARD.' },
+      ],
+    },
     { on: 'enter', tag: 'informant', do: [{ action: 'message', text: 'INFORMANT (STAND-IN): HERE IS A PASS. THE CHECKPOINT WILL LET YOU THROUGH.' }, { action: 'openDoors', tag: 'checkpoint' }] },
     { on: 'enter', tag: 'hold', do: [{ action: 'message', text: "RUSK (STAND-IN): THAT FOB IS IMPERIAL. THEY'RE ALREADY HERE." }, { action: 'hostile' }] },
     {
