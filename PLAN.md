@@ -48,10 +48,14 @@ These need Mark to try something, or to decide. Don't start them without him.
 
 - **Mos Eisley's middle, blocked out** (`?map=m1`, 2026-10-29): the
   cantina, the junk yard, the alleys and Bay 86, as plain volumes. The
-  cantina: in by S's door on the market, a dark entrance that turns, steps
-  down into the round room (two steps down, a low ceiling), the bar a
-  ring of counter under an opening to the sky, and a passage up to the
-  back door on the back lane, past the blast doors. The junk yard: up the
+  cantina (relaid 2026-10-30 after Mark's references): in by S's door
+  on the market, an entry that turns into the vestibule, two steps down
+  into a wide room with its front corners cut at a slant, niches along
+  the sides, a stage on the east; the U-shaped bar under an opening lit
+  from above, open at the back into the back-bar, whose door leads
+  through a back room and up two steps to the back door on the back
+  lane, past the blast doors (go round the bar's east end, where the
+  counter stops short). The junk yard: up the
   alley between H and I, through a gate and two steps down; a slanting
   heap of scrap, stand-ins for the crane and furnace, the sandcrawler
   (a block) over the low north wall. The alleys: up the alley between I
@@ -63,9 +67,10 @@ These need Mark to try something, or to decide. Don't start them without him.
   Each way round the blast doors works on its own (checked with the
   street shut there). To judge: the cantina's size and the bar under the
   opening, the alleys' length and bends, whether the sandcrawler shows
-  enough from the market. Known: the round room's edge is open to the
-  sky in a thin ring (angled walls can't take a ceiling), seen only
-  looking up at the wall, and the opening's edge is stepped; both go
+  enough from the market. Known: the cantina's angled walls (its cut
+  corners, the bar's round end) are open to the sky along a thin strip
+  (angled walls can't take a ceiling), and the opening's edge is
+  stepped; both go
   with the cantina's detail.
 
 - **Character sheets for Mos Eisley** (`docs/mission1.md`, Characters):
@@ -328,31 +333,10 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
   - [x] The middle: the cantina's shell (its back door on the back lane,
         built with the rooftops), the alleys (on to the mouth by the
         checkpoint), the junk yard, Bay 86 to look into.
-  - [ ] Mark's notes on the blockout (2026-10-30):
-    - [x] Flatter: Mos Eisley is flat, so areas sit a couple of steps
-          (0.5) up or down from their neighbours, no more. The cantina
-          -0.5, the junk yard -0.5, the old quarter 0.5, the wash 0; the alleys rise a step at a time to 0.5. The
-          docking bays stay pits, as in the film.
-    - [x] The checkpoint: set up by the Imperials in the town, not built
-          by them: no steel walls or booth. The street goes through an
-          adobe gatehouse into the old quarter, its heavy door shut;
-          barricades, floodlights and a guard post under a tarp.
-    - [x] The prefecture goes (Mark, 2026-10-30: no Imperial
-          architecture in town; the blast doors stay). Its ground is the
-          town's again; the reinforcements come in at the old quarter's
-          north street; the comm tower stays as the town's landmark.
-    - [ ] The cantina from Mark's references (2026-10-30: a fan floor
-          plan, film stills, the diorama): the slanting door into a
-          vestibule, a couple of steps down, a wide room with its front
-          corners cut at 45 degrees, booth niches along the sides, a
-          stage alcove, corner alcoves at the back; a U-shaped bar, its
-          round end to the door, the taps on an island inside it, open at
-          the back into the back-bar; the back door behind the bar, a back
-          room, and a hall to the back lane.
   - [ ] Play both halves (rough troopers for the loud half), then
         Waiting on Mark.
 - [ ] **Then each area in detail**, in the order the blockout suggests:
-  - [ ] The cantina: entrance, steps down, the round room, the bar,
+  - [ ] The cantina: entrance, steps down, the main room, the bar,
         booths, bandstand, back rooms.
   - [ ] Bay 86, the dewback stable and the speeder garage.
   - [ ] The Jawa junk yard and the sandcrawler.

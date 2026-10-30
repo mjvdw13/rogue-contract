@@ -488,52 +488,87 @@ tagTile(143, 110, 'roof-sniper');
 // the cantina, seen through its gate. The cantina and the alleys are the
 // two ways round the blast doors.
 
-// 3. The cantina. Its front is S, on the market. A dark entrance turns so
-// the street can't see in, then two steps go down into a round main room
-// under a low ceiling, the round bar in its middle under
-// an opening to the sky (Mark's still: lit from above). A passage from the
-// room's east side climbs to the back door, on the back lane east of the
-// blast doors.
-const CANTINA = { cx: 103, cy: 105, r: 13, floorZ: -0.5, ceilZ: 4, h: 6, wall: 'adobe-pale', light: 104 };
+// 3. The cantina, laid out after Mark's references (2026-10-30: a fan
+// floor plan, film stills, the diorama), with its door on the market (S).
+// An entry turns into the vestibule, so the street can't see in, and two
+// steps go down into a wide main room: its front corners cut at a slant,
+// booth niches between buttress walls along its sides, a stage two steps
+// up in an alcove on the east, two alcoves at the back. The bar is a long
+// U, its round end to the door and the taps on an island inside it, open
+// at the back into the back-bar, under an opening to the sky (lit from
+// above). The back-bar's door leads to a back room and a passage up two
+// steps to the back door on the back lane, east of the blast doors.
+const CANTINA = { floorZ: -0.5, ceilZ: 3.5, h: 6, wall: 'adobe-pale', light: 104 };
 // A ceiling at `ceilZ` over the open floor in a box, the roof at `h` on
-// it (as room() paints), for floors painted some other way: steps, a round
-// room. Angled walls can't take one, so they stay open to the sky, in the
-// room's light: a slit round the round room's edge until the detail.
+// it (as room() paints), for floors painted some other way: steps, a room
+// with angled walls. Those can't take a ceiling, so they stay open to the
+// sky, in the room's light: a slit along each until the detail.
 const roofOver = (x0, y0, x1, y1, ceilZ, h) => p.rect(x0, y0, x1, y1, (_, __, c) => {
   if (c.line) return { ...c, light: CANTINA.light };
   if (c.wall || (c.floorZ ?? 0) >= ceilZ) return c;
   return { ...c, ceiling: 'sky', ceilZ: SKY, light: town.light, slab: { bottom: ceilZ, top: h, floor: town.roof, ceiling: 'planks', side: CANTINA.wall, light: CANTINA.light } };
 });
 {
-  const { cx, cy, r, floorZ, ceilZ, h, wall, light } = CANTINA;
-  town.block(87, 88, 118, 121, { h, wall, light, skirt: null });
-  town.circle(cx, cy, r, { inside: town.street(floorZ, { floor: 'flagstone', side: wall }), wall: { wall, wallTop: h }, seam: 270 });
-  roofOver(cx - r - 1, cy - r - 1, cx + r + 1, cy + r + 1, ceilZ, h);
-  // The bar: a ring of counter round the bartender's well, under the opening.
-  const COUNTER = floorZ + 0.9;
-  town.circle(cx, cy, 4.5, { inside: town.street(COUNTER, { floor: 'flagstone', side: 'adobe-brick' }), wall: { wall: 'adobe-brick', wallTop: COUNTER }, open: 'out' });
-  town.circle(cx, cy, 2.5, { inside: town.street(floorZ, { floor: 'flagstone' }), wall: { wall: 'adobe-brick', wallTop: COUNTER } });
-  p.rect(cx - 6, cy - 6, cx + 6, cy + 6, (x, y, c) => {
-    if (Math.hypot(x + 0.5 - cx, y + 0.5 - cy) > 6) return c;
+  const { floorZ: F, ceilZ, h, wall, light } = CANTINA;
+  const MASS = { h, wall, light, skirt: null };
+  const floor = town.street(F, { floor: 'flagstone', side: wall });
+  // The building behind S, in the room's light (S keeps the sun on its
+  // front and on its dome, which takes the light of the roof under it).
+  town.block(87, 88, 118, 119, MASS);
+  // The main room, its two alcoves at the back, and the back-bar between them.
+  p.rect(88, 90, 110, 107, floor).rect(90, 107, 94, 110, floor).rect(95, 107, 102, 110, floor).rect(103, 107, 107, 110, floor);
+  town.slanted([[88, 90], [94, 90], [88, 96]], MASS).slanted([[104, 90], [110, 90], [110, 96]], MASS);
+  town.block(88, 99, 92, 102, MASS).block(106, 99, 110, 101, MASS).block(106, 106, 110, 107, MASS);
+  town.block(94, 106, 95, 110, MASS).block(102, 106, 103, 110, MASS);
+  p.rect(105, 102, 106, 106, town.street(F + 0.25, { floor: 'planks', side: wall }));
+  p.rect(106, 101, 110, 106, town.street(F + 0.5, { floor: 'planks', side: wall }));
+  // The bar: a U of counter (round at the door's end, centre 98.5, 100),
+  // its east arm stopping short for the bartender's way in, and the taps'
+  // island inside it.
+  const counter = town.street(F + 0.9, { floor: 'flagstone', side: 'adobe-brick' });
+  const top = { wall: 'adobe-brick', wallTop: F + 0.9 };
+  town.circle(98.5, 100, 4.5, { inside: counter, wall: top, open: 'out' }).circle(98.5, 100, 3.5, { inside: floor, wall: top });
+  p.rect(94, 100, 103, 106, floor).rect(94, 100, 95, 106, counter).rect(102, 100, 103, 104, counter);
+  const TAPS = { h: F + 1.6, wall: 'metal-grey', roof: 'metal-grey', skirt: null };
+  town.circle(98.5, 102, 1.5, { inside: town.roofCell(TAPS), wall: { wall: TAPS.wall, wallTop: TAPS.h }, open: 'out' });
+  town.block(97, 102, 100, 106, TAPS);
+  // Ceilings: the room's, lower in the niches and alcoves, and none over
+  // the bar, under the opening.
+  roofOver(88, 90, 110, 110, ceilZ, h);
+  for (const box of [[88, 96, 92, 99], [88, 102, 92, 107], [106, 95, 110, 99], [90, 107, 94, 110], [103, 107, 107, 110]]) roofOver(...box, F + 3, h);
+  p.rect(92, 93, 106, 107, (x, y, c) => {
+    if (((x + 0.5 - 98.5) / 5.5) ** 2 + ((y + 0.5 - 100.5) / 6.5) ** 2 > 1) return c;
     const { slab: _, ...open } = c;
     return { ...open, light: 150 };
   });
-  // The entrance: in from the market, a turn east, and steps down.
-  town.room(92, 83, 97, 85, { h, ceilZ: 3.5, wall, light });
-  town.room(97, 84, 100, 86, { h, ceilZ: 3.5, wall, light });
-  town.stair(97, 86, 100, 94, { up: 'N', from: floorZ, top: 0, rise: 0.25, floor: 'flagstone', side: wall });
-  roofOver(97, 86, 100, 94, 3.5, h);
+  // A drum round the opening, its roof at 9, so the opening is a shaft
+  // that hides the roofs round it. (Only round it: the suns are in the
+  // south-west, and a taller building would shade the roof under S's dome.)
+  p.rect(90, 91, 108, 111, (x, y, c) => {
+    const e = ((x + 0.5 - 98.5) / 5.5) ** 2 + ((y + 0.5 - 100.5) / 6.5) ** 2;
+    if (e <= 1 || e > 1.9 || c.line) return c;
+    if (c.slab) return { ...c, slab: { ...c.slab, top: 9 } };
+    return c.floorZ === h ? { ...c, floorZ: 9 } : c;
+  });
+  // The way in: the door, an entry turning east into the vestibule, and
+  // two steps down.
+  town.room(92, 83, 98, 86, { h, ceilZ: 3.5, wall, light });
+  town.room(96, 85, 101, 88, { h, ceilZ: 3.5, wall, light });
+  town.stair(96, 88, 101, 90, { up: 'N', from: F, top: 0, rise: 0.25, floor: 'flagstone', side: wall });
+  roofOver(96, 88, 101, 90, 3.5, h);
   town.door(94, 82, 'N', { h, tex: 'door-grey', wall, opens: true });
-  // (The entrance's walls in the room's light, so it's dark inside; S's
-  // outer walls and its dome, which takes the light of the roof under it,
-  // keep the sun.)
-  p.light(91, 83, 98, 86, light).light(96, 83, 101, 92, light);
-  // The way out the back: up two steps to a door on the back lane.
-  town.room(113, 99, 118, 101, { h, floorZ, ceilZ, wall, light });
-  town.stair(118, 99, 126, 101, { up: 'E', from: floorZ, top: 0, rise: 0.25, floor: 'flagstone', side: wall });
-  roofOver(118, 99, 126, 101, 3.5, 8);
-  town.door(126, 100, 'E', { h: 8, tex: 'door-grey', opens: true });
-  p.light(113, 98, 125, 102, light);
+  // (S's walls round them in the room's light, all but the roof under the dome.)
+  p.light(91, 83, 99, 86, light).light(95, 84, 102, 88, light);
+  // The way out: the back-bar's door, a back room, and a passage up two
+  // steps to the back door.
+  town.door(99, 111, 'S', { h, tex: 'door-grey', wall, opens: true, floorZ: F });
+  town.room(93, 111, 115, 116, { h, floorZ: F, ceilZ, wall, light });
+  town.room(112, 104, 115, 111, { h, floorZ: F, ceilZ, wall, light });
+  town.room(115, 105, 118, 107, { h, floorZ: F, ceilZ, wall, light });
+  town.stair(118, 105, 126, 107, { up: 'E', from: F, top: 0, rise: 0.25, floor: 'flagstone', side: wall });
+  roofOver(118, 105, 126, 107, ceilZ, 8);
+  town.door(126, 106, 'E', { h: 8, tex: 'door-grey', opens: true });
+  p.light(117, 103, 125, 108, light);
 }
 
 // 17. Docking Bay 86, next door: a pit like Bay 87, its door at the end of
