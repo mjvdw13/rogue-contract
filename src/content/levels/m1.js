@@ -1,5 +1,5 @@
 import { defineLevel } from '../../engine/defs.js';
-import { TAPS, CANOPY } from '../models/cantina.js';
+import { WALL, TAPS, CANOPY } from '../models/cantina.js';
 import { Painter } from './lib/painter.js';
 import { Town } from './lib/town.js';
 import { CISTERN } from '../models/market.js';
@@ -502,11 +502,12 @@ tagTile(143, 110, 'roof-sniper');
 // of the blast doors.
 /** Light sources (lamps), added area by area. */
 const lights = [];
-const CANTINA = { floorZ: -0.5, ceilZ: 3.5, h: 6, wall: 'adobe-pale', light: 104 };
+const CANTINA = { floorZ: -0.5, ceilZ: 3.5, h: 6, wall: WALL, light: 104 };
 // A ceiling at `ceilZ` over the open floor in a box, the roof at `h` on
 // it (as room() paints), for floors painted some other way: steps, a room
-// with angled walls. Those can't take a ceiling, so they stay open to the
-// sky, in the room's light: a slit along each until the detail.
+// with angled walls. Those can't take a ceiling, so they'd stay open to the
+// sky, in the room's light: the cantina has none (its cut corners are
+// panels, models/cantina.js).
 const roofOver = (x0, y0, x1, y1, ceilZ, h) => p.rect(x0, y0, x1, y1, (_, __, c) => {
   if (c.line) return { ...c, light: CANTINA.light };
   if (c.wall || (c.floorZ ?? 0) >= ceilZ) return c;
@@ -521,7 +522,11 @@ const roofOver = (x0, y0, x1, y1, ceilZ, h) => p.rect(x0, y0, x1, y1, (_, __, c)
   town.block(87, 88, 118, 119, MASS);
   // The main room, its two alcoves at the back, and the back-bar between them.
   p.rect(88, 90, 110, 107, floor).rect(90, 107, 94, 110, floor).rect(95, 107, 102, 110, floor).rect(103, 107, 107, 110, floor);
-  town.slanted([[88, 90], [94, 90], [88, 96]], MASS).slanted([[104, 90], [110, 90], [110, 96]], MASS);
+  // The front corners, cut at 45 degrees: square wall tiles behind each
+  // diagonal and a panel of the wall on it (models/cantina.js), so the
+  // ceiling runs right into the corner.
+  for (let y = 90; y < 95; y++) town.block(88, y, 183 - y, y + 1, MASS).block(y + 15, y, 110, y + 1, MASS);
+  town.things.push(at('cantina-corner', 91, 93, { z: F, angle: 45 }), at('cantina-corner', 107, 93, { z: F, angle: 315 }));
   town.block(88, 99, 92, 102, MASS).block(106, 99, 110, 101, MASS).block(106, 106, 110, 107, MASS);
   town.block(94, 106, 95, 110, MASS).block(102, 106, 103, 110, MASS);
   p.rect(105, 102, 106, 106, town.street(F + 0.25, { floor: 'planks', side: wall }));
