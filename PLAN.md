@@ -157,8 +157,9 @@ These need Mark to try something, or to decide. Don't start them without him.
   guard stands at the blast doors. Six Jawas: two haggling at the droid
   seller's pen, two standing by the street, one strolling the street and
   one the north back lane. Bump into one or press use to hear a line.
-  Firing a blaster or hitting anyone turns the whole town at once
-  (nothing else happens yet: m1 has no `on: 'hostile'` trigger). After
+  Firing a blaster or hitting anyone turns the whole town at once (and
+  since the east third's blockout, the `on: 'hostile'` trigger opens the
+  checkpoint and the prefecture and brings stand-in troopers). After
   Mark's notes (2026-10-18): they stroll slower (troopers 1.2 tiles a
   second, Jawas 1.5), their legs keep pace (the new calm `stride`: 1.4
   tiles a walk cycle for a trooper, 0.9 for a Jawa), and they stand in
@@ -304,8 +305,9 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
   - [x] The east third: the checkpoint, the rooftops, the old quarter
         and the dry wash, the derelict bay, the prefecture's wall and
         tower.
-  - [ ] The middle: the cantina's shell, the back lane, the alleys, the
-        junk yard, Bay 86 to look into.
+  - [ ] The middle: the cantina's shell (its back door on the back lane,
+        built with the rooftops), the alleys (on to the mouth by the
+        checkpoint), the junk yard, Bay 86 to look into.
   - [ ] Play both halves (rough troopers for the loud half), then
         Waiting on Mark.
 - [ ] **Then each area in detail**, in the order the blockout suggests:
@@ -320,12 +322,16 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
   - [ ] The derelict bay and the gutted freighter.
   - [ ] The skyline: dunes and mesas in the backdrop, the town's edges.
 - [ ] **Life:** the cantina's customers, the customs officer, the
-      dewback with the patrol; an `on: 'hostile'` trigger (blast doors,
-      reinforcements, music). Calm troopers and Jawas are placed.
+      dewback with the patrol; the blast doors shutting and the music at
+      the switch (the `on: 'hostile'` trigger opens the gates and brings
+      stand-in reinforcements). Calm troopers and Jawas are placed.
 - [ ] **Air and sound:** dust, emitters, ambient sound, the cantina band
       (sections 2 and 3).
 - [ ] **The story:** conversations, the fob, the drop-off and pickup, the
-      loud half (section 5).
+      loud half (section 5), in place of the blockout's stand-ins: the
+      informant's den opening the gate, Rusk's hold (open now; shut until
+      the fob has the signal) turning the town, and clearing customs as
+      the pickup (shooting them early ends the level).
 - [ ] **Tune:** light, frame time with a full market, the per-skill table.
 
 ### 2. Hangings: cables and cloth that sway (Mark, 2026-10-17)

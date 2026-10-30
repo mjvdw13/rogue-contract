@@ -534,10 +534,11 @@ snapshots. The steps are in PLAN.md section 1.
 4. **The blockout** (Mark, 2026-10-29: level design before details): the
    rest of the town as plain volumes at their final heights, with the
    real ways between them and stand-ins for the landmarks, the east third
-   first (the checkpoint, the rooftops, the old quarter and the wash, the
-   derelict bay, the prefecture), then the middle (the cantina's shell,
-   the back lane, the alleys, the junk yard, Bay 86). Both halves played
-   end to end, with message triggers standing in for the story.
+   first (the checkpoint, the rooftops and the back lane, the old quarter
+   and the wash, the derelict bay, the prefecture: done 2026-10-29), then
+   the middle (the cantina's shell, the alleys, the junk yard, Bay 86).
+   Both halves played end to end, with message triggers standing in for
+   the story.
 5. **Each area in detail**, in the order the blockout suggests: the
    cantina; Bay 86, the stable and the garage; the junk yard and the
    sandcrawler; the back alleys and the back lane; the checkpoint and the
