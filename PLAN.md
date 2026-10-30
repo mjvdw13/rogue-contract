@@ -1037,7 +1037,8 @@ unknown actions), documented in MODDING.md and covered by tests.
        friendly characters' reaction (today only `kind === 'npc'` gets
        bump reactions, `world.js` `tryMove`).
 5. [ ] **The town's switch** (small): a `hostile` action turns every calm
-       monster normal at once, with an `on: 'hostile'` trigger (blast
+       monster into an idle one at once (it fights when it sees or hears
+       Kyle, but doesn't chase; see 29), with an `on: 'hostile'` trigger (blast
        doors, reinforcements, combat music). The player firing runs it too
        (hook it where a shot makes noise, `weapons.js` `if (def.noise)`), and
        so does any damage the player deals.
@@ -1049,7 +1050,8 @@ unknown actions), documented in MODDING.md and covered by tests.
        that blinks its light and beeps faster near the signal, a
        `setSignal` action (a tag, item or character), and a `takeWeapon`
        action to remove it at the end. Giving it is an ordinary weapon
-       pickup in the broker's booth.
+       pickup in the broker's booth, which sets its first signal: the Jawa
+       trader (see 16).
 8. [ ] **`remove` and `place` actions** (small): Dace is taken in Mission
        1 and waits at the pad in Mission 3; Mohc leaves.
 9. [ ] Nice to have: **patrol routes** (`patrol: 'street'` walks tiles
@@ -1080,53 +1082,53 @@ found gaps between the calm half's steps, ways round the story, and
 systems that work against each other. The fixes to the design go into Map
 A. The rest wait for the engine pieces above.
 
-*In the design (Map A):*
+*In the design (done in Map A, 2026-10-30):*
 
-15. [ ] **Story order along the street.** The calm half's steps sit west to
+15. [x] **Story order along the street.** The calm half's steps sit west to
         east in the order you need them (bay, cantina, junk yard, alleys,
         checkpoint), so you never walk back on yourself. The first sketch
         put the junk yard beside the bay, west of the cantina, where players
         reach it before they have the contract.
-16. [ ] **The fob guides from the start.** The broker tunes it to the Jawa
+16. [x] **The fob guides from the start.** The broker tunes it to the Jawa
         trader's transponder, so it leads the short way to the junk yard and
         teaches itself there. The trader re-tunes it to Dace's part. Before,
         it was handed over dark, with nothing pointing to the Jawas.
-17. [ ] **No way round the story.** Dace is in the freighter's hold only
+17. [x] **No way round the story.** Dace is in the freighter's hold only
         once the fob has his signal, so going over the roofs early can't
         reach him. The trader's lines wait for the contract.
-18. [ ] **Every step still works after an early flip.** The fob is an item
+18. [x] **Every step still works after an early flip.** The fob is an item
         in the broker's booth, and the Jawas' code is also on a terminal in
         the junk yard, because the Jawas bolt when the town turns.
-19. [ ] **Fewer errands.** The thug's debt goes: the pass is a dead drop in
+19. [x] **Fewer errands.** The thug's debt goes: the pass is a dead drop in
         the alleys that the informant sells you the place of. Collecting a
         debt with no shooting or punching allowed was only a conversation.
-20. [ ] **Tell the player the rule.** Kyle starts with his fists up, and the
+20. [x] **Tell the player the rule.** Kyle starts with his fists up, and the
         customs officer says it: "Keep that blaster holstered in my town,
         hunter."
-21. [ ] **The detours connect.** The blast doors close just west of the
+21. [x] **The detours connect.** The blast doors close just west of the
         cantina's door. The cantina's back room opens onto a service passage
         to Bay 87, and the alleys run behind the street from the junk yard
         to the bay. Both are walked or seen in the calm half, past blast
         doors standing open. The alleys are lit at their mouths and turns,
         because they become a fight.
-22. [ ] **Combat starts small.** The flip sends 2 or 3 troopers through the
+22. [x] **Combat starts small.** The flip sends 2 or 3 troopers through the
         derelict bay's door, at ground level. The fights grow on the way
         back: the old quarter, the checkpoint's barricades, the detour, then
         the bay.
-23. [ ] **Troopers stay where you passed them.** Gunfire wakes every monster
+23. [x] **Troopers stay where you passed them.** Gunfire wakes every monster
         within 52 steps (`noise.js`), and they chase, which would empty the
         streets toward the first shots. Troopers posted along the way back
         are placed with `ambush`, and the closed blast doors split the town
         into separate fights.
-24. [ ] **A beacon in the west.** Bay 87 sits below the street, so the way
+24. [x] **A beacon in the west.** Bay 87 sits below the street, so the way
         back has nothing to aim for. After the flip the Crow circles over
         the bay, and the bay has a control tower you can see from the old
         quarter.
-25. [ ] **Dace's capture.** It happens while Kyle is pinned in the hold, in
+25. [x] **Dace's capture.** It happens while Kyle is pinned in the hold, in
         a short cutscene, and the squad's transport lifts off, so the old
         quarter's fight isn't a chase you can't win. The objective says:
         get back to Bay 87.
-26. [ ] **Roof jumps a step under the limit.** Gaps on the roof route are 2
+26. [x] **Roof jumps a step under the limit.** Gaps on the roof route are 2
         or 3 tiles, not 4 (the most a running jump clears). The climb is in
         sight of the checkpoint gate, in the sun, and a fall lands on the
         street west of the gate.
@@ -2012,3 +2014,14 @@ update the smoke test.
   controls), a mouse button now only clicks until it is. The smoke test
   checks both clicks (it fails without the fix), and that a click fires
   once the mouse is captured.
+- 2026-10-30: Map A (Mos Eisley) reworked for flow (to-dos 15 to 26). The
+  street holds the calm half's steps west to east in order: the bay, the
+  blast doors (open), the cantina, the junk yard, the alleys' mouth, the
+  checkpoint. The broker tunes the fob to the Jawa trader, so it guides
+  from the cantina on, and Dace is in the hold only once the fob has his
+  signal. The pass is a dead drop (no thug's debt). The cantina's back
+  room runs to Bay 87 and the alleys to a gate across from it, both doors
+  opening only from inside. The flip starts with two or three troopers
+  while Dace is dragged out of sight, troopers along the way back are
+  posted with `ambush`, the Crow circles over the bay, and the roof jumps
+  are 2 or 3 tiles. A "How it guides you" list sums it up.
