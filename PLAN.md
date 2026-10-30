@@ -28,6 +28,17 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
+- **Mos Eisley's layout** (`docs/mission1.md`, The map, 2026-10-29): the
+  paper pass before the blockout, which waits on it. Two proposals: the
+  junk yard moved north of the market, facing the cantina across it (so
+  the calm half walks the main street once each way, not three times),
+  and the old quarter on a rise past the checkpoint (1.5 up, the
+  prefecture at 3, the gate at the top of a flight of steps), its main
+  street on a slant down to the derelict bay. Also new: the alleys run
+  from between I and J to a mouth by the checkpoint, the back lane runs
+  straight so its climb shows from the street, and the freighter's hold
+  stays shut until the fob has the signal.
+
 - **Character sheets for Mos Eisley** (`docs/mission1.md`, Characters):
   cantina aliens (4-6 kinds), the band, the bartender, the broker, the
   informant, the thug, the customs officer, the bay owner, the water
@@ -278,11 +289,10 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
       area gets a slant and a change of level (`docs/mission1.md`, "Off
       the grid, and up and down"). Message triggers stand in for the
       story until conversations and the fob exist.
-  - [ ] Paper pass: the map and area table in `docs/mission1.md` fitted
-        to what's built, and the open questions settled: where the junk
-        yard goes (the calm route doubles back to the far west), the two
-        ways round the blast doors, the way past the checkpoint, the
-        landmarks.
+  - [x] Paper pass: the map and area table in `docs/mission1.md` fitted
+        to what's built, and the open questions answered there: where the
+        junk yard goes, the two ways round the blast doors, the way past
+        the checkpoint, the landmarks.
   - [ ] The east third: the checkpoint, the rooftops, the old quarter
         and the dry wash, the derelict bay, the prefecture's wall and
         tower.
