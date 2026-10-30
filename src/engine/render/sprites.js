@@ -1,8 +1,11 @@
 import { TEXELS_PER_UNIT, TRANSPARENT } from '../config.js';
 import { F_SKY } from '../world/tilemap.js';
+import { viewOf } from '../things/anim.js';
 
 const visible = [];
 let fuzzPos = 0;
+/** Glint pixels are lit at the sprite's light plus this many times the glint light where it stands. */
+export const GLINT_GAIN = 3;
 const FUZZ = [1, -1, 1, -1, 1, 1, -1, 1, 1, -1, 1, 1, 1, -1, 1, 1, 1, -1, -1, -1, -1, 1, -1, -1, 1, 1, 1, 1, -1, 1, -1, 1];
 
 /**
@@ -11,17 +14,23 @@ const FUZZ = [1, -1, 1, -1, 1, 1, -1, 1, 1, -1, 1, 1, 1, -1, 1, 1, 1, -1, -1, -1
  * pixels (view.mdepth, when one drew this frame).
  *
  * A thing is drawable when it has `sheet` (a Sheet), `frame` (index) and
- * position x/y/z. Optional: `fullbright` (current frame glows), `flipX`,
- * `def.scale`, `def.renderStyle` ('normal' | 'fuzz').
+ * position x/y/z. When its animation has `views`, the frame is the one seen
+ * from the camera, given the thing's `angle` (things/anim.js `viewOf`).
+ * Optional: `fullbright` (current frame glows), `flipX`,
+ * `def.scale`, `def.renderStyle` ('normal' | 'fuzz'). A frame's `glint` pixels
+ * brighten with the glint light (`map.glintmap`) where the thing stands.
+ * With `writeDepth` (and a valid view.mdepth), each pixel drawn records its
+ * depth there, for particles drawn after.
  *
  * @param {import('./view.js').View} view
  * @param {Array<any>} things
  * @param {import('../world/tilemap.js').TileMap} map
  */
-export function drawSprites(view, things, map, fb, fbW, colormaps, skip) {
+export function drawSprites(view, things, map, fb, fbW, colormaps, skip, writeDepth = false) {
   const { W, H, x: px, y: py, dirX, dirY, planeX, planeY, fx, fy, camZ, horizon, zbuf } = view;
   const { segDist, segTop, segBot, segFirst, segCount, SEG } = view;
   const mdepth = view.depthValid ? view.mdepth : null;
+  const depthOut = writeDepth && mdepth !== null;
   const invDet = 1 / (planeX * dirY - dirX * planeY);
   visible.length = 0;
   for (const t of things) {
@@ -40,7 +49,20 @@ export function drawSprites(view, things, map, fb, fbW, colormaps, skip) {
   visible.sort((a, b) => b._depth - a._depth);
 
   for (const t of visible) {
-    const frame = t.sheet.frame(t.frame);
+    // The view of the thing from where the camera stands (a view frame past
+    // the sheet's end, as on a placeholder sheet, draws the front one).
+    let fi = t.frame;
+    let flipX = t.flipX;
+    const views = t.anim?.views;
+    if (views) {
+      const v = viewOf(t.angle, px - t.x, py - t.y);
+      const f = views[v < 0 ? -v : v][t.animPos];
+      if (f !== undefined && f < t.sheet.count) {
+        fi = f;
+        if (v < 0) flipX = !flipX;
+      }
+    }
+    const frame = t.sheet.frame(fi);
     const depth = t._depth;
     const scale = ((t.def?.scale ?? 1) * (t.sheet.scale ?? 1)) / TEXELS_PER_UNIT;
     const spriteW = (frame.w * scale * fx) / depth;
@@ -49,7 +71,7 @@ export function drawSprites(view, things, map, fb, fbW, colormaps, skip) {
     const screenX = (W / 2) * (1 + t._tx / depth);
     const left = screenX - spriteW / 2;
     // Projectiles hang centred on their z; everything else stands on it.
-    const z = t.kind === 'projectile' ? t.z - (frame.h * scale) / 2 : t.z ?? 0;
+    const z = t.kind === 'projectile' ? t.z - (frame.h * scale) / 2 : (t.z ?? 0) + (t.bobZ ?? 0);
     const bottom = horizon + ((camZ - z) * fy) / depth;
     const top = bottom - spriteH;
 
@@ -59,17 +81,28 @@ export function drawSprites(view, things, map, fb, fbW, colormaps, skip) {
     if (x1 > W) x1 = W;
     if (x1 <= x0) continue;
 
+    const fuzz = t.def?.renderStyle === 'fuzz';
     let lv;
+    // Glint pixels (armour highlights) brighten with the light sources that can see the sprite.
+    let gv = -1;
     if (view.fixedColormap >= 0) lv = view.fixedColormap;
     else if (t.fullbright) lv = 0;
     else {
       // The smooth light where it stands, in its storey.
       const tile = map.inBounds(t.x | 0, t.y | 0) ? (t.y | 0) * map.w + (t.x | 0) : -1;
+      const storey = tile >= 0 ? map.storeyAt(tile, (t.z ?? 0) + 0.5) : 0;
+      const light = tile >= 0 && map.lightmap ? map.lightmap.sample(t.x, t.y, storey) : 128;
       // (Outdoors in haze, fading toward the haze colour.)
-      lv = view.row(tile >= 0 && map.lightmap ? map.lightmap.sample(t.x, t.y, map.storeyAt(tile, (t.z ?? 0) + 0.5)) : 128, depth, tile >= 0 && (map.flags[tile] & F_SKY) !== 0);
+      const outdoor = tile >= 0 && (map.flags[tile] & F_SKY) !== 0;
+      lv = view.row(light, depth, outdoor);
+      if (frame.glint && !fuzz && tile >= 0 && map.glintmap) {
+        const g = map.glintmap.sample(t.x, t.y, storey);
+        if (g >= 1) gv = view.row(light + g * GLINT_GAIN, depth, outdoor);
+      }
     }
     const cm = lv * 256;
-    const fuzz = t.def?.renderStyle === 'fuzz';
+    const gcm = gv * 256;
+    const gmask = gv >= 0 ? frame.glint : null;
     const texScaleX = frame.w / spriteW;
     const texScaleY = frame.h / spriteH;
     const fh = frame.h;
@@ -87,7 +120,7 @@ export function drawSprites(view, things, map, fb, fbW, colormaps, skip) {
       while (first > 0 && !segFirst[sb + first]) first--;
       let tx = ((x + 0.5 - left) * texScaleX) | 0;
       if (tx >= frame.w) tx = frame.w - 1;
-      if (t.flipX) tx = frame.w - 1 - tx;
+      if (flipX) tx = frame.w - 1 - tx;
       const ct = frame.top[tx];
       if (ct < 0) continue;
       const cb = frame.bottom[tx];
@@ -111,8 +144,9 @@ export function drawSprites(view, things, map, fb, fbW, colormaps, skip) {
             const src = o + FUZZ[fuzzPos++ & 31] * fbW;
             fb[o] = colormaps[6 * 256 + fb[src < 0 || src >= fb.length ? o : src]];
           } else {
-            fb[o] = colormaps[cm + c];
+            fb[o] = colormaps[(gmask && gmask[base + ty] ? gcm : cm) + c];
           }
+          if (depthOut) mdepth[o] = depth;
         }
       }
     }

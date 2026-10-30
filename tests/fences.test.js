@@ -174,7 +174,7 @@ test('a low railing leaves the view above its top alone', () => {
   const w = renderer.surface.w;
   const rows = diff(open, railed).map((i) => Math.floor(i / w));
   assert.ok(rows.length > 100);
-  // The eye is at 1, above the railing's 0.75: it is drawn below the horizon only.
+  // The eye is at 1.25, above the railing's 0.75: it is drawn below the horizon only.
   assert.ok(Math.min(...rows) > VIEW_H / 2, `railing rows start at ${Math.min(...rows)}`);
 });
 

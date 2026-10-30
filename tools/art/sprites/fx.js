@@ -1,5 +1,7 @@
-// Effects and projectiles: blaster puffs, blood, explosions, blaster bolts
-// and the Jawas' ion blasts. Fire is drawn with noisy fullbright gradients.
+// Effects and projectiles: blaster puffs, blood, explosions, blaster bolts,
+// the Jawas' ion blasts and Boba Fett's rockets. (The concussion rifle's shot
+// is unseen.)
+// Fire is drawn with noisy fullbright gradients.
 import { PixelCanvas } from '../lib/canvas.js';
 import { C, G } from '../lib/pal.js';
 import { sheet } from '../lib/sprite.js';
@@ -162,12 +164,28 @@ function ionBlast() {
   return sheet(frames);
 }
 
+/**
+ * Boba Fett's rocket: a fireball with a dark smoke rim (frames 0-2, looped),
+ * then a burst of fire and smoke where it hits (frames 3-5). 32x32.
+ */
+function rocket() {
+  const frames = [];
+  for (let f = 0; f < 3; f++) {
+    const c = new PixelCanvas(32, 32);
+    smoke(c, 16, 16, 7, 140 + f, 0.3);
+    fireBlob(c, 16, 16, 4.6 + (f % 2) * 0.5, 150 + f, FIRE.slice(0, 5));
+    frames.push(c);
+  }
+  return sheet([...frames, ...explosion(32, FIRE, 160, 3)]);
+}
+
 export default [
   { name: 'puff', out: F('puff'), draw: puff },
   { name: 'blood', out: F('blood'), draw: () => blood('blood') },
   { name: 'explosion', out: F('explosion'), draw: () => sheet(explosion(64, FIRE, 31, 5)) },
   { name: 'blaster-bolt', out: F('blaster-bolt'), draw: () => blasterBolt('red') },
   { name: 'ion-blast', out: F('ion-blast'), draw: ionBlast },
+  { name: 'rocket', out: F('rocket'), draw: rocket },
 ];
 
 export { fireBlob, smoke, FIRE };

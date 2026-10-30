@@ -6,9 +6,28 @@ const NEAR = 3.2; // full volume inside this distance (tiles)
 const FAR = 48; // silent beyond this distance
 
 /**
+ * Where a recorded sound really starts: the first sample above 1% of its
+ * peak, less 2 ms. MP3s carry 25 ms or more of silence before the sound.
+ */
+export function leadingSilence(samples, rate) {
+  let peak = 0;
+  for (const v of samples) peak = Math.max(peak, Math.abs(v));
+  const threshold = peak * 0.01;
+  let i = 0;
+  while (i < samples.length && Math.abs(samples[i]) <= threshold) i++;
+  if (i >= samples.length) return 0;
+  return Math.max(0, i - Math.round(rate * 0.002));
+}
+
+/**
  * Sound effects and music. Synthesized sounds are rendered on first use;
  * file sounds are fetched and decoded in the background. Browsers only allow
  * audio after a user gesture, so call unlock() from a key/click handler.
+ *
+ * Sound overrides: `assets/custom/sound-overrides.json` maps a sound id to a
+ * recorded file, `{ src, volume? }`. The file plays instead of the synth (the
+ * synth stands in until the file is decoded, and for good if it fails to
+ * load). Skipped under test automation, so tests hear the synthesized sounds.
  */
 export class AudioSystem {
   /** @param {import('../registry.js').Registry} registry */
@@ -17,6 +36,8 @@ export class AudioSystem {
     this.ctx = null;
     this.buffers = new Map();
     this.pending = new Set();
+    this.overrides = new Map();
+    this.files = new Map();
     this.voices = [];
     this.muted = false;
     this.sfxLevel = 0.8;
@@ -54,6 +75,7 @@ export class AudioSystem {
     this.sfxGain.connect(this.master);
     this.musicGain.connect(this.master);
     this._applyVolumes();
+    this._decodeOverrides();
     if (this.wantedSong) {
       const song = this.wantedSong;
       this.wantedSong = null;
@@ -81,30 +103,92 @@ export class AudioSystem {
     this.music.setVolume(this.muted ? 0 : this.musicLevel);
   }
 
+  /** Fetch `assets/custom/sound-overrides.json` and start downloading its files. */
+  async loadOverrides() {
+    if (globalThis.navigator?.webdriver) return;
+    let map = {};
+    try {
+      const res = await fetch('assets/custom/sound-overrides.json', { cache: 'no-store' });
+      if (res.ok) map = await res.json();
+    } catch {
+      // No overrides.
+    }
+    this.setOverrides(map);
+    for (const o of this.overrides.values()) this._fetch(o.src).catch(() => {});
+    if (this.ctx) this._decodeOverrides();
+  }
+
+  /** Use recorded files for sound ids: `{ id: { src, volume? } }`. */
+  setOverrides(map) {
+    this.overrides.clear();
+    for (const [id, o] of Object.entries(map ?? {})) {
+      if (!this.registry.sounds.has(id)) console.warn(`Sound override for unknown sound "${id}"`);
+      else if (o?.src) {
+        this.overrides.set(id, o);
+        console.info(`Sound override: ${id} -> ${o.src}`);
+      }
+    }
+  }
+
+  /** The sound definition to play for an id: its override's file if it has one. */
+  soundDef(id) {
+    const def = this.registry.sounds.get(id);
+    const o = this.overrides.get(id);
+    if (!def || !o) return def ?? null;
+    return { ...def, src: o.src, synth: undefined, volume: o.volume ?? def.volume, standIn: def.synth ? def : null };
+  }
+
+  _fetch(src) {
+    if (!this.files.has(src)) {
+      this.files.set(src, fetch(src).then((r) => {
+        if (!r.ok) throw new Error(`${r.status} ${src}`);
+        return r.arrayBuffer();
+      }));
+    }
+    return this.files.get(src);
+  }
+
+  _decodeOverrides() {
+    for (const id of this.overrides.keys()) this._buffer(this.soundDef(id));
+  }
+
   _buffer(def) {
-    if (this.buffers.has(def.id)) return this.buffers.get(def.id);
+    const key = def.src ?? def.id;
+    if (this.buffers.has(key)) return this.buffers.get(key);
     if (def.synth) {
       const samples = renderSynth(def.synth, SYNTH_RATE, def.id);
       const buf = this.ctx.createBuffer(1, samples.length, SYNTH_RATE);
       buf.getChannelData(0).set(samples);
-      this.buffers.set(def.id, buf);
+      this.buffers.set(key, buf);
       return buf;
     }
-    if (def.src && !this.pending.has(def.id)) {
-      this.pending.add(def.id);
-      fetch(def.src)
-        .then((r) => r.arrayBuffer())
-        .then((data) => this.ctx.decodeAudioData(data))
-        .then((buf) => this.buffers.set(def.id, buf))
-        .catch((err) => console.warn(`Could not load sound "${def.id}"`, err));
+    if (def.src && !this.pending.has(key)) {
+      this.pending.add(key);
+      this._fetch(def.src)
+        .then((data) => this.ctx.decodeAudioData(data.slice(0)))
+        .then((buf) => this.buffers.set(key, this._trim(buf)))
+        .catch((err) => {
+          console.warn(`Could not load sound "${def.id}" (${def.src})`, err);
+          // An override that won't load falls back to the synth for good.
+          for (const [id, o] of this.overrides) if (o.src === def.src) this.overrides.delete(id);
+        });
     }
     return null;
+  }
+
+  /** A copy of a decoded file without its leading silence. */
+  _trim(buf) {
+    const skip = leadingSilence(buf.getChannelData(0), buf.sampleRate);
+    if (!skip) return buf;
+    const out = this.ctx.createBuffer(buf.numberOfChannels, buf.length - skip, buf.sampleRate);
+    for (let c = 0; c < buf.numberOfChannels; c++) out.getChannelData(c).set(buf.getChannelData(c).subarray(skip));
+    return out;
   }
 
   /** Pre-render every synthesized sound (avoids hitches the first time each plays). */
   warmUp() {
     if (!this.ctx) return;
-    for (const def of this.registry.sounds.values()) this._buffer(def);
+    for (const id of this.registry.sounds.keys()) this._buffer(this.soundDef(id));
   }
 
   /**
@@ -112,9 +196,11 @@ export class AudioSystem {
    */
   play(id, opts = {}) {
     if (!this.ctx || this.muted) return;
-    const def = this.registry.sounds.get(id) ?? (opts.fallback ? this.registry.sounds.get(opts.fallback) : null);
+    let def = this.soundDef(id) ?? (opts.fallback ? this.soundDef(opts.fallback) : null);
     if (!def) return;
-    const buf = this._buffer(def);
+    let buf = this._buffer(def);
+    // A recorded sound still loading: the synth plays meanwhile.
+    if (!buf && def.standIn) buf = this._buffer((def = def.standIn));
     if (!buf) return;
     const ctx = this.ctx;
     // Same sound from the same origin cuts itself off; otherwise steal the oldest voice.

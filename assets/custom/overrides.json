@@ -1,9 +1,10 @@
 {
   "assets/sprites/monsters/stormtrooper.png": {
     "src": "assets/custom/stormtrooper.png",
-    "frameWidth": 46,
+    "frameWidth": 50,
     "frameHeight": 67,
-    "scale": 0.85
+    "scale": 0.85,
+    "glint": [[252, 252, 252]]
   },
   "assets/sprites/monsters/officer.png": {
     "src": "assets/custom/officer.png",
@@ -15,7 +16,8 @@
     "src": "assets/custom/probe-droid.png",
     "frameWidth": 88,
     "frameHeight": 89,
-    "scale": 0.85
+    "scale": 0.85,
+    "glow": [[252, 252, 252]]
   },
   "assets/sprites/weapons/fists.png": {
     "src": "assets/custom/fists.png",
@@ -123,5 +125,57 @@
   },
   "assets/textures/desert-gravel.png": {
     "src": "assets/custom/textures/desert-gravel.png"
+  },
+  "assets/sprites/monsters/bossk.png": {
+    "src": "assets/custom/bossk.png",
+    "frameWidth": 74,
+    "frameHeight": 99,
+    "scale": 0.85
+  },
+  "assets/sprites/monsters/boba-fett.png": {
+    "src": "assets/custom/boba-fett.png",
+    "frameWidth": 90,
+    "frameHeight": 92,
+    "scale": 0.65
+  },
+  "assets/sprites/fx/rocket.png": {
+    "src": "assets/custom/rocket.png",
+    "frameWidth": 18,
+    "frameHeight": 15,
+    "scale": 0.85
+  },
+  "assets/sprites/fx/thermal-detonator.png": {
+    "src": "assets/custom/thermal-detonator-ball.png",
+    "frameWidth": 16,
+    "frameHeight": 15,
+    "scale": 0.85
+  },
+  "assets/sprites/items/thermal-detonator.png": {
+    "src": "assets/custom/thermal-detonator-item.png",
+    "frameWidth": 16,
+    "frameHeight": 15,
+    "scale": 0.85
+  },
+  "assets/sprites/items/detonator-belt.png": {
+    "src": "assets/custom/detonator-belt.png",
+    "frameWidth": 44,
+    "frameHeight": 25,
+    "scale": 0.85
+  },
+  "assets/sprites/weapons/thermal-detonator.png": {
+    "src": "assets/custom/thermal-detonator.png",
+    "frameWidth": 124,
+    "frameHeight": 134
+  },
+  "assets/sprites/items/concussion-rifle.png": {
+    "src": "assets/custom/concussion-rifle-item.png",
+    "frameWidth": 62,
+    "frameHeight": 19,
+    "scale": 0.85
+  },
+  "assets/sprites/weapons/concussion-rifle.png": {
+    "src": "assets/custom/concussion-rifle.png",
+    "frameWidth": 174,
+    "frameHeight": 119
   }
 }

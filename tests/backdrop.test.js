@@ -31,6 +31,30 @@ test('slopes facing the moon are lit brighter', () => {
   assert.ok(west.lightAt(0, 0) > east.lightAt(0, 0));
 });
 
+test('the texture runs along a face, fixed to the world whichever way it is seen', () => {
+  // The ramp faces west, so its texture runs along y, like a wall's.
+  const bd = new Backdrop(ramp(), () => 0);
+  assert.equal(bd.faceU(0.5, 1.25), 1.25);
+  assert.equal(bd.faceU(-1, -0.75), -0.75);
+  // Turned to face north, it runs along x.
+  const heights = [];
+  for (let j = 0; j <= 4; j++) for (let i = 0; i <= 4; i++) heights.push(j * 2);
+  assert.equal(new Backdrop({ ...ramp(), heights }, () => 0).faceU(0.5, 1.25), 0.5);
+});
+
+test('each block keeps its highest corner, edges included, for the renderer to pass over low ground', () => {
+  // 10 x 3 cells: two blocks across (8 cells and 2), one down.
+  const heights = [];
+  for (let j = 0; j <= 3; j++) for (let i = 0; i <= 10; i++) heights.push(i === 8 && j === 1 ? 50 : i);
+  const bd = new Backdrop({ x: 0, y: 0, cell: 1, w: 10, h: 3, heights, tex: 'sandstone' }, () => 0);
+  assert.equal(bd.bw, 2);
+  assert.equal(bd.bh, 1);
+  // The peak on the corner between them counts for both.
+  assert.deepEqual([...bd.blockMax], [50, 50]);
+  heights[1 * 11 + 8] = 8;
+  assert.deepEqual([...new Backdrop({ x: 0, y: 0, cell: 1, w: 10, h: 3, heights, tex: 'sandstone' }, () => 0).blockMax], [8, 10]);
+});
+
 test('a bad backdrop is a level error', () => {
   assert.deepEqual(checkBackdrop(ramp()), []);
   const errors = checkBackdrop({ ...ramp(), heights: [1, 2], tex: undefined });

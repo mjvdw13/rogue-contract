@@ -41,8 +41,9 @@ const pngSize = (src, owner) => {
 };
 for (const t of reg.textures.values()) {
   const size = pngSize(t.src, `texture "${t.id}"`);
-  if (!size || t.sky || t.fence) continue;
+  if (!size || t.sky || t.fence || t.decal) continue;
   // Any power-of-two size from 16 to 256 (64x64 is the usual; a door's art is one whole door).
+  // Fences and decals keep their own sizes.
   const fw = size.width / (t.frames ?? 1);
   const ok = (n) => Number.isInteger(n) && n >= 16 && n <= 256 && (n & (n - 1)) === 0;
   if (!ok(fw) || !ok(size.height)) {

@@ -1,5 +1,6 @@
-import { TRANSPARENT } from '../config.js';
+import { TRANSPARENT, LIGHT_LEVELS, SHADE_STEP } from '../config.js';
 import { F_SKY } from '../world/tilemap.js';
+import { HAZE_STEPS } from '../gfx/palette.js';
 
 /** Nearest depth drawn; polygons are clipped here. */
 export const NEAR = 0.05;
@@ -12,6 +13,8 @@ const LIGHT = (() => {
 /** Colormap levels darker for a face turned fully away from the light. */
 export const SHADE = 8;
 const MAX_POLY = 16;
+/** 4 x 4 ordered dither thresholds, centred on 0, for grime faces' fractional levels (as columns.js). */
+const DITHER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map((v) => (v + 0.5) / 16 - 0.5);
 
 // Scratch space: per-vertex camera space, and the clipped polygon.
 let camD = new Float64Array(256);
@@ -67,6 +70,21 @@ export function drawModels(view, things, map, textures, fb, fbW, colormaps, skip
     if (cDepth + r < NEAR) continue;
     const cTx = invDet * (dirY * cdx - dirX * cdy);
     if (Math.abs(cTx) - r > cDepth + r) continue;
+    // Hidden behind the walls in every column it could cover (its nearest
+    // point is no nearer than where they end): nothing would draw.
+    const dMin = cDepth - r > NEAR ? cDepth - r : NEAR;
+    const dMax = cDepth + r;
+    const rl = r / view.planeLen;
+    const qLo = Math.min((cTx - rl) / dMin, (cTx - rl) / dMax);
+    const qHi = Math.max((cTx + rl) / dMin, (cTx + rl) / dMax);
+    let hidden = true;
+    for (let x = Math.max(0, Math.floor(halfW * (1 + qLo)) - 1), x1 = Math.min(W, Math.ceil(halfW * (1 + qHi)) + 1); x < x1; x++) {
+      if (zbuf[x] > dMin - 1e-6) {
+        hidden = false;
+        break;
+      }
+    }
+    if (hidden) continue;
 
     const nv = model.verts.length / 3;
     if (camD.length < nv) {
@@ -75,14 +93,22 @@ export function drawModels(view, things, map, textures, fb, fbW, colormaps, skip
     }
     const c = Math.cos(t.angle ?? 0);
     const sn = Math.sin(t.angle ?? 0);
-    const tz = t.z ?? 0;
+    // (A bobbing thing, `bob`, is drawn `bobZ` off its place; its grime
+    // faces, a shadow on the ground, stay where they are.)
+    const bob = t.bobZ ?? 0;
+    const tz = (t.z ?? 0) + bob;
+    // (It rolls `bobRoll` about its long axis, through its base.)
+    const rc = Math.cos(t.bobRoll ?? 0);
+    const rs = Math.sin(t.bobRoll ?? 0);
     const vs = model.verts;
     for (let i = 0; i < nv; i++) {
       const mx = vs[i * 3] * s;
-      const my = vs[i * 3 + 1] * s;
+      const my0 = vs[i * 3 + 1] * s;
+      const mz0 = vs[i * 3 + 2] * s;
+      const my = my0 * rc - mz0 * rs;
       const wx = t.x + mx * c - my * sn;
       const wy = t.y + mx * sn + my * c;
-      const wz = tz + vs[i * 3 + 2] * s;
+      const wz = tz + my0 * rs + mz0 * rc;
       worldX[i] = wx;
       worldY[i] = wy;
       worldZ[i] = wz;
@@ -94,7 +120,8 @@ export function drawModels(view, things, map, textures, fb, fbW, colormaps, skip
     }
 
     const tile = map.inBounds(t.x | 0, t.y | 0) ? (t.y | 0) * map.w + (t.x | 0) : -1;
-    const light = tile >= 0 && map.lightmap ? map.lightmap.sample(t.x, t.y, map.storeyAt(tile, (t.z ?? 0) + 0.5)) : 128;
+    // (A thing may carry its own light: a tarp over the shade it makes.)
+    const light = t.fixedLight >= 0 ? t.fixedLight : tile >= 0 && map.lightmap ? map.lightmap.sample(t.x, t.y, map.storeyAt(tile, (t.z ?? 0) + 0.5)) : 128;
     const outdoor = tile >= 0 && (map.flags[tile] & F_SKY) !== 0;
     const fixed = view.fixedColormap;
 
@@ -116,6 +143,7 @@ export function drawModels(view, things, map, textures, fb, fbW, colormaps, skip
       }
 
       // Clip at the near plane (Sutherland-Hodgman), in camera space.
+      const dz = f.grime ? -bob : 0;
       let k = 0;
       const uv = f.uv;
       for (let i = 0; i < m; i++) {
@@ -126,7 +154,7 @@ export function drawModels(view, things, map, textures, fb, fbW, colormaps, skip
         if (da >= NEAR) {
           inD[k] = da;
           inX[k] = camX[a];
-          inZ[k] = camZ_[a];
+          inZ[k] = camZ_[a] + dz;
           if (uv) {
             inU[k] = uv[i * 2];
             inV[k] = uv[i * 2 + 1];
@@ -137,7 +165,7 @@ export function drawModels(view, things, map, textures, fb, fbW, colormaps, skip
           const q = (NEAR - da) / (db - da);
           inD[k] = NEAR;
           inX[k] = camX[a] + (camX[b] - camX[a]) * q;
-          inZ[k] = camZ_[a] + (camZ_[b] - camZ_[a]) * q;
+          inZ[k] = camZ_[a] + (camZ_[b] - camZ_[a]) * q + dz;
           if (uv) {
             const j = (i + 1) % m;
             inU[k] = uv[i * 2] + (uv[j * 2] - uv[i * 2]) * q;
@@ -178,7 +206,7 @@ export function drawModels(view, things, map, textures, fb, fbW, colormaps, skip
       // the light. The shading wraps all the way round, so faces turned away
       // still differ from each other.
       const lit = (nx * LIGHT[0] + ny * LIGHT[1] + nz * LIGHT[2] + 1) / 2;
-      const shade = Math.round(SHADE * (1 - lit));
+      const shade = f.flat ? 0 : Math.round(SHADE * (1 - lit));
       const glow = f.glow;
       const color = f.color;
       const tex = f.slot >= 0 ? textures[f.slot] : null;
@@ -187,6 +215,10 @@ export function drawModels(view, things, map, textures, fb, fbW, colormaps, skip
       const wm = tex ? tex.wMask : 0;
       const hm = tex ? tex.hMask : 0;
       const pix = tex ? tex.cur : null;
+      // Grime darkens what's there by its texels' levels, less in haze, and
+      // hides nothing behind it (it writes no depth).
+      const grime = f.grime ? tex.shade : null;
+      const hazy = outdoor && view.hazeOn;
 
       for (let x = x0; x < x1; x++) {
         const xc = x + 0.5;
@@ -249,8 +281,18 @@ export function drawModels(view, things, map, textures, fb, fbW, colormaps, skip
         const wallT = zbuf[x];
         const sb = x * SEG;
         const ns = segCount[x];
-        let seg = 0; // ledge windows nearer than the pixel: segments [0, seg)
         const dIz = (izB - izA) / span;
+        // Ledge windows nearer than the pixel: segments [0, seg). Found for the
+        // first pixel by a binary search (a town's columns record many), then
+        // moved along pixel by pixel.
+        const d0 = 1 / (izA + dIz * (y0 + 0.5 - yA));
+        let seg = 0;
+        let hi = ns;
+        while (seg < hi) {
+          const mid = (seg + hi) >> 1;
+          if (segDist[sb + mid] < d0) seg = mid + 1;
+          else hi = mid;
+        }
         const dU = (uB - uA) / span;
         const dV = (vB - vA) / span;
         for (let y = y0; y < y1; y++) {
@@ -269,6 +311,18 @@ export function drawModels(view, things, map, textures, fb, fbW, colormaps, skip
             if (!(y >= segTop[sb + k] && y < segBot[sb + k])) continue;
           }
           let ci;
+          if (grime) {
+            const u = (uA + dU * along) * depth;
+            const v = (vA + dV * along) * depth;
+            const sh = grime[(Math.floor(u * tw) & wm) * th + (Math.floor(v * th) & hm)];
+            if (sh === 0) continue;
+            const g = hazy ? (1 - view.hazeF(depth) / (HAZE_STEPS - 1)) / SHADE_STEP : 1 / SHADE_STEP;
+            let l = (sh * g + DITHER[(x & 3) + (y & 3) * 4] + 0.5) | 0;
+            if (l <= 0) continue;
+            if (l >= LIGHT_LEVELS) l = LIGHT_LEVELS - 1;
+            fb[o] = colormaps[l * 256 + fb[o]];
+            continue;
+          }
           if (pix) {
             const u = (uA + dU * along) * depth;
             const v = (vA + dV * along) * depth;

@@ -3,10 +3,12 @@
  * slightly different speeds to reveal the next one.
  */
 export class MeltWipe {
-  constructor(w, h) {
+  /** `w` x `h` is the layout; the screen is `scale` times that in each direction. */
+  constructor(w, h, scale = 1) {
     this.w = w;
     this.h = h;
-    this.old = new Uint8Array(w * h);
+    this.scale = scale;
+    this.old = new Uint8Array(Math.round(w * scale) * Math.round(h * scale));
     this.cols = w >> 1; // two-pixel-wide columns, like the original
     this.y = new Int16Array(this.cols);
     this.active = false;
@@ -54,11 +56,14 @@ export class MeltWipe {
   /** Draw the melting old screen on top of the new one. */
   draw(px) {
     if (!this.active) return;
-    const { w, h, old } = this;
+    const k = this.scale;
+    const w = Math.round(this.w * k);
+    const h = Math.round(this.h * k);
+    const old = this.old;
     for (let c = 0; c < this.cols; c++) {
-      const dy = Math.max(0, this.y[c]);
+      const dy = Math.round(Math.max(0, this.y[c]) * k);
       if (dy >= h) continue;
-      for (let x = c * 2; x < c * 2 + 2; x++) {
+      for (let x = Math.round(c * 2 * k); x < Math.round((c + 1) * 2 * k); x++) {
         for (let y = h - 1; y >= dy; y--) px[y * w + x] = old[(y - dy) * w + x];
       }
     }

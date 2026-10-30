@@ -112,6 +112,7 @@ export class LightEffects {
   _setSource(src, amount) {
     if (amount === src.cur) return;
     applySource(this.map, src.baked, amount - src.cur, this.lightmap);
+    if (src.glint) applySource(this.map, src.glint, amount - src.cur, this.map.glintmap, this.map.glintLight);
     src.cur = amount;
   }
 

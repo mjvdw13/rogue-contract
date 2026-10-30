@@ -22,7 +22,9 @@ import { defineLevel } from '../../engine/defs.js';
 // Two storeys (slabs): a bridge across the pit at the hall's floor, which you
 // can walk under down in the pit; a bunker dug under the west end of the
 // sniper ledge (an energy pack inside); and a walkway with railings running
-// north from the ledge out over the courtyard.
+// north from the ledge out over the courtyard. Bossk and Boba Fett wait in
+// the courtyard, to try them out, and five villagers stroll about the start
+// room.
 export default defineLevel({
   id: 'sandbox',
   mapLabel: 'M1',
@@ -153,7 +155,7 @@ export default defineLevel({
       fence: { tex: 'imp-railing', edges: 'E', height: 0.75 },
     },
   },
-  thingLegend: { '9': { type: 'stormtrooper', angle: 'S' } },
+  thingLegend: { '9': { type: 'stormtrooper', angle: 'S' }, R: { type: 'concussion-rifle' } }, // (here 9 is a trooper, not the rifle)
   tiles: [
     'OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO',
     'OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO',
@@ -215,15 +217,15 @@ export default defineLevel({
     '',
     '',
     '',
-    '',
+    '          u',
     '                 k',
+    '              w',
+    '        n                                9',
     '',
-    '                                         9',
-    '',
-    '   >                             h       o',
-    '',
-    '                                 l',
-    '',
+    '   > 4 R                         h       o',
+    '           D',
+    '            m                    l',
+    '               e',
     '     x                       C             c',
     '',
     '',
@@ -233,14 +235,14 @@ export default defineLevel({
     '',
     '',
     '       x x',
-    '',
+    '          T',
     '',
     '',
     '                                     p',
     '',
     '',
     '',
-    '',
+    '                                        F',
     '',
     '             f',
     '',
@@ -248,6 +250,6 @@ export default defineLevel({
     '',
     '',
     '',
-    '       C   a           9      s   j',
+    '       C   a           9      s S j',
   ],
 });

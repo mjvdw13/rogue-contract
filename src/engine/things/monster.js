@@ -1,5 +1,6 @@
 import { performAttack } from '../combat/attacks.js';
 import { canSeeBody } from '../combat/aim.js';
+import { calmThink } from './calm.js';
 
 /**
  * Definition-driven monster AI, in the spirit of Doom's:
@@ -9,6 +10,8 @@ import { canSeeBody } from '../combat/aim.js';
  *   attack -> plays the attack animation; the 'fire' frame event deals damage
  *   pain   -> flinches
  *   dead   -> death animation, then a corpse
+ *   calm   -> goes about its business and never attacks (calm.js), until
+ *             it or the town turns hostile (world.turnHostile)
  * Hooks on the definition (onSight, onThink, onAttack, onPain, onDeath,
  * onEvent) allow custom behaviour without changing this file.
  */
@@ -154,9 +157,19 @@ function applyMomentum(world, t, dt) {
   if (Math.abs(t.vy) < 0.02) t.vy = 0;
 }
 
+function calmWalkRate(m) {
+  const { speed, stride } = m.calm;
+  if (!stride) return speed / (m.def.speed || 1);
+  // Cycles a second to cover `speed`, times how long a cycle takes at rate 1.
+  return (speed / stride) * m.def.anims.walk.durations.reduce((t, d) => t + d, 0);
+}
+
 export function monsterThink(world, m, dt) {
   applyMomentum(world, m, dt);
-  const finished = m.stepAnim(dt, (ev) => {
+  // A calm stroll is slower than a chase: its walk plays to match, so the feet
+  // don't slide. With a stride, one cycle covers that many tiles.
+  const rate = m.calm && m.animName === 'walk' ? calmWalkRate(m) : 1;
+  const finished = m.stepAnim(dt * rate, (ev) => {
     if (ev === 'fire') fireAttack(world, m);
     else if (ev.startsWith('sound:')) world.playSoundFrom(ev.slice(6), m);
     else m.def.hooks?.onEvent?.(world, m, ev);
@@ -165,6 +178,9 @@ export function monsterThink(world, m, dt) {
   if (m.def.hooks?.onThink?.(world, m, dt) === true) return;
 
   switch (m.state) {
+    case 'calm':
+      calmThink(world, m, dt);
+      break;
     case 'idle': {
       m.timer -= dt;
       if (m.timer <= 0) {

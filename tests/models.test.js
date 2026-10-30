@@ -5,7 +5,9 @@ import { Registry } from '../src/engine/registry.js';
 import content from '../src/content/index.js';
 import { Palette } from '../src/engine/gfx/palette.js';
 import { Surface } from '../src/engine/gfx/surface.js';
-import { Assets } from '../src/engine/assets.js';
+import { Assets, Texture } from '../src/engine/assets.js';
+import { IndexedImage } from '../src/engine/gfx/image.js';
+import { validateContent } from '../src/engine/validate.js';
 import { Model } from '../src/engine/gfx/model.js';
 import { Renderer } from '../src/engine/render/renderer.js';
 import { NEAR } from '../src/engine/render/models.js';
@@ -75,6 +77,26 @@ test('faces pointing away are culled, unless two-sided', () => {
   const empty = frame(open, []);
   assert.deepEqual(frame(open, [thing(square(), 5.5, 2.5, { angle: Math.PI })]), empty);
   assert.notDeepEqual(frame(open, [thing(square({ twoSided: true }), 5.5, 2.5, { angle: Math.PI })]), empty);
+});
+
+test('a flat face is lit as the walls are, whichever way it faces', () => {
+  // The square and the camera turned right round together: the same view,
+  // but the square faces the light (from the north-west) in one and away in
+  // the other.
+  const y = rowAt(0.5, 3.5);
+  const west = (extra) => frame(open, [thing(square(extra), 5, 2.5)], { ...CAM, x: 1.5 })[at(mid, y)];
+  const east = (extra) => frame(open, [thing(square(extra), 5, 2.5, { angle: Math.PI })], { ...CAM, x: 8.5, angle: Math.PI })[at(mid, y)];
+  assert.notEqual(west({}), east({}), 'shaded faces differ');
+  assert.equal(west({ flat: true }), east({ flat: true }), 'flat ones match');
+});
+
+test('a model placed with `lit` takes that light, not the light map where it stands; the validator wants 0 to 255', () => {
+  const list = [{ type: 'player', x: 2.5, y: 1.5 }, { type: 'door-jamb', x: 5.5, y: 2.5, lit: 200 }];
+  const w = makeWorld(room(['##########', '#........#', '#........#', '#........#', '##########'], [], { legend, list }));
+  assert.equal(w.things.find((t) => t.def.id === 'door-jamb').fixedLight, 200);
+  const bad = room(['#####', '#...#', '#####'], [], { id: 'bad', list: [{ type: 'player', x: 1.5, y: 1.5 }, { type: 'door-jamb', x: 3.5, y: 1.5, lit: 300 }] });
+  const { errors } = validateContent(new Registry({ ...content, levels: [bad] }));
+  assert.deepEqual(errors.filter((e) => e.includes('"lit"')), ['Level "bad": a door-jamb at (3.5, 1.5): "lit" must be a light from 0 to 255']);
 });
 
 test('walls hide models behind them', () => {
@@ -186,6 +208,9 @@ const gameReg = new Registry({
     ...content.things,
     defineDecoration({ id: 'test-wall', model: 'test-wall', solid: true, height: 2 }),
     defineDecoration({ id: 'test-spinner', model: 'terminal', spin: 1 }),
+    defineDecoration({ id: 'test-prop', model: 'terminal', radius: 0.55 }),
+    defineDecoration({ id: 'test-prop-fixed', model: 'terminal', radius: 0.55, fixed: true }),
+    defineDecoration({ id: 'test-bobber', model: 'terminal', fixed: true, bob: { height: 0.1, period: 2 } }),
   ],
 });
 const arena = room(['############', ...Array(9).fill('#..........#'), '############'], [], { legend });
@@ -206,6 +231,42 @@ test('model scenery with lines collides as those walls, not as its cylinder', ()
   assert.equal(w.checkPosition(p, 5.6, 3.5), false, 'walks into the wall line');
   assert.equal(w.checkPosition(p, 4.8, 3.5), true, 'backs away from it');
   assert.equal(w.checkPosition(p, 6, 2.2), true, 'passes beyond its end');
+});
+
+test('model scenery with lines stays where it is put against a wall; it is not moved clear by its radius', () => {
+  const w = makeWorld(arena, { noMonsters: true, registry: gameReg });
+  w.assets = { sheetFor: () => null, modelFor: (def) => (def.model === 'test-wall' ? new Model(wallDef, palette, () => 0) : null) };
+  const wall = w.spawn('test-wall', 1.2, 5); // its radius (0.5) reaches into the west wall, its line doesn't
+  assert.equal(wall.x, 1.2);
+  assert.equal(wall.y, 5);
+});
+
+test('the parked landspeeder blocks you at its nose, its flanks and its side engines, but not round it', () => {
+  const lot = room(['################', ...Array(10).fill('#..............#'), '################'], [], { legend });
+  const w = makeWorld(lot, { noMonsters: true });
+  const speeder = w.spawn('landspeeder', 7, 5.5); // nose east
+  speeder.model = new Model(registry.models.get('landspeeder'), palette, () => 0);
+  const p = w.player;
+  const blocked = [[9.4, 5.5, 'its nose'], [6.5, 4.6, 'its flank'], [7, 6.4, 'its other flank'], [6.2, 6.9, 'a side engine'], [6.2, 4.1, 'the other']];
+  for (const [x, y, what] of blocked) assert.equal(w.checkPosition(p, x, y), false, `walks into ${what}`);
+  const clear = [[10.4, 5.5], [6.5, 3.6], [6.2, 2.6], [6.2, 8.4], [3.4, 5.5]];
+  for (const [x, y] of clear) assert.equal(w.checkPosition(p, x, y), true, `stands clear at (${x}, ${y})`);
+});
+
+test('you walk under the hovering Moldy Crow, but not into its gun pod', () => {
+  const bay = room(['####################################', ...Array(28).fill('#..................................#'), '####################################'], [], { legend });
+  const w = makeWorld(bay, { noMonsters: true });
+  const crow = w.spawn('moldy-crow', 18, 14.5); // nose east, drawn (and colliding) at its scale
+  crow.model = new Model(registry.models.get('moldy-crow'), palette, () => 0);
+  const p = w.player;
+  const s = crow.def.scale;
+  const blocked = [[0, -1.1, 'its pod'], [-1.3, 0, 'the back of the pod'], [3, 0.4, 'a barrel']];
+  for (const [x, y, what] of blocked) assert.equal(w.checkPosition(p, 18 + x * s, 14.5 + y * s), false, `walks into ${what}`);
+  const under = [[0, -2.8, 'beside the pod'], [12, 0, 'under the nose'], [-12, 0, 'under the back'], [-10, -8, 'under a wing']];
+  for (const [x, y, what] of under) assert.equal(w.checkPosition(p, 18 + x * s, 14.5 + y * s), true, `walks ${what}`);
+  // Everything off the floor (its shadow) and outside the pod is above your head.
+  const low = registry.models.get('moldy-crow').vertices.filter(([x, y, z]) => z > 0.05 && (Math.abs(y) > 1.25 || x < -1.45 || x > 4.85));
+  assert.ok(low.every(([, , z]) => z * s > p.def.height), 'the hull and wings clear you');
 });
 
 test('solid model scenery stops hitscan shots and projectiles', () => {
@@ -233,6 +294,21 @@ test('a decoration with `spin` turns', () => {
   assert.ok(Math.abs(s.angle - a - 0.5) < 1e-9);
 });
 
+test('a prop against a raised floor climbs onto it, unless it is fixed where it is put', () => {
+  // A block of raised floor (0.8) east of x = 4; the props stand 0.45 west of it.
+  const ledge = room(['#######', '#...hh#', '#...hh#', '#...hh#', '#######'], [], { legend });
+  const w = makeWorld(ledge, { noMonsters: true, registry: gameReg });
+  const loose = w.spawn('test-prop', 3.55, 1.5);
+  const fixed = w.spawn('test-prop-fixed', 3.55, 2.5);
+  const stacked = w.spawn('test-prop-fixed', 2.5, 3.5);
+  stacked.z = 1.5;
+  assert.equal(fixed.z, 0, 'it starts on the floor under its middle');
+  w.tick(0.5, mockInput());
+  assert.ok(Math.abs(loose.z - 0.8) < 1e-6, 'its radius reaches the ledge, so it settles on top');
+  assert.equal(fixed.z, 0);
+  assert.equal(stacked.z, 1.5, 'a fixed thing placed in the air stays there');
+});
+
 test('textured faces show their texture, at the walls\' scale with world-unit uvw', () => {
   const slot = assets.textureSlot('imp-panel');
   const tex = assets.textures[slot];
@@ -256,4 +332,65 @@ test('textured faces show their texture, at the walls\' scale with world-unit uv
   const flat = new Set();
   for (let x = mid - 20; x < mid + 20; x++) if (view.mdepth[at(x, y)] < Infinity) flat.add(renderer.surface.px[at(x, y)]);
   assert.equal(flat.size, 1, 'a flat-coloured face is one colour');
+});
+
+/** A grime texture (mid grey: it takes some of the light) in the test assets, and an upright square wearing it. */
+function grimeSquare() {
+  const rgba = new Uint8Array(4 * 4 * 4).fill(128);
+  const slot = assets.textures.push(new Texture('test-grime', new IndexedImage(4, 4, new Uint8Array(16).fill(1)), { grime: true }, { width: 4, height: 4, data: rgba })) - 1;
+  return new Model(
+    defineModel({
+      id: 'grime-square',
+      vertices: [[0, -0.5, 0], [0, -0.5, 1], [0, 0.5, 1], [0, 0.5, 0]],
+      faces: [{ v: [0, 1, 2, 3], tex: 'test-grime', uv: [[0, 1], [0, 0], [1, 0], [1, 1]] }],
+    }),
+    palette,
+    () => slot,
+    assets.textures,
+  );
+}
+const brightness = (c) => palette.rgb[c * 3] + palette.rgb[c * 3 + 1] + palette.rgb[c * 3 + 2];
+
+test('a model face in a grime texture darkens what is behind it, and hides nothing', () => {
+  const model = grimeSquare();
+  assert.equal(model.faces[0].grime, true);
+  const empty = frame(open, []);
+  const fb = frame(open, [thing(model, 5.5, 2.5)]);
+  const o = at(mid, rowAt(0.5, 4));
+  assert.ok(brightness(fb[o]) < brightness(empty[o]), 'darker than the wall behind it');
+  assert.equal(view.mdepth[o], Infinity, 'it writes no depth, so what is behind still shows through it');
+});
+
+test('a bobbing decoration floats up and down round its place, each at its own point, and collides where it stands', () => {
+  const w = makeWorld(arena, { noMonsters: true, registry: gameReg });
+  const a = w.spawn('test-bobber', 3.5, 3.5);
+  const b = w.spawn('test-bobber', 7.5, 6.5);
+  const seen = [];
+  for (let i = 0; i < 120; i++) {
+    w.tick(1 / 30, mockInput());
+    seen.push(a.bobZ);
+    assert.equal(a.z, 0, 'its place stays on the floor');
+  }
+  assert.ok(Math.max(...seen) > 0.09 && Math.min(...seen) < -0.09, 'it rises and falls by its height over its period');
+  assert.notEqual(a.bobZ.toFixed(3), b.bobZ.toFixed(3), 'two of them are not in step');
+});
+
+test('a bobbing model is drawn off its place, but its grime faces stay where they are', () => {
+  const up = (model) => [frame(open, [thing(model, 5.5, 2.5)]), frame(open, [thing(model, 5.5, 2.5, { bobZ: 0.3 })])];
+  const [still, bobbed] = up(square());
+  assert.notDeepEqual(bobbed, still, 'the square is drawn higher');
+  const [shadow, raised] = up(grimeSquare());
+  assert.deepEqual(raised, shadow, 'the grime stays put');
+});
+
+test('a rolling model is drawn tipped to one side', () => {
+  const still = frame(open, [thing(square(), 5.5, 2.5)]);
+  const rolled = frame(open, [thing(square(), 5.5, 2.5, { bobRoll: 0.3 })]);
+  assert.notDeepEqual(rolled, still);
+});
+
+test('the validator checks a decoration\'s bob', () => {
+  const bad = defineDecoration({ id: 'bad-bob', model: 'terminal', bob: { height: 0.1 } });
+  const { errors } = validateContent(new Registry({ ...content, things: [...content.things, bad] }));
+  assert.deepEqual(errors.filter((e) => e.includes('bad-bob')), ['decoration "bad-bob": "bob" needs a "height" of 0 or more, a "period" above 0 (seconds) and a "roll" of 0 or more (degrees)']);
 });

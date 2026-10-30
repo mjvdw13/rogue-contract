@@ -12,16 +12,27 @@
 
 /**
  * @typedef {number[] | {frames:number[], fps?:number, loop?:boolean, fireAt?:number|number[],
- *   fullbright?: boolean|number[], events?: Record<number,string>, durations?: number[]}} AnimSpec
+ *   fullbright?: boolean|number[], events?: Record<number,string>, durations?: number[],
+ *   views?: {frontSide?:number[], side?:number[], backSide?:number[], back?:number[]}}} AnimSpec
  *   Frame numbers are indices into the sprite sheet. `fireAt`/`fullbright`/`events`
- *   refer to positions within this animation's `frames` list.
+ *   refer to positions within this animation's `frames` list. `frames` is the
+ *   front view; `views` the same animation seen from the thing's left (front
+ *   three-quarter, side, back three-quarter, back), each as long as `frames`.
+ *   From the right the art is mirrored (see things/anim.js `viewOf`).
  *
- * @typedef {{src:string, frameWidth?:number, frameHeight?:number}} SheetSpec
+ * @typedef {{src:string, frameWidth?:number, frameHeight?:number, glint?:number[][], glow?:number[][]}} SheetSpec
+ *   `glint`: colours ([r, g, b]) that catch the light (armour highlights);
+ *   `glow`: colours that always shine (see gfx/image.js `quantize`).
  *
  * @typedef {{kind:string, damage?:number|number[], pellets?:number, spread?:number, range?:number,
  *   projectile?:string, count?:number, sound?:string, hitSound?:string, missSound?:string,
  *   puff?:string, berserkMultiplier?:number, [key:string]:any}} AttackSpec
  *   kind: 'hitscan' | 'projectile' | 'melee' | any custom kind registered with defineAttack().
+ *
+ * @typedef {{type:string, count?:number, speed?:number|[number,number], spread?:number,
+ *   dir?:[number,number,number]}} BurstSpec
+ *   A burst of particles (world/particles.js `burst`): `count` of `type` at
+ *   `speed` units a second, along `dir` (none: all round), `spread` 0 to 2.
  */
 
 const ANIM_DEFAULTS = {
@@ -60,7 +71,37 @@ export function normalizeAnim(spec, defaults = {}) {
   if (spec.fireAt !== undefined) for (const i of [].concat(spec.fireAt)) events[i] = 'fire';
   if (spec.events) for (const [k, v] of Object.entries(spec.events)) events[Number(k)] = v;
   const total = durations.reduce((a, b) => a + b, 0);
-  return { frames, durations, loop: spec.loop ?? defaults.loop ?? false, fullbright, events, total };
+  return { frames, durations, loop: spec.loop ?? defaults.loop ?? false, fullbright, events, total, views: normalizeViews(spec.views, frames) };
+}
+
+/** The views an animation may list besides its front (`frames`), front to back. */
+export const VIEWS = ['frontSide', 'side', 'backSide', 'back'];
+
+/**
+ * An animation's `views` as five frame lists, front (`frames`) to back, or
+ * null without any. A missing view uses the nearest given one (the nearer
+ * the front on a tie).
+ */
+function normalizeViews(views, frames) {
+  if (views == null) return null;
+  if (typeof views !== 'object' || Array.isArray(views)) throw new Error(`Animation "views" must be an object with any of ${VIEWS.join(', ')}`);
+  for (const k of Object.keys(views)) if (!VIEWS.includes(k)) throw new Error(`Animation views: unknown view "${k}" (use ${VIEWS.join(', ')})`);
+  const given = [frames];
+  for (const k of VIEWS) {
+    const v = views[k];
+    if (v == null) {
+      given.push(null);
+      continue;
+    }
+    if (!Array.isArray(v) && typeof v !== 'number') throw new Error(`Animation view "${k}" must be a list of frame numbers`);
+    const list = (typeof v === 'number' ? [v] : v).map((f) => Number(f));
+    if (list.length !== frames.length) throw new Error(`Animation view "${k}" has ${list.length} frames; it needs ${frames.length}, like "frames"`);
+    given.push(list);
+  }
+  return given.map((list, i) => {
+    for (let d = 1; !list; d++) list = given[i - d] ?? given[i + d];
+    return list;
+  });
 }
 
 function normalizeAnims(anims = {}) {
@@ -74,7 +115,7 @@ function normalizeAnims(anims = {}) {
 function normalizeSheet(sheet, id) {
   if (!sheet) return null;
   if (typeof sheet === 'string') return { ref: sheet };
-  return { id: sheet.id ?? id, src: sheet.src, frameWidth: sheet.frameWidth ?? 0, frameHeight: sheet.frameHeight ?? 0 };
+  return { id: sheet.id ?? id, src: sheet.src, frameWidth: sheet.frameWidth ?? 0, frameHeight: sheet.frameHeight ?? 0, glint: sheet.glint, glow: sheet.glow };
 }
 
 function requireId(def, what) {
@@ -110,11 +151,17 @@ export function normalizeAttack(spec) {
  * square frames. `fence: true` marks a see-through texture for fences
  * (transparent pixels are holes); it may be any size, as it is never a floor.
  * `decal: true` marks one for decals (world/decals.js), likewise.
- * @param {{id:string, src:string, frames?:number, fps?:number, sky?:boolean, fence?:boolean, decal?:boolean}} def
+ * `grime: true` makes a decal texture grime (and a decal): instead of
+ * covering the wall, it darkens what's under it. A texel's brightness is the
+ * share of light it leaves, white (the palette's brightest lit colour)
+ * leaving it all, so one grime picture dirties any wall in its own colour.
+ * @param {{id:string, src:string, frames?:number, fps?:number, sky?:boolean, fence?:boolean, decal?:boolean, grime?:boolean}} def
  */
 export function defineTexture(def) {
   requireId(def, 'Texture');
-  return { frames: 1, fps: 4, sky: false, ...def, type: 'texture' };
+  const t = { frames: 1, fps: 4, sky: false, grime: false, ...def, type: 'texture' };
+  if (t.grime === true) t.decal = true;
+  return t;
 }
 
 /**
@@ -129,13 +176,15 @@ export function defineTexture(def) {
  * or a `tex` (texture id) with one coordinate per vertex: `uv` in texture
  * repeats (as OBJ files have them), or `uvw` in world units, mapped at the
  * walls' 32 texels per unit whatever the texture's size. `glow` faces are
- * fullbright (an animated texture keeps animating); `twoSided` faces are
+ * fullbright (an animated texture keeps animating); `flat` faces are lit as
+ * the walls are, without the shading by the way they face (for a face flush
+ * with a wall); `twoSided` faces are
  * drawn from behind too.
  *
  * `lines` ([x0, y0, x1, y1] in model space) are optional wall segments for
  * collision; without them a solid model collides as its thing's cylinder.
  * @param {{id:string, vertices:number[][], faces:{v:number[], color?:any[], tex?:string,
- *   uv?:number[][], uvw?:number[][], glow?:boolean, twoSided?:boolean}[], lines?:number[][]}} def
+ *   uv?:number[][], uvw?:number[][], glow?:boolean, flat?:boolean, twoSided?:boolean}[], lines?:number[][]}} def
  */
 export function defineModel(def) {
   requireId(def, 'Model');
@@ -189,11 +238,19 @@ export function defineAmmo(def) {
  * A player weapon. `light: { radius, light }` is its muzzle flash: it lights
  * the room round the player on the fire animation's fullbright frames.
  * (`flashLight` instead brightens the whole view, Doom's way.)
+ * `reraise: true`: after each shot the hand drops out of view and comes back
+ * up with the next one (a thrown detonator).
+ * `charge: { time, min, sink, pull }`: pressing fire pulls the hand back
+ * (down `sink` pixels over `pull` seconds; it stays there while fire is held)
+ * and letting go fires it. Its power runs from
+ * `min` (a tap) to 1 (held `time` seconds or longer) and scales the speed of
+ * the projectile it throws.
  * @param {{id:string, name:string, slot:number, ammo?:string|null, ammoPerShot?:number,
  *   sheet: SheetSpec, anims: {idle:AnimSpec, fire:AnimSpec}, fire: AttackSpec,
  *   offset?:[number,number], flashLight?:number, light?:{radius:number, light:number},
  *   noise?:boolean, priority?:number,
- *   accurateFirstShot?:boolean, sounds?:Record<string,string>, bob?:number}} def
+ *   accurateFirstShot?:boolean, sounds?:Record<string,string>, bob?:number, reraise?:boolean,
+ *   charge?:{time?:number, min?:number, sink?:number, pull?:number}}} def
  */
 export function defineWeapon(def) {
   requireId(def, 'Weapon');
@@ -213,6 +270,7 @@ export function defineWeapon(def) {
     sheet: normalizeSheet(def.sheet, `weapon:${def.id}`),
     anims: normalizeAnims(def.anims),
     fire: normalizeAttack(def.fire),
+    charge: def.charge ? { time: 1, min: 0.3, sink: 36, pull: 0.18, ...def.charge } : null,
   };
 }
 
@@ -254,13 +312,27 @@ function baseThing(def, kind, defaults) {
  * Walkers step up to `stepHeight` (default 0.8) and won't walk off drops
  * deeper than `dropHeight` (default: their step height). `flying` monsters
  * ignore floors, hovering `z` above the floor their target stands on, and
- * climb or sink at `flySpeed` (default 3 per second).
+ * climb or sink at `flySpeed` (default 3 per second). `death.explosion` is
+ * an explosion (defineExplosion) set off where it dies; `death.particles` are
+ * bursts thrown from the middle of the body when it's killed; once the
+ * corpse lies still, it throws `corpse.bursts` of `corpse.particles`,
+ * `corpse.every` seconds apart, `corpse.z` above the floor, each one way at
+ * random (shootable decorations take both too).
+ * `calm` is how it behaves when a level places it calm (things/calm.js):
+ * the `lines` it says when bumped or used, its strolling `speed` (tiles a
+ * second, default 2), its `stride` (tiles a walk cycle covers: the walk plays
+ * as fast as its feet need; unset, it plays at `speed` over the chase speed),
+ * how far it may `wander` from its spot (tiles, default 4; 0 stands its post)
+ * and `idleTime` ([min, max] seconds standing between walks, default [2, 5]). A placement's own `calm` fields override these.
  * @param {{id:string, name?:string, glyph?:string, sheet:SheetSpec, anims:Record<string,AnimSpec>,
  *   health:number, speed?:number, radius?:number, height?:number, painChance?:number,
  *   stepHeight?:number, dropHeight?:number, flying?:boolean, flySpeed?:number, z?:number,
  *   attack?:AttackSpec, melee?:AttackSpec, cooldown?:[number,number], reactionTime?:number,
  *   sightRange?:number, drops?:(string|{item:string, chance?:number})[], mass?:number,
  *   splashImmune?:boolean, boss?:boolean, sounds?:Record<string,string>,
+ *   death?:{particles?:BurstSpec[], explosion?:string}, corpse?:{particles:BurstSpec[], bursts?:number|[number,number],
+ *   every?:number|[number,number], z?:number},
+ *   calm?:{lines?:string[], speed?:number, stride?:number, wander?:number, idleTime?:[number,number]},
  *   hooks?:Record<string,Function>}} def
  */
 export function defineMonster(def) {
@@ -286,25 +358,32 @@ export function defineMonster(def) {
   m.attack = normalizeAttack(def.attack);
   m.melee = normalizeAttack(def.melee);
   m.drops = (m.drops ?? []).map((d) => (typeof d === 'string' ? { item: d, chance: 1 } : { chance: 1, ...d }));
+  m.calm = { lines: [], speed: 2, wander: 4, idleTime: [2, 5], ...def.calm };
   m.gibHealth ??= -m.health;
   return m;
 }
 
 /**
- * A friendly character, such as a coworker. Friendlies can't be hurt or
- * targeted: bullets, projectiles and explosions pass through them. They idle,
- * wander up to `wander` tiles from where they were placed (staying out of
- * doorways, narrow passages and hazards), and react when the player bumps into
- * them or uses them: they turn to the player, play `react` and say one of
- * their `lines`.
+ * A friendly character, such as a villager. They idle, wander up to `wander`
+ * tiles from where they were placed (staying out of doorways, narrow passages
+ * and hazards), and react when the player bumps into them or uses them: they
+ * turn to the player, play `react` and say one of their `lines`. Monsters
+ * never target them.
+ * With no `health` they can't be hurt: bullets, projectiles and explosions
+ * pass through them. With `health` they can be shot (and the player's aim
+ * locks on to them as it does to monsters); the first hit plays `pain`, then
+ * they flee the player at `fleeSpeed` for good, until `fleeDistance` tiles
+ * away, and say nothing more. They die with `death`, crying out with
+ * `sounds.pain` and `sounds.death`; `flee` is their running animation (else
+ * `walk`).
  * @param {{id:string, name:string, glyph?:string, sheet:SheetSpec,
- *   anims:{idle:AnimSpec, walk?:AnimSpec, react?:AnimSpec}, lines?:string[],
- *   wander?:number, speed?:number, idleTime?:[number,number], reactTime?:number,
- *   reactCooldown?:number, bubble?:string, sounds?:{react?:string},
- *   hooks?:{onReact?:Function}}} def
+ *   anims:{idle:AnimSpec, walk?:AnimSpec, react?:AnimSpec, pain?:AnimSpec, flee?:AnimSpec, death?:AnimSpec},
+ *   lines?:string[], wander?:number, speed?:number, idleTime?:[number,number], reactTime?:number,
+ *   reactCooldown?:number, bubble?:string, health?:number, mass?:number, fleeSpeed?:number, fleeDistance?:number,
+ *   sounds?:{react?:string, pain?:string, death?:string}, hooks?:{onReact?:Function, onPain?:Function, onDeath?:Function}}} def
  */
 export function defineNpc(def) {
-  return baseThing(def, 'npc', {
+  const n = baseThing(def, 'npc', {
     solid: true,
     shootable: false,
     radius: 0.5,
@@ -315,7 +394,11 @@ export function defineNpc(def) {
     reactTime: 1.8,
     reactCooldown: 2.5,
     lines: [],
+    fleeSpeed: 6,
+    fleeDistance: 20,
   });
+  if (n.health > 0) n.shootable = def.shootable ?? true;
+  return n;
 }
 
 /**
@@ -333,13 +416,22 @@ export function defineItem(def) {
 
 /**
  * Scenery: lamps, plants, barrels... Solid decorations block movement.
- * Shootable ones with `health` die (and optionally `explode`).
+ * Shootable ones with `health` die (and optionally `explode`). A decoration
+ * settles on the highest floor its `radius` reaches; a `fixed` one stays at
+ * the height it's placed at instead (on the floor under its middle, or a
+ * level thing's `z`): props against a wall, fixtures on it, things stacked.
+ * `spin` turns it (radians a second). `bob: { height, period }` floats it
+ * up and down, `height` either way over `period` seconds (a hovering
+ * speeder), and `roll` sways a model side to side, that many degrees either
+ * way, a quarter swing ahead of the rise: drawn only, so it collides where it stands, and a model's grime
+ * faces (its shadow) stay on the ground.
  * @param {{id:string, glyph?:string, sheet:SheetSpec, anims?:Record<string,AnimSpec>, solid?:boolean,
- *   radius?:number, height?:number, z?:number, hanging?:boolean, health?:number,
+ *   radius?:number, height?:number, z?:number, hanging?:boolean, fixed?:boolean, health?:number,
+ *   spin?:number, bob?:{height:number, period:number, roll?:number},
  *   explode?:{radius:number, damage:number, sound?:string}}} def
  */
 export function defineDecoration(def) {
-  const d = baseThing(def, 'decoration', { radius: 0.5, height: 1.6 });
+  const d = baseThing(def, 'decoration', { radius: 0.5, height: 1.6, fixed: false });
   if (d.health > 0) d.shootable = def.shootable ?? true;
   if (!d.anims.idle) d.anims.idle = normalizeAnim([0], ANIM_DEFAULTS.idle);
   return d;
@@ -348,10 +440,30 @@ export function defineDecoration(def) {
 /**
  * A projectile (fireballs, rockets...). Speed in tiles/second. It flies from
  * its owner's fire height along the shot's slope; `z` instead starts it that
- * high above the owner's feet. Its z is the middle of the sprite.
- * @param {{id:string, sheet:SheetSpec, anims:{fly:AnimSpec, explode?:AnimSpec}, speed?:number,
- *   damage?:number|number[], radius?:number, splash?:{radius:number, damage:number},
- *   gravity?:number, z?:number, sounds?:{fire?:string, explode?:string}, trail?:string}} def
+ * high above the owner's feet. Its z is the middle of the sprite. When it
+ * bursts it sets off its `explosion` (defineExplosion), facing out of what
+ * it hit.
+ * `bounce` makes it bounce instead (a thrown detonator): thrown along the aim
+ * plus `toss` upward (and `loft` more times the throw's power, so a hard
+ * throw goes up higher), off walls, floors, ceilings and solid scenery, keeping
+ * `restitution` (0..1) of its speed into what it hit and `friction` of the
+ * rest; slower than `minSpeed` into the floor it stops bouncing and rolls,
+ * losing `roll` of its speed a second. It goes off after `fuse` seconds, or
+ * at once on a body; its `bounce` sound plays on a knock harder than
+ * `minSpeed`.
+ * `splash` hurts bodies within `radius` of the burst, `damage` falling off
+ * with distance (`falloff: false`: the full damage to all of them); `erupt`
+ * is an explosion set off at the feet of each one, and of each friendly
+ * character and standing piece of scenery in reach (see projectile.js). With
+ * no `sheet`, it flies unseen (Dark Forces' concussion shot).
+ * `proximity` bursts it where it passes nearest an enemy's body that it came
+ * within that distance of (monsters for the player's shot, the player for a
+ * monster's), so a near miss still lands the splash on them; 0 (the
+ * default) bursts only on what it hits.
+ * @param {{id:string, sheet?:SheetSpec, anims?:{fly:AnimSpec, explode?:AnimSpec}, speed?:number, proximity?:number,
+ *   damage?:number|number[], radius?:number, splash?:{radius:number, damage:number, falloff?:boolean, erupt?:string},
+ *   gravity?:number, z?:number, sounds?:{fire?:string, explode?:string, bounce?:string}, trail?:string, explosion?:string,
+ *   bounce?:{restitution?:number, friction?:number, minSpeed?:number, roll?:number, fuse?:number, toss?:number, loft?:number}}} def
  */
 export function defineProjectile(def) {
   const p = baseThing(def, 'projectile', {
@@ -363,7 +475,9 @@ export function defineProjectile(def) {
     fullbright: true,
     gravity: 0,
     splash: null,
+    proximity: 0,
   });
+  if (def.bounce) p.bounce = { restitution: 0.5, friction: 0.7, minSpeed: 1.5, roll: 3, fuse: 2.5, toss: 4, loft: 0, ...def.bounce };
   return p;
 }
 
@@ -376,6 +490,76 @@ export function defineEffect(def) {
   if (!e.anims.idle) throw new Error(`Effect "${def.id}": needs anims.idle`);
   e.anims.idle.loop = false;
   return e;
+}
+
+/**
+ * A particle type (world/particles.js): sparks, embers, shrapnel, smoke,
+ * steam, dust. Particles are points, not things: cheap enough for hundreds.
+ * Colours over its life are palette ramp steps: `['glow-yellow', 6]`, or
+ * `{ ramp: 'gray', from: 9, to: 4 }` for every step between. Sizes are in
+ * world units (a tile is 1), speeds in units per second.
+ * @param {{id:string, colors:any[], life?:number|number[], size?:number, maxPx?:number,
+ *   shape?:'square'|'disc', streak?:number, gravity?:number, drag?:number, bounce?:number,
+ *   onFloor?:'die'|'bounce'|'stick', walls?:'die'|'bounce', wind?:number,
+ *   blend?:'solid'|'add'|'half'|'dither', alpha?:number, fadeIn?:number, fadeOut?:number, fade?:boolean, fullbright?:boolean,
+ *   grow?:number, trail?:{type:string, every?:number, for?:number}, cap?:number}} def
+ */
+export function defineParticle(def) {
+  requireId(def, 'Particle');
+  if (!Array.isArray(def.colors) || !def.colors.length) throw new Error(`Particle "${def.id}": needs "colors"`);
+  return { ...def, type: 'particle' };
+}
+
+/**
+ * A hanging type (world/hangings.js): a rope or cable, or a cloth, hanging
+ * from fixed points and moving in the air. A level places them (its
+ * `hangings`). Cosmetic: nothing in play touches them. `color` is a palette
+ * ramp and a place on it, 0 dark to 1 light (`['rust', 0.5]`); `width` is a
+ * rope's thickness in units (drawn at least a pixel); points sit about
+ * `spacing` units apart. They follow the level's wind (times `wind`) and a
+ * breeze of `breeze` units per second that comes and goes, taking up the
+ * air's speed at `drag` per second; `stiffness` passes a step hold their
+ * length, and `damping` is the share of their speed kept each sixtieth of a
+ * second. A cloth's `folds` set every other column of points that far
+ * forward or back, so the light picks out pleats. A cloth's `texture` is
+ * drawn at 32 texels a tile with its bottom row on the hem, repeating
+ * across: its transparent texels are the tears and holes.
+ * @param {{id:string, shape?:'rope'|'cloth', color?:[string, number], width?:number, spacing?:number,
+ *   gravity?:number, drag?:number, wind?:number, breeze?:number, stiffness?:number, damping?:number,
+ *   folds?:number, texture?:string, fullbright?:boolean}} def
+ */
+export function defineHanging(def) {
+  requireId(def, 'Hanging');
+  return { shape: 'rope', ...def, type: 'hanging' };
+}
+
+/**
+ * An explosion (world/explosions.js): a recipe of particle bursts, a flash of
+ * light, a sound and optionally a sprite effect, set off by id from code
+ * (`world.explode`), things' `death.explosion`, projectiles' `explosion` and
+ * the `explode` trigger action. Only for looks: damage is the exploder's.
+ * Each burst is a BurstSpec plus `delay` (seconds, or [min, max]), `over`
+ * (its count spread over that many seconds), `radius` (they start anywhere
+ * within it), `z` (above the centre) and `dir` 'up', 'out' (the way the
+ * explosion faces; also what a burst with no `dir` does) or 'ring' (flat,
+ * across the way it faces: along the floor or wall it hit).
+ * `light: { radius, light, time }` is a flash that fades over `time` seconds.
+ * `shake: { amount, time, radius }` jolts the view: `amount` (0 to 1, 1 the
+ * hardest) right beside it, dying away over `time` seconds (0.5), less the
+ * farther off, none from `radius` (12) away.
+ * `then: [{ explosion, delay, offset, z }]` sets off other explosions after
+ * this one: `delay` seconds later, `offset` to the side (a random way, not
+ * into what it faces out of), `z` higher.
+ * @param {{id:string, particles:(BurstSpec & {delay?:number|[number,number], over?:number, radius?:number,
+ *   z?:number, dir?:'up'|'out'|'ring'|[number,number,number]})[], light?:{radius:number, light:number, time?:number},
+ *   shake?:{amount?:number, time?:number, radius?:number},
+ *   then?:{explosion:string, delay?:number|[number,number], offset?:number|[number,number], z?:number}[],
+ *   sound?:string, effect?:string, name?:string}} def
+ */
+export function defineExplosion(def) {
+  requireId(def, 'Explosion');
+  if (!Array.isArray(def.particles)) throw new Error(`Explosion "${def.id}": needs "particles" (a list of bursts)`);
+  return { ...def, type: 'explosion' };
 }
 
 // ---------------------------------------------------------------- audio
@@ -409,10 +593,24 @@ export function defineSong(def) {
  * (content/levels/legend.js) and can be overridden per level via `legend` and
  * `thingLegend`. `fog` darkens surfaces with distance (colormap levels per
  * tile); outdoors (under the sky), `haze: { color: [r, g, b], half }` fades
- * them toward a colour instead, halfway there at `half` tiles.
+ * them toward a colour instead, halfway there at `half` tiles. `weather`
+ * keeps `count` particles of `type` in the air round the camera, `range`
+ * tiles each way (10), under the sky only: made `z` ([0.05, 2.5]) above the
+ * floor with a random speed of up to `drift` ([0.3, 0.1]: across, up or
+ * down), carried by `wind` ([x, y, z] units per second; still by default).
+ * `list` places things at exact spots: `{ type, x, y, angle?, z?, tag?,
+ * skill?, drops?, ambush?, wander?, calm? }`; a friendly's `wander` (tiles, 0
+ * stands still) replaces its type's for that one. A monster's `calm` (true,
+ * or `{ lines?, speed?, wander?, idleTime?, patrol?, loop? }` over its
+ * type's `calm`) places it calm: it never attacks until the town turns
+ * hostile (world.turnHostile: hurt, or gunfire). `patrol` is a
+ * list of two or more [x, y] points it walks between in straight lines,
+ * pausing at each, there and back, or round with `loop: true`.
  * @param {{id:string, name:string, tiles:string[], things?:string[], legend?:object,
  *   thingLegend?:object, list?:object[], triggers?:object[], music?:string, sky?:string,
- *   fog?:number, haze?:{color:number[], half?:number}, par?:number, next?:string,
+ *   fog?:number, haze?:{color:number[], half?:number},
+ *   weather?:{type:string, count:number, range?:number, z?:number[], drift?:number[], wind?:number[]},
+ *   par?:number, next?:string,
  *   secretNext?:string, defaults?:object}} def
  */
 export function defineLevel(def) {

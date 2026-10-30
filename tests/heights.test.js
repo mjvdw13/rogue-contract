@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { buildLevel } from '../src/engine/world/level.js';
+import { EYE_HEIGHT } from '../src/engine/config.js';
 import { makeWorld, mockInput, room, coarse, run } from './helpers.js';
 import { registry } from './helpers.js';
 
@@ -106,7 +107,7 @@ test('the camera rides on the floor, and the view tilts with pitch', () => {
   assert.equal(w.player.z, 1);
   w.player.pitch = 30;
   const cam = w.camera();
-  assert.ok(Math.abs(cam.z - 2) < 1e-6, `eye at floor + eye height (${cam.z})`);
+  assert.ok(Math.abs(cam.z - (1 + EYE_HEIGHT)) < 1e-6, `eye at floor + eye height (${cam.z})`);
   assert.equal(cam.horizonOffset, 30);
 });
 

@@ -139,9 +139,11 @@ export class FlowField {
   /**
    * The neighbouring tile centre to walk toward from (x, y), for a body
    * reaching up to `reach`, or null. Diagonals are only taken when both side
-   * tiles are open and level enough to cross (no corner cutting).
+   * tiles are open and level enough to cross (no corner cutting). `away`:
+   * the neighbour furthest from the player instead (a body fleeing them),
+   * or null with none further away, or no route to the player at all.
    */
-  next(x, y, reach = Infinity) {
+  next(x, y, reach = Infinity, away = false) {
     const map = this.map;
     const N = this.n;
     const tx = Math.floor(x);
@@ -149,6 +151,7 @@ export class FlowField {
     if (!map.inBounds(tx, ty)) return null;
     const from = this.nodeAt(tx, ty, reach);
     const here = this.dist[from];
+    if (away && here === UNREACHABLE) return null;
     /** The storeys of tile i (as nodes) this body can step into from node a. */
     const into = (a, i) => {
       if (!this.passable(i)) return [];
@@ -165,7 +168,7 @@ export class FlowField {
       if (!map.inBounds(nx, ny)) continue;
       for (const to of into(from, ny * map.w + nx)) {
         const d = this.dist[to];
-        if (d >= best) continue;
+        if (away ? d <= best || d === UNREACHABLE : d >= best) continue;
         if (dx && dy) {
           // No cutting corners: both side tiles must join up with this one and the next.
           const sides = [ty * map.w + nx, ny * map.w + tx];

@@ -87,6 +87,21 @@ export class Palette {
     return best;
   }
 
+  /** The nearest fullbright colour (for art that must glow). */
+  nearestGlow(r, g, b) {
+    const rgb = this.rgb;
+    let best = this.fullbrightStart;
+    let bestD = Infinity;
+    for (let i = this.fullbrightStart; i < TRANSPARENT; i++) {
+      const d = colorDist(r, g, b, rgb[i * 3], rgb[i * 3 + 1], rgb[i * 3 + 2]);
+      if (d < bestD) {
+        bestD = d;
+        best = i;
+      }
+    }
+    return best;
+  }
+
   /**
    * Fast lookup for quantizing images: exact palette colours map exactly,
    * anything else goes through a cached 15-bit colour cube.

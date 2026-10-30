@@ -6,6 +6,8 @@ export class IndexedImage {
     this.width = width;
     this.height = height;
     this.pixels = pixels ?? new Uint8Array(width * height).fill(TRANSPARENT);
+    /** Which pixels are glints (see `quantize`), or null. */
+    this.glint = null;
   }
 
   /** Magenta/black checkerboard used when an asset is missing. */
@@ -41,12 +43,21 @@ const BAYER4 = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
  * Convert RGBA pixels into palette indices. Alpha < 128 and pure magenta
  * (#FF00FF) become transparent. `dither` (0..64) adds ordered Bayer dithering,
  * which gives photos a crunchy 80s look.
+ *
+ * `glint` and `glow` list exact colours ([r, g, b]): glint pixels (armour
+ * highlights that catch the light) snap to lit colours only and are kept in
+ * the image's `glint` mask (1 per glint pixel; null when there are none);
+ * glow pixels snap to fullbright colours only.
  * @param {{width:number, height:number, data: Uint8ClampedArray|Uint8Array}} rgba
  * @param {import('./palette.js').Palette} palette
  */
-export function quantize(rgba, palette, { dither = 0, litOnly = false } = {}) {
+export function quantize(rgba, palette, { dither = 0, litOnly = false, glint = null, glow = null } = {}) {
   const { width, height, data } = rgba;
   const out = new Uint8Array(width * height);
+  const pack = (list) => (list?.length ? new Set(list.map(([r, g, b]) => (r << 16) | (g << 8) | b)) : null);
+  const glints = pack(glint);
+  const glows = pack(glow);
+  let mask = null;
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
       const i = y * width + x;
@@ -58,6 +69,19 @@ export function quantize(rgba, palette, { dither = 0, litOnly = false } = {}) {
         out[i] = TRANSPARENT;
         continue;
       }
+      if (glints || glows) {
+        const key = (r << 16) | (g << 8) | b;
+        if (glints?.has(key)) {
+          mask ??= new Uint8Array(width * height);
+          mask[i] = 1;
+          out[i] = palette.lookup(r, g, b, true);
+          continue;
+        }
+        if (glows?.has(key)) {
+          out[i] = palette.nearestGlow(r, g, b);
+          continue;
+        }
+      }
       if (dither) {
         const d = (BAYER4[(y & 3) * 4 + (x & 3)] / 16 - 0.5) * dither;
         r = Math.max(0, Math.min(255, r + d)) | 0;
@@ -67,7 +91,9 @@ export function quantize(rgba, palette, { dither = 0, litOnly = false } = {}) {
       out[i] = palette.lookup(r, g, b, litOnly);
     }
   }
-  return new IndexedImage(width, height, out);
+  const img = new IndexedImage(width, height, out);
+  img.glint = mask;
+  return img;
 }
 
 /** Load an <img>. Resolves with the element once decoded. */
@@ -97,37 +123,3 @@ export function readPixels(img, crop) {
   return ctx.getImageData(0, 0, sw, sh);
 }
 
-/** Box-filter downscale of RGBA data (good quality for shrinking photos). */
-export function downscale(rgba, w, h) {
-  const { width: sw, height: sh, data } = rgba;
-  const out = new Uint8ClampedArray(w * h * 4);
-  for (let y = 0; y < h; y++) {
-    const y0 = Math.floor((y * sh) / h);
-    const y1 = Math.max(y0 + 1, Math.floor(((y + 1) * sh) / h));
-    for (let x = 0; x < w; x++) {
-      const x0 = Math.floor((x * sw) / w);
-      const x1 = Math.max(x0 + 1, Math.floor(((x + 1) * sw) / w));
-      let r = 0;
-      let g = 0;
-      let b = 0;
-      let a = 0;
-      let n = 0;
-      for (let yy = y0; yy < y1; yy++) {
-        for (let xx = x0; xx < x1; xx++) {
-          const o = (yy * sw + xx) * 4;
-          r += data[o];
-          g += data[o + 1];
-          b += data[o + 2];
-          a += data[o + 3];
-          n++;
-        }
-      }
-      const o = (y * w + x) * 4;
-      out[o] = r / n;
-      out[o + 1] = g / n;
-      out[o + 2] = b / n;
-      out[o + 3] = a / n;
-    }
-  }
-  return { width: w, height: h, data: out };
-}

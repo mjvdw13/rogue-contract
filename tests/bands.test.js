@@ -50,3 +50,23 @@ test('a banded wall shows each band\'s texture over its heights, and the wall\'s
   assert.deepEqual(column(banded, r2 + 1, r05 - 1), column(panel, r2 + 1, r05 - 1), 'the wall between');
   assert.notDeepEqual(column(banded, r05 + 1, bottom - 1), column(panel, r05 + 1, bottom - 1), 'the trim below 0.5');
 });
+
+test('an angled wall shows its tile\'s bands too', () => {
+  const cam = { x: 1.5, y: 2.5, angle: 0, z: 1 };
+  // A line down the middle of column 8, solid on its east side: the face is 7 away.
+  const slanted = (bands) =>
+    room(['##########', '#.......A#', '#.......A#', '#.......A#', '##########'], ['', ' >'], {
+      legend: { '.': ROOM, '#': { wall: 'imp-panel' }, A: { ...ROOM, wall: 'imp-panel', line: [0.5, 1, 0.5, 0], ...(bands && { bands }) } },
+    });
+  const banded = shot(slanted(BANDS), cam);
+  const plain = shot(slanted(), cam);
+  const { w } = renderer.surface;
+  const { fy, horizon } = renderer.view;
+  const x = w >> 1;
+  const row = (z) => Math.ceil(horizon + ((cam.z - z) * fy) / 7 - 0.5);
+  const column = (px, a, b) => Array.from({ length: b - a }, (_, k) => px[(a + k) * w + x]);
+  const [r2, r05, bottom] = [row(2), row(0.5), row(0)];
+  assert.deepEqual(column(banded, r2 + 1, r05 - 1), column(plain, r2 + 1, r05 - 1), 'the wall between');
+  assert.notDeepEqual(column(banded, r05 + 1, bottom - 1), column(plain, r05 + 1, bottom - 1), 'the trim below 0.5');
+  assert.notDeepEqual(column(banded, row(4) + 1, r2 - 1), column(plain, row(4) + 1, r2 - 1), 'rock above 2');
+});

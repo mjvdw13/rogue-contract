@@ -19,10 +19,6 @@ export class LevelScene {
     this.world = null;
   }
 
-  get showTouch() {
-    return true;
-  }
-
   get wantsPointerLock() {
     return true;
   }
@@ -55,7 +51,6 @@ export class LevelScene {
     );
     for (const err of this.world.buildErrors) console.warn(`[${this.level.id}] ${err}`);
     g.hud.reset();
-    g.hud.faceSheet = g.faceSheet;
     const p = this.world.player.player;
     if (g.debug.god) p.god = true;
     if (g.debug.allWeapons) g.giveEverything(this.world);
@@ -76,7 +71,7 @@ export class LevelScene {
       if (input.isDown('zoomOut')) g.hud.mapScale = Math.max(1, g.hud.mapScale / (1 + dt * 2));
     }
     w.tick(dt, input);
-    g.hud.update(dt, w);
+    g.hud.update(dt);
     if (w.exitRequested) g.levelComplete(this, w.exitRequested);
     else if (w.restartRequested) g.restartLevel();
   }

@@ -100,13 +100,19 @@ export function analyseLevel(reg, level, skill = 3) {
   const problems = [];
   const notes = [];
 
-  // Tags that some trigger or switch can open (remote doors behind them count as passable).
+  // Tags that some trigger or switch can open (remote doors behind them count
+  // as passable if they stay open, or if what opens them can be used again).
   const openable = new Set();
-  const collect = (list) => {
-    for (const a of actionsOf(list)) if (a.action === 'openDoors' && a.tag) openable.add(a.tag);
+  const reopenable = new Set();
+  const collect = (list, again) => {
+    for (const a of actionsOf(list)) {
+      if (a.action !== 'openDoors' || !a.tag) continue;
+      openable.add(a.tag);
+      if (again) reopenable.add(a.tag);
+    }
   };
-  for (const t of level.triggers ?? []) collect(t.do);
-  for (const u of map.uses.values()) collect(u.actions);
+  for (const t of level.triggers ?? []) collect(t.do, t.once === false);
+  for (const u of map.uses.values()) collect(u.actions, u.repeat);
 
   // Solid, indestructible decorations block their tile for walking purposes.
   const blocked = new Uint8Array(W * map.h);
@@ -141,7 +147,7 @@ export function analyseLevel(reg, level, skill = 3) {
     if (f & F_DOOR) {
       const d = map.doors[map.doorIndex[i]];
       if (!d.lock) return true;
-      if (d.lock === 'remote') return openable.has(d.tag);
+      if (d.lock === 'remote') return d.stayOpen ? openable.has(d.tag) : reopenable.has(d.tag);
       return keys.has(d.lock);
     }
     return !(f & F_SOLID) && !blocked[i];

@@ -1,12 +1,14 @@
 import { lineOfSight } from '../world/physics.js';
 import { F_SOLID, F_DOOR, F_DAMAGE } from '../world/tilemap.js';
 import { Rng } from '../core/rng.js';
+import { UNREACHABLE } from '../world/nav.js';
 
 /**
- * Friendly characters (coworkers). They are solid but not shootable, so every
- * attack passes through them and monsters never notice them. Each one idles,
- * strolls around the spot it was placed, and reacts when the player bumps into
- * it or presses use on it.
+ * Friendly characters (townsfolk, coworkers). They are solid, and monsters
+ * never notice them. Each one idles, strolls around the spot it was placed,
+ * and reacts when the player bumps into it or presses use on it. Without
+ * `health` every attack passes through them; with it they can be shot, and
+ * once hurt they flee the player for good.
  */
 
 const DIRS = [
@@ -16,14 +18,18 @@ const DIRS = [
   [0, -1],
 ];
 
+/** How far an NPC may stroll: its placement's `wander`, else its type's. */
+const reachOf = (t) => t.wanderReach ?? t.def.wander ?? 0;
+
 /**
  * The tiles an NPC may stand on: open floor connected to its starting tile,
- * at most `def.wander` steps away, avoiding doors, hazards, the tiles next to
- * doors and one-tile-wide passages, so it never blocks the way.
+ * at most its `wander` steps away (the placement's, else the type's),
+ * avoiding doors, hazards, the tiles next to doors and one-tile-wide
+ * passages, so it never blocks the way.
  */
 export function wanderArea(world, t) {
   const map = world.map;
-  const radius = t.def.wander ?? 0;
+  const radius = reachOf(t);
   const open = (x, y) => map.inBounds(x, y) && !(map.flags[map.index(x, y)] & (F_SOLID | F_DOOR | F_DAMAGE));
   const roomy = (x, y) => !((!open(x - 1, y) && !open(x + 1, y)) || (!open(x, y - 1) && !open(x, y + 1)));
   const byDoor = (x, y) => DIRS.some(([dx, dy]) => map.inBounds(x + dx, y + dy) && map.flags[map.index(x + dx, y + dy)] & F_DOOR);
@@ -61,6 +67,7 @@ export function initNpc(world, t) {
   t.reactCooldown = 0;
   t.stuck = 0;
   t.lastLine = -1;
+  t.scared = false;
 }
 
 function idle(world, t) {
@@ -101,7 +108,7 @@ function step(world, t, dx, dy) {
 
 /** Turn to the player, play the reaction and say something. */
 export function npcReact(world, t) {
-  if (t.reactCooldown > 0) return false;
+  if (t.reactCooldown > 0 || t.scared || t.dead) return false;
   const def = t.def;
   const p = world.player;
   t.angle = t.angleTo(p);
@@ -129,11 +136,71 @@ export function npcReact(world, t) {
   return true;
 }
 
+/**
+ * Hurt and still standing (see damage.js): the first time, it flinches
+ * (`pain`), then flees the player from then on. Later hits only make it cry
+ * out.
+ */
+export function npcPain(world, t) {
+  world.playSoundFrom(t.def.sounds?.pain, t);
+  if (t.scared) return;
+  t.scared = true;
+  t.stuck = 0;
+  t.state = 'pain';
+  if (!t.setAnim('pain')) startFlee(t);
+}
+
+function startFlee(t) {
+  t.state = 'flee';
+  if (!t.setAnim('flee', false)) t.setAnim('walk', false);
+}
+
+/** Stand still, cowering, until the player comes near again. */
+function cower(t) {
+  t.setAnim('idle', false);
+}
+
+/**
+ * Run from the player: uphill along the player's flow field (through doors,
+ * up steps and round walls), or straight away from them with no route
+ * between. It stops when it's `fleeDistance` from them, or cornered.
+ */
+function flee(world, t, dt) {
+  const p = world.player;
+  if (p.player?.dead || t.distanceTo(p) >= (t.def.fleeDistance ?? 20)) return cower(t);
+  let a;
+  if (t.stuck > 0) {
+    t.stuck -= dt;
+    a = t.dodge;
+  } else {
+    const nav = world.navFor(t);
+    const reach = world.reach(t);
+    const n = nav.next(t.x, t.y, reach, true);
+    if (n) a = Math.atan2(n.y - t.y, n.x - t.x);
+    else if (nav.distanceAt(Math.floor(t.x), Math.floor(t.y), reach) === UNREACHABLE) a = p.angleTo(t);
+    else return cower(t);
+  }
+  if (!t.setAnim('flee', false)) t.setAnim('walk', false);
+  const ca = Math.cos(a);
+  const sa = Math.sin(a);
+  // Open doors in the way, as monsters do.
+  const door = world.map.doorAt(Math.floor(t.x + ca * (t.radius + 0.7)), Math.floor(t.y + sa * (t.radius + 0.7)));
+  if (door && !door.passable && !door.lock && !door.secret) world.openDoor(door);
+  const s = (t.def.fleeSpeed ?? 6) * dt;
+  t.angle = a;
+  if (!world.tryMove(t, ca * s, sa * s, true) && t.stuck <= 0) {
+    // Blocked (another body, a ledge): dodge sideways for a moment.
+    t.stuck = t.rng.range(0.3, 0.7);
+    t.dodge = a + (t.rng.chance(0.5) ? 1 : -1) * (Math.PI / 2 + t.rng.range(0, 0.8));
+  }
+}
+
 export function npcThink(world, t, dt) {
   t.stepAnim(dt, (ev) => {
     if (ev.startsWith('sound:')) world.playSoundFrom(ev.slice(6), t);
     else t.def.hooks?.onEvent?.(world, t, ev);
   });
+  if (t.dead) return;
   t.reactCooldown = Math.max(0, t.reactCooldown - dt);
   if (world.playerBumped === t) {
     world.playerBumped = null;
@@ -142,6 +209,12 @@ export function npcThink(world, t, dt) {
   if (t.def.hooks?.onThink?.(world, t, dt) === true) return;
 
   switch (t.state) {
+    case 'pain':
+      if (t.animDone) startFlee(t);
+      break;
+    case 'flee':
+      flee(world, t, dt);
+      break;
     case 'react':
       t.timer -= dt;
       if (t.timer <= 0) idle(world, t);
@@ -164,7 +237,7 @@ export function npcThink(world, t, dt) {
     default:
       t.timer -= dt;
       if (t.timer > 0) break;
-      if ((t.def.wander ?? 0) > 0 && t.area.size > 1 && t.rng.chance(0.75)) startWalk(world, t);
+      if (reachOf(t) > 0 && t.area.size > 1 && t.rng.chance(0.75)) startWalk(world, t);
       else idle(world, t);
   }
 }

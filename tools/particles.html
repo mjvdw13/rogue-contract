@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The game loads its assets relative to the repo root (and so do the imports below). -->
+  <base href="../">
+  <title>Particle Bench</title>
+  <link rel="stylesheet" href="css/game.css">
+  <style>
+    #bench {
+      position: fixed; top: 8px; left: 8px; z-index: 10; width: 300px;
+      background: rgba(12, 14, 18, 0.88); color: #d9dde4; border: 1px solid #3a4152; border-radius: 6px;
+      padding: 10px 12px; font: 12px/1.45 system-ui, sans-serif; user-select: text; -webkit-user-select: text;
+      max-height: calc(100vh - 16px); overflow-y: auto; box-sizing: border-box;
+    }
+    #bench h2 { font-size: 12px; margin: 10px 0 0; padding-top: 6px; border-top: 1px solid #2c313a; color: #f0c040; font-weight: 600; }
+    #bench input[type=checkbox] { margin: 0 4px 0 0; vertical-align: -2px; }
+    #bench .check { display: inline-block; margin: 6px 10px 0 0; color: #d9dde4; }
+    #bench #live { color: #8a93a3; margin-top: 4px; }
+    #bench h1 { font-size: 14px; margin: 0 0 6px; color: #f0c040; }
+    #bench label { display: block; margin: 6px 0 2px; color: #8a93a3; }
+    #bench select, #bench input, #bench button {
+      background: #0d0f12; color: #d9dde4; border: 1px solid #3a4152; border-radius: 4px; font: inherit; padding: 2px 4px;
+    }
+    #bench button { cursor: pointer; background: #2b3140; padding: 3px 9px; margin: 6px 4px 0 0; }
+    #bench button:hover { border-color: #f0c040; }
+    #bench .row { display: flex; gap: 6px; align-items: center; }
+    #bench input[type=range] { flex: 1; }
+    #bench input[type=number] { width: 5em; }
+    #bench table { width: 100%; border-collapse: collapse; margin-top: 6px; font-variant-numeric: tabular-nums; }
+    #bench td, #bench th { padding: 1px 4px; text-align: right; border-bottom: 1px solid #2c313a; }
+    #bench td:first-child, #bench th:first-child { text-align: left; }
+    #bench .dim { color: #8a93a3; }
+    #bench .hide { display: none; }
+    #readout b { color: #f0c040; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <main id="stage">
+    <canvas id="screen" width="320" height="200" aria-label="Game screen" tabindex="0"></canvas>
+    <div id="boot-message" role="status">LOADING...</div>
+  </main>
+  <div id="bench">
+    <h1>Particle bench</h1>
+    <div class="dim">Click the view to look round (Esc to let go); the game's keys to walk.</div>
+    <label for="spot">Go to</label>
+    <select id="spot"></select>
+    <div id="readout" style="margin-top:8px">Loading...</div>
+    <div id="live"></div>
+
+    <h2>Explosions</h2>
+    <label for="style">Style</label>
+    <select id="style"></select>
+    <label for="where">Where</label>
+    <select id="where">
+      <option value="floor">On the floor ahead</option>
+      <option value="air">In the air ahead</option>
+      <option value="wall">On the wall ahead</option>
+    </select>
+    <label for="dist">Distance ahead</label>
+    <div class="row"><input id="dist" type="range" min="1.5" max="15" step="0.5" value="5"><span id="distN">5</span></div>
+    <label class="check"><input id="sprite" type="checkbox">The old sprite too</label>
+    <label class="check"><input id="repeat" type="checkbox">Every <input id="every" type="number" min="0.2" max="20" step="0.1" value="2"> s</label>
+    <div><button id="boom">Detonate (X)</button></div>
+    <div class="dim">Real caps hold while the stream below is off.</div>
+
+    <h2>Stream</h2>
+    <label for="kind">Kind</label>
+    <select id="kind"></select>
+    <label for="count">Live particles</label>
+    <div class="row"><input id="count" type="range" min="0" max="4000" step="100" value="1000"><input id="countN" type="number" min="0" max="4000" step="100" value="1000"></div>
+    <button id="sweep">Run sweep here</button><button id="hideT" class="hide">Hide table</button>
+    <div id="sweepOut"></div>
+  </div>
+  <script type="module">
+    import { Game } from './src/engine/game.js';
+    import content from './src/content/index.js';
+    import { TICK } from './src/engine/config.js';
+    import { contentAngle } from './src/engine/world/level.js';
+    import { BENCH_KINDS, BenchSpawner } from './tools/lib/particle-bench.js';
+
+    const $ = (id) => document.getElementById(id);
+    const params = new URLSearchParams(location.search);
+    for (const [k, v] of [['map', 'm3'], ['nomonsters', ''], ['god', ''], ['mute', '']]) if (!params.has(k)) params.set(k, v);
+    // No "leave site?" prompt on the bench (the game asks mid-level): this listener runs before the game's.
+    window.addEventListener('beforeunload', (e) => e.stopImmediatePropagation());
+    const game = new Game({ canvas: $('screen'), content, params });
+    window.game = game;
+    await game.boot((s) => { if (s === 'fonts') $('boot-message').hidden = true; });
+
+    // Wait for the level to start.
+    while (!game.scene?.world) await new Promise((r) => setTimeout(r, 50));
+
+    $('kind').add(new Option('(none: explosions only)', ''));
+    for (const [k, v] of Object.entries(BENCH_KINDS)) $('kind').add(new Option(v.label, k));
+    $('kind').value = params.get('kind') ?? '';
+    for (const e of game.registry.explosions.values()) $('style').add(new Option(e.name ?? e.id, e.id));
+
+    // Spots: the headless bench's views (Mission 3).
+    const spots = { here: null };
+    const w0 = game.scene.world;
+    spots['Canyon start'] = [w0.player.x, w0.player.y, 90];
+    [[56, 18, 0], [60.5, 18, 180], [83.5, 47.5, 150], [20.5, 73, 40], [48, 42, 90], [90, 30, 270], [80, 20, 0], [100, 50, 180]]
+      .forEach((v, i) => (spots[`Inside ${'ABCDEFGH'[i]}`] = v));
+    $('spot').add(new Option('(stay here)', 'here'));
+    for (const k of Object.keys(spots)) if (k !== 'here') $('spot').add(new Option(k, k));
+
+    let world = null;
+    let spawner = null;
+    const upd = [];
+    const drw = [];
+    const frm = [];
+    // Hook a (new) world: top particles up after every tick, and time the updates.
+    function hook(w) {
+      world = w;
+      spawner = new BenchSpawner(w);
+      spawner.kind = $('kind').value;
+      spawner.count = Number($('countN').value);
+      const ps = w.particles;
+      const update = ps.update.bind(ps);
+      ps.update = (dt) => {
+        const t = performance.now();
+        update(dt);
+        upd.push(performance.now() - t);
+      };
+      const tick = w.tick.bind(w);
+      w.tick = (dt, input) => {
+        tick(dt, input);
+        spawner.fill(w.camera());
+      };
+    }
+    const render = game.renderer.render.bind(game.renderer);
+    game.renderer.render = (scene, cam, extras) => {
+      const t = performance.now();
+      render(scene, cam, extras);
+      frm.push(performance.now() - t);
+      drw.push(game.renderer.particleMs);
+    };
+
+    const avg = (a) => (a.length ? a.reduce((s, v) => s + v, 0) / a.length : 0);
+    setInterval(() => {
+      if (game.scene?.world && game.scene.world !== world) hook(game.scene.world);
+      if (!world) return;
+      const n = Math.max(1, frm.length);
+      $('readout').innerHTML =
+        `Live: <b>${world.particles.n}</b> &nbsp; ${game.surface.w} columns &nbsp; ${game.loop.fps} fps<br>` +
+        `3D view: <b>${avg(frm).toFixed(2)}</b> ms a frame<br>` +
+        `&nbsp; of which particles drawn: <b>${avg(drw).toFixed(2)}</b> ms<br>` +
+        `Particle update: <b>${avg(upd).toFixed(3)}</b> ms a tick`;
+      const ps = world.particles;
+      const capOf = (c) => (c >= ps.cap ? 'no cap' : `cap ${c}`);
+      $('live').innerHTML =
+        `Points ${ps.points} (${capOf(ps.capPoints)}), discs ${ps.discs} (${capOf(ps.capDiscs)})<br>` +
+        (ps.types.filter((t) => t.live).map((t) => `${t.id} ${t.live}${t.live >= t.cap ? ' (at cap)' : ''}`).join(', ') || '&nbsp;');
+      frm.length = drw.length = upd.length = 0;
+    }, 500);
+
+    const setCount = (v) => {
+      $('count').value = $('countN').value = v;
+      if (spawner) spawner.count = Number(v);
+    };
+    $('count').oninput = () => setCount($('count').value);
+    $('countN').onchange = () => setCount($('countN').value);
+    $('kind').onchange = () => { if (spawner) spawner.kind = $('kind').value; $('screen').focus(); };
+    $('spot').onchange = () => {
+      const v = spots[$('spot').value];
+      if (v && world) {
+        const p = world.player;
+        p.x = v[0];
+        p.y = v[1];
+        p.angle = contentAngle(v[2]);
+        p.pitch = 0;
+        p.z = world.floorAt(p.x, p.y, p.radius, -Infinity);
+        world.particles.clear();
+      }
+      $('spot').value = 'here';
+      $('screen').focus();
+    };
+
+    // The sweep: every kind at several counts from this spot, timed frame by frame (mean of 80).
+    $('sweep').onclick = () => {
+      if (!world) return;
+      const ps = world.particles;
+      const p = world.player;
+      const cam = world.camera();
+      const saved = { kind: spawner.kind, count: spawner.count };
+      const counts = [500, 1000, 2000, 4000];
+      const frame = () => { game.renderer.render(world, cam, { psprites: world.psprites(), skip: p }); return game.renderer.particleMs; };
+      let html = `<table><tr><th>kind</th>${counts.map((c) => `<th>${c}</th>`).join('')}</tr>`;
+      ps.clear();
+      for (let k = 0; k < 20; k++) frame();
+      const base = [];
+      for (let k = 0; k < 80; k++) { const t = performance.now(); frame(); base.push(performance.now() - t); }
+      for (const kind of Object.keys(BENCH_KINDS)) {
+        html += `<tr><td>${kind}</td>`;
+        for (const count of counts) {
+          spawner.kind = kind;
+          spawner.count = count;
+          ps.clear();
+          spawner.fill(cam);
+          for (let k = 0; k < 30; k++) { ps.update(TICK); spawner.fill(cam); }
+          for (let k = 0; k < 5; k++) frame();
+          // (Chrome's timer is coarse, 0.1 ms here: the mean of many frames.)
+          const times = [];
+          for (let k = 0; k < 80; k++) times.push(frame());
+          html += `<td>${avg(times).toFixed(2)}</td>`;
+        }
+        html += '</tr>';
+      }
+      html += `</table><div class="dim">ms a frame to draw the particles (mean of 80), at ${game.surface.w} columns; the view alone: ${avg(base).toFixed(2)} ms.</div>`;
+      $('sweepOut').innerHTML = html;
+      $('hideT').classList.remove('hide');
+      spawner.kind = saved.kind;
+      spawner.count = saved.count;
+      ps.clear();
+      frm.length = drw.length = upd.length = 0;
+    };
+    $('hideT').onclick = () => { $('sweepOut').innerHTML = ''; $('hideT').classList.add('hide'); };
+
+    // Explosions: set one off ahead of you, on the floor, in the air or on the wall you face.
+    function detonate() {
+      if (!world) return;
+      const map = world.map;
+      const cam = world.camera();
+      const dx = Math.cos(cam.angle);
+      const dy = Math.sin(cam.angle);
+      // The wall straight ahead, and which way its face looks.
+      let wall = 30;
+      let normal = [-dx, -dy, 0];
+      for (let d = 0.05; d < 30; d += 0.05) {
+        const x = cam.x + dx * d;
+        const y = cam.y + dy * d;
+        if (!map.solidPoint(x, y)) continue;
+        wall = d;
+        const px = cam.x + dx * (d - 0.05);
+        const py = cam.y + dy * (d - 0.05);
+        normal = Math.floor(px) !== Math.floor(x) ? [-Math.sign(dx), 0, 0] : [0, -Math.sign(dy), 0];
+        break;
+      }
+      const where = $('where').value;
+      const d = where === 'wall' ? wall - 0.15 : Math.min(Number($('dist').value), wall - 0.4);
+      const x = cam.x + dx * d;
+      const y = cam.y + dy * d;
+      const floor = map.floorAt(x, y, 0, cam.z);
+      const z = where === 'floor' ? floor + 0.1 : where === 'air' ? floor + 1.2 : Math.max(floor + 0.3, cam.z - 0.3);
+      world.explode($('style').value, x, y, z, { dir: where === 'wall' ? normal : null });
+      if ($('sprite').checked) world.spawnEffect('explosion', x, y, z);
+    }
+    $('boom').onclick = () => { detonate(); $('screen').focus(); };
+    window.addEventListener('keydown', (e) => { if (e.code === 'KeyX' && e.target.tagName !== 'INPUT') detonate(); });
+    $('dist').oninput = () => ($('distN').textContent = $('dist').value);
+    for (const id of ['style', 'where']) $(id).addEventListener('change', () => $('screen').focus());
+    let nextBoom = 0;
+    setInterval(() => {
+      if (!$('repeat').checked || !world) return;
+      const now = performance.now();
+      if (now >= nextBoom) {
+        detonate();
+        nextBoom = now + Math.max(0.2, Number($('every').value)) * 1000;
+      }
+    }, 50);
+  </script>
+</body>
+</html>

@@ -1,3 +1,20 @@
+const SECTOR = Math.PI / 4;
+
+/**
+ * Which view a viewer sees of a thing facing `angle` (radians), standing
+ * (dx, dy) from it: 0 front, 1 front three-quarter, 2 side, 3 back
+ * three-quarter, 4 back, in eight 45° sectors. View art shows the thing's
+ * left side, so the view comes back negative (to be mirrored) when the
+ * viewer is on its right: clockwise of its facing, as the map's y runs down.
+ */
+export function viewOf(angle, dx, dy) {
+  let rel = (Math.atan2(dy, dx) - angle) % (2 * Math.PI);
+  if (rel > Math.PI) rel -= 2 * Math.PI;
+  else if (rel <= -Math.PI) rel += 2 * Math.PI;
+  const view = Math.min(4, Math.round(Math.abs(rel) / SECTOR));
+  return rel > 0 && view > 0 && view < 4 ? -view : view;
+}
+
 /**
  * Shared animation playback for things and first-person weapons. Subclasses
  * must provide `this.def.anims` (normalized animations from defs.js).

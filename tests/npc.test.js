@@ -1,6 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { wanderArea } from '../src/engine/things/npc.js';
+import { lockOn } from '../src/engine/combat/aim.js';
+import content from '../src/content/index.js';
+import { Registry } from '../src/engine/registry.js';
+import { defineNpc, defineLevel } from '../src/engine/defs.js';
+import friendlies from './fixtures/friendlies.js';
+import { validateContent } from '../src/engine/validate.js';
 import { makeWorld, mockInput, room, run, npcRegistry } from './helpers.js';
 
 // The friendlies are test-only (tests/fixtures/friendlies.js).
@@ -104,6 +110,23 @@ test('coworkers stay out of doorways, hazards and narrow passages', () => {
   assert.ok(far > 0.8, 'and does wander around');
 });
 
+test("a coworker placed with its own wander keeps to that instead of its type's", () => {
+  const level = { ...office, things: undefined, list: [{ type: 'player', x: 10.5, y: 2.5, angle: 180 }, { type: 'terry', x: 3.5, y: 2.5, wander: 0 }, { type: 'terry', x: 3.5, y: 8.5, wander: 1 }] };
+  const w = world(level, { noMonsters: true });
+  const [still, near] = w.things.filter((t) => t.def.id === 'terry');
+  assert.equal(still.area.size, 1, 'wander 0: only the tile it stands on');
+  assert.ok(near.area.size > 1 && near.area.size <= 5, 'wander 1: the tiles next to it');
+  run(w, mockInput(), 30);
+  assert.ok(Math.hypot(still.x - 3.5, still.y - 2.5) < 0.01, 'it stands where it was put');
+
+  const bad = defineLevel({ ...level, id: 'bad', list: [...level.list, { type: 'terry', x: 4.5, y: 3.5, wander: -1 }, { type: 'stormtrooper', x: 4.5, y: 1.5, wander: 2 }] });
+  const { errors } = validateContent(new Registry({ ...content, things: [...content.things, ...friendlies], levels: [bad] }));
+  assert.deepEqual(errors.filter((e) => e.includes('"wander"')), [
+    'Level "bad": a terry at (4.5, 3.5): "wander" must be a number of tiles, 0 or more',
+    'Level "bad": a stormtrooper at (4.5, 1.5) has "wander", which only friendly characters take',
+  ]);
+});
+
 test('monsters never go after coworkers', () => {
   const w = world(room(['#########', '#.......#', '#.......#', '#.......#', '#########'], ['', ' > 0  t', '    2']));
   w.player.player.god = true;
@@ -111,4 +134,50 @@ test('monsters never go after coworkers', () => {
   run(w, mockInput(), 15, () => assert.notEqual(monster.target?.kind, 'npc'));
   assert.ok(monster.target === w.player, 'the trooper went for the player');
   assert.ok(w.things.filter((t) => t.kind === 'npc').every((t) => !t.dead && !t.removed));
+});
+
+// A villager ('w') beside the player, in a corridor that turns south at its
+// east end.
+const lane = room(
+  ['#############', '#...........#', '#...........#', '#...........#', '#########...#', '        #...#', '        #...#', '        #...#', '        #####'],
+  ['', '', ' >  w'],
+);
+
+test('a shot villager flinches, then runs from the player round the corner, and stops talking', () => {
+  const w = world(lane);
+  const villager = npc(w, 'villager-woman');
+  assert.ok(villager.shootable, 'villagers can be hit');
+  w.damage(villager, 5, w.player, w.player);
+  assert.equal(villager.state, 'pain');
+  assert.ok(!villager.dead);
+  run(w, mockInput(), 0.6);
+  assert.equal(villager.state, 'flee');
+  run(w, mockInput(), 4);
+  assert.ok(villager.y > 5, `she went round the corner, away from the player (at ${villager.x.toFixed(1)}, ${villager.y.toFixed(1)})`);
+  assert.equal(villager.state, 'flee', 'still scared');
+  w.player.x = villager.x;
+  w.player.y = villager.y - 1.2;
+  w.player.angle = Math.PI / 2;
+  w.use(w.player);
+  assert.equal(said(w, 'TOWNSWOMAN').length, 0, 'she has nothing to say');
+});
+
+test('the player locks on to a villager as to a monster, and can kill one', () => {
+  const w = world(hall, { noMonsters: true });
+  const villager = w.spawn('villager-man', 7.5, 2.9, Math.PI);
+  const lock = lockOn(w, w.player, 0, 5);
+  assert.ok(lock && Math.abs(lock.angle - w.player.angleTo(villager)) < 1e-9, 'lock-on turns the shot to them');
+  w.damage(villager, 1000, w.player, w.player);
+  assert.ok(villager.dead && !villager.removed, 'a corpse stays');
+  assert.equal(villager.animName, 'death');
+  assert.equal(w.stats.kills, 0, 'not counted as a kill');
+  assert.equal(lockOn(w, w.player, 0, 5), null, 'nothing to lock on to now');
+});
+
+test('the validator checks a friendly that can be hurt', () => {
+  const S = { src: 'assets/sprites/monsters/officer.png', frameWidth: 64, frameHeight: 64 };
+  const bad = defineNpc({ id: 'bad-npc', name: 'BAD', sheet: S, wander: 0, anims: { idle: [0] }, health: 10, fleeSpeed: 0, fleeDistance: -1 });
+  const { errors, warnings } = validateContent(new Registry({ ...content, things: [...content.things, bad] }));
+  assert.deepEqual(errors.filter((e) => e.includes('bad-npc')), ['npc "bad-npc": fleeSpeed must be above 0', 'npc "bad-npc": fleeDistance must be above 0']);
+  assert.deepEqual(warnings.filter((e) => e.includes('bad-npc')), ['npc "bad-npc": can be hurt but has no "death" animation (it vanishes when killed)']);
 });

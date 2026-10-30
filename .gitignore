@@ -3,7 +3,7 @@ tools/art/out/
 .smoke/
 *.log
 .DS_Store
-# Photos of real people stay on your own computer (see assets/custom/README.md).
+# Art you try out here stays on your own computer unless listed below (see assets/custom/README.md).
 assets/custom/*
 !assets/custom/README.md
 # Ripped Dark Forces art, for local testing only (see DISCLAIMER.md).
@@ -15,13 +15,35 @@ assets/custom/*
 !assets/custom/probe-droid.png
 !assets/custom/fists.png
 !assets/custom/blaster.png
+!assets/custom/bossk.png
+!assets/custom/boba-fett.png
+!assets/custom/rocket.png
+!assets/custom/thermal-detonator.png
+!assets/custom/thermal-detonator-ball.png
+!assets/custom/thermal-detonator-item.png
+!assets/custom/detonator-belt.png
+!assets/custom/concussion-rifle.png
+!assets/custom/concussion-rifle-item.png
 !assets/custom/textures.mjs
 !assets/custom/textures/
+# The whole Dark Forces texture pack, sorted by what each texture shows.
+!assets/custom/df-textures/
+# Dark Forces sound effects, sorted by what each one is, and the ones in use.
+!assets/custom/sounds/
+!assets/custom/sound-overrides.json
 # (Recolouring the cut sheets, and deriving more textures from the DF ones.)
 !assets/custom/recolour.mjs
 !assets/custom/derive.mjs
-# Character sheets that aren't rips (the sandtrooper and the Jawa), their
+# Jedi Knight's Moldy Crow textures, and the script that names them.
+!assets/custom/jk-crow/
+!assets/custom/crow.mjs
+# Character sheets that aren't rips (the sandtrooper and its commander, the Jawa, the dewback and the villagers), their
 # cutters and the cutters' shared steps.
 !assets/custom/sandtrooper/
+!assets/custom/sandtrooper-commander/
 !assets/custom/jawa/
+!assets/custom/villagers/
+!assets/custom/dewback/
 !assets/custom/sheetcut.py
+!assets/custom/graft.py
+__pycache__/

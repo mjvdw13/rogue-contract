@@ -11,8 +11,8 @@
 // on the floor under the thing. A face style is `{ color }` ([ramp, 0..1] or
 // [r, g, b]) or `{ tex }` (a texture, projected onto the face at the walls'
 // scale and kept upright; `texScale` enlarges it, `texOffset: [u, v]` shifts
-// it, in world units), plus `glow` and `twoSided`. `false` leaves the face
-// out.
+// it, in world units; or `uv`, one [u, v] per point of a face(), in repeats
+// of the texture), plus `glow`, `flat` and `twoSided`. `false` leaves the face out.
 import { defineModel } from '../../../engine/defs.js';
 
 const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
@@ -52,12 +52,17 @@ export class ModelBuilder {
       if (dot(n, sub(centre(pts), inside)) < 0) pts = [...pts].reverse();
     }
     const f = { v: pts.map((p) => this._vertex(p)) };
-    if (style.tex) {
+    if (style.tex && style.uv) {
+      // Given per point, in repeats of the texture (in the order passed in).
+      f.tex = style.tex;
+      f.uv = pts === points ? style.uv : [...style.uv].reverse();
+    } else if (style.tex) {
       f.tex = style.tex;
       f.uvw = planarUV(pts, style.texScale ?? 1, style.texOffset ?? [0, 0]);
     } else f.color = style.color;
     if (style.glow) f.glow = true;
     if (style.twoSided) f.twoSided = true;
+    if (style.flat) f.flat = true;
     this.faces.push(f);
     return this;
   }

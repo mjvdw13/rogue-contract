@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Soundboard</title>
+  <style>
+    :root { --bg: #111317; --panel: #1b1e24; --line: #2c313a; --text: #d9dde4; --dim: #8a93a3; --accent: #f0c040; }
+    body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.4 system-ui, sans-serif; }
+    main { max-width: 1100px; margin: 0 auto; padding: 16px; }
+    h1 { font-size: 20px; margin: 8px 0 4px; }
+    h2 { font-size: 16px; margin: 28px 0 8px; color: var(--accent); }
+    p { color: var(--dim); margin: 4px 0 12px; }
+    table { width: 100%; border-collapse: collapse; background: var(--panel); }
+    th, td { text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+    th { color: var(--dim); font-weight: 600; }
+    button { background: #2b3140; color: var(--text); border: 1px solid #3a4152; border-radius: 4px; padding: 3px 9px; cursor: pointer; font: inherit; }
+    button:hover { border-color: var(--accent); }
+    select, input { background: #0d0f12; color: var(--text); border: 1px solid #3a4152; border-radius: 4px; padding: 2px 4px; font: inherit; }
+    input[type=number] { width: 4.5em; }
+    code { color: var(--accent); }
+    textarea { width: 100%; height: 14em; background: #0d0f12; color: var(--text); border: 1px solid #3a4152; font: 12px monospace; }
+    .changed td { background: #2a2614; }
+    .wrap { overflow-x: auto; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Soundboard</h1>
+  <p>Every game sound, synthesized and with its Dark Forces override (<code>assets/custom/sound-overrides.json</code>),
+    and every file in <code>assets/custom/sounds/</code>. Pick another file or volume to try it, then copy the JSON
+    into <code>sound-overrides.json</code>. Serve the repo over HTTP (<code>npm run serve</code>) and open
+    <code>/tools/soundboard.html</code>.</p>
+
+  <h2>Game sounds</h2>
+  <div class="wrap"><table id="game"><thead><tr><th>Sound id</th><th>Synth</th><th>Dark Forces file</th><th>Volume</th><th></th></tr></thead><tbody></tbody></table></div>
+  <p><button id="copy">Copy sound-overrides.json</button></p>
+  <textarea id="json" readonly></textarea>
+
+  <h2>Every Dark Forces sound</h2>
+  <div id="files"></div>
+</main>
+<script type="module">
+  import sounds from '../src/content/sounds.js';
+  import { renderSynth, SYNTH_RATE } from '../src/engine/audio/synth.js';
+  import { leadingSilence } from '../src/engine/audio/audio.js';
+
+  let ctx = null;
+  const audio = () => (ctx ??= new AudioContext());
+  const decoded = new Map();
+
+  function playBuffer(buf, volume = 1) {
+    const src = audio().createBufferSource();
+    src.buffer = buf;
+    const g = ctx.createGain();
+    g.gain.value = volume;
+    src.connect(g).connect(ctx.destination);
+    src.start(0, leadingSilence(buf.getChannelData(0), buf.sampleRate) / buf.sampleRate);
+  }
+  function playSynth(def) {
+    const samples = renderSynth(def.synth, SYNTH_RATE, def.id);
+    const buf = audio().createBuffer(1, samples.length, SYNTH_RATE);
+    buf.getChannelData(0).set(samples);
+    playBuffer(buf, def.volume ?? 1);
+  }
+  async function playFile(src, volume) {
+    if (!decoded.has(src)) decoded.set(src, fetch('../' + src).then((r) => r.arrayBuffer()).then((d) => audio().decodeAudioData(d)));
+    playBuffer(await decoded.get(src), volume);
+  }
+  const button = (label, onclick) => Object.assign(document.createElement('button'), { textContent: label, onclick });
+
+  // The pack's index: folder headings and table rows "| NAME | length | what it is |".
+  const index = await (await fetch('../assets/custom/sounds/INDEX.md')).text();
+  const folders = [];
+  for (const line of index.split('\n')) {
+    const h = line.match(/^## (.+)$/);
+    if (h) folders.push({ name: h[1], files: [] });
+    const r = line.match(/^\| ([A-Z0-9-]+) \| ([\d.]+s) \| (.*) \|$/);
+    if (r && folders.length) folders.at(-1).files.push({ name: r[1], length: r[2], what: r[3] });
+  }
+  const allFiles = folders.flatMap((f) => f.files.map((x) => ({ ...x, src: `assets/custom/sounds/${f.name}/${x.name}.mp3` })));
+
+  const overrides = await (await fetch('../assets/custom/sound-overrides.json', { cache: 'no-store' })).json().catch(() => ({}));
+  const current = structuredClone(overrides);
+  const json = document.getElementById('json');
+  const showJson = () => {
+    const lines = Object.entries(current).filter(([, v]) => v.src).map(([k, v]) => `  ${JSON.stringify(k)}: { "src": ${JSON.stringify(v.src)}, "volume": ${v.volume} }`);
+    json.value = `{\n${lines.join(',\n')}\n}\n`;
+  };
+
+  const tbody = document.querySelector('#game tbody');
+  for (const def of sounds) {
+    const tr = document.createElement('tr');
+    const o = (current[def.id] ??= { src: '', volume: 1 });
+    const pick = document.createElement('select');
+    pick.append(new Option('(synth only)', ''));
+    for (const f of allFiles) pick.append(new Option(`${f.name}: ${f.what}`, f.src));
+    pick.value = o.src;
+    const vol = Object.assign(document.createElement('input'), { type: 'number', step: 0.05, min: 0, max: 2, value: o.volume });
+    const update = () => {
+      o.src = pick.value;
+      o.volume = Number(vol.value);
+      const was = overrides[def.id];
+      tr.classList.toggle('changed', (was?.src ?? '') !== o.src || (o.src && was?.volume !== o.volume));
+      showJson();
+    };
+    pick.onchange = vol.onchange = update;
+    const cells = [def.id, button('Play', () => playSynth(def)), pick, vol, button('Play file', () => pick.value && playFile(pick.value, Number(vol.value)))];
+    tr.replaceChildren(...cells.map((c) => { const td = document.createElement('td'); td.append(c); return td; }));
+    tbody.append(tr);
+  }
+  showJson();
+  document.getElementById('copy').onclick = () => navigator.clipboard.writeText(json.value);
+
+  const filesDiv = document.getElementById('files');
+  for (const f of folders) {
+    const h = Object.assign(document.createElement('h2'), { textContent: f.name });
+    const table = document.createElement('table');
+    table.innerHTML = '<thead><tr><th></th><th>File</th><th>Length</th><th>What it is</th><th>Used for</th></tr></thead>';
+    const body = table.createTBody();
+    for (const x of f.files) {
+      const src = `assets/custom/sounds/${f.name}/${x.name}.mp3`;
+      const tr = body.insertRow();
+      tr.insertCell().append(button('Play', () => playFile(src, 1)));
+      tr.insertCell().textContent = x.name;
+      tr.insertCell().textContent = x.length;
+      tr.insertCell().textContent = x.what;
+      tr.insertCell().textContent = Object.keys(overrides).filter((k) => overrides[k].src === src).join(', ');
+    }
+    filesDiv.append(h, Object.assign(document.createElement('div'), { className: 'wrap' }));
+    filesDiv.lastChild.append(table);
+  }
+</script>
+</body>
+</html>

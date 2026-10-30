@@ -1,11 +1,11 @@
-# Modding Raccoon Alex
+# Modding Rogue Contract
 
-Everything that makes this game *Raccoon Alex* lives in `src/content/` as plain
-data. The engine in `src/engine/` never mentions Alex. It only reads that
-content pack. Each new monster, weapon, item, level, sound or song is a small
-definition in a file, plus one line in an index.
+Everything that makes this game *Rogue Contract* lives in `src/content/` as
+plain data. The engine in `src/engine/` never mentions Star Wars. It only
+reads that content pack. Each new monster, weapon, item, level, sound or song
+is a small definition in a file, plus one line in an index.
 
-This guide covers each kind of content in turn: monsters, coworkers, weapons,
+This guide covers each kind of content in turn: monsters, friendly characters, weapons,
 items, scenery, levels, textures, sounds, music, cheats and custom behaviour.
 All paths are relative to the repository root.
 
@@ -17,7 +17,7 @@ All paths are relative to the repository root.
    exit, keys and secrets can be reached from the start. It also prints an
    ammo budget for each level.
 3. Reload the game. Jump straight to a level with
-   `index.html?map=e1m2&skill=3`, and add `&god` or `&nomonsters` while
+   `index.html?map=m3&skill=3`, and add `&god` or `&nomonsters` while
    testing.
 4. Run `npm test` before you push.
 
@@ -38,10 +38,22 @@ with JSDoc types, so editors like VS Code autocomplete the fields.
   and LEDs. A texture defined with `fullbright: false` (rock, sand) only
   snaps to the lit colours, so no stray pixel of it glows.
 - **Sprite sheets:** frames of equal size, left to right and wrapping onto new
-  rows. Frame 0 is the top-left frame. Things always face the player (there
-  are no 8-angle rotations), and the bottom of the frame stands on the floor.
+  rows. Frame 0 is the top-left frame. A thing shows its front from every
+  side unless its animations list `views` (below), and the bottom of the
+  frame stands on the floor.
   32 pixels is one tile, so a person about 56 pixels tall stands about 1.75
   tiles high, and fills a 64×64 frame.
+- **Glints and glows:** a sheet can list exact colours (`[r, g, b]`) that
+  behave differently from the rest of its art. `glint` colours are
+  highlights that catch the light, like the shine on a stormtrooper's
+  armour: they're lit like the rest of the sprite, but brighten toward
+  fullbright when a light source can see the thing, even if it stands in
+  shadow, and flash with muzzle flashes and passing bolts. With no source
+  about (a canyon at night) they're plain lit white. `glow` colours always
+  shine, as if they were fullbright (sparks in an explosion):
+  `sheet: { src: '...', frameWidth: 64, frameHeight: 64, glint: [[255, 255, 255]] }`.
+  An art override (`assets/custom/overrides.json`) can set its own `glint`
+  and `glow` for its art.
 - **Textures:** walls and flats are usually 64×64, and span two tiles (32
   texels per tile), about the height of a person. Any power-of-two size from
   16 to 256 works (a door's art is one whole door). Textures are laid out by
@@ -49,7 +61,7 @@ with JSDoc types, so editors like VS Code autocomplete the fields.
   out on the door instead. An animated texture is a horizontal strip of
   frames.
 - **The built-in art** comes from code in `tools/art/`. Run `npm run art`, or
-  `node tools/art/generate.mjs --only ant --preview`. It uses a small
+  `node tools/art/generate.mjs --only stormtrooper --preview`. It uses a small
   software "clay" renderer (`tools/art/lib/model.js`), and a rig for
   humanoids (`lib/rig.js`). You can also just draw PNGs by hand. If you
   hand-edit a generated PNG, don't regenerate that asset afterwards, or your
@@ -64,10 +76,10 @@ Make a file in `src/content/monsters/`, import it in
 import { defineMonster } from '../../engine/defs.js';
 
 export default defineMonster({
-  id: 'temp',                 // unique id
-  name: 'Rabid Temp',
-  glyph: 't',                 // its letter in level maps (must be unused)
-  sheet: { src: 'assets/sprites/monsters/temp.png', frameWidth: 64, frameHeight: 64 },
+  id: 'scout-trooper',        // unique id
+  name: 'Scout Trooper',
+  glyph: 'q',                 // its letter in level maps (must be unused)
+  sheet: { src: 'assets/sprites/monsters/scout-trooper.png', frameWidth: 64, frameHeight: 64 },
   health: 40,
   speed: 2.6,                 // tiles per second
   radius: 0.3,                // collision radius in tiles
@@ -75,8 +87,8 @@ export default defineMonster({
   reactionTime: 0.4,          // seconds before reacting after being woken
   cooldown: [1, 2.2],         // seconds between attacks (random in range)
   aggression: 0.65,           // how eagerly it attacks when it could
-  attack: { kind: 'projectile', projectile: 'exception-fireball', range: 30, minRange: 1.5 },
-  melee: { kind: 'melee', damage: [6, 18], range: 1.1, hitSound: 'claw' },
+  attack: { kind: 'projectile', projectile: 'trooper-bolt', spread: 0.07, range: 60, sound: 'blaster-enemy' },
+  melee: { kind: 'melee', damage: [6, 18], range: 1.1, hitSound: 'punch-hit' },
   anims: {
     idle: { frames: [0, 1], fps: 2, loop: true },
     walk: { frames: [0, 1, 2, 3], fps: 6 },
@@ -85,9 +97,8 @@ export default defineMonster({
     pain: [6],
     death: { frames: [7, 8, 9, 10], fps: 8 },
   },
-  sounds: { sight: 'firefly-sight', active: 'firefly-active', pain: 'firefly-pain', death: 'firefly-death' },
-  blood: 'ichor',             // effect when hit (bugs bleed green)
-  drops: ['staples-clip', { item: 'donut', chance: 0.25 }],
+  sounds: { sight: 'trooper-sight', pain: 'trooper-pain', death: 'trooper-death' },
+  drops: ['power-cell', { item: 'med-kit', chance: 0.25 }],
 });
 ```
 
@@ -95,14 +106,36 @@ export default defineMonster({
 `{ frames, fps | durations, loop, fireAt, fullbright, events }`. `fireAt` is
 the position (within `frames`) at which the attack happens. `fullbright` lists
 the positions that ignore lighting (muzzle flashes). `events` maps a position
-to a string such as `'sound:pumpkin-rustle'`, or to anything a hook wants.
+to a string such as `'sound:droid-active'`, or to anything a hook wants.
 A monster needs `walk` (or `idle`) and `death`. The last death frame stays on
 the floor as the corpse.
+
+**Views.** `frames` is the animation seen from the front. Add `views` to show
+it from the other sides, as Dark Forces did:
+
+```js
+walk: {
+  frames: [0, 1, 2, 3], fps: 6,
+  views: { frontSide: [12, 13, 14, 15], side: [16, 17, 18, 19], backSide: [20, 21, 22, 23], back: [24, 25, 26, 27] },
+},
+```
+
+Each view is as long as `frames`, drawn with the figure facing the
+viewer's left (so it shows its left side): `frontSide` is the front
+three-quarter view, `side` the profile, `backSide` the back three-quarter.
+Seen from its right, the art is mirrored, so five views cover eight
+directions. A view left out uses the nearest one given. Which one shows
+depends on where the thing faces (its placed `angle`; monsters turn to
+where they walk and to whom they shoot, NPCs to where they stroll and to
+whoever bumps them). Attacks and pain usually face the player, and deaths
+can look the same from every side, so `walk` and `idle` are the ones that
+need views. A view frame past the end of the sheet draws the front frame,
+so an art override can add views the committed sheet lacks.
 
 **Attacks.** An attack is one of:
 
 - `{ kind: 'hitscan', damage: [3, 12], spread: 0.1, range: 24, pellets: 1, sound }`
-- `{ kind: 'projectile', projectile: 'exception-fireball', count: 1, spread: 0 }`
+- `{ kind: 'projectile', projectile: 'trooper-bolt', count: 1, spread: 0 }`
 - `{ kind: 'melee', damage: [10, 30], range: 1.1, hitSound }`
 - a custom kind (see *Custom behaviour*)
 
@@ -116,56 +149,93 @@ steps and ledges, and shots into the sky simply vanish. Explosions measure
 3D distance, so a blast on the floor below a ledge doesn't reach over it.
 
 **Other fields:** `scale` (sprite size), `height`, `mass` (knockback),
-`sightRange`, `splashImmune`, `infighting: false`, `boss: true`,
+`sightRange`, `splashImmune`, `bleeds: false` (a puff instead of `blood` when hit: droids), `infighting: false`, `boss: true`,
 `renderStyle: 'fuzz'` (shimmering, partly invisible), `countKill: false`,
 `stepHeight`, `dropHeight`, `flying: true` with `z` and `flySpeed` (see
 *Heights* under Levels).
 
+**Calm.** A level can place a monster calm (see *Things* under Levels): a
+trooper on patrol or a Jawa about town, before the shooting starts. A calm
+monster never looks for the player, hears no gunfire and never attacks. It
+stands its post, strolls round its spot as friendly characters do (out of
+doorways and one-tile passages), or walks a patrol. Bumped or used, it
+turns to the player and says one of its `lines` (shown as `NAME: line`).
+Hurt, it turns normal and fights back, and so does the rest of the town:
+every calm monster on the level turns at once (the town's switch). The
+player firing a weapon with `noise` (not fists) or hurting anyone while
+some are calm throws it too, and so does the `hostile` action; the
+level's `on: 'hostile'` triggers then run (close the blast doors, spawn
+reinforcements, change the music). Those that hear it come for the
+player; the rest look out for them from then on. Its type's `calm` sets
+how it behaves; a placement can override any of it:
+
+```js
+calm: {
+  lines: ['Move along.', 'Keep your hands where I can see them.'],
+  speed: 2,          // tiles per second while calm (default 2)
+  stride: 1.4,       // tiles one walk cycle covers, so the feet keep pace (unset: the walk
+                     // plays at speed over the chase speed, the chase's stride)
+  wander: 4,         // tiles it may stroll from its spot (default 4; 0 stands its post)
+  idleTime: [2, 5],  // seconds standing between walks, and at each patrol point
+},
+```
+
 **Hooks** run your own code: `onSpawn(world, self)`, `onSight(world, self)`,
 `onThink(world, self, dt)` (return `true` to skip the normal AI that tick),
 `onAttack(world, self, attack)`, `onPain(world, self, source, amount)`,
-`onDeath(world, self, source)` and `onEvent(world, self, eventName)`. The Pumpkin
-King in `monsters/pumpkin-king.js` uses `onThink` to cackle for reinforcements.
+`onDeath(world, self, source)` and `onEvent(world, self, eventName)`.
 
-## Coworkers (friendly characters)
+## Friendly characters
 
-`src/content/coworkers.js` defines Alex's coworkers with `defineNpc()`.
-Friendlies are solid, so you bump into them, but they can't be hurt.
-Bullets, projectiles and explosions pass through them, and monsters never
-target them. Each one idles and wanders up to `wander` tiles from where it was
-placed. It stays out of doorways, hazards and one-tile passages, so it never
-blocks the way. When Alex bumps into one or presses use on it, it turns to
-him, plays `react`, says one of its `lines` (shown as `NAME: line`), plays
+`src/content/npcs/villagers.js` defines the townsfolk with `defineNpc()`.
+Friendlies are solid, so you bump into them, and monsters never target
+them. Without `health` they can't be hurt: bullets, projectiles and
+explosions pass through them (a `splash.erupt` blast still goes up under
+them, harmlessly). Each one idles and wanders up to `wander` tiles from where it was
+placed (or its placement's own `wander`: see Things). It stays out of doorways, hazards and one-tile passages, so it never
+blocks the way. When the player bumps into one or presses use on it, it turns to
+them, plays `react`, says one of its `lines` (shown as `NAME: line`), plays
 `sounds.react` and pops up a `bubble` effect.
+
+With `health` (the villagers have 20), a friendly can be shot, and your aim
+locks on to it as it does to a monster. The first hit plays its `pain`
+animation; then it runs from you for good, at `fleeSpeed` (tiles a second,
+default 6) along the way monsters find to you, but uphill (through doors,
+round walls, up steps), until it's `fleeDistance` tiles away (default 20)
+or cornered, where it cowers on its `idle` frame until you come near
+again. A frightened friendly says nothing when bumped or used. `flee` is its
+running animation (else `walk`), `death` its fall (it lies there; without
+one it vanishes), and `sounds.pain` and `sounds.death` its cries. Killing
+one doesn't count as a kill. Knockback uses `mass` as for monsters.
 
 ```js
 defineNpc({
-  id: 'vera',
-  name: 'VERA',
-  glyph: '2',
-  sheet: { src: 'assets/sprites/coworkers/vera.png', frameWidth: 64, frameHeight: 64 },
+  id: 'moisture-farmer',
+  name: 'FARMER',
+  glyph: 'z',
+  sheet: { src: 'assets/sprites/npcs/moisture-farmer.png', frameWidth: 64, frameHeight: 64 },
   wander: 3,                // tiles from the spot; 0 = stays put
   speed: 0.8,
   idleTime: [3, 6],         // seconds between strolls
-  anims: { idle: { frames: [0, 1], durations: [2.8, 1.6], loop: true }, walk: [2, 3, 4, 5], react: [6] },
-  lines: ['Cool.', 'Wow. Riveting.'],
-  bubble: 'bubble-dots',    // an effect from content/effects.js
-  sounds: { react: 'npc-hmph' },
+  anims: { idle: { frames: [0, 1], durations: [2.8, 1.6], loop: true }, walk: [2, 3, 4, 5], react: [6],
+           pain: [7], death: { frames: [8, 9, 10], fps: 8 } },
+  lines: ['Vaporators don't fix themselves.', 'Storm's coming in off the Dune Sea.'],
+  bubble: 'bubble-dots',    // optional: an effect (defineEffect) that pops up over them
+  sounds: { react: 'npc-hmph', pain: 'villager-pain', death: 'villager-death' }, // optional: any sound ids
+  health: 20,               // optional: can be shot, and flees once hurt
+  fleeSpeed: 6,
+  fleeDistance: 20,
 });
 ```
 
-Animation frame events like `events: { 2: 'sound:npc-sigh' }` play a sound
-(Dale sighs on his idle loop). `hooks.onReact(world, self)` and
-`hooks.onThink(world, self, dt)` add custom behaviour.
+Animation frame events like `events: { 2: 'sound:npc-sigh' }` play a sound.
+`hooks.onReact(world, self)`, `hooks.onThink(world, self, dt)`,
+`hooks.onPain(world, self, source, amount)` and
+`hooks.onDeath(world, self, source)` add custom behaviour.
 
-The sprites are hand-drawn pixel art, one file per coworker in
-`tools/art/sprites/people/`. Each character is drawn as text grids, one
-character per pixel and a legend of palette colours, split into parts (head,
-body, arms, legs) so poses can reuse them. `compose()` stamps the parts onto a
-frame and `paint()` finishes it: dithered blends between shades, a light
-fabric grain, soft edges between materials, and a shadow-side outline instead
-of a black one (all in `tools/art/lib/pixels.js`). Edit a grid, then run
-`npm run art -- --only coworker-<id>`.
+The villagers' sheets are cut from character sheets by
+`assets/custom/villagers/cut.py` (Python, Pillow), like the sandtroopers and
+the Jawa; see `assets/custom/README.md`.
 
 ## Weapons
 
@@ -176,20 +246,20 @@ pickup item for it (see *Items*).
 import { defineWeapon } from '../../engine/defs.js';
 
 export default defineWeapon({
-  id: 'hole-punch',
-  name: 'HOLE PUNCH',
+  id: 'repeater',
+  name: 'REPEATER',
   slot: 3,                        // number key; several weapons can share a slot
-  ammo: 'tacks',                  // or null for melee
+  ammo: 'energy',                 // or null for melee
   ammoPerShot: 1,
   priority: 3,                    // auto-switch preference when picking up ammo
   light: { radius: 5, light: 96 }, // the muzzle flash lights the room round you
-  sheet: { src: 'assets/sprites/weapons/hole-punch.png', frameWidth: 128, frameHeight: 96 },
+  sheet: { src: 'assets/sprites/weapons/repeater.png', frameWidth: 128, frameHeight: 96 },
   anims: {
     idle: [0],
     fire: { frames: [1, 2, 0], durations: [0.08, 0.15, 0.2], fireAt: 0, fullbright: [0] },
   },
   fire: { kind: 'hitscan', damage: [5, 15], pellets: 3, spread: 0.06, range: 40 },
-  sounds: { fire: 'tack-fire' },
+  sounds: { fire: 'blaster-fire' },
 });
 ```
 
@@ -200,9 +270,25 @@ the same number of pixels. The HUD panels in the bottom corners draw over the
 weapon. The fire animation's length sets the rate of fire. `accurateFirstShot: true` makes a single shot perfectly
 accurate when you aren't holding the trigger. New ammo types go in
 `src/content/ammo.js` as `defineAmmo({ id, name, short, max, clip })`.
+`lockOn: 5` in `fire` aims it Dark Forces' way: of the monsters (and
+friendlies that can be hurt) you can see, the nearest one within 5° either side of the crosshair (or under it, so
+one close up is hard to miss) gets the shot, turned and tilted onto it
+however high or low it stands (see `concussion-rifle.js`). Without it,
+shots only get Doom's small nudge up or down onto a body already under the
+crosshair. Turning auto-aim off in the options turns both off.
 `light` is the muzzle flash: on the fire animation's `fullbright` frames it
 lights the room round you (see *Glowing things* below). `flashLight: 1`
 (0-2) instead brightens the whole view, Doom's way.
+`reraise: true` drops the hand out of view after each shot and brings the
+next one up (a thrown weapon: see `thermal-detonator.js`); with none left,
+it switches to your best weapon with ammo.
+`charge: { time: 1, min: 0.2, sink: 36, pull: 0.18 }` throws when fire is
+let go instead of when it's pressed. Pressing fire pulls the hand back,
+down `sink` pixels over `pull` seconds, and it stays there while fire is
+held. The throw's power runs from `min` for a tap to
+1 for a hold of `time` seconds or more, and it scales the projectile's
+`speed` (and a bouncer's `loft`), so a tap is a short, low toss. Changing
+weapon while winding up drops the throw.
 
 ## Items
 
@@ -227,8 +313,8 @@ Built-in `pickup` effects (combine as many as you like):
 | Effect | Meaning |
 |---|---|
 | `health: n` | Heal `n`, up to `maxHealth` (default 100) |
-| `armor: n` | Add caffeine (armor), up to `maxArmor` (default 200). With `armorClass: 1` or `2`, set it to `n` with that absorption (⅓ or ½) |
-| `ammo: { staples: 10 }` | Give ammo (doubled on the easiest and hardest skills) |
+| `armor: n` | Add shields (armor), up to `maxArmor` (default 200). With `armorClass: 1` or `2`, set it to `n` with that absorption (⅓ or ½) |
+| `ammo: { energy: 15 }` | Give ammo (doubled on the easiest and hardest skills) |
 | `weapon: 'id'` | Give a weapon and switch to it |
 | `key: 'blue'` | Give a key (the ids are listed in `config.keys`) |
 | `powerup: 'invulnerable' \| 'nightvision' \| 'hazard' \| 'berserk'` | Timed powerup (`duration` in seconds, default 30). Berserk lasts the whole level |
@@ -242,12 +328,70 @@ be added with `definePickup` (see *Custom behaviour*).
 ## Scenery, projectiles and effects
 
 - **Decorations** are defined in `src/content/decor.js` with
-  `defineDecoration({ id, glyph, sheet, solid, radius, hanging, anims })`. Give
+  `defineDecoration({ id, glyph, sheet, solid, radius, hanging, fixed, anims })`. Give
   one `health` and `explode: { radius, damage, sound, effect }` to make a
-  barrel that explodes (see `toxic-drum`).
+  barrel that explodes (see `toxic-drum`). A decoration settles on the
+  highest floor its `radius` reaches, so one standing against a raised
+  floor climbs onto it; `fixed: true` keeps it at the height it's placed
+  at (the floor under its middle, or the level thing's `z`): props against
+  a wall, fixtures on one, things stacked on others. `spin` turns one
+  (radians a second), and `bob: { height, period }` floats one up and down
+  by `height` either way over `period` seconds, like the hovering
+  `landspeeder`; add `roll` (degrees) to sway a model side to side as it
+  floats, like the `moldy-crow`. Bobbing is drawn only: the thing collides and stops shots
+  where it stands, each bobs at its own point in the swing, and a model's
+  grime faces (its shadow) stay on the ground.
 - **Projectiles** are defined in `src/content/effects.js` with
   `defineProjectile({ id, sheet, anims: { fly, explode }, speed, damage, splash: { radius, damage }, gravity, sounds })`.
-- **Effects** such as puffs, blood, bug ichor and explosions use
+  Give one `bounce` to make it bounce instead of bursting on what it hits
+  (a thrown detonator, `detonator-thrown`):
+
+  ```js
+  gravity: 28,
+  bounce: {
+    toss: 4.25,         // thrown along your aim, plus this much upward speed
+    loft: 8.75,         // and this much more times the throw's power (a weapon's `charge`)
+    restitution: 0.55,  // share of its speed into a wall or floor it keeps (0-1)
+    friction: 0.75,     // share of the rest it keeps at each bounce (0-1)
+    minSpeed: 1.5,      // slower than this into the floor, it stops bouncing and rolls
+    roll: 3,            // rolling, it loses this much of its speed a second
+    fuse: 2.5,          // seconds until it goes off (at once on a body)
+  },
+  sounds: { bounce: 'detonator-bounce', explode: 'detonator-explode' },
+  ```
+
+  It bounces off walls, floors, ceilings, doors and solid scenery, and a
+  lift rising under it carries it up. Its `bounce` sound plays on each
+  knock harder than `minSpeed`. It goes off where it lies (its `explosion`
+  facing up off the floor), with its `splash`, which can hurt its thrower.
+
+  A `splash` hurts every body within `radius` of the burst (walls and
+  floors shelter them), `damage` falling off with distance. Dark Forces'
+  concussion rifle (`concussion-shot`) works another way:
+
+  ```js
+  damage: 0,          // no damage itself; the splash does it all
+  splash: {
+    radius: 3.3,
+    damage: 60,
+    falloff: false,   // every body caught takes the full damage
+    erupt: 'concussion', // an explosion going up from the floor under each one
+  },
+  ```
+
+  With `erupt`, one more goes up from the floor where it struck a wall or
+  floor, but none where it hit a body (that body erupts already). A
+  projectile with no `sheet` flies unseen. Villagers in the splash are
+  hurt and erupt as monsters do; friendlies that can't be hurt, and
+  scenery (except hanging scenery), erupt as well, unharmed.
+
+  `proximity: 2` bursts a projectile that passes within 2 tiles of an
+  enemy's body (monsters and villagers for your shots, you for theirs) where it passes
+  nearest, if it can see them, so a near miss in the open still lands its
+  splash on them. The concussion
+  shot has it; without it, a shot just wide of a trooper in the open flies
+  on to the far wall.
+- **Effects** such as puffs, blood and sprite explosions use
   `defineEffect({ id, sheet, anims: { idle } })`. An effect disappears when its
   animation ends.
 
@@ -284,7 +428,12 @@ defineDecoration({ id: 'reactor-ring', model: 'reactor-ring', spin: 0.5 }) // ra
   Each has a `color` (`[ramp, 0..1]` or `[r, g, b]`) or a `tex` with `uv`
   (texture repeats) or `uvw` (world units, at the walls' scale). `glow`
   makes a face fullbright (animated textures keep animating), and `twoSided`
-  draws it from behind too. Faces are shaded by a fixed light from above.
+  draws it from behind too. Faces are shaded by a fixed light from above,
+  north-west, unless `flat`: then they take the light as the walls do (for
+  a face flush with a wall, such as the front of a rounded arch).
+  A face in a grime texture (`grime: true`, see Decals) darkens what's
+  behind it instead of covering it and hides nothing: a soft shadow on the
+  ground (`speeder-shadow`, a grey oval).
 - **Building in code:** `ModelBuilder` in `src/content/models/lib/build.js`
   makes boxes, prisms, lofts (tapered prisms) and cylinders along any axis,
   winds their faces, and projects textures upright at the walls' scale.
@@ -295,40 +444,307 @@ defineDecoration({ id: 'reactor-ring', model: 'reactor-ring', spin: 0.5 }) // ra
   400).
 - **Collision:** a solid model collides as its cylinder (`radius`,
   `height`), or as its `lines` (wall segments in model space) when it has
-  them, for long shapes like a ship. Solid models stop shots and
-  projectiles. The level checker treats the tiles under the lines as
+  them, for long shapes like a ship. A solid thing whose cylinder starts
+  in a wall is nudged clear of it, but one with `lines` stays where it is
+  put (back to a wall, say). Solid models stop shots and projectiles.
+  The level checker treats the tiles under the lines as
   blocked, and the map viewer draws them in pink.
+
+### Particles
+
+Sparks, embers, shrapnel, smoke, steam and dust are **particles**: points
+and small discs drawn straight into the frame, far cheaper than sprites, so
+a scene can have hundreds. They're defined in `src/content/particles.js`:
+
+```js
+defineParticle({
+  id: 'spark',
+  colors: [{ ramp: 'glow-yellow', from: 6, to: 0 }], // white-hot to red over its life
+  life: [0.4, 1],     // seconds, picked at random between the two
+  size: 0.02,         // world units; drawn 1 to maxPx pixels across
+  streak: 0.04,       // draw a streak back along its velocity, this many seconds long
+  fullbright: true,   // glows (otherwise it's lit by the light where it is)
+  blend: 'add',
+  gravity: 6,         // units per second per second (negative rises)
+  bounce: 0.5,
+  onFloor: 'bounce',
+  walls: 'bounce',
+  cap: 400,
+})
+```
+
+- `colors`: the colour over the particle's life, first to last. Each entry
+  is a palette ramp and a step counted from its dark end (`['gray', 9]`),
+  or `{ ramp, from, to }` for every step between two (either way round).
+- `shape`: `'square'` (the default; dots and small squares, `maxPx`
+  default 3) or `'disc'` (round puffs for smoke and steam). `maxPx` is at
+  most 64: a big disc right in front of you still stops at 64 pixels.
+- `blend`: `'solid'`, `'add'` (glows: sparks, fire), `'half'` (see-through:
+  smoke) or `'dither'` (a screen-door pattern that thins out as the particle
+  ages; `alpha` sets how solid it is at its most, and `fadeIn`, the share
+  of its life it takes to fade in, so mist doesn't pop up). `fade: true`
+  makes an `add` or `half` type thin out the same way: soft while it's
+  strong, and still fading in and out. `fadeOut` is the share of its life
+  it spends fading out, at the end (1, the default: its whole life), so a
+  fireball can stay solid and then go.
+- `grow`: a disc or square swells to this many times its `size` by the end
+  of its life (a fireball 2.5, smoke 2); below 1 it shrinks.
+- `trail: { type: 'smoke-wisp', every: 0.08, for: 0.8 }`: while it flies,
+  it drops one particle of `type` every `every` seconds, for its first
+  `for` seconds (all its life if left out), and none once it lies on the
+  floor. Burning debris trails smoke this way. Trails count against their
+  own type's cap.
+- `drag`: the share of its speed lost per second (toward the wind, for
+  types with `wind`). `wind`: how much of the level's wind carries it (1:
+  all of it).
+- `onFloor`: `'die'` (the default), `'bounce'` or `'stick'` (lies there
+  until its life is up; it still bounces off a hard landing). `walls`:
+  `'die'` (the default) or `'bounce'`. Particles stop at ceilings.
+- **Caps:** at most 1000 points and 150 discs live at once (discs cost by
+  the pixels they cover); past that, new ones aren't made. `cap` limits one
+  type within those, so smoke can't crowd out sparks.
+
+Code makes them with `world.particles.burst('spark', x, y, z, { count: 20,
+dir: [1, 0, 0.5], spread: 0.6, speed: [2, 5] })` (`spread` 0 is straight
+along `dir`, 1 a hemisphere round it, 2 all round) or one at a time with
+`world.particles.spawn('smoke', x, y, z, vx, vy, vz)`. Particles are only
+for looks: they never touch the game's random numbers, so they can't change
+what happens.
+
+Content throws bursts too. A monster (or a shootable decoration) with
+`death: { particles: [{ type: 'shrapnel', count: 30, speed: [2, 6] }] }`
+throws them from the middle of its body when it's killed; each burst takes
+the same `count`, `dir`, `spread` and `speed`. With `corpse`, the wreck
+keeps sparking once it has landed, as the probe droid's does:
+
+```js
+corpse: {
+  bursts: [3, 5],      // how many (a number, or a range)
+  every: [0.25, 0.9],  // seconds between them; the first comes this long after it lands
+  z: 0.3,              // how high above the floor they start (the default)
+  particles: [{ type: 'spark', count: 14, speed: [2, 5] }],
+},
+```
+
+Each corpse burst shoots one way, picked at random (up and out), in a tight
+jet (`spread` 0.3 unless it says otherwise).
+
+To see what they cost, serve the repo and open `tools/particles.html`: it
+runs Mission 3 with any number of one type in front of you, and times them.
+
+### Explosions
+
+An **explosion** is a named recipe of particle bursts with a flash of light,
+set off by id wherever one is wanted. The styles are in
+`src/content/explosions.js`:
+
+```js
+defineExplosion({
+  id: 'small',
+  light: { radius: 5, light: 112, time: 0.45 }, // a flash that fades over `time` seconds
+  sound: 'rocket-hit',  // optional
+  effect: 'explosion',  // optional: a sprite effect played with it
+  particles: [
+    { type: 'fire', count: 10, speed: [0.5, 2.5], radius: 0.15 },
+    { type: 'spark', count: 10, speed: [3, 7] },
+    { type: 'debris', count: 5, speed: [3, 6] },
+    { type: 'ember', count: 10, speed: [0.5, 1.5], dir: 'up', spread: 0.8, delay: 0.1, over: 0.4 },
+    { type: 'blast-smoke', count: 6, speed: [0.2, 0.6], radius: 0.25, dir: 'up', delay: [0.15, 0.25], over: 0.4 },
+  ],
+})
+```
+
+Each burst takes `type`, `count`, `speed` and `spread` as above, and:
+
+- `delay`: seconds before it starts (or `[min, max]`), so smoke can follow
+  the fire. `over`: its `count` comes out spread over this many seconds
+  instead of all at once.
+- `radius`: each particle starts anywhere within this distance of the
+  centre, so a fireball fills a ball rather than growing from a point.
+- `z`: start this far above the centre.
+- `dir`: `'up'`, a vector `[x, y, z]`, or `'out'` (the default): the way
+  the explosion faces. One set off against a wall or on the floor faces
+  out of it, and its `'out'` bursts keep to that side (a hemisphere at
+  most); one in mid-air throws them all round.
+  `'ring'` throws them flat instead, across the way it faces: a ring
+  running out along the floor or the wall it hit (round the upright in
+  mid-air), like the flat flash of the `concussion` style.
+
+A style can set off others after it with `then`, say a second, smaller
+blast beside the first (`large` does this with `secondary`, a fireball
+with no shrapnel or smoke of its own):
+
+```js
+then: [{ explosion: 'secondary', delay: [0.2, 0.3], offset: [0.6, 0.9], z: 0.2 }],
+```
+
+`delay` is seconds after this one, `offset` how far to the side (a random
+way, never back into the wall or floor it hit, and stopping short of any
+wall), `z` how much higher. Each can be a number or `[min, max]`. The
+validator refuses a loop (a style that, through `then`, sets itself off).
+
+A style can shake the view too. `extra-large` shakes it the hardest:
+
+```js
+shake: { amount: 1, time: 0.6, radius: 16 },
+```
+
+The rest shake it less, the smaller the blast, for a shorter time and from
+nearer: `large` 0.6, `concussion` 0.45, `small` 0.35, `dirt` 0.3,
+`secondary` 0.25 (on top of the blast that set it off), `sparks` just a
+tick (0.1, within 4 tiles). Keep 1 for the really big ones.
+
+`amount` is how hard right beside it, above 0 and at most 1 (the hardest
+the engine shakes). It dies away fast, then slowly, over `time` seconds
+(0.5 if left out), and is weaker the farther you are, with none from
+`radius` (12) away. Shakes close together add up, still at most 1. Only
+the view moves: the eye jolts up and down, the view tips and turns a
+little, and your aim stays where it was.
+
+Set one off with:
+
+- `death: { explosion: 'large' }` on a monster or shootable decoration
+  (where it dies, from the middle of its body);
+- `explosion: 'small'` on a projectile (where it bursts, facing out of the
+  wall, floor or ceiling it hit);
+- the trigger action `{ action: 'explode', explosion: 'large', tag:
+  'reactor' }` (or `x, y`), `z` above the floor (0.5 by default);
+- code: `world.explode('large', x, y, z, { dir: [1, 0, 0] })`.
+
+Explosions are only for looks: the damage stays with `explode` (things)
+and `splash` (projectiles). Keep an eye on the caps: one `large` (with its
+`secondary` after it) uses about 73 of the 150 discs at its peak, and one
+`extra-large` (a fireball that fills a hall, of discs up to 64 pixels
+across) about 70, so two at once already crowd each other. The bench page (`tools/particles.html`) sets them off on the floor,
+in the air or on the wall in front of you, once or every few seconds, with
+the real caps and a count of what's live.
+
+### Hangings: ropes, cables and cloth
+
+Cables strung between buildings, ropes and ragged cloth that sway in the
+air. They're only for looks: nothing in play touches them (you walk and
+shoot through them). Types are in `src/content/hangings.js`:
+
+```js
+defineHanging({
+  id: 'rag',
+  shape: 'cloth',          // 'rope' (the default) or 'cloth'
+  texture: 'cloth-rag',    // a cloth's weave; its transparent texels are its tears
+  color: ['rust', 0.55],   // a palette ramp and a place on it, 0 dark to 1 light
+                           // (a rope's colour, or a cloth's with no texture)
+  breeze: 1.2,             // the breeze that comes and goes, units per second
+  drag: 3.25,              // how fast it takes up the air's speed, per second
+})
+```
+
+- `texture`: drawn at the world's scale (32 texels a tile) with its
+  bottom row on the cloth's hem, and repeating across, so a torn hem
+  painted at the bottom of the texture is torn on every cloth. Draw it as
+  tall as your longest cloth (a longer cloth stretches it to fit). Holes
+  and tears are transparent pixels, frayed edges a darker colour; see
+  `cloth-rag` (generated by `tools/art/textures/cloth.js`). Its size must
+  be a power of two.
+- `width`: a rope's thickness in units (0.04); it's never drawn thinner
+  than a pixel, nor thicker than 4.
+- `spacing`: units between its points (0.5 for a rope, 0.4 for a cloth).
+  Closer is smoother and costs more.
+- `wind`: the share of the level's wind (its `weather.wind`) that carries
+  it (1). `breeze` moves it even in still air, in slow waves that travel
+  down the street, so neighbours move a little differently, and a quicker
+  flutter in closer ripples, so a short cloth moves too. It comes and goes
+  in gusts. Cloth catches more of it than rope: a higher `drag`.
+- `gravity` (20), `damping` (0.98, the share of its speed kept each
+  sixtieth of a second), `stiffness` (2, passes a step that hold its
+  length), `folds` (a cloth's pleats: every other column of points this
+  far forward or back, 0.08, so the light picks them out),
+  `fullbright`.
+
+A level places them in its `hangings` list. Points are `[x, y, z]`, z the
+height above 0, not above the floor; tie them just in front of a wall
+(0.05 out), not in it. A wall within 0.3 of where a hanging is tied is
+behind it, and it sways against the wall, never into it (a rope strung
+between two points is out in the air, so it isn't checked):
+
+```js
+hangings: [
+  // A cable across the street, its middle 1.2 below its ends.
+  { type: 'cable', from: [13.8, 63.05, 5.6], to: [10, 77.95, 5.4], sag: 1.2 },
+  // A rope hanging 1.6 down from a wall.
+  { type: 'rope', from: [12, 63.05, 5], length: 1.6 },
+  // A cloth hanging 1.8 from the line between two points.
+  { type: 'rag', from: [19.5, 66.05, 3.9], to: [22.5, 66.05, 3.9], length: 1.8 },
+  // Laundry: pinned only at its top corners, so it sags between them.
+  { type: 'cloth-pale', from: [7, 77.95, 5.8], to: [9, 77.95, 5.8], length: 2.5, pin: 'corners' },
+]
+```
+
+A rope with a `to` is strung between two points (`sag`, 0.3 by default);
+without one it hangs `length` (1) from `from`. A cloth always has both.
+
+A tarp is a cloth with `out`: its far edge runs from `from + out` to
+`to + out` instead of hanging straight down (and it is as long as `out`,
+so it has no `length`). With `pin: 'corners'` all four corners are tied,
+and `sag` is how far its middle hangs below them (half that at the middle
+of each edge). `light` (0 to 255) lights it with that instead of the light
+map's: a tarp over a stall is in the sun, though the ground under it is in
+its shade.
+
+```js
+// A tarp over a stall, 2 m square, tied to four poles, its back edge higher.
+{ type: 'tarp-red', from: [50, 83.9, 3.25], to: [50, 80.1, 3.25], out: [-3.8, 0, -0.5], sag: 0.3, pin: 'corners', light: 216 },
+```
+
+A cloth's drawing costs mostly by the pixels it covers: a 2 m tarp filling
+a third of the view costs about 0.4 ms.
+They settle before the level starts, and ones more than 40 tiles from you
+hold still. Cost (Chromium, the Mos Eisley street, ms a frame): a cable
+right across the view about 0.012 to draw, a 1 x 1 m cloth about 0.032;
+both about 0.003 to move. A level has room for 4096 points in all.
 
 ## Levels
 
-A level is an ASCII map. Copy `src/content/levels/e1m1.js`, rename it, add it to
+A level is an ASCII map. Add a file in `src/content/levels/`, import it in
 `src/content/levels/index.js`, and put its id in an episode's `levels` list.
+`sandbox.js` is a typed map like the one below; Mission 3 (`m3.js`) is too
+big to type, so it's painted in code by `levels/lib/painter.js` (rooms,
+chamfers, stairs, lifts), which hands the game an ordinary map. Mos Eisley
+(`m1.js`) adds the town kit, `levels/lib/town.js`: buildings as blocks of
+raised floor under the sky (each with its own roofline), with rounded
+corners and storeys set back (low angled walls, `wallTop`), doorways
+through them as slab arches, rooms inside them as the lower storey of a
+slab, doors (pictures, or with `door({ opens: true })` rising doors into a
+room, the wall over them a slab), cloth awnings, round buildings, domes on the roofs (models in
+nine widths, placed by `house({ dome })` or `town.dome()`), and shade from
+two suns (and the domes) worked out from the heights (see docs/mission1.md, "How it's
+built").
 
 ```js
 import { defineLevel } from '../../engine/defs.js';
 
 export default defineLevel({
-  id: 'e1m6',
-  mapLabel: 'E1M6',
-  name: 'THE ROOF',
-  music: 'office',
-  sky: 'sky-city',
+  id: 'm2',
+  mapLabel: 'M2',
+  name: 'THE HOMESTEAD',
+  music: 'garrison',
+  sky: 'sky-night',
   par: 120,                  // seconds, shown on the tally screen
   fog: 0.05,                 // extra darkness with distance (the default)
   haze: { color: [32, 24, 64], half: 40 }, // outdoors, fade to this colour
+  weather: { type: 'glint', count: 60 }, // particles in the air round you, outdoors
+  hangings: [],              // ropes, cables and cloth (see Hangings)
   tiles: [
     '###########',
     '#....#....#',
     '#.:..D..:.#',           // D: a door, : a bright floor tile
     '#....#....#',
-    '#1#########',           // 1: a door that needs the blue badge
+    '#1#########',           // 1: a door that needs the blue keycard
     '#.#',                   // short rows are padded with solid nothing
     '#X#',                   // X: the exit switch
   ],
   things: [
     '',
-    ' >  b  i',              // player start facing east, blue badge, ant
-    '        d',             // a donut
+    ' >  b  t',              // player start facing east, blue keycard, stormtrooper
+    '        h',             // a med kit
   ],
   legend: {},                // per-level tile glyphs (see below)
   thingLegend: {},           // per-level thing glyphs
@@ -344,6 +760,18 @@ instead, halfway there at `half` tiles (40 by default): a night canyon
 fades into purple air rather than black. Pick a colour like the sky's near
 the horizon. Indoors, haze changes nothing.
 
+`weather` keeps `count` particles of one type (see Particles) in the air
+round the player, in a square `range` tiles each way (10), and only in
+tiles under the sky. Each is made `z` above the floor (`[0.05, 2.5]`) with
+a random speed of up to `drift` (`[0.3, 0.1]`: across, and up or down).
+`wind: [x, y, z]` (units per second) is the level's wind, which carries
+every particle type with `wind`, smoke included. Ones the player leaves
+behind come round to the far side of the square; ones that die are made
+again somewhere in it. About a quarter of the square is in view at once, so
+360 round you look like 100 in front of you. The count can't be
+more than the type's `cap` or the cap for its kind (1000 points, 150
+discs).
+
 ### Tiles
 
 The shared glyphs are in `src/content/levels/legend.js`, and each level can add
@@ -351,13 +779,13 @@ more or override them in `legend`. A glyph means one of these:
 
 ```js
 // A wall:
-'#': { wall: 'drywall' },
+'#': { wall: 'imp-panel' },
 // A floor (the ceiling: 'sky' opens it to the sky):
-'.': { floor: 'carpet', ceiling: 'ceiling-tile', light: 160 },
-// A door ('slide' or 'split'; lock: 'blue' | 'yellow' | 'red' | 'remote'):
-'D': { door: 'door-office', jamb: 'door-jamb' },
+'.': { floor: 'imp-floor', ceiling: 'imp-ceiling', light: 160 },
+// A door ('rise', 'slide' or 'split'; lock: 'blue' | 'yellow' | 'red' | 'remote'):
+'D': { door: 'imp-door', jamb: 'imp-jamb', upper: 'imp-lintel', style: 'rise' },
 // A switch (use it to run actions):
-'X': { wall: 'switch-exit', use: 'exit', switchTo: 'switch-exit-on' },
+'X': { wall: 'imp-switch', use: 'exit', switchTo: 'imp-switch-on' },
 // Copy another glyph and change some of it:
 'a': { base: '.', light: 220, lightFx: 'flicker', tag: 'hall' },
 ```
@@ -400,13 +828,15 @@ down); the first band that covers a height wins, and the wall's own texture
 fills the rest. A band's texture hangs from its top (from the face's top if
 it runs on up), so it lines up across walls of different heights. On an
 open tile or a doorway, `bands` change the faces of its raised floor and
-lowered ceiling (a gate's lintel) the same way. The map viewer shows a wall
-by its top band.
+lowered ceiling (a gate's lintel) the same way, and on an angled wall its
+face (Mos Eisley's rounded corners carry the skirt round). The map viewer
+shows a wall by its top band.
 
 ### Decals
 
 Signs, crests, hazard stripes and vents go on wall faces as decals: see-through
-pictures over the wall (or a step's face, or a doorway's lintel). A level
+pictures over the wall (or a step's face, a doorway's lintel, or a slab's
+edge, such as the wall over an arch). A level
 lists them in `decals`:
 
 ```js
@@ -425,10 +855,30 @@ decals: [
 - Its size is its texture's (32 texels a tile, so a 64x64 picture is 2 tiles,
   a metre) times `scale`. Transparent texels show the wall.
 - `glow: true` ignores the light (a lit screen); `flip: true` mirrors it.
+- `face: 'angled'` puts it on an angled wall instead (`diagonal` or
+  `line`): the one nearest (`x`, `y`), within a tile, its middle where
+  that point is along the wall. On a curve whose tiles say where their
+  texture starts (`wallU`, as the town kit's `circle({ seam })` does), it
+  runs on round the curve from tile to tile; otherwise it stops at its
+  own tile's edge. A soot mark on a round pit's wall:
+  `{ x: 12.3, y: 120.6, z: 3, face: 'angled', tex: 'grime-scorch-1' }`.
 
-Decal textures are defined with `decal: true` (`src/content/textures.js`) and
-drawn by `tools/art/textures/decals.js`. The map viewer marks decals with a
-white tick.
+Decal textures are defined with `decal: true` (`src/content/textures.js`), any
+size, and drawn by `tools/art/textures/decals.js`; Mos Eisley's doors and
+windows are cut from Dark Forces textures by `assets/custom/derive.mjs`
+(`DECALS`), and the town kit places them (`town.door()`, `town.window()`).
+The map viewer marks decals with a white tick.
+
+**Grime** is a decal that darkens the wall under it instead of covering
+it: rain streaks, stains, cracks, dust. Its texture is defined with
+`grime: true` (which makes it a decal too) and is a grey picture: each
+pixel's brightness is the share of light it leaves, white none taken and
+black all of it, so the same streak dirties a rose wall darker rose and an
+ochre one darker ochre. Grime keeps the picture's own greys (finer than
+the palette's), and fades out with the haze in the distance. Place it like
+any decal. The generated ones (`grime-streaks-1` and so on) are drawn by
+`tools/art/textures/grime.js`, and `town.grime()` weathers a whole town
+with them (docs/mission1.md). The map viewer doesn't mark grime.
 
 ### Backdrop: terrain past the edge of play
 
@@ -453,7 +903,7 @@ the middle of a canyon would show above the canyon's rims.
 `canyonBackdrop(p, { rim, tex, light })` (`src/content/levels/lib/backdrop.js`)
 makes one for a painted level: low over its open sky, starting at the
 canyon's rim (`rim(x, y, floor)` gives its height) and climbing away in
-smooth slopes and ridges, out to 96 tiles past the map. Mission 1 ends its
+smooth slopes and ridges, out to 96 tiles past the map. Mission 3 ends its
 canyon walls in a low rim of rock (one tile out of reach, with its sky just
 above it so the view ends there) and lets the backdrop take over above it.
 
@@ -487,6 +937,8 @@ lights: [
   sources with that `sync`.
 - `tag`: `setLight` with the tag sets its `light` (and effect), so a
   trigger can switch it off: `{ action: 'setLight', tag: 'gen-lamps', light: 0 }`.
+- `glint: false`: it doesn't make glints shine (see Art). Otherwise a source
+  makes glints catch its light out to twice its radius, where it can see.
 
 It lights the tiles whose centres it can see. Walls, angled walls and doors
 block it (doors are shut when it's worked out, so it stays in its room). A
@@ -577,13 +1029,32 @@ Door options:
     a tile, so use `imp-jamb` (16 wide); in a wall 2 tiles thick use
     `imp-gate-jamb` (32 wide). `imp-lintel` (lights along its bottom edge,
     for a lintel 1-2 tall) goes above.
+
+    Under the sky (a door in a building's outside wall), give the door's
+    tiles `ceiling: 'sky'` and a `slab` for the wall over the opening: its
+    `bottom` is the top of the opening (the panel rises into it), its `top`
+    the roof, and its `side` the wall. The tile's own `ceilZ` is the sky
+    over the roof, as on the street. Beside such a door, a raised floor at
+    least as high as the opening counts as the doorway's wall, so a door
+    can stand in a building made of raised floor:
+
+    ```js
+    'D': { door: 'door-red-rising', style: 'rise', floor: 'flagstone', ceiling: 'sky', ceilZ: 24,
+           slab: { bottom: 3, top: 6, floor: 'adobe-roof', ceiling: 'adobe', side: 'adobe' } },
+    ```
   - `'slide'` (the default): a panel through the middle of the tile slides
     sideways.
   - `'split'`: an elevator-style panel that opens from the middle.
 - `secret: true`: the door looks exactly like the wall around it (give it that
   wall's texture), stays open, and hides from the automap and from monsters
   until it's found.
-- `lock: 'remote'`: only triggers can open the door.
+- `lock: 'remote'`: only triggers can open the door. Like any door it shuts
+  again after `wait` seconds, and the player can't reopen it, so a remote
+  door opened once (a one-shot switch or trigger) on the way through needs
+  `stayOpen: true`. The level checker counts a remote door as passable only
+  if it stays open, or if what opens it can be used again (`repeat` on a
+  switch, `once: false` on a trigger).
+- `stayOpen: true`: once open, the door stays open.
 - `speed`: how much of the door opens (or closes) per second, default 3.5:
   under 0.3 seconds, Star Wars-fast.
 - `wait`, `tag` and `sounds` are also available.
@@ -610,6 +1081,20 @@ other. Give the entry a `wall` texture plus either a 45° preset or a line:
   or shallower walls. For example `[1, 0.5, 0, 1]` then `[1, 0, 0, 0.5]` in
   the tile to its east makes a wall about 26.6° off horizontal across two
   tiles.
+- `wallTop`: the wall stops at this height instead of the tile's ceiling,
+  and you see over it, from the front and from behind. Under the sky it's a
+  round building's wall or a rounded corner as tall as its roof, with the
+  sky (and anything taller behind it) above. Without it, an angled wall
+  under the sky stands as tall as the sky over the tile in front of it, and
+  hides everything behind. It must lie between the tile's floor and ceiling.
+  Bodies, shots and sight still stop at the line at any height, and its top
+  isn't drawn as a surface, so keep it out of reach.
+- `wallU`: where along its texture the wall starts, in tiles, at its second
+  point (the texture runs right to left from there, seen from the open
+  side). Without it each tile's wall starts its texture afresh, so a wide
+  texture on a curve of chained tiles comes out cut up; give each tile how
+  far round the curve it is and the texture runs on. The town kit's
+  `circle({ seam })` does this.
 
 The wall texture runs along the line at 32 texels per unit, so it isn't
 stretched. Players and monsters slide along angled walls, and shots, sight
@@ -689,8 +1174,10 @@ slab: `{ type: 'stormtrooper', x: 20.5, y: 12, z: 3.5 }` stands on the
 bridge, and so can the player start. A monster's drops land on the storey
 it died on.
 
-Not yet: a slab in a door, lift or angled-wall tile (the validator says
-so), more than one slab per tile, and slabs that stop sound.
+A rising door's tiles can have a slab: the wall over a door under the sky
+(see Door options). Not yet: a slab in any other door, a lift or an
+angled-wall tile (the validator says so), more than one slab per tile, and
+slabs that stop sound.
 
 ### Lifts
 
@@ -723,15 +1210,15 @@ against the ceiling turns back.
 The `things` grid lines up with `tiles`. Put a thing's glyph on a floor tile.
 The player start is `^ > v <` (facing north, east, south or west). Every
 monster, item and decoration has a `glyph` in its definition. Glyphs for
-skill-specific placement are in the shared `things` legend: `!` is an Off-By-One Ant
-on skill 3 and up, and `+` is a donut on skills 1–2. Add your own in
+skill-specific placement are in the shared `things` legend: `!` is a
+stormtrooper on skill 3 and up, and `+` is a med kit on skills 1–2. Add your own in
 `thingLegend`:
 
 ```js
 thingLegend: {
-  Z: { type: 'firefly', tag: 'closet-flies' },  // tag it for triggers
-  9: { type: 'beetle', skill: [3, 4, 5] },      // only on these skills
-  8: { type: 'ant', ambush: true, angle: 'W' }  // ambush: waits until it sees you
+  Z: { type: 'probe-droid', tag: 'closet-droids' }, // tag it for triggers
+  9: { type: 'sandtrooper', skill: [3, 4, 5] },     // only on these skills
+  8: { type: 'jawa', ambush: true, angle: 'W' }     // ambush: waits until it sees you
 },
 ```
 
@@ -741,19 +1228,45 @@ it dies. The validator and the reachability check count a key that a
 reachable monster always drops (chance 1) as placed.
 
 You can also place things precisely with
-`list: [{ type: 'donut', x: 3.5, y: 7.25 }]`. A `z` there puts a thing (or
-the player start) on top of a slab rather than under it.
+`list: [{ type: 'med-kit', x: 3.5, y: 7.25 }]`. A `z` there puts a thing (or
+the player start) on top of a slab rather than under it. A friendly
+character's `wander` there replaces its type's for that one (tiles; 0
+stands still): `{ type: 'villager-man', x: 80.5, y: 74.5, wander: 0 }` is
+a shopkeeper behind his counter or someone waiting in a queue.
+`lit` (0-255) draws a model at that light whatever the light map says
+where it stands: a model on a wall, lit as the wall is (the town kit's
+arch hoods), when the ground in front of it is in shade.
+
+A monster placed with `calm` starts calm (see *Calm* under Monsters):
+`calm: true` behaves as its type's `calm` says, and an object overrides
+some of it (`lines`, `speed`, `wander`, `idleTime`). `patrol` is a list of
+two or more `[x, y]` points: it walks to the nearest, then from point to
+point in straight lines, pausing `idleTime` at each, to the end and back,
+or round and round with `loop: true`. Someone in the way, it walks round
+them. Patrols all set off together, half a second in, so two placed side
+by side on parallel routes with a fixed `idleTime` (`[3, 3]`) walk as a
+pair.
+
+```js
+{ type: 'jawa', x: 50.5, y: 47.5, calm: { wander: 6 } },
+{ type: 'sandtrooper', x: 30.5, y: 70.5, calm: { patrol: [[30.5, 70.5], [60.5, 70.5], [90.5, 68.5]] } },
+{ type: 'sandtrooper', x: 104.5, y: 66.5, angle: 270, calm: { wander: 0, lines: ["Checkpoint's shut."] } },
+```
+
+The validator checks that every patrol point has room for the body and
+that each walk, from the spot to the nearest point too, is a clear
+straight line.
 
 ### Triggers and actions
 
 ```js
 triggers: [
-  { on: 'start', do: [{ action: 'message', text: 'THE ROOF. IT IS RAINING.' }] },
+  { on: 'start', do: [{ action: 'message', text: 'THE HOMESTEAD. TWIN SUNSET.' }] },
   { on: 'enter', tag: 'hall', do: [{ action: 'openDoors', tag: 'closet' }] },
   { on: 'use', tag: 'panel', do: ['exit'] },
-  { on: 'pickup', thing: 'badge-red', do: [{ action: 'spawn', thing: 'firefly', tag: 'spawn-spot' }] },
-  { on: 'killed', tag: 'closet-flies', do: [{ action: 'setLight', tag: 'hall', light: 200 }] },
-  { on: 'killed', thing: 'pumpkin-king', do: [{ action: 'finale' }] },
+  { on: 'pickup', thing: 'keycard-red', do: [{ action: 'spawn', thing: 'stormtrooper', tag: 'spawn-spot' }] },
+  { on: 'killed', tag: 'closet-droids', do: [{ action: 'setLight', tag: 'hall', light: 200 }] },
+  { on: 'killed', thing: 'boba-fett', do: [{ action: 'finale' }] },
 ],
 ```
 
@@ -764,6 +1277,8 @@ Events:
 - `use`: the player uses a wall with that tag.
 - `pickup`: the player picks up that item.
 - `killed`: every monster of that type (`thing`) or with that tag is dead.
+- `hostile`: the calm monsters turn (see *Calm* under Monsters), by the
+  `hostile` action or the player's gunfire.
 
 A trigger fires once unless you add `once: false`.
 
@@ -783,6 +1298,8 @@ Actions:
 - `lift` `{ tag, to }`: starts the lifts with the tag (to stop index `to`, or
   the next stop)
 - `teleport` `{ tag, angle }`: moves the player to the first tile with the tag
+- `hostile`: the town's switch: every calm monster turns normal at once,
+  and the `on: 'hostile'` triggers run (only the first time)
 
 ### Checking a level
 
@@ -797,7 +1314,7 @@ Actions:
 - `npm run validate -- --verbose` also lists unreachable items and one-way
   areas: places the player can drop into but never get back out of to the
   start. Some are on purpose, but a pit with no lift or stairs out is a trap.
-- `node tools/mapview.mjs e1m6` writes `tools/art/out/maps/e1m6.png`, a
+- `node tools/mapview.mjs m3` writes `tools/art/out/maps/m3.png`, a
   top-down picture with monsters in red, items in yellow, keys in their colour
   and unreachable floor cross-hatched. Floors are shaded by height (higher is
   brighter), with a black edge where a ledge is too high to walk up and a grey
@@ -821,7 +1338,7 @@ Tips from the built-in maps:
 `defineEpisode({ id, name, levels: [...], map, finale: { text, background, endImage, endText, music } })`.
 If there is more than one episode, the menu asks which one to play.
 
-`map: { spots: { e1m1: [82, 34], ... } }` places each level on the
+`map: { spots: { m3: [160, 100], ... } }` places each level on the
 intermission picture (`assets/ui/intermission.png`). Spots are in the
 picture's centre 320×200, which is all a 4:3 screen shows. Full-screen
 pictures can be 560×200 so they also fill a 21:9 screen; a 320-wide picture is
@@ -846,7 +1363,7 @@ Sounds are defined in `src/content/sounds.js`. Each one is either synthesized
 from parameters or loaded from a file:
 
 ```js
-defineSound({ id: 'stapler-jam', synth: { wave: 'square', freq: 300, freqEnd: 80, duration: 0.2, bits: 6 } }),
+defineSound({ id: 'droid-beep', synth: { wave: 'square', freq: 300, freqEnd: 80, duration: 0.2, bits: 6 } }),
 defineSound({ id: 'scream', src: 'assets/sounds/scream.wav', volume: 0.8 }),
 ```
 
@@ -862,7 +1379,12 @@ Synth parameters:
   sounds mixed on top).
 
 The full list is at the top of `src/engine/audio/synth.js`. `pitchVariance`
-randomizes the pitch a little each time the sound plays.
+randomizes the pitch a little each time the sound plays. A file's leading
+silence (MP3s start with some) is cut so it plays the moment it's triggered.
+
+To swap recorded files in for synthesized sounds without touching
+`sounds.js`, list them in `assets/custom/sound-overrides.json` (see
+`assets/custom/README.md`); `tools/soundboard.html` plays them side by side.
 
 ## Music
 
@@ -904,10 +1426,10 @@ an audio file: `defineSong({ id, src: 'assets/music/theme.ogg' })`.
   Return a message to show it.
 - `src/content/strings.js` holds all the text: menus, skill names, quit
   messages, the help screen and the finale.
-- `src/content/hero.js` sets the starting health, weapons, ammo, speed and
-  face (see `assets/custom/README.md` for using a photo).
+- `src/content/hero.js` sets the starting health, weapons, ammo, speed,
+  body and `sounds` (`jump` and `land`).
 - `src/content/config.js` sets the key colours and names, the title and
-  intermission music, and where the photo portrait goes on the title screen.
+  intermission music, and how far below the screen's edge weapons sit.
 - `src/content/palette.js` holds the colour ramps and the fitted colours
   after them. Change one and run `npm run art` to re-theme everything.
   `node tools/fit-palette.mjs` scores how well the palette fits the art
@@ -924,20 +1446,20 @@ import { defineAction, defineAttack, definePickup } from '../engine/defs.js';
 export default {
   // ...
   actions: [
-    // { action: 'shake', seconds: 1 } in any trigger
-    defineAction('shake', (world, params) => world.message('THE BUILDING SHUDDERS')),
+    // { action: 'rumble' } in any trigger
+    defineAction('rumble', (world, params) => world.message('THE GARRISON SHUDDERS')),
   ],
   attacks: [
-    // { kind: 'triple-exception' } in any monster or weapon
+    // { kind: 'triple-bolt' } in any monster or weapon
     // opts.aim is { z, slope }: where the attack starts and how steeply it climbs.
-    defineAttack('triple-exception', (world, attacker, spec, angle, opts) => {
-      for (const d of [-0.2, 0, 0.2]) world.spawnProjectile('exception-fireball', attacker, angle + d, spec, opts.aim);
+    defineAttack('triple-bolt', (world, attacker, spec, angle, opts) => {
+      for (const d of [-0.2, 0, 0.2]) world.spawnProjectile('trooper-bolt', attacker, angle + d, spec, opts.aim);
       return true;
     }),
   ],
   pickups: [
-    // pickup: { coffeeBreak: 5 } in any item
-    definePickup('coffeeBreak', (world, player, value) => {
+    // pickup: { bacta: 5 } in any item
+    definePickup('bacta', (world, player, value) => {
       player.health = Math.min(200, player.health + value);
       return true; // consumed
     }),
@@ -957,6 +1479,6 @@ export default {
 
 ## Making a different game
 
-The engine knows nothing about Alex. To start a different game, copy
+The engine knows nothing about Star Wars. To start a different game, copy
 `src/content/` and change it: the palette, strings, hero, art and levels. Then
 point `src/main.js` at the new pack.

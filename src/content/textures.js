@@ -1,4 +1,5 @@
 import { defineTexture } from '../engine/defs.js';
+import { AWNING_CLOTHS } from './models/awning.js';
 
 // Wall, floor, ceiling and sky textures. Walls/flats are 64x64 PNGs in
 // assets/textures/ (animated ones are horizontal strips of 64x64 frames;
@@ -29,6 +30,75 @@ const FENCES = ['imp-railing', 'imp-bars', 'imp-cage'];
 // hazard stripes and a vent.
 const DECALS = ['decal-crest', 'decal-hazard', 'decal-sign', 'decal-vent'];
 
+// Mos Eisley (Mark, 2026-10-17: Dark Forces textures for now, no generated
+// stand-ins): DF textures recoloured by assets/custom/derive.mjs, loaded from
+// there directly.
+const TOWN = [
+  'adobe', 'adobe-pale', 'adobe-ochre', 'adobe-rose', 'adobe-grey', 'adobe-old', 'adobe-brick', 'adobe-skirt', 'adobe-roof',
+  'planks', 'street-sand', 'street-drift', 'flagstone', 'door-jamb',
+  // Corrugated tin for lean-to roofs, rusty and galvanised.
+  'metal-rust', 'metal-grey',
+  // Docking bays: duracrete walls (buttressed at the foot), floor and stair risers.
+  'bay-wall', 'bay-wall-ribbed', 'bay-floor', 'bay-step',
+  // The bay's fuel pumps (models/bay.js).
+  'pump-front', 'pump-side', 'pump-hazard', 'pump-hose', 'bay-plate',
+  // Its fuel lines.
+  'bay-pipe','line-front', 'valve-wheel', 'hose-orange',
+  // A scrapped astromech's dome (models/clutter.js).
+  'dome-white', 'dome-blue',
+  // The cargo pod's hull.
+  'pod-hull',
+  // Sooted drums and canisters.
+  'drum-rust', 'drum-grey',
+  // The condenser tower's plain dark bands (models/market.js).
+  'band-steel',
+  // Its lid and cap panels and its condenser plates' fins and edges.
+  'cone-panel', 'fin-disc', 'fin-edge', 'pipe-rust',
+  // Still water in the plaza's trough and basin.
+  'water-murky',
+  // The market stalls' wares, in bright paints (models/market.js).
+  'ware-red', 'ware-blue', 'ware-yellow', 'ware-teal', 'ware-orange', 'ware-white',
+  // Street clutter: crates and junk (models/clutter.js).
+  'crate-tan', 'crate-grey', 'crate-rust', 'junk',
+  // The X-34 landspeeder (models/speeder.js): paint, stripes, engine metal,
+  // the engines' intakes and the flanks' (derive.mjs, DECALS: framed).
+  'speeder-paint', 'speeder-red', 'speeder-metal', 'speeder-intake', 'speeder-grille',
+  // Doors: the door decals as rising doors' panels (derive.mjs, RISING), a
+  // shop's shutter and Docking Bay 87's 4x4 door.
+  'door-red-rising', 'door-grey-rising', 'shutter-rising', 'door-bay-rising',
+  // The drifts' edges, by which corners are drift (lib/town.js, drifts()).
+  ...Array.from({ length: 14 }, (_, k) => `street-drift-${k + 1}`),
+];
+
+// Mos Eisley's doors and windows: decals cut from DF textures by derive.mjs.
+const TOWN_DECALS = [
+  'door-red', 'door-grey', 'door-sign', 'door-panel', 'shutter', 'window-bars', 'window-louvre',
+  // Vents, a fan and gauges on the walls (lib/town.js, vent()).
+  'vent-grille', 'vent-slats', 'vent-round', 'wall-fan', 'wall-meter',
+  // Litter on the ground: the clutter's `litter` models wear it.
+  'litter',
+];
+
+// Grime: darkens the walls it's on (tools/art/textures/grime.js); the town
+// kit weathers Mos Eisley's walls with it (lib/town.js, grime()).
+const GRIME = [
+  'grime-streaks-1', 'grime-streaks-2', 'grime-streaks-3', 'grime-drip-1', 'grime-drip-2',
+  'grime-blotch-1', 'grime-blotch-2', 'grime-smudge', 'grime-crack-1', 'grime-crack-2', 'grime-dust-1', 'grime-dust-2',
+  'grime-scorch-1', 'grime-scorch-2',
+];
+
+// Awning canvas (tools/art/textures/awning.js): `-x` turned a quarter for
+// an awning looking east or west, `-hem` its torn front edge.
+const AWNINGS = AWNING_CLOTHS.flatMap((c) => [`awning-${c}`, `awning-${c}-x`, `awning-${c}-hem`]);
+
+// The landspeeder's windscreen, mostly see-through, and its shadow, grime
+// on the ground (tools/art/textures/speeder.js).
+const SPEEDER = ['speeder-glass'];
+
+// The Moldy Crow (models/crow.js): Jedi Knight's textures, copied by
+// assets/custom/crow.mjs and loaded from there directly. The engines glow.
+const CROW = ['crow-hull-side', 'crow-hull-top', 'crow-side', 'crow-belly', 'crow-rear', 'crow-nose', 'crow-ribs', 'crow-panel', 'crow-gun', 'crow-barrel', 'crow-wing', 'crow-fin', 'crow-grille', 'crow-ladder'];
+
 const ANIMATED = {
   'imp-computer': { frames: 3, fps: 3 },
 };
@@ -39,5 +109,13 @@ export default [
   ...Object.entries(ANIMATED).map(([id, a]) => defineTexture({ id, src: `assets/textures/${id}.png`, ...a })),
   ...FENCES.map((id) => defineTexture({ id, src: `assets/textures/${id}.png`, fence: true })),
   ...DECALS.map((id) => defineTexture({ id, src: `assets/textures/${id}.png`, decal: true })),
+  ...[...GRIME, 'speeder-shadow'].map((id) => defineTexture({ id, src: `assets/textures/${id}.png`, grime: true })),
+  ...AWNINGS.map((id) => defineTexture({ id, src: `assets/textures/${id}.png`, fullbright: false })),
+  ...SPEEDER.map((id) => defineTexture({ id, src: `assets/textures/${id}.png`, fullbright: false })),
+  ...TOWN.map((id) => defineTexture({ id, src: `assets/custom/textures/${id}.png`, fullbright: false })),
+  ...CROW.map((id) => defineTexture({ id, src: `assets/custom/textures/${id}.png`, fullbright: false })),
+  defineTexture({ id: 'crow-engine', src: 'assets/custom/textures/crow-engine.png' }),
+  ...TOWN_DECALS.map((id) => defineTexture({ id, src: `assets/custom/textures/${id}.png`, decal: true, fullbright: false })),
   defineTexture({ id: 'sky-night', src: 'assets/textures/sky-night.png', sky: true }),
+  defineTexture({ id: 'sky-day', src: 'assets/custom/textures/sky-day.png', sky: true }),
 ];

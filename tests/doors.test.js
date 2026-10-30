@@ -171,3 +171,70 @@ test('a door shows its art once, fitted to the doorway, wherever the doorway is'
   }
   assert.equal(same, total);
 });
+
+// ---------------------------------------------------------------- under the sky
+
+// A street (sky at 12) beside a building: its roof (a raised floor at 6), a
+// room inside under a slab, and a door 2 wide through the 1-tile wall
+// between (x 6), the wall over it a slab from the opening's top (3) to the
+// roof. `A` is the same doorway as an open arch, to compare with.
+const STREET = { floor: 'imp-floor', ceiling: 'sky', ceilZ: 12, light: 200 };
+const LINTEL = { bottom: 3, top: 6, floor: 'imp-floor', ceiling: 'imp-panel', side: 'imp-panel', light: 160 };
+const ROOF = { ...STREET, floorZ: 6, side: 'imp-panel' };
+const INSIDE = { ...STREET, slab: { bottom: 4, top: 6, floor: 'imp-floor', ceiling: 'imp-ceiling', side: 'imp-panel', light: 160 } };
+const SKY_DOOR = { ...STREET, door: 'imp-door', style: 'rise', slab: LINTEL };
+
+function building(glyph = 'D', legend = {}) {
+  const rows = ['############', '#.....BBBBB#', '#.....Brrrr#', '#.....Brrrr#', '#.....Xrrrr#', '#.....Xrrrr#', '#.....Brrrr#', '#.....Brrrr#', '#.....BBBBB#', '############'];
+  return room(
+    rows.map((r) => r.replaceAll('X', glyph)),
+    ['', '', '', '', '', ' >'],
+    { sky: 'sky-day', legend: { '.': STREET, B: ROOF, r: INSIDE, D: SKY_DOOR, A: { ...STREET, slab: LINTEL }, ...legend } },
+  );
+}
+
+test('a rising door can stand in a wall under the sky: the wall over it is a slab up to the roof', () => {
+  const { map, errors } = buildLevel(registry, building(), {});
+  assert.deepEqual(errors, []);
+  const d = map.doorAt(6, 4);
+  assert.equal(d.group.length, 2);
+  assert.equal(d.axis, 'x', 'the roof either side is the doorway\'s walls');
+  assert.equal(d.plane, 6.5, 'the panel halfway through the wall');
+  assert.equal(d.openZ, 3, 'it opens up to the slab');
+  assert.equal(map.ceilZ[map.index(6, 4)], 12, 'the tile keeps the sky over its slab');
+  assert.equal(map.ceilAt(6.3, 4.5, 0, 0.5), 3, 'a body in the doorway has the opening as its ceiling');
+});
+
+test('a slab on a sliding door is an error', () => {
+  const { errors } = buildLevel(registry, building('D', { D: { ...SKY_DOOR, style: 'slide' } }), {});
+  assert.ok(errors.some((e) => /slab on a door needs a rising door/.test(e)), errors.join('\n'));
+});
+
+test('the player opens a door under the sky and walks through into the room', () => {
+  const w = makeWorld(building(), { noMonsters: true });
+  const pt = w.player;
+  pt.x = 3.5;
+  pt.y = 5;
+  pt.angle = contentAngle(0);
+  const input = mockInput();
+  input.hold('forward');
+  run(w, input, 1);
+  assert.ok(Math.abs(pt.x - (6.5 - pt.radius)) < 0.05, 'stopped at the panel');
+  input.tap('use');
+  run(w, input, 1.5);
+  assert.ok(pt.x > 8, 'through into the room');
+});
+
+test('a door under the sky shows sky above its roof, and once open looks like an arch', () => {
+  const shut = frame(building(), 5);
+  const open = frame(building(), 5, 1);
+  const arch = frame(building('A'), 5);
+  assert.deepEqual(open.px, arch.px, 'open, it is the arch');
+  // Above the opening's top on the wall's face (3 ahead), shut or not, the
+  // same: the wall over the door, the roof and the sky.
+  const { horizon, fy } = renderer.view;
+  const top = Math.ceil(horizon + ((1.25 - 3) * fy) / 3 - 0.5);
+  assert.ok(top > 0);
+  assert.deepEqual(shut.px.subarray(0, top * SCREEN_W), arch.px.subarray(0, top * SCREEN_W), 'nothing above the opening changes');
+  assert.notDeepEqual(shut.px, arch.px, 'the panel shows below it');
+});

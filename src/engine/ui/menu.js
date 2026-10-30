@@ -10,7 +10,7 @@ import { SCREEN_W, SCREEN_H, VIEW_H } from '../config.js';
  *   { label, toggle: { get, set } }
  *   { label, disabled: () => bool }                   greyed out
  *   { text: 'Some words', tint?, center? }             a line of small, unselectable text
- * Navigation works with keys, mouse/touch and gamepads.
+ * Navigation works with keys, the mouse and gamepads.
  */
 export class MenuSystem {
   constructor(game) {
@@ -145,7 +145,7 @@ export class MenuSystem {
     else if (input.wasPressed('menuBack') || input.wasPressed('menu')) this.back();
     else if (input.wasPressed('menuSelect')) this._activate(item);
 
-    // Mouse / touch.
+    // Mouse.
     if (input.pointer?.moved) {
       input.pointer.moved = false;
       const pt = this._toLayout(input.pointer.x, input.pointer.y);

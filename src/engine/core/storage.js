@@ -39,7 +39,6 @@ export const DEFAULT_SETTINGS = {
   alwaysRun: true,
   showFps: false,
   messages: true,
-  touchControls: 'auto', // 'auto' | 'on' | 'off'
   invertMouseY: false,
   mouseLook: true,
   autoAim: true,

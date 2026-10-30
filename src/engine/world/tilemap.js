@@ -33,8 +33,11 @@ export const LIGHT_FX = { none: 0, flicker: 1, strobe: 2, glow: 3, fire: 4, blin
  * through the tile centre. Rising doors (`style: 'rise'`, Dark Forces' kind)
  * stand across the middle of the whole doorway's depth, set back from both
  * faces; the door tiles are an open recess with their ceiling at `openZ`, and
- * the panel rises from the floor into it. `span0`..`span1` is the doorway's
- * extent across (the other axis), so a rising door's texture fits the door.
+ * the panel rises from the floor into it. Under the sky the door's tiles
+ * have a slab instead (the wall over the opening, up to the roof): its
+ * bottom is `openZ`, and the tiles' own ceiling is the sky over it.
+ * `span0`..`span1` is the doorway's extent across (the other axis), so a
+ * rising door's texture fits the door.
  */
 export class Door {
   constructor(spec) {
@@ -130,6 +133,8 @@ export class TileMap {
      * and the sources themselves.
      */
     this.srcLight = [new Float32Array(n), new Float32Array(n)];
+    /** The sources' light again, reaching further, for glints (lightsources.js), per storey. */
+    this.glintLight = [new Float32Array(n), new Float32Array(n)];
     /** @type {import('./lightsources.js').LightSource[]} */
     this.sources = [];
     /**
@@ -142,12 +147,13 @@ export class TileMap {
     this.bandSets = [];
     /**
      * Decals (see decals.js): all of them, the ones on each tile edge
-     * (tile * 4 + face), and how many each edge has. Laid out by the
-     * renderer when `decalsDirty`.
+     * (tile * 4 + face), how many each edge has, and the ones on each
+     * angled wall's tile. Laid out by the renderer when `decalsDirty`.
      */
     this.decals = [];
     this.edgeDecals = new Map();
     this.decalEdge = new Uint8Array(n * 4);
+    this.slantDecals = new Map();
     this.decalsDirty = false;
     this.damage = new Uint8Array(n);
     this.doorIndex = new Int16Array(n).fill(-1);
@@ -171,6 +177,11 @@ export class TileMap {
     /** tag name -> tile indices */
     this.tags = new Map();
     this.tagNames = [];
+    /**
+     * The highest anything can stand in the level (see computeSkyline): a
+     * ray looking out over it sees only sky, so the renderer stops it there.
+     */
+    this.skyline = Infinity;
     /** tile index -> {actions, switchTo, repeat, used} for usable walls */
     this.uses = new Map();
   }
@@ -263,6 +274,49 @@ export class TileMap {
 
   fenceTop(f) {
     return f.height ? this.fenceBottom(f) + f.height : this.ceilZ[f.tile];
+  }
+
+  /**
+   * The skyline: the top of every surface the renderer can draw (floors,
+   * slabs, angled walls, fences, ceilings indoors, a solid wall as tall as
+   * the ceilings beside it, lifts at their highest stop), plus `margin`.
+   * Things may stand taller: a ray stopped here leaves its depth far, so
+   * they still show over it.
+   */
+  computeSkyline(margin = 3) {
+    let top = -Infinity;
+    const { w, h } = this;
+    for (let i = 0; i < w * h; i++) {
+      const f = this.flags[i];
+      if (f & F_VOID) continue;
+      let t;
+      // (A door with a slab is in a wall under the sky: its top is the slab's.)
+      if (f & F_SOLID || (f & F_DOOR && !(f & F_SLAB))) {
+        // A wall or door stands as tall as the ceilings in front of it.
+        const x = i % w;
+        t = this.floorZ[i];
+        for (const n of [x > 0 ? i - 1 : -1, x < w - 1 ? i + 1 : -1, i - w, i + w]) {
+          if (n >= 0 && n < w * h && !(this.flags[n] & (F_SOLID | F_VOID))) t = Math.max(t, this.ceilZ[n]);
+        }
+        if (f & F_DOOR) t = Math.max(t, this.ceilZ[i]);
+      } else if (!(f & F_SKY)) t = this.ceilZ[i];
+      else {
+        t = this.floorZ[i];
+        if (f & F_SLAB) t = Math.max(t, this.slabTop[i]);
+        if (f & F_SLANT) {
+          const s = this.slants[this.slantIndex[i]];
+          t = Math.max(t, s.top < this.ceilZ[i] ? s.top : this.ceilZ[i]);
+        }
+      }
+      if (t > top) top = t;
+    }
+    for (const fe of this.fences) top = Math.max(top, this.fenceTop(fe));
+    for (const lift of this.lifts) {
+      const rise = Math.max(...lift.stops) - Math.min(...lift.stops);
+      for (const i of lift.tiles) top = Math.max(top, Math.max(...lift.stops), lift.moves === 'both' ? this.ceilZ[i] + rise : -Infinity);
+    }
+    this.skyline = top + margin;
+    return this.skyline;
   }
 
   /** True if the tile blocks sight/bullets. Doors block until mostly open. */

@@ -2,13 +2,11 @@ import { SCREEN_W, SCREEN_H } from './config.js';
 import { Registry } from './registry.js';
 import { validateContent } from './validate.js';
 import { Palette, PAL_NORMAL } from './gfx/palette.js';
-import { Surface } from './gfx/surface.js';
+import { Surface, ScaledSurface } from './gfx/surface.js';
 import { Presenter } from './gfx/present.js';
 import { MeltWipe } from './gfx/wipe.js';
-import { Sheet } from './gfx/sheet.js';
 import { Assets } from './assets.js';
 import { Input } from './input/input.js';
-import { TouchControls, isTouchDevice } from './input/touch.js';
 import { GamepadPoller } from './input/gamepad.js';
 import { AudioSystem } from './audio/audio.js';
 import { Storage, DEFAULT_SETTINGS } from './core/storage.js';
@@ -18,7 +16,6 @@ import { Renderer } from './render/renderer.js';
 import { Hud } from './ui/hud.js';
 import { MenuSystem } from './ui/menu.js';
 import { pauseMenu } from './ui/menus.js';
-import { buildPhotoFace } from './ui/photoface.js';
 import { LoadingScene } from './scenes/loading.js';
 import { TitleScene } from './scenes/title.js';
 import { LevelScene } from './scenes/level.js';
@@ -32,9 +29,9 @@ import { FinaleScene } from './scenes/finale.js';
  */
 export class Game {
   /**
-   * @param {{canvas: HTMLCanvasElement, stage: HTMLElement, content: any, params?: URLSearchParams}} opts
+   * @param {{canvas: HTMLCanvasElement, content: any, params?: URLSearchParams}} opts
    */
-  constructor({ canvas, stage, content, params = new URLSearchParams() }) {
+  constructor({ canvas, content, params = new URLSearchParams() }) {
     this.canvas = canvas;
     this.registry = new Registry(content);
     const { errors, warnings } = validateContent(this.registry);
@@ -51,43 +48,38 @@ export class Game {
       skill: params.has('skill') ? Number(params.get('skill')) : null,
     };
     this.palette = new Palette(this.registry.paletteDef);
-    this.surface = new Surface(SCREEN_W, SCREEN_H);
+    // ?res=2 draws the 3D view at 640x400 (1x and 2x only: see PLAN.md).
+    const res = params.get('res') === '2' ? 2 : 1;
+    this.surface = res > 1 ? new ScaledSurface(SCREEN_W, SCREEN_H, res) : new Surface(SCREEN_W, SCREEN_H);
     this.storage = new Storage(this.registry.game.storagePrefix ?? this.registry.game.id);
     this.settings = this.storage.load('settings', DEFAULT_SETTINGS);
     if (params.has('fps')) this.settings.showFps = true;
     if (params.has('crt')) this.settings.crt = params.get('crt');
     if (params.has('wide')) this.settings.widescreen = params.get('wide') !== '0';
     this.progress = this.storage.load('progress', {});
-    this.presenter = new Presenter(canvas, { preferGL: params.get('gl') !== '0', wide: this.settings.widescreen });
+    this.presenter = new Presenter(canvas, { preferGL: params.get('gl') !== '0', wide: this.settings.widescreen, scale: res });
     this.input = new Input(canvas);
     this.input.onPointerLockChange = (locked) => {
       if (!locked && this.scene?.wantsPointerLock && !this.menu.active) this.pause();
     };
-    this.input.wantsPointerLock = () => this.wantsPointerLock;
-    this.input.onTouch = () => {
-      if (this.settings.touchControls === 'auto') this.touchSeen = true;
-    };
-    this.touch = new TouchControls(stage, this.input);
-    this.touchSeen = isTouchDevice();
+    this.input.wantsPointerLock = () => !!this.scene?.wantsPointerLock;
     this.gamepad = new GamepadPoller(this.input);
     this.audio = new AudioSystem(this.registry, this.settings);
     if (params.has('mute')) this.audio.setMuted(true);
     this.assets = new Assets(this.registry, this.palette);
     this.rng = new Rng(params.has('seed') ? Number(params.get('seed')) : Date.now() & 0xffffffff);
-    this.wipe = new MeltWipe(SCREEN_W, SCREEN_H);
+    this.wipe = new MeltWipe(SCREEN_W, SCREEN_H, res);
     this.renderer = new Renderer(this.surface, this.assets, this.palette);
     this.hud = new Hud(this);
     this.menu = new MenuSystem(this);
     this.scene = null;
     this.time = 0;
     this.session = null;
-    this.faceSheet = null;
-    this.photoPortrait = null;
     this.loop = new Loop({ update: (dt) => this.update(dt), render: (dt) => this.render(dt) });
     this.applySettings(false);
 
     canvas.addEventListener('click', () => {
-      if (this.wantsPointerLock && !this.menu.active) this.input.lockPointer();
+      if (this.scene?.wantsPointerLock && !this.menu.active) this.input.lockPointer();
     });
     window.addEventListener('beforeunload', (e) => {
       if (this.scene instanceof LevelScene && !this.menu.active && !this.scene.world?.player.player.dead) {
@@ -102,16 +94,6 @@ export class Game {
     return this.assets.fonts.get(f) ?? null;
   }
 
-  get touchActive() {
-    const mode = this.settings.touchControls;
-    return mode === 'on' || (mode === 'auto' && this.touchSeen);
-  }
-
-  /** Does the game want the mouse captured? In a level, unless touch controls are on. */
-  get wantsPointerLock() {
-    return !!this.scene?.wantsPointerLock && !this.touchActive;
-  }
-
   // ------------------------------------------------------------ boot
 
   async boot(onStatus = () => {}) {
@@ -120,9 +102,9 @@ export class Game {
     await this.assets.loadFonts();
     onStatus('fonts');
     this.loop.start();
-    await this.assets.loadAll((done, total) => loading.progress(done, total));
+    await Promise.all([this.assets.loadAll((done, total) => loading.progress(done, total)), this.audio.loadOverrides()]);
     for (const p of this.assets.problems) console.warn(`[assets] ${p}`);
-    await this._buildFace();
+    this.renderer.prepare();
     onStatus('ready');
     if (this.contentErrors.length) {
       console.error(`${this.contentErrors.length} content error(s); see above.`);
@@ -138,23 +120,6 @@ export class Game {
       console.warn(`No level "${this.debug.map}"`);
     }
     this.setScene(new TitleScene(this));
-  }
-
-  async _buildFace() {
-    // ?photo=assets/custom/me.jpg previews a face photo without editing hero.js.
-    const face = { ...(this.registry.hero?.face ?? {}) };
-    if (this.params.get('photo')) face.photo = this.params.get('photo');
-    if (face.photo) {
-      try {
-        const { sheet, portrait } = await buildPhotoFace(this.assets, this.palette, face);
-        this.faceSheet = new Sheet(sheet, 24, 30);
-        this.photoPortrait = portrait;
-        return;
-      } catch (err) {
-        console.warn(`Could not use face photo "${face.photo}"; using the drawn face.`, err);
-      }
-    }
-    this.faceSheet = this.assets.sheets.get(face.sheet?.ref) ?? null;
   }
 
   // ------------------------------------------------------------ frame
@@ -188,14 +153,13 @@ export class Game {
     const pal = this.menu.active ? PAL_NORMAL : (scene?.paletteIndex?.() ?? PAL_NORMAL);
     this.presenter.present(s.px, this.palette.palettes[pal], this.time);
     const inGame = scene instanceof LevelScene && !this.menu.active;
-    this.touch.setVisible(inGame && this.touchActive);
     this.canvas.classList.toggle('in-game', inGame && this.input.pointerLocked);
   }
 
   /** Follow the presenter to a new framebuffer width (the window's shape changed). */
   _resizeScreen(w) {
     this.surface.resize(w, SCREEN_W);
-    this.wipe = new MeltWipe(w, SCREEN_H);
+    this.wipe = new MeltWipe(w, SCREEN_H, this.surface.scale);
   }
 
   /** Switch scenes with Doom's screen melt. */
@@ -322,7 +286,7 @@ export class Game {
 
   onMenuClosed() {
     if (this.scene instanceof TitleScene) return;
-    if (this.wantsPointerLock) this.input.lockPointer();
+    if (this.scene?.wantsPointerLock) this.input.lockPointer();
   }
 
   quitToTitle() {

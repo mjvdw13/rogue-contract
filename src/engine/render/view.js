@@ -21,14 +21,20 @@ export const LIGHT_BLACK = 212;
  * weapon renderers.
  */
 export class View {
-  constructor(width = VIEW_W) {
-    this.H = VIEW_H;
+  /**
+   * @param {number} [width] view width in pixels
+   * @param {number} [scale] pixels per layout pixel: 2 draws the view at 640x400
+   */
+  constructor(width = VIEW_W, scale = 1) {
+    this.scale = scale;
+    this.H = Math.round(VIEW_H * scale);
     /**
      * Per column, the uncovered windows of rows after each tile the ray crossed
      * (for sprite clipping): one batch per boundary, usually a single window,
-     * more where slabs split the view.
+     * more where slabs split the view. 48 of them, and room after for one
+     * last batch where a ray stops at the skyline (columns.js).
      */
-    this.SEG = 48;
+    this.SEG = 48 + 8;
     this.resize(width);
     this.lightStart = new Float32Array(256);
     this.x = 0;
@@ -56,7 +62,7 @@ export class View {
    */
   resize(width) {
     this.W = width;
-    this.fx = VIEW_W / 2 / Math.tan((FOV_DEG * Math.PI) / 360); // horizontal focal length (px)
+    this.fx = (VIEW_W * this.scale) / 2 / Math.tan((FOV_DEG * Math.PI) / 360); // horizontal focal length (px)
     this.fy = this.fx / PIXEL_ASPECT; // vertical focal length (px), corrected for 4:3 display
     this.planeLen = this.W / 2 / this.fx;
     this.zbuf = new Float32Array(this.W);
@@ -74,7 +80,7 @@ export class View {
      */
     this.mdepth = new Float32Array(this.W * this.H);
     this.depthValid = false;
-    /** The backdrop's pixels, for the columns that show sky this frame (render/backdrop.js). */
+    /** Marks the rows of a column that show sky, for the backdrop (render/backdrop.js); all 0 between columns. */
     this.bdBuf = new Uint8Array(this.W * this.H);
   }
 
@@ -95,7 +101,7 @@ export class View {
     this.planeX = -this.dirY * this.planeLen;
     this.planeY = this.dirX * this.planeLen;
     this.camZ = cam.z ?? 0.5;
-    this.horizon = this.H / 2 + (cam.horizonOffset ?? 0);
+    this.horizon = this.H / 2 + (cam.horizonOffset ?? 0) * this.scale;
     this.fog = fog;
     this.fixedColormap = cam.fixedColormap ?? -1;
     const extra = (cam.extraLight ?? 0) * 4;

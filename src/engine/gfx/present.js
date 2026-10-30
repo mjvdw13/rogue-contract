@@ -17,6 +17,7 @@ precision mediump float;
 varying vec2 v_uv;
 uniform sampler2D u_tex;
 uniform vec2 u_src;
+uniform float u_rows;
 uniform vec2 u_out;
 uniform float u_time;
 uniform float u_curve;
@@ -54,7 +55,7 @@ void main() {
              fetch(uv + vec2(0.0, px.y)) + fetch(uv - vec2(0.0, px.y));
     col = mix(col, max(col, b * 0.25), u_glow * 0.6);
   }
-  float row = fract(uv.y * u_src.y);
+  float row = fract(uv.y * u_rows);
   col *= 1.0 - u_scan * pow(abs(row - 0.5) * 2.0, 2.0);
   float m = mod(floor(gl_FragCoord.x), 3.0);
   vec3 mask = vec3(1.0 - u_mask);
@@ -83,14 +84,16 @@ export const CRT_MODES = {
  * of black bars. The game reads `w` each frame and resizes to match.
  */
 export class Presenter {
-  constructor(canvas, { height = SCREEN_H, preferGL = true, wide = true } = {}) {
+  constructor(canvas, { height = SCREEN_H, preferGL = true, wide = true, scale = 1 } = {}) {
     this.canvas = canvas;
     this.w = SCREEN_W;
     this.h = height;
+    /** Framebuffer pixels per layout pixel; the framebuffer is pw x ph. */
+    this.scale = scale;
     this.wide = wide;
     this.mode = 'subtle';
     this.gl = null;
-    this.rgba = new Uint32Array(this.w * height);
+    this.rgba = new Uint32Array(this.pw * this.ph);
     this.bytes = new Uint8Array(this.rgba.buffer);
     if (preferGL) {
       try {
@@ -105,6 +108,14 @@ export class Presenter {
     window.addEventListener('resize', this._onResize);
     window.visualViewport?.addEventListener('resize', this._onResize);
     this.resize();
+  }
+
+  get pw() {
+    return Math.round(this.w * this.scale);
+  }
+
+  get ph() {
+    return Math.round(this.h * this.scale);
   }
 
   get backend() {
@@ -133,20 +144,20 @@ export class Presenter {
     this.w = w;
     if (this.gl) {
       const gl = this.gl;
-      this.rgba = new Uint32Array(w * this.h);
+      this.rgba = new Uint32Array(this.pw * this.ph);
       this.bytes = new Uint8Array(this.rgba.buffer);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, w, this.h, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.bytes);
-      gl.uniform2f(this.uniforms.src, w, this.h);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, this.pw, this.ph, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.bytes);
+      gl.uniform2f(this.uniforms.src, this.pw, this.ph);
     } else {
       this._init2D();
     }
   }
 
   _init2D() {
-    this.canvas.width = this.w;
-    this.canvas.height = this.h;
+    this.canvas.width = this.pw;
+    this.canvas.height = this.ph;
     this.ctx = this.canvas.getContext('2d');
-    this.imageData = this.ctx.createImageData(this.w, this.h);
+    this.imageData = this.ctx.createImageData(this.pw, this.ph);
     this.rgba = new Uint32Array(this.imageData.data.buffer);
     this.bytes = new Uint8Array(this.rgba.buffer);
   }
@@ -189,7 +200,7 @@ export class Presenter {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, this.w, this.h, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.bytes);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, this.pw, this.ph, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.bytes);
 
     const u = (name) => gl.getUniformLocation(prog, name);
     this.uniforms = {
@@ -202,9 +213,10 @@ export class Presenter {
       vig: u('u_vig'),
       noise: u('u_noise'),
       glow: u('u_glow'),
+      rows: u('u_rows'),
     };
     gl.uniform1i(u('u_tex'), 0);
-    gl.uniform2f(this.uniforms.src, this.w, this.h);
+    gl.uniform2f(this.uniforms.src, this.pw, this.ph);
     this.gl = gl;
   }
 
@@ -247,7 +259,7 @@ export class Presenter {
    */
   present(px, pal32, time = 0) {
     const rgba = this.rgba;
-    const n = this.w * this.h;
+    const n = this.pw * this.ph;
     for (let i = 0; i < n; i++) rgba[i] = pal32[px[i]];
 
     const gl = this.gl;
@@ -255,13 +267,15 @@ export class Presenter {
       this.ctx.putImageData(this.imageData, 0, 0);
       return;
     }
-    gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, this.w, this.h, gl.RGBA, gl.UNSIGNED_BYTE, this.bytes);
+    gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, this.pw, this.ph, gl.RGBA, gl.UNSIGNED_BYTE, this.bytes);
     const m = CRT_MODES[this.mode] ?? CRT_MODES.off;
-    // Scanlines need a few physical pixels per source row; soften them on small screens.
+    // Scanlines are a layout row apart (200 down the screen at 2x too), and need a
+    // few physical pixels per row; soften them on small screens.
     const rowsPx = this.canvas.height / this.h;
     const scanScale = Math.max(0, Math.min(1, (rowsPx - 1.5) / 1.5));
     const U = this.uniforms;
     gl.uniform2f(U.out, this.canvas.width, this.canvas.height);
+    gl.uniform1f(U.rows, this.h);
     gl.uniform1f(U.time, time);
     gl.uniform1f(U.curve, m.curve);
     gl.uniform1f(U.scan, m.scan * scanScale);

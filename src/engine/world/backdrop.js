@@ -11,6 +11,9 @@
  * walls). It's lit by `light` (moonlight), shaded by its slope against the
  * `moon` direction, and drawn out to `far` tiles.
  */
+/** The size (in cells) of the blocks whose highest point is kept. */
+export const BLOCK = 8;
+
 export class Backdrop {
   /**
    * @param {*} def the level's `backdrop`
@@ -32,6 +35,9 @@ export class Backdrop {
     const base = def.light ?? 150;
     const cw = this.w + 1;
     this.light = new Uint8Array(cw * (this.h + 1));
+    // Which way each corner's slope faces: 1 if more along x (its texture
+    // then runs along y, as on a wall), else 0.
+    this.facesX = new Uint8Array(cw * (this.h + 1));
     for (let j = 0; j <= this.h; j++) {
       for (let i = 0; i <= this.w; i++) {
         const hx = (this._corner(i + 1, j) - this._corner(i - 1, j)) / (2 * this.cell);
@@ -40,6 +46,24 @@ export class Backdrop {
         const lit = Math.max(0, (-hx * mx - hy * my + mz) / (nl * ml));
         // (The slope's shading is what makes it read as ground going back.)
         this.light[j * cw + i] = Math.max(0, Math.min(255, base * (0.62 + 0.55 * lit)));
+        this.facesX[j * cw + i] = Math.abs(hx) > Math.abs(hy) ? 1 : 0;
+      }
+    }
+    // The highest corner in each block of BLOCK x BLOCK cells, so the
+    // renderer can pass over blocks too low to show.
+    this.bw = Math.ceil(this.w / BLOCK);
+    this.bh = Math.ceil(this.h / BLOCK);
+    this.blockMax = new Float32Array(this.bw * this.bh).fill(-Infinity);
+    for (let j = 0; j <= this.h; j++) {
+      for (let i = 0; i <= this.w; i++) {
+        const hgt = this.heights[j * cw + i];
+        // (A corner on a block's edge belongs to the blocks either side.)
+        for (let bj = Math.max(0, Math.ceil(j / BLOCK) - 1); bj <= Math.min(this.bh - 1, Math.floor(j / BLOCK)); bj++) {
+          for (let bi = Math.max(0, Math.ceil(i / BLOCK) - 1); bi <= Math.min(this.bw - 1, Math.floor(i / BLOCK)); bi++) {
+            const k = bj * this.bw + bi;
+            if (hgt > this.blockMax[k]) this.blockMax[k] = hgt;
+          }
+        }
       }
     }
   }
@@ -67,11 +91,29 @@ export class Backdrop {
     return a + (b - a) * v;
   }
 
+  /** How far a ray from (x, y) along (dx, dy) goes before it leaves the grid (in multiples of (dx, dy)). */
+  exit(x, y, dx, dy) {
+    const tx = dx > 0 ? (this.x0 + this.w * this.cell - x) / dx : dx < 0 ? (this.x0 - x) / dx : Infinity;
+    const ty = dy > 0 ? (this.y0 + this.h * this.cell - y) / dy : dy < 0 ? (this.y0 - y) / dy : Infinity;
+    return tx < ty ? tx : ty;
+  }
+
   /** The light at (x, y) (the nearest corner's). */
   lightAt(x, y) {
     const i = Math.round((x - this.x0) / this.cell);
     const j = Math.round((y - this.y0) / this.cell);
     return this.light[(j < 0 ? 0 : j > this.h ? this.h : j) * (this.w + 1) + (i < 0 ? 0 : i > this.w ? this.w : i)];
+  }
+
+  /**
+   * The texture's column coordinate (in tiles) at (x, y): along the face, so
+   * it's fixed to the world whichever way it's seen from (y where the slope
+   * there faces along x, else x).
+   */
+  faceU(x, y) {
+    const i = Math.round((x - this.x0) / this.cell);
+    const j = Math.round((y - this.y0) / this.cell);
+    return this.facesX[(j < 0 ? 0 : j > this.h ? this.h : j) * (this.w + 1) + (i < 0 ? 0 : i > this.w ? this.w : i)] ? y : x;
   }
 
   /** The texture for faces at height z. */

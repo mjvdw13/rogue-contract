@@ -1,12 +1,17 @@
 import { buildLevel } from './level.js';
 import { F_SECRET, F_DAMAGE, F_EXIT, F_USE } from './tilemap.js';
 import { Backdrop } from './backdrop.js';
-import { initNpc, npcThink, npcReact } from '../things/npc.js';
+import { initNpc, npcThink, npcReact, npcPain } from '../things/npc.js';
 import { castRay, blockedByMap, fenceBlocks, rayCircle, slantNear } from './physics.js';
 import { updateDoors, openDoor, closeDoor } from './doors.js';
 import { updateLifts, startLift, liftAt } from './lifts.js';
 import { LightEffects } from './lights.js';
 import { LightMap } from './lightmap.js';
+import { Particles } from './particles.js';
+import { Weather } from './weather.js';
+import { Hangings } from './hangings.js';
+import { Explosions } from './explosions.js';
+import { GLINT_REACH } from './lightsources.js';
 import { FlowField, WALKER } from './nav.js';
 import { noiseAlert } from './noise.js';
 import { Triggers } from './triggers.js';
@@ -15,9 +20,10 @@ import { Thing } from '../things/thing.js';
 import { overlap } from '../things/shape.js';
 import { PlayerState, playerThink, playerCamera } from '../things/player.js';
 import { monsterThink, wakeMonster, monsterPain, applyMomentum } from '../things/monster.js';
+import { makeCalm, endCalm, calmReact } from '../things/calm.js';
 import { projectileThink, launchProjectile, effectThink } from '../things/projectile.js';
 import { tryPickup } from '../things/pickups.js';
-import { damage, radiusDamage, hitscan, meleeTarget } from '../combat/damage.js';
+import { damage, radiusDamage, hitscan, meleeTarget, corpseThink } from '../combat/damage.js';
 import { weaponSprites, bestWeapon } from '../things/weapons.js';
 import { TEXELS_PER_UNIT } from '../config.js';
 
@@ -65,6 +71,24 @@ function animProgress(t) {
   return t.animDone ? 1 : total > 0 ? Math.min(1, done / total) : 0;
 }
 
+/**
+ * How far a bobbing decoration (`bob: { height, period }`) is drawn above
+ * its place at `time`: a slow sine `height` up and down, each thing at its
+ * own point in it (from where it was put), so two don't bob together.
+ * Drawn only: its z, collision and shots stay where it is.
+ */
+function bobAt(t, time) {
+  if (t.bobPhase === undefined) {
+    const k = Math.sin(t.x * 12.9898 + t.y * 78.233) * 43758.5453;
+    t.bobPhase = k - Math.floor(k);
+  }
+  const { height, period, roll = 0 } = t.def.bob;
+  const a = (time / period + t.bobPhase) * Math.PI * 2;
+  // The roll leads the rise by a quarter swing, so it sways as it floats.
+  t.bobRoll = ((roll * Math.PI) / 180) * Math.cos(a);
+  return height * Math.sin(a);
+}
+
 export class World {
   /**
    * @param {{registry:any, assets?:any, audio?:any, rng:any, settings?:any, hooks?:any}} services
@@ -90,6 +114,8 @@ export class World {
     this.floorTimer = 0;
     /** The friendly NPC the player last walked into (it reacts on its next think). */
     this.playerBumped = null;
+    /** Has the town's switch been thrown (turnHostile)? */
+    this.hostile = false;
 
     const slot = this.assets ? (id) => this.assets.textureSlot(id) : () => 0;
     const built = buildLevel(this.registry, level, { skill, textureSlot: slot });
@@ -104,6 +130,24 @@ export class World {
     /** Smooth light, interpolated between tile centres (the renderer reads `map.lightmap`). */
     this.lightmap = new LightMap(this.map, { occlusion: level.occlusion ?? 0 });
     this.map.lightmap = this.lightmap;
+    /** Light from sources only, reaching further, for glints on sprites (the renderer reads `map.glintmap`). */
+    this.glintmap = new LightMap(this.map, { glint: true });
+    this.map.glintmap = this.glintmap;
+    /** Sparks, smoke, sand: cosmetic, drawn as points (render/particles.js). */
+    this.particles = new Particles(this.map, [...this.registry.particles.values()], this.registry.paletteDef?.ramps);
+    /** Dust or sand in the air round the camera, under the sky (world/weather.js); filled on the first tick. */
+    this.weather = level.weather ? new Weather(this.particles, this.map, level.weather) : null;
+    /** Ropes and cloth hanging from fixed points, moving in the air (world/hangings.js): cosmetic. */
+    const texture = (id) => {
+      if (!this.assets) return null;
+      const s = this.assets.textureSlot(id);
+      const t = this.assets.textures[s];
+      return t ? { slot: s, w: t.w, h: t.h } : null;
+    };
+    this.hangings = new Hangings(this.map, [...this.registry.hangings.values()], level.hangings ?? [], this.registry.paletteDef?.ramps, level.weather?.wind, texture);
+    this.buildErrors.push(...this.hangings.errors);
+    /** Explosions made of particles, a flash and a sound (world/explosions.js), set off with explode(). */
+    this.explosions = new Explosions(this);
     this.lights = new LightEffects(this.map, this.rng, this.lightmap);
     this.nav = new FlowField(this.map);
     /** Flow fields per kind of body (see navFor), the walker's being `nav`. */
@@ -149,6 +193,12 @@ export class World {
       t.tag = s.tag;
       t.drops = s.drops;
       if (s.z !== null && s.z !== undefined) t.z = s.z;
+      if (s.lit !== null && s.lit !== undefined) t.fixedLight = s.lit;
+      if (s.wander !== null && s.wander !== undefined && t.kind === 'npc') {
+        t.wanderReach = s.wander;
+        initNpc(this, t);
+      }
+      if (s.calm && t.kind === 'monster') makeCalm(this, t, s.calm);
       if (t.kind === 'monster' && t.def.countKill) this.stats.totalKills++;
       if (t.kind === 'item' && t.def.countItem) this.stats.totalItems++;
     }
@@ -204,7 +254,9 @@ export class World {
     } else if (!t.setAnim('idle')) {
       t.setAnim('walk');
     }
-    if (t.solid) this.unstick(t);
+    // (Model scenery with lines collides as them, drawn to fit where it's
+    // put, often back to a wall: its radius says nothing, so it stays.)
+    if (t.solid && !t.model?.lines?.length) this.unstick(t);
     if (def.kind === 'monster') t.timer = this.rng.range(0, 0.3);
     if (def.kind === 'npc') initNpc(this, t);
     const reach = (z ?? -Infinity) + 0.5;
@@ -245,6 +297,15 @@ export class World {
     const e = this.spawn(id, x, y);
     if (e) e.z = z - (e.sheet ? spriteHeight(e.sheet, e.def) * 0.5 : 0);
     return e;
+  }
+
+  /**
+   * Set off explosion `id` (defineExplosion) at (x, y, z): particles, a flash
+   * and a sound, for looks only. `dir` is the way it faces (out of what it
+   * hit); near the floor it faces up.
+   */
+  explode(id, x, y, z, opts) {
+    return this.explosions.explode(id, x, y, z, opts);
   }
 
   spawnProjectile(id, owner, angle, spec, aim) {
@@ -310,7 +371,7 @@ export class World {
       if (depth > 0) {
         // Allow moving apart if already overlapping.
         if (depth > overlap(o, t.x, t.y, t.radius)) {
-          if (t === this.player && o.kind === 'npc') this.playerBumped = o;
+          if (t === this.player && (o.kind === 'npc' || o.calm)) this.playerBumped = o;
           return false;
         }
       }
@@ -357,7 +418,8 @@ export class World {
    * ceiling; dead ones drop.
    */
   fall(t, dt) {
-    if (t.def.hanging) return;
+    // (A fixed decoration stays where it was put: against a wall, on one, on a stack.)
+    if (t.def.hanging || t.def.fixed) return;
     if (t.def.flying && !t.dead) {
       const reach = this.reach(t);
       const floor = this.map.floorAt(t.x, t.y, t.radius, reach);
@@ -458,8 +520,8 @@ export class World {
     if (target?.player) target.health = target.player.health;
   }
 
-  radiusDamage(x, y, radius, amount, inflictor, source, z) {
-    radiusDamage(this, x, y, radius, amount, inflictor, source, z);
+  radiusDamage(x, y, radius, amount, inflictor, source, z, opts) {
+    return radiusDamage(this, x, y, radius, amount, inflictor, source, z, opts);
   }
 
   hitscan(shooter, angle, range, amount, spec, aim) {
@@ -472,6 +534,26 @@ export class World {
 
   wakeMonster(m, target) {
     wakeMonster(this, m, target);
+  }
+
+  /** Are any monsters still calm (calm.js)? */
+  calmLeft() {
+    return !this.hostile && this.things.some((t) => t.calm && !t.dead && !t.removed);
+  }
+
+  /**
+   * The town's switch: every calm monster turns normal at once, and the
+   * level's `on: 'hostile'` triggers run. Only the first time.
+   */
+  turnHostile() {
+    if (this.hostile) return;
+    this.hostile = true;
+    for (const t of this.things) if (t.calm) endCalm(t);
+    this.triggers.hostile();
+  }
+
+  npcPain(t) {
+    npcPain(this, t);
   }
 
   monsterPain(m) {
@@ -523,12 +605,13 @@ export class World {
     const dx = Math.cos(pt.angle);
     const dy = Math.sin(pt.angle);
     const hit = castRay(this.map, pt.x, pt.y, dx, dy, USE_RANGE);
-    // Friendly characters (NPCs) in front of the player get talked to first.
+    // Friendly characters (NPCs) and calm monsters in front of the player get talked to first.
     for (const t of this.things) {
-      if (t.kind !== 'npc' || t.removed) continue;
+      if (!(t.kind === 'npc' || t.calm) || t.removed || t.dead) continue;
       const d = rayCircle(pt.x, pt.y, dx, dy, t.x, t.y, t.radius + 0.1);
       if (d >= 0 && d < Math.min(hit.dist, USE_RANGE)) {
-        npcReact(this, t);
+        if (t.calm) calmReact(this, t);
+        else npcReact(this, t);
         return;
       }
     }
@@ -565,13 +648,13 @@ export class World {
   _useDoor(d, pt) {
     const p = pt.player;
     if (d.lock === 'remote') {
-      this.playSound('oof');
+      this.playSound('door-locked');
       return;
     }
     if (d.lock && !p.keys.has(d.lock)) {
       const key = this.registry.config.keys?.find((k) => k.id === d.lock);
       this.message(this.registry.text('needKey', { key: key?.name ?? d.lock }));
-      this.playSound('oof');
+      this.playSound('door-locked');
       return;
     }
     if (d.state === 'open' || d.state === 'opening') {
@@ -653,6 +736,7 @@ export class World {
         case 'monster':
           monsterThink(this, t, dt);
           this.fall(t, dt);
+          corpseThink(this, t, dt);
           break;
         case 'projectile':
           projectileThink(this, t, dt);
@@ -661,20 +745,30 @@ export class World {
           effectThink(this, t, dt);
           break;
         case 'npc':
+          applyMomentum(this, t, dt);
           npcThink(this, t, dt);
           this.fall(t, dt);
           break;
         default:
           if (t.def.spin) t.angle += t.def.spin * dt;
+          if (t.def.bob) t.bobZ = bobAt(t, this.time);
           applyMomentum(this, t, dt);
           this.fall(t, dt);
           t.stepAnim(dt);
+          corpseThink(this, t, dt);
           t.def.hooks?.onThink?.(this, t, dt);
       }
     }
     if (list.some((t) => t.removed)) this.things = list.filter((t) => !t.removed);
-    this.lightmap.setDynamic(this.dynamicLights());
+    this.explosions.update(dt);
+    this.particles.update(dt);
+    this.weather?.update(pt.x, pt.y);
+    this.hangings.update(dt, pt.x, pt.y);
+    const dyn = this.dynamicLights();
+    this.lightmap.setDynamic(dyn);
     this.lightmap.update();
+    this.glintmap.setDynamic(dyn.map((l) => ({ ...l, radius: l.radius * GLINT_REACH })));
+    this.glintmap.update();
     // Moving lifts change floor heights, so routes are refreshed while they run.
     this.navRefresh -= dt;
     const refresh = this.navRefresh <= 0 && this.map.lifts.some((l) => l.state === 'moving');
@@ -685,11 +779,11 @@ export class World {
   /**
    * This frame's dynamic lights: things with a `light` while they glow (a
    * fullbright frame: a bolt, a muzzle flash, an explosion), effects and
-   * bursting bolts fading as their animation plays, and the player's muzzle
-   * flash.
+   * bursting bolts fading as their animation plays, explosions' flashes and
+   * the player's muzzle flash.
    */
   dynamicLights() {
-    const out = [];
+    const out = this.explosions.lights([]);
     for (const t of this.things) {
       const l = t.def.light;
       if (!l || !t.fullbright || t.removed) continue;

@@ -1,4 +1,4 @@
-import { aimAttack } from './aim.js';
+import { aimAttack, lockOn } from './aim.js';
 
 /**
  * Attack kinds shared by player weapons and monsters. An attack spec looks like
@@ -7,7 +7,8 @@ import { aimAttack } from './aim.js';
  *   { kind: 'melee', damage: [2, 20], range: 2.2, hitSound: 'punch' }
  * Content can register more kinds with defineAttack(name, fn). Every kind gets
  * `opts.aim` ({z, slope}): the height the attack starts from and how steeply
- * it climbs (see aim.js).
+ * it climbs (see aim.js). A player's attack with `lockOn` (degrees) is turned
+ * onto the nearest monster in that cone, Dark Forces' way (aim.js lockOn).
  */
 export const BUILTIN_ATTACKS = {
   hitscan(world, attacker, spec, angle, opts) {
@@ -53,5 +54,10 @@ export function performAttack(world, attacker, spec, angle, opts = {}) {
     return false;
   }
   if (spec.sound) world.playSoundFrom(spec.sound, attacker);
-  return fn(world, attacker, spec, angle, { ...opts, aim: opts.aim ?? aimAttack(world, attacker, angle, spec.range) });
+  let aim = opts.aim;
+  if (!aim && spec.lockOn && attacker.player && world.settings.autoAim !== false) {
+    const lock = lockOn(world, attacker, angle, spec.lockOn, spec.range, spec.kind === 'projectile');
+    if (lock) ({ angle, aim } = lock);
+  }
+  return fn(world, attacker, spec, angle, { ...opts, aim: aim ?? aimAttack(world, attacker, angle, spec.range) });
 }

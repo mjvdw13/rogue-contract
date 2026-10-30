@@ -18,6 +18,9 @@ export function damage(world, target, amount, inflictor, source, opts = {}) {
     damagePlayer(world, target, amount, inflictor, source, opts);
     return;
   }
+  // Hurting a calm monster, or the player hurting anyone while some are
+  // calm, turns the town hostile (and the one hurt wakes, below).
+  if (target.calm || (source?.player && world.calmLeft())) world.turnHostile();
 
   // Knockback.
   if (inflictor && !opts.noThrust) {
@@ -33,6 +36,7 @@ export function damage(world, target, amount, inflictor, source, opts = {}) {
     return;
   }
   target.def.hooks?.onPain?.(world, target, source, amount);
+  if (target.kind === 'npc') world.npcPain(target);
   if (target.kind !== 'monster') return;
 
   // Infighting: monsters hit by other monsters turn on them (except their own kind).
@@ -96,6 +100,14 @@ export function kill(world, target, source) {
     if (def.kind !== 'monster') target.removed = true;
   }
   world.playSoundFrom(gib ? (def.sounds.gib ?? def.sounds.death) : def.sounds.death, target);
+  for (const b of def.death?.particles ?? []) world.particles.burst(b.type, target.x, target.y, aimZ(target), b);
+  if (def.death?.explosion) world.explode(def.death.explosion, target.x, target.y, aimZ(target));
+  if (def.corpse?.particles) {
+    // Cosmetic: the particles' own RNG, so the game plays out the same.
+    const rng = world.particles.rng;
+    target.corpseBursts = Math.round(between(rng, def.corpse.bursts ?? 3));
+    target.corpseWait = between(rng, def.corpse.every ?? CORPSE_EVERY);
+  }
   if (def.kind === 'monster' && def.countKill) world.stats.kills++;
   for (const drop of [...(def.drops ?? []), ...(target.drops ?? [])]) {
     if (world.rng.chance(drop.chance ?? 1)) {
@@ -113,27 +125,67 @@ export function kill(world, target, source) {
   world.triggers?.killed(target);
 }
 
+/** Seconds between a corpse's bursts by default. */
+const CORPSE_EVERY = [0.2, 0.8];
+
+/** A number, or one picked at random in [min, max]. */
+const between = (rng, v) => (Array.isArray(v) ? v[0] + (v[1] - v[0]) * rng.next() : v);
+
+/**
+ * A corpse with `corpse.particles` throws its bursts once it lies still (on
+ * the floor, its death animation done): `bursts` of them, `every` seconds
+ * apart (the first one `every` after it settles). Each burst goes one random way, up and out, unless it has a `dir`.
+ */
+export function corpseThink(world, t, dt) {
+  if (!t.dead || !(t.corpseBursts > 0) || !t.animDone || t.z > world.groundZ(t) + 0.001) return;
+  if ((t.corpseWait -= dt) > 0) return;
+  const c = t.def.corpse;
+  const ps = world.particles;
+  const rng = ps.rng;
+  t.corpseWait = between(rng, c.every ?? CORPSE_EVERY);
+  t.corpseBursts--;
+  const a = rng.next() * Math.PI * 2;
+  const up = 0.3 + rng.next() * 0.9;
+  const dir = [Math.cos(a), Math.sin(a), up];
+  const z = t.z + (c.z ?? 0.3);
+  for (const b of c.particles) ps.burst(b.type, t.x, t.y, z, { spread: 0.3, dir, ...b });
+}
+
+/**
+ * How far a blast at (x, y, z) is from the nearest point of `t`, or -1 when
+ * that's `radius` or more, or a wall, floor or ledge is in the way.
+ */
+export function blastReach(world, t, x, y, z, radius) {
+  const across = Math.max(0, Math.hypot(t.x - x, t.y - y) - t.radius);
+  const vertical = Math.max(0, t.z - z, z - t.z - t.height);
+  const d = Math.hypot(across, vertical);
+  if (d >= radius) return -1;
+  // Sight to the nearest height on the body, a little inside it so the line
+  // doesn't graze the floor it stands on.
+  const inset = Math.min(0.2, t.height / 4);
+  const tz = Math.max(t.z + inset, Math.min(t.z + t.height - inset, z));
+  return lineOfSight3D(world.map, x, y, z, t.x, t.y, tz) ? d : -1;
+}
+
 /**
  * Explosion damage: falls off linearly with the 3D distance from (x, y, z) to
  * the nearest point of each body, and floors, ledges and walls block it. `z`
  * defaults to the middle of a standing body above the floor there.
+ * `falloff: false` gives every body caught the full damage. Returns the
+ * bodies it hurt.
  */
-export function radiusDamage(world, x, y, radius, maxDamage, inflictor, source, z = world.map.floorAt(x, y) + 0.8) {
+export function radiusDamage(world, x, y, radius, maxDamage, inflictor, source, z = world.map.floorAt(x, y) + 0.8, { falloff = true } = {}) {
+  const hurt = [];
   for (const t of [...world.things]) {
     if (!t.shootable || t.dead || t.removed) continue;
     if (t.def.splashImmune) continue;
-    const across = Math.max(0, Math.hypot(t.x - x, t.y - y) - t.radius);
-    const vertical = Math.max(0, t.z - z, z - t.z - t.height);
-    const d = Math.hypot(across, vertical);
-    if (d >= radius) continue;
-    // Sight to the nearest height on the body, a little inside it so the line
-    // doesn't graze the floor it stands on.
-    const inset = Math.min(0.2, t.height / 4);
-    const tz = Math.max(t.z + inset, Math.min(t.z + t.height - inset, z));
-    if (!lineOfSight3D(world.map, x, y, z, t.x, t.y, tz)) continue;
-    const dmg = maxDamage * (1 - d / radius);
+    const d = blastReach(world, t, x, y, z, radius);
+    if (d < 0) continue;
+    const dmg = falloff ? maxDamage * (1 - d / radius) : maxDamage;
+    hurt.push(t);
     damage(world, t, dmg, inflictor ?? { x, y }, source);
   }
+  return hurt;
 }
 
 /**

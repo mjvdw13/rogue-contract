@@ -4,11 +4,12 @@ import { buildLevel } from '../src/engine/world/level.js';
 import { traceRay3D, rayCylinder } from '../src/engine/world/physics.js';
 import { performAttack } from '../src/engine/combat/attacks.js';
 import { pitchSlope, AUTOAIM_SLOPE } from '../src/engine/combat/aim.js';
+import { EYE_HEIGHT } from '../src/engine/config.js';
 import { makeWorld, mockInput, coarse, run, registry } from './helpers.js';
 
 // Maps are drawn on the coarse grid and upscaled (coarse() in helpers.js), so
 // legend heights double. The player starts at (3.5, 3.5), facing east, with
-// the eye 1 up; corridors are rows 2-3. Checks use real (fine-grid) numbers.
+// the eye EYE_HEIGHT up; corridors are rows 2-3. Checks use real (fine-grid) numbers.
 const TALL = { floor: 'imp-floor', ceiling: 'imp-ceiling', light: 160, ceilZ: 3 };
 const GUN = { kind: 'hitscan', damage: 1000, spread: 0, range: 96 };
 
@@ -72,9 +73,9 @@ test('the player shoots along the view pitch: level shots hit the ledge, aimed o
   const a = trooper(w, 15.5);
   performAttack(w, w.player, GUN, 0);
   assert.equal(a.dead, false, 'a level shot hits the ledge face below it');
-  // Look up at the trooper's middle: from the eye at 1 up to 2 + 0.88, twelve tiles away.
+  // Look up at the trooper's middle: from the eye up to 2 + 0.88, twelve tiles away.
   const slopePerPixel = pitchSlope({ pitch: 1 });
-  w.player.pitch = (2.88 - 1) / 12 / slopePerPixel;
+  w.player.pitch = (2.88 - EYE_HEIGHT) / 12 / slopePerPixel;
   performAttack(w, w.player, GUN, 0);
   assert.equal(a.dead, true, 'looking up at it hits');
 });

@@ -13,12 +13,17 @@ export class Surface {
     this.w = w;
     this.h = h;
     this.ox = 0;
+    /** The pixel buffer's size and pixels per layout pixel (ScaledSurface's are bigger). */
+    this.pw = w;
+    this.ph = h;
+    this.scale = 1;
     this.px = new Uint8Array(w * h);
   }
 
   /** Reallocate at a new width and centre a layout of `layoutW` columns in it. */
   resize(w, layoutW = w) {
     this.w = w;
+    this.pw = w;
     this.ox = (w - layoutW) >> 1;
     this.px = new Uint8Array(w * this.h);
   }
@@ -149,5 +154,91 @@ export class Surface {
   /** Copy every pixel of another same-sized surface. */
   copyFrom(other) {
     this.px.set(other.px);
+  }
+}
+
+/**
+ * A surface whose pixel buffer is `scale` times the layout in each direction
+ * (640x400 for 320x200 at scale 2), for drawing the 3D view at a higher
+ * resolution. The 2D drawing methods still take layout coordinates and draw
+ * each layout pixel as a 2x2 block, so the HUD and menus keep their pixel
+ * art; the renderer draws into `px` at `pw` x `ph`.
+ */
+export class ScaledSurface extends Surface {
+  constructor(w, h, scale) {
+    super(w, h);
+    this.scale = scale;
+    this.pw = Math.round(w * scale);
+    this.ph = Math.round(h * scale);
+    this.px = new Uint8Array(this.pw * this.ph);
+  }
+
+  resize(w, layoutW = w) {
+    this.w = w;
+    this.pw = Math.round(w * this.scale);
+    this.ox = (w - layoutW) >> 1;
+    this.px = new Uint8Array(this.pw * this.ph);
+  }
+
+  pixel(x, y, c) {
+    this.fillRect(Math.floor(x), Math.floor(y), 1, 1, c);
+  }
+
+  /** The buffer rectangle covering a layout rectangle (x already shifted by ox), clipped. */
+  _span(x, y, w, h) {
+    const k = this.scale;
+    return [
+      Math.max(0, Math.round((x | 0) * k)),
+      Math.max(0, Math.round((y | 0) * k)),
+      Math.min(this.pw, Math.round(((x + w) | 0) * k)),
+      Math.min(Math.round(this.h * k), Math.round(((y + h) | 0) * k)),
+    ];
+  }
+
+  fillRect(x, y, w, h, c) {
+    const [x0, y0, x1, y1] = this._span(x + this.ox, y, w, h);
+    for (let yy = y0; yy < y1; yy++) this.px.fill(c, yy * this.pw + x0, yy * this.pw + x1);
+  }
+
+  shadeRect(x, y, w, h, remap) {
+    const [x0, y0, x1, y1] = this._span(x + this.ox, y, w, h);
+    const px = this.px;
+    for (let yy = y0; yy < y1; yy++) {
+      let o = yy * this.pw + x0;
+      for (let xx = x0; xx < x1; xx++, o++) px[o] = remap[px[o]];
+    }
+  }
+
+  blit(src, dx, dy, opts = {}) {
+    const srcW = src.width ?? src.w;
+    const srcH = src.height ?? src.h;
+    const pixels = src.pixels ?? src.px;
+    const sx = opts.sx ?? 0;
+    const sy = opts.sy ?? 0;
+    const sw = opts.sw ?? srcW;
+    const sh = opts.sh ?? srcH;
+    const remap = opts.remap;
+    const flip = opts.flipX;
+    const k = this.scale;
+    dx = (dx + this.ox) | 0;
+    dy |= 0;
+    const W = this.pw;
+    const H = Math.round(this.h * k);
+    const px = this.px;
+    // Each buffer pixel takes the layout pixel its centre falls in.
+    const tx0 = Math.max(0, Math.round(dx * k));
+    const tx1 = Math.min(W, Math.round((dx + sw) * k));
+    const ty0 = Math.max(0, Math.round(dy * k));
+    const ty1 = Math.min(H, Math.round((dy + sh) * k));
+    for (let ty = ty0; ty < ty1; ty++) {
+      const v = Math.min(sh - 1, Math.floor((ty + 0.5) / k) - dy);
+      const row = (sy + v) * srcW;
+      for (let tx = tx0; tx < tx1; tx++) {
+        const u = Math.min(sw - 1, Math.floor((tx + 0.5) / k) - dx);
+        const c = pixels[row + sx + (flip ? sw - 1 - u : u)];
+        if (c === TRANSPARENT) continue;
+        px[ty * W + tx] = remap ? remap[c] : c;
+      }
+    }
   }
 }

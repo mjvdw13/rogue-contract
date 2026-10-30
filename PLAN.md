@@ -1,2027 +1,588 @@
-# Plan: Rogue Contract, a Dark Forces-style Star Wars game
+# Plan: Rogue Contract
 
-A Star Wars first-person shooter that is heavily influenced by *Dark Forces*
-(LucasArts, 1995). It is forked from Raccoon Alex's browser engine
-(`C:\Mark\raccoon-alex`). This file is the durable plan: tick items off as they
-land, and record new decisions here.
+A Star Wars first-person shooter in the style of *Dark Forces* (LucasArts,
+1995), for desktop browsers, on our own height-grid engine (forked from
+Raccoon Alex). This file holds the decisions and the **open** work only.
+Finished work goes in git history; the design notes of everything finished
+up to 2026-10-17 are in [docs/plan-archive.md](docs/plan-archive.md).
 
-## Decisions (2026-10-11)
+How to use it: before starting a task, add its steps here (under the right
+heading, or a new one) and tick them off as they land. When a whole item is
+done, delete it, and record the reasoning in the commit message (and
+MODDING.md, if content authors need it). Keep this file short.
+
+## Decisions
 
 | Question | Decision |
 |---|---|
-| Engine | **Height grid.** Keep the tile grid, but give each tile its own floor and ceiling height. Add elevators, looking up and down, jump and crouch. Not a flat reskin, and not a full sector/portal engine. |
-| Where | **New sibling repo**, `C:\Mark\rogue-contract` (first created as `dark-forces-clone`), copied from raccoon-alex with its history. Raccoon Alex stays untouched. |
-| Story | **Original story in Dark Forces' style.** A new mercenary working for the Rebellion, Imperial bases, mission briefings and objectives, a serious tone. No Kyle Katarn retelling. |
-| Scope | **A one-mission vertical slice first**, then decide whether to build more. |
-| Title | **Rogue Contract** (chosen 2026-10-11). Repo `mjvdw13/rogue-contract`, public, served by GitHub Pages. It also holds ripped Dark Forces art for local testing (Mark's decision, 2026-10-12; see Phase 1b D). "Star Wars" and "Dark Forces" stay out of the title. |
-| Engine, revisited (2026-10-12) | **Stay on our height-grid engine.** Considered instead: The Force Engine (needs the original Dark Forces files, so it can only host a mod; desktop only), GZDoom (true sectors and slopes, but desktop only) and Godot with TrenchBroom (no grid limits, but a full rebuild). Fill the grid's visual gaps with 3D models (Phase 1b F). |
-| Platforms (2026-10-12) | **Desktop browsers.** Phones are no longer a target: no phone performance gate, and touch controls aren't required. |
-| Story, revisited (2026-10-13) | **Bad Paper, a prequel to Dark Forces** (`docs/story.md`), set a few months before Dark Forces' first mission. Kyle takes a Guild bounty on Tatooine as cover for the Alliance, and the contract turns on him: the Canyon Garrison is an early field test of Mohc's Dark Trooper project, and its prototype is Phase 3's mini-boss. **Only Mission 1 (Mos Eisley) is free roam:** calm troopers and the tracking fob, until Kyle finds his target and the shooting starts. From there it's straight run-and-gun, and later missions have no stealth or tracker. **The hero is Kyle Katarn** (Mark, 2026-10-13, replacing the earlier "no Kyle Katarn retelling"), and Jan Ors drops him off and picks him up in the Moldy Crow in every mission; the first mission opens with the Crow landing in a Mos Eisley docking bay. |
-| Stacked spaces (2026-10-13) | **Two storeys per tile** (Phase 1c), before the story's maps. Mark wants to walk under other parts of the map. A tile can hold one solid slab, with a storey under it and one on top, like GZDoom's 3D floors. Considered instead: walkable 3D models (bridges only, no rooms under rooms) and overlapping layers joined by portals (Dark Forces' and Build's way: much bigger, for little more). |
-| Rights | A non-commercial fan game. All art, sound and music are generated or original. Nothing ripped from Dark Forces, and no note-for-note John Williams transcriptions. Exception (Mark's decision, 2026-10-12): the ripped Dark Forces enemy and weapon sheets in `assets/custom/` are used, on the hosted site too (see Phase 1b D). |
-
-## Starting point
-
-Raccoon Alex keeps the engine and the content apart. `src/engine/` doesn't
-know which game it runs, and `src/content/` is plain data. The engine is
-Wolfenstein-flat:
-
-- every wall is 1 unit tall (`render/walls.js`)
-- every floor is at height 0 (`render/flats.js`)
-- collision only checks x and y (`world/physics.js`)
-- combat is 2D (`combat/damage.js`)
-
-The renderer already supports shifting the view up and down
-(`view.horizonOffset`), which is how Dark Forces did looking up and down.
-
-## Phase 0: Fork
-
-- [x] Create the repo (now `C:\Mark\rogue-contract`), keeping the raccoon-alex history.
-- [x] Rename the package, title and README, and keep `npm test`,
-      `npm run validate` and CI passing.
-- [ ] Replace the Alex content step by step as each Star Wars piece lands,
-      always keeping a playable build.
-
-## Phase 1: Height-grid engine (the biggest phase)
-
-1. [x] **Map data.** Each tile gets `floorZ` and `ceilZ`, set through the
-       legend (`'.': { floor, ceiling, floorZ: 0, ceilZ: 1.5 }`) or the
-       optional `floorHeights` / `ceilHeights` grids. The defaults (0 and 1) reproduce today's flat
-       maps exactly.
-2. [x] **Renderer.** The ray doesn't stop at the first wall. As it crosses
-       tiles it draws the step faces where the floor or ceiling changes height,
-       plus each tile's floor and ceiling. A running top and bottom limit per
-       screen column ("Doom on a grid") also lets sprites hide correctly behind
-       ledges. The sky still works.
-3. [x] **Player movement.** Gravity, a step-up height, jump, crouch (lower
-       eyes and body), looking up and down (mouse, keys, gamepad), and damage
-       from long falls.
-4. [x] **Doors and lifts.** Doors rise into the ceiling like Dark Forces
-       doors (an animated ceiling height). Elevators are tiles whose floor
-       height moves between stops, triggered by a switch or by stepping on
-       them.
-5. [x] **Angled walls.** Each tile can hold one wall line, with its
-       endpoints on the tile's edges at 1/8-tile positions. The renderer
-       checks where each ray crosses the line, the same way it handles door
-       panels.
-       - Ship the four 45° presets first (`diagonal: 'NE' | 'NW' | 'SE' |
-         'SW'`, naming the solid corner). They give chamfered room corners,
-         octagonal rooms and angled corridors.
-       - The data model already allows any angle (for example about 26.6°
-         across two tiles), and chains of short lines for rounded corners.
-       - Later: two-sided lines that separate two floor heights instead of
-         wall and floor (diagonal ledges and step edges).
-       - Collision is circle against line. Enemy pathfinding treats
-         part-solid tiles as open, and collision keeps monsters out of the
-         solid part (so angled corridors stay walkable). The automap, map viewer and validator
-         draw and understand the lines.
-       - Textures run along the line at a true 64 texels per unit, so they
-         aren't stretched.
-6. [x] **3D combat.** Shots aim along the camera's pitch with gentle
-       vertical auto-aim. Projectiles move in 3D, hit floors, ceilings and
-       angled walls. Explosions measure distance in 3D.
-7. [x] **Enemies.** Monsters follow floor heights, and pathfinding knows
-       how high they can climb. Flying enemies hover at their own height.
-8. [x] **Tools.** The validator checks reachability with step and jump
-       heights. The map viewer shades by height and draws angled walls. Add
-       tests.
-9. [ ] **Gate:** a sandbox map with stairs, a pit, a lift, a vent, a jump gap,
-       a sniper on a ledge and chamfered corners. It must run near 60 fps in a
-       desktop browser. (It was a phone target until 2026-10-12.)
-
-Grid limits we accept: no rooms stacked over rooms, and no sloped floors.
-Dark Forces had no slopes either. Walls can be at angles (step 5), but each
-tile holds at most one wall line. 3D models (Phase 1b F) can add shapes the
-grid can't (curves, ship hulls, machinery), but only as decoration: nobody
-walks on or under them.
-
-## Phase 1b: Look and feel
-
-Why: after the first Star Wars content pass (2026-10-12), Mark's verdict was
-"low quality Star Wars knock-off, not real Star Wars". The textures are low
-quality, the map geometry is blocky, and the enemies look like fake
-characters, not hand-drawn art.
-
-Decided (2026-10-12):
-
-- **Claude does:** the finer grid (A), the real Mission 1 map (B), and
-  better placeholder textures plus an import pipeline (C).
-- **Outsourced later (D):** enemy and weapon sprites (a sprite artist, or 3D
-  models rendered in Blender), probably hero textures, sound effects and
-  music.
-- **Order:** A, then B, then C. The Phase 1 gate (step 9) runs after A, on
-  the converted sandbox.
-- **Added (2026-10-12):** F, 3D models, after C.
-- **Added (2026-10-12):** G, widescreen, moved up from Phase 2. Done now,
-  before B3.
-- **Added (2026-10-12):** H, the corner HUD and a lower weapon, moved up
-  from Phase 2. Done now, before B3.
-- **Changed (2026-10-12):** Mark wants engine work next rather than more
-  of Mission 1, so F (3D models) goes before B3-B5 and C.
-
-### A. Finer grid: half-size tiles (do first)
-
-Goal: walls, pillars, trims and steps half as thick as now, so rooms stop
-looking like stacked boxes.
-
-Approach: the engine keeps "1 tile = 1 world unit". Everything measured
-against the tile doubles instead (a world scale of 2): bodies, speeds,
-heights, ranges and texture density. A person becomes about two tiles tall,
-and a corridor about two tiles wide. This leaves the geometry code (DDA,
-renderer, collision) alone.
-
-1. [x] **Audit** (2026-10-12). The tile-scale numbers to double (×2) or
-       halve:
-       - **Textures (`render/columns.js`).** Textures repeat once per unit.
-         Flats use `world * tex.w`. Walls use `v = (anchor - camZ) * th`,
-         and `u` is the fraction inside the tile (`face()` wants `u` in
-         0..1). Slants use `u` in units. Door panels use `du` inside the
-         tile. Change all of these to world units × `TEXELS_PER_UNIT` (64
-         → 32), with `face()` taking `u` in world units. Sprites already
-         use `TEXELS_PER_UNIT`.
-       - **`config.js`.** `EYE_HEIGHT` 0.5.
-       - **`player.js`:**
-         - `BODY`: height 0.85, eyeHeight, crouchHeight 0.5,
-           crouchEyeHeight 0.3, stepHeight 0.4, airStep 0.15, jumpSpeed
-           4.2, gravity 14, fallDamageSpeed 9. Halve fallDamagePerSpeed 8.
-         - View easing: step-up threshold 0.06, eye ease `dt * 2.5`,
-           landing `impact > 3 / > 6`, `min(0.2, impact * 0.02)`, recovery
-           `max(0.6, ...)`, bob 0.018, dead eye `0.1` and `dt * 0.9`, and
-           the velocity cutoff 0.005.
-       - **`world.js`.** `USE_RANGE` 1.3, `PICKUP_BELOW_FEET` 0.15,
-         `GRAVITY` 14, the `_slide` sub-step 0.2, and the default player
-         radius and height.
-       - **`nav.js`.** `WALKER` step 0.4, drop 0.4, height 0.85.
-       - **`monster.js`:**
-         - Default ranges: sightRange 40, attack range 40, melee range 1.1.
-         - Movement: speed 2, the `d < 5` direct rule, the door probe
-           `+0.35`, strafe `d > 2`.
-         - Flying: hover reach `+0.3`, flySpeed 1.5.
-         - Momentum cutoff 0.01.
-       - **`combat`:**
-         - `aim.js`: `MISSILE_DROP` 0.1, and the auto-aim margin
-           `min(0.1, ...)`.
-         - `damage.js`: `PUFF_INSET` 0.06, the hitscan pullback 0.06, the
-           z jitter 0.04, the default blast z `+0.4`, the inset
-           `min(0.1, ...)`, `MELEE_REACH_Z` 0.25, and knockback
-           (`0.02` / cap 1.2; player `0.004` / cap 0.35).
-         - `attacks.js` and `defs.js`: default ranges (hitscan 48, melee
-           1.1).
-       - **`projectile.js`.** `STEP` 0.1, `CLEARANCE` 0.05, the burst
-         pullback 0.15, the launch offset `+0.05`, the lob distance 6, and
-         the `+0.1` lob fudge.
-       - **`defs.js` defaults.** Thing radius 0.25 and height 0.8; monster
-         speed 2, radius 0.3 and height 0.85; npc radius 0.28, height 0.85,
-         speed 1.1 and wander 3; item radius 0.3 and height 0.4; decoration
-         radius 0.25 and height 0.8; projectile speed 10, radius 0.12 and
-         height 0.25.
-       - **Lifts.** Default speed 1.5. (Doors open by fraction, so they're
-         unaffected.)
-       - **Lighting (`view.js`).** `DIMINISH` 20 (brightness at 1 unit),
-         the `d < 0.25` clamp, and level `fog`, which is per unit, so it
-         halves.
-       - **Audio.** `NEAR` 1.6 and `FAR` 24.
-       - **Raycasting.** `castRay` and `traceRay3D` default maximum 64, and
-         the renderer's `MAX_STEPS` 160.
-       - **Other engine numbers.** Noise `maxSteps` 26, the npc height clamp
-         `0.82`, and levelcheck `MAX_GAP` 2. Check the automap zoom by eye.
-       - **Content.** The hero (radius, walk and run speed), and every
-         monster, item, decor and projectile radius, height, speed, `z`,
-         range and explode/splash radius. Every level's heights, lift
-         stops, `heightStep` and `fog`.
-       - **Unchanged:** slopes (auto-aim, pitch), screen-space sizes
-         (weapon bob, the HUD), and times.
-2. [x] **World-space texture mapping** (done 2026-10-12, still at 64
-       texels per unit; 4 sandbox views render pixel-identical). The switch
-       to 32 comes with step 3. Today each tile shows a full 64 px
-       texture (`render/columns.js`: `u = wx - floor(wx)`, and flats likewise).
-       Map textures by world position instead, for walls, floors and
-       ceilings, step faces, angled walls and door panels. Make
-       `TEXELS_PER_UNIT` 32, so a 64 px texture spans 2 tiles (the same real
-       size as today). Sprites use the same constant, so they come out the
-       right size.
-3. [x] **Scale everything else ×2:**
-       - **Player:** the hero body (height, eye, crouch, step, airStep,
-         radius), walk and run speed, jump speed and gravity (both ×2: the
-         jump is twice as high, with the same airtime), fall-damage speeds,
-         view bob.
-       - **Enemies and combat:** monster radius, height, speed,
-         `stepHeight`, `z` and `flySpeed`; projectile speed and radius;
-         attack, melee, sight and use ranges; splash and explode radii.
-       - **Engine constants:** `PICKUP_BELOW_FEET`, `MELEE_REACH_Z`,
-         `CLEARANCE`, `MISSILE_DROP` and `PUFF_INSET`; `castRay` maximum
-         distances; the nav `WALKER` profile; levelcheck `MAX_GAP` (2 → 4
-         tiles).
-       - **World and presentation:** lift and door speeds, fog and light
-         falloff per tile (halve), audio falloff distances, noise steps
-         (26 → 52), automap zoom.
-4. [x] **Doors.** A doorway must now be 2+ tiles wide. Group adjacent door
-       tiles of one glyph into one door that opens together, the way lifts
-       group their tiles.
-5. [x] **Converter tool.** `tools/upscale-map.mjs` doubles an ASCII level:
-       each glyph becomes 2x2, heights double, and thing positions double.
-       Use it on the sandbox.
-6. [x] **Tests.** Most use tile positions and heights. Convert their test
-       maps the same way, or rescale their numbers.
-7. [x] **Performance.** Rays cross about twice as many tiles. Time frames
-       before and after (headless snapshots, and the browser fps counter).
-       Note the result for the phone gate.
-8. [x] **Docs and check.** Update MODDING.md (heights, sizes), and check it
-       in a real browser.
-
-### B. Mission 1: the Canyon Garrison map (after A)
-
-Build Phase 4's mission as a designed level, not a feature test. The
-objectives and briefing (Phase 2) aren't in yet, so for now it ends at an
-exit switch, with keycards.
-
-Design rules (what makes it feel like Dark Forces):
-- tall spaces, and catwalks over drops
-- overlooks where snipers watch you
-- angled walls everywhere
-- varied ceiling heights, pools of light and dark corners
-- a landmark in every area
-- detail built as geometry: pillars, trims, consoles and window frames
-- no long box corridors
-
-1. [x] Sketch first: the area table, route, secrets and enemies are in
-       `docs/mission1.md` (done 2026-10-12). Decided there: the map is
-       painted in code by `src/content/levels/lib/painter.js`, not typed as
-       ASCII.
-2. [x] Build it at the fine grid as `src/content/levels/m1.js` (first build,
-       2026-10-12). It becomes
-       the episode's level, and the sandbox goes back to being a test map
-       outside the episode.
-3. [x] Lighting pass: light levels, flicker and light strips (done
-       2026-10-12; the levels are in `docs/mission1.md`). Light is per tile (walls take the light of the tile in
-       front of them), so pools of light and dark corners are painted as
-       tiles.
-       - [x] Fix hanging decorations and effects sizing themselves at 64
-             texels per unit (leftover E): the ceiling lamps sit right.
-       - [x] `snapshot.mjs --custom`: render with the Dark Forces art
-             overrides, read from disk, for reviewing the look.
-       - [x] Engine: `lightMin` in the legend (the low end of a tile's
-             light effect, instead of always 96 below), and `setLight`
-             taking an optional `lightFx`, so the overload can make the
-             generator chamber flicker. Tests, MODDING.md.
-       - [x] Canyon: a night (moonlit) base, a darker gorge and vent,
-             shadow along the garrison face, floodlight pools under the
-             gate's light strips, a dark secret alcove.
-       - [x] Interiors: darker bases with bright pools under ceiling lights
-             and lamps, dark chamfered corners, a broken flickering light
-             in maintenance, monitor glow pulsing along the vault's
-             computer banks.
-       - [x] Generator: a dark shaft bottom, a slow pulse round the reactor
-             column, light strips on the catwalk walls; the overload drops
-             it to a dim flicker.
-       - [x] The way out: a dark chasm, a floodlit pad, the pickup spot
-             pulsing.
-       - [x] Screenshots of every area before and after; tests, validator,
-             smoke test.
-4. [x] Enemies, items, skill variants and 2-3 secrets (done 2026-10-13).
-       A first placement went in with the map: 20 monsters, 13 items and
-       3 secrets, with only 4 things varying by skill and an empty vault.
-       This pass makes the skills real and fills the gaps:
-       - [x] Engine: a placed monster can carry its own `drops` (added to
-             its type's), so the officer drops the red keycard, as Dark
-             Forces' officers do. The validator and reachability check
-             count keys dropped by reachable monsters. Tests, MODDING.md.
-       - [x] Enemies by skill: fewer on 1-2, extra on 4-5 (bowl, gorge,
-             maintenance, barracks, generator, pad). Guards for the vault
-             (empty today).
-       - [x] Items by skill: med kits where fights end (the bowl's strip,
-             the gantry) on 1-3, the start bowl's useless med kit moved, a
-             power cell in the vent.
-       - [x] Secrets: check all 3 count once each and are reachable.
-       - [x] A per-skill table in `docs/mission1.md`; the validator's
-             counts, map viewer at skills 1, 3 and 5, tests, smoke test.
-5. [ ] Validator, map viewer and screenshot review, then playtest.
-
-### C. Better placeholder textures, and an import pipeline (after B)
-
-1. [ ] Better generators: greebles, shadows baked into recesses, wear, colour
-       variation, and more variants (6+ wall panels, trims, floor plates,
-       lights). Decide on 128 px wall textures.
-2. [ ] `tools/import-texture.mjs` for outside art: resize, snap to the
-       palette, check the tiling, and write it into `assets/textures/`.
-
-### D. To outsource (later; decide approach and budget with Mark)
-
-- Enemy sprites, ideally from 8 angles with full animation sets. Either a
-  sprite artist, or 3D models rendered by a Blender script Claude writes.
-  This is closest to how Dark Forces did it.
-- First-person weapon sprites.
-- Hero textures: an artist, a licensed texture pack, or AI-generated images
-  cleaned up.
-- Recorded sound effects, and music (a composer or orchestral samples). The
-  films' own sounds and music stay out.
-- Ripped art (e.g. Dark Forces sprites) goes in through
-  `assets/custom/overrides.json`. The Dark Forces sheets are committed in
-  the public repo with `assets/custom/DISCLAIMER.md` (Mark's decision,
-  2026-10-12).
-- [x] **The hosted site uses the Dark Forces art** (Mark's decision,
-      2026-10-12). Overrides are read everywhere, not only on localhost;
-      the smoke test still skips them. An override image that fails to
-      load falls back to the committed art. Update the comment in
-      `assets.js`, `assets/custom/README.md` and `DISCLAIMER.md`.
-- [x] **Dark Forces textures** (Mark, 2026-10-12, from his texture pack
-      zip). `assets/custom/textures.mjs` copies or composites one DF texture
-      per generated texture into `assets/custom/textures/` and adds the
-      overrides. Switches and key doors are DF wall/door art with DF's
-      small switch and key panels laid on top. Texture overrides can change
-      the frame count (the console is static). Review in screenshots of
-      Mission 1, then tune the picks.
-- [x] Key doors show their key panel once per 64x64 tile, so a big door
-      shows it four times (fixed by Phase 1b L: door art is fitted to the door). Make door textures one panel per door (a
-      128x128 door texture, or draw the panel only once per door).
-
-### E. Leftovers from the first Star Wars pass
-
-- [x] HUD: the ARMS panel still shows slots 2-7, and the face panel is
-      empty. Both go with the corner HUD (H).
-- [ ] The finale reuses the title and intermission pictures.
-- [ ] MODDING.md and the README still describe Raccoon Alex content.
-- [ ] The smoke test's screenshots 01-04 come out as a blank page with a
-      broken-image icon, though its checks pass.
-- [ ] The options menu doesn't fit: its 11 big-font rows need about 210
-      px, so SHOW FPS is cut off at the bottom and the rows touch. Use the
-      small font, or split it into sub-menus (video, controls).
-- [x] Hanging decorations and effect sprites still size themselves at 64
-      texels per unit (`world.js`: `sheet.fh / 64`). Since the finer grid
-      it is 32, so ceiling lamps hang half their height into the ceiling.
-
-### F. 3D models, like Dark Forces' 3DO objects (the current work, from 2026-10-12)
-
-Goal: low-poly models drawn in true 3D inside the grid world (consoles,
-crates, pipes, a reactor, a parked ship, mouse droids), clipped by walls and
-ledges the same way sprites are. They hide the blockiness the grid can't
-avoid. Mark chose this as the next engine work (2026-10-12), ahead of
-multi-angle sprites, smarter enemies and dynamic lighting.
-
-Decided (2026-10-12):
-- **Model format:** `defineModel({ id, vertices, faces, lines? })` in a new
-  `models` list in the content pack. Vertices are `[x, y, z]` in world units
-  (tiles), the origin at the floor under the thing's centre; at angle 0 the
-  model's axes are the world's (x east, y south, z up). Each face is a
-  convex polygon `{ v: [i, j, k, ...], color, tex?, uv?, glow?, twoSided? }`,
-  wound so the right-hand normal `(v1-v0) x (v2-v0)` points outward. `color`
-  is `[ramp, 0..1]` or an RGB triple (snapped to the palette's lit colours
-  at load); `tex` with per-vertex `uv` (in texture repeats) maps a texture.
-- **Sorting with sprites: a depth buffer, not a shared far-to-near order.**
-  Models draw after the walls and before the sprites, writing their depth
-  per pixel; sprite pixels behind a model pixel are skipped. Models need no
-  sorting among themselves either. The buffer is only cleared and checked
-  in frames where a model drew.
-- **Lighting:** the tile light at the model's position with the usual
-  distance fade, plus a fixed light direction shading each face (up to a
-  few colormap levels darker). `glow` faces are fullbright.
-- **Generated models in code**, with a small builder (boxes, prisms,
-  cylinders, with automatic winding), as content files in
-  `src/content/models/`. `tools/import-model.mjs` converts a Blender OBJ
-  (with its MTL colours) into the same format.
-
-1. [x] **Renderer** (`render/models.js`):
-       - Move vertices into camera space with the sprite transform.
-       - Drop faces pointing away from the camera (world-space normal test,
-         unless `twoSided`). Clip polygons at the near plane.
-       - Fill polygons column by column, interpolating 1/depth (and u/depth,
-         v/depth) along edges, so textures are perspective-correct.
-       - Each pixel is checked against `zbuf` and the ledge windows
-         (`segDist` / `segTop` / `segBot`) at its own depth.
-2. [x] **Depth buffer with sprites** (`view.mdepth`), as decided above.
-3. [x] **Model format and pipeline.** `defineModel`, registry and asset
-       loading (colours to palette indices, texture slots), the builder,
-       and `tools/import-model.mjs` for OBJ + MTL. Triangle budget: a few
-       hundred per model.
-4. [x] **Game integration.**
-       - A decoration with `model`, placed with a facing angle; `scale` and
-         an optional `spin` (radians per second).
-       - Collision is the thing's cylinder for small models. Big ones list
-         `lines` (wall segments in model space): circle-against-segment
-         collision for movement.
-       - Solid models stop hitscan shots and projectiles (a puff, no
-         damage), using the cylinder or the lines.
-5. [x] **Tools.** The map viewer draws model footprints. The validator
-       checks model ids and texture names, and warns when a solid model
-       blocks the route.
-6. [x] **Tests and a showcase.** Unit tests for clipping and culling;
-       headless snapshot checks (a model behind a ledge, beside a sprite,
-       cut by the near plane). Then place a few in Mission 1: consoles, the
-       generator and a ship on the pad. Time frames before and after.
-
-Follow-ups found on the way:
-- [ ] Monsters see and aim through models (line of sight only knows the
-      map). Fine for low scenery; a ship or a tank should block sight.
-- [ ] Pathfinding doesn't know about models: a monster can walk into a
-      tank and stall, as with sprite crates today.
-- [ ] Builder textures restart on each face of a cylinder (each face is
-      projected on its own); wrap them round instead.
-- [ ] Better showcase art: the shuttle is a placeholder shape. Models made
-      in Blender (or by a modeller) are the real thing.
-
-Later, if wanted: walkable model surfaces (a bridge you can cross or walk
-under). That changes physics and pathfinding, which assume one floor per
-tile, so it's a separate, larger job.
-
-### G. Widescreen: fill the whole screen (done 2026-10-12)
-
-Today the game draws a fixed 320x200 frame shown at 4:3, with black bars on
-wider screens (`gfx/present.js` `resize()`). Moved up from Phase 2
-(2026-10-12).
-
-What it should do:
-- Keep today's 4:3 view as the guaranteed centre: the same vertical view and
-  the same 90 degree field of view in the middle 320 columns. On a wider
-  screen, draw more world at the left and right edges instead of bars.
-- The framebuffer stays 200 px tall, and its width follows the window: 320
-  at 4:3, about 427 at 16:9, wider on ultrawides. Cap it at 21:9 (560), and
-  use bars past that. Screens narrower than 4:3 keep bars top and bottom.
-- The horizontal field of view grows with the width, so nothing in the
-  centre moves or changes size.
-- The HUD, menus and full-screen pictures (title, intermission, finale) stay
-  laid out for the centre 320 columns, so nothing important is cut off on
-  4:3. Their backgrounds extend to the edges. (The bottom status bar has
-  since been replaced by the corner HUD, H.)
-- An options toggle keeps the old 4:3 frame for anyone who wants it.
-- The generated title and intermission pictures are painted 560x200, so
-  they fill even a 21:9 screen. A 320-wide picture (from a mod) is mirrored
-  and darkened at the sides instead.
-
-How:
-1. [x] **Runtime width.** `SCREEN_W` stays 320 and now means the 4:3
-       layout width; the framebuffer's width is `surface.w`. The presenter picks the frame width from the
-       window and reallocates its buffers and texture; the game resizes the
-       framebuffer, the melt wipe and the view to match.
-2. [x] **Renderer.** `View` sizes its per-column buffers (`zbuf`, the
-       sprite clip windows, sky columns) to the width, and widens
-       `planeLen` so the focal length stays at 320's. The weapon sprite
-       stays centred.
-3. [x] **2D layout.** `Surface` gets a draw origin (`ox`): all 2D drawing
-       is offset so UI code keeps working in centre-320 coordinates.
-       Full-width parts (screen shading, the automap, backgrounds, the
-       status bar's sides, the FPS counter) are drawn across the whole
-       width on purpose. Mouse clicks on menus map through the same origin.
-4. [x] **Options.** A widescreen on/off toggle in the options menu, and
-       `?wide=0` in the URL.
-5. [x] **Tests and checks.** Unit tests for the width rule and for the
-       centre view staying the same; the smoke test adds a 16:9 run. Check
-       title, menus, level, automap, intermission and finale in a browser at
-       4:3, 16:9 and 21:9, and time frames at 16:9 (about 33% more columns).
-
-### H. Corner HUD and a lower weapon (done 2026-10-12)
-
-Mark (2026-10-12): the weapon is far too high and hides the action. Move it
-down, and replace the bottom status bar with readouts in the bottom left and
-right corners only, like Dark Forces. Moved up from Phase 2.
-
-1. [x] **Full-height view.** The 3D view fills all 200 rows (`VIEW_H` =
-       `SCREEN_H`); the status bar art and its panel layout go.
-2. [x] **Corner panels.** Left: SHIELD and HEALTH. Right: the current
-       weapon's ammo and the keycards. Small generated panel art
-       (`hud-left.png`, `hud-right.png`) with the big HUD digits. On
-       widescreen they sit at the real screen corners. The ARMS, face and
-       ammo-tally panels are dropped.
-3. [x] **Lower weapon.** Weapons now sit on the screen's bottom edge (32
-       px lower than above the bar). `weaponDrop` in the content config
-       lowers every weapon further: 24 px, picked from screenshots.
-4. [x] **Fix-ups.** The automap's level name and the respawn prompt move
-       clear of the corner panels; check menus over the game.
-5. [x] **Checks.** Tests, validator, smoke test; screenshots at 4:3 and
-       16:9, with the generated and the Dark Forces weapons.
-
-### I. A sandtrooper enemy (2026-10-12)
-
-Mark gave an AI-generated asset sheet (sandtrooper with a T-21 repeating
-blaster: front, side and back walks, aiming, hit reactions and two death
-falls, on a blue backdrop, as a 1264x848 JPEG). Make it a new enemy.
-
-Decided: the engine draws one view per frame (no rotations), so only the
-front-facing poses are used. The art is drawn at the Dark Forces sprites'
-density (about 37 px per unit, `scale: 0.85`), so a sandtrooper matches the
-Dark Forces stormtrooper beside it. The sheet is our own art, not a rip, so
-the cut sheet is committed straight into `assets/sprites/monsters/` (no
-override); the source and the cutter live in `assets/custom/sandtrooper/`.
-
-1. [x] **Cutter** (`assets/custom/sandtrooper/cut.py`, Python with Pillow
-       and numpy, as JPEG decoding is needed): key out the blue with soft
-       edges and remove the blue spill, then cut the frames. Figures whose
-       rifle barrels run into the next figure are split along the barrel:
-       the barrel goes to its owner, and the gap it leaves in the neighbour
-       is filled from the surrounding pixels. Scale down with the alpha
-       premultiplied, keep the body centred and the feet on the bottom row,
-       and snap to the palette's lit colours (so armour highlights don't
-       glow in the dark).
-2. [x] **Frames:** walk (the six front-view cycle frames), aim and fire
-       (the front "aiming" poses; fire gets a red muzzle flash in
-       fullbright colours), pain (the first "taking damage" pose), death
-       (the four-frame fall onto the back, captioned "aiming" on the
-       sheet: all four poses stand apart, unlike the "faller" row).
-3. [x] **Monster** `src/content/monsters/sandtrooper.js`: tougher and
-       faster-firing than the stormtrooper (the T-21 is a repeating
-       rifle): bursts of three bolts, 45 health (30 for a stormtrooper).
-       Glyph `s`.
-4. [x] **Placement:** a few in Mission 1's canyon (sandtroopers belong
-       outdoors) and one in the sandbox.
-5. [x] **Checks:** tests, the validator and the smoke test; screenshots
-       of sandtroopers in game (walking, firing, dying).
-6. [ ] Later, if wanted: the side and back views (walk cycles at four
-       angles are on the sheet), once enemies are drawn from several
-       angles (Phase 2 stretch goal).
-
-### J. A Jawa (2026-10-12)
-
-Mark gave a Jawa sprite sheet (1619x971 PNG, painted pixel-art style on a
-blue backdrop: front, side and back walks, aiming and firing with a muzzle
-flash, a hit-and-fall death and a slump death). Jawas are small: first
-half an adult's height; Mark then asked for them up to a stormtrooper's
-chest (1.25 units).
-
-Decided: a hostile enemy (the sheet has aiming and firing poses): small
-(1.25 tall, radius 0.3), weak and quick, firing slow ion bolts. Drawn at
-the same pixel density as the other enemies, so a standing Jawa is about
-47 px tall. Front-facing poses only, as for the sandtrooper. Its eyes and
-muzzle flash keep their glow (snapped to fullbright colours).
-
-1. [x] Move the sandtrooper cutter's shared steps into
-       `assets/custom/sheetcut.py`; the sandtrooper's output must not
-       change.
-2. [x] `assets/custom/jawa/cut.py`: walk (front cycle, 6), aim and fire
-       (the crouched pose with the flash), pain (the hunch), death (hit,
-       falling, lying, dead). Every frame's feet (or body, lying down) on
-       the bottom row.
-3. [x] Monster `jawa`, an `ion-bolt` projectile, high chattering sounds,
-       glyph `j`.
-4. [x] A few in Mission 1's canyon, one in the sandbox; tests, validator,
-       smoke test, screenshots beside a stormtrooper.
-
-### K. See-through walls: railings, bars and grates (done 2026-10-12)
-
-Mark chose this as the next engine work: Dark Forces' transparent mid
-textures. The texture pack has about 30 textures with real transparency
-(bars `ZWBARS`, the girder truss `ZMGRATE1`, the lattice `ICDELEV`, gates,
-window frames, holo glass, blast holes). Its force field (`IFORCFLD`) is
-opaque, so force fields need blending and come later.
-
-Decided (2026-10-12):
-- **Fences sit on tile edges.** A legend entry gets
-  `fence: { tex, edges: 'NE', height? }`: the tile's north and east edges
-  carry the texture. With `height` the fence stands that high on the
-  tile's floor (a railing); without it, it runs floor to ceiling (bars). It
-  rides a lift with its tile.
-- **Rendering:** when a column's ray crosses a fenced edge it records the
-  fence (distance, texture position, light, the rows still open) and keeps
-  going. After the column's solid surfaces it draws its fences far to near,
-  skipping transparent texels. Fence pixels write the per-pixel depth
-  buffer the models use (`mdepth`), so sprites and models behind a bar are
-  hidden and ones in front draw over it.
-- **What they stop:** bodies (circle against the edge, only below the
-  fence's top, so you can jump over a low railing). Sight, hitscan shots
-  and projectiles pass through. Monster pathfinding won't cross a fenced
-  edge (flyers cross low ones); the validator's reachability doesn't
-  either.
-
-1. [x] Engine: legend parsing and per-edge storage (mirrored on the
-       neighbour), the renderer's fence pass and the shared depth buffer,
-       collision, pathfinding.
-2. [x] Tools: the validator (bad edges, a fence against a wall), the
-       reachability check, the map viewer and automap draw fences, the
-       upscaler splits them.
-3. [x] Textures: generated placeholders with transparency (`imp-railing`,
-       `imp-bars`, `imp-cage`), and the Dark Forces ones as overrides
-       (`ZMGRATE1` squashed to a 0.75-tall railing, `ZWBARS`, `ICDELEV`).
-4. [x] Mission 1: railings round the generator's catwalk ring and along its
-       bridges, a barred window from the barracks corridor into the
-       officer's office, a storage cage round the maintenance crates.
-5. [x] Tests (rendering, depth against sprites, collision, jumping a low
-       railing, pathfinding, shots passing), MODDING.md, screenshots, the
-       validator and smoke test.
-
-Later: see-through doors (a barred gate that rises), force fields (a
-blended or stippled texture that blocks or hurts), decals on solid walls,
-and fences in the middle of a tile or at an angle. More of the pack's
-see-through textures (gates, window frames, holo glass, blast holes) can
-go in as fence textures when a level wants them.
-
-Found on the way:
-- [ ] A second `Registry` built from the same content pack finds no sprite
-      sheets: the first one replaces each def's inline `sheet` with a
-      `{ ref }` in the shared content objects. Only tools that build two
-      registries hit it; copy the defs instead of changing them.
-
-### L. Doors you can find (done 2026-10-13)
-
-Mark: doors are hard to find (a door tile looks like any other wall), and
-they're too thick (the whole doorway, a full tile or two, rises as one
-block). He liked the older doors, which sat inset into the wall. Use the
-proper door textures from the texture pack.
-
-Research:
-- **The older doors** (before `698b326`, Raccoon Alex's Wolfenstein kind)
-  were a thin panel through the middle of the door tile, so they sat half a
-  tile back from the wall face, with jamb texture on the doorway's sides.
-- **Dark Forces doors** are a thin door sector set back in the doorway.
-  The frame doesn't move: the sides are jamb textures (light strips and a
-  small control panel), and the wall continues above the door as a lintel.
-  The door texture moves up with the door's ceiling, so it slides up into
-  the lintel. A DF door texture is one whole door: `IDDOOR1` (SecBase's grey
-  X-braced door) is 64x64, which at our 32 texels per unit is 2 wide by 2
-  tall (the player is 1.7). Today's 3-4 wide, 4-6 tall M1 doors tile it 2x2
-  and more, so a door reads as wall panelling.
-- **The films:** Imperial doors are thin slabs that drop or rise like a
-  guillotine (or slide sideways), set in a deep frame.
-- **The pack's door art:** doors `IDDOOR1` (= `ZDIMPER1`), `ZDIMPER4/5`
-  (the big dark door with the red ring), `IDBLKDOR` (a round blast door,
-  128x128), `ZDBIGDR1-4`; jambs `IDJAMPNL` (32x64: a blue light strip and a
-  control panel, exactly one tile wide), `IDJAMLCY`, `ZDJAML2Y`; the lintel
-  strip `IDJAMLCX` (a horizontal row of blue lights).
-
-Decided:
-- **Rising doors become a thin panel set back in the doorway.** The door
-  tiles are an open recess (floor, a lowered ceiling at the door's top, the
-  jamb texture on its sides). The panel stands across the middle of the
-  doorway's depth (in a 2-deep M1 doorway that's 1 tile back from each
-  face) and rises into the lintel, its texture moving with its bottom edge.
-  The room's wall above the opening is the lintel face (`upper`).
-- **One door texture per door.** The panel's texture is anchored to the
-  doorway (centred across it, bottom edge up), not to world position, so a
-  door shows its art once, and key panels show once (closes the Phase 1b D
-  item).
-- **Collision, sight and shots use the panel**, not the whole tile: you can
-  step into the recess, shots and projectiles stop at the panel (3D shots
-  pass under a half-open door), and a door won't close on a body in its
-  panel's way. Slide, split and secret doors are unchanged.
-- **Mission 1's doors resized to the art:** standard doors 2 wide, 2 tall
-  (`IDDOOR1`), with a lit lintel and jambs; the main gate a 4x4 blast door
-  (`IDBLKDOR`).
-
-1. [x] Engine: the panel plane and span per door group, the renderer's
-       panel (partly open: it draws the panel and narrows the window, and
-       the ray goes on below it), `castRay` / `traceRay3D` / body collision /
-       projectiles against the panel, closing checks bodies at the panel.
-2. [x] Textures: `imp-lintel` (new), `imp-gate` (new), `imp-jamb` and the
-       doors; generated placeholders and the DF overrides (`IDJAMPNL`,
-       `IDJAMLCX` strip, `IDBLKDOR`).
-3. [x] Mission 1 and the sandbox: doors 2 wide and 2 tall with lintels, the
-       gate 4x4.
-4. [x] Tests (panel position, a body in the recess, shots under a half-open
-       door, texture once per door), MODDING.md, screenshots before and
-       after, validator and smoke test.
-5. [x] Faster doors (Mark: "This is Star Wars!"): open and close in under
-       0.3 s instead of about 0.6, with shorter, snappier whoosh sounds.
-6. [x] Half-depth jambs (Mark, 2026-10-13): a jamb's depth is half the
-       wall's thickness, so thin the walls at Mission 1's doors to 1 tile
-       (the panel in the middle, jambs half a tile deep). No engine change:
-       1-deep doorways already work. The main gate stays deep.
-       - [x] Bunk room and office grow a row south; the barred window's
-             sill is 1 deep too.
-       - [x] The red door: the corridor runs one tile further east.
-       - [x] The generator door: the vault grows a row south (its screens
-             and chamfers move with it); the door's one tile shows the
-             computer banks above it on both sides.
-       - [x] The escape hatch: a one-tile landing outside it, at the top of
-             the gantry.
-       - [x] Jambs: `imp-jamb` becomes half a tile wide (16 texels, the
-             middle of IDJAMPNL with its light strip); the gate keeps the
-             full IDJAMPNL as `imp-gate-jamb`.
-       - [x] Screenshots, tests, the validator and smoke test.
-
-## Phase 1c: Two storeys per tile (done 2026-10-13)
-
-Mark (2026-10-13): we want to walk underneath other parts of the map. Today
-every tile has one floor and one ceiling, so there are no bridges you can
-walk under, no rooms under walkable ground and no upper floors over open
-space. This comes before the story's maps (`docs/story.md`), which are
-designed around it: the generator chamber's bridges no longer need to reach
-down and split its floor, the homestead's rooms can lie under the ground
-round its courtyard, and Mos Eisley's streets can have arches and upper
-floors.
-
-Decided (2026-10-13):
-- **One slab per tile.** A legend entry's `slab: { bottom, top, floor,
-  ceiling, side, light }` puts a solid layer from `bottom` to `top` inside
-  the tile's open space. That gives a lower storey (the tile's floor up to
-  the slab's underside) and an upper storey (the slab's top up to the
-  tile's ceiling or sky). `floor` is the texture on the slab's top,
-  `ceiling` its underside, `side` its edges, and `light` the lower storey's
-  light (the tile's `light` lights the upper one).
-- **Each storey can have its own walls.** An upper-storey wall over open
-  space below is a tile whose ceiling stops at the slab; a lower-storey wall
-  under an open upper floor is a raised floor. Both exist already, so rooms
-  can stand on rooms with different layouts.
-- **Which storey a body is in:** the upper one when the slab's top is
-  within its step reach (its `z` plus how high it can step), else the lower
-  one. `floorAt`, `ceilAt` and `lowFloorAt` take that reach; without one
-  they answer for the upper storey. Projectiles and 3D rays use their own
-  height.
-- **Renderer:** each screen column keeps a short list of open row windows
-  (up to 8) instead of one. Every window is in one storey of the tile the
-  ray is crossing, and behaves like today's single window inside it. A
-  slab's edge seen from the side covers the middle of a window and splits
-  it. Each tile boundary records the column's whole set of windows (a
-  batch), and sprites and models clip against the last batch nearer than
-  them.
-- **Maps without slabs render exactly as before:** pixel-identical
-  snapshots of Mission 1 and the sandbox, before and after.
-- **Placement:** things and the player start stand in the lower storey
-  unless their `z` puts them on the slab.
-- **First-version limits** (the validator rejects them): no slab in a door,
-  lift or angled-wall tile; one slab per tile. A fence in a slab tile stands
-  on the slab (a railing along a bridge). Sound travels through slabs.
-
-1. [x] **Data and level format:** `F_SLAB` and per-tile slab arrays in
-       `TileMap` (bottom, top, textures, the lower storey's light offset),
-       the legend's `slab` in `level.js`, validator errors (a slab outside
-       the tile's open space, too thin, or in a door, lift or angled-wall
-       tile), the painter and the upscaler (heights double).
-2. [x] **Renderer** (`render/columns.js`): open windows per column; each
-       window's storey (its floor and ceiling, the slab's top and underside
-       textures, the lower storey's light); the faces at each boundary per
-       window, including slab edges that split a window; rising doors,
-       angled walls and fences per window. Sprites and models clip against
-       the window batches (`sprites.js`, `models.js`). Check: pixel-identical
-       snapshots of today's maps, and frame times.
-3. [x] **Sandbox showcase:** a bridge across a hall and a walkway over a
-       room. (Built: a bridge across the hall's pit, a bunker under the
-       sniper ledge, and a railed walkway out over the courtyard.) Snapshots from the side, from underneath, from on top and from
-       above.
-4. [x] **Movement and combat:** reach-aware `floorAt` / `ceilAt` /
-       `lowFloorAt`; the player, monsters, gravity, flyers, lift riders,
-       crouching; `traceRay3D` (slab tops, undersides and edges), projectiles,
-       explosions, bullet puffs; fences on slabs; things placed with `z`; the
-       player start's `z`.
-5. [x] **Next to slabs:** a rising door beside a slab tile opens to the
-       right storey's ceiling; sprites and models under a slab take the
-       lower storey's light.
-6. [x] **Pathfinding** (`world/nav.js`): the flow field over (tile,
-       storey), so monsters cross bridges and walk under them.
-7. [x] **Tools:** the level checker's standing spots per storey
-       (`tools/lib/levelcheck.mjs`), the map viewer and the automap (the
-       upper storey drawn over the lower), `snapshot.mjs`.
-8. [x] **Tests and docs:** renderer, physics, combat, pathfinding and
-       checker tests; MODDING.md.
-9. [x] **Gate:** the sandbox's bridge runs near 60 fps in a desktop
-       browser; all tests, the validator and the smoke test pass. (In
-       headless Chromium at 16:9, slab views take 1.7-3.6 ms a frame;
-       still to see on Mark's desktop.)
-
-Later, if wanted: doors and lifts inside slab tiles, more than two storeys,
-slabs that stop sound, triggers for one storey only.
-
-- [x] **Used in Mission 1** (2026-10-13): the generator's catwalk ring and
-      bridges are grate slabs over one open shaft floor, and a rock arch
-      spans the gorge with a sniper on top.
-
-## Phase 1d: Detail and immersion (from 2026-10-13)
-
-Mark (2026-10-13): spend time on Mission 1 to really push its detail and
-immersion, and fix the engine wherever it holds the level back.
-
-### What holds it back (survey, 2026-10-13)
-
-From screenshots of every area with the Dark Forces art, and the code:
-
-- **Light is per tile, and steep.** A pool of light is a square of tiles
-  with hard edges. Distance darkening (`view.js`: 4 light units per
-  colormap level, `DIMINISH` 40, fog 0.15) turns anything 10 m away
-  nearly black in a space lit at 144, so the generator chamber and the
-  canyon read as black voids. Nothing gives light: bolts, muzzle flashes
-  and explosions light nothing.
-- **The canyon is a box.** Every rock wall rises straight to the sky
-  height (12 m), so the sky is a sliver and the cliffs have no skyline.
-  The floor is SecBase's grey rock (DF's dirt snapped to blood red in our
-  palette), and distance fades to black instead of night haze.
-- **One texture per wall tile, floor to ceiling.** The garrison's face
-  can't have a base course with rock above it, and big walls (the reactor
-  column, the canyon, the shaft) repeat one texture 10 m up. No decals:
-  no signs, insignia, hazard stripes or scorch marks.
-- **Rooms are boxes.** Flat ceilings, bare floors, no trim, few props
-  (crates and consoles as sprites, four models).
-- **Silent and still.** No ambient sound (reactor hum, wind, machinery),
-  no particles (steam, sparks, dust), no translucency (glass, shafts of
-  light, holograms).
-- **The palette is Raccoon Alex's.** Snapping the DF art to it costs 11.6
-  RGB on average (31 on the ceiling light, 22 on the jambs); it's thin on
-  dark blue-greys, so dim SecBase walls go grey-black, and it has no sand.
-- **Props confuse monsters.** Pathfinding and sight ignore 3D models, so a
-  furnished room would trap and blind them.
-- Smaller: grates and rock shimmer at a distance (no mipmaps); the model
-  builder restarts a cylinder's texture on each face.
-
-Frame time now: 4.3 ms on average at 16:9 (16 views of Mission 1,
-headless Node, DF art). Budget for this phase: stay under about 8 ms.
-
-### Decided (2026-10-13)
-
-- **Engine first, then the level area by area**, each engine feature
-  proven in the level as it lands. Screenshots before and after every
-  area.
-- **Smooth, placed light.** Light is kept at tile corners (a light map)
-  and interpolated across floors, walls and things, with ordered
-  dithering between colormap levels. Levels place **light sources**
-  (lamps, strips, floodlights: position, radius, strength, effect), baked
-  in with falloff and shadows from walls. A tile's `light` stays as its
-  area's ambient light, so maps without sources look as before, only
-  smoother.
-- **Dynamic light:** bolts, muzzle flashes and explosions light their
-  surroundings, through open tiles only.
-- **A palette fitted to the art** (Phase 3's palette item, brought
-  forward): ramps measured from the DF textures and sprites, with more
-  blue-greys and dark tones and a desert range, keeping the ramp names
-  the generated art and models use.
-- **A semi-3D skyline** (Mark, 2026-10-13/14: the stepped ledges looked
-  like "pieces of paper", and he didn't like the rock strata bands): the
-  canyon's walls end in a low rim, and a backdrop (a coarse height grid
-  past the edge of play, drawn voxel-style where the sky shows) climbs
-  from the rim in smooth, moonlit slopes and ridges. No strata. Also
-  tried and dropped: setting the edge back in the grid itself (the rock
-  behind the face climbing in short steps to a ridge a few tiles in, then
-  sky); Mark preferred the backdrop's ridges.
-- New art is generated (`tools/art`), or cut and recoloured from the DF
-  textures already in `assets/custom/textures/` (the pack itself is on
-  Mark's machine).
-- The pickup ship on the pad becomes the **Moldy Crow** (Jan picks Kyle
-  up, `docs/story.md`): a new low-poly model.
-
-### Engine
-
-1. [x] **Palette fitted to the art.** Measure the colours of the DF
-       textures, sprites and generated art; set the ramps' key colours and
-       sizes from them (more `steel`, `navy` and near-black, a `sand` and
-       `rock` range; fewer flesh, toxic and purple entries). Report the
-       snapping error before and after, regenerate the art, check that
-       dark colormap levels keep blue-greys blue. A sandy canyon floor
-       (the DF rock recoloured, and a generated one).
-2. [x] **Light map.** `world/lightmap.js` keeps light at tile corners per
-       storey (the lower storey under slabs has its own), averaged over the
-       open tiles round each corner, so light doesn't leak through walls;
-       an optional darkening where walls meet (baked ambient occlusion).
-       The renderer reads it: floors and ceilings per pixel, walls, step
-       faces, slab edges, doors and angled walls along their length,
-       sprites, models and the weapon at their position. Light levels are
-       dithered (4x4 ordered) between colormap levels. Light effects keep
-       working; a group can be synced by name, with each tile keeping its
-       own range, so a whole pool pulses as one. Painter helpers for round
-       pools.
-3. [x] **Light sources.** Level `lights: [{ x, y, z?, radius, light, fx?,
-       min?, tag? }]`, baked into the corners within `radius` that can see
-       the source (line of sight over the grid; walls and doors block),
-       with a smooth falloff. Animated sources keep their part per corner
-       and update it each frame. `setLight` reaches sources by tag (the
-       overload kills the generator's lamps). Validator, map viewer,
-       MODDING.md, tests.
-4. [x] **Dynamic light.** Projectiles, effects and weapons get `light: {
-       radius, light }`: bolts light walls as they pass, muzzle flashes
-       (the player's and monsters') and explosions flash the room. Added
-       each frame by a small flood fill through open tiles, fading with the
-       animation.
-5. [x] **Distance and haze.** Retune the distance darkening so lit spaces
-       read across a room, and add an outdoor haze: under the sky, surfaces
-       fade toward a level's `haze` colour (colormaps blending to a
-       colour) instead of to black.
-6. [x] **Wall bands.** A wall tile can change texture with height:
-       `bands: [{ from: 8, tex: 'canyon-rock' }, { to: 0.5, tex: 'imp-trim'
-       }]`. The garrison's face with rock above, skirting trims, the
-       reactor column's bands. Validator, map viewer, tests.
-7. [x] **Decals.** Level `decals: [{ x, y, z, face, tex, glow? }]`: a
-       see-through texture on a wall face or a step face (signs, the
-       Imperial crest, hazard stripes, pipes, vents, panels). (Blaster
-       bolts left scorch marks on walls; taken out 2026-10-14.)
-8. [ ] **Translucency.** Blend tables (half and additive) built from the
-       palette; sprites, effects and fences can be translucent or additive:
-       steam, glass, shafts of light, holograms, force fields.
-9. [ ] **Emitters.** A decoration that spawns effects at a rate, with
-       spread, velocity and gravity: steam vents, sparks from a broken
-       panel, blowing dust, motes over the reactor. New FX art.
-10. [ ] **Ambient sound.** Looping positional sounds placed in a level,
-        muffled where there's no line of sight, from looping synth sounds
-        (seamless ends); occasional random one-shots (a distant cry, comm
-        chatter). Reactor hum, wind, machinery, server racks, steam.
-11. [ ] **Scrolling textures:** `scroll: [u, v]` per texture: energy in
-        the reactor core, data on screens, the pad's guide lights.
-12. [ ] **Models in pathfinding and sight.** Solid models block the flow
-        field's tiles and monster sight (low ones only below their top);
-        the builder wraps cylinder textures round.
-13. [ ] Stretch: **mipmaps** for floors and walls in the distance (no
-        shimmer on grates and rock).
-
-- [ ] **TODO: glints on armour** (Mark, 2026-10-14: a happy accident worth
-      making a feature; it will take some work). Not yet placed in the
-      order below.
-      - **What happened.** Under Raccoon Alex's palette, the brightest
-        highlight on the DF stormtrooper's armour (252,252,252: 287 pixels,
-        2.4% of the sheet) had no lit colour near it and snapped to
-        glow-yellow's white, so it was fullbright. In a dark room with a
-        lamp, a trooper standing in shadow seemed to catch the lamp on their
-        armour. Outdoors in the dark canyon, with nothing to reflect, the
-        white looked out of place. The fitted palette (step 1) added a lit
-        (253,253,253), and the highlights stopped glowing. The officer (208
-        such pixels, 118 left) and the probe droid (345, 73 left) lost some
-        too; check which of the rest are meant to glow.
-      - **The feature.** Highlight pixels stay lit like the rest of the
-        sprite, but brighten toward fullbright when a light source can see
-        the sprite, even if the sprite stands in shadow. With no source
-        about (the canyon at night) they're plain lit white.
-      - **A sketch.** Mark the pixels per sheet (`glint: [[252, 252, 252]]`
-        at import, kept as a mask beside the frames, or a small `glint`
-        palette range). A second light map channel holds light from
-        sources only (no ambient), baked like the light map, with line of
-        sight but a longer reach than the source's own radius; dynamic
-        lights add to it too, so a muzzle flash makes the troopers' armour
-        flash in the dark. The sprite drawer uses the higher of the two
-        levels for glint pixels. Maybe: stronger when the source is on the
-        viewer's side of the sprite, a per-source `glint: false`, models
-        with shiny faces.
-      - **Check** with screenshots: a trooper in shadow in a lit room (the
-        old look), in the dark canyon (no glints), under a muzzle flash and
-        a passing bolt.
-
-### Mission 1
-
-14. [ ] **The canyon.** A skyline (done): the walls end in a low rim of
-        rock out of reach, and a backdrop of slopes and ridges climbs from
-        it past the edge of play (see Decided). A sandy floor with gravel
-        channels and boulders (rock models, done). Imperial
-        perimeter (done): floodlight towers (models and light sources), a
-        sensor mast with a turning dish and a blinking beacon, barricades
-        and crates by the gate. Moonlight and haze (done, step 5). Left:
-        wind and blowing dust, with emitters and ambient sound (steps 9
-        and 10).
-15. [ ] **The garrison's face.** A base wall with the cliff above it
-        (bands), a concrete overhang over the gate strip with lights under
-        it (a slab), the gate in a deep frame with hazard stripes, the
-        vent mouth as a grilled duct, a lit control window above the gate.
-16. [ ] **The vent and maintenance.** Shafts of light through the vent's
-        grate, a fan at its end. Pipes along the walls and ceiling (models
-        and a duct slab), machinery, a workbench, steam from a valve, the
-        broken light sparking, hum.
-17. [ ] **The barracks.** The corridor with pilasters, ceiling beams and
-        recessed light panels (sources), signs and the crest; bunk beds and
-        lockers in the bunk room; a desk, chair and a holotable with a
-        translucent hologram in the office, and a window out of it.
-18. [ ] **The data vault.** Rows of blinking server racks (models) making
-        aisles to fight through, a raised dais with the data terminal,
-        floor light strips, cold mist, server hum.
-19. [ ] **The generator** (the showpiece). The column in bands (plinth,
-        a glowing core with scrolling energy, light rings), conduits from
-        the walls into it, struts under the catwalks, banded shaft walls
-        with vents and signs, hanging lamps; steam and sparks; a deep
-        hum. The overload: a klaxon, red strobes, the lamps die, bursts of
-        sparks and steam.
-20. [ ] **The way out.** A deep chasm (lift L3 from the bottom), the gantry
-        with a floodlight, the pad open to a view east down the canyon
-        (the map grows east), landing lights, the Moldy Crow.
-21. [ ] **Tune and check.** Light and sound mix, frame time, cover and
-        enemy positions round the new props, the per-skill check; tests,
-        the validator, the map viewer, the smoke test, MODDING.md and
-        `docs/mission1.md`.
-
-Order: 1-5 (the look), 6-7 with 14-15 (outside), 8-11 with 19 (the
-generator), 12 with 16-18 (the interiors), then 20, 21 and 13. Each step
-is committed with screenshots checked, and tests, the validator and the
-smoke test passing.
-
-## Phase 2: Dark Forces systems
-
-- [ ] A mission briefing screen (scrolling text over a picture) before each
-      level.
-- [ ] Mission objectives. The exit only works once they're done.
-- [ ] A PDA screen with the map and an objectives checklist.
-- [ ] Lives and checkpoints instead of saves, with extra-life pickups.
-- [ ] Lives on the HUD, once lives exist (the corner HUD itself is Phase 1b
-      H).
-- [ ] Visible blaster bolts for both enemies and the player: slow and
-      dodgeable, with inaccurate stormtroopers.
-- [ ] **TODO: smarter enemies around heights** (left over from Phase 1
-      step 7):
-      - Monsters with no walking route to the player hold still and shoot
-        when they can see them. Today they walk at the player and stall
-        against the ledge face.
-      - A sniper on a ledge holds its position instead of pacing along the
-        edge.
-      - Monsters ride lifts on purpose: wait for one, step on it and ride it
-        to the player's level. Today they only end up on one by accident.
+| Engine | **Height grid, our own** (2026-10-11, confirmed 2026-10-12). Tiles with their own floor and ceiling heights, rising doors, lifts, angled walls (one line per tile), two storeys per tile (slabs), see-through fences and 3D models for what the grid can't shape. Rejected: The Force Engine, GZDoom, Godot with TrenchBroom. No WebGL renderer (2026-10-15). |
+| Platform | **Desktop browsers** (2026-10-12). No phone target: no phone performance gate, and no touch controls (removed 2026-10-17). |
+| Scale | 1 tile = 0.5 m, 32 texels per tile; the player is 1.7 tall, eye at 1.25. |
+| Resolution | **1x and 2x** (Mark, 2026-10-18): the 3D view at 320x200 or 640x400; the HUD and menus stay 320x200 pixel art, drawn as 2x2 blocks. Not 1.5x: the HUD's pixels come out unevenly 1 and 2 wide. |
+| Story | **Bad Paper** (`docs/story.md`, 2026-10-13): a prequel to Dark Forces. Kyle Katarn takes a Guild bounty on Tatooine as cover for the Alliance; Jan Ors flies him in and out in the Moldy Crow. Only Mission 1 (Mos Eisley) is free roam; the rest is run-and-gun. |
+| Scope | **A vertical slice first**, then decide on more missions. The slice is **Mission 1, Mos Eisley** (2026-10-17): the first level we make. The Canyon Garrison already built (`m3`) is the story's Mission 3. |
+| Title and repo | **Rogue Contract**. Public repo `mjvdw13/rogue-contract`, served by GitHub Pages from `main`. "Star Wars" and "Dark Forces" stay out of the title. |
+| Art, sound and rights | A non-commercial fan game. Mark's decisions (2026-10-12, 2026-10-15): ripped Dark Forces art and sound effects are committed in `assets/custom/` and used on the hosted site, through `overrides.json` and `sound-overrides.json`, with generated art and synth sounds as the fallback (and what tests and the smoke test use). Characters Mark makes with AI image tools are committed as our own art. Music stays original: no note-for-note John Williams. |
+
+## Waiting on Mark
+
+These need Mark to try something, or to decide. Don't start them without him.
+
+- **Mos Eisley's east third, blocked out** (`?map=m1`, 2026-10-29; the
+  areas in `docs/mission1.md`): plain volumes to try the route, no detail.
+  Walk east past the blast doors: the street climbs two steps to the
+  checkpoint's gate. Two ways past it: the informant's den, open to the
+  alleys' mouth north of the street (stepping in is a stand-in pass that
+  opens the gate), or the back lane to the rubble at its end, up onto the
+  roofs, two running jumps and a drop into a yard in the old quarter.
+  Then the slanting main street (or the dry wash, down steps at the north
+  street's end) to the derelict bay; stepping into the stand-in hull's
+  hold (Rusk) turns the town: the gate opens, troopers come over the
+  bay's rim, in at the old quarter's north street and onto a roof. The stand-in ending: clear customs' two troopers in their office
+  by Bay 87. To judge: the distances and the climb, the slant, whether
+  the roofs read as a way over from the checkpoint, the derelict bay's
+  depth. The comm tower stand-in (22 tall) is hidden from the market by
+  K; the real one is a model and can stand taller. Also: grime and
+  clutter now take a seed per wall, so building elsewhere no longer
+  moves them, which re-rolled them all once (same look, other spots).
+
+- **Mos Eisley's middle, blocked out** (`?map=m1`, 2026-10-29): the
+  cantina, the junk yard, the alleys and Bay 86, as plain volumes. The
+  cantina (relaid 2026-10-30 after Mark's references): in by S's door
+  on the market, an entry that turns into the vestibule, two steps down
+  into a wide room with its front corners cut at a slant, niches along
+  the sides, a stage on the east; the U-shaped bar under an opening lit
+  from above, open at the back into the back-bar, whose door leads
+  through a back room and up two steps to the back door on the back
+  lane, past the blast doors (go round the bar's east end, where the
+  counter stops short). The junk yard: up the
+  alley between H and I, through a gate and two steps down; a slanting
+  heap of scrap, stand-ins for the crane and furnace, the sandcrawler
+  (a block) over the low north wall. The alleys: up the alley between I
+  and J (or through the junk yard's side gate) to a yard behind J, a
+  slanting lane up to a second yard (the hostel's room off it), another
+  up to a square at their east end (the thug's room off it),
+  and two steps down to the mouth by the checkpoint. Bay 86: the yard
+  past R ends at bars over the pit, customs troopers by a stand-in hull.
+  Each way round the blast doors works on its own (checked with the
+  street shut there). To judge: the cantina's size and the bar under the
+  opening, the alleys' length and bends, whether the sandcrawler shows
+  enough from the market. Known: the cantina's angled walls (its cut
+  corners, the bar's round end) are open to the sky along a thin strip
+  (angled walls can't take a ceiling), and the opening's edge is
+  stepped; both go
+  with the cantina's detail.
+
+- **Character sheets for Mos Eisley** (`docs/mission1.md`, Characters):
+  cantina aliens (4-6 kinds), the band, the bartender, the broker, the
+  informant, the thug, the customs officer, the bay owner, the water
+  seller, Rusk, a dewback and a power droid. Until they exist, villagers
+  stand in.
+- **Mos Eisley's first look** (`?map=m1`, the west end of the main street,
+  rebuilt with every building a volume: alleys, rounded corners, set-back
+  storeys, a porch, a lean-to, a domed tower, a shop to walk into, and dome
+  toppers on nearly every roof, sized to it):
+  the sky and how dark the suns' shade is.
+  Dust in the air: 90 soft `glint` specks round you, sinking slowly
+  (`dust` was too hard to see, glowing motes too intense, then Mark
+  halved the glints twice from 240 to 60). 90 is a trial of 50% more
+  (2026-10-18): keep it or go back to 60? (`count` in m1.js).
+  No suns painted on the sky (Mark, 2026-10-17). The textures are fine
+  but a little monochrome: being worked on under Mission 1, "The look".
+
+- **Hangings in Mos Eisley** (`?map=m1`): five cables (one high, from
+  C's tower to F's upper storey), two ropes, a rag curtain over B's porch
+  doorway, valances on the market stalls, a long banner on G's west wall and a
+  sheet slung across the north back lane. The look (the generated
+  `cloth-rag` and `cloth-pale`, their tears about 1 unit deep, so short
+  cloths are mostly tatters), how fast and far they sway (`breeze`), and
+  how many. 0.04 to 0.38 ms a frame at six views (headless, 320
+  columns); the dearest is the lane's sheet up close.
+
+- **Grime in Mos Eisley** (`?map=m1`): streaks off every straight
+  roofline, dust above the walls' feet, stains and cracks, a drip under
+  each window and smudges by the doors' controls (`town.grime()`, about
+  0.2 ms a frame). How dark (the pictures' greys,
+  `tools/art/textures/grime.js`) and how much (`town.grime({ amount })`,
+  or a house's own `grime`). Rounded corners and round walls have none
+  (the new slanting fronts past the market have it).
+
+- **Awnings, tin, pipes and clutter in Mos Eisley** (`?map=m1`): cloth
+  awnings on the market (I olive, and the stalls; off the houses since
+  Mark's film stills, 2026-10-18), a
+  tarp over a stall on the square, tin on C's lean-to and B's porch,
+  downpipes, tanks, box units, conduits and vents on the walls, and the
+  street clutter: crates, drums, pressure canisters, cargo pods, power
+  units, junk and litter with droid domes, rubble, scrap and a vaporator
+  (no jars or sacks: Mark, 2026-10-18), set along the walls by
+  `town.clutter()` and by hand on the main street (a stall selling droid
+  parts under the tarp). How they look, how much clutter (`amount`),
+  whether the tarp and the valance sway too much, and whether more stalls
+  should sway. The cloth redone (Mark, 2026-10-18: the stripes and
+  scallops looked medieval): plain, muted and ragged, bleached in
+  blotches, patched with scraps of other cloth, the hems torn to tatters;
+  faded teal is the splash, and a dark `umber` for contrast (a
+  stall). Whether the colours are right and the tears
+  ragged enough. All the new models together cost 0.44 ms a frame on
+  average over eight views, 0.75 at worst (headless, measured with the
+  machine at about half its usual speed).
+
+- **The landspeeder** (`?map=m1`, back on the main street in front of C,
+  nose west, turned 15 degrees off the line of the street): the bob made
+  subtler (Mark, 2026-10-18: 0.02 up and down every 3.2 s, was 0.05 every
+  2.6) and the grime shadow, a third of the light under the hull. Whether
+  the bob is right now, and the angle. About 0.7 ms a frame near it, 2.1
+  standing over it (headless).
+
+- **Docking Bay 87's floor** (`?map=m1`, round you at the start, Mark
+  2026-10-18: more detail, big crates, hoses): crates 2 tall (above you)
+  stacked two high on the west and south, a long rust crate, drums, and
+  hoses from two pumps: one with its nozzle on the floor, one coiled.
+  All round the edge, clear of the stairs, the pit and the Crow. Mark's
+  first notes (2026-10-18) took out the hose into the Crow, the tool
+  cart, the container and the repulsor pallet.
+  The fuel pumps now wear DF's FuelStat panels (2026-10-20): whether the
+  front's gauges, the hazard band and the dark rubber hose read right.
+
+- **The Moldy Crow** (`?map=m1`, hovering in Docking Bay 87, nose east
+  and turned 20 degrees south of it, in front of you at the start, a
+  little south of the maintenance pit): its shape against the HWK-290
+  views (the deep hull and raked bow, the fins, the wings angled down),
+  its size (drawn at 0.8 of canon after Mark's first look: 23.2 long,
+  18.9 across the wings), how it sits (2 off the floor, bobbing 0.04 over
+  4 s, over soft shadows) and JK's textures on it (the cockpit windows
+  high on the nose's flanks, the engines glowing cyan along the wings'
+  trailing edges, the sponsons' and arms' fronts the grille and lights
+  off the back's texture, no longer plain red; the pod's barrels
+  thicker and longer after his second look, with collars and
+  muzzles a little wider than the tubes, their bores black). Only
+  its gun pod collides: you walk under the hull and wings, and shots at
+  your height pass under them. Over the pit, the pod would block the way
+  along it to the secret (the level checker isn't height-aware), hence
+  the spot. 166 faces; about 1.5 ms a frame on average over eight views
+  round the bay, 4 at worst (close up), the new barrels 0.15 and 0.8 of
+  that (headless). Then it replaces the placeholder shuttle on
+  m3's pad, and the drop-off flies it.
+
+- **The main street east, the market and the water plaza** (`?map=m1`,
+  2026-10-18): the street on to x 136 past the blast doors' frame (flush
+  steel strips, easy to miss) and its bend; six stalls with their
+  stallholders, the droid seller's pen, cables and cloth; the condenser
+  tower (the landmark), the water seller and his queue under a teal tarp,
+  the dewback trough. The cantina's front, the stable, the garage and the
+  rooftops' first house are plain houses until their steps. The tower's
+  look and height, the stalls, how full the market feels. Frame time
+  (headless): the market adds about 1.2 ms a frame, the plaza 1.6 on
+  average but 3 to 4 standing by the queue's tarp (not yet looked into:
+  maybe drop the tarp or make it smaller).
+
+- **Calm troopers and Jawas in Mos Eisley** (`?map=m1`, 2026-10-18,
+  `things/calm.js`): most stand about. A commander and a trooper walk the
+  main street side by side, from the west end to the blast doors and
+  back; a second commander stands talking to a trooper in the market; a
+  guard stands at the blast doors. Six Jawas: two haggling at the droid
+  seller's pen, two standing by the street, one strolling the street and
+  one the north back lane. Bump into one or press use to hear a line.
+  Firing a blaster or hitting anyone turns the whole town at once (and
+  since the east third's blockout, the `on: 'hostile'` trigger opens the
+  checkpoint and brings stand-in troopers). After
+  Mark's notes (2026-10-18): they stroll slower (troopers 1.2 tiles a
+  second, Jawas 1.5), their legs keep pace (the new calm `stride`: 1.4
+  tiles a walk cycle for a trooper, 0.9 for a Jawa), and they stand in
+  the sheets' turnaround poses when stopped (the Jawa's has no side view,
+  so side-on it shows the front turned a little). To check by eye: the leg speed, and
+  the commanders' lines. Still open: the
+  lines (the Jawaese is made up), and whether Jawas should run rather
+  than fight when the town turns (the story has civilians run; Jawas are
+  monsters, so they fight).
+
+- **Real doors in Mos Eisley** (`?map=m1`, 2026-10-18): every door is a
+  rising door; the ones with nothing behind are locked (the locked sound
+  on use). The jambs' bevelled corners in the wall's plaster and skirt.
+  The shops' shutters are doors too, D's porch is 4 wide so its door is
+  centred, and Docking Bay 87's door is DF's X-braced cargo door, 4x4.
+  Whether the bay door's grey is right, and whether any locked door
+  should open into a room. The bay door now has a 4-wide round hood and a
+  buttress either side of it (2026-10-20): whether it feels like Mos
+  Eisley now (the hood hides the controls panel beside the door).
+
+- **Round-topped arches in Mos Eisley** (`?map=m1`, after Mark's film
+  stills): hoods standing out round F's, H's and M's doors (a half circle
+  on two legs, 0.45 deep, taller than the door, its sign and controls
+  inside), and B's, D's and K's porches rounded under their lintels. The
+  hoods' fronts take the wall's light, so they read by the shade under the
+  curve, as in the film; whether they want to be deeper or stand out more,
+  and which other doors want one.
+
+- **The dewback** (`?map=m1`, at the main street's north edge, at (44.5, 64.5)
+  facing west, against blank wall between two doors; also in `?map=sandbox`):
+  a decoration that stands about, solid, radius 1. Its size (2.1 tall to the
+  saddle's horn, about 4.4 long), the colours (the palette's olive ramp makes
+  the hide greyer than the sheet's green), the idle (the head up and the tail
+  down three pixels, in three slices, with two in-between poses, and back
+  every 4 s), and where it stands: it's only placed once so far, and the stable
+  and the patrol want more. Place one with `at('dewback', x, y, { angle })`.
+
+## Next up
+
+In this order unless Mark says otherwise.
+
+### 1. Mission 1: Mos Eisley
+
+The story's Map A. The design (areas, light, the town kit, art and sound
+lists) is `docs/mission1.md`. It pulls in the story pieces it needs from
+section 5 as it goes (calm troopers, the town's switch, conversations, the
+fob). Each step is a commit with snapshots, playable at `?map=m1`.
+
+- [x] Design: `docs/mission1.md`.
+- [x] **Daylight and the kit:** `sky-day` and a warm haze; DF textures
+      recoloured; `lib/town.js`; a bigger glyph pool; `m1` with a first
+      stretch of street (`?map=m1`).
+- [ ] **The look** (Mark, 2026-10-17: get the first stretch right before
+      new areas; it's a little monochrome, wants variation and detail such
+      as doors). Snapshots before and after each step.
+  - [x] Colour: more plasters (ochre, rose, grey) spread over the houses,
+        a dirty skirt along every wall's foot (a band), sand drifts.
+  - [x] Doors and windows, inset: doors after Mark's reference (a
+        lattice door, a tiled jamb, a sign and controls) and windows in
+        notches, cut from DF textures; `town.door()` and `town.window()`.
+  - [ ] **Grime** (Mark, 2026-10-17: break up the plain plaster): decals
+        that darken the wall under them instead of covering it, so one set
+        fits every plaster and nothing repeats.
+    - [x] Engine: `grime: true` decal textures (a texel's grey is the
+          share of light it leaves), drawn as darker colormaps over what's
+          there and fading out into the haze. Defs, validator, MODDING.md,
+          tests; m3 and sandbox snapshots byte-identical.
+    - [x] Art: generated grime decals: streaks, drips, blotches, smudges,
+          cracks, dust above the skirt.
+    - [x] Town kit: `town.grime()` weathers every straight wall under the
+          sky (streaks from roof edges and under windows and signs,
+          smudges by doors, cracks, blotches, dust), and a house's `grime`
+          says how much (0 clean to 2 neglected). Frame time before and
+          after.
+    - [ ] Bare brick where the plaster has fallen: ordinary decals cut
+          from `adobe-brick` with ragged edges.
+    - [x] In Mos Eisley: snapshots, then Waiting on Mark.
+  - [ ] **Docking Bay 87's fittings, textured** (Mark, 2026-10-20, the
+        look guideline in CLAUDE.md): one object at a time from the DF
+        pack, a commit and a check-in with Mark after each. Everything
+        should look broken-down and dirty (Mark, 2026-10-20): rusty pipes,
+        rust and soot on the panels (`WORN` in derive.mjs), dead lamps.
+        Skipped as too far or too small to see (Mark, 2026-10-20): the
+        rim lamps, the ribs' iron band and cap.
+    - [x] Fuel pump (FuelStat's gauge panel, hazard band, louvres, ribbed
+          hose on the reel).
+    - [x] Fuel line: chrome pipes, FuelStat's brass elbow and gauge on
+          the manifold, a valve wheel.
+    - [x] The two hoses: ribbed rubber, orange and black, nozzle capped.
+    - [x] Big crates' iron straps: skipped (Mark, 2026-10-21).
+    - [x] The astromech dome (`models/clutter.js`, in the droid seller's
+          pen and on the street: white paint, blue panels, scorched).
+    - [x] The cargo pod (`models/clutter.js`, shared with the town):
+          scorched tin, plate ends, rusty hoops, rubber skids.
+    - [x] Barrels and canisters: soot blotched over their tin bodies
+          (`drum-rust`, `drum-grey`), not their hoops and lids.
+  - [ ] Waiting on Mark.
+  - [ ] **The market's fittings, textured** (Mark, 2026-10-21): the same
+        way, one object at a time, a commit and a check-in after each.
+    - [x] Market stall (`models/market.js`): crates for wares, textured
+          power cells, worn plate on the counter and rack tops, a rubber
+          plinth.
+    - [x] The condenser tower: plates, rings, collar, cap, pipes, tap,
+          in the bay's worn plate, rusty pipe and valve wheel.
+    - [x] The dewback trough: large stones like the tower's plinth, murky
+          water (the tap's basin too).
+    - [ ] The droid seller's power unit, scrap and junk heap (check what
+          is still flat).
+- [ ] **An X-34 landspeeder on the main street** (Mark, 2026-10-18, after
+      his schematic and the weathered prop): a model, hovering, textured
+      like the town.
+  - [x] Textures: peach and rose paint and rusty engine metal from DF's
+        IWGREYC2, the engines' intakes from IWENGBAC (derive.mjs); glass
+        glints and a dithered shadow, generated.
+  - [x] The model (`models/speeder.js`): the hull, the open cockpit with
+        its seats and windscreen, the side intakes, three engines on
+        their pylons. Collision lines; under the face budget.
+  - [x] Parked on the main street; snapshots.
+  - [ ] Waiting on Mark.
+- [ ] **Buildings after the film** (Mark's stills, 2026-10-18; the shapes
+      are in `docs/mission1.md`, "What the film shows"). A step at a time,
+      checking in with Mark after each.
+  - [x] Notes; awnings off the houses (I's on the market stays).
+  - [x] Round-topped arches: a hood standing out round a door, and
+        rounded openings on porches.
+  - [x] Low walls, kerbs and steps: E's yard, kerbs on A and Q, N up
+        three steps, doors a step up on C, H and Q.
+  - [x] Sloping buttresses and a stair up a house's side: F and G,
+        a stair up D's east side to a door on a landing.
+  - [ ] Hitching rings on walls; perforated canisters and engine rings
+        in the clutter.
+- [ ] **Block out the whole town first** (Mark, 2026-10-29: level design
+      before details). Every area as plain volumes at their final
+      heights, with the real ways between them and stand-ins for the
+      landmarks; no clutter, grime, hangings or textured fittings. Each
+      area gets a slant and a change of level (`docs/mission1.md`, "Off
+      the grid, and up and down"). Message triggers stand in for the
+      story until conversations and the fob exist.
+  - [x] Paper pass: the map and area table in `docs/mission1.md` fitted
+        to what's built, and the open questions answered there: where the
+        junk yard goes, the two ways round the blast doors, the way past
+        the checkpoint, the landmarks.
+  - [x] The east third: the checkpoint, the rooftops, the old quarter
+        and the dry wash, the derelict bay, the comm tower.
+  - [x] The middle: the cantina's shell (its back door on the back lane,
+        built with the rooftops), the alleys (on to the mouth by the
+        checkpoint), the junk yard, Bay 86 to look into.
+  - [ ] Play both halves (rough troopers for the loud half), then
+        Waiting on Mark.
+- [ ] **Then each area in detail**, in the order the blockout suggests:
+  - [ ] The cantina: entrance, steps down, the main room, the bar,
+        booths, bandstand, back rooms.
+  - [ ] Bay 86, the dewback stable and the speeder garage.
+  - [ ] The Jawa junk yard and the sandcrawler.
+  - [ ] The back alleys and the back lane.
+  - [ ] The checkpoint and the rooftops.
+  - [ ] The comm tower.
+  - [ ] The old quarter and the dry wash.
+  - [ ] The derelict bay and the gutted freighter.
+  - [ ] The skyline: dunes and mesas in the backdrop, the town's edges.
+- [ ] **Life:** the cantina's customers, the customs officer, the
+      dewback with the patrol; the blast doors shutting and the music at
+      the switch (the `on: 'hostile'` trigger opens the gates and brings
+      stand-in reinforcements). Calm troopers and Jawas are placed.
+- [ ] **Air and sound:** dust, emitters, ambient sound, the cantina band
+      (sections 2 and 3).
+- [ ] **The story:** conversations, the fob, the drop-off and pickup, the
+      loud half (section 5), in place of the blockout's stand-ins: the
+      informant's den opening the gate, Rusk's hold (open now; shut until
+      the fob has the signal) turning the town, and clearing customs as
+      the pickup (shooting them early ends the level).
+- [ ] **Tune:** light, frame time with a full market, the per-skill table.
+
+### 2. Hangings: cables and cloth that sway (Mark, 2026-10-17)
+
+Cables strung between buildings, and ropes and ragged cloth hanging from
+them, swaying gently in the air: life for Mos Eisley (the market's hanging
+cloth, the alleys' laundry lines). Cosmetic, like particles: they never
+touch gameplay, keep their own clock and never use `world.rng`. Budget:
+the whole town's under 0.5 ms a frame, simulation and drawing together.
+
+- **Simulation** (`world/hangings.js`): points in typed arrays (position,
+  last position, pinned), links as index pairs with rest lengths (a
+  cloth's run across each cell too, so it holds together as a sheet).
+  Verlet: gravity, drag toward the air, `stiffness` passes over the links
+  (forward then back), then tethers: each free point is never further
+  from its pins than it was at rest (both ends of a strung cable: onto the
+  circle where the two spheres meet), so long chains don't stretch and a
+  cable keeps its sag. The air is the level's wind (times the type's
+  `wind`) plus a breeze of slow waves travelling down the street. Each
+  hanging steps every other tick (30 a second, half on even ticks and half
+  on odd). Hangings more than 40 tiles from the camera hold still; all
+  settle at load (2 s of steps).
+- **Drawing** (`render/hangings.js`, and the model drawer for cloth): a
+  rope segment is one span of rows per screen column, at least 1 px
+  thick, clipped like particles and writing `mdepth`. A cloth is a model
+  of one two-sided quad a cell, shaded by its slope, textured at 32
+  texels a tile with the texture's bottom row on its hem (Mark,
+  2026-10-17: the tears are transparent texels in the texture, not cut
+  from the shape). `cloth-rag` and `cloth-pale` are generated
+  (`tools/art/textures/cloth.js`).
+- **Content:** `defineHanging` (MODDING.md, Hangings); level `hangings`.
+
+Bench (Chromium, the Mos Eisley start, 504 columns, best of 6 batches of
+60 frames, `renderer.hangingMs`, frames about 9.3 ms). Cables run right
+across the street, cloths are 1 x 1 m and textured:
+
+| count | cables, draw | cables, move | cloths, draw | cloths, move |
+|-------|--------------|--------------|--------------|--------------|
+| 10    | 0.12         | 0.02         | 0.32         | 0.03         |
+| 20    | 0.21         | 0.03         | 0.45         | 0.05         |
+| 40    | 0.44         | 0.06         | 0.79         | 0.12         |
+| 80    | 0.89         | 0.13         | 1.32         | 0.22         |
+
+So about 10 cables and 10 cloths in view at once is the budget (0.48 ms).
+Found on
+the way: the model drawer's per-pixel walk of the ledge windows was its
+hottest line in Mos Eisley (now a binary search per column: models there
+21% faster, byte-identical). The cap is 4096 points a level.
+
+Steps:
+
+- [x] First cuts of the simulation and drawing, and the bench.
+- [x] The content and level fields: defs, validator, MODDING.md, tests.
+- [x] In Mos Eisley: cables across the street, a few rags and a banner.
+- [ ] Explosions push the hangings near them (a blast flaps the cloth).
+
+### 3. Particles into the game (from the particle system, 2026-10-15)
+
+The explosion styles (`src/content/explosions.js`) are only used by the
+detonator (`large`) and the concussion rifle (`concussion`).
+
+- [ ] The probe droid's death and the fuel barrel: a particle explosion
+      instead of the `explosion` sprite (no sprite: Mark's decision).
+- [ ] Rockets (Boba Fett): `small` where they burst, and a smoke trail.
+- [ ] Sparks where blaster bolts hit walls (`bolt-spark`; `ion-spark` for the
+      Jawa's ion bolts).
+- [ ] **Emitters** in levels: steam vent, sparking panel, fire with embers
+      and a light, reactor motes; tags, `setEmitter`, a distance cut-off.
+      Validator, map viewer marks, MODDING.md. Then in Mission 3: the
+      maintenance valve and broken light, the generator.
+- [ ] **Weather:** sand and wind in the canyon (a wrapping box of particles
+      round the camera, only under the sky). For Mos Eisley later: `dust` at
+      about 100 (Mark: "perfect for sunny Mos Eisley").
+      - [x] Level `weather: { type, count, range, z, drift, wind }`
+            (world/weather.js): defs, validator, MODDING.md, tests; the
+            snapshot tool fills it round the camera.
+      - [x] Mos Eisley: `dust`, as thick in view as the bench's 100.
+      - [ ] The canyon: sand on the wind, with gusts.
+- [ ] Bench again with everything on (does the budget hold?).
+
+### 4. Mission 3 (the Canyon Garrison): detail and immersion
+
+Engine pieces still to build, each proven in the level as it lands:
+
+- [ ] **Ambient sound:** looping positional sounds (muffled without line of
+      sight) and occasional one-shots. DF has WIND1, MACHINE1/2, RUMBLE1,
+      ELECTRIC in `assets/custom/sounds/`.
+- [ ] **Scrolling textures:** `scroll: [u, v]` per texture (the reactor core,
+      screens, the pad's guide lights).
+- [ ] **Translucent sprites and fences** (the blend tables exist, from the
+      particles): glass, shafts of light, holograms, force fields.
+- [ ] **Models in pathfinding and sight:** solid models block the flow field
+      and monster sight (low ones only below their top). Today a monster
+      walks into a tank and stalls, and sees and shoots through it.
+- [ ] Stretch: mipmaps for distant floors and walls (grates and rock shimmer).
+
+Areas, each with screenshots before and after:
+
+- [ ] **The canyon:** wind and blowing dust (with the emitters, weather and
+      ambient sound above).
+- [ ] **The garrison's face:** a base wall with the cliff above (bands), a
+      concrete overhang over the gate strip with lights under it (a slab), the
+      gate in a deep frame with hazard stripes, the vent mouth as a grilled
+      duct, a lit control window above the gate.
+- [ ] **The vent and maintenance:** shafts of light through the vent's grate,
+      a fan, pipes along walls and ceiling, machinery, a workbench, steam from
+      a valve, the broken light sparking, hum.
+- [ ] **The barracks:** pilasters, ceiling beams, recessed light panels, signs
+      and the crest; bunks and lockers; a desk and a holotable with a
+      translucent hologram in the office.
+- [ ] **The data vault:** rows of blinking server racks (models), a raised
+      dais with the terminal, floor light strips, cold mist, server hum.
+- [ ] **The generator** (the showpiece): the column in bands with a glowing,
+      scrolling core and light rings, conduits, struts under the catwalks,
+      hanging lamps, steam and sparks, a deep hum. The overload: a klaxon, red
+      strobes, the lamps die, bursts of sparks and steam.
+- [ ] **The way out:** a deep chasm, the gantry with a floodlight, the pad
+      open to a view east down the canyon, landing lights, the **Moldy Crow**
+      model in place of the placeholder shuttle.
+- [ ] **Tune and check:** light and sound mix, frame time, cover round the new
+      props, the per-skill check; `docs/mission3.md`.
+
+### 5. Dark Forces systems
+
+- [ ] A mission briefing screen (scrolling text over a picture).
+- [ ] Mission objectives; the exit only works once they're done.
+- [ ] A PDA screen with the map and the objectives.
+- [ ] Lives and checkpoints instead of saves, extra-life pickups, lives on
+      the HUD.
+- [ ] **Smarter enemies around heights:** a monster with no walking route to
+      the player holds still and shoots when it can see them (today it walks
+      at them and stalls against the ledge); a sniper holds its ledge instead
+      of pacing its edge; monsters ride lifts on purpose.
 - [ ] A headlamp that drains batteries, infrared goggles and a gas mask.
-- [ ] Music that switches between exploration and combat tracks when enemies
-      wake up, like iMUSE.
-- [ ] Stretch goal: enemies drawn from 8 angles, rendered from the clay
-      models.
+- [ ] Music that switches between exploration and combat (like iMUSE).
 
-### For the story (`docs/story.md`)
+### 6. For the story (`docs/story.md`)
 
-About a dozen pieces, all small or medium, and no new rendering technique:
-most extend code that already exists. After Phase 1c (two storeys). Order: the Crow pieces first (every
-mission uses them, and they give Mos Eisley's opening), then calm troopers
-and the switch, then conversations, then the fob. Each new action or
-trigger is registered and checked by the validator (`validate.js` rejects
-unknown actions), documented in MODDING.md and covered by tests.
+Small or medium pieces, mostly extending existing code. Each new action or
+trigger goes in the validator (it rejects unknown actions), MODDING.md and a
+test. Order: the Crow pieces, then calm troopers and the switch, then
+conversations, then the fob.
 
-**Every mission: the Moldy Crow's drop-offs and pickups**
+- [ ] **`fly` action:** moves a model decoration along timed keyframes (x, y,
+      z, facing, seconds).
+- [ ] **`cutscene` action:** the view from a tagged spot looking at a target
+      for a few seconds, HUD and weapon hidden, input locked; use or fire
+      skips. An override of `world.camera()`.
+- [ ] **`wait` in trigger lists:** a trigger's actions can pause.
+- [ ] **Conversations:** an `on: 'talk'` trigger from `npcReact`, lines that
+      move on with each use, story flags (`setFlag`, `if` on triggers).
+- [ ] **The tracking fob:** a weapon with no attack, a per-tick weapon hook
+      (blinks and beeps faster near the signal), `setSignal` and `takeWeapon`
+      actions.
+- [ ] **`remove` and `place` actions.**
+- [ ] **`damage { tag, amount }` action** (the overload hurts the prototype).
+- [ ] Nice to have: villagers who see a shooting
+      running too (only the one hit runs today), factions (Tuskens
+      against troopers).
+- [ ] Fixes that go with these: the level checker skips models placed high or
+      flying (the Crow); `spawn` stays quiet with `fog: false`; the headless
+      play test skips opening cutscenes.
 
-1. [ ] **`fly` action** (small): moves a model decoration along timed
-       keyframes (x, y, z, facing, seconds). Collision already reads each
-       thing's current position and height every tick (`world.js`
-       `tryMove`), so a Crow up in the air blocks nothing.
-2. [ ] **`cutscene` action** (small to medium): for a few seconds the view
-       comes from a tagged spot looking at a target, the HUD and weapon are
-       hidden and input is locked; use or fire skips it. An override of
-       `world.camera()`, which the renderer draws from.
-3. [ ] **`wait` in trigger lists** (small): a trigger's actions can pause,
-       for the landing's timing, Jan's lines and Mission 2's "two
-       minutes". Today a trigger runs all its actions at once.
+### 7. Content for the slice
 
-**Mission 1's free roam**
+- [ ] Enemies still missing: a commando, and the mini-boss (a prototype
+      assault droid, an early Dark Trooper test).
+- [ ] An E-11-style rifle.
+- [ ] Items still missing: batteries (for the headlamp), the objective item
+      (a data tape).
+- [ ] The finale has its own picture (it reuses the title and intermission
+      ones).
 
-4. [ ] **Calm monsters** (small to medium): a placed monster with `calm`
-       skips the idle "can I see the player?" check (`monster.js`), stands
-       its post or wanders, and says lines when bumped or used, using the
-       friendly characters' reaction (today only `kind === 'npc'` gets
-       bump reactions, `world.js` `tryMove`).
-5. [ ] **The town's switch** (small): a `hostile` action turns every calm
-       monster into an idle one at once (it fights when it sees or hears
-       Kyle, but doesn't chase; see 29), with an `on: 'hostile'` trigger (blast
-       doors, reinforcements, combat music). The player firing runs it too
-       (hook it where a shot makes noise, `weapons.js` `if (def.noise)`), and
-       so does any damage the player deals.
-6. [ ] **Conversations** (small to medium): an `on: 'talk'` trigger raised
-       from `npcReact` (`npc.js`), NPC lines that move on with each use, and
-       story flags (`setFlag`, plus `if` on triggers).
-7. [ ] **The tracking fob** (small to medium): a weapon with no attack (the
-       weapon code assumes every weapon has `fire`), a per-tick weapon hook
-       that blinks its light and beeps faster near the signal, a
-       `setSignal` action (a tag, item or character), and a `takeWeapon`
-       action to remove it at the end. Giving it is an ordinary weapon
-       pickup in the broker's booth, which sets its first signal: the Jawa
-       trader (see 16).
-8. [ ] **`remove` and `place` actions** (small): Dace is taken in Mission
-       1 and waits at the pad in Mission 3; Mohc leaves.
-9. [ ] Nice to have: **patrol routes** (`patrol: 'street'` walks tiles
-       tagged `street-1`, `street-2`... in order) and **civilians running
-       away** when the town turns.
+### 8. 2x resolution (Mark, 2026-10-18)
 
-**Missions 2 and 3**
+The 3D view drawn at 640x400 (twice 320x200 each way), the HUD and menus
+as 2x2 blocks. It's in, behind `?res=2` (and `snapshot.mjs --res 2`); 1x
+renders byte-identical to before. It costs 2.3 to 2.8 times the render
+time (headless: Mos Eisley 18 to 45 ms, m3 12 to 28, sandbox 6.5 to 18).
+Time 1x before and after a change here in one process, alternating
+blocks of frames: separate runs on this machine drift by up to 20%.
 
-10. [ ] **`damage { tag, amount }` action** (small): the overload hurts the
-        prototype.
-11. [ ] Optional: **factions**, so Tuskens and troopers fight each other at
-        the farm (monster infighting already sets `m.target`).
+- [ ] A setting in the options menu (1x or 2x, saved with the others),
+      switching without a reload: rebuild the surface, the renderer's
+      view, the presenter's buffers and the melt.
+- [ ] Frame time in Chromium at 1x and 2x (Mos Eisley, m3, widescreen
+      and 4:3) for the record; then Waiting on Mark: the look (sparks
+      and ropes can be 1 pixel thin at 2x, the dithering is finer), and
+      whether the menu should warn that 2x needs a fast machine.
 
-**Fixes and tools that go with these**
+## Small fixes and known rough edges
 
-12. [ ] The level checker blocks the floor under a model's collision lines
-        where it spawns (`tools/lib/levelcheck.mjs`). The Crow spawns in the
-        air above the bay, so skip models placed high or marked as flying.
-13. [ ] The `spawn` action always plays the teleport sound
-        (`actions.js`); stay quiet when `fog: false`, for reinforcements.
-14. [ ] The headless play test runs every level, so it skips opening
-        cutscenes.
+- [ ] A second `Registry` built from the same content pack finds no sprite
+      sheets: the first replaces each def's inline `sheet` with a `{ ref }` in
+      the shared objects. Only tools building two registries hit it; copy the
+      defs instead of changing them.
+- [ ] Long views over Mos Eisley fill a column's 48 windows (`view.SEG`),
+      and things further off are then clipped by stale ones: a few hundred
+      pixels a view differ from a renderer with room for all of them,
+      mostly far models showing a pixel or two through nearer walls.
+- [ ] Angled-wall tiles count as fully open for reachability, so a gap
+      squeezed between two angled walls isn't checked.
+- [ ] A walker chasing the player round the small rock in the sandbox's
+      courtyard (diagonal tiles at 34-35, 28-29) stops against its east face
+      and walks on the spot.
+- [ ] The model builder restarts a cylinder's texture on each face; wrap it
+      round.
+- [ ] A low angled wall (`wallTop`) still stops bodies, shots and sight
+      above its top, and its top isn't drawn as a surface (seen from above,
+      it shows wall). Fine out of reach; needed before walkable round roofs.
+- [ ] The generated Jawa's robe has stray pixels that snap to a glow colour
+      (fix the generator's colour).
 
-**Mission 1: from the flow review (2026-10-30)**
+## Ideas, not planned
 
-A review of Mos Eisley's flow and guidance (Map A in `docs/story.md`)
-found gaps between the calm half's steps, ways round the story, and
-systems that work against each other. The fixes to the design go into Map
-A. The rest wait for the engine pieces above.
+Kept so they aren't lost; none is scheduled.
 
-*In the design (done in Map A, 2026-10-30):*
-
-15. [x] **Story order along the street.** The calm half's steps sit west to
-        east in the order you need them (bay, cantina, junk yard, alleys,
-        checkpoint), so you never walk back on yourself. The first sketch
-        put the junk yard beside the bay, west of the cantina, where players
-        reach it before they have the contract.
-16. [x] **The fob guides from the start.** The broker tunes it to the Jawa
-        trader's transponder, so it leads the short way to the junk yard and
-        teaches itself there. The trader re-tunes it to Dace's part. Before,
-        it was handed over dark, with nothing pointing to the Jawas.
-17. [x] **No way round the story.** Dace is in the freighter's hold only
-        once the fob has his signal, so going over the roofs early can't
-        reach him. The trader's lines wait for the contract.
-18. [x] **Every step still works after an early flip.** The fob is an item
-        in the broker's booth, and the Jawas' code is also on a terminal in
-        the junk yard, because the Jawas bolt when the town turns.
-19. [x] **Fewer errands.** The thug's debt goes: the pass is a dead drop in
-        the alleys that the informant sells you the place of. Collecting a
-        debt with no shooting or punching allowed was only a conversation.
-20. [x] **Tell the player the rule.** Kyle starts with his fists up, and the
-        customs officer says it: "Keep that blaster holstered in my town,
-        hunter."
-21. [x] **The detours connect.** The blast doors close just west of the
-        cantina's door. The cantina's back room opens onto a service passage
-        to Bay 87, and the alleys run behind the street from the junk yard
-        to the bay. Both are walked or seen in the calm half, past blast
-        doors standing open. The alleys are lit at their mouths and turns,
-        because they become a fight.
-22. [x] **Combat starts small.** The flip sends 2 or 3 troopers through the
-        derelict bay's door, at ground level. The fights grow on the way
-        back: the old quarter, the checkpoint's barricades, the detour, then
-        the bay.
-23. [x] **Troopers stay where you passed them.** Gunfire wakes every monster
-        within 52 steps (`noise.js`), and they chase, which would empty the
-        streets toward the first shots. Troopers posted along the way back
-        are placed with `ambush`, and the closed blast doors split the town
-        into separate fights.
-24. [x] **A beacon in the west.** Bay 87 sits below the street, so the way
-        back has nothing to aim for. After the flip the Crow circles over
-        the bay, and the bay has a control tower you can see from the old
-        quarter.
-25. [x] **Dace's capture.** It happens while Kyle is pinned in the hold, in
-        a short cutscene, and the squad's transport lifts off, so the old
-        quarter's fight isn't a chase you can't win. The objective says:
-        get back to Bay 87.
-26. [x] **Roof jumps a step under the limit.** Gaps on the roof route are 2
-        or 3 tiles, not 4 (the most a running jump clears). The climb is in
-        sight of the checkpoint gate, in the sun, and a fall lands on the
-        street west of the gate.
-
-*In the engine and the build:*
-
-27. [x] **A click that captures the mouse doesn't fire** (small, done
-        2026-10-30). `input.js` counted a mouse button as held while the
-        mouse was free, and the mouse is only captured on the click
-        (`game.js`), so that click fired a shot, and so did clicking RESUME
-        in the pause menu. In Mos Eisley the shot would turn the town. Now,
-        while the game wants the mouse captured (a level, without touch
-        controls), mouse buttons count only once it is. The smoke test
-        checks both clicks, and that a click fires once the mouse is
-        captured.
-28. [ ] **A level's starting weapon** (small, with 4): a level
-        `startWeapon`, so Mission 1 starts with fists up, not the blaster
-        (`hero.js`). Fists make no noise, so a punch at the air doesn't turn
-        the town.
-29. [ ] **The switch leaves troopers at their posts** (with 5): calm
-        troopers turn into idle monsters, which wake when they see or hear
-        Kyle, not chasing ones. A headless test fires in the derelict bay
-        and checks that the troopers at the checkpoint and in the cantina
-        are still at their posts.
-30. [ ] **`fly` can loop** (with 1), for the Crow circling over the bay
-        until the pickup.
-31. [ ] **Build order:** a current objective on screen (Phase 2's
-        objectives: one line that changes at each step, shown when it
-        changes and on the automap), and the smarter enemies around heights,
-        both before Map A is painted. The free roam leans on objectives more
-        than any other mission, and the derelict bay's rim and the roof
-        snipers need the ledge AI.
-
-**Already above, and these maps lean on them:** briefings and objectives
-(Jan and Kyle's briefings; the exit waits for objectives), and smarter
-enemies around heights (Mission 1's rooftop snipers and the troopers on the
-farm's pit rim would walk at Kyle and stall at the ledge).
-
-**No engine work needed** (checked 2026-10-13):
-
-- Mos Eisley's rooflines: a solid wall is drawn only up to the sky height
-  of the tile in front of it (`columns.js`, the solid `face()` call), so a
-  street whose sky sits just above the roofs shows the buildings with sky
-  behind them. Design rule: where a roof is walkable, the sky over the
-  streets beside it stays above Kyle's eye.
-- Sunken docking bays and the farm's courtyard, flickering firelight
-  (`lightFx`), blast doors (remote-locked doors and `closeDoors`),
-  reinforcements (`spawn`), dust (`spawnEffect`), the checkpoint pass (a
-  renamed keycard), the combat music switch (`music`), and importing 3D
-  models.
-- The real cost is art: the Moldy Crow model, the prototype and townsfolk
-  sprites, adobe textures and a day sky (Phase 3 and Phase 1b D).
-
-## Phase 3: Content for the slice
-
-- [ ] **Palette:** Imperial greys and gloss blacks, desert ochre, and
-      glowing red and green bolts.
-- [ ] **Enemies:** Stormtrooper, Imperial Officer (drops keycards),
-      Commando, Probe Droid, and an original mini-boss (a prototype assault
-      droid: an early Dark Trooper test, see `docs/story.md`).
-- [ ] **Weapons:** fists, blaster pistol, E-11-style rifle and thermal
-      detonators.
-- [ ] **Items:** shield units, med kits, batteries, power cells, red and blue
-      keycards, and the objective item (a data tape).
-- [ ] **Textures:** Imperial wall panels, light strips, grates, canyon rock
-      and sand, and a night sky.
-- [ ] **Sounds:** synthesized blaster shots, droid beeps and door hisses.
-- [ ] **Music:** original marches in a Star Wars style.
-
-## Phase 4: Mission 1 (the vertical slice)
-
-In the story (`docs/story.md`, 2026-10-13) this map is Mission 3, the Canyon
-Garrison, and the hero is Kyle Katarn; Mos Eisley is the new Mission 1.
-Which one is the slice is still open.
-
-The player infiltrates an Imperial garrison in a desert canyon:
-
-1. Start in an outdoor canyon with ledges and snipers.
-2. Get in through a crouch vent.
-3. Take a lift up to the barracks.
-4. Find an officer carrying the red keycard.
-5. Reach the data vault (objective 1: steal the data tape).
-6. Overload the generator (objective 2). The lights fail, so the headlamp is
-   needed.
-7. Escape across a jump gap to the landing pad.
-
-The mission has 2 or 3 secrets and uses every new engine feature at least once
-on purpose. Then playtest, tune the ammo budget and difficulty levels, and
-update the smoke test.
-
-## Phase 5: Ship
-
-- [ ] README, CI and GitHub Pages, the same as Raccoon Alex.
-- [ ] Decide whether to build more missions.
-
-## Risks
-
-- **Renderer speed and sprite clipping** in pure JS. That's why Phase 1 ends
-  with a performance check before any content work.
-- **Blocky architecture** from the grid. Angled walls (Phase 1, step 5) and
-  3D models (Phase 1b F) help. Otherwise lean on height variety, lighting
-  and texture detail.
-
-## Progress log
-
-- 2026-10-11: Plan written. Starting Phase 0.
-- 2026-10-11: Phase 0 done: forked with history, renamed the package, added
-  the README note. The package name `dark-forces-clone` is a working name, and
-  the title is still to be decided.
-- 2026-10-11: Phase 1 steps 1-3 done.
-  - **Map data:** `floorZ`, `ceilZ`, `side` and `upper` in the legend, plus
-    `floorHeights` / `ceilHeights` grids. Documented in MODDING.md.
-  - **Renderer:** the new column renderer (`render/columns.js`) replaces
-    `walls.js` and `flats.js`. Flat maps render the same as before (under
-    0.25% of pixels differ, all floating-point rounding at texel edges).
-    Sprites are clipped by ledges using a per-column window.
-  - **Player:** jump (Space / A / JUMP), crouch (C / B / DUCK), gravity, eased
-    step-ups, fall damage, and mouse / key / stick look by y-shearing (±70 px).
-    Collision checks floor and ceiling heights, and solid things only collide
-    when they overlap in height.
-  - **Sandbox map:** `?map=sandbox`, a test map for all of this.
-  - **Tools:** `tools/snapshot.mjs` renders the 3D view headlessly.
-  - **Tests:** `tests/heights.test.js` covers stairs, ledges, jumping,
-    falling, crouching and the camera. 59 tests and the smoke test pass.
-  - **Speed:** about 1-2 ms per frame for the world on a desktop, versus
-    0.8-1.2 ms before. Recheck on a phone at the Phase 1 gate.
-  - **Notes for later steps:**
-    - Monsters snap to the floor and can walk off ledges (step 6 adds
-      drop-off limits).
-    - Hitscans and projectiles are still 2D (step 5).
-    - The validator's reachability ignores heights (step 7).
-    - Doors are still the sliding panels; rising doors and lifts are step 4.
-- 2026-10-11: Added Phase 1 step 5, angled walls, after doors and lifts. It
-  uses a line-in-tile data model, with the 45° presets first. Later steps
-  renumbered 6-9. Height granularity, for reference:
-  - heights are floats, so any value works
-  - the grids use `heightStep` (default 1/8) times `0`-`z` plus `heightBase`
-  - multiples of 1/8 keep textures aligned
-- 2026-10-11: Phase 1 step 4 done.
-  - **Rising doors** (`style: 'rise'`): the door tile's ceiling animates up
-    to the lowest neighbouring ceiling. The lintel above it keeps its own
-    `upper` texture. The shared doors now rise; the split elevator door stays.
-  - **Lifts** (`lift: { stops, mode, speed, wait, on, moves }`) have three
-    modes: return (the default), toggle and cycle. Riders move with the
-    floor, a lift turns back instead of crushing, and `moves: 'both'` makes a
-    closed cab. They start when you step on them, press use, or a trigger
-    runs the new `lift` action.
-  - **Sounds:** `lift-start` and `lift-stop`.
-  - **Sandbox:** a rising door, a lift up to the sniper ledge, and a lift out
-    of the pit.
-  - **Tests:** `tests/lifts.test.js` (6 tests), plus a rising-door ray test.
-    66 tests and the smoke test pass. Checked in a real browser too.
-- 2026-10-11: Added a Phase 2 TODO: fill the whole screen on widescreen
-  displays. Keep the 4:3 centre and draw more world at the edges (Hor+),
-  instead of black bars.
-- 2026-10-11: Phase 1 step 5 done: angled walls.
-  - **Data:** `world/slants.js`. A tile holds one line with a solid side:
-    `diagonal: 'NE' | 'NW' | 'SE' | 'SW'` presets, or a general `line: [ax,
-    ay, bx, by]` with points on the tile edges. It's open floor on the other
-    side.
-  - **Renderer:** walls drawn where the ray crosses the line, plus the back
-    face when a ray enters through the solid side. Texture spacing stays true
-    along the line.
-  - **Physics:** rays (sight, use, hitscans) stop at the line. Collision is
-    circle against the clipped solid polygon. Players and monsters slide along
-    angled walls (the move turned 45° each way). Projectiles burst on them.
-  - **Maps:** the automap draws the lines, and the map viewer fills the
-    solid side.
-  - **Fix found on the way:** sliding treated a near-zero axis component
-    (cos 90° ≈ 6e-17) as a successful slide.
-  - **Sandbox:** chamfered corners in all three areas, a two-tile 26.6° wall,
-    a diamond pillar and a triangular block.
-  - **Tests:** `tests/slants.test.js` (6 tests). 72 tests pass. Checked in a
-    real browser too.
-  - **Still to do:** two-sided lines (a diagonal ledge between two floor
-    heights) and the validator's view of the solid part. Reachability treats
-    slant tiles as open for now.
-- 2026-10-11: Fixed items being picked up by jumping over them. Pickups now
-  need vertical reach: from 0.15 below the feet up to the top of the body.
-- 2026-10-11: Named the game **Rogue Contract**.
-  - Renamed the page title and link preview, the package, the README header,
-    the smoke-test subpath and the content pack's `game` id and title.
-  - The storage prefix is now `rogue-contract`, so it doesn't share saved
-    settings with Raccoon Alex on the same github.io origin.
-  - The local folder is still `C:\Mark\dark-forces-clone`.
-- 2026-10-12: Published.
-  - Public repo: https://github.com/mjvdw13/rogue-contract (remote
-    `origin`; `upstream` still points at the local raccoon-alex).
-  - GitHub Pages serves `main` from the root at
-    https://mjvdw13.github.io/rogue-contract/. The CI workflow runs on every
-    push.
-  - Commits use only the GitHub no-reply identity, never a real email.
-- 2026-10-12: Renamed the local folder to `C:\Mark\rogue-contract`.
-- 2026-10-12: Phase 1 step 6 done: 3D combat.
-  - **Trace:** `traceRay3D` in `world/physics.js` walks the height grid in
-    3D. It stops at walls, door panels, angled walls, step faces, floors and
-    ceilings. Rising doors are just their tile's ceiling. It also reports
-    when a ray goes into the sky.
-  - **Aim:** `combat/aim.js`. The player fires from the eye along the view
-    pitch. Gentle vertical auto-aim bends a shot by at most 0.12 slope (about
-    7°) onto a monster already in line horizontally. AUTO AIM in Options
-    turns it off. Monsters fire from 60% of their height at the middle of
-    their target. Every attack kind gets `opts.aim = { z, slope }`.
-  - **Hitscans** hit bodies as 3D cylinders. Puffs land where the shot
-    struck, and shots into the sky leave nothing.
-  - **Projectiles** fly with vertical speed. Their z is now the sprite's
-    centre. They burst on floors, ceilings and step faces, and vanish into
-    the sky. Lobs land at the target's height. `defineProjectile`'s `z` is
-    now optional: a start height above the owner's feet.
-  - **Explosions** measure 3D distance to the nearest point of each body,
-    and floors and ledges block them. **Melee** only reaches bodies at
-    about the same height.
-  - **Sight:** monsters see in 3D (from their fire height to the target's
-    middle or head), so a ledge hides you when you stand under its edge.
-  - **Tests:** `tests/combat3d.test.js` (11 tests). The chaos test now checks
-    that something woke during the run, since monsters sleep again if the
-    player dies. 84 tests, the validator and the smoke test pass. Rocket
-    flight was checked in headless renders.
-  - **Still to do:** step 7 (monsters walk off ledges, and flying monsters
-    still snap to the floor).
-- 2026-10-12: Phase 1 step 7 done: enemies and heights.
-  - **Ledges:** walking monsters and friendlies follow Doom's dropoff rule.
-    They won't stand straddling a drop deeper than their `dropHeight`
-    (default: their step height), so they don't walk off ledges or hang over
-    edges. Knockback can still push them off.
-  - **Gravity:** monsters, friendlies, corpses and loose things fall to the
-    floor instead of snapping down. They still step straight up.
-  - **Routes:** the flow field plans per kind of body (step, drop, height,
-    flying). `world.navFor(m)` keeps one field per profile, so a 1.1-tall
-    beetle won't plan through a 0.9 vent that an ant fits. Diagonals don't
-    cut corners across drops. Fields refresh every 0.25 s while a lift
-    moves. Monsters go straight at a visible player only when the route
-    isn't a long way round.
-  - **Flyers:** `flying: true` monsters hover `z` above their target's floor,
-    climb over raised floors ahead at `flySpeed`, and drop when they die. The
-    firefly flies now (`z: 0.35`) as the test flyer.
-  - **Tests:** `tests/enemies.test.js` (5 tests). 89 tests, the validator and
-    the smoke test pass. With 70 awake monsters on e1m3, a tick costs about
-    1.13 ms against 1.02 ms before.
-  - **Not done:** monsters don't ride lifts on purpose, and one that can't
-    reach the player just heads toward them and gets stuck at the ledge
-    face. A sniper on a ledge paces along its edge.
-- 2026-10-12: Recorded the rough edges from step 7 as a Phase 2 TODO
-  (smarter enemies around heights).
-- 2026-10-12: Phase 1 step 8 done: tools.
-  - **Reachability** (`tools/lib/levelcheck.mjs`) searches standing spots
-    (a tile at one of its floors, so each lift stop counts) using the hero's
-    body. It handles 0.4 steps, jumps up to about 0.78 (less under a low
-    ceiling), any drop, crouching through 0.5, lifts to every stop, and
-    running jumps over gaps of up to two tiles. `canCross` and `bodyLimits`
-    are exported for tests.
-  - **One-way areas:** spots you can reach but can't get back to the start
-    from, found by walking the moves backwards. `validate --verbose` lists
-    them.
-  - **Map viewer:** floors are shaded by height, with black edges for
-    ledges too high to walk up, grey ones for steps, orange frames for lifts
-    and cyan ones for crouch-only spaces. Angled walls were already drawn in
-    step 5.
-  - **Found on the way:** the sandbox's start-room window (sill 0.45,
-    ceiling 1.05) can't be climbed through, which matches the game. You can't
-    jump while crouched, and standing doesn't fit.
-  - **Tests:** `tests/reach.test.js` (6 tests). 95 tests, the validator and
-    the smoke test pass.
-  - **Still rough:** angled-wall tiles count as fully open for reachability,
-    so a gap squeezed between two angled walls isn't checked.
-- 2026-10-12: First Star Wars pass (Phase 0's "replace the Alex content", and
-  a start on Phase 3).
-  - **Removed:** levels E1M1-E1M5, the coworkers, the bugs and the Pumpkin
-    King, every weapon but fists, the office/basement/sewer textures, the
-    old items, decor, music and the HUD face. The validator no longer
-    requires a face.
-  - **New art** (all generated in tools/art):
-    - Imperial wall, floor, ceiling, door and switch textures, plus canyon
-      rock, sand and a night sky.
-    - A stormtrooper, an officer and a probe droid (a flyer that explodes).
-    - Fists and a blaster pistol.
-    - Med kits, shield units, power cells, energy packs and keycards.
-    - Crates, fuel barrels, consoles and lamps.
-    - Blaster bolts, a new title screen and an intermission backdrop.
-  - **Content:**
-    - The blaster fires visible projectile bolts on `energy` ammo. Troopers
-      fire slower bolts you can dodge.
-    - The sandbox is the only mission, rethemed as CANYON GARRISON.
-    - A new original march, Star Wars-toned text, and the `mercenary`
-      cheat.
-    - The NPC tests use test-only friendlies (tests/fixtures/friendlies.js).
-  - **Checks:** 82 tests, the validator and the smoke test pass.
-  - **Still to do:**
-    - The HUD: the ARMS panel still shows slots 2-7, and the face panel is
-      empty.
-    - The finale reuses the title and intermission pictures.
-    - MODDING.md and the README still describe Alex content.
-    - The smoke test's first four screenshots come out as a blank page with
-      a broken-image icon. The checks still pass; not investigated yet.
-- 2026-10-12: Mark reviewed the first pass. The verdict was "knock-off", not
-  "real Star Wars". Planned Phase 1b (look and feel): the finer grid, then
-  the Mission 1 map, then better placeholder textures. Enemy art, sound
-  and music to be outsourced later. Starting Phase 1b step A1.
-- 2026-10-12: Phase 1b A3 and A5 are in progress on branch `finer-grid`
-  (not merged; `main` is still the coarse grid).
-  - **Done on the branch:**
-    - All the engine and content numbers from the A1 audit are doubled:
-      `TEXELS_PER_UNIT` is 32, and the default ceiling (2), height step
-      (0.25) and fog (0.15) changed too.
-    - The converter (`tools/lib/upscale.mjs` and `tools/upscale-map.mjs`)
-      works, and the sandbox has been converted with it (`DD` is now a 2x2
-      door).
-  - **Next:**
-    1. A4: the validator rejects the 2x2 door ("needs walls on two opposite
-       sides"). In `world/level.js` (around line 197), count neighbouring
-       door tiles of the same glyph as part of the door, and group them (a
-       `door.group` that `openDoor`/`closeDoor` in `world/doors.js` apply
-       together, like lifts).
-    2. A6: fix the tests. They still use coarse-grid positions and heights.
-       Upscale their test maps with `upscaleLevel` and double their
-       coordinates and heights.
-    3. A7 (performance) and A8 (docs: MODDING.md heights and sizes, and a
-       browser check), then merge into main.
-- 2026-10-12: Phase 1b A (the finer grid) done, merged from `finer-grid`.
-  - **Scale:** the world is measured at twice the old scale. A tile is half
-    a metre. The player is 1.7 tall with radius 0.5, and textures and
-    sprites use 32 texels per tile.
-  - **Doors:** neighbouring door tiles of one glyph form a group that opens
-    and closes together.
-  - **Collision fixes found on the way:**
-    - Things spawned with their body in a wall are nudged clear.
-    - A box that only touches a tile edge no longer counts as being in that
-      tile.
-    - A walking body may hang 0.15 over a drop edge (`OVERHANG`).
-    - Walking humans are radius 0.5, so they fit one tile and can take
-      stairs. At 0.56 they stalled on the stair edges.
-  - **Tests:** the `coarse()` and `fine()` test helpers draw maps the old
-    way and upscale them. `tests/finegrid.test.js` covers the converter,
-    door groups and unsticking. 85 tests, the validator and the smoke test
-    pass.
-  - **Performance:** desktop, headless, average over 5 sandbox views: 1.47
-    ms per frame before, about 1.8 ms after (+25%). Recheck at the phone
-    gate.
-  - **Next:** Phase 1b B, the Mission 1 map. Start with the sketch in
-    `docs/mission1.md`.
-- 2026-10-12: Phase 1b B2: first build of Mission 1 (`m1`).
-  - **The map:** painted in code by `levels/lib/painter.js` (rects,
-    chamfers, angled pillars, stairs, and dedupe into glyphs), 128x100. It's
-    now the episode's level; the sandbox stays a test map.
-  - **The route:** all 17 areas from `docs/mission1.md`, with 3 secrets, the
-    red keycard, and the overload switch that opens the escape hatch. The
-    exit is a marked pickup spot on the pad (a full-height switch column
-    looked wrong).
-  - **Fixes found on the way:**
-    - The generator's bridges reach down to its floor and split the bottom
-      in two, so the east half got its own lift (L2b).
-    - Lift L2 has to touch the catwalks. The validator's one-way check
-      caught both.
-    - The chaos test now starts beside the farthest enemy, since a far item
-      can be in a sealed room.
-  - **Checks:** the validator is clean, and 87 tests and the smoke test
-    pass.
-  - **Next:**
-    - B3 lighting pass: the generator is still dim, and the canyon is flat.
-    - B4 enemy and item tuning: ammo is 15x the budget, far too generous.
-    - B5 playtest in a browser.
-- 2026-10-12: Local art overrides. `assets/custom/overrides.json` (ignored by
-  git) swaps a committed asset for a local file, optionally with its own frame
-  size and a draw `scale` (sheets now carry `scale`). It is only read on
-  localhost, never under test automation. Mark's ripped Dark Forces
-  stormtrooper, Imperial officer and probe droid sheets are cut locally by
-  `assets/custom/cut.mjs` into the 12-frame monster layout and drawn at scale
-  0.85. The same script cuts the weapons sheet into the fists and the blaster
-  (the Bryar pistol), drawn 1:1 and padded into Dark Forces' screen positions.
-  The public build keeps the procedural enemies and weapons.
-- 2026-10-12: Engine review. Mark worried the grid limits the maps, so we
-  compared The Force Engine, GZDoom and Godot (see Decisions). We're staying
-  on our engine and adding 3D models (Phase 1b F). Phones are dropped as a
-  target, and the Phase 1 gate now means a desktop browser.
-- 2026-10-12: The ripped Dark Forces sheets, `cut.mjs` and `overrides.json`
-  are committed in `assets/custom/`, with `DISCLAIMER.md` (Mark owns the
-  game; don't redistribute). The repo stays public: Mark's decision.
-- 2026-10-12: Phase 1b G: widescreen, moved up from Phase 2 and done.
-  - **How:** the presenter picks the frame width from the window's shape
-    (`screenWidth()` in `config.js`: 320 at 4:3, 426 at 16:9, capped at 560
-    for 21:9). The game resizes the framebuffer and the melt wipe to match,
-    and the view resizes its column buffers. The focal length stays at
-    320's, so the centre 320 columns are exactly the old 4:3 view.
-  - **2D layout:** `Surface.ox` is a draw origin that centres the
-    320-column layout, so the HUD, menus and pictures needed few changes.
-    Shading, the automap and the status bar's frame span the full width.
-  - **Art:** the title and intermission pictures are generated at 560x200.
-  - **Options:** a WIDESCREEN toggle and `?wide=0`. The TOUCH PAD row is
-    gone (phones aren't a target), so the menu has its old 11 rows.
-  - **Checks:** `tests/widescreen.test.js` (4 tests), and a 16:9 / 21:9 /
-    4:3 pass in the smoke test. 91 tests, the validator and the smoke test
-    pass. Screenshots of the title, menus, level, automap, intermission and
-    finale at 4:3 and 16:9 look right.
-  - **Speed:** in headless Chromium, the 3D view takes 2.8-3.4 ms at 320
-    columns and 4.2 ms at 426, well inside a 60 fps frame.
-  - **Found:** the options menu was already too tall for the screen (added
-    to E).
-  - **Next:** B3, the lighting pass.
-- 2026-10-12: The hosted site now uses the Dark Forces art (Mark's
-  decision). Overrides were only read on localhost, so the pushed sheets
-  never showed on GitHub Pages. Now `overrides.json` is read everywhere
-  except under test automation. An override image that fails to load falls
-  back to the committed art. Checked under the `/rogue-contract/` subpath
-  with the automation flag hidden: all five overrides load, and a blocked
-  stormtrooper sheet falls back. 91 tests and the smoke test pass.
-- 2026-10-12: Phase 1b H: the corner HUD and a lower weapon (Mark: the
-  weapon hid the action).
-  - **HUD:** the status bar is gone and the 3D view fills all 200 rows.
-    Two generated panels sit in the bottom corners (the real screen
-    corners on widescreen): SHIELD and HEALTH on the left, the weapon's
-    ammo and the keycards on the right. ARMS, the empty face panel and the
-    ammo tally are dropped.
-  - **Weapon:** it now stands on the screen's bottom edge (32 px lower),
-    plus `weaponDrop: 24` in `content/config.js` for every weapon: 56 px
-    lower in all. Checked with the generated and the Dark Forces art.
-  - **Fix-ups:** the automap's level name and the respawn prompt sit above
-    the panels.
-  - **Checks:** 91 tests, the validator and the smoke test pass;
-    screenshots at 4:3 and 16:9.
-  - **Next:** B3, the lighting pass.
-- 2026-10-12: Dark Forces textures, from Mark's texture pack zip (918
-  textures, all power-of-two sizes, at about our texel density).
-  `assets/custom/textures.mjs` maps all 21 generated textures to DF ones
-  (SecBase walls and doors, Generic floors and lights, Talay's night sky)
-  and composites the switches and key doors from DF's small switch and key
-  panels. Texture overrides can now change the frame count (the console is
-  a still picture). The dirt floor (ZPDIRT01) snapped to blood red in our
-  palette, so the canyon floor is SecBase's grey rock (IPSEC1), matching the
-  grey cliffs. Reviewed in screenshots of 13 spots in Mission 1. Found: key
-  panels repeat on big doors (logged in Phase 1b D).
-- 2026-10-12: Phase 1b I: a sandtrooper enemy, from Mark's AI-generated
-  asset sheet. `assets/custom/sandtrooper/cut.py` (Python, Pillow) keys out
-  the blue backdrop with soft edges, unmixes the blue fringe, splits the
-  walk and hit-reaction rows where each rifle's barrel crosses the next
-  pose (barrel tips measured by hand; the hole in the neighbour is filled
-  from around it), scales to the Dark Forces sprites' density (13 frames
-  of 58x68, `scale: 0.85`) and snaps to the palette's lit colours. The
-  fire frame gets a red muzzle flash. The monster fires 3-bolt bursts and
-  has 45 health. Two canyon stormtroopers and one on the landing pad in
-  Mission 1 are now sandtroopers, plus one in the sandbox. Screenshots
-  beside the Dark Forces stormtrooper: same height and pixel size. 91
-  tests, the validator and the smoke test pass.
-- 2026-10-12: Phase 1b F: 3D models (Mark chose this as the next engine
-  work, ahead of more of Mission 1).
-  - **Renderer** (`render/models.js`): camera-space transform, back-face
-    culling, near-plane clipping, column-by-column filling with
-    perspective-correct textures, per-pixel checks against walls, ledge
-    windows and a model depth buffer that sprites test too. Faces are
-    shaded by a fixed light (wrapping round, so cylinders read as round).
-  - **Format:** `defineModel` (flat colours, or textures with `uv` in
-    repeats or `uvw` in world units at the walls' scale; `glow`,
-    `twoSided`, collision `lines`), `ModelBuilder` (boxes, prisms, lofts,
-    cylinders) and `tools/import-model.mjs` for Blender OBJ + MTL.
-  - **Game:** decorations with `model`, `spin` and a placement `z`; solid
-    models collide as cylinders or as their lines, and stop hitscan shots
-    and projectiles.
-  - **Tools:** the validator checks model ids, textures and the face budget;
-    the level checker blocks tiles under model lines; the map viewer draws
-    them.
-  - **Showcase in Mission 1:** terminals in maintenance and the vault, two
-    turning containment rings round the generator column, four coolant
-    tanks on the shaft floor, and a shuttle on the landing pad (the pad's
-    stormtrooper moved south of the exit).
-  - **Speed:** models add 0.06-0.2 ms a frame in Mission 1, and 0.74 ms
-    with the shuttle filling a 560-wide view (Node, headless).
-  - **Checks:** 103 tests (12 new), the validator and the smoke test pass.
-- 2026-10-12: Phase 1b J: a Jawa enemy, from Mark's Jawa sprite sheet. The
-  sandtrooper cutter's shared steps moved to `assets/custom/sheetcut.py`
-  (the sandtrooper sheet comes out pixel-identical); `assets/custom/jawa/
-  cut.py` cuts 13 frames of 50x49 (walk, aim, fire with the flash, pain,
-  a fall-back death). The Jawa is 1.25 tall (up to a trooper's chest; first
-  cut at 0.95, half a trooper, which Mark found too short), 12 health,
-  quick, and fires slow `ion-bolt`s; its eyes and muzzle flash glow. Three
-  in Mission 1's gorge (the third from skill 3), one in the sandbox.
-  Screenshots beside the stormtrooper and sandtrooper. 103 tests, the
-  validator and the smoke test pass.
-- 2026-10-12: The sandtrooper restyled to match the Dark Forces stormtrooper
-  (Mark: it looked too realistic beside it, lacking definition and
-  blockiness). Measured on a walk frame, the DF trooper has a much wider
-  tonal range (brightness spread 75 vs 44, darkest/brightest twentieths
-  17/232 vs 41/185), more hard steps between pixels (28% vs 15%), dark
-  contours (68 vs 101), fewer colours (38 vs 73) and a stockier build.
-  `sheetcut.py` gained an optional style stage (`DARK_FORCES`): widen 15%,
-  median-smooth the source's dirt texture, sharpen, an S-curve contrast
-  stretch, light from the right, darkened contours, and snapping to only
-  the armour's ramps (gray, beige, concrete, orange). Now: spread 61, 10/206
-  (the armour is beige, not white), hard steps 23%, contours 59, 50
-  colours. Frames are 66x68. The Jawa (already in a pixel-art style) is
-  unchanged.
-- 2026-10-12: Jawa ion blasts (Mark: blue, a cloud of electricity zapping
-  through the air). A generated `ion-blast` sprite (`tools/art/sprites/
-  fx.js`): a flickering blue-white cloud with jagged arcs that change every
-  frame (4 frames at 20 fps), then a burst of arcs leaping out where it
-  hits (3 frames), all fullbright. Its own sounds: `ion-fire`, a buzzing
-  bit-crushed zap, and `ion-hit`, a quick crackle.
-- 2026-10-12: Phase 1b B3, Mission 1's lighting pass. Light is per tile and
-  walls take the light of the tile in front, so pools and dark corners are
-  painted as tiles (`Painter.light()` relights the open tiles of a box).
-  With the Dark Forces textures 120 already reads dark and under ~110 black,
-  so dark places stay at 112-128 and contrast comes from bright pools: a
-  moonlit canyon (144, was a flat 176 that read as daylight), floodlights
-  under the gate's strips, pools under ceiling panels, strips and lamps,
-  dark corners, a broken flickering light in maintenance, the vault's
-  screens pulsing, a slow pulse round the reactor column, new light strips
-  on the generator walls, and a pulsing pickup spot. Engine: `lightMin` in
-  the legend (the low end of an effect), `setLight` with `lightFx` /
-  `lightMin` (the overload now leaves the chamber in a dim flicker, 136 down
-  to 72, instead of a flat black 72), an unknown `lightFx` is an error.
-  Hanging decorations and effects size themselves at 32 texels per unit, so
-  the ceiling lamps hang from the ceiling instead of half inside it.
-  `snapshot.mjs --custom` renders with the Dark Forces art. 108 tests (5
-  new), the validator and the smoke test pass.
-- 2026-10-12: Phase 1b K, see-through walls (Dark Forces' transparent mid
-  textures). A legend `fence: { tex, edges, height? }` puts a railing, bars
-  or a grate on tile edges, stored on both tiles beside the edge. The
-  column renderer notes each fence its ray crosses (with the rows still
-  open there), keeps going, and draws them far to near after the column's
-  solid surfaces, skipping transparent texels and writing the depth buffer
-  the models use, so sprites and models behind bars show only through the
-  holes. Bodies are stopped below the fence's top (a low railing can be
-  jumped); sight, shots and projectiles pass. Pathfinding and the
-  validator's reachability don't cross fences (flyers go over low ones);
-  the map viewer, automap and upscaler know them. Textures: `imp-railing`
-  (DF `ZMGRATE1` truss squashed to 0.75 tall), `imp-bars` (`ZWBARS`),
-  `imp-cage` (`ICDELEV`), with generated placeholders; fence textures may be
-  any size. Mission 1: railings round the generator's catwalk ring and its
-  bridges, a barred window from the barracks corridor into the officer's
-  office, a cage round the maintenance crates. The fence pass adds about
-  0.6 ms a frame in railing-heavy generator views (560 wide, Node). 118
-  tests (10 new), the validator and the smoke test pass.
-- 2026-10-13: Phase 1b L, doors you can find (Mark: doors were hard to find
-  and too thick; he liked the older inset doors). Rising doors are now a thin
-  panel standing across the middle of the doorway's depth, which slides up
-  into the top of the opening (Dark Forces' door sector, the films' guillotine
-  doors). The doorway is an open recess as tall as the opening, with lit jambs
-  on its sides and the lintel above. The renderer draws the panel set back,
-  narrows the column's window to below its bottom edge and carries on under
-  it. Bodies, `castRay`, `traceRay3D` (shots pass under a half-open door) and
-  projectiles stop at the panel, not the tile; a door closes on someone
-  standing in its recess but not on someone in its panel's way. Door art is
-  fitted to the doorway (centred, hung from its bottom edge), so one door
-  texture shows one door and key panels show once. Door tiles group by their
-  door fields, not by glyph, so each side can have its own lintel. Textures
-  (Dark Forces pack): `imp-door` IDDOOR1 (2x2), `imp-jamb` IDJAMPNL (32x64,
-  a light strip and control panel), the new `imp-lintel` (IDJAMLCX's row of
-  lights rolled to the bottom edge) and `imp-gate` (IDBLKDOR, 4x4), with
-  generated placeholders. Wall textures may now be any power-of-two size
-  (validator). Mission 1's doors resized to the art: 2 wide and 2 tall with
-  lit lintels (the plain wall above where a room is tall), the main gate a
-  4x4 blast door. `snapshot.mjs --doors <open>` sets every door's state for
-  review. 124 tests (6 new in `doors.test.js`), the validator and the smoke
-  test pass.
-- 2026-10-13: Faster doors (Mark: "This is Star Wars!"). The default door
-  speed is 3.5 (was 1.6): a door opens or closes in 0.29 s, and you can walk
-  through after 0.24 s. The door sounds are shorter to match: a 0.3 s whoosh
-  open, and a whoosh and thump closing. MODDING.md gives the default. 124
-  tests and the validator pass.
-- 2026-10-13: Half-depth jambs (Mark: make the jambs half as thick). A
-  rising door's jambs are half its wall's thickness deep, so no new grid was
-  needed: Mission 1's walls are 1 tile thick at its doors now (jambs half a
-  tile deep), the main gate's stays 4 deep. The bunk room, office and vault
-  grew a row toward their doors (the barred window's sill is 1 deep too), the
-  corridor runs a tile further to the red door, and the escape hatch has a
-  one-tile landing outside. `imp-jamb` is now IDJAMPNL's middle 16 columns
-  (its light strip); the gate and the sandbox's 2-deep door use the whole
-  IDJAMPNL as `imp-gate-jamb`. docs/mission1.md and MODDING.md updated. 124
-  tests, the validator and the smoke test pass.
-- 2026-10-13: Phase 1b B4, Mission 1's enemies, items and skills. A monster
-  placed in a level can carry its own `drops` (on top of its type's), so the
-  officer now drops the red keycard, as Dark Forces' officers do; the
-  validator, the reachability check and the ammo budget count drops a
-  placed monster always makes, and the map viewer marks a carried key with a
-  ringed dot. Mission 1 now has 14/18/22/29/30 monsters on skills 1-5 (was
-  17/17/19/20/20): skills 1-2 drop a gate guard, a bunk-room trooper, a
-  catwalk trooper and the pad's sandtrooper; 4-5 add a sandtrooper under
-  ledge A, a Jawa, a second maintenance ambusher, a bunk-room trooper, a
-  vault officer, a south catwalk trooper and a pad trooper (skill 5 a second
-  probe droid). The vault, empty before, has guards against its far banks,
-  lit by the screens' glow. Med kits moved to where fights end: by the vent
-  mouth and on the gantry (skills 1-3) and in the office (1-2); the start
-  bowl's (useless at full health) is gone, and the vent has a power cell.
-  The 3 secrets each count once. `docs/mission1.md` has the per-skill table.
-  126 tests (2 new), the validator and the smoke test pass.
-- 2026-10-13: Story and map ideas drafted in `docs/story.md`, not decided
-  yet. Two storylines that start on Tatooine: Dead Drop (a Rebel contract,
-  closest to Dark Forces) and Bad Paper (a bounty contract that turns on the
-  hunter, closest to *The Mandalorian*). Both put a calm Mos Eisley mission
-  before the Canyon Garrison. Two map sketches (Mos Eisley, a moisture-farm
-  homestead), and the engine work calm missions need (calm enemies and an
-  alarm, patrols, holstering, conversations).
-- 2026-10-13: Story chosen: Bad Paper, as a prequel to Dark Forces (see
-  Decisions). `docs/story.md` is rewritten around it: how it ties into Dark
-  Forces (Mohc's prototype, Jan Ors at the end), three missions (Mos Eisley,
-  the Homestead, the Canyon Garrison with a calm front half), the tracking
-  fob as a mechanic (a tool, then the tracer that betrays you, then a decoy
-  to throw), and the engine work: calm enemies and an alarm, the fob,
-  searching, patrols, conversations. Open: Dark Forces cameos, the hero's
-  ending and name, and confirming Mos Eisley first with no-fail alarms.
-- 2026-10-13: The hero is Kyle Katarn (Mark), in the gap between his
-  defection and Danuta, with Jan Ors flying the Moldy Crow. `docs/story.md`
-  updated: Kyle takes the Guild contract as cover for the Alliance under a
-  false licence, and the garrison's twist now unmasks him ("Kyle Katarn,
-  Imperial deserter"). Every mission opens with a Crow drop-off and ends
-  with a pickup, played in the level: Mission 1 opens on a camera at Docking
-  Bay 87's rim as the Crow comes down. The finale hands over to Danuta. New
-  engine items: flying models, a scripted camera, and delays in triggers.
-- 2026-10-13: Free roam only in Mission 1 (Mark). `docs/story.md`
-  updated: Mos Eisley is a loop. Kyle walks east through a calm town with
-  the tracking fob, finds Dace in a derelict docking bay, and the shooting
-  starts. The town turns hostile all at once, and he fights back west to
-  the Crow in Docking Bay 87. Dace is taken there, so the Homestead becomes
-  a straight combat mission (recovering his hidden recordings), and the
-  Canyon Garrison stays a combat mission entered by the vent. Dropped:
-  restricted zones, warnings, monster searching, the traced fob and
-  throwing it. The story's engine items are listed under Phase 2.
-- 2026-10-13: The story's engine work, checked against the code, is now a
-  numbered list under Phase 2 ("For the story"): the Crow's `fly`,
-  `cutscene` and `wait`; calm monsters and the `hostile` switch;
-  conversations; the tracking fob; `remove`/`place` and `damage`; and the
-  tool fixes that go with them (the level checker and flying models, the
-  spawn sound, skipping cutscenes in tests). Mos Eisley's rooflines need no
-  engine change.
-- 2026-10-13: Planned Phase 1c, two storeys per tile (Mark: we want to walk
-  under other parts of the map), ahead of the story's engine work. A tile
-  can hold one solid slab; the renderer keeps several open windows per
-  column; bodies pick a storey by their step reach. Starting on it.
-- 2026-10-13: Phase 1c done: two storeys per tile.
-  - **Data:** a legend `slab: { bottom, top, floor, ceiling, side, light }`
-    (`F_SLAB`, per-tile slab arrays). `floorAt` / `ceilAt` / `lowFloorAt`
-    take a `reach` and answer for the storey a body reaches (its feet plus
-    its step: `world.reach`).
-  - **Renderer:** up to 8 open row windows per column, each in one storey;
-    a slab's edge splits a window. Each boundary records a batch of windows
-    (`view.segFirst`), which sprites and models clip against. Maps without
-    slabs render pixel-identically (640 seeded views of Mission 1 and the
-    sandbox, both art sets); their frame time is up about 10% headless.
-  - **Movement and combat:** walking, gravity, jumps and head bumps,
-    crouching, flyers, lift riders, projectiles, bullet puffs and
-    `traceRay3D` (shots, sight, explosions) keep to their storey. Things
-    spawn under a slab unless their `z` reaches it (drops land where the
-    body fell). A rising door beside a slab opens to the right storey;
-    sprites and models under a slab take its light.
-  - **Pathfinding:** the flow field's nodes are (tile, storey); where a slab
-    is involved, a step needs the two storeys to overlap by the body's
-    height. Railings on a bridge don't stop monsters walking underneath.
-  - **Tools:** the level checker gives slab tiles two standing spots and
-    checks things in their own storey; the map viewer shows a slab's top
-    in a dotted frame; the automap draws a slab's edges; `snapshot.mjs
-    --top` stands on a slab.
-  - **Sandbox:** a bridge across the pit, a bunker under the sniper ledge, a
-    railed walkway over the courtyard.
-  - **Checks:** 140 tests (14 in `tests/storeys.test.js`), the validator and
-    the smoke test pass; MODDING.md has a "Two storeys" section.
-  - **Later:** doors and lifts in slab tiles, more storeys, slabs that stop
-    sound, triggers per storey; Mission 1's generator bridges can now leave
-    the floor whole.
-- 2026-10-13: Two storeys in Mission 1 (Mark). The generator chamber's
-  catwalk ring and its two bridges are grate slabs (5.5 to 6) instead of
-  solid columns down to the shaft floor, so the bottom is one open space
-  round the reactor column and out under the catwalks to the walls. Both
-  lifts stay as two ways between the floor and the ring. Things on the
-  catwalks stand on them (`z`). The shaft floor is lit at 128 (was 112, which
-  reads black with the Dark Forces art), 120 under the catwalks with pools
-  of 168 below the wall strips, and a power cell waits in the dark under the
-  north-west corner. A natural rock arch spans the gorge (a slab from 4 to
-  5), moonlit on top and in shadow underneath, with a sniper on top on
-  skills 2-5 (monsters now 14/19/23/30/31). Reviewed in snapshots; the
-  validator finds the exit, every item and no one-way areas on every skill.
-  `docs/mission1.md` updated.
-- 2026-10-13: Planned Phase 1d, detail and immersion (Mark: push Mission
-  1's detail and immersion, and fix the engine where it holds the level
-  back). A survey of every area found per-tile, steep lighting (black
-  voids at a distance, nothing lights up), a boxed-in canyon with no
-  skyline, one texture per wall tile and no decals, bare box rooms, no
-  ambient sound, particles or translucency, a palette that fits the DF art
-  poorly, and pathfinding and sight that ignore models. The plan: a fitted
-  palette, a light map with placed and dynamic lights, haze, wall bands,
-  decals, translucency, emitters, ambient sound, scrolling textures and
-  models in pathfinding, then the level area by area, ending with the
-  Moldy Crow on an open landing pad.
-- 2026-10-13: Phase 1d step 1, a palette fitted to the art. New ramps
-  measured from the DF textures and sprites (more `steel` blue-greys and
-  near-blacks, `navy`, a `sand` range for the desert, fewer flesh, toxic
-  and purple entries) and fitted colours placed by `tools/fit-palette.mjs`
-  where the lit art is worst covered. The average snapping error once lit
-  fell from 11.6 to 4.4 RGB (DF textures 4.3, sprites 5.1, generated art
-  3.5). The generated art is regenerated. The canyon is Tatooine's now:
-  sandstone cliffs in three strata and a sand floor with gravel, generated
-  (`tools/art/textures/desert.js`) and derived from the DF rock by
-  `assets/custom/derive.mjs`; textures with `fullbright: false` snap to lit
-  colours only. The officer's rip turns from khaki to Imperial olive
-  (`assets/custom/recolour.mjs`, run by `cut.mjs`). SecBase reads as its
-  steel blue-grey instead of saturated blue, and stays blue in shadow.
-- 2026-10-13: Phase 1d step 2, smooth light. `world/lightmap.js` samples
-  light at tile centres (not corners, which flattened Mission 1's small
-  pools: a lone 200 tile among 144s would have peaked at 158) and
-  interpolates between them; a sample in a wall takes the average of the
-  open ones beside it, so light never leaks through a wall, less a level's
-  `occlusion`. One set per storey. Cells keep their four samples, and only
-  cells round changed tiles are recomputed. The renderer interpolates light
-  along each ray's stretch through a tile for floors and ceilings, samples
-  it where the ray meets walls, step faces, slab edges, doors, angled walls
-  and fences, and at sprites, models and the weapon, with 4x4 ordered
-  dithering between colormap levels (centred, so as bright on average as
-  before). Light effects keep a range per tile; `lightSync` names a group
-  across the map. `Painter.pool()` paints round pools. Tried `occlusion: 24`
-  on Mission 1: its dim rooms went black at the walls, so it stays off.
-  Mission 1's frame time: 2.0 to 2.3 ms (headless, DF art). 149 tests.
-- 2026-10-13: Phase 1d step 3, light sources. A level's `lights` are baked
-  at load (`world/lightsources.js`) into a per-storey `srcLight` the light
-  map adds to each tile: each reaches the tile centres it can see within
-  its radius (2D line of sight; walls, angled walls and shut doors block),
-  fading as (1 - (d/r)^2)^2. Under a slab it lights the storey its `z` is
-  in. Sources with an `fx` join the light-effect groups (`sync` keeps time
-  with a `lightSync`), applying the change in their strength to their
-  tiles; `setLight` reaches sources by tag. Bad sources are level errors,
-  and a `setLight` tag may name only sources. The map viewer draws them.
-  Sampled at tile centres (not corners, as planned), like the light map.
-  Mission 1: the gate floodlights, the barracks corridor's strips and
-  lamps, and the generator's wall strips (a lamp over each catwalk and one
-  under it) are sources now, in place of painted pools; the overload makes
-  the generator's lamps sputter. 27 sources, 12 ms level load, frame time
-  unchanged (2.3 ms), 0.05 ms a frame for the overload's flicker. 155 tests.
-- 2026-10-13: Phase 1d step 4, dynamic light. Any thing (and a weapon) can
-  have `light: { radius, light }`: it lights the room while it shows a
-  fullbright frame, so bolts light what they pass all their flight, and
-  monsters' and the blaster's muzzle flashes light it on their fullbright
-  frames; effects and bursting bolts fade with their animation. Each frame
-  `World.dynamicLights()` gathers them and `LightMap.setDynamic()` flood
-  fills each through open tiles within its radius (walls and shut doors
-  stop it; under a slab it lights the storey its height is in), clearing
-  last frame's; only the cells round changed tiles are recomputed. The
-  blaster's whole-view `flashLight` gives way to a local flash (radius 5,
-  +96); troopers flash +80, bolts +64, explosions +128 over 6 tiles. A
-  heavy firefight (20 bolts, 3 explosions) costs 0.2 ms a frame; rendering
-  is unchanged. 161 tests.
-- 2026-10-13: Phase 1d step 5, distance and haze. The distance curve is
-  gentler: `DIMINISH` 40 to 24, the level at a light 7 lower
-  (`LIGHT_BLACK` 212 for 240) and the default fog 0.15 to 0.05, so a space
-  lit at 144 is level 5 at 1 m (as before), 11 at 2 m and 17 at 10 m (was
-  25, near black): the gorge, the chamber's far walls and the vault's banks
-  read now, and 104 still reads dark. A level's `haze: { color, half }`
-  makes surfaces seen from sky tiles (and sprites and models standing in
-  them) fade toward the colour instead of fogging darker: the palette
-  builds haze tables after the colormaps (15 steps of 32 levels, 75 ms,
-  kept per colour), and the renderer picks the step by distance, dithered
-  like the light. Mission 1's haze is the sky's dusky purple, halfway at
-  20 m. Frame time 2.3 to 2.9 ms (the haze's per-pixel work outdoors).
-  165 tests.
-- 2026-10-13: Phase 1d step 6 started, wall bands (engine). A glyph's
-  `bands: [{ from?, to?, tex }]` change its wall's texture with height
-  (first band wins, the wall's texture elsewhere, each hung from its top),
-  and the faces of an open tile's raised floor and lowered ceiling (a
-  gate's lintel). Parsed per glyph (`map.bandSets`), scaled by the
-  upscaler, drawn over the face in the renderer; the map viewer shows a
-  wall's top band. Tests share a headless renderer (`headlessRenderer()`
-  in tests/helpers.js). 168 tests.
-- 2026-10-13: Phase 1d step 6 done. Mission 1's garrison is dug into the
-  cliff: its outside walls, and the faces over the gate and the vent
-  mouth, stand 4 m (8) above the ground in front of them with the
-  canyon's rock above, worked out from the map (skipped where the rock
-  would show indoors, so the gantry's end wall, which is also the
-  generator's, stays panel until steps 19-20). Trims and the reactor
-  column's bands come with steps 17 and 19.
-- 2026-10-13: Phase 1d step 7, decals. A level's `decals: [{ x, y, z,
-  face, tex, scale?, glow?, flip? }]` put see-through pictures on wall
-  faces, step faces and lintels: laid out by the renderer once their
-  textures' sizes are known, on the tile edges they cover
-  (`world/decals.js`), and drawn over each face they're on, clipped to it,
-  in its light and haze. Projectiles with `scorch` leave scorch marks where
-  they burst on walls or step faces (the last 48). New art
-  (`tools/art/textures/decals.js`): scorch, the Empire's crest, hazard
-  stripes, a sector sign, a vent. Mission 1: the crest over the gate with
-  hazard stripes along its lintel, signs in the barracks corridor, vents in
-  maintenance, stripes over the overload switch. The rest of the dressing
-  comes with steps 15-19. 172 tests.
-- 2026-10-13: Phase 1d step 14 started, the canyon's skyline. The rock
-  within 3 tiles of the canyon (and of its angled corners) steps back in
-  ledges out of reach: 8, 12 and 16 above the floor in front, plus noise,
-  up to 22, so the rims are jagged against the sky. Each ledge's sky
-  ceiling sits just above the highest rock behind it (the Doom sky trick),
-  so the view stops at the skyline and sight lines and bolts can't pass
-  over a ridge; rays stay short (frame time unchanged, 2.9 ms). The
-  garrison and doors keep a wall of rock round them. Rock strata by height
-  (wall bands: dark below 2.5, pale above 14) on every rock face, gravel
-  channels across the sand (the gravel lightened to read as gravel, not
-  stains), and angled corners capped at the skyline (one whose back faced
-  open ground, where the gorge was painted over a corner, is floor now).
-- 2026-10-13: the skyline again, after Mark's look: the ledges read as
-  "pieces of paper" (from the floor you only ever see their faces, a tile
-  apart, each with a sharp top), and the strata bands looked bad. Now the
-  canyon's walls end at one low rim (4.5 to 6 m, smooth along the canyon,
-  climbing to meet the taller cliff round the garrison), and a **backdrop**
-  takes over above it: `world/backdrop.js` keeps a height grid past the
-  edge of play and `render/backdrop.js` draws it voxel-space style (each
-  column marches its ray over the grid near to far, filling spans), only
-  for columns that show sky and only on sky pixels, with the faces'
-  texture by height, moon shading by slope, light levels and haze like
-  the rest. `canyonBackdrop()` builds Mission 1's: low over the open sky,
-  climbing from the rim in smooth slopes and ridges (no terraces), with
-  valleys between the far ridges, 96 tiles past the map. No strata.
-  Frame time 3.0 to 3.4 ms; Mission 1's module takes 0.1 s to build it.
-  176 tests.
-- 2026-10-14: tried the other way to give the skyline depth, all in the
-  grid: walls rising 5 to 7.5 m at the face, then the rock behind it
-  climbing in short steps (smoothed tile to tile) to a ridge 3 to 7 tiles
-  in, each tile's sky just above the highest rock behind it, then sky. It
-  needed more painter glyphs than the pool had (per-tile heights). Side by
-  side with the backdrop, Mark chose the backdrop. The trial isn't kept.
-- 2026-10-14: scorch marks taken out (Mark: ugly, and they add little).
-  Blaster bolts no longer mark the walls they burst on: the projectile
-  `scorch` field, the world's scorch list, `removeDecal` and the scorch
-  art are gone. Decals placed by levels are unchanged.
-- 2026-10-14: Added a Phase 1d TODO: glints on armour. The fitted palette
-  ended a happy accident: the DF stormtrooper's brightest armour highlight
-  used to snap to a fullbright white, which read as a lamp's reflection in
-  dark rooms but glowed for no reason in the dark canyon. The TODO makes it
-  a feature: highlights that brighten only when a light source can see them.
-- 2026-10-15: Phase 1d step 14, in chunks. First: barricades and crates by
-  the gate. A `barricade` model (`models/barricade.js`): an armoured
-  shield 2.6 long and 1.15 tall, sloped both sides, with yellow-on-black
-  hazard stripes along each slope (faces, not a texture: the DF
-  `imp-stripe` is a panel, not stripes) and two red lamps, on feet; solid,
-  with collision lines round its footprint. Three across the approach to
-  the gate, angled out, cover for the gate guards; supply crates stacked
-  against the face by the light strips, one half hiding the vent mouth.
-  Monsters still walk into models until step 12.
-- 2026-10-15: step 14, boulders. `models/boulder.js` builds
-  `boulder-large` (2.6 across, 1.8 tall) and `boulder-small` (1.3, 0.8):
-  a lumpy outline lofted up in six tiers, each the one below shrunk and
-  shifted (so the faces stay flat), rounded like a weathered rock. Rough
-  stone (`desert-gravel`; the DF rock textures' block seams made the first
-  try read as masonry), the top `sandstone-pale`. Ten along the walls'
-  feet in the start bowl, the gorge and the bowl, off the way through.
-  The angled rock pillars are left out: the models do the job.
-- 2026-10-15: step 14, floodlight towers. A `floodlight-tower` model: a
-  tapered steel mast 6.6 tall on a base plate, braced and banded yellow at
-  its foot, a crossbar with two lamp heads tilted down (glowing lenses) and
-  a red warning light on top. Two on the bowl's north corners, by the
-  strip, facing into the bowl, each with a light source (radius 8, light
-  64) a few tiles out in front: pools of light out in the bowl. The first
-  masts (dark steel, thin) vanished against the cliff in shadow and left
-  the lamps floating; the mast is lighter and thicker now.
-- 2026-10-15: step 14, the sensor mast. `models/sensor-mast.js` builds
-  `sensor-mast` (a thin steel mast 8 tall on a concrete footing, an
-  equipment box with a lit panel and its cable, red and white bands near
-  the top, a platform) and `sensor-dish` (a pivot, an arm, a shallow dish
-  tipped up with a feed horn), placed as a spinning decoration (`spin`, like
-  the reactor rings) on the platform. On ledge B, where the sniper
-  stands; a light source with `fx: 'blink'` at the top is the beacon,
-  lighting the rock round it on and off.
-- 2026-10-15: step 14, the overhang. Along the start bowl's east wall the
-  cliff juts out over the sand, 2.25 m up and 1.5 m thick, 1 to 2.5 m
-  deep (deepest in the middle, ragged along its edge): a slab out of
-  reach, in its own shadow underneath. A first try 0.75 m thick read as a
-  thin shelf from the start; thicker, it reads as rock. Step 14's art is
-  done but for wind and blowing dust, which wait for steps 9 and 10.
-  Frame time on canyon views (headless, 4:3, DF art): 3.3 to 3.5 ms
-  before step 14's props, 3.6 to 4.1 ms after.
-- 2026-10-15: the overhang less flat (Mark: its bottom and top were too
-  flat). Each tile has its own slab now, a wedge of rock thickening into
-  the wall: the underside climbs from about 1.9 m at the wall to 2.3 m at
-  the lip, the top falls from 4.4 m to 3.9 m, each with a lumpy offset
-  (value noise, in steps of 12.5 cm). Seen from the bowl the underside
-  steps and the top's silhouette is ragged. (Heights stay per tile: there
-  are no sloped floors or slabs, so the surfaces step rather than slope.)
-- 2026-10-15: the overhang taken out (Mark: he doesn't like it). The start
-  bowl's east wall is a plain cliff again. Step 14 has no overhang.
-- 2026-10-30: Mos Eisley flow review. Map A's loop (calm out, loud back
-  over the same streets) holds up, but the calm half doubles back (the junk
-  yard sat beside the bay, west of the cantina), the fob guided nothing
-  until halfway, the roofs could skip the story, and four nested errands
-  came before the first shot. On the way back the cantina's detour didn't
-  connect, gunfire would pull every trooper toward the first shots, the
-  first fight was the whole town at once, and nothing marked the west. In
-  the engine, the click that captures the mouse fires a shot, which would
-  turn the town. To-dos 15 to 31 under "For the story".
-- 2026-10-30: clicks that capture the mouse aren't shots (to-do 27). The
-  click on the game that captures the mouse fired the blaster, and so did
-  clicking RESUME in the pause menu: `input.js` counted the button as held
-  from mousedown, and the mouse is captured on the click, after mouseup.
-  While the game wants the mouse captured (a level, without touch
-  controls), a mouse button now only clicks until it is. The smoke test
-  checks both clicks (it fails without the fix), and that a click fires
-  once the mouse is captured.
-- 2026-10-30: Map A (Mos Eisley) reworked for flow (to-dos 15 to 26). The
-  street holds the calm half's steps west to east in order: the bay, the
-  blast doors (open), the cantina, the junk yard, the alleys' mouth, the
-  checkpoint. The broker tunes the fob to the Jawa trader, so it guides
-  from the cantina on, and Dace is in the hold only once the fob has his
-  signal. The pass is a dead drop (no thug's debt). The cantina's back
-  room runs to Bay 87 and the alleys to a gate across from it, both doors
-  opening only from inside. The flip starts with two or three troopers
-  while Dace is dragged out of sight, troopers along the way back are
-  posted with `ambush`, the Crow circles over the bay, and the roof jumps
-  are 2 or 3 tiles. A "How it guides you" list sums it up.
+- Two-sided angled lines (a diagonal ledge between two floor heights).
+- Doors and lifts inside slab tiles, more than two storeys, slabs that stop
+  sound, triggers for one storey only.
+- Walkable model surfaces (a bridge you can cross or walk under).
+- See-through rising gates, force fields that block or hurt, fences in the
+  middle of a tile or at an angle.
+- Particles: a sound per burst, blood as particles, rain, scorch decals.
+- Glints: stronger when the source is on the viewer's side, shiny model
+  faces, glints on the sandtrooper.
+- `tools/import-texture.mjs` for outside art (resize, snap to the palette,
+  check the tiling).
+- Recorded music (a composer or orchestral samples).

@@ -72,15 +72,15 @@ export const fine = (p) => p * 2 + 0.5;
 
 /**
  * A headless renderer with the content's own art (PNGs from disk, no art
- * overrides), for tests that look at rendered frames. Call once per file.
+ * overrides), for tests that look at rendered frames. Call once per file
+ * (and once more for `scale` 2, the 3D view at 640x400).
  */
-export async function headlessRenderer() {
+export async function headlessRenderer({ scale = 1 } = {}) {
   const fs = await import('node:fs');
   const path = await import('node:path');
   const { fileURLToPath } = await import('node:url');
   const { Palette } = await import('../src/engine/gfx/palette.js');
-  const { Surface } = await import('../src/engine/gfx/surface.js');
-  const { quantize } = await import('../src/engine/gfx/image.js');
+  const { Surface, ScaledSurface } = await import('../src/engine/gfx/surface.js');
   const { Assets } = await import('../src/engine/assets.js');
   const { Renderer } = await import('../src/engine/render/renderer.js');
   const { SCREEN_W, VIEW_H } = await import('../src/engine/config.js');
@@ -91,15 +91,10 @@ export async function headlessRenderer() {
   assets._loadOverrides = async () => {
     assets.overrides = {};
   };
-  assets._loadImage = async (src) => {
-    try {
-      return quantize(decodePNG(fs.readFileSync(path.join(root, src))), palette);
-    } catch {
-      return null;
-    }
-  };
+  assets._readPixels = async (src) => decodePNG(fs.readFileSync(path.join(root, src)));
   await assets.loadAll();
-  const renderer = new Renderer(new Surface(SCREEN_W, VIEW_H), assets, palette);
+  const surface = scale > 1 ? new ScaledSurface(SCREEN_W, VIEW_H, scale) : new Surface(SCREEN_W, VIEW_H);
+  const renderer = new Renderer(surface, assets, palette);
   /** Render `level` from a camera; the frame's palette indices. */
   const shot = (level, cam) => {
     const w = new World({ registry, assets, rng: new Rng(1), settings: { noMonsters: true } }, level, { skill: 3 });

@@ -21,3 +21,17 @@ export const smoothstep = (a, b, x) => {
   const t = Math.max(0, Math.min(1, (x - a) / (b - a)));
   return t * t * (3 - 2 * t);
 };
+
+/** A seeded random number generator (0-1), so a painted level comes out the same every time. */
+export function random(seed) {
+  let s = seed >>> 0 || 1;
+  const next = () => {
+    let t = (s = (s + 0x6d2b79f5) >>> 0);
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+  next.range = (a, b) => a + (b - a) * next();
+  next.pick = (list) => list[Math.floor(next() * list.length)];
+  return next;
+}

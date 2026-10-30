@@ -113,8 +113,98 @@ function blasterPickup() {
   return m.render({ ...RENDER, light: [-0.4, -0.8, 0.45] });
 }
 
+// ------------------------------------------------------------------ thermal detonator
+
+const DET_METAL = { ...MAT.metal, spec: 0.7, shine: 26 };
+
+/** A thermal detonator: a steel ball with a dark band and red lights round it. */
+function detonator(m, x, y, z, r) {
+  m.sphere(x, y, z, r, C('steel', 0.62), DET_METAL);
+  m.ellipsoid(x, y + r * 0.1, z + 0.5, r * 1.02, r * 0.28, r * 1.02, C('gray', 0.18), MAT.metal);
+  for (const k of [-0.5, 0, 0.5]) m.paint(x + k * r, y + r * 0.1, r * 0.13, r * 0.13, G('red', 1), MAT.glow, { minZ: z });
+}
+
+/** The fist holding a detonator (0), or the open hand after the throw (1). 124x134, the arm in from the bottom right. */
+function detonatorFrame(open = false) {
+  const m = new Model(124, 134, { seed: 107 });
+  if (!open) {
+    forearm(m, [104, 150, 4], [72, 80, 14], 11);
+    detonator(m, 50, 58, 16, 15);
+    fist(m, 66, 66, 20, 15, 1);
+  } else {
+    forearm(m, [112, 150, 4], [88, 82, 12], 11);
+    m.ellipsoid(80, 62, 16, 15, 17, 7, GLOVE, MAT.leather); // the palm
+    const fingers = [[42, 20], [56, 8], [72, 4], [88, 10]];
+    fingers.forEach(([fx, fy], k) => m.capsule(70 + k * 4, 52, 18, fx, fy, 14, 4.2, 3.4, lighten(GLOVE, 0.04), MAT.leather));
+    m.capsule(66, 72, 18, 34, 60, 14, 4.6, 3.6, GLOVE, MAT.leather); // thumb
+  }
+  return m.render(RENDER);
+}
+
+function detonatorSheet() {
+  return sheet([detonatorFrame(), detonatorFrame(true)]);
+}
+
+/** One detonator in flight (16x16), or lying on the floor (16x16). */
+function detonatorBall() {
+  const m = new Model(16, 16, { seed: 109 });
+  detonator(m, 8, 8, 6, 5.5);
+  return m.render({ ...RENDER, light: [-0.4, -0.8, 0.45] });
+}
+
+/** A belt of five detonators on the floor. 48x24. */
+function detonatorBelt() {
+  const m = new Model(48, 24, { seed: 111 });
+  m.capsule(3, 18, 2, 45, 18, 2, 2.2, 2.2, C('rust', 0.3), MAT.leather);
+  for (let k = 0; k < 5; k++) detonator(m, 7 + k * 8.5, 14, 5, 4.2);
+  return m.render({ ...RENDER, light: [-0.4, -0.8, 0.45] });
+}
+
+// ------------------------------------------------------------------ concussion rifle
+
+/**
+ * The concussion rifle: a heavy slotted barrel housing pointing up and in at
+ * the crosshair from the bottom right, the gloved hand under it. `glow`
+ * lights the vents blue (1 the shot, 0.5 its after-glow). 112x96.
+ */
+function concussionFrame({ kick = 0, glow = 0 } = {}) {
+  const m = new Model(112, 96, { seed: 113 });
+  const metal = { ...MAT.metal, spec: 0.5, shine: 22, grain: 0.05 };
+  const [x0, y0, x1, y1] = [104, 100 + kick, 44, 8 + kick];
+  m.capsule(x0, y0, 10, x1, y1, 16, 15, 11, C('gray', 0.22), metal); // the housing
+  m.capsule(x1 + 4, y1 + 6, 18, x1 - 2, y1 - 3, 18, 7, 7, C('gray', 0.1), metal); // the muzzle
+  for (let k = 1; k < 6; k++) {
+    const t = k / 6.5;
+    m.paint(x1 + (x0 - x1) * t * 0.8 - 4, y1 + (y0 - y1) * t * 0.8, 2.2, 3.2, glow ? G('cyan', glow) : C('gray', 0.04), glow ? MAT.glow : undefined);
+  }
+  forearm(m, [96, 130, 6], [72, 84 + kick, 18], 11);
+  fist(m, 70, 80 + kick, 24, 12, 1);
+  return m.render(RENDER);
+}
+
+function concussionSheet() {
+  return sheet([concussionFrame(), concussionFrame({ kick: 4, glow: 1 }), concussionFrame({ kick: 2, glow: 0.5 })]);
+}
+
+/** The concussion rifle lying on the floor, for a pickup. 64x24. */
+function concussionPickup() {
+  const m = new Model(64, 24, { seed: 115 });
+  const metal = { ...MAT.metal, spec: 0.5, shine: 22, grain: 0.05 };
+  m.capsule(6, 12, 4, 44, 12, 4, 5, 5, C('gray', 0.22), metal);
+  m.capsule(4, 12, 5, 9, 12, 5, 3.4, 3.4, C('gray', 0.1), metal);
+  m.slab([[40, 10], [60, 12], [60, 16], [42, 18]], 3, C('rust', 0.3), MAT.leather, { bevel: 1, thickness: 1.5 }); // the stock
+  for (let k = 0; k < 4; k++) m.paint(14 + k * 7, 10, 1.6, 1.2, C('gray', 0.04));
+  return m.render({ ...RENDER, light: [-0.4, -0.8, 0.45] });
+}
+
 export default [
   { name: 'fists', out: W('fists'), draw: fistsSheet, dither: 'fs' },
   { name: 'blaster', out: W('blaster'), draw: blasterSheet, dither: 'fs' },
   { name: 'pickup-blaster', out: 'assets/sprites/items/pickup-blaster.png', draw: blasterPickup, dither: 'fs' },
+  { name: 'thermal-detonator', out: W('thermal-detonator'), draw: detonatorSheet, dither: 'fs' },
+  { name: 'det-ball', out: 'assets/sprites/fx/thermal-detonator.png', draw: detonatorBall, dither: 'fs' },
+  { name: 'det-pickup', out: 'assets/sprites/items/thermal-detonator.png', draw: detonatorBall, dither: 'fs' },
+  { name: 'detonator-belt', out: 'assets/sprites/items/detonator-belt.png', draw: detonatorBelt, dither: 'fs' },
+  { name: 'concussion-rifle', out: W('concussion-rifle'), draw: concussionSheet, dither: 'fs' },
+  { name: 'pickup-concussion-rifle', out: 'assets/sprites/items/concussion-rifle.png', draw: concussionPickup, dither: 'fs' },
 ];

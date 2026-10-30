@@ -37,14 +37,21 @@ def palette():
 
 
 def key(rgb, backdrop):
-    """Soft alpha from how blue a pixel is, and its colour with the backdrop taken out."""
+    """Soft alpha from how much a pixel looks like the backdrop (blue, or
+    magenta when the backdrop is red as well as blue), and its colour with
+    the backdrop taken out."""
     r, g, b = rgb[..., 0], rgb[..., 1], rgb[..., 2]
-    blueness = b - np.maximum(r, 0.7 * g)  # a blue backdrop is 140 or more, the art below 40
-    alpha = np.clip((115 - blueness) / 70, 0, 1)
+    if backdrop[0] > 100:
+        magentaness = np.minimum(r, b) - g  # a magenta backdrop is 90 or more, the art below -15
+        alpha = np.clip((98 - magentaness) / 115, 0, 1)
+    else:
+        blueness = b - np.maximum(r, 0.7 * g)  # a blue backdrop is 140 or more, the art below 40
+        alpha = np.clip((115 - blueness) / 70, 0, 1)
     a = np.maximum(alpha, 0.05)[..., None]
     fg = np.clip((rgb - (1 - a) * np.asarray(backdrop, float)) / a, 0, 255)
-    # Remove the backdrop's spill: nothing on these characters is blue or teal.
-    fg[..., 1] = np.minimum(fg[..., 1], fg[..., 0] + 12)
+    # Remove the backdrop's spill: nothing on these characters is blue, teal or purple.
+    if backdrop[0] <= 100:
+        fg[..., 1] = np.minimum(fg[..., 1], fg[..., 0] + 12)
     fg[..., 2] = np.minimum(fg[..., 2], fg[..., 1] + 8)
     return alpha, fg
 
@@ -103,17 +110,25 @@ def runs(flags):
     return out
 
 
-def split(mask, figures, tips):
-    """Splits touching poses whose rifles point right into the next pose.
+def split(mask, figures, tips, leftward=False):
+    """Splits touching poses whose rifles point right into the next pose
+    (or with `leftward`, left into the one before).
 
     Bodies are the runs of tall columns. Between two bodies only the left
     pose's barrel shows; a line through it and the measured tip follows the
-    barrel over the next pose. The barrel is thick for a few pixels past the
-    gap, then a thin rod. It goes to its owner; where it crossed the next
-    pose, the hole is filled from around it.
+    barrel over the next pose. A tip of 'gap' ends it just past the gap
+    (a barrel that only touches the next pose). The barrel is thick for a
+    few pixels past the gap, then a thin rod. It goes to its owner; where
+    it crossed the next pose, the hole is filled from around it.
+    `tips` are on the sheet, one per gap from the left, either way.
     Returns a (mask, filled) per pose; `filled` marks the pixels to fill.
     """
     h, w = mask.shape
+    if leftward:
+        # Mirrored, the rifles point right.
+        tips = [t if t is None or t == 'gap' else (w - 1 - t[0], t[1]) for t in reversed(tips)]
+        parts = split(mask[:, ::-1], figures, tips)
+        return [(m[:, ::-1], f[:, ::-1]) for m, f in reversed(parts)]
     counts = mask.sum(0)
     bodies = [r for r in runs(counts > 14) if r[1] - r[0] >= 25]
     if len(bodies) != figures:
@@ -136,6 +151,9 @@ def split(mask, figures, tips):
                 thick.append(segs[0][1] - segs[0][0] + 1)
         if not pts:
             raise SystemExit(f'no barrel between bodies {k} and {k + 1}')
+        if tip == 'gap':
+            m, c = np.polyfit(*zip(*pts), 1) if len(pts) > 1 else (0, pts[0][1])
+            tip = (g1 + 4, m * (g1 + 4) + c)
         px, py = zip(*pts, tip)
         m, c = np.polyfit(px, py, 1, w=[1] * len(pts) + [len(pts)])
         for x in range(g0, int(tip[0]) + 1):
@@ -173,6 +191,73 @@ def inpaint(rgb, known, holes):
     return rgb
 
 
+# The AI sheets' shared layout (the villagers, the Jawa, the sandtrooper):
+# 48 poses in four rows. Row 1: front walk (6), front three-quarter walk
+# (6). Row 2: back walk (6), flinch and guard (3), a fall-back death (4).
+# Row 3: side walk (6), back three-quarter walk (6). Row 4: a hunch and
+# slump death (6), a turnaround (5). Some sheets mix the walks up a little.
+LAYOUT = [12, 13, 12, 11]
+
+
+def split_thin(poses, count):
+    """Splits the widest of a list of pose masks at its thinnest column (in
+    its middle three fifths) until there are `count`: poses that touch body
+    to body, or by a foot or an elbow."""
+    poses = list(poses)
+    while len(poses) < count:
+        k = max(range(len(poses)), key=lambda i: np.ptp(np.nonzero(poses[i].any(0))[0]))
+        cols = np.nonzero(poses[k].any(0))[0]
+        x0, x1 = cols.min(), cols.max()
+        mid = slice(x0 + (x1 - x0) // 5, x1 - (x1 - x0) // 5)
+        x = mid.start + int(np.argmin(poses[k].sum(0)[mid]))
+        left = poses[k].copy()
+        left[:, x:] = False
+        poses[k] = poses[k] & ~left
+        poses.insert(k, left)
+    return poses
+
+
+def find_poses(mask, rows=LAYOUT):
+    """Each pose's mask, row by row, left to right. Some poses touch: a foot
+    on the head below, or an elbow on the next pose. So the rows are split
+    at the emptiest line near each quarter of the sheet, and in a row with
+    too few shapes the widest is split at its thinnest column until the
+    count is right. Specks beside a pose (a lock of hair) go with it."""
+    h = mask.shape[0]
+    counts = mask.sum(1)
+    cuts = [0]
+    for k in range(1, len(rows)):
+        lo, hi = int((k / len(rows) - 1 / 12) * h), int((k / len(rows) + 1 / 12) * h)
+        cuts.append(lo + int(np.argmin(counts[lo:hi])))
+    cuts.append(h)
+    found = []
+    for (top, bottom), expected in zip(zip(cuts, cuts[1:]), rows):
+        band = np.zeros_like(mask)
+        band[top:bottom] = mask[top:bottom]
+        lab, info = components(band)
+        sizes = sorted((c['size'] for c in info.values()), reverse=True)
+        big = [n for n, c in info.items() if c['size'] >= 0.15 * sizes[min(5, len(sizes) - 1)]]
+        poses = split_thin([lab == n for n in big], expected)
+        if len(poses) != expected:
+            raise SystemExit(f'expected {rows} poses per row, found {len(poses)} in the row at {top}-{bottom}')
+        for n, c in info.items():
+            if n not in big:
+                speck = lab == n
+                for p in poses:
+                    if (grow(p, 3) & speck).any():
+                        p |= speck
+                        break
+        poses.sort(key=lambda p: np.nonzero(p.any(0))[0].min())
+        found.append(poses)
+    return found
+
+
+def pose(alpha, rgb, mask):
+    """A pose for assemble(), its lowest pixel (feet, or body lying down) on
+    the frame's bottom row."""
+    return dict(mask=mask, alpha=np.where(mask, alpha, 0), rgb=rgb, centre=body_centre(mask), base=int(np.nonzero(mask.any(1))[0].max()))
+
+
 def body_centre(mask):
     """The middle of the columns tall enough to be body, not a gun."""
     counts = mask.sum(0)
@@ -180,11 +265,16 @@ def body_centre(mask):
     return (cols.min() + cols.max() + 1) / 2
 
 
-def cut_poses(alpha, rgb, lab, info, box, figures=1, tips=(), base=None):
+def cut_poses(alpha, rgb, lab, info, box, figures=1, tips=(), base=None, leftward=False, thin=False):
     """The poses in a box, left to right. `base` is the sheet row of their
-    feet (the frame's bottom row); by default each pose's own lowest pixel."""
+    feet (the frame's bottom row); by default each pose's own lowest pixel.
+    `tips` and `leftward` are for split(); with `thin` the poses are split
+    at their thinnest columns instead (split_thin)."""
     mask = group_mask(lab, info, box)
-    parts = split(mask, figures, tips) if figures > 1 else [(mask, np.zeros_like(mask))]
+    if thin:
+        parts = [(m, np.zeros_like(mask)) for m in split_thin([mask], figures)]
+    else:
+        parts = split(mask, figures, tips, leftward) if figures > 1 else [(mask, np.zeros_like(mask))]
     out = []
     for m, filled in parts:
         a = np.where(m, alpha, 0)
@@ -205,11 +295,13 @@ def snap(rgb, colours):
     return colours[np.argmin(dist, 1)].reshape(rgb.shape)
 
 
-def resample(arr, box, size, pad=64):
+def resample(arr, box, size, pad=64, filter=Image.LANCZOS):
     """Scales a box of `arr` to `size`; the box may run off the sheet's edges."""
-    padded = np.pad(arr.astype(np.float32), pad)
+    h, w = arr.shape[:2]
+    pad = max(pad, int(np.ceil(max(-box[0], -box[1], box[2] - w, box[3] - h))) + 1)
+    padded = np.pad(arr.astype(np.float32), [(pad, pad), (pad, pad)] + [(0, 0)] * (arr.ndim - 2))
     box = tuple(v + pad for v in box)
-    return np.asarray(Image.fromarray(padded).resize(size, Image.LANCZOS, box=box))
+    return np.asarray(Image.fromarray(padded).resize(size, filter, box=box))
 
 
 LUMA = np.array([0.3, 0.59, 0.11])
@@ -233,14 +325,18 @@ def dark_forces(rgb, opaque, style, tones):
     sharpened, its brightness stretched over the sheet's `tones` (3rd and
     97th percentiles) with an S-curve (`contrast`) and a `gamma` that deepens
     the shadows, lit from one side (`side`: brightness at the body's left and
-    right edges), and its contour darkened (`outline`)."""
+    right edges), and its contour darkened (`outline`). Optional: `range`,
+    the darkest and brightest output (default 8 to 248); `lift`, how far
+    pixels much darker than the opaque pixels round them (line work) are
+    eased toward them, and with `liftEdges` the contour's too."""
     lo, hi = tones
     lum = rgb @ LUMA
     sharp = lum + style['sharpen'] * (lum - blur3(lum))
     t = np.clip((sharp - lo) / (hi - lo), 0, 1)
     k = style['contrast']
     t = (1 - k) * t + k * t * t * (3 - 2 * t)
-    target = 255 * ((8 + 240 * t) / 255) ** style['gamma']
+    dark, light = style.get('range', (8, 248))
+    target = 255 * ((dark + (light - dark) * t) / 255) ** style['gamma']
     rgb = rgb * (target / np.maximum(lum, 1))[..., None]
     cols = np.nonzero(opaque.any(0))[0]
     if len(cols):
@@ -249,6 +345,16 @@ def dark_forces(rgb, opaque, style, tones):
         rgb = rgb * (left + (right - left) * x)[None, :, None]
     pad = np.pad(opaque, 1)
     edge = opaque & ~(pad[:-2, 1:-1] & pad[2:, 1:-1] & pad[1:-1, :-2] & pad[1:-1, 2:])
+    if style.get('lift'):
+        # Ease pixels much darker than the opaque pixels round them (the
+        # source's line work) toward them, so seams read as shading.
+        lum = rgb @ LUMA
+        w = opaque.astype(float)
+        mean = blur3(lum * w) / np.maximum(blur3(w), 1e-3)
+        gap = np.clip(mean - lum - style.get('liftAbove', 12), 0, None)
+        lifted = lum + style['lift'] * gap
+        some = opaque if style.get('liftEdges') else opaque & ~edge
+        rgb[some] *= (lifted / np.maximum(lum, 1))[some][:, None]
     rgb[edge] *= style['outline']
     return np.clip(rgb, 0, 255)
 
@@ -261,8 +367,9 @@ def assemble(frames, scale, glow=None, draw=None, style=None, ramps=None):
     eyes or a muzzle flash) covers most of a pixel: those snap to the
     fullbright colours. `style` (like DARK_FORCES) restyles the frames:
     `widen` stretches them across, `median` smooths the source's fine
-    texture first, `threshold` is how covered a pixel must be to be opaque,
-    and the rest goes to dark_forces(). `draw(i, frame, box)` may paint on
+    texture first, `box` scales by area averaging instead of Lanczos,
+    `threshold` is how covered a pixel must be to be opaque, and the rest
+    goes to dark_forces(). `draw(i, frame, box)` may paint on
     frame i (an RGBA array; `box` is its area on the sheet)."""
     lit, glows, ramp_colours = palette()
     if ramps:
@@ -285,8 +392,11 @@ def assemble(frames, scale, glow=None, draw=None, style=None, ramps=None):
         if style and style.get('median'):
             src = np.asarray(Image.fromarray(np.clip(src, 0, 255).astype(np.uint8)).filter(ImageFilter.MedianFilter(style['median']))).astype(float)
         a = resample(f['alpha'], box, (fw, fh))
-        rgb = np.stack([resample(src[..., c] * f['alpha'], box, (fw, fh)) for c in range(3)], -1)
-        rgb = np.clip(rgb / np.maximum(a, 1e-3)[..., None], 0, 255)
+        rf = Image.BOX if style and style.get('box') else Image.LANCZOS
+        rgb = np.stack([resample(src[..., c] * f['alpha'], box, (fw, fh), filter=rf) for c in range(3)], -1)
+        # The colour, like the alpha, may have been scaled by another filter.
+        a_rgb = resample(f['alpha'], box, (fw, fh), filter=rf) if rf != Image.LANCZOS else a
+        rgb = np.clip(rgb / np.maximum(a_rgb, 1e-3)[..., None], 0, 255)
         opaque = a >= threshold
         if style:
             rgb = dark_forces(rgb, opaque, style, tones)

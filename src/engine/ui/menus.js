@@ -123,7 +123,6 @@ export function optionsMenu(game) {
       { label: t(game, 'autoAim', 'AUTO AIM'), toggle: { get: () => s.autoAim, set: set('autoAim') } },
       { label: t(game, 'messages', 'MESSAGES'), toggle: { get: () => s.messages, set: set('messages') } },
       { label: t(game, 'showFps', 'SHOW FPS'), toggle: { get: () => s.showFps, set: set('showFps') } },
-      // No TOUCH row: phones aren't a target, and touch controls still turn on by themselves (settings.touchControls 'auto').
     ],
   };
 }

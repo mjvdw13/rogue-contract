@@ -21,6 +21,9 @@ export class Registry {
     this.weapons = new Map();
     this.things = new Map();
     this.sounds = new Map();
+    this.particles = new Map();
+    this.hangings = new Map();
+    this.explosions = new Map();
     this.songs = new Map();
     this.levels = new Map();
     this.episodes = new Map();
@@ -38,6 +41,9 @@ export class Registry {
     this._addAll(pack.weapons, this.weapons, 'weapon');
     this._addAll(pack.things, this.things, 'thing');
     this._addAll(pack.sounds, this.sounds, 'sound');
+    this._addAll(pack.particles, this.particles, 'particle');
+    this._addAll(pack.hangings, this.hangings, 'hanging');
+    this._addAll(pack.explosions, this.explosions, 'explosion');
     this._addAll(pack.songs, this.songs, 'song');
     this._addAll(pack.levels, this.levels, 'level');
     this._addAll(pack.episodes, this.episodes, 'episode');
@@ -46,10 +52,9 @@ export class Registry {
     for (const a of pack.attacks ?? []) this.attacks.set(a.name, a.fn);
     for (const p of pack.pickups ?? []) this.pickups.set(p.name, p.fn);
 
-    // Inline sprite sheets on things/weapons/hero become registered sheets.
+    // Inline sprite sheets on things and weapons become registered sheets.
     for (const t of this.things.values()) this._inlineSheet(t);
     for (const w of this.weapons.values()) this._inlineSheet(w);
-    if (this.hero?.face?.sheet) this.hero.face.sheet = this._inlineSheetSpec(this.hero.face.sheet, 'hero:face');
 
     // Glyph legends: shared tiles + shared things + each thing's own glyph.
     this.tileLegend = { ...(pack.legend?.tiles ?? {}) };
@@ -82,7 +87,7 @@ export class Registry {
     if (sheet.ref) return sheet;
     const sid = sheet.id ?? id;
     if (!this.sheets.has(sid)) {
-      this.sheets.set(sid, { type: 'sheet', id: sid, src: sheet.src, frameWidth: sheet.frameWidth, frameHeight: sheet.frameHeight });
+      this.sheets.set(sid, { type: 'sheet', id: sid, src: sheet.src, frameWidth: sheet.frameWidth, frameHeight: sheet.frameHeight, glint: sheet.glint, glow: sheet.glow });
     }
     return { ref: sid };
   }

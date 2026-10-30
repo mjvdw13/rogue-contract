@@ -1,5 +1,4 @@
 import { VIEW_W, VIEW_H, SCREEN_H } from '../config.js';
-import { FaceController } from './face.js';
 import { F_SOLID, F_DOOR, F_USE, F_EXIT, F_VOID, F_SLAB } from '../world/tilemap.js';
 
 /**
@@ -26,15 +25,12 @@ export class Hud {
     this.messages = [];
     this.automap = false;
     this.mapScale = 3; // pixels per tile
-    this.face = new FaceController(game.rng);
-    this.faceSheet = null;
     this.revealThings = false;
   }
 
   reset() {
     this.messages = [];
     this.automap = false;
-    this.face = new FaceController(this.game.rng);
   }
 
   message(text) {
@@ -44,8 +40,7 @@ export class Hud {
     if (this.messages.length > 3) this.messages.shift();
   }
 
-  update(dt, world) {
-    this.face.update(dt, world);
+  update(dt) {
     for (const m of this.messages) m.time -= dt;
     this.messages = this.messages.filter((m) => m.time > 0);
   }
@@ -210,7 +205,7 @@ export class Hud {
         if (t === pt || t.removed) continue;
         let c = pal.ramp('steel', 0.6);
         if (t.kind === 'monster') c = t.dead ? pal.ramp('gray', 0.4) : pal.ramp('glow-red', 1);
-        else if (t.kind === 'npc') c = pal.ramp('glow-green', 1);
+        else if (t.kind === 'npc') c = t.dead ? pal.ramp('gray', 0.4) : pal.ramp('glow-green', 1);
         else if (t.kind === 'item') c = pal.ramp('glow-yellow', 0.6);
         s.fillRect(sx(t.x) - 1, sy(t.y) - 1, 2, 2, c);
       }

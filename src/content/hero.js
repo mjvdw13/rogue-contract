@@ -1,5 +1,5 @@
 // The player: an original mercenary hired by the Rebellion. Starting stats
-// and inventory. (No status-bar face for now; the HUD is reworked later.)
+// and inventory.
 export default {
   health: 100,
   radius: 0.5,
@@ -9,4 +9,5 @@ export default {
   startWeapon: 'blaster',
   startAmmo: { energy: 60 },
   blood: 'blood',
+  sounds: { jump: 'player-jump', land: 'player-land' },
 };
