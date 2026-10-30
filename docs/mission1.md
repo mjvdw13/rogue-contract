@@ -1,7 +1,7 @@
 # Mission 1: Mos Eisley (design)
 
 The story's Map A (`docs/story.md`), and the vertical slice. Kyle walks east
-through a calm Mos Eisley in daylight, finds Dace at the far end, then fights
+through a calm Mos Eisley in daylight, finds Rusk at the far end, then fights
 back west through the same streets to the bay he landed in. This file is the
 level's layout, how it's built, and the order it's built in. The story
 (who says what, the switch, the fob) stays in `docs/story.md`.
@@ -43,7 +43,7 @@ don't, and a dozen places that each look and sound different.
 **Going east (calm):** Bay 87 → the lane → the main street → the cantina
 (the contract and the fob) → the junk yard (the signal) → past the
 checkpoint, with a pass from the alleys or over the rooftops → the old
-quarter → the derelict bay (Dace).
+quarter → the derelict bay (Rusk).
 
 **Coming back west (loud):** the derelict bay → the old quarter (across the
 wash) → the checkpoint (now open, and fighting) or the rooftops (snipers now)
@@ -65,9 +65,9 @@ street is at 0. The numbers 1-10 are the story's; 11 on are new.
 | B | **Blast doors** | at x 104..106 | | Two Imperial blast doors across the street, open in the calm half: slid into slots in the walls either side, strips of dark steel easy to miss. The switch shuts them and splits the town in two. |
 | 3 | **Chalmun's cantina** | 88..126, 84..122 | -2 | The classic (Mark's still, 2026-10-18: the bar a pale ring under a big oval opening in a low, heavy ceiling, lit from above with its taps and pipes behind it; arched alcoves round the walls; grey, dim and hazy). A dark entrance with a droid detector (and a "no droids" sign), steps down into a round main room (about 26 across, a true circle of angled walls). A round bar in the middle with the bartender, booths in alcoves round the edge under lower ceilings, each with a dim lamp. A bandstand with the band (its own music). Smoke hangs in the lamplight. Dark: 96-120, with pools at the bar and the booths. The broker's booth at the back. A back room, a storeroom and the kitchen; the back door opens onto the back lane (19). |
 | 14 | **Bay owner's office** | 44..53, 101..105 | 0 | In the bay's building, east of its door: a red door off the lane and a window (open, at eye height) onto it. A cramped office with a terminal and crates, a desk, a tired owner ("Docking fees doubled. Imperials."), a power droid charging outside. |
-| 16 | **Customs house** | 11..21, 99..106 | 0 | West of the bay door, jutting a tile into the lane: a grey Imperial prefab (corrugated `metal-grey`, its roof at 5, below the bay's) dropped among the adobe, a door and a window onto the lane, impounded cargo inside: the customs officer and his troopers come out of it. A counter, a terminal, a holo-notice of wanted faces (not Dace's yet). |
+| 16 | **Customs house** | 11..21, 99..106 | 0 | West of the bay door, jutting a tile into the lane: a grey Imperial prefab (corrugated `metal-grey`, its roof at 5, below the bay's) dropped among the adobe, a door and a window onto the lane, impounded cargo inside: the customs officer and his troopers come out of it. A counter, a terminal, a holo-notice of wanted faces (not Rusk's yet). |
 | 17 | **Docking Bay 86** | 58..86, 94..130 | -5, sky | Next door, shut. Through its barred gate you look down on customs troopers inspecting a battered freighter, crates opened on the floor. Atmosphere only; you can't get in. |
-| 4 | **Jawa junk yard** | 6..46, 26..58 | 0, sky | Piles of droid parts and scrap behind a cage fence, a crane, a scrap furnace glowing, Jawa traders and their droids for sale. The trader who sold Dace the coupling. A side gate to the back alleys. |
+| 4 | **Jawa junk yard** | 6..46, 26..58 | 0, sky | Piles of droid parts and scrap behind a cage fence, a crane, a scrap furnace glowing, Jawa traders and their droids for sale. The trader who sold Rusk the coupling. A side gate to the back alleys. |
 | 15 | **The sandcrawler** | 2..22, 2..24 | out of reach | The Jawas' sandcrawler parked outside the town wall, seen over the junk yard: a huge 3D model and a landmark from the west half. |
 | 11 | **Dewback stable** | 50..78, 40..58 | 0 | An open-fronted stable off the market: stalls, hay and water, a dewback or two (when the sprite exists), the patrol's spare mounts. Dim and dusty, shafts of light through the slatted roof. |
 | 12 | **Speeder garage** | 80..100, 40..58 | 0 | A mechanic's garage: a landspeeder on blocks, a swoop on a hoist, tools, a pit droid. A back door into the alleys. |
@@ -75,10 +75,10 @@ street is at 0. The numbers 1-10 are the story's; 11 on are new.
 | 19 | **The back lane** | 126..130, 78..124 | 0, sky | A narrow service lane behind the cantina, from the main street's east half south past the cantina's back door. Crates and a collapsed wall at its south end: the climb onto the rooftops. |
 | 5 | **Checkpoint** | 136..146, 60..80 | 0, sky | Barricades across the street, a guard booth, a closed gate (`checkpoint`), floodlights on poles. "Old quarter's sealed, hunter." |
 | 6 | **Rooftops** | 130..148, 78..112 | 4-8, sky | Flat roofs at different heights, a moisture tank, vaporators, a dome or two, washing on lines. Running jumps across gaps (up to 4 tiles), a plank across a wider one. The rooftop cache (secret: a better weapon). A drop down into the old quarter past the checkpoint. Snipers when loud. |
-| 8 | **Prefecture** | 146..196, 6..54 | 0 | A walled Imperial compound, its gate on the old quarter's north street: a courtyard, a garage with a speeder bike, barracks, and the comm tower (the landmark, about 30 tall). Shut in the calm half. A terminal by the gate shows Dace's wanted file: "Jundland Range security". Its doors open at the switch and the reinforcements come out. |
+| 8 | **Prefecture** | 146..196, 6..54 | 0 | A walled Imperial compound, its gate on the old quarter's north street: a courtyard, a garage with a speeder bike, barracks, and the comm tower (the landmark, about 30 tall). Shut in the calm half. A terminal by the gate shows Rusk's wanted file: "Jundland Range security". Its doors open at the switch and the reinforcements come out. |
 | 9 | **Old quarter** | 146..206, 56..104 | 0, sky | Half-empty streets, sand drifting through broken walls, a collapsed dome, a few squatters and a hermit, a small shrine with candles. Quieter: wind instead of the market's noise. |
 | 18 | **The dry wash** | 168..176, 54..104 | -3, sky | A flood channel through the old quarter, from a grated culvert under the prefecture's wall south into the derelict bay (which is why the bay is half full of sand). Crossed by two bridges (slabs: walk over or under) and a culvert under the old quarter's main street. A second way through, and a good place for a fight. |
-| 10 | **Derelict bay** | 160..204, 104..148 | -6, sky | An abandoned docking bay half-buried in drifted sand, a gutted freighter (a 3D model) with its ramp down and its hold open, scaffolding, scrap. Dace is hiding in the hold. The flip happens here: troopers come in over the rim and through the bay door. |
+| 10 | **Derelict bay** | 160..204, 104..148 | -6, sky | An abandoned docking bay half-buried in drifted sand, a gutted freighter (a 3D model) with its ramp down and its hold open, scaffolding, scrap. Rusk is hiding in the hold. The flip happens here: troopers come in over the rim and through the bay door. |
 | 20 | **Town edges** | the outer wall | | Where streets end at the edge of town, a low wall with the Dune Sea beyond: dunes and the Jundland's mesas in the backdrop, fading into the haze. The view at the end of the main street, past the junk yard, and from the rooftops. |
 
 ### Secrets (6)
@@ -408,7 +408,7 @@ troopers stand posts and walk patrols, everyone else wanders and talks.
 | The band | the cantina's bandstand | **Mark** |
 | Bartender, broker, informant, thug | cantina, alleys | **Mark** |
 | Customs officer, bay owner, water seller | bay, customs, plaza | **Mark** (the officer could be our officer recoloured) |
-| Dace (a scout trooper without his helmet) | the derelict bay | **Mark** |
+| Rusk (a scout trooper without his helmet) | the derelict bay | **Mark** |
 | Dewback, power droid | stable, bay, patrols | **Mark** |
 
 ## Sound
@@ -429,7 +429,7 @@ when the level is populated. The plan:
 
 | Area | Every skill | 2+ | 3+ | 4+ |
 |------|-------------|----|----|----|
-| Derelict bay | the squad that takes Dace (left), 2 troopers on the rim | | a trooper at the bay door | |
+| Derelict bay | the squad that takes Rusk (left), 2 troopers on the rim | | a trooper at the bay door | |
 | Old quarter | the patrol that passed you | a probe droid | | |
 | Rooftops | | a sniper | 2 snipers | |
 | Checkpoint | its guards behind the barricades | a commander | | |

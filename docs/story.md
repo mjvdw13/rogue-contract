@@ -58,18 +58,18 @@ droid built before Mohc had phrik, so blasters do hurt it. This is Phase
 
 ## The story
 
-**The job.** The Bounty Hunters' Guild has posted a quiet contract on Arlen
-Dace, a scout trooper who deserted and has gone to ground in Mos Eisley.
+**The job.** The Bounty Hunters' Guild has posted a quiet contract on Tavin
+Rusk, a scout trooper who deserted and has gone to ground in Mos Eisley.
 Jan's Alliance contacts say he saw something in the Jundland, and they want
 him before the Empire gets him. The Alliance can't go openly, so Kyle takes
 the Guild contract as cover. A licensed hunter can walk anywhere in Mos
 Eisley, troopers wave hunters through, and the contract comes with a
 tracking fob. The licence is in a false name, which Jan made. Kyle is a
 wanted deserter himself, so it had better hold. Kyle also notes that the
-Guild pays double if Dace is breathing, and that he means to collect from
+Guild pays double if Rusk is breathing, and that he means to collect from
 both.
 
-**What Dace knows.** His scout unit guarded the garrison's test range in the
+**What Rusk knows.** His scout unit guarded the garrison's test range in the
 Jundland. He watched the prototype destroy a Tusken camp. Then his unit was
 ordered to clear a moisture farm so the prototype could be tested on it. He
 refused, warned the family and ran. They hid him for a while, then he came
@@ -77,16 +77,16 @@ to Mos Eisley to buy passage off-world. Like Kyle, he walked away from the
 Empire, and the story uses that.
 
 **The twist.** Mohc's people posted the contract through a front. They don't
-want Dace back. They want him silenced, and they want to know who he told.
-The fob carries an Imperial tracer, so the moment Kyle finds Dace, the
+want Rusk back. They want him silenced, and they want to know who he told.
+The fob carries an Imperial tracer, so the moment Kyle finds Rusk, the
 Empire has found him too. Customs also logged the Moldy Crow when it landed,
 so they know who the hunter really is. The contract has gone rogue.
 
 | # | Mission | Kind | Drop-off | What happens | Pickup |
 |---|---------|------|----------|--------------|--------|
-| 1 | Mos Eisley: The Puck | Free roam, then run-and-gun | The Crow lands in Docking Bay 87 and leaves before customs arrives. | **Calm:** Kyle takes the contract and the fob from the broker in the cantina. Dace has wiped his ID code, so the fob has nothing to track. A Jawa trader sold Dace a part tagged with their own transponder, which gives the fob a signal. It leads across town, past the closed checkpoint, to a derelict docking bay where Dace is hiding. **Loud:** Dace pulls the Imperial tracer out of the fob, and the shooting starts. An officer's voice: "Kyle Katarn. Customs logged your ship this morning." A squad takes Dace, and every trooper in town turns on Kyle. Before he's dragged off, Dace shouts where he hid what he saw: the farm, the cellar. Kyle fights back across town to the bay. | Back in Docking Bay 87. JAN: "Customs won't be checking papers now." |
-| 2 | The Homestead | Run-and-gun | On the ridge at night, above a farm that's already burning. | The Empire is cleaning up everyone Dace talked to. Kyle fights down through the vaporator field and into the sunken courtyard, and finds Dace's helmet recordings of the test in the cellar. Then the prototype walks out of the dark. It's far too tough to fight here: run. | Under fire. Jan is two minutes out, so Kyle holds the landing spot until the Crow sets down. |
-| 3 | The Canyon Garrison | Run-and-gun | In the canyon's start bowl at night. | The map we've built, entered by the vent. Through the officer's barred window Kyle sees a general hurry out. He frees Dace from a new detention block, takes the test records from the vault, and destroys the prototype in the generator chamber with the overload. | On the landing pad. The general's shuttle is gone. |
+| 1 | Mos Eisley: The Puck | Free roam, then run-and-gun | The Crow lands in Docking Bay 87 and leaves before customs arrives. | **Calm:** Kyle takes the contract and the fob from the broker in the cantina. Rusk has wiped his ID code, so the fob has nothing to track. A Jawa trader sold Rusk a part tagged with their own transponder, which gives the fob a signal. It leads across town, past the closed checkpoint, to a derelict docking bay where Rusk is hiding. **Loud:** Rusk pulls the Imperial tracer out of the fob, and the shooting starts. An officer's voice: "Kyle Katarn. Customs logged your ship this morning." A squad takes Rusk, and every trooper in town turns on Kyle. Before he's dragged off, Rusk shouts where he hid what he saw: the farm, the cellar. Kyle fights back across town to the bay. | Back in Docking Bay 87. JAN: "Customs won't be checking papers now." |
+| 2 | The Homestead | Run-and-gun | On the ridge at night, above a farm that's already burning. | The Empire is cleaning up everyone Rusk talked to. Kyle fights down through the vaporator field and into the sunken courtyard, and finds Rusk's helmet recordings of the test in the cellar. Then the prototype walks out of the dark. It's far too tough to fight here: run. | Under fire. Jan is two minutes out, so Kyle holds the landing spot until the Crow sets down. |
+| 3 | The Canyon Garrison | Run-and-gun | In the canyon's start bowl at night. | The map we've built, entered by the vent. Through the officer's barred window Kyle sees a general hurry out. He frees Rusk from a new detention block, takes the test records from the vault, and destroys the prototype in the generator chamber with the overload. | On the landing pad. The general's shuttle is gone. |
 | | Finale | Text | | The Crow gets away. The Alliance files the records as unconfirmed, and Jan brings the next job: Danuta. | |
 
 **Sample briefing, Mission 1:**
@@ -102,7 +102,7 @@ so they know who the hunter really is. The contract has gone rogue.
 
 **Sample finale:**
 
-> The Moldy Crow cleared the Jundland with Dace asleep in the hold and the
+> The Moldy Crow cleared the Jundland with Rusk asleep in the hold and the
 > garrison burning behind it.
 >
 > The Alliance filed the recordings as unconfirmed: one prototype,
@@ -159,9 +159,9 @@ engine has today.
 
 **One switch.** The town turns hostile all at once, and it has two causes:
 
-- **The story:** Kyle finds Dace, and a trigger flips it.
+- **The story:** Kyle finds Rusk, and a trigger flips it.
 - **You:** fire a weapon or hit anyone, and the town flips early. That
-  doesn't fail the mission. The fob still leads to Dace, and the hunt for
+  doesn't fail the mission. The fob still leads to Rusk, and the hunt for
   him becomes a fight.
 
 When it flips, every calm trooper becomes a normal monster, blast doors
@@ -179,7 +179,7 @@ small handheld unit whose light blinks faster as you close in.
   there's nothing to track. Triggers set the signal: a tagged spot, an item
   or a character.
 - **It lives only in Mission 1.** It starts dark, picks up the Jawas'
-  transponder code and leads to Dace. Then Dace pulls the tracer out of it,
+  transponder code and leads to Rusk. Then Rusk pulls the tracer out of it,
   Kyle drops it, and the slot is gone for the rest of the game.
 
 **No stealth.** There are no restricted zones, no warnings and no
@@ -188,7 +188,7 @@ an informant, or climb over the rooftops.
 
 ## Map A: Mos Eisley (Mission 1)
 
-A loop. Kyle walks east through a calm town in daylight, finds Dace at the
+A loop. Kyle walks east through a calm town in daylight, finds Rusk at the
 far end, then fights back west through the same streets to the bay he
 started in. The second half reuses the first half's geometry, with every
 trooper you passed now shooting. The level's full design, which grows this
@@ -209,14 +209,14 @@ sketch (a bigger map, more areas), is `docs/mission1.md`.
  west                                        ║                         east
   [4 Jawa junk yard]  [7 alleys]             ║  [8 prefecture]
           |                 |                ║        |
-  ======= 2 main street (market) =======  [5 checkpoint] == 9 old quarter == [10 derelict bay: Dace]
+  ======= 2 main street (market) =======  [5 checkpoint] == 9 old quarter == [10 derelict bay: Rusk]
           |                 |                ║
   [1 Docking Bay 87]   [3 cantina]           ║  [6 rooftops: a way over 5]
 ```
 
 **Going east (calm):** the Crow drops Kyle in the bay → the cantina
 (contract and fob) → the junk yard (a signal) → past the checkpoint, with
-a pass or over the roofs → the old quarter → the derelict bay (Dace).
+a pass or over the roofs → the old quarter → the derelict bay (Rusk).
 
 **Coming back west (loud):** the derelict bay → the old quarter → through
 the checkpoint (now open) or over the roofs, with troopers on the roofs this
@@ -228,13 +228,13 @@ the back alleys → the bay, where the Crow lands.
 | 1 | Docking Bay 87 | The start: a round bay sunk 3 below the street and open to the sky, the drop-off's stage. Stairs go up to a 4 × 4 bay door. A power droid and the bay owner ("Docking fees doubled. Imperials."). Customs checks Kyle's licence. | The pickup. Customs troopers hold the bay. Clear them, and the Crow comes down. |
 | 2 | Main street | Wide (10-14 tiles), sand, adobe walls. Market stalls with awnings (3D models) and crates. A sandtrooper patrol with a dewback, Jawas arguing over a droid, a probe droid hovering over the market. The prefecture's comm tower above the roofs is the landmark. | Blast doors close across it, splitting it in two. Troopers behind the stalls, the probe droid on the hunt. |
 | 3 | The cantina | A dark entrance, then steps down into a round main room (an octagon about 24 across). A round bar stands in the middle (a 3D model or an angled-wall island). Booths sit round the edge under lower ceilings. The band has its own music, which starts when you walk in (the existing `music` action). There's a bartender, other customers, and two troopers whose patrol passes through. The broker's booth is at the back: the contract and the fob. | The way round the blast doors: in by the front, out through a back room to the alleys. The customers have gone, and troopers come down the steps. |
-| 4 | Jawa junk yard | A yard of droid parts behind a cage fence, with Jawa traders. A trader remembers selling Dace a power coupling, and for a price gives Kyle its transponder code. The fob lights up. | The Jawas have bolted. A side gate leads round to the alleys. |
+| 4 | Jawa junk yard | A yard of droid parts behind a cage fence, with Jawa traders. A trader remembers selling Rusk a power coupling, and for a price gives Kyle its transponder code. The fob lights up. | The Jawas have bolted. A side gate leads round to the alleys. |
 | 5 | Checkpoint | Barricades across the street (low railings and 3D barrier models) and a closed gate. "Old quarter's sealed, hunter." | The gate is open, and the checkpoint's troopers fight from behind the barricades. |
 | 6 | Rooftops | Crates and a collapsed wall let you climb onto flat roofs. You cross them with running jumps (up to 4 tiles) and drop down past the checkpoint. | Snipers on the roofs. |
 | 7 | Back alleys | Narrow, angled and dark (light 120). An informant sells a pass for the checkpoint, if Kyle collects a debt from a thug in a back room first. | The quiet way past the blast doors, and an ambush. |
-| 8 | Prefecture | A walled Imperial compound, closed, with the comm tower. A terminal by its door shows Dace's wanted file: "Jundland Range security", the first hint of the garrison. | Its doors open, and the reinforcements come out. |
-| 9 | Old quarter | Half-empty streets, sand drifting through broken walls, a few squatters. | A running fight with the squad that took Dace. |
-| 10 | Derelict bay | An abandoned docking bay with a gutted freighter (a 3D model). Dace is hiding in its hold. | The flip happens here: troopers come in over the rim and through the bay door. |
+| 8 | Prefecture | A walled Imperial compound, closed, with the comm tower. A terminal by its door shows Rusk's wanted file: "Jundland Range security", the first hint of the garrison. | Its doors open, and the reinforcements come out. |
+| 9 | Old quarter | Half-empty streets, sand drifting through broken walls, a few squatters. | A running fight with the squad that took Rusk. |
+| 10 | Derelict bay | An abandoned docking bay with a gutted freighter (a 3D model). Rusk is hiding in its hold. | The flip happens here: troopers come in over the rim and through the bay door. |
 
 **Secrets:** a cantina back room (power cells and a piece of lore), a
 maintenance pit in Bay 87's floor where the Crow landed (a shield unit),
@@ -242,7 +242,7 @@ and a rooftop cache with a better weapon.
 
 ## Map B: The Homestead (Mission 2)
 
-The farm that hid Dace, at the edge of the Jundland, at night. The raid is
+The farm that hid Rusk, at the edge of the Jundland, at night. The raid is
 already under way when Kyle arrives. All combat.
 
 - **Size:** about 110 × 90 tiles.
@@ -266,7 +266,7 @@ already under way when Kyle arrives. All combat.
 | 2 | Vaporator field | Rows of moisture vaporators (tall 3D models) and low dunes (raised floors). Sandtroopers moving through. The prototype comes through here at the end. |
 | 3 | Entry dome | A small round building over an enclosed stairwell down to the courtyard. |
 | 4 | Sunken courtyard | A round pit open to the sky, about 20 across, 6 below the ground. Troopers on the rim shoot down into it, which the height grid does well. |
-| 5 | Rooms | Off the courtyard: a common room, storage, and a cellar with a dark cistern, where Dace hid his helmet recordings. |
+| 5 | Rooms | Off the courtyard: a common room, storage, and a cellar with a dark cistern, where Rusk hid his helmet recordings. |
 | 6 | Garage | The family is holed up here. Clear the courtyard, and they escape in their speeder (off screen). A long stair leads up to the surface. |
 | 7 | Ridge | Tuskens watching. If Tuskens and troopers fight each other (see factions below), it's a three-way fight. |
 | 8 | Pickup | Open ground south of the garage stair, with low rocks for cover. |
@@ -293,14 +293,14 @@ by the vent. This story adds:
   can't shoot) hurrying out of a far door as Kyle passes. He's gone before
   Kyle can get round.
 - **A detention block** off the barracks corridor, behind bars (existing
-  fences). Kyle opens Dace's cell, and Dace heads for the pad on his own.
+  fences). Kyle opens Rusk's cell, and Rusk heads for the pad on his own.
   He's removed here and placed at the pad, so he needs no escort AI.
 - **The vault** holds the test records, the mission's objective.
 - **The prototype in the generator chamber,** as the boss. Blasters wear it
   down slowly. The overload finishes it.
 - **The pickup** at the pad's marked spot, which is already the exit.
   Mohc's shuttle has gone (the placeholder shuttle model leaves the pad),
-  and the Crow comes down for Kyle and Dace.
+  and the Crow comes down for Kyle and Rusk.
 
 ## Engine work this needs
 
@@ -321,7 +321,7 @@ triggers and actions.
 | **Flying models** | A `fly` action moves a tagged model decoration along keyframes (position, height, facing, time), for the Crow landing and leaving and the shuttle leaving. It's only solid while it stands still. | Model decorations | Small | All |
 | **Scripted camera** | A `cutscene` action: for a few seconds, the view comes from a tagged spot looking at a target, the HUD and weapon are hidden, input is locked, and use or fire skips it. | `world.camera()` | Small to medium | All |
 | **Delays** | Actions that wait (`{ action: 'wait', seconds }`) inside a trigger's list, for drop-off timing and Jan's "two minutes". | Triggers | Small | All |
-| **Moving characters** | `remove` and `place` actions, for Dace being taken, Mohc leaving and Dace reaching the pad. | Actions | Small | M1, M3 |
+| **Moving characters** | `remove` and `place` actions, for Rusk being taken, Mohc leaving and Rusk reaching the pad. | Actions | Small | M1, M3 |
 | **Damage from a trigger** | A `damage { tag, amount }` action, so the overload hurts the prototype. | Actions | Small | M3 |
 | **Objectives and briefings** | Already planned in Phase 2. The briefings are Jan and Kyle talking. | | Medium | All |
 | **Day sky** | A sky with both suns for Mos Eisley. | Sky | Small (art) | M1 |
@@ -344,8 +344,8 @@ triggers: [
     { action: 'fly', tag: 'crow', path: [[20, 90, 0, 0], [20, 90, 12, 2], [60, 40, 40, 5]] },
     { action: 'spawn', thing: 'customs-officer', tag: 'bay-door' },
   ] },
-  { on: 'talk', npc: 'jawa-trader', do: [{ action: 'setSignal', thing: 'dace' }] },
-  { on: 'talk', npc: 'dace', do: ['hostile', { action: 'remove', thing: 'dace' }] },
+  { on: 'talk', npc: 'jawa-trader', do: [{ action: 'setSignal', thing: 'rusk' }] },
+  { on: 'talk', npc: 'rusk', do: ['hostile', { action: 'remove', thing: 'rusk' }] },
   { on: 'hostile', do: [
     { action: 'closeDoors', tag: 'street-blast' },
     { action: 'spawn', thing: 'stormtrooper', tag: 'prefecture-door' },
@@ -372,7 +372,7 @@ sheets would help (Phase 2's multi-angle stretch goal).
 - **Sprites** (outsourced like the sandtrooper and Jawa sheets):
   - **The prototype:** big, crude and loud, with exposed cabling, a blade
     arm (a nod to Phase I) and a repeating blaster bolted on.
-  - **Characters:** Dace (a scout trooper without his helmet), Mohc, the
+  - **Characters:** Rusk (a scout trooper without his helmet), Mohc, the
     broker, a customs officer, a bartender, the informant, two to four
     kinds of townsfolk, Jawa traders, a Tusken Raider, a power droid and a
     dewback.
@@ -393,6 +393,6 @@ sheets would help (Phase 2's multi-angle stretch goal).
 
 1. Is the officer naming "Kyle Katarn" at Mission 1's flip the right
    moment, or should Kyle's cover hold until the garrison?
-2. With Dace taken in Mission 1, the Homestead mission is about his hidden
-   recordings, and Dace waits until Mission 3. Or should Kyle get Dace out
+2. With Rusk taken in Mission 1, the Homestead mission is about his hidden
+   recordings, and Rusk waits until Mission 3. Or should Kyle get Rusk out
    of Mos Eisley, and the Empire take him at the farm instead?

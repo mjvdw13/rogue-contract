@@ -2422,7 +2422,7 @@ unknown actions), documented in MODDING.md and covered by tests.
        `setSignal` action (a tag, item or character), and a `takeWeapon`
        action to remove it at the end. Giving it is an ordinary weapon
        pickup in the broker's booth.
-8. [ ] **`remove` and `place` actions** (small): Dace is taken in Mission
+8. [ ] **`remove` and `place` actions** (small): Rusk is taken in Mission
        1 and waits at the pad in Mission 3; Mohc leaves.
 9. [ ] Nice to have: **patrol routes** (`patrol: 'street'` walks tiles
        tagged `street-1`, `street-2`... in order) and **civilians running
@@ -3020,9 +3020,9 @@ update the smoke test.
   engine items: flying models, a scripted camera, and delays in triggers.
 - 2026-10-13: Free roam only in Mission 1 (Mark). `docs/story.md`
   updated: Mos Eisley is a loop. Kyle walks east through a calm town with
-  the tracking fob, finds Dace in a derelict docking bay, and the shooting
+  the tracking fob, finds Rusk in a derelict docking bay, and the shooting
   starts. The town turns hostile all at once, and he fights back west to
-  the Crow in Docking Bay 87. Dace is taken there, so the Homestead becomes
+  the Crow in Docking Bay 87. Rusk is taken there, so the Homestead becomes
   a straight combat mission (recovering his hidden recordings), and the
   Canyon Garrison stays a combat mission entered by the vent. Dropped:
   restricted zones, warnings, monster searching, the traced fob and

@@ -31,7 +31,7 @@ These need Mark to try something, or to decide. Don't start them without him.
 - **Character sheets for Mos Eisley** (`docs/mission1.md`, Characters):
   cantina aliens (4-6 kinds), the band, the bartender, the broker, the
   informant, the thug, the customs officer, the bay owner, the water
-  seller, Dace, a dewback and a power droid. Until they exist, villagers
+  seller, Rusk, a dewback and a power droid. Until they exist, villagers
   stand in.
 - **Mos Eisley's first look** (`?map=m1`, the west end of the main street,
   rebuilt with every building a volume: alleys, rounded corners, set-back
