@@ -93,9 +93,12 @@ export const TOWN = [
   { out: 'street-sand', df: 'ZPROCK02', gradient: [[62, 46, 30], [116, 90, 62], [160, 128, 92], [192, 162, 120], [214, 188, 146]], keep: 0.1, contrast: 0.6 },
   // Loose sand the wind piles against the walls: paler and softer.
   { out: 'street-drift', df: 'ZPROCK02', smooth: 1, gradient: [[150, 120, 82], [199, 172, 129], [216, 193, 152], [232, 214, 176]], keep: 0, contrast: 0.5 },
-  // Small pale tiles lining a doorway's jamb: ZPTILE4's bevelled square, shrunk to a
-  // quarter tile (Mark's reference has small ones) and repeated.
-  { out: 'door-jamb', df: 'ZPTILE4', scale: [8, 8], tile: [8, 8], gradient: [[104, 66, 44], [200, 150, 112], [234, 198, 160], [250, 228, 200]], keep: 0, contrast: 1 },
+  // Small pale tiles lining a doorway's jamb: ZPTILE4's bevelled square, 8 x 16
+  // texels, repeated 8 by 4. The jamb lays them a quarter tile along the doorway
+  // (Mark's reference has small ones) and half a tile across its depth, one row
+  // each side of the door (models/door-jamb.js): 32 texels a tile both ways, as
+  // the walls are.
+  { out: 'door-jamb', df: 'ZPTILE4', scale: [8, 16], tile: [8, 4], gradient: [[104, 66, 44], [200, 150, 112], [234, 198, 160], [250, 228, 200]], keep: 0, contrast: 1 },
   { out: 'flagstone', df: 'IPDET1', gradient: [[44, 32, 22], [100, 78, 56], [150, 122, 90], [190, 162, 124], [220, 198, 160]], keep: 0.1, contrast: 0.9 },
   // Corrugated tin for lean-to roofs: TestBase's ribbed panel, its ribs
   // running down the texture, rusted (`rust`: blotches of rust that tile)
