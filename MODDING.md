@@ -883,7 +883,10 @@ ochre one darker ochre. Grime keeps the picture's own greys (finer than
 the palette's), and fades out with the haze in the distance. Place it like
 any decal. The generated ones (`grime-streaks-1` and so on) are drawn by
 `tools/art/textures/grime.js`, and `town.grime()` weathers a whole town
-with them (docs/mission1.md). The map viewer doesn't mark grime.
+with them (docs/mission1.md); `town.grimeIndoors(box)` dirties the walls
+inside rooms, floor to ceiling. For a floor, lay a model face in a grime
+texture on it (the stains in `models/stains.js`). The map viewer doesn't
+mark grime.
 
 ### Backdrop: terrain past the edge of play
 

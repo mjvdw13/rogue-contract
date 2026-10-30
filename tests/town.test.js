@@ -241,6 +241,28 @@ test('a window is set into its wall: a notch with a sill and a lintel, the windo
   assert.throws(() => town.window(7.5, 14, 'S', { z: 9 }), /no wall/, 'not above the roof');
 });
 
+test("indoor grime dirties a room's walls from its floor to its ceiling, not an alcove's open mouth or the outside", () => {
+  const build = () => {
+    const { town } = kit();
+    town.house(4, 4, 16, 14, { h: 6 });
+    // A room 4 high, and an alcove off its south side, 3 high: open into it.
+    town.room(6, 6, 14, 12, { h: 6, ceilZ: 4 }).room(10, 12, 13, 13, { h: 6, ceilZ: 3 });
+    town.finish().grimeIndoors(0, 0, 40, 40, { amount: 2 });
+    return town.decals;
+  };
+  const grime = build();
+  assert.ok(grime.length > 10, `${grime.length} pieces`);
+  assert.ok(grime.every((d) => d.tex.startsWith('grime-')));
+  for (const d of grime) {
+    assert.ok(d.z > 0 && d.z < 4, `between the room's floor and ceiling: ${JSON.stringify(d)}`);
+    const inRoom = d.x >= 6 && d.x <= 14 && d.y >= 6 && d.y <= 13;
+    assert.ok(inRoom, `on the room's walls, not the house's outside: ${JSON.stringify(d)}`);
+  }
+  assert.ok(!grime.some((d) => d.face === 'N' && d.y === 12 && d.x > 10 && d.x < 13), "none across the alcove's mouth");
+  assert.ok(grime.some((d) => d.face === 'N' && d.y === 13 && d.x > 10 && d.x < 13), "the alcove's own back wall, though");
+  assert.deepEqual(build(), grime, 'the same every time');
+});
+
 test("grime weathers a house's straight walls and the wall under its window, not its rounded corners or a clean house", () => {
   const { p, town } = kit();
   town.house(4, 4, 16, 14, { h: 6, r: 2 });

@@ -721,6 +721,9 @@ town.finish();
 town.drifts();
 // Rain streaks, dust and stains on the walls (lib/town.js).
 town.grime();
+// Inside the cantina, filthy (Mark): soot, dirt, stains and smudges thick on
+// every wall from floor to ceiling.
+town.grimeIndoors(87, 82, 127, 119, { amount: 4 });
 // Crates, drums, canisters, cargo pods, junk and litter along the walls
 // (lib/town.js), but none yet in the blocked-out middle and east third.
 town.clutter({ keep: [[126, 92, 130, 122], [130, 86, 150, 122], [136, 44, W, H], [54, 1, 146, 49], [57, 94, 87, 131], [87, 82, 126, 122], [85, 76, 102, 82]] });
@@ -875,6 +878,54 @@ list.push(
   at('villager-man', 104, 106.5, { angle: 0, wander: 0 }), at('villager-woman', 105.4, 106.5, { angle: 180, wander: 0 }),
   at('villager-man', 108.4, 102.4, { angle: 180, wander: 0 }), at('villager-wanderer', 108.9, 103.5, { angle: 180, wander: 0 }), at('villager-adventurer', 108.4, 104.6, { angle: 180, wander: 0 }),
 );
+
+// The cantina's floor, filthy too (Mark): spills, burns and scuffs all over
+// it (models/stains.js, grime lying on the floor), dirt banked against the
+// walls' feet and where it's tracked in (the foot of the steps, inside the
+// street door), and litter underfoot. Scattered from a fixed seed, on floor
+// under the cantina's ceilings only.
+{
+  let s = 1030;
+  const rnd = () => (s = (s * 1103515245 + 12345) % 2147483648) / 2147483648;
+  const indoors = (x, y) => {
+    const c = p.get(Math.floor(x), Math.floor(y));
+    return c && !c.wall && !c.door && c.slab && (c.floorZ ?? 0) < 0;
+  };
+  const scatter = (types, n, [x0, y0, x1, y1]) => {
+    for (let k = 0; k < n; k++) {
+      const [x, y] = [x0 + rnd() * (x1 - x0), y0 + rnd() * (y1 - y0)];
+      const type = types[Math.floor(rnd() * types.length)];
+      const angle = Math.floor(rnd() * 24) * 15;
+      if (indoors(x, y)) list.push(at(type, Math.round(x * 100) / 100, Math.round(y * 100) / 100, { z: CANTINA.floorZ, angle }));
+    }
+  };
+  const ROOM = [88, 90, 110, 107];
+  const BACK = [93, 111, 115, 116];
+  scatter(['floor-spill-1', 'floor-spill-2', 'floor-spill-1'], 48, ROOM);
+  scatter(['floor-burn-1', 'floor-burn-2'], 12, ROOM);
+  scatter(['floor-scuff'], 34, ROOM);
+  scatter(['floor-spill-1', 'floor-spill-2', 'floor-scuff', 'floor-burn-1'], 18, BACK);
+  scatter(['litter', 'litter-small', 'litter-small'], 12, ROOM);
+  scatter(['litter', 'litter-small'], 4, BACK);
+  // Dirt against the walls' feet: on about one in three floor tiles beside a
+  // wall, its dark edge to the wall (angle 0 puts it to the south).
+  const solid = (x, y) => {
+    const c = p.get(x, y);
+    return !c || c.wall || (!c.slab && (c.floorZ ?? 0) >= 5);
+  };
+  for (let y = 83; y < 119; y++) {
+    for (let x = 87; x < 127; x++) {
+      if (!indoors(x + 0.5, y + 0.5)) continue;
+      for (const [dx, dy, angle] of [[0, -1, 180], [0, 1, 0], [1, 0, 90], [-1, 0, 270]]) {
+        if (!solid(x + dx, y + dy) || rnd() > 0.33) continue;
+        const type = rnd() < 0.5 ? 'floor-dirt-1' : 'floor-dirt-2';
+        const off = 0.5 - (type === 'floor-dirt-1' ? 1 : 1.25) / 2;
+        list.push(at(type, x + 0.5 + dx * off, y + 0.5 + dy * off, { z: CANTINA.floorZ, angle }));
+      }
+    }
+  }
+  list.push(at('floor-dirt-2', 98.5, 90.62, { z: CANTINA.floorZ, angle: 180 }), at('floor-dirt-1', 92, 86.5, { z: 0, angle: 180 }));
+}
 
 // Cables, ropes and cloth moving in the air (world/hangings.js). Each is
 // tied 0.05 out from a straight stretch of wall, clear of the rounded

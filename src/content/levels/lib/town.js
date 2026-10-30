@@ -72,6 +72,37 @@ const GRIME = {
   dust: [['grime-dust-1', 4, 1], ['grime-dust-2', 4, 1.25]],
 };
 
+const ns = (face) => face === 'N' || face === 'S';
+// The tile a face belongs to (behind it), and the one in front, at tile `a` along its edge `line`.
+const behind = (face, line, a) => (face === 'S' ? [a, line - 1] : face === 'N' ? [a, line] : face === 'E' ? [line - 1, a] : [line, a]);
+const before = (face, line, a) => (face === 'S' ? [a, line] : face === 'N' ? [a, line - 1] : face === 'E' ? [line, a] : [line - 1, a]);
+
+/**
+ * One grime decal of `kind` (GRIME) into `out`, picked and flipped with
+ * `r`: round `a` along the edge `line` (kept inside lo..hi), its middle at
+ * `z`, or its top at `top`, or its bottom at `bottom`. Returns its width,
+ * or nothing if it doesn't fit.
+ */
+function grimeDecal(r, out, kind, face, line, a, lo, hi, { scale = 1, z, top, bottom }) {
+  const [tex, w, h] = r.pick(GRIME[kind]);
+  const half = (w * scale) / 2;
+  const flip = r() < 0.5;
+  if (hi - lo < half * 2) return undefined;
+  const mid = Math.min(hi - half, Math.max(lo + half, a));
+  const zz = z ?? (top !== undefined ? top - (h * scale) / 2 : bottom + (h * scale) / 2);
+  const round = (v) => Math.round(v * 100) / 100;
+  // (On a slanting wall, `line` is the slant and `mid` how far along it.)
+  const t = face === 'angled' ? mid / line.len : 0;
+  const at =
+    face === 'angled'
+      ? { x: round(line.a[0] + (line.b[0] - line.a[0]) * t), y: round(line.a[1] + (line.b[1] - line.a[1]) * t) }
+      : ns(face)
+        ? { x: round(mid), y: line }
+        : { x: line, y: round(mid) };
+  out.push({ ...at, z: round(zz), face, tex, ...(scale !== 1 && { scale: round(scale) }), ...(flip && { flip }) });
+  return w * scale;
+}
+
 export class Town {
   /**
    * @param {import('./painter.js').Painter} p
@@ -893,37 +924,12 @@ export class Town {
     const { p } = this;
     let r = random(seed);
     const out = [];
-    const ns = (face) => face === 'N' || face === 'S';
-    // The tile a face belongs to (behind it), and the one in front, at tile `a` along its edge `line`.
-    const behind = (face, line, a) => (face === 'S' ? [a, line - 1] : face === 'N' ? [a, line] : face === 'E' ? [line - 1, a] : [line, a]);
-    const before = (face, line, a) => (face === 'S' ? [a, line] : face === 'N' ? [a, line - 1] : face === 'E' ? [line, a] : [line - 1, a]);
     const levelAt = ([x, y]) => {
       let g = amount;
       for (const [x0, y0, x1, y1, k] of this.grimeBoxes) if (x >= x0 && x < x1 && y >= y0 && y < y1) g = k;
       return g;
     };
-    // One of `kind` round `a` along the edge `line` (kept inside lo..hi),
-    // its middle at `z`, or its top at `top`, or its bottom at `bottom`.
-    // Returns its width, or nothing if it doesn't fit.
-    const put = (kind, face, line, a, lo, hi, { scale = 1, z, top, bottom }) => {
-      const [tex, w, h] = r.pick(GRIME[kind]);
-      const half = (w * scale) / 2;
-      const flip = r() < 0.5;
-      if (hi - lo < half * 2) return undefined;
-      const mid = Math.min(hi - half, Math.max(lo + half, a));
-      const zz = z ?? (top !== undefined ? top - (h * scale) / 2 : bottom + (h * scale) / 2);
-      const round = (v) => Math.round(v * 100) / 100;
-      // (On a slanting wall, `line` is the slant and `mid` how far along it.)
-      const t = face === 'angled' ? mid / line.len : 0;
-      const at =
-        face === 'angled'
-          ? { x: round(line.a[0] + (line.b[0] - line.a[0]) * t), y: round(line.a[1] + (line.b[1] - line.a[1]) * t) }
-          : ns(face)
-            ? { x: round(mid), y: line }
-            : { x: line, y: round(mid) };
-      out.push({ ...at, z: round(zz), face, tex, ...(scale !== 1 && { scale: round(scale) }), ...(flip && { flip }) });
-      return w * scale;
-    };
+    const put = (kind, face, line, a, lo, hi, opts) => grimeDecal(r, out, kind, face, line, a, lo, hi, opts);
     const height = (c) => (c.slab ? c.slab.top : c.floorZ ?? 0);
     const open = (c) => c && !c.wall && !c.door && c.ceiling === 'sky' && (!c.slab || c.slab.top - c.slab.bottom <= 0.25);
     // (A door that opens is an arch with a panel in it: the wall over it weathers.)
@@ -1004,6 +1010,70 @@ export class Town {
       }
     }
     // (First, so the signs and doors are drawn over their walls' grime.)
+    this.decals.unshift(...out);
+    return this;
+  }
+
+  /**
+   * Grime inside rooms in the box x0..x1, y0..y1 (grime() weathers the
+   * outsides): on every straight wall round a floor under a ceiling (a
+   * room's slab or a plain ceiling), from that floor up to the ceiling,
+   * where the wall is solid all the way up (not an alcove's open mouth).
+   * Soot streaks down from the ceiling, dirt along the foot, stains and
+   * cracks, and greasy smudges at hand height; `amount` times as much as
+   * the usual (1; 3 is filthy). Placed at random from `seed`, the same
+   * every time, each wall from its own seed. Run it after `finish()`.
+   */
+  grimeIndoors(x0, y0, x1, y1, { amount = 1, seed = 17 } = {}) {
+    const { p } = this;
+    const out = [];
+    const ceiling = (c) => (c.slab ? c.slab.bottom : c.ceiling !== 'sky' ? c.ceilZ ?? 2 : null);
+    const inside = (c) => c && !c.wall && !c.door && ceiling(c) !== null;
+    // Runs of straight wall, the same face, floor and ceiling.
+    const runs = [];
+    for (const face of 'NESW') {
+      const [l0, l1, a0, a1] = ns(face) ? [y0, y1, x0, x1] : [x0, x1, y0, y1];
+      for (let line = l0; line <= l1; line++) {
+        let run = null;
+        for (let a = a0; a <= a1; a++) {
+          let edge = null;
+          const f = a < a1 ? p.get(...before(face, line, a)) : null;
+          const b = a < a1 ? p.get(...behind(face, line, a)) : null;
+          if (inside(f) && b && !b.door && (b.wall || (!b.slab && (b.floorZ ?? 0) >= ceiling(f)))) edge = { bot: f.floorZ ?? 0, top: ceiling(f) };
+          if (run && edge && edge.bot === run.bot && edge.top === run.top) run.a1 = a + 1;
+          else {
+            if (run) runs.push(run);
+            run = edge && { ...edge, face, line, a0: a, a1: a + 1 };
+          }
+        }
+      }
+    }
+    const g = amount;
+    for (const { face, line, a0, a1, bot, top } of runs) {
+      const r = random(placeSeed(seed, FACES.indexOf(face), line, a0));
+      const put = (kind, a, opts) => grimeDecal(r, out, kind, face, line, a, a0 + 0.1, a1 - 0.1, opts);
+      const len = a1 - a0;
+      const tall = top - bot;
+      // Soot down from the ceiling, close together.
+      for (let a = a0 + r.range(0, 1); a < a1; a += r.range(0.4, 2) / g) {
+        if (r() < 0.8) a += put('streaks', a + 1, { scale: Math.min(r.range(0.7, 1.1), (tall - 0.4) / 3), top }) ?? 0;
+      }
+      // Dirt along the foot, nearly all the way.
+      for (let a = a0 + r.range(0, 0.5); a < a1 - 0.5; a += r.range(1.5, 3) / Math.min(g, 2)) {
+        put('dust', a + 1.5, { scale: r.range(0.6, 1), bottom: bot + 0.02 });
+      }
+      // Stains and cracks anywhere, and smudges where hands and shoulders rub.
+      for (let k = Math.round((len / 4) * g * r.range(0.5, 1.5)); k > 0; k--) {
+        put('blotch', r.range(a0, a1), { scale: r.range(0.6, 1.1), z: r.range(bot + 0.5, top - 0.5) });
+      }
+      for (let k = Math.round((len / 3) * g * r.range(0.3, 1)); k > 0; k--) {
+        put('smudge', r.range(a0, a1), { scale: r.range(0.8, 1.2), z: bot + r.range(1, 1.5) });
+      }
+      for (let k = Math.round((len / 10) * g * r.range(0, 1.5)); k > 0; k--) {
+        put('crack', r.range(a0, a1), { scale: r.range(0.6, 1), top: top - r.range(0.2, 1) });
+      }
+    }
+    // (First, so signs and fittings are drawn over it.)
     this.decals.unshift(...out);
     return this;
   }

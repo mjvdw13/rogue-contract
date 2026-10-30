@@ -11,6 +11,7 @@ import { BAY_WALL, BAY_HOSES } from './models/bay.js';
 import { TOWER_HEIGHT } from './models/market.js';
 import { BAR, TAPS, CORNER } from './models/cantina.js';
 import { POD } from './models/pod.js';
+import { STAINS } from './models/stains.js';
 
 // Scenery. Solid ones block movement; ones with health can be shot (and
 // `explode`).
@@ -131,6 +132,8 @@ export default [
   // (models/pod.js), colliding as its cylinder.
   defineDecoration({ id: 'hitching-ring', model: 'hitching-ring', fixed: true }),
   defineDecoration({ id: 'dome-pod', model: 'dome-pod', solid: true, radius: POD.r, height: POD.h, fixed: true }),
+  // Stains lying on floors (models/stains.js): grime, darkening the floor.
+  ...STAINS.map(([id]) => defineDecoration({ id, model: id, fixed: true })),
   // The Moldy Crow, hovering (models/crow.js), bobbing gently, drawn at 0.8 of
   // canon size: only its gun pod is low enough to collide (as its outline);
   // you walk under the rest.
