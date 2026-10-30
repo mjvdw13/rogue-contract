@@ -1,5 +1,5 @@
 import { defineLevel } from '../../engine/defs.js';
-import { WALL, BOOTH, TAPS, CANOPY } from '../models/cantina.js';
+import { WALL, BOOTH, TAPS, CANOPY, LAMP_CORD } from '../models/cantina.js';
 import { Painter } from './lib/painter.js';
 import { Town } from './lib/town.js';
 import { CISTERN } from '../models/market.js';
@@ -534,6 +534,8 @@ const roofOver = (x0, y0, x1, y1, ceilZ, h) => p.rect(x0, y0, x1, y1, (_, __, c)
   town.block(94, 106, 95, 110, MASS).block(102, 106, 103, 110, MASS);
   p.rect(105, 102, 106, 106, town.street(F + 0.25, { floor: 'planks', side: wall }));
   p.rect(106, 101, 110, 106, town.street(F + 0.5, { floor: 'planks', side: wall }));
+  // Warm light over the stage, for the band (to come).
+  lights.push({ x: 108, y: 102.5, z: F + 2.5, radius: 3.5, light: 56 }, { x: 108, y: 104.5, z: F + 2.5, radius: 3.5, light: 56 });
   // The bar (models/cantina.js): a pale U of counter round at the door's
   // end (centre 98.5, 100), its east arm stopping short for the bartender,
   // the taps' column inside it, and the back-bar's shelves on its back wall,
@@ -592,7 +594,13 @@ const roofOver = (x0, y0, x1, y1, ceilZ, h) => p.rect(x0, y0, x1, y1, (_, __, c)
   town.room(96, 85, 101, 88, { h, ceilZ: 3.5, wall, light });
   town.stair(96, 88, 101, 90, { up: 'N', from: F, top: 0, rise: 0.25, floor: 'flagstone', side: wall });
   roofOver(96, 88, 101, 90, 3.5, h);
-  town.door(94, 82, 'N', { h, tex: 'door-grey', wall, opens: true });
+  town.door(94, 82, 'N', { h, tex: 'door-grey', wall: 'adobe-pale', opens: true });
+  // A round-topped hood round it on S's front (the street's plaster), the
+  // droid detector on the vestibule's wall, and a bulb over the steps.
+  town.hood(94, 82, 'N', { h, width: 4, wall: 'adobe-pale' });
+  town.fixture('cantina-detector', 101, 86.5, 'W', { z: 1 });
+  town.things.push(at('cantina-lamp', 98.5, 87.5, { z: 3.5 - LAMP_CORD }));
+  lights.push({ x: 98.5, y: 87.5, z: 2.5, radius: 4, light: 40 });
   // (S's walls round them in the room's light, all but the roof under the dome.)
   p.light(91, 83, 99, 86, light).light(95, 84, 102, 88, light);
   // The way out: the back-bar's door, a back room, and a passage up two
@@ -604,6 +612,19 @@ const roofOver = (x0, y0, x1, y1, ceilZ, h) => p.rect(x0, y0, x1, y1, (_, __, c)
   town.stair(118, 105, 126, 107, { up: 'E', from: F, top: 0, rise: 0.25, floor: 'flagstone', side: wall });
   roofOver(118, 105, 126, 107, ceilZ, 8);
   town.door(126, 106, 'E', { h: 8, tex: 'door-grey', opens: true });
+  // The back room: kegs, crates and canisters along its walls, a power unit
+  // in the far corner, the storeroom's crates and a cargo pod out of the
+  // way to the back door; a bulb over each.
+  town.things.push(
+    at('crate-tan', 93.6, 111.7, { angle: 10 }), at('crate-grey-small', 93.5, 113.1), at('crate-tan', 93.6, 115.3, { angle: 95 }),
+    at('barrel-rust', 95.1, 115.5), at('barrel-grey', 95.9, 115.6), at('barrel-rust', 96.7, 115.5), at('barrel-rust', 95.5, 114.8),
+    at('canister', 101.6, 115.65), at('canister-rust', 102.1, 115.7),
+    at('crate-rust-long', 107.5, 115.2, { angle: 0 }), at('crate-tan', 104.6, 115.3, { angle: 80 }), at('barrel-grey', 110.6, 115.5), at('power-unit', 114.2, 115.2),
+    at('crate-grey-small', 105.5, 111.5, { angle: 20 }), at('barrel-rust', 106.4, 111.45),
+    at('crate-tan', 112.6, 104.6, { angle: 5 }), at('crate-grey-small', 112.5, 105.9), at('cargo-pod', 114.15, 109.6, { angle: 90 }),
+    at('cantina-lamp', 99.5, 113.5, { z: F + 4 - LAMP_CORD }), at('cantina-lamp', 108.5, 113.5, { z: F + 4 - LAMP_CORD }), at('cantina-lamp', 113.5, 107.5, { z: F + 4 - LAMP_CORD }),
+  );
+  lights.push({ x: 99.5, y: 113.5, z: F + 2.5, radius: 5, light: 40 }, { x: 108.5, y: 113.5, z: F + 2.5, radius: 5, light: 40 }, { x: 113.5, y: 107.5, z: F + 2.5, radius: 4, light: 32 });
   p.light(117, 103, 125, 108, light);
 }
 

@@ -28,6 +28,23 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
+- **The cantina in detail** (`?map=m1`, 2026-10-30, after Mark's
+  references; `models/cantina.js`). No skylight: over the bar the heavy
+  ceiling opens into a shallow oval well whose top glows, a canopy ring
+  in the ceiling's planks round it. The bar a pale U (a model) with a
+  steel top and stools, the taps' column with its pipes up into the well,
+  shelves of bottles either side of the back-bar's door. The booth niches
+  are vaulted alcoves walled on three sides (short walls now close the
+  ends that opened into the room), a booth in each and one on each cut
+  corner: a half ring of red-seated bench, a table and a lamp. The cut
+  corners are flat wall panels (no more sky along them). A hood round the
+  street door, the droid detector in the vestibule, light over the stage,
+  the back room stocked. The references weren't in this session (they
+  aren't in the repo), so this follows the notes taken from them and the
+  film; committing them (say `docs/references/`) would let later passes
+  check against them. To judge: the well's size and glow, the booths'
+  light, whether the walls should go grey, and the alcoves' changed shapes.
+
 - **Mos Eisley's east third, blocked out** (`?map=m1`, 2026-10-29; the
   areas in `docs/mission1.md`): plain volumes to try the route, no detail.
   Walk east past the blast doors: the street climbs two steps to the
@@ -347,10 +364,12 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
           walls) over square tiles, so their slits of sky go.
     - [x] Booths: round-topped arches over the niches, benches and round
           tables in them and along the cut corners, a lamp at each table.
-    - [ ] The way in: a hood round the street door, the vestibule's droid
-          detector. The bandstand's lamps; the kitchen and storeroom
-          stocked. Grey plaster, a darker floor, and the light pass: dim,
-          with pools under the lamps.
+    - [x] The way in: a hood round the street door, the vestibule's droid
+          detector and a bulb over the steps. Warm light over the stage;
+          the back room and storeroom stocked, a bulb in each. The walls
+          stay pale plaster (the back building's outside is the same
+          texture; dim, it reads grey): pools of light under the lamps.
+    - [ ] Waiting on Mark.
   - [ ] Bay 86, the dewback stable and the speeder garage.
   - [ ] The Jawa junk yard and the sandcrawler.
   - [ ] The back alleys and the back lane.

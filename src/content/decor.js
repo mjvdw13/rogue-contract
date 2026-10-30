@@ -120,6 +120,9 @@ export default [
   defineDecoration({ id: 'cantina-corner', model: 'cantina-corner', solid: true, height: CORNER.h, fixed: true }),
   defineDecoration({ id: 'cantina-shelves', model: 'cantina-shelves', solid: true, height: 2.2, fixed: true }),
   defineDecoration({ id: 'cantina-canopy', model: 'cantina-canopy', fixed: true }),
+  // The vestibule's droid detector on its wall, and bare bulbs hung from ceilings.
+  defineDecoration({ id: 'cantina-detector', model: 'cantina-detector', fixed: true }),
+  defineDecoration({ id: 'cantina-lamp', model: 'cantina-lamp', fixed: true }),
   // The Moldy Crow, hovering (models/crow.js), bobbing gently, drawn at 0.8 of
   // canon size: only its gun pod is low enough to collide (as its outline);
   // you walk under the rest.
