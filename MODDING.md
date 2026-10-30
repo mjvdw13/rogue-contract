@@ -429,8 +429,13 @@ defineDecoration({ id: 'reactor-ring', model: 'reactor-ring', spin: 0.5 }) // ra
   (texture repeats) or `uvw` (world units, at the walls' scale). `glow`
   makes a face fullbright (animated textures keep animating), and `twoSided`
   draws it from behind too. Faces are shaded by a fixed light from above,
-  north-west, unless `flat`: then they take the light as the walls do (for
-  a face flush with a wall, such as the front of a rounded arch).
+  north-west, unless `flat`: then they're lit as a wall in their place
+  would be (for a face flush with a wall, or meant to read as part of one,
+  such as a rounded arch): by the light map at each corner, a hair in
+  front of the face and in its storey, blended across it, with the walls'
+  contrast by the way it faces, their dithering and their haze. So a flat
+  face meets the wall beside it at the same light, sun, shadow and lamps
+  included. Other faces take one light for the whole model.
   A face in a grime texture (`grime: true`, see Decals) darkens what's
   behind it instead of covering it and hides nothing: a soft shadow on the
   ground (`speeder-shadow`, a grey oval).
@@ -878,7 +883,10 @@ ochre one darker ochre. Grime keeps the picture's own greys (finer than
 the palette's), and fades out with the haze in the distance. Place it like
 any decal. The generated ones (`grime-streaks-1` and so on) are drawn by
 `tools/art/textures/grime.js`, and `town.grime()` weathers a whole town
-with them (docs/mission1.md). The map viewer doesn't mark grime.
+with them (docs/mission1.md); `town.grimeIndoors(box)` dirties the walls
+inside rooms, floor to ceiling. For a floor, lay a model face in a grime
+texture on it (the stains in `models/stains.js`). The map viewer doesn't
+mark grime.
 
 ### Backdrop: terrain past the edge of play
 
@@ -1235,7 +1243,8 @@ stands still): `{ type: 'villager-man', x: 80.5, y: 74.5, wander: 0 }` is
 a shopkeeper behind his counter or someone waiting in a queue.
 `lit` (0-255) draws a model at that light whatever the light map says
 where it stands: a model on a wall, lit as the wall is (the town kit's
-arch hoods), when the ground in front of it is in shade.
+arch hoods), when the ground in front of it is in shade. Its `flat` faces
+ignore it: they're lit by the light map in front of them.
 
 A monster placed with `calm` starts calm (see *Calm* under Monsters):
 `calm: true` behaves as its type's `calm` says, and an object overrides

@@ -213,7 +213,8 @@ test("a door's bevelled corners are in the wall's plaster, the bottom ones in it
   const lips = town.things.filter((t) => t.type.startsWith('door-lips'));
   assert.deepEqual(lips.map((t) => t.type), ['door-lips-pale', 'door-lips-foot-plinth', 'door-lips-metal', 'door-lips-foot-metal']);
   for (const t of lips) assert.ok(registry.things.get(t.type), `${t.type} is a decoration`);
-  assert.ok(lips.every((t) => t.lit > 0), 'lit as the wall');
+  // (Every face flat: the renderer lights it as the wall round it.)
+  assert.ok(lips.every((t) => registry.models.get(t.type).faces.every((f) => f.flat)), 'lit as the wall');
   const level = { id: 't', name: 'T', ...p.build(), decals: town.decals, list: [{ type: 'player', x: 20, y: 20 }, ...town.things] };
   assert.deepEqual(buildLevel(registry, level).errors, []);
 });
@@ -238,6 +239,28 @@ test('a window is set into its wall: a notch with a sill and a lintel, the windo
   town.window(10.5, 10, 'S', { z: 8 });
   assert.equal(p.get(10, 9).slab.top, 10);
   assert.throws(() => town.window(7.5, 14, 'S', { z: 9 }), /no wall/, 'not above the roof');
+});
+
+test("indoor grime dirties a room's walls from its floor to its ceiling, not an alcove's open mouth or the outside", () => {
+  const build = () => {
+    const { town } = kit();
+    town.house(4, 4, 16, 14, { h: 6 });
+    // A room 4 high, and an alcove off its south side, 3 high: open into it.
+    town.room(6, 6, 14, 12, { h: 6, ceilZ: 4 }).room(10, 12, 13, 13, { h: 6, ceilZ: 3 });
+    town.finish().grimeIndoors(0, 0, 40, 40, { amount: 2 });
+    return town.decals;
+  };
+  const grime = build();
+  assert.ok(grime.length > 10, `${grime.length} pieces`);
+  assert.ok(grime.every((d) => d.tex.startsWith('grime-')));
+  for (const d of grime) {
+    assert.ok(d.z > 0 && d.z < 4, `between the room's floor and ceiling: ${JSON.stringify(d)}`);
+    const inRoom = d.x >= 6 && d.x <= 14 && d.y >= 6 && d.y <= 13;
+    assert.ok(inRoom, `on the room's walls, not the house's outside: ${JSON.stringify(d)}`);
+  }
+  assert.ok(!grime.some((d) => d.face === 'N' && d.y === 12 && d.x > 10 && d.x < 13), "none across the alcove's mouth");
+  assert.ok(grime.some((d) => d.face === 'N' && d.y === 13 && d.x > 10 && d.x < 13), "the alcove's own back wall, though");
+  assert.deepEqual(build(), grime, 'the same every time');
 });
 
 test("grime weathers a house's straight walls and the wall under its window, not its rounded corners or a clean house", () => {
@@ -435,15 +458,16 @@ test("a hood stands out round a door in the wall's plaster, lit as the wall is, 
   assert.throws(() => town.hood(10, 14, 'S', { h: 6, width: 5 }), /models for 3 and 4/);
 });
 
-test('a rounded arch fills the corners under its lintel, a model a tile through it, the front one lit as the wall', () => {
+test('a rounded arch fills the corners under its lintel, a model a tile through it, lit as the walls round it', () => {
   const { town } = kit();
   town.house(4, 4, 16, 14, { h: 6 });
   town.arch(8, 11, 12, 14, { h: 6, lintel: 3.5, round: 'S' });
   const rounds = town.things.filter((t) => t.type === 'arch-round-4');
   assert.deepEqual(rounds.map((t) => t.y), [14, 13, 12], 'from the front back');
   assert.ok(rounds.every((t) => t.x === 10 && t.z === 2 && t.angle === 0), 'springing 1.5 under the lintel');
-  town.finish();
-  assert.ok(rounds[0].lit > 0 && rounds.slice(1).every((t) => t.lit === undefined), 'only the front one lit as the wall');
+  // (Every face flat, its curve too: the renderer lights it as the walls
+  // round it, with no bands from the faces' turns.)
+  assert.ok(registry.models.get('arch-round-4').faces.every((f) => f.flat), 'lit as the walls');
   assert.throws(() => town.arch(8, 11, 13, 14, { h: 6, lintel: 3.5, round: 'S' }), /models for 3 and 4/);
   assert.throws(() => town.arch(8, 11, 12, 14, { h: 6, lintel: 3, round: 'S' }), /head room/);
 });

@@ -14,8 +14,10 @@ import { PLASTERS } from './dome.js';
 // of that width: the two corners under its lintel filled down to a half
 // ellipse, ROUND.rise tall. A tile deep, behind its front face (y -1 to 0),
 // the origin there where the curve springs from the sides; one a tile
-// through. The faces flush with the wall are `flat`, and the kit gives the
-// front ones the wall's light (`lit`), so they match the wall in shade too.
+// through. Its faces are `flat`, lit as walls are (by the light map in
+// front of each, with the walls' contrast), so the faces flush with the wall
+// match it and the curve under the opening reads as the plaster round it
+// rather than in bands, one per segment.
 // Each comes in the five plasters (`arch-hood-3-pale`, as the domes).
 
 export const HOOD = { spring: 2.75, band: 0.45, depth: 0.45, widths: [3, 4] };
@@ -70,7 +72,7 @@ function round(id, w, tex) {
       const [t0, t1] = [(k / CORNER) * (Math.PI / 2), ((k + 1) / CORNER) * (Math.PI / 2)];
       const p0 = [sign * a * Math.cos(t0), v * Math.sin(t0)];
       const p1 = [sign * a * Math.cos(t1), v * Math.sin(t1)];
-      m.prism([corner, p0, p1], -1, 0, { ...s, axis: 'y', top: front, bottom: front, side: (i) => (i === 1 ? s : false) });
+      m.prism([corner, p0, p1], -1, 0, { ...front, axis: 'y', top: front, bottom: front, side: (i) => (i === 1 ? front : false) });
     }
   }
   return m.build();

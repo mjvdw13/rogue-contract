@@ -10,8 +10,8 @@ import { PLASTERS } from './dome.js';
 //
 // `door-lips-<wall>`: the bevelled corners round the curve on the wall's
 // face, filling the square corners of the recess down to the rounded
-// lining, in the wall's own texture. The faces are `flat` and the kit gives
-// them the wall's light (`lit`), so the opening reads as rounded in the
+// lining, in the wall's own texture. The faces are `flat`, lit as the wall
+// round them (render/models.js), so the opening reads as rounded in the
 // wall rather than framed in tiles. Built looking south with the wall's
 // face at y 0; a door through a wall has a pair, one on each face. The top
 // corners are one model per plaster (`door-lips-pale`, as the domes) and

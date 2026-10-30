@@ -190,10 +190,25 @@ function lamp() {
   return m.build();
 }
 
+// The grime on a corner's panel (decals only go on the grid's walls): soot
+// down from the ceiling, dirt along its foot, a stain and smudges, as
+// grimeIndoors() puts on the walls round it. [picture, its middle along the
+// panel, its middle up it, its width and height.]
+const CORNER_GRIME = [
+  ['grime-streaks-1', -2.6, 2.6, 2, 2.8], ['grime-streaks-3', 0.4, 3, 3, 2], ['grime-streaks-2', 2.9, 2.7, 1.8, 2.6],
+  ['grime-dust-1', -2, 0.5, 4, 1], ['grime-dust-2', 2, 0.6, 4, 1.25],
+  ['grime-blotch-2', -0.6, 1.7, 2.4, 1.6], ['grime-smudge', 1.6, 1.3, 1, 1.25], ['grime-smudge', -3.3, 1.2, 0.9, 1.1],
+];
+
 function corner() {
   const m = new ModelBuilder('cantina-corner');
   const [a, h] = [CORNER.len / 2, CORNER.h];
   m.face([[-a, 0, 0], [a, 0, 0], [a, 0, h], [-a, 0, h]], { tex: WALL, flat: true }, [0, -1, h / 2]);
+  // (A hair in front of the panel, so it darkens it.)
+  for (const [tex, x, z, w, gh] of CORNER_GRIME) {
+    const [l, r, b, t] = [x - w / 2, x + w / 2, z - gh / 2, z + gh / 2];
+    m.face([[l, 0.01, b], [r, 0.01, b], [r, 0.01, t], [l, 0.01, t]], { tex, uv: [[0, 1], [1, 1], [1, 0], [0, 0]] }, [x, -1, z]);
+  }
   m.line(-a, 0, a, 0);
   return m.build();
 }
