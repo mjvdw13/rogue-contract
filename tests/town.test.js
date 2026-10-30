@@ -213,7 +213,8 @@ test("a door's bevelled corners are in the wall's plaster, the bottom ones in it
   const lips = town.things.filter((t) => t.type.startsWith('door-lips'));
   assert.deepEqual(lips.map((t) => t.type), ['door-lips-pale', 'door-lips-foot-plinth', 'door-lips-metal', 'door-lips-foot-metal']);
   for (const t of lips) assert.ok(registry.things.get(t.type), `${t.type} is a decoration`);
-  assert.ok(lips.every((t) => t.lit > 0), 'lit as the wall');
+  // (Every face flat: the renderer lights it as the wall round it.)
+  assert.ok(lips.every((t) => registry.models.get(t.type).faces.every((f) => f.flat)), 'lit as the wall');
   const level = { id: 't', name: 'T', ...p.build(), decals: town.decals, list: [{ type: 'player', x: 20, y: 20 }, ...town.things] };
   assert.deepEqual(buildLevel(registry, level).errors, []);
 });
@@ -435,15 +436,16 @@ test("a hood stands out round a door in the wall's plaster, lit as the wall is, 
   assert.throws(() => town.hood(10, 14, 'S', { h: 6, width: 5 }), /models for 3 and 4/);
 });
 
-test('a rounded arch fills the corners under its lintel, a model a tile through it, the front one lit as the wall', () => {
+test('a rounded arch fills the corners under its lintel, a model a tile through it, lit as the walls round it', () => {
   const { town } = kit();
   town.house(4, 4, 16, 14, { h: 6 });
   town.arch(8, 11, 12, 14, { h: 6, lintel: 3.5, round: 'S' });
   const rounds = town.things.filter((t) => t.type === 'arch-round-4');
   assert.deepEqual(rounds.map((t) => t.y), [14, 13, 12], 'from the front back');
   assert.ok(rounds.every((t) => t.x === 10 && t.z === 2 && t.angle === 0), 'springing 1.5 under the lintel');
-  town.finish();
-  assert.ok(rounds[0].lit > 0 && rounds.slice(1).every((t) => t.lit === undefined), 'only the front one lit as the wall');
+  // (Every face flat, its curve too: the renderer lights it as the walls
+  // round it, with no bands from the faces' turns.)
+  assert.ok(registry.models.get('arch-round-4').faces.every((f) => f.flat), 'lit as the walls');
   assert.throws(() => town.arch(8, 11, 13, 14, { h: 6, lintel: 3.5, round: 'S' }), /models for 3 and 4/);
   assert.throws(() => town.arch(8, 11, 12, 14, { h: 6, lintel: 3, round: 'S' }), /head room/);
 });

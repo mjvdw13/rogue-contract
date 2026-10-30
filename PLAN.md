@@ -389,6 +389,11 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
     - [x] Characters: Bossk at the bar, Boba Fett in the east alcove;
           villagers standing in for the bartender, the broker (a stand-in
           message), customers and the band; two calm troopers by the steps.
+    - [x] The rounded arches lit as the walls round them (Mark,
+          2026-10-30: they didn't match, in and out of the cantina).
+    - [ ] Filthy inside (Mark): grime thick on the walls and the floor,
+          litter underfoot.
+    - [ ] Jawas inside.
     - [ ] Waiting on Mark.
   - [ ] Bay 86, the dewback stable and the speeder garage.
   - [ ] The Jawa junk yard and the sandcrawler.

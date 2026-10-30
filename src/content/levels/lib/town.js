@@ -108,7 +108,7 @@ export class Town {
     this.slants = [];
     /** The boxes stalls stand in, kept clear by `clutter()`. */
     this.stalls = [];
-    /** Models flush with a wall (arches), lit as it in `finish()`: { thing, wall, street } tiles. */
+    /** Hoods on a wall, lit as it in `finish()` (their faces that stand out aren't flat): { thing, wall, street } tiles. */
     this.wallLit = [];
   }
 
@@ -308,20 +308,17 @@ export class Town {
       const width = ns ? x1 - x0 : y1 - y0;
       if (!ROUND.widths.includes(width)) throw new Error(`Town: a rounded arch at (${x0}, ${y0}) is ${width} wide; there are models for ${ROUND.widths.join(' and ')}`);
       if (lintel - ROUND.rise < 1.8) throw new Error(`Town: a rounded arch at (${x0}, ${y0}) needs its lintel at least ${1.8 + ROUND.rise} up, to keep head room at its sides`);
-      // Each on its tile's outer edge; the front one in the light of the
-      // wall beside the opening, so its face matches the wall's.
+      // Each on its tile's outer edge. Its faces are flat, lit as the walls
+      // round it (models/arch.js).
       const type = `arch-round-${width}${plaster(wall)}`;
       const angle = { S: 0, E: 90, N: 180, W: 270 }[round];
       const z = floorZ + lintel - ROUND.rise;
       const out = round === 'S' || round === 'E' ? 1 : -1;
       const [lo, hi] = ns ? [y0, y1] : [x0, x1];
       const front = out > 0 ? hi : lo;
-      const row = out > 0 ? hi - 1 : lo;
       for (let k = 0; k < hi - lo; k++) {
         const edge = front - out * k;
-        const thing = { type, ...(ns ? { x: (x0 + x1) / 2, y: edge } : { x: edge, y: (y0 + y1) / 2 }), z, angle };
-        this.things.push(thing);
-        if (k === 0) this.wallLit.push({ thing, wall: ns ? [x0 - 1, row] : [row, y0 - 1], street: ns ? [x0 - 1, row + out] : [row + out, y0 - 1] });
+        this.things.push({ type, ...(ns ? { x: (x0 + x1) / 2, y: edge } : { x: edge, y: (y0 + y1) / 2 }), z, angle });
       }
     }
     return this;
@@ -442,23 +439,18 @@ export class Town {
       this.things.push({ type: 'door-jamb', ...at(mid, (line + back) / 2), z: floorZ, angle });
       // Its bevelled corners on the wall's face (and on the room's side,
       // through a wall), in the wall's plaster, the bottom ones in its skirt
-      // if it has one, and lit as the wall is: by the wall beside the
-      // opening and the street in front, or by the room.
+      // if it has one. Their faces are flat, lit as the wall is
+      // (models/door-jamb.js).
       const row = (edge, dir) => (dir > 0 ? edge : edge - 1); // the tile past an edge, going `dir`
       const tile = (a, r) => (ns ? [a, r] : [r, a]);
       const beside = tile(a0 - 1, row(line, -out));
       const suffix = (set, tex) => Object.keys(set).find((k) => set[k] === tex) ?? '';
       const foot = this.p.get(...beside)?.bands?.[0]?.tex ?? wall;
-      const lit = [[line, angle, { wall: beside, street: tile(a0, row(line, out)) }]];
-      if (opens) {
-        const room = tile(a0, row(back, -out));
-        lit.push([back, (angle + 180) % 360, { wall: room, street: room }]);
-      }
-      for (const [edge, turn, by] of lit) {
+      const faces = [[line, angle]];
+      if (opens) faces.push([back, (angle + 180) % 360]);
+      for (const [edge, turn] of faces) {
         for (const type of [`door-lips${suffix(LIP_WALLS, wall)}`, `door-lips-foot${suffix(LIP_FEET, foot)}`]) {
-          const thing = { type, ...at(mid, edge), z: floorZ, angle: turn };
-          this.things.push(thing);
-          this.wallLit.push({ thing, ...by });
+          this.things.push({ type, ...at(mid, edge), z: floorZ, angle: turn });
         }
       }
     }

@@ -90,6 +90,28 @@ test('a flat face is lit as the walls are, whichever way it faces', () => {
   assert.equal(west({ flat: true }), east({ flat: true }), 'flat ones match');
 });
 
+test('a flat face takes the light in front of it, as a wall there would, not the light where its model stands', () => {
+  // A square 2.5 west of its model's origin: the face on the edge between
+  // tile 4 and tile 5, the origin in tile 7. Tiles 5 and on are dark; tile 4
+  // is lit or dark.
+  const offset = new Model(
+    defineModel({
+      id: 'square-offset',
+      vertices: [[-2.5, -0.5, 0], [-2.5, -0.5, 1], [-2.5, 0.5, 1], [-2.5, 0.5, 0]],
+      faces: [{ v: [0, 1, 2, 3], color: ['steel', 0.8], flat: true }],
+    }),
+    palette,
+    () => 0,
+  );
+  const lum = (i) => palette.rgb[i * 3] + palette.rgb[i * 3 + 1] + palette.rgb[i * 3 + 2];
+  const seen = (front) => {
+    const dark = { ...TALL, light: 40 };
+    const level = room(['##########', '#...fdddd#', '#...fdddd#', '#...fdddd#', '##########'], [], { legend: { '.': dark, d: dark, f: { ...TALL, light: front } } });
+    return lum(frame(level, [thing(offset, 7.5, 2.5)])[at(mid, rowAt(0.5, 3.5))]);
+  };
+  assert.ok(seen(220) > seen(40), 'brighter with the tile in front of it lit, though its model stands in the dark either way');
+});
+
 test('a model placed with `lit` takes that light, not the light map where it stands; the validator wants 0 to 255', () => {
   const list = [{ type: 'player', x: 2.5, y: 1.5 }, { type: 'door-jamb', x: 5.5, y: 2.5, lit: 200 }];
   const w = makeWorld(room(['##########', '#........#', '#........#', '#........#', '##########'], [], { legend, list }));

@@ -1,6 +1,6 @@
 import { TRANSPARENT, LIGHT_LEVELS, SHADE_STEP } from '../config.js';
 import { F_SKY } from '../world/tilemap.js';
-import { HAZE_STEPS } from '../gfx/palette.js';
+import { HAZE_STEPS, HAZE_ROW } from '../gfx/palette.js';
 
 /** Nearest depth drawn; polygons are clipped here. */
 export const NEAR = 0.05;
@@ -28,11 +28,16 @@ const inX = new Float64Array(MAX_POLY);
 const inZ = new Float64Array(MAX_POLY);
 const inU = new Float64Array(MAX_POLY);
 const inV = new Float64Array(MAX_POLY);
+// A flat face's light at each corner (faceL), carried through clipping (inL)
+// and projected as light / depth (slz), like u and v.
+const faceL = new Float64Array(MAX_POLY);
+const inL = new Float64Array(MAX_POLY);
 const sx = new Float64Array(MAX_POLY);
 const sy = new Float64Array(MAX_POLY);
 const siz = new Float64Array(MAX_POLY);
 const suz = new Float64Array(MAX_POLY);
 const svz = new Float64Array(MAX_POLY);
+const slz = new Float64Array(MAX_POLY);
 
 /**
  * Draw every visible thing that has a `model` (gfx/model.js), in true 3D.
@@ -142,6 +147,34 @@ export function drawModels(view, things, map, textures, fb, fbW, colormaps, skip
         nz = -nz;
       }
 
+      // A flat face (flush with a wall, or meant to read as part of it) is
+      // lit as a wall is, not by the thing's one light: by the light map at
+      // each of its corners, a hair in front of it and in its storey (so the
+      // sun's shadows and the lamps reach it, and where it meets a wall it
+      // has the wall's light), blended across it; with the walls' contrast
+      // by the way it faces (+1 looking along x, -1 along y, none level or
+      // slanting), their fog and haze from the tile it looks into, and their
+      // dithering.
+      let flatLit = false;
+      let flatContrast = 0;
+      let flatOut = false;
+      if (f.flat && fixed < 0 && map.lightmap) {
+        flatLit = true;
+        let cx = 0;
+        let cy = 0;
+        for (let i = 0; i < m; i++) {
+          const lx = worldX[idx[i]] + nx * 0.05;
+          const ly = worldY[idx[i]] + ny * 0.05;
+          const lt = map.inBounds(lx | 0, ly | 0) ? (ly | 0) * map.w + (lx | 0) : -1;
+          faceL[i] = lt >= 0 ? map.lightmap.sample(lx, ly, map.storeyAt(lt, worldZ[idx[i]] + nz * 0.05)) : light;
+          cx += lx;
+          cy += ly;
+        }
+        const ft = map.inBounds((cx / m) | 0, (cy / m) | 0) ? ((cy / m) | 0) * map.w + ((cx / m) | 0) : -1;
+        flatContrast = nx * nx - ny * ny;
+        flatOut = ft >= 0 && (map.flags[ft] & F_SKY) !== 0 && view.hazeOn;
+      }
+
       // Clip at the near plane (Sutherland-Hodgman), in camera space.
       const dz = f.grime ? -bob : 0;
       let k = 0;
@@ -159,6 +192,7 @@ export function drawModels(view, things, map, textures, fb, fbW, colormaps, skip
             inU[k] = uv[i * 2];
             inV[k] = uv[i * 2 + 1];
           }
+          if (flatLit) inL[k] = faceL[i];
           k++;
         }
         if (da >= NEAR !== db >= NEAR) {
@@ -171,6 +205,7 @@ export function drawModels(view, things, map, textures, fb, fbW, colormaps, skip
             inU[k] = uv[i * 2] + (uv[j * 2] - uv[i * 2]) * q;
             inV[k] = uv[i * 2 + 1] + (uv[j * 2 + 1] - uv[i * 2 + 1]) * q;
           }
+          if (flatLit) inL[k] = faceL[i] + (faceL[(i + 1) % m] - faceL[i]) * q;
           k++;
         }
       }
@@ -188,6 +223,7 @@ export function drawModels(view, things, map, textures, fb, fbW, colormaps, skip
           suz[i] = inU[i] * iz;
           svz[i] = inV[i] * iz;
         }
+        if (flatLit) slz[i] = inL[i] * iz;
         if (sx[i] < minX) minX = sx[i];
         if (sx[i] > maxX) maxX = sx[i];
       }
@@ -228,10 +264,12 @@ export function drawModels(view, things, map, textures, fb, fbW, colormaps, skip
         let izA = 0;
         let uA = 0;
         let vA = 0;
+        let lA = 0;
         let yB = 0;
         let izB = 0;
         let uB = 0;
         let vB = 0;
+        let lB = 0;
         for (let i = 0; i < k; i++) {
           const j = i + 1 === k ? 0 : i + 1;
           const xa = sx[i];
@@ -242,16 +280,19 @@ export function drawModels(view, things, map, textures, fb, fbW, colormaps, skip
           const iz = siz[i] + (siz[j] - siz[i]) * q;
           const u = uv ? suz[i] + (suz[j] - suz[i]) * q : 0;
           const v = uv ? svz[i] + (svz[j] - svz[i]) * q : 0;
+          const l = flatLit ? slz[i] + (slz[j] - slz[i]) * q : 0;
           if (n === 0) {
             yA = y;
             izA = iz;
             uA = u;
             vA = v;
+            lA = l;
           } else {
             yB = y;
             izB = iz;
             uB = u;
             vB = v;
+            lB = l;
           }
           if (++n === 2) break;
         }
@@ -269,6 +310,9 @@ export function drawModels(view, things, map, textures, fb, fbW, colormaps, skip
           tmp = vA;
           vA = vB;
           vB = tmp;
+          tmp = lA;
+          lA = lB;
+          lB = tmp;
         }
         const span = yB - yA;
         if (span <= 0) continue;
@@ -295,6 +339,7 @@ export function drawModels(view, things, map, textures, fb, fbW, colormaps, skip
         }
         const dU = (uB - uA) / span;
         const dV = (vB - vA) / span;
+        const dL = (lB - lA) / span;
         for (let y = y0; y < y1; y++) {
           const along = y + 0.5 - yA;
           const iz = izA + dIz * along;
@@ -332,7 +377,17 @@ export function drawModels(view, things, map, textures, fb, fbW, colormaps, skip
           let lv;
           if (fixed >= 0) lv = fixed;
           else if (glow) lv = 0;
-          else {
+          else if (flatLit) {
+            const d = DITHER[(x & 3) + (y & 3) * 4];
+            const fl = (lA + dL * (y + 0.5 - yA)) * depth;
+            lv = (view.levelF(fl, depth) + flatContrast - (flatOut ? depth * view.fog : 0) + d) | 0;
+            if (lv < 0) lv = 0;
+            else if (lv >= LIGHT_LEVELS) lv = LIGHT_LEVELS - 1;
+            if (flatOut) {
+              const h = (view.hazeF(depth) + d + 0.5) | 0;
+              if (h) lv += HAZE_ROW + (h - 1) * LIGHT_LEVELS;
+            }
+          } else {
             lv = view.row(light, depth, outdoor, shade);
           }
           mdepth[o] = depth;
