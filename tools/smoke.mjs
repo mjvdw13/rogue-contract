@@ -5,6 +5,7 @@
 //   2. walks, shoots and opens the automap,
 //   3. warps through every level with ?map=,
 //   4. checks widescreen: the frame width follows the window (16:9, 21:9, 4:3),
+//   5. checks that the click that captures the mouse isn't a shot,
 // failing on any page error or console error. Screenshots go to .smoke/.
 //
 //   npm run smoke
@@ -163,6 +164,44 @@ for (const level of new Registry(content).levels.values()) {
   const r = await page('index.html?mute&wide=0', { width: 1280, height: 720 });
   check((await r.evaluate(() => window.game.surface.w)) === 320, '?wide=0 keeps the 4:3 frame');
   await r.close();
+}
+
+// 5. Clicks that capture the mouse aren't shots: the click on the game, and a
+// click on RESUME in the pause menu. Once the mouse is captured, a click fires.
+{
+  const p = await page('index.html?map=m1&mute&nomonsters');
+  await p.waitForFunction(() => window.game.scene.constructor.name === 'LevelScene', null, { timeout: 20000 }).catch(() => {});
+  await p.waitForTimeout(1500);
+  const energy = () => p.evaluate(() => window.game.scene.world.player.player.ammo.energy);
+  const locked = () => p.evaluate(() => window.game.input.pointerLocked);
+  const start = await energy();
+  await p.mouse.click(480, 360, { delay: 120 });
+  await p.waitForTimeout(500);
+  check((await energy()) === start, "the click that captures the mouse doesn't fire");
+  await p.evaluate(() => window.game.pause());
+  await p.waitForTimeout(300);
+  // RESUME's centre, from framebuffer to page coordinates.
+  const resume = await p.evaluate(() => {
+    const g = window.game;
+    const it = g.menu.itemRects[0];
+    const r = g.presenter.canvas.getBoundingClientRect();
+    return {
+      x: r.left + ((it.x + it.w / 2 + g.surface.ox) / g.presenter.w) * r.width,
+      y: r.top + ((it.y + it.h / 2) / g.presenter.h) * r.height,
+    };
+  });
+  await p.mouse.click(resume.x, resume.y, { delay: 120 });
+  await p.waitForTimeout(500);
+  check(!(await p.evaluate(() => window.game.menu.active)), 'clicking RESUME closes the pause menu');
+  check((await energy()) === start, "clicking RESUME doesn't fire");
+  if (await locked()) {
+    await p.mouse.click(480, 360, { delay: 120 });
+    await p.waitForTimeout(500);
+    check((await energy()) < start, 'once the mouse is captured, a click fires');
+  } else {
+    console.log("skip the browser didn't capture the mouse, so a captured click can't be checked");
+  }
+  await p.close();
 }
 
 await browser.close();

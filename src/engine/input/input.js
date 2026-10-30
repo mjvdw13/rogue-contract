@@ -72,6 +72,8 @@ export class Input {
     this.virtual = new Set(); // held virtual codes (touch / gamepad)
     this.pointerLocked = false;
     this.onPointerLockChange = null;
+    /** Set by the game: a function, true while it wants the mouse captured (in a level). */
+    this.wantsPointerLock = null;
     this._attach();
   }
 
@@ -110,13 +112,16 @@ export class Input {
     });
     c.addEventListener('mousedown', (e) => {
       if (performance.now() - (this._lastTouch ?? -1e9) < 1000) return;
-      const code = `Mouse${e.button}`;
       this.lastDevice = 'mouse';
+      if (!this.pointerLocked) this.clicks.push({ x: e.clientX, y: e.clientY });
+      c.focus();
+      // While the game wants the mouse captured and it isn't yet, a click
+      // only captures it or picks a menu item: it isn't a shot.
+      if (!this.pointerLocked && c.requestPointerLock && this.wantsPointerLock?.()) return;
+      const code = `Mouse${e.button}`;
       this.down.add(code);
       this.pressed.add(code);
       this.anyPressed = true;
-      if (!this.pointerLocked) this.clicks.push({ x: e.clientX, y: e.clientY });
-      c.focus();
     });
     window.addEventListener('mouseup', (e) => {
       this.down.delete(`Mouse${e.button}`);

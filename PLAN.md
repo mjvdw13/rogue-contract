@@ -1133,12 +1133,15 @@ A. The rest wait for the engine pieces above.
 
 *In the engine and the build:*
 
-27. [ ] **A click that captures the mouse doesn't fire** (small). `input.js`
-        counts a mouse button as held while the mouse is free, and the mouse
-        is only captured on the click (`game.js`), so that click fires a
-        shot, and so does clicking RESUME in the pause menu. In Mos Eisley
-        the shot turns the town. In a level, mouse buttons count only once
-        the mouse is captured.
+27. [x] **A click that captures the mouse doesn't fire** (small, done
+        2026-10-30). `input.js` counted a mouse button as held while the
+        mouse was free, and the mouse is only captured on the click
+        (`game.js`), so that click fired a shot, and so did clicking RESUME
+        in the pause menu. In Mos Eisley the shot would turn the town. Now,
+        while the game wants the mouse captured (a level, without touch
+        controls), mouse buttons count only once it is. The smoke test
+        checks both clicks, and that a click fires once the mouse is
+        captured.
 28. [ ] **A level's starting weapon** (small, with 4): a level
         `startWeapon`, so Mission 1 starts with fists up, not the blaster
         (`hero.js`). Fists make no noise, so a punch at the air doesn't turn
@@ -2001,3 +2004,11 @@ update the smoke test.
   first fight was the whole town at once, and nothing marked the west. In
   the engine, the click that captures the mouse fires a shot, which would
   turn the town. To-dos 15 to 31 under "For the story".
+- 2026-10-30: clicks that capture the mouse aren't shots (to-do 27). The
+  click on the game that captures the mouse fired the blaster, and so did
+  clicking RESUME in the pause menu: `input.js` counted the button as held
+  from mousedown, and the mouse is captured on the click, after mouseup.
+  While the game wants the mouse captured (a level, without touch
+  controls), a mouse button now only clicks until it is. The smoke test
+  checks both clicks (it fails without the fix), and that a click fires
+  once the mouse is captured.

@@ -63,6 +63,7 @@ export class Game {
     this.input.onPointerLockChange = (locked) => {
       if (!locked && this.scene?.wantsPointerLock && !this.menu.active) this.pause();
     };
+    this.input.wantsPointerLock = () => this.wantsPointerLock;
     this.input.onTouch = () => {
       if (this.settings.touchControls === 'auto') this.touchSeen = true;
     };
@@ -86,7 +87,7 @@ export class Game {
     this.applySettings(false);
 
     canvas.addEventListener('click', () => {
-      if (this.scene?.wantsPointerLock && !this.menu.active && !this.touchActive) this.input.lockPointer();
+      if (this.wantsPointerLock && !this.menu.active) this.input.lockPointer();
     });
     window.addEventListener('beforeunload', (e) => {
       if (this.scene instanceof LevelScene && !this.menu.active && !this.scene.world?.player.player.dead) {
@@ -104,6 +105,11 @@ export class Game {
   get touchActive() {
     const mode = this.settings.touchControls;
     return mode === 'on' || (mode === 'auto' && this.touchSeen);
+  }
+
+  /** Does the game want the mouse captured? In a level, unless touch controls are on. */
+  get wantsPointerLock() {
+    return !!this.scene?.wantsPointerLock && !this.touchActive;
   }
 
   // ------------------------------------------------------------ boot
@@ -316,7 +322,7 @@ export class Game {
 
   onMenuClosed() {
     if (this.scene instanceof TitleScene) return;
-    if (this.scene?.wantsPointerLock && !this.touchActive) this.input.lockPointer();
+    if (this.wantsPointerLock) this.input.lockPointer();
   }
 
   quitToTitle() {
