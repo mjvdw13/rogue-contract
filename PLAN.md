@@ -67,10 +67,7 @@ These need Mark to try something, or to decide. Don't start them without him.
   past R ends at bars over the pit, customs troopers by a stand-in hull.
   Each way round the blast doors works on its own (checked with the
   street shut there). To judge: the cantina's size, the alleys' length
-  and bends, whether the sandcrawler shows enough from the market. Known:
-  the cantina's cut corners are open to the sky along a thin strip
-  (angled walls can't take a ceiling) until their panels, next in the
-  cantina's detail.
+  and bends, whether the sandcrawler shows enough from the market.
 
 - **Character sheets for Mos Eisley** (`docs/mission1.md`, Characters):
   cantina aliens (4-6 kinds), the band, the bartender, the broker, the
@@ -346,7 +343,7 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
           taps' column with pipes up into the well; the back-bar's shelves
           of bottles. No angled walls under the ceiling, so no sky along
           the bar.
-    - [ ] The cut front corners as flat wall panels (models lit as the
+    - [x] The cut front corners as flat wall panels (models lit as the
           walls) over square tiles, so their slits of sky go.
     - [ ] Booths: round-topped arches over the niches, benches and round
           tables in them and along the cut corners, a lamp at each table.

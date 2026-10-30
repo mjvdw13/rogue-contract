@@ -20,6 +20,13 @@ import { ModelBuilder } from './lib/build.js';
 //
 // `cantina-stool`: a bar stool, a seat on a post on a round foot.
 //
+// `cantina-corner`: a front corner of the room, cut at 45 degrees: a flat
+// stretch of the walls' plaster, floor to ceiling, standing on the
+// diagonal in front of square wall tiles (angled walls can't take a
+// ceiling, so a corner built of them showed the sky). Built along x,
+// looking south, the origin on the floor at its middle; it collides along
+// its face. Its face is lit as the walls are.
+//
 // `cantina-canopy`: the ring round the well in the ceiling over the bar, an
 // oval band in the ceiling's planks hanging below it and rising to the
 // well's top, so the well's edge, stepped by the tiles, is hidden behind
@@ -28,6 +35,10 @@ import { ModelBuilder } from './lib/build.js';
 // foot. The level paints the well to fit it (CANOPY): every tile the oval
 // reaches into.
 
+/** The cantina's walls: plaster (the level's walls and the corners' panels). */
+export const WALL = 'adobe-pale';
+/** A cut corner's panel: its length (6 tiles each way) and height (the room's). */
+export const CORNER = { len: 6 * Math.SQRT2, h: 4 };
 /** The counter: radii of its round end, its arms' lengths south, its top. */
 export const BAR = { outer: 4.5, inner: 3.5, west: 6, east: 4, top: 0.97 };
 /**
@@ -108,6 +119,14 @@ function stool() {
   return m.build();
 }
 
+function corner() {
+  const m = new ModelBuilder('cantina-corner');
+  const [a, h] = [CORNER.len / 2, CORNER.h];
+  m.face([[-a, 0, 0], [a, 0, 0], [a, 0, h], [-a, 0, h]], { tex: WALL, flat: true }, [0, -1, h / 2]);
+  m.line(-a, 0, a, 0);
+  return m.build();
+}
+
 // Bottles: glass in a few colours.
 const GLASS = [[60, 110, 70], [120, 70, 40], [70, 90, 130], [150, 140, 90], [110, 50, 60]];
 
@@ -157,4 +176,4 @@ function canopy() {
   return m.build();
 }
 
-export default [bar(), taps(), stool(), shelves(), canopy()];
+export default [bar(), taps(), stool(), corner(), shelves(), canopy()];
