@@ -271,16 +271,36 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
         a stair up D's east side to a door on a landing.
   - [ ] Hitching rings on walls; perforated canisters and engine rings
         in the clutter.
-- [ ] **The cantina:** entrance, steps down, the round room, the bar,
-      booths, bandstand, back rooms.
-- [ ] **Bay 86, the dewback stable and the speeder garage.**
-- [ ] **The Jawa junk yard and the sandcrawler.**
-- [ ] **The back alleys and the back lane.**
-- [ ] **The checkpoint and the rooftops.**
-- [ ] **The prefecture** and its comm tower.
-- [ ] **The old quarter and the dry wash.**
-- [ ] **The derelict bay** and the gutted freighter.
-- [ ] **The skyline:** dunes and mesas in the backdrop, the town's edges.
+- [ ] **Block out the whole town first** (Mark, 2026-10-29: level design
+      before details). Every area as plain volumes at their final
+      heights, with the real ways between them and stand-ins for the
+      landmarks; no clutter, grime, hangings or textured fittings. Each
+      area gets a slant and a change of level (`docs/mission1.md`, "Off
+      the grid, and up and down"). Message triggers stand in for the
+      story until conversations and the fob exist.
+  - [ ] Paper pass: the map and area table in `docs/mission1.md` fitted
+        to what's built, and the open questions settled: where the junk
+        yard goes (the calm route doubles back to the far west), the two
+        ways round the blast doors, the way past the checkpoint, the
+        landmarks.
+  - [ ] The east third: the checkpoint, the rooftops, the old quarter
+        and the dry wash, the derelict bay, the prefecture's wall and
+        tower.
+  - [ ] The middle: the cantina's shell, the back lane, the alleys, the
+        junk yard, Bay 86 to look into.
+  - [ ] Play both halves (rough troopers for the loud half), then
+        Waiting on Mark.
+- [ ] **Then each area in detail**, in the order the blockout suggests:
+  - [ ] The cantina: entrance, steps down, the round room, the bar,
+        booths, bandstand, back rooms.
+  - [ ] Bay 86, the dewback stable and the speeder garage.
+  - [ ] The Jawa junk yard and the sandcrawler.
+  - [ ] The back alleys and the back lane.
+  - [ ] The checkpoint and the rooftops.
+  - [ ] The prefecture and its comm tower.
+  - [ ] The old quarter and the dry wash.
+  - [ ] The derelict bay and the gutted freighter.
+  - [ ] The skyline: dunes and mesas in the backdrop, the town's edges.
 - [ ] **Life:** the cantina's customers, the customs officer, the
       dewback with the patrol; an `on: 'hostile'` trigger (blast doors,
       reinforcements, music). Calm troopers and Jawas are placed.
