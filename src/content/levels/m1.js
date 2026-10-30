@@ -383,16 +383,20 @@ gateTag(168, 52, 174, 53, 'prefecture-gate');
 tagTile(168, 46, 'prefecture-yard');
 tagTile(174, 46, 'prefecture-yard');
 
-// 5. The checkpoint: the street climbs two steps to the old quarter's rise,
-// to a gate in a steel wall across it, a guard booth beside the gate. From
-// the top both ways round are in sight: the alleys' mouth to the north and
-// the back lane behind you.
+// 5. The checkpoint: the street climbs two steps to the old quarter's rise
+// and its gatehouse, the town's own adobe arch across the street, its
+// door 4 wide (a docking bay's, the town's heavy door). The Imperials set
+// up here but built nothing (Mark): they keep the gate shut, with barricades at the foot of the steps, floodlights and
+// a guard post under a tarp. From the top both ways round are in sight:
+// the alleys' mouth to the north and the back lane behind you.
 p.rect(136, 61, 139, 73, town.street());
 town.stair(139, 61, 147, 73, { up: 'E', top: OQ, rise: 0.25, floor: 'flagstone', side: 'adobe-brick' });
-town.block(147, 61, 148, 64, { ...GATE, h: 7 }).block(147, 70, 148, 73, { ...GATE, h: 7 });
-town.door(147, 67, 'W', { h: 7, tex: 'door-grey', width: 6, tall: 4, jamb: false, sign: false, panel: false, floorZ: OQ, wall: GATE.wall });
-gateTag(147, 64, 148, 70, 'checkpoint');
-town.block(145, 70, 147, 73, { ...GATE, h: OQ + 3 });
+const GATEHOUSE = { h: 8, wall: 'adobe-ochre' };
+town.block(145, 61, 148, 65, GATEHOUSE).block(145, 69, 148, 73, GATEHOUSE);
+town.arch(145, 65, 146, 69, { ...GATEHOUSE, lintel: 4, floorZ: OQ }).arch(147, 65, 148, 69, { ...GATEHOUSE, lintel: 4, floorZ: OQ });
+town.door(146, 67, 'W', { ...GATEHOUSE, tex: 'door-bay', width: 4, tall: 4, jamb: false, sign: false, panel: false, step: false, floorZ: OQ });
+gateTag(146, 65, 147, 69, 'checkpoint');
+town.tarp(141, 70, 145, 73, { z: OQ + 2.75, face: 'N', cloth: 'sand', floorZ: OQ });
 // North of it the alleys' east mouth (the alleys come down into it, with
 // the middle, below) and the informant's den, open to it.
 p.rect(136, 48, 139, 61, town.street());
@@ -701,8 +705,8 @@ list.push(
 const CHECKPOINT_LINES = ["Old quarter's sealed, hunter.", 'No pass, no way through.'];
 const QUARTER_PATROL = [[153.5, 68], [165.5, 79], [178.5, 94]];
 list.push(
-  at('sandtrooper', 145.5, 63, { angle: 180, calm: { wander: 0, lines: CHECKPOINT_LINES } }),
-  at('sandtrooper', 145.5, 68.5, { angle: 180, calm: { wander: 0, lines: CHECKPOINT_LINES } }),
+  at('sandtrooper', 144.2, 63.4, { angle: 180, calm: { wander: 0, lines: CHECKPOINT_LINES } }),
+  at('sandtrooper', 144.2, 68.8, { angle: 180, calm: { wander: 0, lines: CHECKPOINT_LINES } }),
   at('sandtrooper-commander', 141.5, 66, { angle: 180, calm: { wander: 0, lines: CHECKPOINT_LINES } }),
   at('sandtrooper', 153.5, 68, { calm: { patrol: QUARTER_PATROL, idleTime: [3, 3] } }),
   at('sandtrooper', 155, 66.6, { calm: { patrol: QUARTER_PATROL.map(([x, y]) => [x + 1.5, y - 1.4]), idleTime: [3, 3] } }),
@@ -715,7 +719,10 @@ list.push(
   at('villager-man', 152, 73),
   at('villager-man', 180, 134.5, { angle: 0, wander: 0 }),
   at('barricade', 137.6, 63.6, { angle: 20 }), at('barricade', 137.6, 69.8, { angle: 335 }),
-  at('floodlight-tower', 145.6, 61.6), at('floodlight-tower', 144.4, 72.4),
+  at('floodlight-tower', 143.6, 61.7), at('floodlight-tower', 140.3, 72.3),
+  // The guard post under the tarp: a terminal on crates brought in.
+  at('crate-tan', 143.9, 72.4, { angle: 4 }), at('terminal', 143.9, 72.4, { z: OQ + 0.9, angle: 90 }),
+  at('crate-grey-small', 141.8, 72.5, { angle: 350 }), at('cargo-pod', 142.6, 70.9, { angle: 85 }),
 );
 
 // Townsfolk (npcs/villagers.js), all five kinds, each strolling up to 5

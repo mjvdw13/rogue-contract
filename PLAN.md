@@ -331,15 +331,15 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
         built with the rooftops), the alleys (on to the mouth by the
         checkpoint), the junk yard, Bay 86 to look into.
   - [ ] Mark's notes on the blockout (2026-10-30):
-    - [ ] Flatter: Mos Eisley is flat, so areas sit a couple of steps
+    - [x] Flatter: Mos Eisley is flat, so areas sit a couple of steps
           (0.5) up or down from their neighbours, no more. The cantina
           -0.5, the junk yard -0.5, the old quarter 0.5, the prefecture
           1, the wash 0; the alleys rise a step at a time to 0.5. The
           docking bays stay pits, as in the film.
-    - [ ] The checkpoint: set up by the Imperials in the town, not built
+    - [x] The checkpoint: set up by the Imperials in the town, not built
           by them: no steel walls or booth. The street goes through an
-          adobe gatehouse into the old quarter, its shutter held down;
-          barricades, floodlights and crates in front.
+          adobe gatehouse into the old quarter, its heavy door shut;
+          barricades, floodlights and a guard post under a tarp.
     - [ ] The cantina's layout from Mark's references (the map: waiting
           for an image I can read).
   - [ ] Play both halves (rough troopers for the loud half), then
