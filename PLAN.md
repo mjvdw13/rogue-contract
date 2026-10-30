@@ -30,7 +30,7 @@ These need Mark to try something, or to decide. Don't start them without him.
 
 - **Mos Eisley's east third, blocked out** (`?map=m1`, 2026-10-29; the
   areas in `docs/mission1.md`): plain volumes to try the route, no detail.
-  Walk east past the blast doors: the street climbs six steps to the
+  Walk east past the blast doors: the street climbs two steps to the
   checkpoint's gate. Two ways past it: the informant's den, open to the
   alleys' mouth north of the street (stepping in is a stand-in pass that
   opens the gate), or the back lane to the rubble at its end, up onto the
@@ -50,7 +50,7 @@ These need Mark to try something, or to decide. Don't start them without him.
 - **Mos Eisley's middle, blocked out** (`?map=m1`, 2026-10-29): the
   cantina, the junk yard, the alleys and Bay 86, as plain volumes. The
   cantina: in by S's door on the market, a dark entrance that turns, steps
-  down into the round room (2 below the street, a low ceiling), the bar a
+  down into the round room (two steps down, a low ceiling), the bar a
   ring of counter under an opening to the sky, and a passage up to the
   back door on the back lane, past the blast doors. The junk yard: up the
   alley between H and I, through a gate and two steps down; a slanting
@@ -59,7 +59,7 @@ These need Mark to try something, or to decide. Don't start them without him.
   and J (or through the junk yard's side gate) to a yard behind J, a
   slanting lane up to a second yard (the hostel's room off it), another
   up to a square under the prefecture's wall (the thug's room off it),
-  and six steps down to the mouth by the checkpoint. Bay 86: the yard
+  and two steps down to the mouth by the checkpoint. Bay 86: the yard
   past R ends at bars over the pit, customs troopers by a stand-in hull.
   Each way round the blast doors works on its own (checked with the
   street shut there). To judge: the cantina's size and the bar under the
@@ -330,6 +330,18 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
   - [x] The middle: the cantina's shell (its back door on the back lane,
         built with the rooftops), the alleys (on to the mouth by the
         checkpoint), the junk yard, Bay 86 to look into.
+  - [ ] Mark's notes on the blockout (2026-10-30):
+    - [ ] Flatter: Mos Eisley is flat, so areas sit a couple of steps
+          (0.5) up or down from their neighbours, no more. The cantina
+          -0.5, the junk yard -0.5, the old quarter 0.5, the prefecture
+          1, the wash 0; the alleys rise a step at a time to 0.5. The
+          docking bays stay pits, as in the film.
+    - [ ] The checkpoint: set up by the Imperials in the town, not built
+          by them: no steel walls or booth. The street goes through an
+          adobe gatehouse into the old quarter, its shutter held down;
+          barricades, floodlights and crates in front.
+    - [ ] The cantina's layout from Mark's references (the map: waiting
+          for an image I can read).
   - [ ] Play both halves (rough troopers for the loud half), then
         Waiting on Mark.
 - [ ] **Then each area in detail**, in the order the blockout suggests:
