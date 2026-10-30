@@ -620,6 +620,9 @@ const roofOver = (x0, y0, x1, y1, ceilZ, h) => p.rect(x0, y0, x1, y1, (_, __, c)
   town.stair(118, 105, 126, 107, { up: 'E', from: F, top: 0, rise: 0.25, floor: 'flagstone', side: wall });
   roofOver(118, 105, 126, 107, ceilZ, 8);
   town.door(126, 106, 'E', { h: 8, tex: 'door-grey', opens: true });
+  // In front of the broker's alcove (the west one at the back): stepping up
+  // to him gets his stand-in message.
+  p.rect(90, 106, 94, 107, (_, __, c) => ({ ...c, tag: 'broker' }));
   // The back room: kegs, crates and canisters along its walls, a power unit
   // in the far corner, the storeroom's crates and a cargo pod out of the
   // way to the back door; a bulb over each.
@@ -853,6 +856,26 @@ list.push(
   at('dewback', 100.3, 78.4, { angle: 180 }), at('water-trough', 99.9, 80.85, { angle: 0 }), at('barrel-grey', 97.6, 79.3),
 );
 
+// The cantina's people. Bossk drinking at the bar and Boba Fett watching
+// the room from the east alcove, calm until the town turns (then they fight
+// with the troopers). Two sandtroopers just in from the street at the foot
+// of the steps. Villagers stand in, staying put, until Mark's sheets exist
+// (docs/mission1.md, Characters): the bartender inside the bar, the broker
+// in the west back alcove (a stand-in message when you step up to him),
+// customers at the bar and the booths, and the band on the stage.
+list.push(
+  at('bossk', 94.3, 96.8, { angle: 322, calm: { wander: 0, lines: ['Hsss. Find your own bounty.', 'This one is mine, hunter.'] } }),
+  at('boba-fett', 106.9, 97.5, { angle: 180, calm: { wander: 0, lines: ['...', 'Not interested.'] } }),
+  at('sandtrooper', 96.4, 91.2, { angle: 290, calm: { wander: 0 } }), at('sandtrooper', 100.6, 91.2, { angle: 250, calm: { wander: 0 } }),
+  at('villager-man', 98.5, 104, { angle: 90, wander: 0 }),
+  at('villager-adventurer', 92, 107.3, { angle: 90, wander: 0 }),
+  at('villager-woman', 96.83, 94.86, { angle: 288, wander: 0 }), at('villager-wanderer', 100.17, 94.86, { angle: 252, wander: 0 }),
+  at('villager-man', 93.3, 103.6, { angle: 0, wander: 0 }),
+  at('villager-adventurer', 90.9, 97.5, { angle: 180, wander: 0 }), at('villager-woman', 93.6, 95, { angle: 135, wander: 0 }),
+  at('villager-man', 104, 106.5, { angle: 0, wander: 0 }), at('villager-woman', 105.4, 106.5, { angle: 180, wander: 0 }),
+  at('villager-man', 108.4, 102.4, { angle: 180, wander: 0 }), at('villager-wanderer', 108.9, 103.5, { angle: 180, wander: 0 }), at('villager-adventurer', 108.4, 104.6, { angle: 180, wander: 0 }),
+);
+
 // Cables, ropes and cloth moving in the air (world/hangings.js). Each is
 // tied 0.05 out from a straight stretch of wall, clear of the rounded
 // corners.
@@ -910,6 +933,14 @@ export default defineLevel({
   // exist (docs/story.md): the informant's pass opens the checkpoint,
   // finding Rusk turns the town, and clearing customs is the pickup.
   triggers: [
+    {
+      on: 'enter',
+      tag: 'broker',
+      do: [
+        { action: 'message', text: "BROKER (STAND-IN): THE GUILD'S CONTRACT ON RUSK, AND A TRACKING FOB." },
+        { action: 'message', text: 'BROKER: HE WIPED HIS CODE. THE JAWAS TAG WHAT THEY SELL: TRY THE JUNK YARD.' },
+      ],
+    },
     { on: 'enter', tag: 'informant', do: [{ action: 'message', text: 'INFORMANT (STAND-IN): HERE IS A PASS. THE CHECKPOINT WILL LET YOU THROUGH.' }, { action: 'openDoors', tag: 'checkpoint' }] },
     { on: 'enter', tag: 'hold', do: [{ action: 'message', text: "RUSK (STAND-IN): THAT FOB IS IMPERIAL. THEY'RE ALREADY HERE." }, { action: 'hostile' }] },
     {

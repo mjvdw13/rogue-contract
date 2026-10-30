@@ -44,6 +44,17 @@ These need Mark to try something, or to decide. Don't start them without him.
   film; committing them (say `docs/references/`) would let later passes
   check against them. To judge: the well's size and glow, the booths'
   light, whether the walls should go grey, and the alcoves' changed shapes.
+  Then (2026-10-30, after Mark's stills of the front): a tall arch cut
+  into S's front with the door at its back, a smaller door, a hitching
+  ring and a lit sign, no windows; the dome pod, three Jawas against the
+  wall (standing: no sheet sits), a dewback at a trough and a drum out
+  front, the two stalls there gone. Inside: Bossk and Boba Fett, two
+  troopers at the steps, villagers standing in for the bartender, the
+  broker (a stand-in message), customers and the band. To decide: Bossk
+  and Boba Fett are calm monsters, so they fight when the town turns
+  (Boba Fett has 200 health), which makes the cantina's way round the
+  blast doors a hard fight; and whether a sitting pose for Jawas and
+  customers is worth a sheet.
 
 - **Mos Eisley's east third, blocked out** (`?map=m1`, 2026-10-29; the
   areas in `docs/mission1.md`): plain volumes to try the route, no detail.
@@ -375,7 +386,7 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
           beside it, a hitching ring, a glowing sign; no windows or hood.
           Out front the dome pod, Jawas against the wall, a dewback at a
           stone trough and a drum (the two stalls there go).
-    - [ ] Characters: Bossk at the bar, Boba Fett in the east alcove;
+    - [x] Characters: Bossk at the bar, Boba Fett in the east alcove;
           villagers standing in for the bartender, the broker (a stand-in
           message), customers and the band; two calm troopers by the steps.
     - [ ] Waiting on Mark.
