@@ -594,10 +594,11 @@ const roofOver = (x0, y0, x1, y1, ceilZ, h) => p.rect(x0, y0, x1, y1, (_, __, c)
   // The way in, after Mark's stills (2026-10-30): a tall round-topped arch
   // cut 3 deep into S's front, in shade, its door at the back; behind it an
   // entry turning east into the vestibule, so the street can't see in, and
-  // two steps down. On S's front east of the arch, in the street's plaster:
+  // two steps down. The arch is sooty as the cantina's vaults are (Mark). On
+  // S's front east of the arch, in the street's plaster:
   // a little lit sign up by the arch's shoulder, a smaller door (shut) and a
   // hitching ring.
-  town.arch(90, 82, 94, 85, { h, lintel: 4.75, wall: 'adobe-pale', round: 'N', light: 136 });
+  town.arch(90, 82, 94, 85, { h, lintel: 4.75, wall: 'adobe-pale', round: 'N', light: 136, grimy: true });
   town.room(90, 86, 98, 88, { h, ceilZ: 3.5, wall, light });
   town.room(96, 85, 101, 88, { h, ceilZ: 3.5, wall, light });
   town.stair(96, 88, 101, 90, { up: 'N', from: F, top: 0, rise: 0.25, floor: 'flagstone', side: wall });
