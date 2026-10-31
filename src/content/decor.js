@@ -7,7 +7,7 @@ import { AWNING_MODELS, AWNING_POLES, poleId } from './models/awning.js';
 import { TIN_MODELS } from './models/tin.js';
 import { PIPE_MODELS } from './models/pipes.js';
 import { CLUTTER } from './models/clutter.js';
-import { JUNK_PILES, JUNK_CAGE, pileHeight } from './models/junk-pile.js';
+import { JUNK_PILES, pileHeight } from './models/junk-pile.js';
 import { FURNACE } from './models/furnace.js';
 import { SKIFF } from './models/skiff.js';
 import { DROIDS } from './models/droids.js';
@@ -157,7 +157,6 @@ export default [
   // The junk yard's heaps (models/junk-pile.js), colliding as their
   // outlines, as high as their crests, too tall to climb.
   ...Object.entries(JUNK_PILES).map(([id, p]) => defineDecoration({ id, model: id, solid: true, height: pileHeight(p), fixed: true })),
-  defineDecoration({ id: JUNK_CAGE.id, model: JUNK_CAGE.id, solid: true, height: JUNK_CAGE.height, fixed: true }),
   // The junk yard's smelter (models/furnace.js), colliding as its outline,
   // as high as its rim: embers and flames off its melt, sparks spitting now
   // and then, a little smoke, and embers where the trickle meets the mould.

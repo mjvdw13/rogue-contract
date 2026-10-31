@@ -4,7 +4,7 @@ import { Painter } from './lib/painter.js';
 import { Town } from './lib/town.js';
 import { CISTERN } from '../models/market.js';
 import { BAY_HOSES } from '../models/bay.js';
-import { JUNK_PILES, JUNK_CAGE } from '../models/junk-pile.js';
+import { JUNK_PILES } from '../models/junk-pile.js';
 
 // MISSION 1: MOS EISLEY. The layout, route and numbers are in
 // docs/mission1.md (area numbers below match its table). Painted in code on
@@ -749,10 +749,8 @@ gateTag(84, 37, 86, 40, 'side-gate');
 // Each is a pile of junk (models/junk-pile.js)
 // on the yard's floor, colliding as its outline.
 for (const [id, { at: [x, y] }] of Object.entries(JUNK_PILES)) list.push(at(id, x, y, { angle: 0, z: 0, lit: town.light }));
-// The cage fence penning the west heap in, along its foot.
-list.push(at(JUNK_CAGE.id, ...JUNK_CAGE.at, { angle: 0, z: 0, lit: town.light }));
-// The Jawas' cargo skiff parked in the court's west end, along the cage
-// fence, hovering, its bow to the court.
+// The Jawas' cargo skiff parked in the court's west end, along the west
+// heap's foot, hovering, its bow to the court.
 list.push(at('cargo-skiff', 59.5, 35.1, { angle: 0, z: JUNK, lit: town.light }));
 // The droids for sale in a row along the court's south wall, west of the
 // steps from the gate, facing in, and two Jawas minding them: one by the

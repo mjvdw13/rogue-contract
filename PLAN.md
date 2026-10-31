@@ -85,11 +85,7 @@ These need Mark to try something, or to decide. Don't start them without him.
   foot, with plates, pipes, girders, drums, crates and the odd droid
   dome sticking out. To judge: their height and steepness, and how much
   junk sticks out (about one piece every 2 tiles of slope).
-  A cage fence pens the west heap in, 0.6 out from its foot, from the
-  north wall to the west wall: Dark Forces' diamond mesh rusted
-  (`cage-rust`), panels about 2 wide and 2.6 high between leaning posts,
-  a quarter of them patched with a sheet of plate. To judge: its height,
-  how orange the rust is, and whether it should stand further out.
+  The cage fence round the west heap is gone (Mark, 2026-10-31).
   The smelter is a vat of molten metal now (Mark, 2026-10-31: first the
   kiln and crane didn't look Star Wars, then make it a trough of melt
   with embers and fire): an open trough of rusty plate against the east
@@ -99,7 +95,7 @@ These need Mark to try something, or to decide. Don't start them without him.
   chute from the heap and hoses to a power unit. Embers, flames, sparks
   now and then and a little smoke come off it (a decoration's new
   `emit`). The crane is gone; a repulsorlift cargo skiff
-  is parked in the court's west end by the cage fence instead, hovering
+  is parked in the court's west end along the west heap instead, hovering
   and bobbing: a flat hull with a blunt bow, a rail round its deck, a
   steering post at the stern, two engine pods, crates, a drum and a dome
   on its deck. To judge: both their looks, the skiff's size (5.8 long),
@@ -616,9 +612,6 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
     - [x] The heaps as piles of junk, not slabs: a lumpy mound for
           each (a model, colliding as its outline), droid parts, plates
           and pipes sticking out.
-    - [x] The cage fence along the west heap: a model on the slant
-          from the north wall to the west, rusty diamond mesh between
-          posts, some panels patched with plate.
     - [x] The court and the hold: the furnace and the crane as models,
           droids for sale in the court with Jawas minding them, the
           hold's racks and clutter.
