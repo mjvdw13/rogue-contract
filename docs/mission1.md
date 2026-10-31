@@ -101,6 +101,20 @@ main street → Bay 87, where the Crow comes down.
   finds a sealed wreck. Stepping into it takes the fob and turns the town.
 - The blast doors shut at the switch, so the way home is round them.
 
+**What points the way** (stand-in words, Mark to write the real ones):
+
+- On landing, Jan: the broker's in the cantina, east along the main street.
+- The broker ends the contract with the junk yard: north of the market,
+  under the sandcrawler (which shows over I from the market).
+- The guard at the blast doors (103, 71): the east is sealed until the
+  garrison says otherwise; after the signal, "Orders came down."
+- The checkpoint's troopers: no pass, no way through. With the signal and
+  no pass, stepping onto the checkpoint's foot (136..139, 61..73, tag
+  `checkpoint-foot`) has the informant call Kyle over from his den.
+- At the switch, Jan: the blast doors are sealed, go round. Back at the
+  checkpoint's foot she names the alleys and the cantina's back door.
+- From the junk yard on, the fob.
+
 **Levels and slants** (above, "Off the grid, and up and down"): Mos
 Eisley is flat (Mark, 2026-10-30), so each part of town stands a couple
 of steps (0.5) up or down from the next. The street is at 0 and the town

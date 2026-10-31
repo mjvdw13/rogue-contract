@@ -25,6 +25,8 @@ export class LevelScene {
 
   enter() {
     const g = this.game;
+    // Before the World: its start triggers may already have something to say.
+    g.hud.reset();
     this.world = new World(
       {
         registry: g.registry,
@@ -50,7 +52,6 @@ export class LevelScene {
       { skill: this.skill, snapshot: this.snapshot },
     );
     for (const err of this.world.buildErrors) console.warn(`[${this.level.id}] ${err}`);
-    g.hud.reset();
     const p = this.world.player.player;
     if (g.debug.god) p.god = true;
     if (g.debug.allWeapons) g.giveEverything(this.world);

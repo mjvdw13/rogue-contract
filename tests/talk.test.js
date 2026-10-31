@@ -4,7 +4,10 @@ import content from '../src/content/index.js';
 import { Registry } from '../src/engine/registry.js';
 import { defineLevel } from '../src/engine/defs.js';
 import { validateContent } from '../src/engine/validate.js';
-import { makeWorld, mockInput, room, run } from './helpers.js';
+import { LevelScene } from '../src/engine/scenes/level.js';
+import { Hud } from '../src/engine/ui/hud.js';
+import { Rng } from '../src/engine/core/rng.js';
+import { makeWorld, mockInput, registry, room, run } from './helpers.js';
 
 // A small hall, the player at its west end facing east, someone 2 tiles in front.
 const HALL = ['##########', ...Array(5).fill('#........#'), '##########'];
@@ -140,4 +143,13 @@ test('the validator checks conversations, flags and talk triggers', () => {
     'Level "bad": a villager-man at (7.5, 2.5): talk branch 1 waits for flag "never", which nothing in the level sets (a setFlag action, or a talk branch\'s "set")',
     'Level "bad": trigger #3 waits for flag "missing", which nothing in the level sets (a setFlag action, or a talk branch\'s "set")',
   ]);
+});
+
+test("a level's start trigger has its say on screen when the level begins", () => {
+  const game = { registry, rng: new Rng(1), debug: {}, settings: { messages: true }, playMusic() {} };
+  game.hud = new Hud(game);
+  game.hud.message('LEFT OVER FROM THE LAST LEVEL');
+  const level = hall([], { triggers: [{ on: 'start', do: [{ action: 'message', text: 'JAN: THE CANTINA.' }] }] });
+  new LevelScene(game, { level, skill: 3 }).enter();
+  assert.deepEqual(game.hud.messages.map((m) => m.text), ['JAN: THE CANTINA.']);
 });

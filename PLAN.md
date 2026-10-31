@@ -38,6 +38,13 @@ These need Mark to try something, or to decide. Don't start them without him.
   doors again. To judge: whether the shut town reads as "not yet", the
   beam's look, and whether the alleys should open before the signal
   (they'd be side content then: the hostel, the thug, the gun shop).
+  People now point the way (stand-in words): Jan on landing names the
+  cantina, the broker the junk yard by the sandcrawler, the guard at the
+  blast doors says they open when the garrison says so, the informant
+  calls "Psst. Hunter. Want a pass?" at the checkpoint's foot, and at the
+  switch Jan says the blast doors are sealed, then names the alleys and
+  the cantina's back door at the checkpoint. To judge: the words, and
+  whether that's enough without objectives.
 
 - **Pushing past people** (`?map=m1`, 2026-10-31): walk into someone in the
   cantina (a villager, a Jawa, a trooper, Bossk) and keep walking. After
@@ -434,9 +441,11 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
         the doors rise into it); the alley between I and J and the junk
         yard's side gate shut until the signal; the cantina's back door
         locked until the switch.
-  - [ ] Lines that point: Jan on landing (the cantina), the broker (the
-        junk yard, by the sandcrawler), the guard at the blast doors, the
-        checkpoint (no pass), Jan at the switch (the ways round).
+  - [x] Lines that point: Jan on landing (the cantina), the broker (the
+        junk yard, by the sandcrawler), the guard at the blast doors (shut
+        until the garrison says), the informant calling Kyle over at the
+        checkpoint's foot, Jan at the switch and again at the checkpoint
+        (the ways round).
   - [ ] Objectives, if Mark wants them: an `objective` action, its line
         shown when it changes and at the top of the automap.
 - [ ] **Then each area in detail**, in the order the blockout suggests:

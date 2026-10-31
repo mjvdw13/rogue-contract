@@ -394,6 +394,8 @@ town.block(178, 42, 182, 46, { h: 22, wall: 'adobe-grey', skirt: null });
 // a guard post under a tarp. From the top both ways round are in sight:
 // the alleys' mouth to the north and the back lane behind you.
 p.rect(136, 61, 139, 73, town.street());
+// Its foot, where the informant calls out (with the signal) and Jan names the ways round (after the switch).
+p.rect(136, 61, 139, 73, (_, __, c) => ({ ...c, tag: 'checkpoint-foot' }));
 town.stair(139, 61, 147, 73, { up: 'E', top: OQ, rise: 0.25, floor: 'flagstone', side: 'adobe-brick' });
 const GATEHOUSE = { h: 8, wall: 'adobe-ochre' };
 town.block(145, 61, 148, 65, GATEHOUSE).block(145, 69, 148, 73, GATEHOUSE);
@@ -842,7 +844,8 @@ list.push(
 // patrol, a commander and a trooper side by side, walks the main street
 // from the west end to the blast doors and back, passing north of the
 // condenser tower. A second commander stands talking to a trooper in the
-// market, and a guard stands at the blast doors, looking down the street.
+// market, and a guard stands at the blast doors, looking down the street:
+// use him and he says they're shut until the garrison says otherwise.
 // Two Jawas haggle at the droid seller's pen and two more stand by the
 // street; one strolls the street and one the north back lane.
 const STREET_PATROL = [[12.5, 67], [60.5, 67], [101.5, 66]];
@@ -851,7 +854,14 @@ list.push(
   at('sandtrooper', 14.5, 68.6, { calm: { patrol: STREET_PATROL.map(([x, y]) => [x, y + 1.6]), idleTime: [3, 3] } }),
   at('sandtrooper-commander', 86.5, 61, { angle: 180, calm: { wander: 0 } }),
   at('sandtrooper', 84.5, 61, { angle: 0, calm: { wander: 0 } }),
-  at('sandtrooper', 103, 71, { angle: 180, calm: { wander: 0 } }),
+  at('sandtrooper', 103, 71, {
+    angle: 180,
+    calm: { wander: 0 },
+    talk: [
+      { unless: 'signal', lines: ['The east is sealed, hunter.', 'The doors open when the garrison says so.'] },
+      { lines: ['Orders came down. The east is open.'] },
+    ],
+  }),
   at('jawa', 95, 60.6, { angle: 0, calm: { wander: 0 } }), at('jawa', 99.2, 61, { angle: 180, calm: { wander: 0 } }),
   at('jawa', 22, 70, { angle: 90, calm: { wander: 0 } }), at('jawa', 116, 68, { angle: 180, calm: { wander: 0 } }),
   at('jawa', 68, 70, { calm: { wander: 3 } }), at('jawa', 50, 47, { calm: { wander: 4 } }),
@@ -958,11 +968,12 @@ list.push(
           'Katarn. Sit down.',
           'The Guild has a contract on a deserter. A scout trooper, Rusk.',
           'He wiped his ID code, so this fob has nothing to track. Yet.',
-          'The Jawas tag what they sell. If he bought parts, try the junk yard.',
+          'The Jawas tag what they sell. Try their junk yard.',
+          'North of the market. Look for the sandcrawler.',
         ],
         set: 'contract',
       },
-      { lines: ["You've got the job. Go.", 'The junk yard, Katarn.'] },
+      { lines: ["You've got the job. Go.", 'The junk yard, Katarn. Look for the sandcrawler.'] },
     ],
   }),
   at('villager-woman', 96.83, 94.86, { angle: 288, wander: 0 }), at('villager-wanderer', 100.17, 94.86, { angle: 252, wander: 0 }),
@@ -1088,6 +1099,8 @@ export default defineLevel({
   // and the drop-off exist (docs/story.md): finding Rusk turns the town,
   // and clearing customs is the pickup.
   triggers: [
+    // Jan on landing, so the first stop is named.
+    { on: 'start', do: [{ action: 'message', text: "JAN: YOUR BROKER'S IN THE CANTINA, ON THE MARKET." }, { action: 'message', text: 'JAN: UP THE STAIRS AND EAST ALONG THE MAIN STREET.' }] },
     {
       on: 'enter',
       tag: 'ledger',
@@ -1097,6 +1110,8 @@ export default defineLevel({
       ],
     },
     { on: 'talk', tag: 'informant', if: 'pass', do: [{ action: 'openDoors', tag: 'checkpoint' }] },
+    // At the checkpoint's foot with the signal and no pass, the informant calls Kyle over from his den.
+    { on: 'enter', tag: 'checkpoint-foot', if: 'signal', unless: ['pass', 'loud'], do: [{ action: 'message', text: 'INFORMANT: PSST. HUNTER. WANT A PASS?' }] },
     // The fob: the broker gives it (dark), the trader's code points it at
     // Rusk, opens the hold and opens the east (the blast doors, and the
     // alleys from the market and the junk yard), and in the hold Rusk pulls
@@ -1128,7 +1143,10 @@ export default defineLevel({
     {
       on: 'hostile',
       do: [
-        // The blast doors shut, so the way home is round them.
+        // The blast doors shut, so the way home is round them: Jan says so
+        // here, and names the ways at the checkpoint's foot.
+        { action: 'setFlag', flag: 'loud' },
+        { action: 'message', text: "JAN: THEY'VE SEALED THE BLAST DOORS. GO ROUND THEM." },
         { action: 'closeDoors', tag: 'blast-doors' },
         { action: 'openDoors', tag: 'cantina-back' },
         { action: 'openDoors', tag: 'checkpoint' },
@@ -1138,6 +1156,7 @@ export default defineLevel({
         { action: 'spawn', thing: 'sandtrooper', tag: 'roof-sniper' },
       ],
     },
+    { on: 'enter', tag: 'checkpoint-foot', if: 'loud', do: [{ action: 'message', text: "JAN: THE ALLEYS TO THE NORTH, OR THE CANTINA'S BACK DOOR." }] },
     { on: 'killed', tag: 'bay-customs', do: [{ action: 'message', text: "JAN: CUSTOMS WON'T BE CHECKING PAPERS NOW." }, { action: 'takeWeapon', weapon: 'fob' }, { action: 'exit' }] },
   ],
   ...p.build(),
