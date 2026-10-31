@@ -50,6 +50,8 @@ const TOWN = [
   'pod-hull',
   // The sandcrawler's hull (models/sandcrawler.js).
   'crawler-hull',
+  // The junk yard's cage fence, see-through (models/junk-pile.js).
+  'cage-rust',
   // Sooted drums and canisters.
   'drum-rust', 'drum-grey',
   // The condenser tower's plain dark bands (models/market.js).

@@ -162,4 +162,61 @@ function junk(m, rnd, at, out) {
 /** How high a pile stands, for its collision (its crest, near enough). */
 export const pileHeight = ({ floor, rise }) => floor + rise;
 
-export default Object.entries(PILES).map(([id, p]) => pile(id, p));
+// The cage fence penning the west heap in (docs/story.md: "a yard of droid
+// parts behind a cage fence"), on the slant along its foot, 0.6 out from
+// it, from the north wall to the west wall: diamond mesh panels about 2
+// wide between rusty posts, set up from whatever came to hand, so the
+// panels' tops and the posts' lean vary and some are patched with a sheet
+// of plate. `path` is in the level's tiles; the model's origin is at `at`,
+// its middle, at z 0.
+const CAGE = { path: [[74.8, 18], [62.3, 32.6], [56, 32.6]], floor: -0.5, h: 2.6, seed: 5 };
+const MESH = 'cage-rust';
+const POST = { tex: 'metal-rust' };
+
+/** The cage fence: its id, where it goes and how high it stands (for its collision). */
+export const JUNK_CAGE = { id: 'junk-cage', at: middle(CAGE.path), height: CAGE.floor + CAGE.h + 0.2 };
+
+function cage({ path, floor, h, seed }) {
+  const m = new ModelBuilder(JUNK_CAGE.id);
+  const rnd = rng(seed);
+  const [cx, cy] = JUNK_CAGE.at;
+  const pts = path.map(([x, y]) => [x - cx, y - cy]);
+  // The posts: at each corner and every 2 tiles or so between, each
+  // leaning a little, and how high the panel either side reaches on it.
+  const posts = [];
+  for (let i = 0; i + 1 < pts.length; i++) {
+    const [a, b] = [pts[i], pts[i + 1]];
+    const n = Math.max(1, Math.round(Math.hypot(b[0] - a[0], b[1] - a[1]) / 2));
+    for (let k = i === 0 ? 0 : 1; k <= n; k++) posts.push([a[0] + ((b[0] - a[0]) * k) / n, a[1] + ((b[1] - a[1]) * k) / n]);
+  }
+  const lean = posts.map(() => [(rnd() - 0.5) * 0.16, (rnd() - 0.5) * 0.16]);
+  const top = posts.map(() => floor + h + (rnd() - 0.5) * 0.3);
+  /** A point on post i, `z` up it (following its lean). */
+  const on = (i, z) => {
+    const t = (z - floor) / h;
+    return [posts[i][0] + lean[i][0] * t, posts[i][1] + lean[i][1] * t, z];
+  };
+  for (let i = 0; i + 1 < posts.length; i++) {
+    // The panel's top dips to the lower of its two posts' and a bit under.
+    const z1 = Math.min(top[i], top[i + 1]) - 0.15;
+    m.face([on(i, floor), on(i + 1, floor), on(i + 1, z1), on(i, z1)], { tex: MESH, twoSided: true, uv: [[0, 1], [1, 1], [1, 0], [0, 0]] });
+    // Now and then a sheet of plate wired over its lower part, a hair off it.
+    if (rnd() < 0.25) {
+      const zp = floor + 0.6 + rnd() * 0.7;
+      const [a, b] = [on(i, floor + 0.1), on(i + 1, floor + 0.1)];
+      const nx = (b[1] - a[1]) / Math.hypot(b[0] - a[0], b[1] - a[1]);
+      const ny = -(b[0] - a[0]) / Math.hypot(b[0] - a[0], b[1] - a[1]);
+      const s = rnd() < 0.5 ? 0.04 : -0.04;
+      const off = (p, z) => [p[0] + nx * s, p[1] + ny * s, z];
+      const [inA, inB] = [0.15 + rnd() * 0.2, 0.15 + rnd() * 0.2];
+      const lerp = (p, q, t) => [p[0] + (q[0] - p[0]) * t, p[1] + (q[1] - p[1]) * t];
+      const [pa, pb] = [lerp(a, b, inA), lerp(b, a, inB)];
+      m.face([off(pa, floor + 0.1), off(pb, floor + 0.1), off(pb, zp), off(pa, zp)], { tex: PLATES[Math.floor(rnd() * PLATES.length)], twoSided: true });
+    }
+  }
+  for (let i = 0; i < posts.length; i++) rod(m, [...posts[i], floor - 0.05], on(i, top[i]), 0.07, 4, POST);
+  for (let i = 0; i + 1 < pts.length; i++) m.line(pts[i][0], pts[i][1], pts[i + 1][0], pts[i + 1][1]);
+  return m.build();
+}
+
+export default [...Object.entries(PILES).map(([id, p]) => pile(id, p)), cage(CAGE)];

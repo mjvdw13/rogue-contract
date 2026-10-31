@@ -85,6 +85,11 @@ These need Mark to try something, or to decide. Don't start them without him.
   foot, with plates, pipes, girders, drums, crates and the odd droid
   dome sticking out. To judge: their height and steepness, and how much
   junk sticks out (about one piece every 2 tiles of slope).
+  A cage fence pens the west heap in, 0.6 out from its foot, from the
+  north wall to the west wall: Dark Forces' diamond mesh rusted
+  (`cage-rust`), panels about 2 wide and 2.6 high between leaning posts,
+  a quarter of them patched with a sheet of plate. To judge: its height,
+  how orange the rust is, and whether it should stand further out.
 
 - **Mos Eisley opens in stages** (`?map=m1`, 2026-10-31): when you land the
   blast doors are shut (a stand-in: a rising Imperial gate under a steel
@@ -586,7 +591,9 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
     - [x] The heaps as piles of junk, not slabs: a lumpy mound for
           each (a model, colliding as its outline), droid parts, plates
           and pipes sticking out.
-    - [ ] The cage fence along the west heap.
+    - [x] The cage fence along the west heap: a model on the slant
+          from the north wall to the west, rusty diamond mesh between
+          posts, some panels patched with plate.
     - [ ] The court and the hold: droids for sale, Jawas, the furnace
           and crane as models, the hold's racks and clutter.
   - [ ] The back alleys and the back lane.

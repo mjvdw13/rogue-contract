@@ -7,7 +7,7 @@ import { AWNING_MODELS, AWNING_POLES, poleId } from './models/awning.js';
 import { TIN_MODELS } from './models/tin.js';
 import { PIPE_MODELS } from './models/pipes.js';
 import { CLUTTER } from './models/clutter.js';
-import { JUNK_PILES, pileHeight } from './models/junk-pile.js';
+import { JUNK_PILES, JUNK_CAGE, pileHeight } from './models/junk-pile.js';
 import { BAY_WALL, BAY_HOSES } from './models/bay.js';
 import { TOWER_HEIGHT } from './models/market.js';
 import { BAR, TAPS, CORNER } from './models/cantina.js';
@@ -153,6 +153,7 @@ export default [
   // The junk yard's heaps (models/junk-pile.js), colliding as their
   // outlines, as high as their crests, too tall to climb.
   ...Object.entries(JUNK_PILES).map(([id, p]) => defineDecoration({ id, model: id, solid: true, height: pileHeight(p), fixed: true })),
+  defineDecoration({ id: JUNK_CAGE.id, model: JUNK_CAGE.id, solid: true, height: JUNK_CAGE.height, fixed: true }),
   defineDecoration({ id: 'ceiling-lamp', glyph: 'l', sheet: S('ceiling-lamp', 48, 16), hanging: true, fullbright: true }),
   defineDecoration({
     id: 'fuel-barrel',

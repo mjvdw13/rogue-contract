@@ -21,6 +21,7 @@
 // `color` from `from` (0 top, 1 bottom) down to the bottom row (a sky's
 // haze at the horizon), and `rust: { color, amount, cell, seed }` stains it
 // with blotches of rust that tile (a list of them stains it with each).
+// `holes: true` keeps the source's see-through texels (a mesh).
 // `turn: true` turns it a quarter (a pipe's picture for a pipe lying across the
 // other way). `lip: [{ rows, color, amount }, ...]` paints bands down from the top row,
 // each `rows` tall, `amount` of the way to `color` (a step's nosing and the
@@ -111,6 +112,9 @@ export const TOWN = [
   // down so the stains tile both ways; the model draws it at twice the
   // walls' scale, so a panel is about a tile.
   { out: 'crawler-hull', df: 'IWSHIP0', crop: [384, 56, 128, 64], tile: [1, 2], gradient: [[30, 18, 12], [72, 44, 28], [112, 70, 44], [146, 98, 66], [176, 130, 94]], keep: 0, contrast: 1.1, rust: [{ color: [150, 70, 24], amount: 0.55, cell: 32, seed: 101 }, { color: [190, 150, 44], amount: 0.75, cell: 32, seed: 103, from: 0.62 }, { color: [22, 16, 12], amount: 0.4, cell: 32, seed: 105, from: 0.55 }] },
+  // The junk yard's cage fence (models/junk-pile.js): Dark Forces' diamond
+  // mesh in its frame, rusted, its holes kept (`holes`).
+  { out: 'cage-rust', df: 'ICDELEV', holes: true, gradient: [[30, 16, 8], [74, 40, 18], [120, 66, 32], [160, 96, 52], [190, 130, 82]], keep: 0, contrast: 1, rust: [{ color: [52, 26, 12], amount: 0.5, cell: 16, seed: 131 }, { color: [18, 14, 10], amount: 0.4, cell: 16, seed: 133, from: 0.55 }] },
   // The cargo pod's hull (models/clutter.js): the galvanised tin again, rusty
   // and scorched with soot.
   { out: 'pod-hull', df: 'ZWGRUV1', crop: [0, 0, 32, 64], tile: [2, 1], gradient: [[40, 40, 40], [88, 86, 82], [130, 126, 118], [166, 160, 150], [196, 190, 178]], keep: 0, contrast: 0.9, rust: [{ color: [120, 64, 30], amount: 0.5, cell: 16, seed: 2 }, ...WORN(16, 61, 0.8)] },
@@ -553,7 +557,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     if (spec.fade) img = faded(img, spec.fade);
     for (const r of [spec.rust ?? []].flat()) img = rusted(img, r);
     if (spec.lip) img = lipped(img, spec.lip);
-    for (let i = 3; i < img.data.length; i += 4) img.data[i] = 255;
+    if (!spec.holes) for (let i = 3; i < img.data.length; i += 4) img.data[i] = 255;
     made.set(spec.out, img);
     fs.writeFileSync(path.join(texDir, `${spec.out}.png`), encodePNG(img.width, img.height, img.data));
     console.log(`${spec.out}.png from ${spec.df} (${img.width}x${img.height})`);
