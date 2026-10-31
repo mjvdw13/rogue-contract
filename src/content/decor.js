@@ -127,6 +127,7 @@ export default [
   defineDecoration({ id: 'cantina-detector', model: 'cantina-detector', fixed: true }),
   defineDecoration({ id: 'cantina-sign', model: 'cantina-sign', fixed: true }),
   defineDecoration({ id: 'cantina-lamp', model: 'cantina-lamp', fixed: true }),
+  defineDecoration({ id: 'cantina-datapad', model: 'cantina-datapad', fixed: true }),
   // On Mos Eisley's walls and streets after Mark's film stills: a hitching
   // ring (models/ring.js), and the white dome pod by the cantina
   // (models/pod.js), colliding as its cylinder.

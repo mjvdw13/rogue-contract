@@ -398,6 +398,10 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
     - [x] Filthy inside (Mark): grime thick on the walls and the floor,
           litter underfoot.
     - [x] Jawas inside.
+    - [x] The secret back room behind the storeroom (docs/mission1.md,
+          Secrets 2): a secret door in the plaster of the storeroom's
+          north wall, half behind its crates, into a smuggler's hidey-hole:
+          power cells, a stash, a dim bulb, and a ledger on a crate (lore).
     - [ ] Waiting on Mark.
   - [ ] Bay 86, the dewback stable and the speeder garage.
   - [ ] The Jawa junk yard and the sandcrawler.
