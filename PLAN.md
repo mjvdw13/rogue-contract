@@ -90,15 +90,17 @@ These need Mark to try something, or to decide. Don't start them without him.
   (`cage-rust`), panels about 2 wide and 2.6 high between leaning posts,
   a quarter of them patched with a sheet of plate. To judge: its height,
   how orange the rust is, and whether it should stand further out.
-  The furnace in the court is a model: a squat kiln of rusty plate on a
-  grey plinth against the east heap's foot, 2.3 tall, its mouth glowing
-  orange behind bars under a hood, a hopper on top and a stack up to 6.
-  To judge: its size, and whether the glow is too bright by day.
-  The crane in the east heap is a model: a rusty lattice mast to 10, a
-  cab near its top, the jib reaching 6.4 out over the furnace's hopper
-  with a counterweight on its tail, stays from a peak at 12, and a hook
-  on a cable hanging to 4 over the yard. To judge: its height, and where
-  the jib points.
+  The furnace is a smelter vessel now (Mark, 2026-10-31: the kiln and
+  the crane didn't look Star Wars): a round-bellied tank on four struts
+  against the east heap's foot, 3.6 tall, domed, its seams banded, a
+  round port glowing orange in a dark collar, a crucible of melt under
+  its spout, vents on the dome, a chute from the heap into its back and
+  hoses to a power unit. The crane is gone; a repulsorlift cargo skiff
+  is parked in the court's west end by the cage fence instead, hovering
+  and bobbing: a flat hull with a blunt bow, a rail round its deck, a
+  steering post at the stern, two engine pods, crates, a drum and a dome
+  on its deck. To judge: both their looks, and the skiff's size (5.8
+  long).
   Droids for sale stand in a row along the court's south wall, west of
   the steps (models, `astromech-blue`, `-red`, `-rust`, `power-droid`,
   `-rust`, about a Jawa's height), a Jawa minding them and another by the
@@ -617,6 +619,9 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
     - [x] The court and the hold: the furnace and the crane as models,
           droids for sale in the court with Jawas minding them, the
           hold's racks and clutter.
+    - [x] Mark's notes (2026-10-31: the crane and furnace don't look Star
+          Wars): no crane, a cargo skiff parked in the court instead; the
+          furnace a smelter vessel.
     - [ ] Waiting on Mark.
   - [ ] The back alleys and the back lane.
   - [ ] The checkpoint and the rooftops.

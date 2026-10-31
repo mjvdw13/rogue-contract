@@ -720,7 +720,7 @@ town.house(64, 107, 80, 117, { h: BAY86.floorZ + 3, r: 2, ...HULL });
 // north side and a side gate east into the back alleys. The trader isn't
 // there (Mark, 2026-10-31): a passage slants up its north-west corner
 // between two heaps of scrap, too tall to see over, to a lane along the
-// low north wall, a crane (models/crane.js) over it. Through a breach in
+// low north wall. Through a breach in
 // the wall, the sandcrawler (models/sandcrawler.js, seen from the market
 // over I's low roof) has its ramp down over it, and the trader is in its
 // hold.
@@ -745,14 +745,15 @@ p.rect(84, 37, 86, 40, (_, __, c) => ({ ...c, door: 'door-planks-rising', style:
 gateTag(84, 37, 86, 40, 'side-gate');
 // The two heaps, the passage between them 4 wide at its foot and opening
 // out at the top into a clearing at the ramp's foot (Mark, 2026-10-31: the
-// ramp mustn't touch the heaps), 3 tiles clear of it; the east one taller,
-// the crane standing in it. Each is a pile of junk (models/junk-pile.js)
+// ramp mustn't touch the heaps), 3 tiles clear of it; the east one taller.
+// Each is a pile of junk (models/junk-pile.js)
 // on the yard's floor, colliding as its outline.
 for (const [id, { at: [x, y] }] of Object.entries(JUNK_PILES)) list.push(at(id, x, y, { angle: 0, z: 0, lit: town.light }));
 // The cage fence penning the west heap in, along its foot.
 list.push(at(JUNK_CAGE.id, ...JUNK_CAGE.at, { angle: 0, z: 0, lit: town.light }));
-// The crane in the east heap, its jib out over the furnace's hopper.
-list.push(at('crane', 82.5, 26.5, { angle: 239, z: JUNK, lit: town.light }));
+// The Jawas' cargo skiff parked in the court's west end, along the cage
+// fence, hovering, its bow to the court.
+list.push(at('cargo-skiff', 59.5, 35.1, { angle: 0, z: JUNK, lit: town.light }));
 // The droids for sale in a row along the court's south wall, west of the
 // steps from the gate, facing in, and two Jawas minding them: one by the
 // row and one by the furnace (calm, so they stay put).
@@ -762,10 +763,10 @@ list.push(
   at('power-droid', 63.3, 40.15, { angle: 95 }), at('astromech-blue', 64.6, 40.1, { angle: 75 }),
   at('crate-grey-small', 66.1, 40.3, { angle: 5 }), at('droid-dome', 66.1, 40.3, { z: JUNK + 0.6, angle: 160 }),
   at('astromech-rust', 57.2, 38.8, { angle: 20 }),
-  at('jawa', 62.4, 38.4, { angle: 45, calm: { wander: 0 } }), at('jawa', 76.6, 35.2, { angle: 200, calm: { wander: 0 } }),
+  at('jawa', 62.4, 38.4, { angle: 45, calm: { wander: 0 } }), at('jawa', 76.2, 35, { angle: 30, calm: { wander: 0 } }),
 );
 // The scrap furnace against the east heap's foot, its mouth to the court.
-list.push(at('furnace', 80, 32.25, { angle: 0, z: JUNK, lit: town.light }));
+list.push(at('furnace', 79.5, 32.7, { angle: 0, z: JUNK, lit: town.light }));
 // The sandcrawler: the model is its outside, the tiles inside it its hold
 // (the crawler's lower deck, dim, the length of it, up on its treads at 3)
 // and the hold's walls. Its ramp is down over a breach in the wall, steps

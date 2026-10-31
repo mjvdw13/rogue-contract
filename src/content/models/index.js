@@ -27,8 +27,8 @@ import stains from './stains.js';
 import sandcrawler from './sandcrawler.js';
 import junkPiles from './junk-pile.js';
 import furnace from './furnace.js';
-import crane from './crane.js';
+import skiff from './skiff.js';
 import droids from './droids.js';
 import racks from './rack.js';
 
-export default [terminal, reactorRing, coolantTank, shuttle, ...barricades, boulderLarge, boulderSmall, ...floodlightTowers, sensorMast, sensorDish, ...domes, doorJamb, ...doorLips, ...arches, ...buttresses, ...awnings, ...tin, ...pipes, ...clutter, landspeeder, ...bay, moldyCrow, ...market, ...cantina, ...hitching, ...pod, ...stains, ...sandcrawler, ...junkPiles, ...furnace, ...crane, ...droids, ...racks];
+export default [terminal, reactorRing, coolantTank, shuttle, ...barricades, boulderLarge, boulderSmall, ...floodlightTowers, sensorMast, sensorDish, ...domes, doorJamb, ...doorLips, ...arches, ...buttresses, ...awnings, ...tin, ...pipes, ...clutter, landspeeder, ...bay, moldyCrow, ...market, ...cantina, ...hitching, ...pod, ...stains, ...sandcrawler, ...junkPiles, ...furnace, ...skiff, ...droids, ...racks];

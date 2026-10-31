@@ -9,6 +9,7 @@ import { PIPE_MODELS } from './models/pipes.js';
 import { CLUTTER } from './models/clutter.js';
 import { JUNK_PILES, JUNK_CAGE, pileHeight } from './models/junk-pile.js';
 import { FURNACE } from './models/furnace.js';
+import { SKIFF } from './models/skiff.js';
 import { DROIDS } from './models/droids.js';
 import { RACK, RACKS } from './models/rack.js';
 import { BAY_WALL, BAY_HOSES } from './models/bay.js';
@@ -159,8 +160,9 @@ export default [
   defineDecoration({ id: JUNK_CAGE.id, model: JUNK_CAGE.id, solid: true, height: JUNK_CAGE.height, fixed: true }),
   // The junk yard's scrap furnace (models/furnace.js), colliding as its plinth.
   defineDecoration({ id: 'furnace', model: 'furnace', solid: true, height: FURNACE.top, fixed: true }),
-  // Its crane (models/crane.js): the mast stands in the east heap, the rest overhead.
-  defineDecoration({ id: 'crane', model: 'crane', fixed: true }),
+  // The Jawas' cargo skiff parked in the court (models/skiff.js), hovering
+  // and bobbing like the landspeeder: it collides as its hull, as high as its rail.
+  defineDecoration({ id: 'cargo-skiff', model: 'cargo-skiff', solid: true, height: SKIFF.rail, fixed: true, bob: { height: 0.03, period: 3.6 } }),
   // The Jawas' droids for sale (models/droids.js), switched off, solid.
   ...Object.entries(DROIDS).map(([id, d]) => defineDecoration({ id, model: id, solid: true, radius: d.radius, height: d.height, fixed: true })),
   // Racks of shelves loaded with wares in the sandcrawler's hold (models/rack.js), colliding as their outlines.
