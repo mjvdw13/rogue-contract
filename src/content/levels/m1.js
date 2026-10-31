@@ -396,7 +396,6 @@ p.rect(136, 48, 139, 61, town.street());
 town.house(139, 48, 148, 61, { h: 7, r: 1, wall: 'adobe-grey', skirt: null });
 town.room(140, 52, 146, 59, { h: 7, wall: 'adobe-grey', light: 128 });
 town.arch(139, 54, 140, 57, { h: 7, lintel: 3, wall: 'adobe-grey' });
-p.rect(140, 52, 146, 59, (_, __, c) => ({ ...c, tag: 'informant' }));
 // South of it, too tall to climb from the roofs behind.
 p.rect(136, 73, 148, 86, town.street());
 town.house(136, 73, 141, 86, { h: 8, r: 1, skirt: 'plinth' });
@@ -622,9 +621,6 @@ const roofOver = (x0, y0, x1, y1, ceilZ, h) => p.rect(x0, y0, x1, y1, (_, __, c)
   town.stair(118, 105, 126, 107, { up: 'E', from: F, top: 0, rise: 0.25, floor: 'flagstone', side: wall });
   roofOver(118, 105, 126, 107, ceilZ, 8);
   town.door(126, 106, 'E', { h: 8, tex: 'door-grey', opens: true });
-  // In front of the broker's alcove (the west one at the back): stepping up
-  // to him gets his stand-in message.
-  p.rect(90, 106, 94, 107, (_, __, c) => ({ ...c, tag: 'broker' }));
   // The back room: kegs, crates and canisters along its walls, a power unit
   // in the far corner, the storeroom's crates and a cargo pod out of the
   // way to the back door; a bulb over each.
@@ -821,7 +817,7 @@ list.push(
 // The east third's calm troopers, and the stand-ins for its people. The
 // checkpoint's guards on its steps; a patrol walking the old quarter's main
 // street; a guard on its north street. The informant (a villager until
-// his sheet exists) in his den, a squatter in the gate square, and Rusk (a
+// his sheet exists) in his den (use him for the pass), a squatter in the gate square, and Rusk (a
 // villager too) in the freighter's hold. Customs' two troopers stand in
 // their office: clearing them at the end is the stand-in pickup.
 const CHECKPOINT_LINES = ["Old quarter's sealed, hunter.", 'No pass, no way through.'];
@@ -837,7 +833,17 @@ list.push(
   at('sandtrooper', 82.5, 113, { angle: 180, calm: { wander: 0 } }), at('sandtrooper', 61.5, 116, { angle: 0, calm: { wander: 0 } }),
   at('sandtrooper', 15.2, 102.4, { angle: 90, tag: 'bay-customs', calm: { wander: 0, lines: ['Your papers check out, hunter.', 'Move along.'] } }),
   at('sandtrooper', 18.2, 102.2, { angle: 90, tag: 'bay-customs', calm: { wander: 0, lines: ['Your papers check out, hunter.', 'Move along.'] } }),
-  at('villager-wanderer', 143, 55.5, { angle: 180, wander: 0 }),
+  // The informant, in his den: the pass opens the checkpoint.
+  at('villager-wanderer', 143, 55.5, {
+    angle: 180,
+    wander: 0,
+    tag: 'informant',
+    name: 'INFORMANT',
+    talk: [
+      { unless: 'pass', lines: ["You'll be wanting the old quarter.", "Here. A pass. The checkpoint won't stop you."], set: 'pass' },
+      { lines: ['Go on, before someone sees us talking.'] },
+    ],
+  }),
   at('villager-man', 152, 73),
   at('villager-man', 180, 134.5, { angle: 0, wander: 0 }),
   at('barricade', 137.6, 63.6, { angle: 20 }), at('barricade', 137.6, 69.8, { angle: 335 }),
@@ -886,14 +892,33 @@ list.push(
 // with the troopers). Two sandtroopers just in from the street at the foot
 // of the steps. Villagers stand in, staying put, until Mark's sheets exist
 // (docs/mission1.md, Characters): the bartender inside the bar, the broker
-// in the west back alcove (a stand-in message when you step up to him),
+// in the west back alcove (use him to talk),
 // customers at the bar and the booths, and the band on the stage.
 list.push(
   at('bossk', 94.3, 96.8, { angle: 322, calm: { wander: 0, lines: ['Hsss. Find your own bounty.', 'This one is mine, hunter.'] } }),
   at('boba-fett', 106.9, 97.5, { angle: 180, calm: { wander: 0, lines: ['...', 'Not interested.'] } }),
   at('sandtrooper', 96.4, 91.2, { angle: 290, calm: { wander: 0 } }), at('sandtrooper', 100.6, 91.2, { angle: 250, calm: { wander: 0 } }),
   at('villager-man', 98.5, 104, { angle: 90, wander: 0 }),
-  at('villager-adventurer', 92, 107.3, { angle: 90, wander: 0 }),
+  // The broker: the Guild's contract, then where to look (the fob is to come).
+  at('villager-adventurer', 92, 107.3, {
+    angle: 90,
+    wander: 0,
+    tag: 'broker',
+    name: 'BROKER',
+    talk: [
+      {
+        unless: 'contract',
+        lines: [
+          'Katarn. Sit down.',
+          'The Guild has a contract on a deserter. A scout trooper, Rusk.',
+          'He wiped his ID code, so the fob has nothing to track. Yet.',
+          'The Jawas tag what they sell. If he bought parts, try the junk yard.',
+        ],
+        set: 'contract',
+      },
+      { lines: ["You've got the job. Go.", 'The junk yard, Katarn.'] },
+    ],
+  }),
   at('villager-woman', 96.83, 94.86, { angle: 288, wander: 0 }), at('villager-wanderer', 100.17, 94.86, { angle: 252, wander: 0 }),
   at('villager-man', 93.3, 103.6, { angle: 0, wander: 0 }),
   at('villager-adventurer', 90.9, 97.5, { angle: 180, wander: 0 }), at('villager-woman', 93.6, 95, { angle: 135, wander: 0 }),
@@ -1009,18 +1034,11 @@ export default defineLevel({
   lights,
   hangings: [...hangings, ...town.hangings],
   par: 600,
-  // Stand-ins for the story until conversations, the fob and the drop-off
-  // exist (docs/story.md): the informant's pass opens the checkpoint,
-  // finding Rusk turns the town, and clearing customs is the pickup.
+  // The story so far: the broker's contract and the informant's pass are
+  // conversations (the pass opens the checkpoint). Stand-ins until the fob
+  // and the drop-off exist (docs/story.md): finding Rusk turns the town,
+  // and clearing customs is the pickup.
   triggers: [
-    {
-      on: 'enter',
-      tag: 'broker',
-      do: [
-        { action: 'message', text: "BROKER (STAND-IN): THE GUILD'S CONTRACT ON RUSK, AND A TRACKING FOB." },
-        { action: 'message', text: 'BROKER: HE WIPED HIS CODE. THE JAWAS TAG WHAT THEY SELL: TRY THE JUNK YARD.' },
-      ],
-    },
     {
       on: 'enter',
       tag: 'ledger',
@@ -1029,7 +1047,7 @@ export default defineLevel({
         { action: 'message', text: "'WANTS OFF-WORLD BEFORE THE IMPERIALS' NEXT FIELD TEST IN THE JUNDLAND.'" },
       ],
     },
-    { on: 'enter', tag: 'informant', do: [{ action: 'message', text: 'INFORMANT (STAND-IN): HERE IS A PASS. THE CHECKPOINT WILL LET YOU THROUGH.' }, { action: 'openDoors', tag: 'checkpoint' }] },
+    { on: 'talk', tag: 'informant', if: 'pass', do: [{ action: 'openDoors', tag: 'checkpoint' }] },
     { on: 'enter', tag: 'hold', do: [{ action: 'message', text: "RUSK (STAND-IN): THAT FOB IS IMPERIAL. THEY'RE ALREADY HERE." }, { action: 'hostile' }] },
     {
       on: 'hostile',

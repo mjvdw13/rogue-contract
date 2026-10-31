@@ -28,6 +28,17 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
+- **Conversations** (`?map=m1`, 2026-10-31): press use on someone to talk;
+  each use says the next line. The broker (in the cantina's west back
+  alcove) gives the contract on Rusk in four lines and points you at the
+  junk yard; the informant (in his den by the checkpoint) gives you the
+  pass, which opens the checkpoint's gate. The lines are drafts from
+  `docs/story.md`: the wording is yours. Bumping into someone repeats what
+  they last said. You can talk from 3.5 tiles (doors stay at 2.6): the
+  broker's table stops you 2.8 from him. To judge: whether use should move
+  a conversation on this quickly (0.3 s between lines), and whether a line
+  wants to stay up longer. Next for them: the fob from the broker, and the Jawa trader.
+
 - **The cantina in detail** (`?map=m1`, 2026-10-30, after Mark's
   references; `models/cantina.js`). No skylight: over the bar the heavy
   ceiling opens into a shallow oval well whose top glows, a canopy ring
@@ -50,7 +61,7 @@ These need Mark to try something, or to decide. Don't start them without him.
   wall (standing: no sheet sits), a dewback at a trough and a drum out
   front, the two stalls there gone. Inside: Bossk and Boba Fett, two
   troopers at the steps, villagers standing in for the bartender, the
-  broker (a stand-in message), customers and the band. To decide: Bossk
+  broker (a conversation, below), customers and the band. To decide: Bossk
   and Boba Fett are calm monsters, so they fight when the town turns
   (Boba Fett has 200 health), which makes the cantina's way round the
   blast doors a hard fight; and whether a sitting pose for Jawas and
@@ -64,8 +75,8 @@ These need Mark to try something, or to decide. Don't start them without him.
   areas in `docs/mission1.md`): plain volumes to try the route, no detail.
   Walk east past the blast doors: the street climbs two steps to the
   checkpoint's gate. Two ways past it: the informant's den, open to the
-  alleys' mouth north of the street (stepping in is a stand-in pass that
-  opens the gate), or the back lane to the rubble at its end, up onto the
+  alleys' mouth north of the street (the informant's pass opens the gate:
+  use him), or the back lane to the rubble at its end, up onto the
   roofs, two running jumps and a drop into a yard in the old quarter.
   Then the slanting main street (or the dry wash, down steps at the north
   street's end) to the derelict bay; stepping into the stand-in hull's
@@ -571,8 +582,6 @@ conversations, then the fob.
       for a few seconds, HUD and weapon hidden, input locked; use or fire
       skips. An override of `world.camera()`.
 - [ ] **`wait` in trigger lists:** a trigger's actions can pause.
-- [ ] **Conversations:** an `on: 'talk'` trigger from `npcReact`, lines that
-      move on with each use, story flags (`setFlag`, `if` on triggers).
 - [ ] **The tracking fob:** a weapon with no attack, a per-tick weapon hook
       (blinks and beeps faster near the signal), `setSignal` and `takeWeapon`
       actions.

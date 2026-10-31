@@ -21,6 +21,7 @@ import { overlap } from '../things/shape.js';
 import { PlayerState, playerThink, playerCamera } from '../things/player.js';
 import { monsterThink, wakeMonster, monsterPain, applyMomentum } from '../things/monster.js';
 import { makeCalm, endCalm, calmReact } from '../things/calm.js';
+import { makeTalk } from '../things/talk.js';
 import { projectileThink, launchProjectile, effectThink } from '../things/projectile.js';
 import { tryPickup } from '../things/pickups.js';
 import { damage, radiusDamage, hitscan, meleeTarget, corpseThink } from '../combat/damage.js';
@@ -37,6 +38,8 @@ export const SKILLS = {
 };
 
 const USE_RANGE = 2.6;
+/** How far the player can talk to someone (tiles): across a booth's table or the bar. */
+const TALK_RANGE = 3.5;
 /**
  * Items are in reach from slightly above them (Doom allows 8 map units, about
  * a quarter of a tile here) up to the top of the player's body. Jumping over
@@ -114,6 +117,8 @@ export class World {
     this.floorTimer = 0;
     /** The friendly NPC the player last walked into (it reacts on its next think). */
     this.playerBumped = null;
+    /** Story flags (the setFlag action), for triggers' and conversations' `if` and `unless`. */
+    this.flags = new Set();
     /** Has the town's switch been thrown (turnHostile)? */
     this.hostile = false;
 
@@ -199,6 +204,9 @@ export class World {
         initNpc(this, t);
       }
       if (s.calm && t.kind === 'monster') makeCalm(this, t, s.calm);
+      // Who they are in what they say, and what they say when used (things/talk.js).
+      if (s.name) t.speaker = s.name;
+      if (s.talk) t.talk = makeTalk(s.talk);
       if (t.kind === 'monster' && t.def.countKill) this.stats.totalKills++;
       if (t.kind === 'item' && t.def.countItem) this.stats.totalItems++;
     }
@@ -605,15 +613,22 @@ export class World {
     const dx = Math.cos(pt.angle);
     const dy = Math.sin(pt.angle);
     const hit = castRay(this.map, pt.x, pt.y, dx, dy, USE_RANGE);
-    // Friendly characters (NPCs) and calm monsters in front of the player get talked to first.
+    // Friendly characters (NPCs) and calm monsters in front of the player get
+    // talked to first: the nearest, out to TALK_RANGE (across a table or a counter).
+    const wall = castRay(this.map, pt.x, pt.y, dx, dy, TALK_RANGE);
+    let talkTo = null;
+    let nearest = Math.min(wall.dist, TALK_RANGE);
     for (const t of this.things) {
       if (!(t.kind === 'npc' || t.calm) || t.removed || t.dead) continue;
       const d = rayCircle(pt.x, pt.y, dx, dy, t.x, t.y, t.radius + 0.1);
-      if (d >= 0 && d < Math.min(hit.dist, USE_RANGE)) {
-        if (t.calm) calmReact(this, t);
-        else npcReact(this, t);
-        return;
+      if (d >= 0 && d < nearest) {
+        talkTo = t;
+        nearest = d;
       }
+    }
+    if (talkTo) {
+      if (talkTo.calm ? calmReact(this, talkTo, true) : npcReact(this, talkTo, true)) this.triggers.talk(talkTo);
+      return;
     }
     if (hit.door) {
       this._useDoor(hit.door, pt);

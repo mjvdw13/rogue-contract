@@ -2,6 +2,7 @@ import { lineOfSight } from '../world/physics.js';
 import { F_SOLID, F_DOOR, F_DAMAGE } from '../world/tilemap.js';
 import { Rng } from '../core/rng.js';
 import { UNREACHABLE } from '../world/nav.js';
+import { pickLine, readyToReact } from './talk.js';
 
 /**
  * Friendly characters (townsfolk, coworkers). They are solid, and monsters
@@ -106,9 +107,12 @@ function step(world, t, dx, dy) {
   return true;
 }
 
-/** Turn to the player, play the reaction and say something. */
-export function npcReact(world, t) {
-  if (t.reactCooldown > 0 || t.scared || t.dead) return false;
+/**
+ * Turn to the player, play the reaction and say something: the next line of
+ * a conversation when the player uses them (`used`), see talk.js.
+ */
+export function npcReact(world, t, used = false) {
+  if (t.scared || t.dead || !readyToReact(world, t, used, t.reactCooldown)) return false;
   const def = t.def;
   const p = world.player;
   t.angle = t.angleTo(p);
@@ -116,13 +120,8 @@ export function npcReact(world, t) {
   if (!t.setAnim('react')) t.setAnim('idle', false);
   t.timer = def.reactTime ?? 1.8;
   t.reactCooldown = def.reactCooldown ?? 2.5;
-  const lines = def.lines ?? [];
-  if (lines.length) {
-    let k = t.rng.int(0, lines.length - 1);
-    if (k === t.lastLine && lines.length > 1) k = (k + 1) % lines.length;
-    t.lastLine = k;
-    world.message(`${def.name}: ${lines[k]}`);
-  }
+  const line = pickLine(world, t, def.lines ?? [], t, used);
+  if (line !== undefined) world.message(`${t.speaker ?? def.name}: ${line}`);
   if (def.sounds?.react) world.playSoundFrom(def.sounds.react, t);
   const a = p.angleTo(t);
   if (def.bubble) {

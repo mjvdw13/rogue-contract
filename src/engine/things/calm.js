@@ -1,6 +1,7 @@
 import { Rng } from '../core/rng.js';
 import { blockedByMap, lineOfSight } from '../world/physics.js';
 import { wanderArea } from './npc.js';
+import { pickLine, readyToReact } from './talk.js';
 
 /**
  * Calm monsters: troopers and Jawas going about their business in a town
@@ -121,22 +122,22 @@ function startStroll(world, m) {
   walkTo(m, (i % map.w) + 0.5 + m.rng.range(-0.2, 0.2), Math.floor(i / map.w) + 0.5 + m.rng.range(-0.2, 0.2));
 }
 
-/** Turn to the player and say a line. Returns false while it's still cooling down from the last one. */
-export function calmReact(world, m) {
+/**
+ * Turn to the player and say a line: the next of its conversation when the
+ * player uses it (`used`, see talk.js). Returns false while it's still
+ * cooling down from the last one.
+ */
+export function calmReact(world, m, used = false) {
   const c = m.calm;
-  if (!c || c.reactCooldown > 0 || m.dead) return false;
+  if (!c || m.dead || !readyToReact(world, m, used, c.reactCooldown)) return false;
   if (c.mode !== 'react') c.resume = c.mode;
   c.mode = 'react';
   c.timer = 1.8;
   c.reactCooldown = 2.5;
   m.angle = m.angleTo(world.player);
   standPose(m);
-  if (c.lines.length) {
-    let k = m.rng.int(0, c.lines.length - 1);
-    if (k === c.lastLine && c.lines.length > 1) k = (k + 1) % c.lines.length;
-    c.lastLine = k;
-    world.message(`${m.def.name.toUpperCase()}: ${c.lines[k]}`);
-  }
+  const line = pickLine(world, m, c.lines, c, used);
+  if (line !== undefined) world.message(`${(m.speaker ?? m.def.name).toUpperCase()}: ${line}`);
   return true;
 }
 

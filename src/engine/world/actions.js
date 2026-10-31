@@ -82,6 +82,11 @@ export const BUILTIN_ACTIONS = {
   hostile(world) {
     world.turnHostile();
   },
+  /** Set a story flag (or clear it, with `value: false`) for triggers' and conversations' `if` and `unless`. */
+  setFlag(world, { flag, value = true }) {
+    if (value) world.flags.add(flag);
+    else world.flags.delete(flag);
+  },
   /** Change the music. */
   music(world, { id }) {
     world.game?.playMusic?.(id);
