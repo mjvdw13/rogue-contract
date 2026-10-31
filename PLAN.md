@@ -90,6 +90,10 @@ These need Mark to try something, or to decide. Don't start them without him.
   (`cage-rust`), panels about 2 wide and 2.6 high between leaning posts,
   a quarter of them patched with a sheet of plate. To judge: its height,
   how orange the rust is, and whether it should stand further out.
+  The furnace in the court is a model: a squat kiln of rusty plate on a
+  grey plinth against the east heap's foot, 2.3 tall, its mouth glowing
+  orange behind bars under a hood, a hopper on top and a stack up to 6.
+  To judge: its size, and whether the glow is too bright by day.
 
 - **Mos Eisley opens in stages** (`?map=m1`, 2026-10-31): when you land the
   blast doors are shut (a stand-in: a rising Imperial gate under a steel
@@ -594,8 +598,13 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
     - [x] The cage fence along the west heap: a model on the slant
           from the north wall to the west, rusty diamond mesh between
           posts, some panels patched with plate.
-    - [ ] The court and the hold: droids for sale, Jawas, the furnace
-          and crane as models, the hold's racks and clutter.
+    - [ ] The court and the hold, a step at a time:
+      - [x] The furnace on the court's north side: a model, a squat
+            rusty kiln, its mouth glowing, a stack and a hopper.
+      - [ ] The crane on the east heap: a model, a rusty mast and jib
+            with a hook hanging.
+      - [ ] Droids for sale in the court, and Jawas minding them.
+      - [ ] The hold's racks and clutter.
   - [ ] The back alleys and the back lane.
   - [ ] The checkpoint and the rooftops.
   - [ ] The comm tower.

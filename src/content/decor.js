@@ -8,6 +8,7 @@ import { TIN_MODELS } from './models/tin.js';
 import { PIPE_MODELS } from './models/pipes.js';
 import { CLUTTER } from './models/clutter.js';
 import { JUNK_PILES, JUNK_CAGE, pileHeight } from './models/junk-pile.js';
+import { FURNACE } from './models/furnace.js';
 import { BAY_WALL, BAY_HOSES } from './models/bay.js';
 import { TOWER_HEIGHT } from './models/market.js';
 import { BAR, TAPS, CORNER } from './models/cantina.js';
@@ -154,6 +155,8 @@ export default [
   // outlines, as high as their crests, too tall to climb.
   ...Object.entries(JUNK_PILES).map(([id, p]) => defineDecoration({ id, model: id, solid: true, height: pileHeight(p), fixed: true })),
   defineDecoration({ id: JUNK_CAGE.id, model: JUNK_CAGE.id, solid: true, height: JUNK_CAGE.height, fixed: true }),
+  // The junk yard's scrap furnace (models/furnace.js), colliding as its plinth.
+  defineDecoration({ id: 'furnace', model: 'furnace', solid: true, height: FURNACE.top, fixed: true }),
   defineDecoration({ id: 'ceiling-lamp', glyph: 'l', sheet: S('ceiling-lamp', 48, 16), hanging: true, fullbright: true }),
   defineDecoration({
     id: 'fuel-barrel',

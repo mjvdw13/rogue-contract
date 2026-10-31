@@ -716,7 +716,7 @@ town.house(64, 107, 80, 117, { h: BAY86.floorZ + 3, r: 2, ...HULL });
 
 // 4. The Jawa junk yard, north of the market: in by the alley between H and
 // I, through a gate (shut until the broker hands over the fob) and two
-// steps down into a front court, the furnace (a stand-in block) on its
+// steps down into a front court, the furnace (models/furnace.js) on its
 // north side and a side gate east into the back alleys. The trader isn't
 // there (Mark, 2026-10-31): a passage slants up its north-west corner
 // between two heaps of scrap, too tall to see over, to a lane along the
@@ -752,7 +752,8 @@ for (const [id, { at: [x, y] }] of Object.entries(JUNK_PILES)) list.push(at(id, 
 // The cage fence penning the west heap in, along its foot.
 list.push(at(JUNK_CAGE.id, ...JUNK_CAGE.at, { angle: 0, z: 0, lit: town.light }));
 town.block(82, 26, 83, 27, { ...SCRAP, h: 14 });
-town.block(78, 31, 82, 33, { ...SCRAP, h: JUNK + 2 });
+// The scrap furnace against the east heap's foot, its mouth to the court.
+list.push(at('furnace', 80, 32.25, { angle: 0, z: JUNK, lit: town.light }));
 // The sandcrawler: the model is its outside, the tiles inside it its hold
 // (the crawler's lower deck, dim, the length of it, up on its treads at 3)
 // and the hold's walls. Its ramp is down over a breach in the wall, steps
