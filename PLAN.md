@@ -80,6 +80,11 @@ These need Mark to try something, or to decide. Don't start them without him.
   To judge: its proportions (36 long, 20 tall, the hull 2.5 off the
   ground), the ramp's steepness (0.5 a tile), the plating's colour and
   how big its panels are (a tile each), and whether the crease shows.
+  The heaps are piles of junk now: lumpy mounds of the junk texture
+  rising from the floor (the west 4.2 high, the east 4.6), steep at the
+  foot, with plates, pipes, girders, drums, crates and the odd droid
+  dome sticking out. To judge: their height and steepness, and how much
+  junk sticks out (about one piece every 2 tiles of slope).
 
 - **Mos Eisley opens in stages** (`?map=m1`, 2026-10-31): when you land the
   blast doors are shut (a stand-in: a rising Imperial gate under a steel
@@ -578,8 +583,10 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
           yellow patches (`crawler-hull`), the crease up the prow's side,
           the vents along the prow's top, the small window, the ports
           along the band, the housings' slots.
-    - [ ] The heaps as piles of junk, not slabs: lumpy tops, droid
-          parts, plates and pipes; the cage fence along the west heap.
+    - [x] The heaps as piles of junk, not slabs: a lumpy mound for
+          each (a model, colliding as its outline), droid parts, plates
+          and pipes sticking out.
+    - [ ] The cage fence along the west heap.
     - [ ] The court and the hold: droids for sale, Jawas, the furnace
           and crane as models, the hold's racks and clutter.
   - [ ] The back alleys and the back lane.

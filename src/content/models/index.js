@@ -25,5 +25,6 @@ import hitching from './ring.js';
 import pod from './pod.js';
 import stains from './stains.js';
 import sandcrawler from './sandcrawler.js';
+import junkPiles from './junk-pile.js';
 
-export default [terminal, reactorRing, coolantTank, shuttle, ...barricades, boulderLarge, boulderSmall, ...floodlightTowers, sensorMast, sensorDish, ...domes, doorJamb, ...doorLips, ...arches, ...buttresses, ...awnings, ...tin, ...pipes, ...clutter, landspeeder, ...bay, moldyCrow, ...market, ...cantina, ...hitching, ...pod, ...stains, ...sandcrawler];
+export default [terminal, reactorRing, coolantTank, shuttle, ...barricades, boulderLarge, boulderSmall, ...floodlightTowers, sensorMast, sensorDish, ...domes, doorJamb, ...doorLips, ...arches, ...buttresses, ...awnings, ...tin, ...pipes, ...clutter, landspeeder, ...bay, moldyCrow, ...market, ...cantina, ...hitching, ...pod, ...stains, ...sandcrawler, ...junkPiles];

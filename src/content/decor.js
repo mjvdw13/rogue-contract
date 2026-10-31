@@ -7,6 +7,7 @@ import { AWNING_MODELS, AWNING_POLES, poleId } from './models/awning.js';
 import { TIN_MODELS } from './models/tin.js';
 import { PIPE_MODELS } from './models/pipes.js';
 import { CLUTTER } from './models/clutter.js';
+import { JUNK_PILES, pileHeight } from './models/junk-pile.js';
 import { BAY_WALL, BAY_HOSES } from './models/bay.js';
 import { TOWER_HEIGHT } from './models/market.js';
 import { BAR, TAPS, CORNER } from './models/cantina.js';
@@ -145,10 +146,13 @@ export default [
   // The Moldy Crow, hovering (models/crow.js), bobbing gently, drawn at 0.8 of
   // canon size: only its gun pod is low enough to collide (as its outline);
   // you walk under the rest.
+  defineDecoration({ id: 'moldy-crow', model: 'moldy-crow', solid: true, height: 8.2, scale: 0.8, fixed: true, bob: { height: 0.04, period: 4, roll: 0.6 } }),
   // The Jawas' sandcrawler (models/sandcrawler.js): the level's tiles are its
   // hold and collide; the model is its outside.
   defineDecoration({ id: 'sandcrawler', model: 'sandcrawler', fixed: true }),
-  defineDecoration({ id: 'moldy-crow', model: 'moldy-crow', solid: true, height: 8.2, scale: 0.8, fixed: true, bob: { height: 0.04, period: 4, roll: 0.6 } }),
+  // The junk yard's heaps (models/junk-pile.js), colliding as their
+  // outlines, as high as their crests, too tall to climb.
+  ...Object.entries(JUNK_PILES).map(([id, p]) => defineDecoration({ id, model: id, solid: true, height: pileHeight(p), fixed: true })),
   defineDecoration({ id: 'ceiling-lamp', glyph: 'l', sheet: S('ceiling-lamp', 48, 16), hanging: true, fullbright: true }),
   defineDecoration({
     id: 'fuel-barrel',

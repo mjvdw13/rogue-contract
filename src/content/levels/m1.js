@@ -4,6 +4,7 @@ import { Painter } from './lib/painter.js';
 import { Town } from './lib/town.js';
 import { CISTERN } from '../models/market.js';
 import { BAY_HOSES } from '../models/bay.js';
+import { JUNK_PILES } from '../models/junk-pile.js';
 
 // MISSION 1: MOS EISLEY. The layout, route and numbers are in
 // docs/mission1.md (area numbers below match its table). Painted in code on
@@ -745,9 +746,9 @@ gateTag(84, 37, 86, 40, 'side-gate');
 // The two heaps, the passage between them 4 wide at its foot and opening
 // out at the top into a clearing at the ramp's foot (Mark, 2026-10-31: the
 // ramp mustn't touch the heaps), 3 tiles clear of it; the east one taller,
-// the crane standing in it.
-town.slanted([[56, 18], [74, 18], [62, 32], [56, 32]], { ...SCRAP, h: JUNK + 2.5 });
-town.slanted([[80, 24], [84, 24], [84, 31], [67, 31]], { ...SCRAP, h: JUNK + 3 });
+// the crane standing in it. Each is a pile of junk (models/junk-pile.js)
+// on the yard's floor, colliding as its outline.
+for (const [id, { at: [x, y] }] of Object.entries(JUNK_PILES)) list.push(at(id, x, y, { angle: 0, z: 0, lit: town.light }));
 town.block(82, 26, 83, 27, { ...SCRAP, h: 14 });
 town.block(78, 31, 82, 33, { ...SCRAP, h: JUNK + 2 });
 // The sandcrawler: the model is its outside, the tiles inside it its hold
