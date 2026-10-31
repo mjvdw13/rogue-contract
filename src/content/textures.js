@@ -48,6 +48,8 @@ const TOWN = [
   'dome-white', 'dome-blue',
   // The cargo pod's hull.
   'pod-hull',
+  // The sandcrawler's hull (models/sandcrawler.js).
+  'crawler-hull',
   // Sooted drums and canisters.
   'drum-rust', 'drum-grey',
   // The condenser tower's plain dark bands (models/market.js).

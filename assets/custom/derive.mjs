@@ -105,6 +105,12 @@ export const TOWN = [
   // or galvanised grey going rusty.
   { out: 'metal-rust', df: 'ZWGRUV1', crop: [0, 0, 32, 64], tile: [2, 1], gradient: [[30, 16, 8], [74, 40, 18], [120, 66, 32], [160, 96, 52], [190, 130, 82]], keep: 0, contrast: 0.9, rust: { color: [52, 26, 12], amount: 0.6, cell: 16, seed: 1 } },
   { out: 'metal-grey', df: 'ZWGRUV1', crop: [0, 0, 32, 64], tile: [2, 1], gradient: [[40, 40, 40], [88, 86, 82], [130, 126, 118], [166, 160, 150], [196, 190, 178]], keep: 0, contrast: 0.9, rust: { color: [120, 64, 30], amount: 0.5, cell: 16, seed: 2 } },
+  // The sandcrawler's hull (models/sandcrawler.js): Ramshed's ship plating,
+  // its plain grid of panels, in rusty brown after Mark's pictures, with
+  // orange rust, the faded yellow patches and soot toward the foot. Doubled
+  // down so the stains tile both ways; the model draws it at twice the
+  // walls' scale, so a panel is about a tile.
+  { out: 'crawler-hull', df: 'IWSHIP0', crop: [384, 56, 128, 64], tile: [1, 2], gradient: [[30, 18, 12], [72, 44, 28], [112, 70, 44], [146, 98, 66], [176, 130, 94]], keep: 0, contrast: 1.1, rust: [{ color: [150, 70, 24], amount: 0.55, cell: 32, seed: 101 }, { color: [190, 150, 44], amount: 0.75, cell: 32, seed: 103, from: 0.62 }, { color: [22, 16, 12], amount: 0.4, cell: 32, seed: 105, from: 0.55 }] },
   // The cargo pod's hull (models/clutter.js): the galvanised tin again, rusty
   // and scorched with soot.
   { out: 'pod-hull', df: 'ZWGRUV1', crop: [0, 0, 32, 64], tile: [2, 1], gradient: [[40, 40, 40], [88, 86, 82], [130, 126, 118], [166, 160, 150], [196, 190, 178]], keep: 0, contrast: 0.9, rust: [{ color: [120, 64, 30], amount: 0.5, cell: 16, seed: 2 }, ...WORN(16, 61, 0.8)] },

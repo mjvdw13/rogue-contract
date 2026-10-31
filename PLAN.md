@@ -73,10 +73,13 @@ These need Mark to try something, or to decide. Don't start them without him.
   to see over) to a lane along the north wall, through a breach and up
   the sandcrawler's ramp into its hold: dim, the length of the crawler,
   the trader at its far west end (layout OK'd by Mark, 2026-10-31). The
-  sandcrawler is a model now (main shapes, plain rust for the moment):
+  sandcrawler is a model now, plated in rusty panels with the yellow
+  patches (`crawler-hull`, from Ramshed's ship plating), the prow's side
+  bevelled in ahead of a crease, vents, a window and ports:
   the hold is up on its deck at 3 and its ramp comes down over the wall.
   To judge: its proportions (36 long, 20 tall, the hull 2.5 off the
-  ground) and the ramp's steepness (0.5 a tile).
+  ground), the ramp's steepness (0.5 a tile), the plating's colour and
+  how big its panels are (a tile each), and whether the crease shows.
 
 - **Mos Eisley opens in stages** (`?map=m1`, 2026-10-31): when you land the
   blast doors are shut (a stand-in: a rising Imperial gate under a steel
@@ -571,9 +574,10 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
           the hull, band, stepped back, prow over a raking front, four
           tread units, the side door open and its ramp down over the
           wall; the hold lifted to its deck (3).
-    - [ ] The hull's look: a texture of riveted panels with rust and
-          the yellow patches, the crease up the prow's side, the vents
-          along the prow's top, the small window, the housings' slots.
+    - [x] The hull's look: a texture of panels with rust and the
+          yellow patches (`crawler-hull`), the crease up the prow's side,
+          the vents along the prow's top, the small window, the ports
+          along the band, the housings' slots.
     - [ ] The heaps as piles of junk, not slabs: lumpy tops, droid
           parts, plates and pipes; the cage fence along the west heap.
     - [ ] The court and the hold: droids for sale, Jawas, the furnace
