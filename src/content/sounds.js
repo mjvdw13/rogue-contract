@@ -141,6 +141,8 @@ export default [
 
   // --------------------------------------------------------- items
   defineSound({ id: 'item', synth: blip }),
+  // The tracking fob's blink: a short, high pip.
+  defineSound({ id: 'fob-beep', synth: { wave: 'square', freq: 1980, freqEnd: 1900, duration: 0.05, attack: 0.002, release: 0.03, volume: 0.25, duty: 0.3 } }),
   defineSound({ id: 'health-pickup', synth: blip }),
   defineSound({ id: 'item-ammo', synth: { ...click(1800, 0.45), layers: [{ ...click(2600, 0.35), delay: 0.05 }, { ...burst(0.05, [6000, 3000], 0.3), delay: 0.02 }] } }),
   defineSound({

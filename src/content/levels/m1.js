@@ -696,6 +696,21 @@ town.stair(82, 37, 84, 40, { up: 'E', from: JUNK, top: 0, rise: 0.25, floor: 'fl
 town.slanted([[56, 18], [74, 18], [62, 32], [56, 32]], { ...SCRAP, h: JUNK + 2.5 });
 town.block(77, 21, 78, 22, { ...SCRAP, h: 14 });
 town.block(78, 29, 82, 33, { ...SCRAP, h: JUNK + 2 });
+// The trader who sold Rusk a power coupling, just inside the gate: with the
+// fob in hand, he keys its transponder code in (the signal).
+list.push(
+  at('jawa', 70.5, 35.5, {
+    angle: 270,
+    tag: 'trader',
+    name: 'Jawa trader',
+    calm: { wander: 0 },
+    talk: [
+      { unless: 'contract', lines: ['Utinni!', 'Kkkt!'] },
+      { unless: 'signal', lines: ["Utinni! M'um m'aloo... eeh-chu-ta?", "(He reads a code off a coupling's tag and keys it into your fob.)"], set: 'signal' },
+      { lines: ['Utinni!'] },
+    ],
+  }),
+);
 
 // 7. The back alleys: from the market between I and J into a yard behind J
 // (the junk yard's side gate off it), a lane slanting north-east to a
@@ -845,7 +860,8 @@ list.push(
     ],
   }),
   at('villager-man', 152, 73),
-  at('villager-man', 180, 134.5, { angle: 0, wander: 0 }),
+  // Rusk, in the freighter's hold: what the fob tracks once the trader's code is in.
+  at('villager-man', 180, 134.5, { angle: 0, wander: 0, tag: 'rusk', name: 'RUSK' }),
   at('barricade', 137.6, 63.6, { angle: 20 }), at('barricade', 137.6, 69.8, { angle: 335 }),
   at('floodlight-tower', 143.6, 61.7), at('floodlight-tower', 140.3, 72.3),
   // The guard post under the tarp: a terminal on crates brought in.
@@ -911,7 +927,7 @@ list.push(
         lines: [
           'Katarn. Sit down.',
           'The Guild has a contract on a deserter. A scout trooper, Rusk.',
-          'He wiped his ID code, so the fob has nothing to track. Yet.',
+          'He wiped his ID code, so this fob has nothing to track. Yet.',
           'The Jawas tag what they sell. If he bought parts, try the junk yard.',
         ],
         set: 'contract',
@@ -1048,7 +1064,23 @@ export default defineLevel({
       ],
     },
     { on: 'talk', tag: 'informant', if: 'pass', do: [{ action: 'openDoors', tag: 'checkpoint' }] },
-    { on: 'enter', tag: 'hold', do: [{ action: 'message', text: "RUSK (STAND-IN): THAT FOB IS IMPERIAL. THEY'RE ALREADY HERE." }, { action: 'hostile' }] },
+    // The fob: the broker gives it (dark), the trader's code points it at
+    // Rusk, and in the hold Rusk pulls its Imperial tracer and the town turns.
+    { on: 'talk', tag: 'broker', if: 'contract', do: [{ action: 'giveWeapon', weapon: 'fob' }, { action: 'message', text: 'THE BROKER HANDS YOU A TRACKING FOB.' }] },
+    { on: 'talk', tag: 'trader', if: 'signal', do: [{ action: 'setSignal', tag: 'rusk' }] },
+    {
+      on: 'enter',
+      tag: 'hold',
+      if: 'signal',
+      do: [
+        { action: 'message', text: "RUSK (STAND-IN): THAT FOB IS IMPERIAL. THEY'RE ALREADY HERE." },
+        { action: 'takeWeapon', weapon: 'fob' },
+        { action: 'setSignal' },
+        { action: 'hostile' },
+      ],
+    },
+    // Turned early (gunfire), the trader is no use: the fob finds Rusk anyway.
+    { on: 'hostile', unless: 'signal', do: [{ action: 'setSignal', tag: 'rusk' }, { action: 'setFlag', flag: 'signal' }] },
     {
       on: 'hostile',
       do: [
@@ -1059,7 +1091,7 @@ export default defineLevel({
         { action: 'spawn', thing: 'sandtrooper', tag: 'roof-sniper' },
       ],
     },
-    { on: 'killed', tag: 'bay-customs', do: [{ action: 'message', text: "JAN: CUSTOMS WON'T BE CHECKING PAPERS NOW." }, { action: 'exit' }] },
+    { on: 'killed', tag: 'bay-customs', do: [{ action: 'message', text: "JAN: CUSTOMS WON'T BE CHECKING PAPERS NOW." }, { action: 'takeWeapon', weapon: 'fob' }, { action: 'exit' }] },
   ],
   ...p.build(),
   things: [],

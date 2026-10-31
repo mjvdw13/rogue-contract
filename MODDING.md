@@ -282,6 +282,28 @@ lights the room round you (see *Glowing things* below). `flashLight: 1`
 `reraise: true` drops the hand out of view after each shot and brings the
 next one up (a thrown weapon: see `thermal-detonator.js`); with none left,
 it switches to your best weapon with ammo.
+A weapon with no `fire` has no attack: pressing fire does nothing, and it's
+never switched to when another weapon runs dry. `track` makes such a
+weapon a tracker of the level's signal (the `setSignal` action), like the
+tracking fob (`fob.js`):
+
+```js
+anims: {
+  idle: [0],                                                    // dark
+  lit: { frames: [1, 0], durations: [0.09, 0.01], fullbright: [0] },       // a blink
+  litFacing: { frames: [2, 0], durations: [0.09, 0.01], fullbright: [0] }, // facing it
+},
+track: { near: 4, far: 80, blink: [0.15, 1.4], facing: 15 },
+sounds: { beep: 'fob-beep' },
+```
+
+Held, it plays `lit` and its `beep` sound every `blink[0]` seconds at
+`near` tiles from the signal or closer, every `blink[1]` at `far` or
+further, and in proportion between (in a straight line, through walls).
+Facing within `facing` degrees of the signal, it plays `litFacing`
+instead (if it has one). With no signal it stays on `idle`. Give it with
+the `giveWeapon` action and take it back with `takeWeapon`.
+
 `charge: { time: 1, min: 0.2, sink: 36, pull: 0.18 }` throws when fire is
 let go instead of when it's pressed. Pressing fire pulls the hand back,
 down `sink` pixels over `pull` seconds, and it stays there while fire is
@@ -1354,6 +1376,13 @@ Actions:
   and the `on: 'hostile'` triggers run (only the first time)
 - `setFlag` `{ flag, value? }`: sets a story flag (`value: false` clears
   it)
+- `setSignal` `{ tag }` or `{ thing }`: points trackers (a weapon's
+  `track`) at the thing placed with the tag (or, with none, the middle of
+  the tiles with it), or at the nearest thing of that type. With neither,
+  they go dark.
+- `giveWeapon` `{ weapon }`: gives the player a weapon and switches to it;
+  `takeWeapon` `{ weapon }` takes it away (held, they switch to their best
+  weapon)
 
 ### Checking a level
 

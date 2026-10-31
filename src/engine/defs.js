@@ -245,8 +245,17 @@ export function defineAmmo(def) {
  * and letting go fires it. Its power runs from
  * `min` (a tap) to 1 (held `time` seconds or longer) and scales the speed of
  * the projectile it throws.
+ * With no `fire` it has no attack: pressing fire does nothing, and it's never
+ * picked when another weapon runs dry.
+ * `track: { near, far, blink, facing }` makes it a tracker (a tracking fob)
+ * of the world's signal (the setSignal action): it plays its `lit`
+ * animation and its `beep` sound every `blink` seconds, `blink[0]` at `near`
+ * tiles or closer and `blink[1]` at `far` or further (between, in
+ * proportion), `litFacing` instead when the player faces within `facing`
+ * degrees of the signal. With no signal it stays on `idle` (dark).
  * @param {{id:string, name:string, slot:number, ammo?:string|null, ammoPerShot?:number,
- *   sheet: SheetSpec, anims: {idle:AnimSpec, fire:AnimSpec}, fire: AttackSpec,
+ *   sheet: SheetSpec, anims: {idle:AnimSpec, fire?:AnimSpec, lit?:AnimSpec, litFacing?:AnimSpec}, fire?: AttackSpec,
+ *   track?:{near?:number, far?:number, blink?:[number,number], facing?:number},
  *   offset?:[number,number], flashLight?:number, light?:{radius:number, light:number},
  *   noise?:boolean, priority?:number,
  *   accurateFirstShot?:boolean, sounds?:Record<string,string>, bob?:number, reraise?:boolean,
@@ -271,6 +280,7 @@ export function defineWeapon(def) {
     anims: normalizeAnims(def.anims),
     fire: normalizeAttack(def.fire),
     charge: def.charge ? { time: 1, min: 0.3, sink: 36, pull: 0.18, ...def.charge } : null,
+    track: def.track ? { near: 4, far: 80, blink: [0.15, 1.5], facing: 15, ...def.track } : null,
   };
 }
 

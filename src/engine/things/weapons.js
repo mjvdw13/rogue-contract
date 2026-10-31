@@ -17,6 +17,8 @@ export class WeaponState extends Animated {
     /** (`charge`) Seconds the throw has been wound up, and the power it was let go at. */
     this.charge = 0;
     this.power = 1;
+    /** (`track`) Seconds to the next blink. */
+    this.blink = 0;
   }
 }
 
@@ -31,7 +33,7 @@ export function bestWeapon(registry, p, exclude = null) {
   for (const id of p.weapons) {
     if (id === exclude) continue;
     const w = registry.weapons.get(id);
-    if (!w || !hasAmmo(p, w)) continue;
+    if (!w || !w.fire || !hasAmmo(p, w)) continue;
     const score = (w.fire?.kind === 'melee' ? -1000 : 0) + (w.priority ?? 0) + (w.preferOnEmpty ?? 0);
     if (!best || score > best.score) best = { id, score };
   }
@@ -131,7 +133,7 @@ export function weaponThink(world, pt, input, dt) {
       break;
     case 'ready':
       ws.stepAnim(dt);
-      if (input.isDown('fire')) {
+      if (input.isDown('fire') && def.fire) {
         if (hasAmmo(p, def) && def.charge) {
           ws.state = 'charge';
           ws.charge = 0;
@@ -203,8 +205,33 @@ export function weaponThink(world, pt, input, dt) {
     default:
       ws.state = 'raise';
   }
+  if (def.track && (ws.state === 'ready' || ws.state === 'raise')) track(world, pt, def, ws, dt);
   ws.flash = ws.state === 'fire' && ws.fullbright ? (def.flashLight ?? 0) : 0;
   p.fireHeld = input.isDown('fire') && ws.state === 'fire' ? (p.fireHeld ?? 0) + dt : 0;
+}
+
+/**
+ * (`track`) A tracker's light: a blink and a beep every so often, quicker
+ * the nearer the signal, its `litFacing` blink when the player faces it.
+ * Dark with no signal.
+ */
+function track(world, pt, def, ws, dt) {
+  const s = world.signalAt();
+  if (!s) {
+    ws.blink = 0;
+    if (ws.animName !== 'idle') ws.setAnim('idle');
+    return;
+  }
+  ws.blink -= dt;
+  if (ws.blink > 0) return;
+  const { near, far, blink, facing } = def.track;
+  const d = Math.hypot(s.x - pt.x, s.y - pt.y);
+  const k = Math.min(1, Math.max(0, (d - near) / Math.max(far - near, 1e-6)));
+  ws.blink = blink[0] + (blink[1] - blink[0]) * k;
+  let off = Math.abs(Math.atan2(s.y - pt.y, s.x - pt.x) - pt.angle) % (2 * Math.PI);
+  if (off > Math.PI) off = 2 * Math.PI - off;
+  if (!(off <= (facing * Math.PI) / 180 && ws.setAnim('litFacing'))) ws.setAnim('lit');
+  if (def.sounds.beep) world.playSound(def.sounds.beep);
 }
 
 /** Psprite list for the renderer (weapon sprite with bob). */

@@ -119,6 +119,8 @@ export class World {
     this.playerBumped = null;
     /** Story flags (the setFlag action), for triggers' and conversations' `if` and `unless`. */
     this.flags = new Set();
+    /** What a tracker weapon tracks (the setSignal action): `{ tag }` or `{ thing }`, or null. */
+    this.signal = null;
     /** Has the town's switch been thrown (turnHostile)? */
     this.hostile = false;
 
@@ -558,6 +560,36 @@ export class World {
     this.hostile = true;
     for (const t of this.things) if (t.calm) endCalm(t);
     this.triggers.hostile();
+  }
+
+  /**
+   * Where the signal is, or null with none: the thing placed with the
+   * signal's tag (else the middle of the tiles with it), or the nearest of
+   * the signal's thing type.
+   */
+  signalAt() {
+    const s = this.signal;
+    if (!s) return null;
+    const p = this.player;
+    if (s.tag) {
+      const t = this.things.find((o) => o.tag === s.tag && !o.removed);
+      if (t) return t;
+      const tiles = this.map.tilesWithTag(s.tag);
+      if (!tiles.length) return null;
+      let x = 0;
+      let y = 0;
+      for (const i of tiles) {
+        x += (i % this.map.w) + 0.5;
+        y += Math.floor(i / this.map.w) + 0.5;
+      }
+      return { x: x / tiles.length, y: y / tiles.length };
+    }
+    let best = null;
+    for (const o of this.things) {
+      if (o.removed || o.def.id !== s.thing) continue;
+      if (!best || Math.hypot(o.x - p.x, o.y - p.y) < Math.hypot(best.x - p.x, best.y - p.y)) best = o;
+    }
+    return best;
   }
 
   npcPain(t) {
