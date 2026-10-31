@@ -753,6 +753,17 @@ for (const [id, { at: [x, y] }] of Object.entries(JUNK_PILES)) list.push(at(id, 
 list.push(at(JUNK_CAGE.id, ...JUNK_CAGE.at, { angle: 0, z: 0, lit: town.light }));
 // The crane in the east heap, its jib out over the furnace's hopper.
 list.push(at('crane', 82.5, 26.5, { angle: 239, z: JUNK, lit: town.light }));
+// The droids for sale in a row along the court's south wall, west of the
+// steps from the gate, facing in, and two Jawas minding them: one by the
+// row and one by the furnace (calm, so they stay put).
+list.push(
+  at('astromech-blue', 58, 40.1, { angle: 90 }), at('power-droid-rust', 59.3, 40.15, { angle: 80 }),
+  at('astromech-rust', 60.6, 40.1, { angle: 100 }), at('astromech-red', 61.9, 40.1, { angle: 85 }),
+  at('power-droid', 63.3, 40.15, { angle: 95 }), at('astromech-blue', 64.6, 40.1, { angle: 75 }),
+  at('crate-grey-small', 66.1, 40.3, { angle: 5 }), at('droid-dome', 66.1, 40.3, { z: JUNK + 0.6, angle: 160 }),
+  at('astromech-rust', 57.2, 38.8, { angle: 20 }),
+  at('jawa', 62.4, 38.4, { angle: 45, calm: { wander: 0 } }), at('jawa', 76.6, 35.2, { angle: 200, calm: { wander: 0 } }),
+);
 // The scrap furnace against the east heap's foot, its mouth to the court.
 list.push(at('furnace', 80, 32.25, { angle: 0, z: JUNK, lit: town.light }));
 // The sandcrawler: the model is its outside, the tiles inside it its hold

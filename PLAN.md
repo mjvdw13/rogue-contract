@@ -99,6 +99,11 @@ These need Mark to try something, or to decide. Don't start them without him.
   with a counterweight on its tail, stays from a peak at 12, and a hook
   on a cable hanging to 4 over the yard. To judge: its height, and where
   the jib points.
+  Droids for sale stand in a row along the court's south wall, west of
+  the steps (models, `astromech-blue`, `-red`, `-rust`, `power-droid`,
+  `-rust`, about a Jawa's height), a Jawa minding them and another by the
+  furnace. To judge: whether the row should be messier or spread round
+  the court, and the paint (the white is dusty grey).
 
 - **Mos Eisley opens in stages** (`?map=m1`, 2026-10-31): when you land the
   blast doors are shut (a stand-in: a rising Imperial gate under a steel
@@ -608,7 +613,7 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
             rusty kiln, its mouth glowing, a stack and a hopper.
       - [x] The crane on the east heap: a model, a rusty mast and jib
             with a hook hanging.
-      - [ ] Droids for sale in the court, and Jawas minding them.
+      - [x] Droids for sale in the court, and Jawas minding them.
       - [ ] The hold's racks and clutter.
   - [ ] The back alleys and the back lane.
   - [ ] The checkpoint and the rooftops.

@@ -9,6 +9,7 @@ import { PIPE_MODELS } from './models/pipes.js';
 import { CLUTTER } from './models/clutter.js';
 import { JUNK_PILES, JUNK_CAGE, pileHeight } from './models/junk-pile.js';
 import { FURNACE } from './models/furnace.js';
+import { DROIDS } from './models/droids.js';
 import { BAY_WALL, BAY_HOSES } from './models/bay.js';
 import { TOWER_HEIGHT } from './models/market.js';
 import { BAR, TAPS, CORNER } from './models/cantina.js';
@@ -159,6 +160,8 @@ export default [
   defineDecoration({ id: 'furnace', model: 'furnace', solid: true, height: FURNACE.top, fixed: true }),
   // Its crane (models/crane.js): the mast stands in the east heap, the rest overhead.
   defineDecoration({ id: 'crane', model: 'crane', fixed: true }),
+  // The Jawas' droids for sale (models/droids.js), switched off, solid.
+  ...Object.entries(DROIDS).map(([id, d]) => defineDecoration({ id, model: id, solid: true, radius: d.radius, height: d.height, fixed: true })),
   defineDecoration({ id: 'ceiling-lamp', glyph: 'l', sheet: S('ceiling-lamp', 48, 16), hanging: true, fullbright: true }),
   defineDecoration({
     id: 'fuel-barrel',
