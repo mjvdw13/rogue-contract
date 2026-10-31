@@ -67,14 +67,16 @@ These need Mark to try something, or to decide. Don't start them without him.
   pale the barricades are, and whether the terminal (still clean) wants
   the same wear.
 
-- **The junk yard, deeper** (`?map=m1`, 2026-10-31, blocked out): the
+- **The junk yard, deeper** (`?map=m1`, 2026-10-31): the
   trader is no longer at the gate. Down into a front court, then a
   passage slanting up between two heaps of scrap (3 to 5 wide, too tall
   to see over) to a lane along the north wall, through a breach and up
   the sandcrawler's ramp into its hold: dim, the length of the crawler,
-  the trader at its far west end. To judge: the passage's length and
-  width, whether the hold should be the crawler's (or a hideaway in the
-  junk), and how much the court wants before the detail.
+  the trader at its far west end (layout OK'd by Mark, 2026-10-31). The
+  sandcrawler is a model now (main shapes, plain rust for the moment):
+  the hold is up on its deck at 3 and its ramp comes down over the wall.
+  To judge: its proportions (36 long, 20 tall, the hull 2.5 off the
+  ground) and the ramp's steepness (0.5 a tile).
 
 - **Mos Eisley opens in stages** (`?map=m1`, 2026-10-31): when you land the
   blast doors are shut (a stand-in: a rising Imperial gate under a steel
@@ -565,7 +567,17 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
           north-east between two heaps of scrap, a lane along the north
           wall, a breach in it, and the sandcrawler's ramp up into its
           hold, where the trader is. Blocked out.
-    - [ ] Waiting on Mark, then the detail.
+    - [x] The sandcrawler's main shape, a 3D model after Mark's pictures:
+          the hull, band, stepped back, prow over a raking front, four
+          tread units, the side door open and its ramp down over the
+          wall; the hold lifted to its deck (3).
+    - [ ] The hull's look: a texture of riveted panels with rust and
+          the yellow patches, the crease up the prow's side, the vents
+          along the prow's top, the small window, the housings' slots.
+    - [ ] The heaps as piles of junk, not slabs: lumpy tops, droid
+          parts, plates and pipes; the cage fence along the west heap.
+    - [ ] The court and the hold: droids for sale, Jawas, the furnace
+          and crane as models, the hold's racks and clutter.
   - [ ] The back alleys and the back lane.
   - [ ] The checkpoint and the rooftops.
   - [ ] The comm tower.

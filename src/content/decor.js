@@ -145,6 +145,9 @@ export default [
   // The Moldy Crow, hovering (models/crow.js), bobbing gently, drawn at 0.8 of
   // canon size: only its gun pod is low enough to collide (as its outline);
   // you walk under the rest.
+  // The Jawas' sandcrawler (models/sandcrawler.js): the level's tiles are its
+  // hold and collide; the model is its outside.
+  defineDecoration({ id: 'sandcrawler', model: 'sandcrawler', fixed: true }),
   defineDecoration({ id: 'moldy-crow', model: 'moldy-crow', solid: true, height: 8.2, scale: 0.8, fixed: true, bob: { height: 0.04, period: 4, roll: 0.6 } }),
   defineDecoration({ id: 'ceiling-lamp', glyph: 'l', sheet: S('ceiling-lamp', 48, 16), hanging: true, fullbright: true }),
   defineDecoration({
