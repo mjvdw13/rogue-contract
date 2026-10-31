@@ -457,8 +457,9 @@ tagTile(198, 55, 'quarter-north');
 // Bay 87. Its gate is at the main street's end: a
 // passage through its building onto a landing at the old quarter's height,
 // and stairs down. The wash breaks in on the north-east, down sand steps.
-// A stand-in hull for the freighter (its hold open at the stern: Rusk),
-// and a stand-in crane on the rim, seen down the street.
+// A stand-in hull for the freighter (Rusk in its hold, behind a door in
+// the stern that opens once the fob has his signal), and a stand-in crane
+// on the rim, seen down the street.
 const DERELICT = { cx: 186, cy: 128, r: 18, floorZ: -5, rim: 7 };
 p.rect(162, 104, W - 1, H - 1, town.roofCell({ h: DERELICT.rim, wall: 'bay-wall', skirt: null }));
 town.circle(DERELICT.cx, DERELICT.cy, DERELICT.r, {
@@ -475,7 +476,9 @@ town.block(191, 106, 192, 107, { h: 18, wall: 'metal-rust', roof: 'metal-rust', 
 const HULL = { wall: 'metal-grey', roof: 'metal-grey', skirt: null };
 town.house(172, 130, 190, 139, { h: DERELICT.floorZ + 5, r: 2, ...HULL });
 town.room(174, 131, 188, 138, { h: DERELICT.floorZ + 5, floorZ: DERELICT.floorZ, ceilZ: DERELICT.floorZ + 3.25, floor: 'imp-floor', ceiling: 'imp-panel-dark', wall: 'metal-grey', light: 120 });
-town.arch(188, 132, 190, 137, { h: DERELICT.floorZ + 5, lintel: 3, floorZ: DERELICT.floorZ, wall: 'metal-grey', floor: 'imp-floor' });
+town.arch(188, 132, 189, 137, { h: DERELICT.floorZ + 5, lintel: 3, floorZ: DERELICT.floorZ, wall: 'metal-grey', floor: 'imp-floor' });
+town.door(190, 134.5, 'E', { h: DERELICT.floorZ + 5, tex: 'door-grey', width: 5, jamb: false, sign: false, panel: false, step: false, floorZ: DERELICT.floorZ, wall: 'metal-grey' });
+p.rect(189, 132, 190, 137, (_, __, c) => ({ ...c, floor: 'imp-floor', tag: 'hold-door', stayOpen: true }));
 p.rect(174, 131, 188, 138, (_, __, c) => ({ ...c, tag: 'hold' }));
 // Where the loud half's troopers come in: over the rim, and through the gate.
 tagTile(170, 112, 'derelict-rim');
@@ -848,13 +851,15 @@ list.push(
   at('sandtrooper', 82.5, 113, { angle: 180, calm: { wander: 0 } }), at('sandtrooper', 61.5, 116, { angle: 0, calm: { wander: 0 } }),
   at('sandtrooper', 15.2, 102.4, { angle: 90, tag: 'bay-customs', calm: { wander: 0, lines: ['Your papers check out, hunter.', 'Move along.'] } }),
   at('sandtrooper', 18.2, 102.2, { angle: 90, tag: 'bay-customs', calm: { wander: 0, lines: ['Your papers check out, hunter.', 'Move along.'] } }),
-  // The informant, in his den: the pass opens the checkpoint.
+  // The informant, in his den: once the fob has Rusk's signal, his pass
+  // opens the checkpoint.
   at('villager-wanderer', 143, 55.5, {
     angle: 180,
     wander: 0,
     tag: 'informant',
     name: 'INFORMANT',
     talk: [
+      { unless: 'signal', lines: ['Nothing for you, hunter.', "Come back when you know where you're going."] },
       { unless: 'pass', lines: ["You'll be wanting the old quarter.", "Here. A pass. The checkpoint won't stop you."], set: 'pass' },
       { lines: ['Go on, before someone sees us talking.'] },
     ],
@@ -1068,9 +1073,10 @@ export default defineLevel({
     },
     { on: 'talk', tag: 'informant', if: 'pass', do: [{ action: 'openDoors', tag: 'checkpoint' }] },
     // The fob: the broker gives it (dark), the trader's code points it at
-    // Rusk, and in the hold Rusk pulls its Imperial tracer and the town turns.
+    // Rusk and opens the hold, and in the hold Rusk pulls its Imperial
+    // tracer and the town turns.
     { on: 'talk', tag: 'broker', if: 'contract', do: [{ action: 'giveWeapon', weapon: 'fob' }, { action: 'message', text: 'THE BROKER HANDS YOU A TRACKING FOB.' }] },
-    { on: 'talk', tag: 'trader', if: 'signal', do: [{ action: 'setSignal', tag: 'rusk' }] },
+    { on: 'talk', tag: 'trader', if: 'signal', do: [{ action: 'setSignal', tag: 'rusk' }, { action: 'openDoors', tag: 'hold-door' }] },
     {
       on: 'enter',
       tag: 'hold',

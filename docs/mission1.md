@@ -83,12 +83,16 @@ main street → Bay 87, where the Crow comes down.
 
 **What holds the player back:**
 
-- The checkpoint's gate opens for the pass, and at the switch.
-- The freighter's hold in the derelict bay stays shut until the fob has
-  the signal, so going over the rooftops early finds nothing. (In the
-  blockout the hold is open: stepping into it does nothing until the fob
-  tracks Rusk, then it takes the fob and turns the town.)
+- Kyle's blaster stays holstered until the switch (Mark, 2026-10-30), so
+  the town can't turn early: it turns when he finds Rusk.
 - The Jawa trader has nothing to say until Kyle carries the fob.
+- The informant has nothing for Kyle until the fob has the signal, so the
+  pass comes after the junk yard (Mark, 2026-10-30: the pass first let
+  Kyle walk to Rusk before the fob found him).
+- The checkpoint's gate opens for the pass, and at the switch.
+- The freighter's hold in the derelict bay is shut (a door in its stern)
+  until the trader keys his code in, so going over the rooftops early
+  finds a sealed wreck. Stepping into it takes the fob and turns the town.
 - The blast doors shut at the switch, so the way home is round them.
 
 **Levels and slants** (above, "Off the grid, and up and down"): Mos
@@ -144,7 +148,7 @@ street is at 0. The numbers 1-10 are the story's; 11 on are new.
 | 8 | **Comm tower** (a stand-in) | at (180, 44) | out of reach | The town's landmark among the houses north of the old quarter, where the street's bend points: about 30 tall, a red beacon on top (a stand-in block 22 tall for now). The Imperial prefecture that stood here first is gone (Mark, 2026-10-30: Mos Eisley has no Imperial buildings). Rusk's wanted file ("Jundland Range security", the first hint of the garrison) is on the terminal at the checkpoint's guard post instead, and the loud half's reinforcements come in at the old quarter's north street. |
 | 9 | **Old quarter** (blocked out) | 148..194, 53..104 | 0.5, sky | On a rise past the checkpoint (Mark's OK 2026-10-29). A square inside the gate (148..160, 60..76), a north street along the houses on its north side (53..60), and the main street, about 8 wide, slanting south-east from the square to the derelict bay's gate (its edges y = 64 + 1.2 (x - 160) and 12 further south); six houses follow the slant, their doors (to come) on their short straight faces. The yard the roofs drop into opens onto the main street by an alley (157..174, 88..92). Half-empty, sand drifting through broken walls, a collapsed dome, a few squatters and a hermit, a small shrine with candles. Quieter: wind instead of the market's noise. |
 | 18 | **The dry wash** (blocked out) | 194..202, 53..116 | 0, sky | A flood channel two steps below the old quarter, along its east side from the houses north of it (a grated culvert, to come) south into the derelict bay (which is why the bay is half full of sand). Two steps go down into it at the north street's east end, and it breaks into the bay on the north-east, down sand steps. The low way to the bay and back, beside the main street, and a good place for a fight. (The main street runs nearly along it, so it crosses no bridge.) |
-| 10 | **Derelict bay** (blocked out) | round, at (186, 128), r 18 | -5, sky | An abandoned docking bay half-buried in drifted sand, its rim at 7, its floor 5.5 below the old quarter (a pit like Bay 87): from its gate at the end of the slanting street a passage leads onto a landing at 0.5, and eleven steps of 0.5 go down (half-buried in drifts, to come). A rusty crane over the rim (a stand-in post for now, seen from the rooftops), a gutted freighter (a stand-in hull for now, 172..190, 130..139) with its hold open at the stern, scaffolding, scrap. Rusk is hiding in the hold. The flip happens here: troopers come in over the rim and through the gate. |
+| 10 | **Derelict bay** (blocked out) | round, at (186, 128), r 18 | -5, sky | An abandoned docking bay half-buried in drifted sand, its rim at 7, its floor 5.5 below the old quarter (a pit like Bay 87): from its gate at the end of the slanting street a passage leads onto a landing at 0.5, and eleven steps of 0.5 go down (half-buried in drifts, to come). A rusty crane over the rim (a stand-in post for now, seen from the rooftops), a gutted freighter (a stand-in hull for now, 172..190, 130..139) with its hold at the stern behind a door (5 wide, tag `hold-door`) that opens when the trader keys in the signal, scaffolding, scrap. Rusk is hiding in the hold. The flip happens here: troopers come in over the rim and through the gate. |
 | 20 | **Town edges** | the outer wall | | Where streets end at the edge of town, a low wall with the Dune Sea beyond: dunes and the Jundland's mesas in the backdrop, fading into the haze. The view west from the main street's end, north past the sandcrawler, and from the rooftops. |
 
 ### Secrets (6)

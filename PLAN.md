@@ -31,26 +31,28 @@ These need Mark to try something, or to decide. Don't start them without him.
 - **Conversations** (`?map=m1`, 2026-10-31): press use on someone to talk;
   each use says the next line. The broker (in the cantina's west back
   alcove) gives the contract on Rusk in four lines and points you at the
-  junk yard; the informant (in his den by the checkpoint) gives you the
-  pass, which opens the checkpoint's gate. The lines are drafts from
-  `docs/story.md`: the wording is yours. Bumping into someone repeats what
-  they last said. You can talk from 3.5 tiles (doors stay at 2.6): the
-  broker's table stops you 2.8 from him. To judge: whether use should move
-  a conversation on this quickly (0.3 s between lines), and whether a line
-  wants to stay up longer.
+  junk yard. The informant (in his den by the checkpoint) sends you away
+  until the fob has the signal, then gives you the pass, which opens the
+  checkpoint's gate (2026-10-30: the story in order). The lines are drafts
+  from `docs/story.md`: the wording is yours. Bumping into someone repeats
+  what they last said. You can talk from 3.5 tiles (doors stay at 2.6):
+  the broker's table stops you 2.8 from him. To judge: whether use should
+  move a conversation on this quickly (0.3 s between lines), and whether a
+  line wants to stay up longer.
 
 - **The tracking fob** (`?map=m1`, 2026-10-31, slot 8): the broker hands
   it over at the end of his lines, dark. The Jawa trader just inside the
   junk yard's gate has only "Utinni!" until you carry it; then he keys a
   code into it and it tracks Rusk, in the derelict bay's hold: an amber
   blink and a beep, every 1.4 s from across town down to 0.15 s up close,
-  green when you face him. Stepping into the hold (now only once it
-  tracks him) takes it from you and turns the town. Until then your
-  weapons stay holstered (Mark, 2026-10-30), so the town can't turn early.
-  The sprite is a generated stand-in (a dark
-  puck in the gloved hand, the lens on top) held up right of centre; the
-  beep is synthesized. To judge: the look, the beep, the blink's speeds and
-  how wide "facing" is (15 degrees either side), and the trader's lines.
+  green when you face him. The hold's door, in the freighter's stern, is
+  shut until then (2026-10-30), so the roofs can't find him first.
+  Stepping into the hold takes the fob and turns the town. Until then your
+  weapons stay holstered (2026-10-30), so the town can't turn early. The
+  sprite is a generated stand-in (a dark puck in the gloved hand, the lens
+  on top) held up right of centre; the beep is synthesized. To judge: the
+  look, the beep, the blink's speeds and how wide "facing" is (15 degrees
+  either side), and the trader's lines.
 
 - **The cantina in detail** (`?map=m1`, 2026-10-30, after Mark's
   references; `models/cantina.js`). No skylight: over the bar the heavy
@@ -441,20 +443,11 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
       stand-in reinforcements). Calm troopers and Jawas are placed.
 - [ ] **Air and sound:** dust, emitters, ambient sound, the cantina band
       (sections 2 and 3).
-- [ ] **The story in order** (Mark, 2026-10-30): nothing made the junk
-      yard come before the checkpoint, so the pass or the roofs found Rusk
-      before the fob did.
-  - [x] Weapons holstered until the town turns: a level's `holster`
-        (defs, weapons.js, validator, MODDING.md, a test). `m1` uses it,
-        so the town can't turn early; its early-turn trigger goes.
-  - [ ] The informant gives the pass only once the fob has the signal.
-  - [ ] The hold shut (a door in the freighter's stern) until the
-        trader keys his code in.
 - [ ] **The story:** the drop-off and pickup and the loud half (section
-      5), in place of the blockout's last stand-ins: Rusk's hold (open
-      now; it takes the fob and turns the town once the fob tracks him),
-      and clearing customs as the pickup (shooting them early ends the
-      level). Conversations and the fob are in.
+      5), in place of the blockout's last stand-ins: Rusk's hold (a door
+      that opens with the signal; stepping in takes the fob and turns the
+      town), and clearing customs as the pickup. Conversations and the fob
+      are in.
 - [ ] **Tune:** light, frame time with a full market, the per-skill table.
 
 ### 2. Hangings: cables and cloth that sway (Mark, 2026-10-17)
