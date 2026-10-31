@@ -64,8 +64,8 @@ const TOWN = [
   // the engines' intakes and the flanks' (derive.mjs, DECALS: framed).
   'speeder-paint', 'speeder-red', 'speeder-metal', 'speeder-intake', 'speeder-grille',
   // Doors: the door decals as rising doors' panels (derive.mjs, RISING), a
-  // shop's shutter and Docking Bay 87's 4x4 door.
-  'door-red-rising', 'door-grey-rising', 'shutter-rising', 'door-bay-rising',
+  // shop's shutter, the cantina's plank door and Docking Bay 87's 4x4 door.
+  'door-red-rising', 'door-grey-rising', 'shutter-rising', 'door-planks-rising', 'door-bay-rising',
   // The drifts' edges, by which corners are drift (lib/town.js, drifts()).
   ...Array.from({ length: 14 }, (_, k) => `street-drift-${k + 1}`),
 ];

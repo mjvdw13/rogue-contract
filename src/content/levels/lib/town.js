@@ -427,8 +427,11 @@ export class Town {
    *
    * `floorZ` puts the doorway a step up (the film's doors often are): its
    * step outside rises to that height, off the street or a kerb.
+   *
+   * `round: true` rounds the opening's top as `arch()` does (3 or 4 wide),
+   * for a panel with a round top (`door-planks`), without a jamb.
    */
-  door(x, y, face, { h, tex = 'door-red', tall = 3, width = 2, lintel = tall, jamb = true, sign = true, panel = true, floorZ = 0, wall = this.wall, step = true, opens = false }) {
+  door(x, y, face, { h, tex = 'door-red', tall = 3, width = 2, lintel = tall, jamb = true, sign = true, panel = true, floorZ = 0, wall = this.wall, step = true, opens = false, round = false }) {
     const ns = face === 'N' || face === 'S';
     const along = ns ? x : y;
     const a0 = Math.round(along - width / 2);
@@ -438,8 +441,10 @@ export class Town {
     const line = ns ? y : x;
     const back = line - out;
     const [b0, b1] = [Math.min(line, back), Math.max(line, back)];
-    if (ns) this.arch(a0, b0, a1, b1, { h, lintel, floorZ, wall });
-    else this.arch(b0, a0, b1, a1, { h, lintel, floorZ, wall });
+    if (round && jamb) throw new Error(`Town: a round-topped door at (${x}, ${y}) can't have a jamb`);
+    const top = round ? face : undefined;
+    if (ns) this.arch(a0, b0, a1, b1, { h, lintel, floorZ, wall, round: top });
+    else this.arch(b0, a0, b1, a1, { h, lintel, floorZ, wall, round: top });
     // The arch's tiles become the door's (with a room behind them, if it opens).
     const row = out > 0 ? line - 1 : line;
     for (let a = a0; a < a1; a++) {

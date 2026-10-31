@@ -36,9 +36,15 @@ import { ModelBuilder } from './lib/build.js';
 // `cantina-detector`: the droid detector on the vestibule's wall, a steel
 // box with a red lens. Built looking south, its back on y 0 (a fixture).
 //
-// `cantina-sign`: the little lit sign up on the front by the arch's
-// shoulder (Mark's stills), a box glowing orange. Built looking south, its
-// back on y 0 (a fixture).
+// `cantina-sign`: the lit sign over the doorway at the back of the arch
+// (Mark's stills), a box glowing orange with a dark red mark on it, SIGN
+// wide and tall. Built looking south, its back on y 0 (a fixture).
+//
+// `cantina-doorframe`: the timber frame round the open doorway at the back
+// of the arch: posts and a lintel lining the opening through the wall,
+// DOORWAY wide and tall, and boards round it on the wall's face. Built
+// looking south, the face on y 0 and the opening a tile deep behind it
+// (y -1 to 0), the origin on the floor at its middle.
 //
 // `cantina-lamp`: a bare bulb glowing on a cord, hung from a ceiling: the
 // origin at the bulb's foot, the cord LAMP_CORD up to the ceiling.
@@ -58,6 +64,10 @@ import { ModelBuilder } from './lib/build.js';
 export const WALL = 'adobe-pale';
 /** A cut corner's panel: its length (6 tiles each way) and height (the room's). */
 export const CORNER = { len: 6 * Math.SQRT2, h: 4 };
+/** The sign over the doorway: how wide and tall. */
+export const SIGN = { w: 1, h: 0.5 };
+/** The open doorway at the back of the arch: how wide and tall (the entry's ceiling). */
+export const DOORWAY = { w: 2, h: 3.5 };
 /** How far a `cantina-lamp`'s cord runs up from its bulb's foot to the ceiling. */
 export const LAMP_CORD = 0.75;
 /** A booth: how far out from the wall its table stands, and its bench's outer radius round it. */
@@ -178,10 +188,39 @@ function detector() {
   return m.build();
 }
 
+// The sign's mark, a squared-off S in bars across its face: [x0, z0, x1, z1].
+const GLYPH = [
+  [-0.17, 0.36, 0.17, 0.42], [-0.17, 0.25, -0.11, 0.36], [-0.17, 0.22, 0.17, 0.28],
+  [0.11, 0.14, 0.17, 0.22], [-0.17, 0.08, 0.17, 0.14], [0.11, 0.42, 0.17, 0.46],
+];
+
 function sign() {
   const m = new ModelBuilder('cantina-sign');
   const lit = { color: [255, 150, 60], glow: true };
-  m.box([-0.22, 0, 0], [0.22, 0.1, 0.32], { ...TRIM, side: (i) => (i === 0 ? false : i === 2 ? lit : TRIM) });
+  const mark = { color: [150, 34, 18], glow: true };
+  const [a, d] = [SIGN.w / 2, 0.12];
+  m.box([-a, 0, 0], [a, d, SIGN.h], { ...TRIM, side: (i) => (i === 0 ? false : i === 2 ? lit : TRIM) });
+  for (const [x0, z0, x1, z1] of GLYPH) m.box([x0, d, z0], [x1, d + 0.01, z1], { ...mark, top: false, bottom: false, side: (i) => (i === 2 ? mark : false) });
+  return m.build();
+}
+
+function doorframe() {
+  const m = new ModelBuilder('cantina-doorframe');
+  const [a, h] = [DOORWAY.w / 2, DOORWAY.h];
+  const [t, b, out] = [0.1, 0.16, 0.04]; // the lining's thickness, the boards' width and how far they stand out
+  // The lining: a post up each side and the lintel under the top, through
+  // the wall (their backs against it hidden).
+  for (const sign of [1, -1]) {
+    const [x0, x1] = sign > 0 ? [a - t, a] : [-a, -a + t];
+    m.box([x0, -1, 0], [x1, 0, h - t], { ...WOOD, top: false, bottom: false, side: (i) => (i === (sign > 0 ? 3 : 1) ? WOOD : false) });
+  }
+  m.box([-a, -1, h - t], [a, 0, h], { ...WOOD, top: false, side: () => false });
+  // The boards round it on the wall's face.
+  for (const sign of [1, -1]) {
+    const [x0, x1] = sign > 0 ? [a, a + b] : [-a - b, -a];
+    m.box([x0, 0, 0], [x1, out, h + b], { ...WOOD, bottom: false, side: (i) => (i === 0 ? false : WOOD) });
+  }
+  m.box([-a, 0, h], [a, out, h + b], { ...WOOD, bottom: WOOD, side: (i) => (i === 2 ? WOOD : false) });
   return m.build();
 }
 
@@ -272,4 +311,4 @@ function canopy() {
   return m.build();
 }
 
-export default [bar(), taps(), stool(), booth(), corner(), detector(), sign(), lamp(), datapad(), shelves(), canopy()];
+export default [bar(), taps(), stool(), booth(), corner(), detector(), sign(), doorframe(), lamp(), datapad(), shelves(), canopy()];

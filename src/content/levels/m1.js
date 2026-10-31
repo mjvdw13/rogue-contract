@@ -1,5 +1,5 @@
 import { defineLevel } from '../../engine/defs.js';
-import { WALL, BOOTH, TAPS, CANOPY, LAMP_CORD } from '../models/cantina.js';
+import { WALL, BOOTH, TAPS, CANOPY, LAMP_CORD, DOORWAY } from '../models/cantina.js';
 import { Painter } from './lib/painter.js';
 import { Town } from './lib/town.js';
 import { CISTERN } from '../models/market.js';
@@ -169,11 +169,16 @@ town.window(65.5, 82, 'N', { z: 2.2 }).window(73, 87.5, 'E');
 // R: a round house under a dome.
 town.circle(80, 88, 5, { inside: town.roofCell({ h: 7, wall: 'adobe-rose', skirt: null }), wall: { wall: 'adobe-rose', wallTop: 7 }, open: 'out', skirt: null });
 town.dome(80, 88, 7, 9.5, { wall: 'adobe-rose' });
-// S: the cantina's front, a long plain house with no windows on the
-// market (Mark's stills, 2026-10-30), its corners rounded tighter so its
-// straight front (89..100) takes the arch, a smaller door and the hitching
-// ring; they and the cantina behind are with the middle, below.
-town.house(87, 82, 102, 92, { h: 6, r: 2, wall: 'adobe-pale', dome: true });
+// S: the cantina's front, plain plaster with no windows on the market
+// (Mark's stills, 2026-10-30, looked at closer 2026-10-31). Its west end a
+// block a tile taller, cut back at 45 degrees (the stills' near wall, seen
+// square from the market's west side), then the straight front (91..102):
+// the arch at the corner, a smaller door and the hitching ring on its post
+// in the nook against N. They and the cantina behind are with the middle,
+// below. The dome sits back over the hall.
+town.slanted([[87, 86], [91, 82], [91, 92], [87, 92]], { h: 7, wall: 'adobe-pale' });
+town.house(91, 82, 102, 92, { h: 6, wall: 'adobe-pale' });
+town.dome(97, 88, 6, 8, { wall: 'adobe-pale' });
 
 
 // Past the market. North side: K by the frame, a rounded porch cut into its
@@ -593,28 +598,31 @@ const roofOver = (x0, y0, x1, y1, ceilZ, h) => p.rect(x0, y0, x1, y1, (_, __, c)
   });
   town.things.push(at('cantina-canopy', WELL.x, WELL.y, { z: WELL.z, angle: 0, lit: light + 16 }));
   lights.push({ x: WELL.x, y: WELL.y, z: wellTop - 0.25, radius: 6, light: 72 });
-  // The way in, after Mark's stills (2026-10-30): a tall round-topped arch
-  // cut 3 deep into S's front, in shade, its door at the back; behind it an
-  // entry turning east into the vestibule, so the street can't see in, and
-  // two steps down. The arch is sooty as the cantina's vaults are (Mark). On
-  // S's front east of the arch, in the street's plaster:
-  // a little lit sign up by the arch's shoulder, a smaller door (shut) and a
-  // hitching ring.
-  town.arch(90, 82, 94, 85, { h, lintel: 4.75, wall: 'adobe-pale', round: 'N', light: 136, grimy: true });
-  town.room(90, 86, 98, 88, { h, ceilZ: 3.5, wall, light });
+  // The way in, after Mark's stills (2026-10-30, looked at closer
+  // 2026-10-31): a tall round-topped arch cut 3 deep into S's front by the
+  // corner block, in shade, sooty as the cantina's vaults are (Mark). At its
+  // back an open doorway in a timber frame, dark (the entry behind it dim),
+  // the lit sign over it; the entry turns east into the vestibule, so the
+  // street can't see in, and two steps go down. On S's front east of the
+  // arch, in the street's plaster: a smaller round-topped door of planks
+  // (shut), and the hitching ring on a round post in the corner by N.
+  town.arch(92, 82, 96, 85, { h, lintel: 5.25, wall: 'adobe-pale', round: 'N', light: 136, grimy: true });
+  town.room(93, 85, 95, 86, { h, ceilZ: DOORWAY.h, wall, light: 32 });
+  town.room(92, 86, 98, 88, { h, ceilZ: 3.5, wall, light: 40 });
   town.room(96, 85, 101, 88, { h, ceilZ: 3.5, wall, light });
   town.stair(96, 88, 101, 90, { up: 'N', from: F, top: 0, rise: 0.25, floor: 'flagstone', side: wall });
   roofOver(96, 88, 101, 90, 3.5, h);
-  town.door(92, 85, 'N', { h, tex: 'door-grey', wall: 'adobe-pale', opens: true });
-  town.door(97, 82, 'N', { h, tex: 'shutter', wall: 'adobe-pale', sign: false, panel: false });
-  town.fixture('cantina-sign', 94.4, 82, 'N', { z: 4.2 }).fixture('hitching-ring', 99.1, 82, 'N', { z: 1.1 });
+  town.things.push(at('cantina-doorframe', 94, 85, { angle: 180 }));
+  town.fixture('cantina-sign', 94, 85, 'N', { z: DOORWAY.h + 0.45 });
+  town.door(99.5, 82, 'N', { h, tex: 'door-planks', width: 3, tall: 4, wall: 'adobe-pale', jamb: false, sign: false, panel: false, round: true });
+  town.things.push(at('ring-post', 101.5, 81.5), at('hitching-ring', 101.5, 80.99, { z: 1.5, angle: 180 }));
   // The droid detector on the vestibule's wall, and a bulb over the steps.
   town.fixture('cantina-detector', 101, 86.5, 'W', { z: 1 });
   town.things.push(at('cantina-lamp', 98.5, 87.5, { z: 3.5 - LAMP_CORD }));
   lights.push({ x: 98.5, y: 87.5, z: 2.5, radius: 4, light: 40 });
   // (S's walls round them in the room's light; the rooms' own tiles keep the
   // sun on the roof over them, under S's dome, which takes its light.)
-  p.rect(89, 84, 102, 89, (_, __, c) => (c.slab || c.door ? c : { ...c, light }));
+  p.rect(91, 84, 102, 89, (_, __, c) => (c.slab || c.door ? c : { ...c, light }));
   // The way out: the back-bar's door, a back room, and a passage up two
   // steps to the back door.
   town.door(99, 111, 'S', { h, tex: 'door-grey', wall, opens: true, floorZ: F });
@@ -898,14 +906,14 @@ list.push(
   at('villager-wanderer', 77.9, 76.7, { angle: 100, wander: 0 }),
 );
 
-// The cantina's front, after Mark's stills (2026-10-30): the white dome pod
-// by its west corner, three Jawas against the wall between the arch and the
-// smaller door, and in the nook by its east corner a dewback at a stone
-// trough, the hitching ring behind it, and a drum.
+// The cantina's front, after Mark's stills (2026-10-30, 2026-10-31): the
+// white dome pod in front of the cut corner, three Jawas against the wall
+// in front of the smaller door, and in the nook against N a dewback at a
+// stone trough along N's wall, and a drum.
 list.push(
-  at('dome-pod', 87.6, 79.4, { angle: 60 }),
-  at('jawa', 94.35, 81.45, { angle: 80, calm: { wander: 0 } }), at('jawa', 95, 81.45, { angle: 95, calm: { wander: 0 } }), at('jawa', 95.65, 81.45, { angle: 100, calm: { wander: 0 } }),
-  at('dewback', 100.3, 78.4, { angle: 180 }), at('water-trough', 99.9, 80.85, { angle: 0 }), at('barrel-grey', 97.6, 79.3),
+  at('dome-pod', 87.6, 81.6, { angle: 60 }),
+  at('jawa', 97.3, 81.15, { angle: 80, calm: { wander: 0 } }), at('jawa', 98.05, 81.15, { angle: 95, calm: { wander: 0 } }), at('jawa', 98.8, 81.15, { angle: 100, calm: { wander: 0 } }),
+  at('dewback', 99.8, 77.4, { angle: 90 }), at('water-trough', 101.5, 77.6, { angle: 90 }), at('barrel-grey', 96.6, 79.2),
 );
 
 // The cantina's people. Bossk drinking at the bar and Boba Fett watching

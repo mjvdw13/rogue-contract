@@ -84,7 +84,18 @@ These need Mark to try something, or to decide. Don't start them without him.
   three Jawas at the bar and a booth (2026-10-30): how dirty. The alcoves'
   vaults are sooty too (Mark): their own grimy arches, a smoky stain along
   each crown and streaks hanging from the lintel at the mouth; the street
-  door's arch as well.
+  door's arch as well. Then the entrance after a closer look at the two
+  stills (2026-10-31): S's west end a block a tile taller cut back at 45
+  degrees (the stills' near wall: from the market's west side, about
+  85,77 looking 335, it's seen square with the pod in front and the arch
+  front receding beside it, as in the stills); the arch beside that
+  corner, taller (5.25); at its back an open doorway in a timber frame,
+  dark, the sign over it inside the arch (orange, a red mark); the
+  smaller door round-topped, of weathered planks, the Jawas in front of
+  it; the ring on a round post in the corner by N; the dewback and trough
+  along N's wall. To judge: how dark the doorway is, the corner block's
+  height, and whether to add the film's oval vent on the roof over the
+  arch.
 
 - **Mos Eisley's east third, blocked out** (`?map=m1`, 2026-10-29; the
   areas in `docs/mission1.md`): plain volumes to try the route, no detail.
@@ -428,6 +439,14 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
           Secrets 2): a secret door in the plaster of the storeroom's
           north wall, half behind its crates, into a smuggler's hidey-hole:
           power cells, a stash, a dim bulb, and a ledger on a crate (lore).
+    - [x] The entrance looked at closer (Mark, 2026-10-31, the two stills
+          of the front): S's west end a taller block cut back at 45
+          degrees (the stills' near wall, seen square), the arch beside it
+          at the corner, taller; its door an open dark doorway in a timber
+          frame, the lit sign over it inside the arch (not up on the
+          front); the smaller door round-topped, of planks; the ring on a
+          round post at the front's east end; the trough and dewback in
+          the nook, the pod by the cut corner, the dome back.
     - [ ] Waiting on Mark.
   - [ ] Bay 86, the dewback stable and the speeder garage.
   - [ ] The Jawa junk yard and the sandcrawler.

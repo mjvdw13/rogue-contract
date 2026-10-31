@@ -225,6 +225,18 @@ test('a door that opens needs a room behind its wall', () => {
   assert.throws(() => town.door(10, 14, 'S', { h: 6, opens: true }), /needs a room behind it/);
 });
 
+test('a round-topped door has its opening rounded over the panel, and no jamb', () => {
+  const { p, town } = kit();
+  town.house(4, 4, 16, 14, { h: 6, wall: 'adobe-pale' });
+  town.door(10.5, 14, 'S', { h: 6, tex: 'door-planks', width: 3, tall: 4, wall: 'adobe-pale', jamb: false, sign: false, panel: false, round: true });
+  for (const x of [9, 10, 11]) assert.deepEqual([p.get(x, 13).door, p.get(x, 13).slab.bottom], ['door-planks-rising', 4]);
+  // One rounded arch on the opening's face, a tile through: it covers the panel's corners.
+  assert.deepEqual(town.things.map((t) => [t.type, t.x, t.y, t.angle]), [['arch-round-3-pale', 10.5, 14, 0]]);
+  assert.throws(() => town.door(6, 4, 'N', { h: 6, round: true }), /can't have a jamb/);
+  const level = { id: 't', name: 'T', ...p.build(), decals: town.decals, list: [{ type: 'player', x: 20, y: 20 }, ...town.things] };
+  assert.deepEqual(buildLevel(registry, level).errors, []);
+});
+
 test('a window is set into its wall: a notch with a sill and a lintel, the window on its back wall', () => {
   const { p, town } = kit();
   town.house(4, 4, 16, 14, { h: 6, wall: 'adobe-pale', skirt: 'plinth', tiers: [{ box: [6, 4, 14, 10], h: 10 }] });

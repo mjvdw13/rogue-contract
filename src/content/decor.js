@@ -11,6 +11,7 @@ import { BAY_WALL, BAY_HOSES } from './models/bay.js';
 import { TOWER_HEIGHT } from './models/market.js';
 import { BAR, TAPS, CORNER } from './models/cantina.js';
 import { POD } from './models/pod.js';
+import { POST } from './models/ring.js';
 import { STAINS } from './models/stains.js';
 
 // Scenery. Solid ones block movement; ones with health can be shot (and
@@ -122,16 +123,19 @@ export default [
   defineDecoration({ id: 'cantina-corner', model: 'cantina-corner', solid: true, height: CORNER.h, fixed: true }),
   defineDecoration({ id: 'cantina-shelves', model: 'cantina-shelves', solid: true, height: 2.2, fixed: true }),
   defineDecoration({ id: 'cantina-canopy', model: 'cantina-canopy', fixed: true }),
-  // The vestibule's droid detector on its wall, the lit sign on the front, and
-  // bare bulbs hung from ceilings.
+  // The vestibule's droid detector on its wall, the lit sign over the
+  // doorway and the timber frame round it, and bare bulbs hung from ceilings.
   defineDecoration({ id: 'cantina-detector', model: 'cantina-detector', fixed: true }),
   defineDecoration({ id: 'cantina-sign', model: 'cantina-sign', fixed: true }),
+  defineDecoration({ id: 'cantina-doorframe', model: 'cantina-doorframe', fixed: true }),
   defineDecoration({ id: 'cantina-lamp', model: 'cantina-lamp', fixed: true }),
   defineDecoration({ id: 'cantina-datapad', model: 'cantina-datapad', fixed: true }),
   // On Mos Eisley's walls and streets after Mark's film stills: a hitching
-  // ring (models/ring.js), and the white dome pod by the cantina
-  // (models/pod.js), colliding as its cylinder.
+  // ring and the post the cantina's hangs on (models/ring.js), and the
+  // white dome pod by the cantina (models/pod.js), colliding as their
+  // cylinders.
   defineDecoration({ id: 'hitching-ring', model: 'hitching-ring', fixed: true }),
+  defineDecoration({ id: 'ring-post', model: 'ring-post', solid: true, radius: POST.r, height: POST.h, fixed: true }),
   defineDecoration({ id: 'dome-pod', model: 'dome-pod', solid: true, radius: POD.r, height: POD.h, fixed: true }),
   // Stains lying on floors (models/stains.js): grime, darkening the floor.
   ...STAINS.map(([id]) => defineDecoration({ id, model: id, fixed: true })),

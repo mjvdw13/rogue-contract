@@ -217,6 +217,9 @@ export const DECALS = [
   // A shop's roll-down shutter, 3 tiles wide: a strip of Nar Shaddaa's
   // corrugated door clear of its red sign, stretched sideways.
   { out: 'shutter', df: 'NDCORUG1', crop: [119, 0, 8, 96], size: [96, 72], gradient: [[30, 26, 22], [74, 66, 56], [118, 108, 92], [160, 150, 132]], keep: 0, contrast: 0.9, mask: 'round', r: 4, rim: REVEAL },
+  // The cantina's smaller door (Mark's stills): weathered planks, 3 tiles
+  // by 4, its top a half circle to fit the rounded arch over it.
+  { out: 'door-planks', df: 'IWGRAN5', size: [96, 128], gradient: [[20, 15, 10], [48, 38, 28], [80, 66, 50], [112, 96, 76], [140, 124, 100]], keep: 0, contrast: 0.8, mask: 'arch', rim: REVEAL },
   // Docking Bay 87's door, 4 tiles by 4: Dark Forces' X-braced cargo door,
   // in the town's rusty grey.
   { out: 'door-bay', df: 'RDBIG4', size: [128, 128], gradient: [[22, 20, 18], [58, 54, 48], [98, 92, 82], [138, 130, 116]], keep: 0.2, contrast: 1, mask: 'round', r: 6, rim: { width: 1.5, color: [24, 16, 10] } },
@@ -254,6 +257,7 @@ export const RISING = [
   { out: 'door-red-rising', from: 'door-red', size: [64, 128], fill: [24, 16, 10] },
   { out: 'door-grey-rising', from: 'door-grey', size: [64, 128], fill: [24, 16, 10] },
   { out: 'shutter-rising', from: 'shutter', size: [128, 128], fill: [52, 38, 26] },
+  { out: 'door-planks-rising', from: 'door-planks', size: [128, 128], fill: [24, 16, 10] },
   { out: 'door-bay-rising', from: 'door-bay', size: [128, 128], fill: [24, 16, 10] },
 ];
 
