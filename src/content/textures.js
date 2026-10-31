@@ -69,6 +69,9 @@ const TOWN = [
   // The blast doors (m1.js): the door, its frame's steel, the beam over it
   // and the faded stripes along its foot.
   'blast-door-rising', 'blast-steel', 'blast-beam', 'blast-hazard',
+  // The checkpoint: Mos Eisley's barricades' plate (models/barricade.js),
+  // and the old quarter's door.
+  'barricade-worn', 'door-gate-rising',
   // The drifts' edges, by which corners are drift (lib/town.js, drifts()).
   ...Array.from({ length: 14 }, (_, k) => `street-drift-${k + 1}`),
 ];

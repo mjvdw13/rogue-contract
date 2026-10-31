@@ -38,6 +38,20 @@ These need Mark to try something, or to decide. Don't start them without him.
   three repeats show too much, and whether it wants sand drifted against
   it (the drifts stop a tile short of a door today).
 
+- **The checkpoint, rebuilt** (`?map=m1`, 2026-10-31): no wall across the
+  street. The street squeezes between two houses whose fronts slant in
+  (the informant's grey one reaching forward, an ochre one on the south),
+  into a gap open to the sky, then a passage under a lower room in plain
+  plaster, round-topped, the heavy door a tile in (now rustier,
+  `door-gate`), under a round hood on the old quarter's side. A cable
+  across the gap. The gear is Mos Eisley's own: barricades in dusty,
+  sooty grey plate with faded stripes and one lamp dead, floodlight masts
+  in rusty steel with one lamp dead, drums closing the gap south of the
+  barricades, a power unit and its slack cable. To judge: whether the
+  passage reads as a way through, the bridge's height and plaster, how
+  pale the barricades are, and whether the terminal (still clean) wants
+  the same wear.
+
 - **Mos Eisley opens in stages** (`?map=m1`, 2026-10-31): when you land the
   blast doors are shut (a stand-in: a rising Imperial gate under a steel
   beam over the street), and so are plank gates across the alley between
@@ -466,9 +480,10 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
         Shaddaa doors and walls, recoloured), faded hazard stripes, rubble
         and litter against them.
   - [ ] Waiting on Mark.
-  - [ ] The checkpoint: the barricades and floodlights dusty and chipped
+  - [x] The checkpoint: the barricades and floodlights dusty and chipped
         (Mos Eisley's own copies, so m3's stay as they are), and the
-        troopers' setup made of what they found in town.
+        troopers' setup made of what they found in town. And no wall
+        across the street (Mark): a passage between two houses, gated.
 - [ ] **Then each area in detail**, in the order the blockout suggests:
   - [ ] The cantina: entrance, steps down, the main room, the bar,
         booths, bandstand, back rooms. In detail after Mark's references

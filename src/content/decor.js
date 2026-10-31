@@ -62,9 +62,12 @@ export default [
   defineDecoration({ id: 'coolant-tank', model: 'coolant-tank', solid: true, radius: 1, height: 3.6 }),
   defineDecoration({ id: 'shuttle', model: 'shuttle', solid: true, height: 3.5 }),
   defineDecoration({ id: 'barricade', model: 'barricade', solid: true, height: 1.15 }),
+  // Mos Eisley's, dusty and worn (models/barricade.js).
+  defineDecoration({ id: 'barricade-worn', model: 'barricade-worn', solid: true, height: 1.15 }),
   defineDecoration({ id: 'boulder-large', model: 'boulder-large', solid: true, height: 1.8 }),
   defineDecoration({ id: 'boulder-small', model: 'boulder-small', solid: true, height: 0.8 }),
   defineDecoration({ id: 'floodlight-tower', model: 'floodlight-tower', solid: true, radius: 0.5, height: 7 }),
+  defineDecoration({ id: 'floodlight-tower-worn', model: 'floodlight-tower-worn', solid: true, radius: 0.5, height: 7 }), // Mos Eisley's
   defineDecoration({ id: 'sensor-mast', model: 'sensor-mast', solid: true, radius: 0.45, height: 8.1 }),
   defineDecoration({ id: 'sensor-dish', model: 'sensor-dish', spin: 0.9 }),
   // Mos Eisley's domes, on roofs and over round buildings.

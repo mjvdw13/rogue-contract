@@ -196,6 +196,12 @@ export const TOWN = [
   { out: 'blast-steel', df: 'NWGREY01', tile: [2, 1], gradient: [[30, 24, 18], [74, 66, 56], [112, 104, 92], [146, 138, 122], [176, 168, 150]], keep: 0, contrast: 1.1, rust: [{ color: [128, 64, 28], amount: 0.6, cell: 32, seed: 103 }, { color: [18, 14, 10], amount: 0.5, cell: 16, seed: 113, from: 0.55 }] },
   { out: 'blast-beam', df: 'NWEXT06', gradient: [[26, 20, 16], [68, 60, 50], [108, 100, 88], [144, 136, 120], [174, 166, 148]], keep: 0.2, contrast: 1.1, rust: WORN(16, 105, 0.7) },
   { out: 'blast-hazard', df: 'NPWRNFAD', gradient: [[34, 28, 20], [80, 70, 56], [128, 116, 94], [164, 150, 120]], keep: 0.6, contrast: 1, rust: WORN(16, 107, 1) },
+  // The checkpoint (m1.js): Mos Eisley's barricades in SecBase's grey plate
+  // (the garrison's wear it clean), dusted with sand, sooty, rust where
+  // they're scraped; and the old quarter's door, Docking Bay 87's X-braced
+  // door gone rustier.
+  { out: 'barricade-worn', df: 'IWSECB2', tile: [2, 1], gradient: [[30, 28, 26], [74, 70, 64], [116, 110, 100], [150, 142, 128], [176, 168, 150]], keep: 0.3, contrast: 0.9, rust: [{ color: [176, 146, 104], amount: 0.55, cell: 32, seed: 121 }, { color: [128, 64, 28], amount: 0.5, cell: 16, seed: 123, from: 0.6 }, { color: [18, 14, 10], amount: 0.5, cell: 16, seed: 125, from: 0.5 }] },
+  { out: 'door-gate-rising', df: 'RDBIG4', gradient: [[22, 20, 18], [58, 54, 48], [98, 92, 82], [138, 130, 116]], keep: 0.2, contrast: 1, rust: WORN(16, 127, 0.8) },
   // A hazy day: Robotics' pale cloudy sky, twice as wide, warming to dust at the horizon.
   { out: 'sky-day', df: 'RESKY01', gradient: [[74, 128, 182], [120, 166, 206], [168, 198, 222], [214, 226, 236]], keep: 0.3, contrast: 0.9, tile: [2, 1], fade: { color: [212, 200, 174], from: 0.55 } },
 ];

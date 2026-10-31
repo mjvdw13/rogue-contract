@@ -4,9 +4,9 @@ import terminal from './terminal.js';
 import reactorRing from './reactor-ring.js';
 import coolantTank from './coolant-tank.js';
 import shuttle from './shuttle.js';
-import barricade from './barricade.js';
+import barricades from './barricade.js';
 import { boulderLarge, boulderSmall } from './boulder.js';
-import floodlightTower from './floodlight-tower.js';
+import floodlightTowers from './floodlight-tower.js';
 import { sensorMast, sensorDish } from './sensor-mast.js';
 import domes from './dome.js';
 import doorJamb, { doorLips } from './door-jamb.js';
@@ -25,4 +25,4 @@ import hitching from './ring.js';
 import pod from './pod.js';
 import stains from './stains.js';
 
-export default [terminal, reactorRing, coolantTank, shuttle, barricade, boulderLarge, boulderSmall, floodlightTower, sensorMast, sensorDish, ...domes, doorJamb, ...doorLips, ...arches, ...buttresses, ...awnings, ...tin, ...pipes, ...clutter, landspeeder, ...bay, moldyCrow, ...market, ...cantina, ...hitching, ...pod, ...stains];
+export default [terminal, reactorRing, coolantTank, shuttle, ...barricades, boulderLarge, boulderSmall, ...floodlightTowers, sensorMast, sensorDish, ...domes, doorJamb, ...doorLips, ...arches, ...buttresses, ...awnings, ...tin, ...pipes, ...clutter, landspeeder, ...bay, moldyCrow, ...market, ...cantina, ...hitching, ...pod, ...stains];

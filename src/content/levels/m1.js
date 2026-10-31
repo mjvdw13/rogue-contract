@@ -388,21 +388,32 @@ const tagTile = (x, y, tag) => p.rect(x, y, x + 1, y + 1, (_, __, c) => ({ ...c,
 town.block(178, 42, 182, 46, { h: 22, wall: 'adobe-grey', skirt: null });
 
 // 5. The checkpoint: the street climbs two steps to the old quarter's rise
-// and its gatehouse, the town's own adobe arch across the street, its
-// door 4 wide (a docking bay's, the town's heavy door). The Imperials set
-// up here but built nothing (Mark): they keep the gate shut, with barricades at the foot of the steps, floodlights and
-// a guard post under a tarp. From the top both ways round are in sight:
-// the alleys' mouth to the north and the back lane behind you.
+// and squeezes between two houses into a passage 4 wide, under a room
+// that bridges it (Mark, 2026-10-31: a wall across the street with a door
+// in it looked odd). The houses' fronts slant in toward the gap, so the
+// street funnels into it; the passage is round-topped at both ends, and
+// the town's heavy door (a docking bay's) is shut a tile in, in its shade.
+// The Imperials set up here but built nothing (Mark): they keep the door
+// shut, with barricades at the foot of the steps, floodlights and a guard
+// post under a tarp. From the top both ways round are in sight: the
+// alleys' mouth to the north and the back lane behind you.
 p.rect(136, 61, 139, 73, town.street());
 // Its foot, where the informant calls out (with the signal) and Jan names the ways round (after the switch).
 p.rect(136, 61, 139, 73, (_, __, c) => ({ ...c, tag: 'checkpoint-foot' }));
 town.stair(139, 61, 147, 73, { up: 'E', top: OQ, rise: 0.25, floor: 'flagstone', side: 'adobe-brick' });
-const GATEHOUSE = { h: 8, wall: 'adobe-ochre' };
-town.block(145, 61, 148, 65, GATEHOUSE).block(145, 69, 148, 73, GATEHOUSE);
-town.arch(145, 65, 146, 69, { ...GATEHOUSE, lintel: 4, floorZ: OQ }).arch(147, 65, 148, 69, { ...GATEHOUSE, lintel: 4, floorZ: OQ });
-town.door(146, 67, 'W', { ...GATEHOUSE, tex: 'door-bay', width: 4, tall: 4, jamb: false, sign: false, panel: false, step: false, floorZ: OQ });
-gateTag(146, 65, 147, 69, 'checkpoint');
-town.tarp(141, 70, 145, 73, { z: OQ + 2.75, face: 'N', cloth: 'sand', floorZ: OQ });
+// The informant's house reaches forward on the north; an ochre house,
+// taller, on the south, in front of the pale one behind it. Two tiles in,
+// a room in plain plaster bridges the gap between them, round-topped
+// underneath, and the door is a tile further in.
+town.slanted([[142, 61], [148, 61], [148, 65], [144, 65]], { h: 7, wall: 'adobe-grey', skirt: null });
+town.slanted([[144, 69], [148, 69], [148, 73], [143, 73]], { h: 8, wall: 'adobe-ochre' });
+const BRIDGE = { h: 6.5, wall: 'adobe', floorZ: OQ };
+town.arch(146, 65, 147, 69, { ...BRIDGE, lintel: 5, round: 'W' });
+town.door(147, 67, 'W', { ...BRIDGE, tex: 'door-gate', width: 4, tall: 4, jamb: false, sign: false, panel: false, step: false });
+gateTag(147, 65, 148, 69, 'checkpoint');
+// On the old quarter's side, a round hood over the door, as the town's doors have.
+town.hood(148, 67, 'E', { h: 6.5, width: 4, floorZ: OQ, wall: 'adobe' });
+town.tarp(140.2, 69.9, 142.9, 72.9, { z: OQ + 2.75, face: 'N', cloth: 'sand', floorZ: OQ });
 // North of it the alleys' east mouth (the alleys come down into it, with
 // the middle, below) and the informant's den, open to it.
 p.rect(136, 48, 139, 61, town.street());
@@ -885,9 +896,9 @@ list.push(
 const CHECKPOINT_LINES = ["Old quarter's sealed, hunter.", 'No pass, no way through.'];
 const QUARTER_PATROL = [[153.5, 68], [165.5, 79], [178.5, 94]];
 list.push(
-  at('sandtrooper', 144.2, 63.4, { angle: 180, calm: { wander: 0, lines: CHECKPOINT_LINES } }),
-  at('sandtrooper', 144.2, 68.8, { angle: 180, calm: { wander: 0, lines: CHECKPOINT_LINES } }),
-  at('sandtrooper-commander', 141.5, 66, { angle: 180, calm: { wander: 0, lines: CHECKPOINT_LINES } }),
+  at('sandtrooper', 144.6, 65.7, { angle: 180, calm: { wander: 0, lines: CHECKPOINT_LINES } }),
+  at('sandtrooper', 144.6, 68.3, { angle: 180, calm: { wander: 0, lines: CHECKPOINT_LINES } }),
+  at('sandtrooper-commander', 142, 67, { angle: 180, calm: { wander: 0, lines: CHECKPOINT_LINES } }),
   at('sandtrooper', 153.5, 68, { calm: { patrol: QUARTER_PATROL, idleTime: [3, 3] } }),
   at('sandtrooper', 155, 66.6, { calm: { patrol: QUARTER_PATROL.map(([x, y]) => [x + 1.5, y - 1.4]), idleTime: [3, 3] } }),
   at('sandtrooper', 171, 57.5, { angle: 270, calm: { wander: 0, lines: ['Move along.'] } }),
@@ -911,11 +922,16 @@ list.push(
   at('villager-man', 152, 73),
   // Rusk, in the freighter's hold: what the fob tracks once the trader's code is in.
   at('villager-man', 180, 134.5, { angle: 0, wander: 0, tag: 'rusk', name: 'RUSK' }),
-  at('barricade', 137.6, 63.6, { angle: 20 }), at('barricade', 137.6, 69.8, { angle: 335 }),
-  at('floodlight-tower', 143.6, 61.7), at('floodlight-tower', 140.3, 72.3),
+  at('barricade-worn', 137.6, 63.6, { angle: 20 }), at('barricade-worn', 137.6, 69.8, { angle: 335 }),
+  at('floodlight-tower-worn', 141.4, 62), at('floodlight-tower-worn', 139.7, 72.3),
+  // What the troopers found in town: drums rolled in to close the gap
+  // south of the barricades (the north one stays open, the alleys' mouth),
+  // and a power unit for the floodlights, its cable on the ground.
+  at('barrel-rust', 137.4, 71.75), at('barrel-grey', 138.05, 72.35), at('canister', 137.2, 72.55),
+  at('power-unit', 140, 62.2, { angle: 270 }),
   // The guard post under the tarp: a terminal on crates brought in.
-  at('crate-tan', 143.9, 72.4, { angle: 4 }), at('terminal', 143.9, 72.4, { z: OQ + 0.9, angle: 90 }),
-  at('crate-grey-small', 141.8, 72.5, { angle: 350 }), at('cargo-pod', 142.6, 70.9, { angle: 85 }),
+  at('crate-tan', 142.2, 72.2, { angle: 4 }), at('terminal', 142.2, 72.2, { z: OQ + 0.9, angle: 90 }),
+  at('crate-grey-small', 141, 72.5, { angle: 350 }), at('cargo-pod', 141.6, 70.7, { angle: 85 }),
 );
 
 // Townsfolk (npcs/villagers.js), all five kinds, each strolling up to 5
@@ -1070,6 +1086,10 @@ const hangings = [
   { type: 'rag', from: [52.95, 80.4, 4.8], to: [52.95, 81.8, 4.8], length: 2.4 },
   // A sheet slung across the north back lane, pinned at its corners.
   { type: 'cloth-pale', from: [12, 44.05, 4], to: [12.5, 49.95, 4], length: 1, pin: 'corners' },
+  // At the checkpoint: one across the gap in front of the passage, and the
+  // floodlight's from its power unit, slack on the ground.
+  { type: 'cable', from: [145.3, 65.05, 5.8], to: [145.1, 68.95, 5.3], sag: 0.6 },
+  { type: 'cable', from: [140.2, 62.2, 1.3], to: [141.3, 62, 1.5], sag: 1.1 },
   // Cables across the market and the street past it.
   { type: 'cable', from: [70, 58.05, 5.4], to: [70.5, 81.95, 5.2], sag: 1.5 },
   { type: 'cable', from: [97, 58.05, 6.6], to: [96.5, 81.95, 5.6], sag: 1.6 },
