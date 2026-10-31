@@ -14,6 +14,7 @@ import { Assets } from '../src/engine/assets.js';
 import { Renderer } from '../src/engine/render/renderer.js';
 import { SCREEN_W, VIEW_H } from '../src/engine/config.js';
 import { decodePNG } from '../tools/art/lib/png.js';
+import { runActions } from '../src/engine/world/actions.js';
 import { registry, room, makeWorld, mockInput, run } from './helpers.js';
 
 // Rising doors (Dark Forces' kind): a thin panel set back in the middle of
@@ -237,4 +238,31 @@ test('a door under the sky shows sky above its roof, and once open looks like an
   assert.ok(top > 0);
   assert.deepEqual(shut.px.subarray(0, top * SCREEN_W), arch.px.subarray(0, top * SCREEN_W), 'nothing above the opening changes');
   assert.notDeepEqual(shut.px, arch.px, 'the panel shows below it');
+});
+
+test('lockDoors shuts the player out of a door they could open, triggers still open it, and unlockDoors frees it, a key door too', () => {
+  // Two corridors, each with a door across it, both tagged "gate"; the lower one needs the red key.
+  const tiles = ['#########', '#...D...#', '#########', '#...K...#', '#########'];
+  const legend = { '.': ROOM, D: { ...DOOR, tag: 'gate' }, K: { ...DOOR, tag: 'gate', lock: 'red' } };
+  const w = makeWorld(room(tiles, ['', ' >'], { legend }), { noMonsters: true });
+  const [gate, keyed] = [w.map.doorAt(4, 1), w.map.doorAt(4, 3)];
+  const tryDoor = (y) => {
+    Object.assign(w.player, { x: 2.5, y, angle: contentAngle(0) });
+    w.use(w.player);
+    run(w, mockInput(), 0.1);
+  };
+
+  runActions(w, [{ action: 'lockDoors', tag: 'gate' }]);
+  tryDoor(1.5);
+  assert.equal(gate.state, 'closed', 'locked, the player can\'t open it');
+  runActions(w, [{ action: 'openDoors', tag: 'gate' }]);
+  assert.notEqual(gate.state, 'closed', 'a trigger still can');
+  run(w, mockInput(), 6);
+  assert.equal(gate.state, 'closed', 'and it shuts again after its wait');
+
+  runActions(w, [{ action: 'unlockDoors', tag: 'gate' }]);
+  tryDoor(1.5);
+  assert.notEqual(gate.state, 'closed', 'unlocked, the player opens it');
+  tryDoor(3.5);
+  assert.notEqual(keyed.state, 'closed', 'and the key door, with no key');
 });

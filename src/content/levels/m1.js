@@ -262,6 +262,9 @@ town.house(11, 99, 22, 107, { h: 5, wall: 'metal-grey', roof: 'metal-grey', skir
 town.room(12, 100, 21, 105, { h: 5, ceilZ: 4, floor: 'imp-floor', ceiling: 'imp-panel-dark', wall: 'metal-grey', light: 136 });
 town.door(15, 99, 'N', { h: 5, tex: 'door-grey', wall: 'metal-grey', opens: true });
 windowThrough(18, 20, 99);
+// After the switch its terminal holds the bay door's lock: use the wall
+// behind it (the terminal stands against it) to open the way to the Crow.
+p.rect(16, 105, 17, 106, (_, __, c) => ({ ...c, tag: 'bay-controls' }));
 // The bay owner's office, east of the door, in the bay's building: a red
 // door and a wide window onto the lane, to watch who comes and goes.
 town.room(44, 101, 54, 106, { h: BAY.rim, wall: 'adobe-grey', light: 128 });
@@ -282,6 +285,10 @@ town.circle(BAY.cx, BAY.cy, BAY.r, {
 p.rect(29, 104, 35, 107, (_, __, c) => ({ ...c, floor: 'bay-floor', floorZ: 0 }));
 town.arch(30, 101, 34, 105, { h: BAY.rim, lintel: 4, wall: 'bay-wall', floor: 'bay-floor', light: 144 });
 town.door(32, 100, 'N', { h: BAY.rim, tex: 'door-bay', width: 4, tall: 4, wall: 'adobe-grey', jamb: false, opens: true });
+// Customs locks it at the switch, and Jan says where its controls are when
+// Kyle comes back along the lane to it.
+p.rect(30, 100, 34, 101, (_, __, c) => ({ ...c, tag: 'bay-door' }));
+p.rect(26, 95, 39, 100, (_, __, c) => ({ ...c, tag: 'bay-lane' }));
 // A round-topped hood round the bay door, and a buttress either side of it.
 town.hood(32, 100, 'N', { h: BAY.rim, width: 4, wall: 'adobe-grey' });
 town.buttress(28.4, 100, 'N', { h: BAY.rim, wall: 'adobe-grey' }).buttress(35.6, 100, 'N', { h: BAY.rim, wall: 'adobe-grey' });
@@ -852,6 +859,9 @@ list.push(
 // of the maintenance pit: its gun pod (solid) would block the way along the
 // pit to its secret.
 list.push(at('moldy-crow', 34, 128.5, { angle: 340 }));
+// Under its middle, clear of the pit: back here once the bay is unlocked,
+// the level ends.
+p.rect(28, 126, 41, 133, (_, __, c) => ({ ...c, tag: 'crow' }));
 
 list.push(
   at('player', 32, 134, { angle: 90 }),
@@ -892,7 +902,7 @@ list.push(
 // street; a guard on its north street. The informant (a villager until
 // his sheet exists) in his den (use him for the pass), a squatter in the gate square, and Rusk (a
 // villager too) in the freighter's hold. Customs' two troopers stand in
-// their office: clearing them at the end is the stand-in pickup.
+// their office, by the terminal that unlocks the bay at the end.
 const CHECKPOINT_LINES = ["Old quarter's sealed, hunter.", 'No pass, no way through.'];
 const QUARTER_PATROL = [[153.5, 68], [165.5, 79], [178.5, 94]];
 list.push(
@@ -904,8 +914,8 @@ list.push(
   at('sandtrooper', 171, 57.5, { angle: 270, calm: { wander: 0, lines: ['Move along.'] } }),
   // Two customs troopers in Bay 86, either side of the freighter.
   at('sandtrooper', 82.5, 113, { angle: 180, calm: { wander: 0 } }), at('sandtrooper', 61.5, 116, { angle: 0, calm: { wander: 0 } }),
-  at('sandtrooper', 15.2, 102.4, { angle: 90, tag: 'bay-customs', calm: { wander: 0, lines: ['Your papers check out, hunter.', 'Move along.'] } }),
-  at('sandtrooper', 18.2, 102.2, { angle: 90, tag: 'bay-customs', calm: { wander: 0, lines: ['Your papers check out, hunter.', 'Move along.'] } }),
+  at('sandtrooper', 15.2, 102.4, { angle: 90, calm: { wander: 0, lines: ['Your papers check out, hunter.', 'Move along.'] } }),
+  at('sandtrooper', 18.2, 102.2, { angle: 90, calm: { wander: 0, lines: ['Your papers check out, hunter.', 'Move along.'] } }),
   // The informant, in his den: once the fob has Rusk's signal, his pass
   // opens the checkpoint.
   at('villager-wanderer', 143, 55.5, {
@@ -1126,7 +1136,8 @@ export default defineLevel({
   // The story so far: the broker's contract and the informant's pass are
   // conversations (the pass opens the checkpoint). Stand-ins until the fob
   // and the drop-off exist (docs/story.md): finding Rusk turns the town,
-  // and clearing customs is the pickup.
+  // and the pickup is the way home: customs locks the bay, its terminal in
+  // the customs house unlocks it, and back at the Crow the level ends.
   triggers: [
     // Jan on landing, so the first stop is named.
     { on: 'start', do: [{ action: 'message', text: "JAN: YOUR BROKER'S IN THE CANTINA, ON THE MARKET." }, { action: 'message', text: 'JAN: UP THE STAIRS AND EAST ALONG THE MAIN STREET.' }] },
@@ -1177,6 +1188,7 @@ export default defineLevel({
         { action: 'setFlag', flag: 'loud' },
         { action: 'message', text: "JAN: THEY'VE SEALED THE BLAST DOORS. GO ROUND THEM." },
         { action: 'closeDoors', tag: 'blast-doors' },
+        { action: 'lockDoors', tag: 'bay-door' },
         { action: 'openDoors', tag: 'cantina-back' },
         { action: 'openDoors', tag: 'checkpoint' },
         { action: 'spawn', thing: 'sandtrooper', tag: 'derelict-rim' },
@@ -1186,7 +1198,21 @@ export default defineLevel({
       ],
     },
     { on: 'enter', tag: 'checkpoint-foot', if: 'loud', do: [{ action: 'message', text: "JAN: THE ALLEYS TO THE NORTH, OR THE CANTINA'S BACK DOOR." }] },
-    { on: 'killed', tag: 'bay-customs', do: [{ action: 'message', text: "JAN: CUSTOMS WON'T BE CHECKING PAPERS NOW." }, { action: 'takeWeapon', weapon: 'fob' }, { action: 'exit' }] },
+    // The way home: the bay door is locked, its controls in the customs house.
+    { on: 'enter', tag: 'bay-lane', if: 'loud', unless: 'bay-open', do: [{ action: 'message', text: 'JAN: CUSTOMS HAS LOCKED THE BAY. ITS CONTROLS ARE IN THE CUSTOMS HOUSE, WEST ALONG THE LANE.' }] },
+    {
+      on: 'use',
+      tag: 'bay-controls',
+      if: 'loud',
+      do: [
+        { action: 'unlockDoors', tag: 'bay-door' },
+        { action: 'setFlag', flag: 'bay-open' },
+        { action: 'sound', id: 'switch' },
+        { action: 'message', text: 'BAY 87 UNLOCKED.' },
+        { action: 'message', text: 'JAN: GOT IT. GET TO THE CROW.' },
+      ],
+    },
+    { on: 'enter', tag: 'crow', if: 'bay-open', do: [{ action: 'message', text: "JAN: CUSTOMS WON'T BE CHECKING PAPERS NOW." }, { action: 'takeWeapon', weapon: 'fob' }, { action: 'exit' }] },
   ],
   ...p.build(),
   things: [],

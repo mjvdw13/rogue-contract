@@ -90,3 +90,36 @@ test('in Mos Eisley people point the way: Jan on landing, the informant at the c
   assert.ok(said(w, 'JAN').length > atSwitch, 'and names the ways round at the checkpoint');
   assert.equal(said(w, 'INFORMANT').length, 1, 'the informant keeps quiet now');
 });
+
+test('the way home from Mos Eisley: customs locks the bay at the switch, the customs terminal unlocks it, and back at the Crow the level ends', () => {
+  const w = makeWorld('m1');
+  w.player.player.god = true;
+  const crow = () => {
+    Object.assign(w.player, { x: 34.5, y: 129.5 });
+    run(w, mockInput(), 0.2);
+    Object.assign(w.player, { x: 32, y: 135.5 });
+    run(w, mockInput(), 0.2);
+  };
+  crow();
+  assert.equal(w.exitRequested ?? null, null, 'the Crow is no way out while the town is calm');
+
+  takeContract(w);
+  for (let i = 0; i < 2; i++) talk(w, 70.5, 37.5, 90);
+  Object.assign(w.player, { x: 184, y: 134.5 });
+  run(w, mockInput(), 3);
+  assert.equal(w.hostile, true);
+
+  // Back along the lane to the bay door, facing it.
+  const jan = said(w, 'JAN').length;
+  talk(w, 32, 98.4, 270);
+  assert.ok(shut(w, 'bay-door'), 'customs has locked it');
+  assert.ok(said(w, 'JAN').length > jan, 'and Jan says where its controls are');
+
+  talk(w, 16.5, 103, 270); // the customs terminal
+  assert.ok(w.flags.has('bay-open'));
+  talk(w, 32, 98.4, 270);
+  assert.ok(!shut(w, 'bay-door'), 'now the bay door opens');
+  assert.equal(w.exitRequested ?? null, null);
+  crow();
+  assert.equal(w.exitRequested, 'normal', 'and under the Crow the level ends');
+});

@@ -17,6 +17,17 @@ export const BUILTIN_ACTIONS = {
   closeDoors(world, { tag }) {
     for (const d of world.map.doors) if (d.tag === tag) closeDoor(world, d);
   },
+  /**
+   * Lock every door with the tag, as `lock: 'remote'`: only triggers open
+   * it now. One standing open still shuts after its wait.
+   */
+  lockDoors(world, { tag }) {
+    for (const d of world.map.doors) if (d.tag === tag) d.lock = 'remote';
+  },
+  /** Take the lock off every door with the tag (a key's or a remote one), so anyone can open it. */
+  unlockDoors(world, { tag }) {
+    for (const d of world.map.doors) if (d.tag === tag) d.lock = null;
+  },
   /** Start every lift with the tag (optionally to stop index `to`). */
   lift(world, { tag, to }) {
     for (const l of world.map.lifts) if (l.tag === tag) startLift(world, l, to);

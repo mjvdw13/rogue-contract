@@ -101,14 +101,15 @@ export function analyseLevel(reg, level, skill = 3) {
   const notes = [];
 
   // Tags that some trigger or switch can open (remote doors behind them count
-  // as passable if they stay open, or if what opens them can be used again).
+  // as passable if they stay open, or if what opens them can be used again;
+  // unlocked, the player opens them as often as they like).
   const openable = new Set();
   const reopenable = new Set();
   const collect = (list, again) => {
     for (const a of actionsOf(list)) {
-      if (a.action !== 'openDoors' || !a.tag) continue;
+      if ((a.action !== 'openDoors' && a.action !== 'unlockDoors') || !a.tag) continue;
       openable.add(a.tag);
-      if (again) reopenable.add(a.tag);
+      if (again || a.action === 'unlockDoors') reopenable.add(a.tag);
     }
   };
   for (const t of level.triggers ?? []) collect(t.do, t.once === false);

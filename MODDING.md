@@ -1355,7 +1355,8 @@ Events:
 
 - `start`: when the level begins.
 - `enter`: the player steps on a tile with that tag.
-- `use`: the player uses a wall with that tag.
+- `use`: the player uses a wall with that tag: a solid wall, or the face
+  of a raised floor at eye height (a town's building, `town.js`).
 - `pickup`: the player picks up that item.
 - `killed`: every monster of that type (`thing`) or with that tag is dead.
 - `hostile`: the calm monsters turn (see *Calm* under Monsters), by the
@@ -1381,6 +1382,11 @@ validator rejects a flag that's read but that nothing in the level sets.
 Actions:
 
 - `openDoors` / `closeDoors` `{ tag }`
+- `lockDoors` / `unlockDoors` `{ tag }`: `lockDoors` locks the doors with
+  the tag as `lock: 'remote'` (only triggers open them; one standing open
+  still shuts after its `wait`). `unlockDoors` takes any lock off them, a
+  key's too, so anyone can open them. For a door the story shuts on the
+  player and a switch gives back.
 - `exit`, `secretExit` (goes to the level's `secretNext`) and `finale` (ends
   the episode)
 - `message` `{ text }`, `sound` `{ id }` and `music` `{ id }`

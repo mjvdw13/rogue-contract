@@ -154,3 +154,17 @@ test('items are picked up within reach of the body, not when jumping over them o
   w._pickups();
   assert.equal(floorKit.removed, true, 'standing on it picks it up');
 });
+
+test('use reaches a raised floor\'s face (a town\'s wall) and runs its use trigger, but not a low ledge under the eye', () => {
+  const level = room(['######', '#.lW.#', '######'], ['', ' >'], {
+    legend: { '.': TALL, l: { base: '.', floorZ: 0.5, tag: 'ledge' }, W: { base: '.', floorZ: 5, tag: 'panel' } },
+    triggers: [
+      { on: 'use', tag: 'panel', do: [{ action: 'setFlag', flag: 'panel' }] },
+      { on: 'use', tag: 'ledge', do: [{ action: 'setFlag', flag: 'ledge' }] },
+    ],
+  });
+  const w = makeWorld(level, { noMonsters: true });
+  w.use(w.player);
+  assert.ok(w.flags.has('panel'), 'the wall at eye height');
+  assert.ok(!w.flags.has('ledge'), 'not the ledge the eye looks over');
+});

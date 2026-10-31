@@ -472,6 +472,16 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
         (the ways round).
   - [ ] Objectives, if Mark wants them: an `objective` action, its line
         shown when it changes and at the top of the automap.
+- [ ] **The way home, and an easier fob** (Mark, 2026-10-31):
+  - [x] Engine: `lockDoors` and `unlockDoors` actions (a door the player
+        could open, locked by the story, and unlocked again); use reaches
+        a raised floor's face, so a town wall can be a control.
+  - [x] The bay door locks at the switch, the customs house's terminal
+        unlocks it (Mark chose the customs house as the control room), and
+        the level ends back under the Crow, not on killing customs.
+  - [ ] The fob: red, yellow and green (turned away, roughly toward, on
+        it), each band wider the nearer the signal, and a change of band
+        shown at once rather than at the next blink.
 - [ ] **The gates, weathered** (Mark, 2026-10-31): the blast doors and the
       checkpoint looked clean and new, the Imperial base's dark panels and
       bright stripes. Make them dirty, rusty and lived-in like the town,

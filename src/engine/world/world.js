@@ -2,7 +2,7 @@ import { buildLevel } from './level.js';
 import { F_SECRET, F_DAMAGE, F_EXIT, F_USE } from './tilemap.js';
 import { Backdrop } from './backdrop.js';
 import { initNpc, npcThink, npcReact, npcPain } from '../things/npc.js';
-import { castRay, blockedByMap, fenceBlocks, rayCircle, slantNear } from './physics.js';
+import { castRay, traceRay3D, blockedByMap, fenceBlocks, rayCircle, slantNear } from './physics.js';
 import { updateDoors, openDoor, closeDoor } from './doors.js';
 import { updateLifts, startLift, liftAt } from './lifts.js';
 import { LightEffects } from './lights.js';
@@ -670,10 +670,17 @@ export class World {
       closeDoor(this, hit.passedDoor);
       return;
     }
-    if (hit.dist < USE_RANGE && this.map.inBounds(hit.tx, hit.ty)) {
-      const i = this.map.index(hit.tx, hit.ty);
+    // Most walls in a height grid are raised floor (a town's buildings),
+    // which the flat ray passes over: the first face at eye height instead.
+    let { tx, ty, dist } = hit;
+    if (dist >= USE_RANGE && pt.player) {
+      const eye = traceRay3D(this.map, pt.x, pt.y, pt.z + pt.player.viewHeight, dx, dy, 0, USE_RANGE);
+      if (eye.hit === 'wall') ({ tx, ty, dist } = eye);
+    }
+    if (dist < USE_RANGE && this.map.inBounds(tx, ty)) {
+      const i = this.map.index(tx, ty);
       if (this.map.flags[i] & F_USE) {
-        this._useSwitch(i, hit.tx, hit.ty);
+        this._useSwitch(i, tx, ty);
         return;
       }
       if (this.triggers.useTile(i)) return;
@@ -689,7 +696,7 @@ export class World {
         return;
       }
     }
-    if (hit.dist < USE_RANGE) this.playSound('oof');
+    if (dist < USE_RANGE) this.playSound('oof');
   }
 
   _useDoor(d, pt) {
