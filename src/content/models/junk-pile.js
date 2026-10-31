@@ -47,7 +47,7 @@ const below = (pts) => {
 };
 
 /** A rod of `sides` sides and radius `r` from a to b, at any slant (a pipe, a girder). */
-function rod(m, a, b, r, sides, style) {
+export function rod(m, a, b, r, sides, style) {
   const d = unit(add(b, a, -1));
   const u = unit(cross(d, Math.abs(d[2]) < 0.9 ? [0, 0, 1] : [1, 0, 0]));
   const v = cross(d, u);

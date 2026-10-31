@@ -94,6 +94,11 @@ These need Mark to try something, or to decide. Don't start them without him.
   grey plinth against the east heap's foot, 2.3 tall, its mouth glowing
   orange behind bars under a hood, a hopper on top and a stack up to 6.
   To judge: its size, and whether the glow is too bright by day.
+  The crane in the east heap is a model: a rusty lattice mast to 10, a
+  cab near its top, the jib reaching 6.4 out over the furnace's hopper
+  with a counterweight on its tail, stays from a peak at 12, and a hook
+  on a cable hanging to 4 over the yard. To judge: its height, and where
+  the jib points.
 
 - **Mos Eisley opens in stages** (`?map=m1`, 2026-10-31): when you land the
   blast doors are shut (a stand-in: a rising Imperial gate under a steel
@@ -601,7 +606,7 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
     - [ ] The court and the hold, a step at a time:
       - [x] The furnace on the court's north side: a model, a squat
             rusty kiln, its mouth glowing, a stack and a hopper.
-      - [ ] The crane on the east heap: a model, a rusty mast and jib
+      - [x] The crane on the east heap: a model, a rusty mast and jib
             with a hook hanging.
       - [ ] Droids for sale in the court, and Jawas minding them.
       - [ ] The hold's racks and clutter.

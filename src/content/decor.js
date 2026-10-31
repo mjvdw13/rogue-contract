@@ -157,6 +157,8 @@ export default [
   defineDecoration({ id: JUNK_CAGE.id, model: JUNK_CAGE.id, solid: true, height: JUNK_CAGE.height, fixed: true }),
   // The junk yard's scrap furnace (models/furnace.js), colliding as its plinth.
   defineDecoration({ id: 'furnace', model: 'furnace', solid: true, height: FURNACE.top, fixed: true }),
+  // Its crane (models/crane.js): the mast stands in the east heap, the rest overhead.
+  defineDecoration({ id: 'crane', model: 'crane', fixed: true }),
   defineDecoration({ id: 'ceiling-lamp', glyph: 'l', sheet: S('ceiling-lamp', 48, 16), hanging: true, fullbright: true }),
   defineDecoration({
     id: 'fuel-barrel',
