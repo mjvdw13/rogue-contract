@@ -25,6 +25,7 @@ import { makeTalk } from '../things/talk.js';
 import { projectileThink, launchProjectile, effectThink } from '../things/projectile.js';
 import { tryPickup } from '../things/pickups.js';
 import { damage, radiusDamage, hitscan, meleeTarget, corpseThink } from '../combat/damage.js';
+import { emitThink } from '../things/emit.js';
 import { weaponSprites, bestWeapon } from '../things/weapons.js';
 import { TEXELS_PER_UNIT } from '../config.js';
 
@@ -810,6 +811,7 @@ export class World {
           this.fall(t, dt);
           t.stepAnim(dt);
           corpseThink(this, t, dt);
+          emitThink(this, t, dt);
           t.def.hooks?.onThink?.(this, t, dt);
       }
     }

@@ -581,6 +581,24 @@ corpse: {
 Each corpse burst shoots one way, picked at random (up and out), in a tight
 jet (`spread` 0.3 unless it says otherwise).
 
+A decoration can give off particles all the time it stands, with `emit`:
+a list of bursts, each with `every` (seconds between them, or a range) and
+`at`, where they start, in its own frame as its model is built (x ahead at
+angle 0, y to its right, z up), turned and scaled with it. `radius` lets
+each particle start anywhere within that distance of the spot. A `dir`
+turns with it too. The smelter in the junk yard:
+
+```js
+emit: [
+  // Embers off the melt, a pair every 0.1 to 0.25 s.
+  { type: 'ember', count: 2, every: [0.1, 0.25], at: [0, 0, 1.1], radius: 0.8, dir: [0, 0, 1], spread: 0.5, speed: [0.4, 1.2] },
+],
+```
+
+They're cosmetic (the particles' own RNG) and only run while the player
+is within 32 tiles (`EMIT_RANGE` in `things/emit.js`), and not once the
+decoration is dead.
+
 To see what they cost, serve the repo and open `tools/particles.html`: it
 runs Mission 3 with any number of one type in front of you, and times them.
 

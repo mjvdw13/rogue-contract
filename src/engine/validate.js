@@ -219,6 +219,20 @@ export function validateContent(reg) {
       if (t.corpse.every !== undefined && !range(t.corpse.every, 0)) err(`${owner} corpse: every is seconds, or [min, max]`);
       if (t.corpse.z !== undefined && typeof t.corpse.z !== 'number') err(`${owner} corpse: z is a height above the floor`);
     }
+    if (t.emit !== undefined) {
+      const emitter = `${owner} emit`;
+      if (t.kind !== 'decoration') err(`${owner}: only a decoration can emit`);
+      if (!Array.isArray(t.emit)) err(`${emitter}: a list of bursts`);
+      else {
+        checkBursts(emitter, t.emit);
+        const range = (v) => [].concat(v).every((n) => typeof n === 'number' && n > 0) && [].concat(v).length <= 2;
+        for (const e of t.emit) {
+          if (!range(e?.every)) err(`${emitter}: every is seconds above 0, or [min, max]`);
+          if (e?.at !== undefined && !(Array.isArray(e.at) && e.at.length === 3 && e.at.every((v) => typeof v === 'number'))) err(`${emitter}: at is [x, y, z] in its own frame`);
+          if (e?.radius !== undefined && !(typeof e.radius === 'number' && e.radius >= 0)) err(`${emitter}: radius is a distance, 0 or more`);
+        }
+      }
+    }
     if (t.model) {
       if (!reg.models.has(t.model)) err(`${owner}: unknown model "${t.model}"`);
     } else if (t.kind !== 'projectile' || t.sheet) checkSheet(owner, t.sheet); // (a projectile with no sheet flies unseen)

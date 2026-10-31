@@ -10,6 +10,7 @@
 //   node tools/snapshot.mjs m3 --doors 0.5                every door half open
 //   node tools/snapshot.mjs sandbox --at 33.5,8.5,90 --top  on top of a slab (under it by default)
 //   node tools/snapshot.mjs m1 --custom --res 2           the 3D view at 2x (640x400)
+//   node tools/snapshot.mjs m1 --time 3                   after 3 s of play (emitters' particles in the air)
 //
 // The default output is tools/art/out/snapshots/<level>.png.
 import fs from 'node:fs';
@@ -51,7 +52,7 @@ export async function headless({ custom = false, scale = 1 } = {}) {
 }
 
 /** Render one frame of `levelId` from a camera. Returns RGBA pixels of the view. */
-export function snapshot(ctx, levelId, { at, pitch = 0, z, skill = 3, noMonsters = false, doors, top = false } = {}) {
+export function snapshot(ctx, levelId, { at, pitch = 0, z, skill = 3, noMonsters = false, doors, top = false, time = 0 } = {}) {
   const { registry, palette, assets, surface, renderer } = ctx;
   const level = registry.levels.get(levelId);
   if (!level) throw new Error(`Unknown level "${levelId}"`);
@@ -64,6 +65,14 @@ export function snapshot(ctx, levelId, { at, pitch = 0, z, skill = 3, noMonsters
     if (at[2] !== undefined) pt.angle = contentAngle(at[2]);
     // (Under a slab, unless `top` stands on it.)
     if (world.floorAt) pt.z = world.floorAt(pt.x, pt.y, pt.radius, top ? Infinity : -Infinity);
+  }
+  // `time` seconds of play first, the camera held where it was put (no
+  // input: calm things stroll, emitters give off their particles).
+  const still = { isDown: () => false, wasPressed: () => false, endFrame() {}, analog: null };
+  const held = [pt.x, pt.y, pt.z, pt.angle];
+  for (let k = 0; k < Math.round(time * 60); k++) {
+    world.tick(1 / 60, still);
+    [pt.x, pt.y, pt.z, pt.angle] = held;
   }
   // The level's weather, round where the camera is.
   world.weather?.fill(pt.x, pt.y);
@@ -106,7 +115,7 @@ export function upscale(img, scale, aspect = true) {
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const args = process.argv.slice(2);
   const opt = (name, def) => (args.includes(name) ? args[args.indexOf(name) + 1] : def);
-  const valued = new Set(['--at', '--pitch', '--z', '--out', '--scale', '--skill', '--doors', '--res']);
+  const valued = new Set(['--at', '--pitch', '--z', '--out', '--scale', '--skill', '--doors', '--res', '--time']);
   const levelId = args.find((a, i) => !a.startsWith('--') && !valued.has(args[i - 1])) ?? 'sandbox';
   const at = opt('--at') ? opt('--at').split(',').map(Number) : undefined;
   const res = Number(opt('--res', 1));
@@ -119,6 +128,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     noMonsters: args.includes('--nomonsters'),
     doors: opt('--doors') !== undefined ? Number(opt('--doors')) : undefined,
     top: args.includes('--top'),
+    time: Number(opt('--time', 0)),
   });
   const out = path.resolve(opt('--out', path.join(root, 'tools/art/out/snapshots', `${levelId}.png`)));
   fs.mkdirSync(path.dirname(out), { recursive: true });

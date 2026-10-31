@@ -388,3 +388,51 @@ test('the validator checks death and corpse bursts', () => {
   has('corpse: bursts');
   has('corpse: every');
 });
+
+/** The content with a droid's dome that gives off `emit`, and a dot that hangs still for 10 s. */
+function emitting(emit) {
+  const dome = content.things.find((t) => t.id === 'droid-dome');
+  const dot = defineParticle({ id: 'test-dot', colors: [['gray', 10]], life: 10 });
+  return new Registry({ ...content, particles: [...content.particles, dot], things: [...content.things.filter((t) => t !== dome), { ...dome, emit }] });
+}
+
+test("a decoration's emit gives off its bursts every so often, from its spot turned with it", () => {
+  const reg = emitting([{ type: 'test-dot', count: 3, every: 0.5, at: [1, 0, 0.5], dir: [1, 0, 0], spread: 0, speed: 1 }]);
+  const w = makeWorld(room(OPEN, ['', ' >'], { legend: { '.': ROOM } }), { noMonsters: true, registry: reg });
+  const d = w.spawn('droid-dome', 6.5, 3.5, Math.PI / 2);
+  const state = w.rng.state;
+  const ps = w.particles;
+  let bursts = 0;
+  for (let k = 0; k < 2 * 60; k++) {
+    const before = ps.n;
+    w.tick(DT, mockInput());
+    if (ps.n === before) continue;
+    bursts++;
+    // Its spot is 1 ahead of it, turned a quarter: south of it, and it shoots that way.
+    for (let i = before; i < ps.n; i++) {
+      assert.ok(Math.abs(ps.x[i] - 6.5) < 0.05 && Math.abs(ps.y[i] - 4.5) < 0.05, `at (${ps.x[i]}, ${ps.y[i]})`);
+      assert.ok(Math.abs(ps.z[i] - (d.z + 0.5)) < 0.05);
+      assert.ok(ps.vy[i] > 0.9 && Math.abs(ps.vx[i]) < 0.1);
+    }
+  }
+  assert.ok(bursts >= 4 && bursts <= 5, `${bursts} bursts in 2 s`);
+  assert.equal(w.rng.state, state, "the particles don't touch the world's RNG");
+});
+
+test('a decoration emits nothing while the player is far off', () => {
+  const reg = emitting([{ type: 'test-dot', count: 3, every: 0.1 }]);
+  const wide = OPEN.map((row) => row[0] + row.slice(1, -1).padEnd(46, row[1]) + row.at(-1));
+  const w = makeWorld(room(wide, ['', ' >'], { legend: { '.': ROOM } }), { noMonsters: true, registry: reg });
+  w.spawn('droid-dome', 45.5, 3.5);
+  for (let k = 0; k < 60; k++) w.tick(DT, mockInput());
+  assert.equal(w.particles.n, 0);
+});
+
+test('the validator checks emit', () => {
+  const { errors } = validateContent(emitting([{ type: 'nope', every: 0, at: [1, 2], radius: -1 }]));
+  const has = (s) => assert.ok(errors.some((e) => e.includes(s)), `expected "${s}" in ${JSON.stringify(errors)}`);
+  has('emit: unknown particle type "nope"');
+  has('emit: every');
+  has('emit: at');
+  has('emit: radius');
+});

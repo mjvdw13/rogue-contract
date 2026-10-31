@@ -439,9 +439,15 @@ export function defineItem(def) {
  * speeder), and `roll` sways a model side to side, that many degrees either
  * way, a quarter swing ahead of the rise: drawn only, so it collides where it stands, and a model's grime
  * faces (its shadow) stay on the ground.
+ * `emit` is a list of bursts it gives off while it stands (things/emit.js):
+ * each a BurstSpec (and `radius`, how far from its spot each particle may
+ * start) every `every` seconds (or [min, max]), from `at` ([x, y, z] in its
+ * own frame, as its model is built, turned and scaled with it; z above its
+ * own), only while the player is near. None by default.
  * @param {{id:string, glyph?:string, sheet:SheetSpec, anims?:Record<string,AnimSpec>, solid?:boolean,
  *   radius?:number, height?:number, z?:number, hanging?:boolean, fixed?:boolean, health?:number,
  *   spin?:number, bob?:{height:number, period:number, roll?:number},
+ *   emit?:(BurstSpec & {every:number|[number,number], at?:[number,number,number], radius?:number})[],
  *   explode?:{radius:number, damage:number, sound?:string}}} def
  */
 export function defineDecoration(def) {
