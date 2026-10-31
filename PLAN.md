@@ -28,6 +28,17 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
+- **Mos Eisley opens in stages** (`?map=m1`, 2026-10-31): when you land the
+  blast doors are shut (a stand-in: a rising Imperial gate under a steel
+  beam over the street), and so are plank gates across the alley between
+  I and J and the junk yard's side gate. So the west end, the market, the
+  cantina and the junk yard are all there is until the trader keys in
+  the signal, which opens all three (the blast doors slowly, 2 s). The
+  cantina's back door is locked until the switch, which shuts the blast
+  doors again. To judge: whether the shut town reads as "not yet", the
+  beam's look, and whether the alleys should open before the signal
+  (they'd be side content then: the hostel, the thug, the gun shop).
+
 - **Pushing past people** (`?map=m1`, 2026-10-31): walk into someone in the
   cantina (a villager, a Jawa, a trooper, Bossk) and keep walking. After
   0.3 s they give way, facing you and stepping back on their walk, slowed
@@ -413,6 +424,21 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
         checkpoint), the junk yard, Bay 86 to look into.
   - [ ] Play both halves (rough troopers for the loud half), then
         Waiting on Mark.
+- [ ] **Guiding the player** (Mark, 2026-10-31): the town opens in stages,
+      so the open part always holds the next stop, and people say where
+      to go. Landing to the trader: the west end, the market, the cantina
+      and the junk yard. The signal opens the east. The switch shuts the
+      blast doors and opens the ways round them.
+  - [x] Gates: the blast doors shut until the trader keys in the signal,
+        and again at the switch (a steel beam over the street for now:
+        the doors rise into it); the alley between I and J and the junk
+        yard's side gate shut until the signal; the cantina's back door
+        locked until the switch.
+  - [ ] Lines that point: Jan on landing (the cantina), the broker (the
+        junk yard, by the sandcrawler), the guard at the blast doors, the
+        checkpoint (no pass), Jan at the switch (the ways round).
+  - [ ] Objectives, if Mark wants them: an `objective` action, its line
+        shown when it changes and at the top of the automap.
 - [ ] **Then each area in detail**, in the order the blockout suggests:
   - [ ] The cantina: entrance, steps down, the main room, the bar,
         booths, bandstand, back rooms. In detail after Mark's references

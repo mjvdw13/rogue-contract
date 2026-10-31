@@ -41,3 +41,22 @@ test('in Mos Eisley the informant has no pass, and the hold stays shut, until th
   assert.equal(said(w, 'INFORMANT').length, 5);
   assert.equal(w.hostile, false, 'the town is calm all the while');
 });
+
+test('Mos Eisley opens in stages: the east waits for the signal, and the switch shuts the blast doors and opens the cantina\'s back door', () => {
+  const w = makeWorld('m1');
+  const east = ['blast-doors', 'side-gate', 'alley-gate'];
+  for (const tag of [...east, 'cantina-back']) assert.ok(shut(w, tag), `${tag} is shut when Kyle lands`);
+
+  for (let i = 0; i < 4; i++) talk(w, 92, 104.6, 270);
+  for (let i = 0; i < 2; i++) talk(w, 70.5, 37.5, 90);
+  run(w, mockInput(), 3);
+  for (const tag of east) assert.equal(door(w, tag).state, 'open', `the signal opens ${tag}, for good`);
+  assert.ok(shut(w, 'cantina-back'), "the cantina's back door stays locked while the town is calm");
+
+  // Into the freighter's hold: Rusk, and the switch.
+  Object.assign(w.player, { x: 184, y: 134.5 });
+  run(w, mockInput(), 3);
+  assert.equal(w.hostile, true);
+  assert.ok(shut(w, 'blast-doors'), 'the blast doors shut behind Kyle');
+  assert.ok(!shut(w, 'cantina-back') && !shut(w, 'side-gate') && !shut(w, 'alley-gate'), 'the ways round them are open');
+});

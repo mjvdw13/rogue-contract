@@ -189,10 +189,16 @@ town.arch(107, 61, 111, 64, { h: 7, lintel: 3.5, wall: 'adobe-pale', round: 'S' 
 town.door(109, 61, 'S', { h: 7, tex: 'door-grey', wall: 'adobe-pale' });
 town.window(102, 61.5, 'W', { z: 3.4, tex: 'window-louvre' }).window(106.5, 64, 'S', { z: 4.6 });
 // The blast doors' frame: a strip of Imperial steel set into the walls
-// either side of the street, the slots the doors slide out of when the
-// town shuts (the story's switch). Easy to miss while they're open.
+// either side of the street, and a beam over it the doors rise into (a
+// stand-in for doors that slide out of the walls). Shut when Kyle lands,
+// so the town east of here waits until the fob has Rusk's signal; they
+// open then (the Empire wants him found: the fob is theirs), and shut
+// again at the switch, splitting the town in two. 12 wide and 4 high,
+// slow and heavy (2 s).
 const GATE = { wall: 'imp-panel-dark', roof: 'imp-floor', skirt: { tex: 'imp-stripe', to: 0.5 } };
 town.block(104, 63, 106, 64, { ...GATE, h: 7 });
+town.arch(104, 64, 106, 76, { ...GATE, h: 6, lintel: 4 });
+p.rect(104, 64, 106, 76, (_, __, c) => ({ ...c, door: 'imp-gate', style: 'rise', lock: 'remote', tag: 'blast-doors', stayOpen: true, speed: 0.5 }));
 town.slanted([[112, 52], [126, 52], [126, 61], [122, 61], [112, 64]], { h: 6, wall: 'adobe-ochre', dome: 'adobe' });
 town.house(126, 50, 136, 61, { h: 8, r: 2, tiers: [{ box: [128, 50, 136, 57], h: 11, r: 2 }], dome: true });
 town.door(130, 61, 'S', { h: 8, tex: 'door-red' });
@@ -632,6 +638,8 @@ const roofOver = (x0, y0, x1, y1, ceilZ, h) => p.rect(x0, y0, x1, y1, (_, __, c)
   town.stair(118, 105, 126, 107, { up: 'E', from: F, top: 0, rise: 0.25, floor: 'flagstone', side: wall });
   roofOver(118, 105, 126, 107, ceilZ, 8);
   town.door(126, 106, 'E', { h: 8, tex: 'door-grey', opens: true });
+  // Locked until the switch: the back way is only wanted on the way home.
+  p.rect(125, 105, 126, 107, (_, __, c) => ({ ...c, lock: 'remote', tag: 'cantina-back', stayOpen: true }));
   // The back room: kegs, crates and canisters along its walls, a power unit
   // in the far corner, the storeroom's crates and a cargo pod out of the
   // way to the back door; a bulb over each.
@@ -704,6 +712,10 @@ town.arch(71, 41, 73, 44, { h: 5, wall: 'adobe-brick' });
 town.stair(71, 39, 73, 41, { up: 'S', from: JUNK, top: 0, rise: 0.25, floor: 'flagstone', side: 'adobe-brick' });
 town.arch(84, 37, 86, 40, { h: 5, wall: 'adobe-brick' });
 town.stair(82, 37, 84, 40, { up: 'E', from: JUNK, top: 0, rise: 0.25, floor: 'flagstone', side: 'adobe-brick' });
+// The side gate is weathered planks, shut until the trader keys in the
+// signal and lets Kyle out the back (the alleys lead past the blast doors).
+p.rect(84, 37, 86, 40, (_, __, c) => ({ ...c, door: 'door-planks-rising', style: 'rise', lock: 'remote' }));
+gateTag(84, 37, 86, 40, 'side-gate');
 town.slanted([[56, 18], [74, 18], [62, 32], [56, 32]], { ...SCRAP, h: JUNK + 2.5 });
 town.block(77, 21, 78, 22, { ...SCRAP, h: 14 });
 town.block(78, 29, 82, 33, { ...SCRAP, h: JUNK + 2 });
@@ -736,6 +748,11 @@ const lane = (x0, y0, x1, y1, slope, k0, k1, floorZ) => p.rect(x0, y0, x1, y1, (
   return k > k0 - 1 && k < k1 + 1 ? town.street(floorZ) : c;
 });
 p.rect(86, 36, 98, 49, town.street());
+// A gate of planks across the alley, past I's and J's rounded corners at
+// its mouth on the market, shut until the signal, as the junk yard's side
+// gate is.
+town.door(87, 56, 'S', { h: 4.5, tex: 'door-planks', jamb: false, sign: false, panel: false, step: false });
+gateTag(86, 55, 88, 56, 'alley-gate');
 lane(98, 29, 112, 45, -0.5, 38, 43, 0);
 town.slanted([[98, 26], [112, 26], [112, 31], [98, 38]], { h: 6, wall: 'adobe-grey' });
 town.slanted([[98, 43], [112, 36], [112, 47], [98, 47]], { h: 5, wall: 'adobe-ochre' });
@@ -1081,10 +1098,22 @@ export default defineLevel({
     },
     { on: 'talk', tag: 'informant', if: 'pass', do: [{ action: 'openDoors', tag: 'checkpoint' }] },
     // The fob: the broker gives it (dark), the trader's code points it at
-    // Rusk and opens the hold, and in the hold Rusk pulls its Imperial
-    // tracer and the town turns.
+    // Rusk, opens the hold and opens the east (the blast doors, and the
+    // alleys from the market and the junk yard), and in the hold Rusk pulls
+    // its Imperial tracer and the town turns.
     { on: 'talk', tag: 'broker', if: 'contract', do: [{ action: 'giveWeapon', weapon: 'fob' }, { action: 'message', text: 'THE BROKER HANDS YOU A TRACKING FOB.' }] },
-    { on: 'talk', tag: 'trader', if: 'signal', do: [{ action: 'setSignal', tag: 'rusk' }, { action: 'openDoors', tag: 'hold-door' }] },
+    {
+      on: 'talk',
+      tag: 'trader',
+      if: 'signal',
+      do: [
+        { action: 'setSignal', tag: 'rusk' },
+        { action: 'openDoors', tag: 'hold-door' },
+        { action: 'openDoors', tag: 'blast-doors' },
+        { action: 'openDoors', tag: 'side-gate' },
+        { action: 'openDoors', tag: 'alley-gate' },
+      ],
+    },
     {
       on: 'enter',
       tag: 'hold',
@@ -1099,6 +1128,9 @@ export default defineLevel({
     {
       on: 'hostile',
       do: [
+        // The blast doors shut, so the way home is round them.
+        { action: 'closeDoors', tag: 'blast-doors' },
+        { action: 'openDoors', tag: 'cantina-back' },
         { action: 'openDoors', tag: 'checkpoint' },
         { action: 'spawn', thing: 'sandtrooper', tag: 'derelict-rim' },
         { action: 'spawn', thing: 'sandtrooper', tag: 'derelict-gate' },
