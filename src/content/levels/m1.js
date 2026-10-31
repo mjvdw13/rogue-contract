@@ -195,10 +195,10 @@ town.window(102, 61.5, 'W', { z: 3.4, tex: 'window-louvre' }).window(106.5, 64, 
 // open then (the Empire wants him found: the fob is theirs), and shut
 // again at the switch, splitting the town in two. 12 wide and 4 high,
 // slow and heavy (2 s).
-const GATE = { wall: 'imp-panel-dark', roof: 'imp-floor', skirt: { tex: 'imp-stripe', to: 0.5 } };
+const GATE = { wall: 'blast-steel', roof: 'bay-plate', skirt: { tex: 'blast-hazard', to: 0.5 } };
 town.block(104, 63, 106, 64, { ...GATE, h: 7 });
-town.arch(104, 64, 106, 76, { ...GATE, h: 6, lintel: 4 });
-p.rect(104, 64, 106, 76, (_, __, c) => ({ ...c, door: 'imp-gate', style: 'rise', lock: 'remote', tag: 'blast-doors', stayOpen: true, speed: 0.5 }));
+town.arch(104, 64, 106, 76, { ...GATE, wall: 'blast-beam', h: 6, lintel: 4, light: 176 });
+p.rect(104, 64, 106, 76, (_, __, c) => ({ ...c, door: 'blast-door-rising', style: 'rise', lock: 'remote', tag: 'blast-doors', stayOpen: true, speed: 0.5 }));
 town.slanted([[112, 52], [126, 52], [126, 61], [122, 61], [112, 64]], { h: 6, wall: 'adobe-ochre', dome: 'adobe' });
 town.house(126, 50, 136, 61, { h: 8, r: 2, tiers: [{ box: [128, 50, 136, 57], h: 11, r: 2 }], dome: true });
 town.door(130, 61, 'S', { h: 8, tex: 'door-red' });
@@ -825,6 +825,15 @@ list.push(
   at('power-unit', 99.5, 58.01, { angle: 0 }), at('scrap', 101.99, 59.6, { angle: 270 }), at('junk-heap', 98.6, 61.4, { angle: 15 }),
   at('droid-dome', 97.6, 60.3, { angle: 120 }), at('droid-dome', 100.4, 62.5, { angle: 290 }), at('canister-rust', 101.2, 61.2),
   at('crate-grey-small', 97.3, 62.8, { angle: 20 }), at('droid-dome', 97.3, 62.8, { z: 0.6, angle: 75 }),
+);
+
+// The blast doors have stood shut long enough for the street's rubbish to
+// pile against their feet: rubble and litter in the corners, a rusty
+// canister tucked in the south-west corner (the rest isn't solid, so the
+// way through stays clear when they open).
+list.push(
+  at('rubble', 103.4, 64.7, { angle: 20 }), at('litter-small', 103.2, 67.5, { angle: 70 }), at('canister-rust', 103.35, 75.55),
+  at('litter', 102.9, 74.6, { angle: 200 }), at('rubble', 106.6, 75.3, { angle: 140 }), at('litter-small', 106.8, 65.2, { angle: 310 }),
 );
 
 // The Moldy Crow, hovering in the bay in front of you, nose east and

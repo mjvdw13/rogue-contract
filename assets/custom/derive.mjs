@@ -187,6 +187,15 @@ export const TOWN = [
   // scorched and rusted through.
   { out: 'dome-white', df: 'IWGREYC2', scale: [32, 32], gradient: [[96, 94, 88], [150, 148, 140], [196, 194, 186], [224, 222, 214], [240, 238, 230]], keep: 0, contrast: 0.7, rust: WORN(16, 51, 0.9) },
   { out: 'dome-blue', df: 'IWGREYC2', scale: [32, 32], gradient: [[10, 22, 54], [28, 56, 112], [58, 100, 168], [96, 140, 196]], keep: 0, contrast: 0.7, rust: WORN(16, 53, 0.7) },
+  // The blast doors across the main street (m1.js), the one Imperial thing
+  // the town has, years in the suns: Nar Shaddaa's grimy X-braced door and
+  // streaked plate in sand-scoured steel, rust and soot over them, and its
+  // faded warning stripes for the frame's foot. The door keeps a little of
+  // its stripes' yellow (`keep`).
+  { out: 'blast-door-rising', df: 'NDPIPES4', gradient: [[22, 18, 14], [62, 54, 44], [104, 96, 84], [142, 134, 118], [178, 170, 150]], keep: 0.35, contrast: 1, rust: [{ color: [128, 64, 28], amount: 0.6, cell: 32, seed: 101 }, { color: [18, 14, 10], amount: 0.6, cell: 16, seed: 111, from: 0.45 }] },
+  { out: 'blast-steel', df: 'NWGREY01', tile: [2, 1], gradient: [[30, 24, 18], [74, 66, 56], [112, 104, 92], [146, 138, 122], [176, 168, 150]], keep: 0, contrast: 1.1, rust: [{ color: [128, 64, 28], amount: 0.6, cell: 32, seed: 103 }, { color: [18, 14, 10], amount: 0.5, cell: 16, seed: 113, from: 0.55 }] },
+  { out: 'blast-beam', df: 'NWEXT06', gradient: [[26, 20, 16], [68, 60, 50], [108, 100, 88], [144, 136, 120], [174, 166, 148]], keep: 0.2, contrast: 1.1, rust: WORN(16, 105, 0.7) },
+  { out: 'blast-hazard', df: 'NPWRNFAD', gradient: [[34, 28, 20], [80, 70, 56], [128, 116, 94], [164, 150, 120]], keep: 0.6, contrast: 1, rust: WORN(16, 107, 1) },
   // A hazy day: Robotics' pale cloudy sky, twice as wide, warming to dust at the horizon.
   { out: 'sky-day', df: 'RESKY01', gradient: [[74, 128, 182], [120, 166, 206], [168, 198, 222], [214, 226, 236]], keep: 0.3, contrast: 0.9, tile: [2, 1], fade: { color: [212, 200, 174], from: 0.55 } },
 ];

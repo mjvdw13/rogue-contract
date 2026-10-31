@@ -66,6 +66,9 @@ const TOWN = [
   // Doors: the door decals as rising doors' panels (derive.mjs, RISING), a
   // shop's shutter, the cantina's plank door and Docking Bay 87's 4x4 door.
   'door-red-rising', 'door-grey-rising', 'shutter-rising', 'door-planks-rising', 'door-bay-rising',
+  // The blast doors (m1.js): the door, its frame's steel, the beam over it
+  // and the faded stripes along its foot.
+  'blast-door-rising', 'blast-steel', 'blast-beam', 'blast-hazard',
   // The drifts' edges, by which corners are drift (lib/town.js, drifts()).
   ...Array.from({ length: 14 }, (_, k) => `street-drift-${k + 1}`),
 ];

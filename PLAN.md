@@ -28,6 +28,16 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
+- **The blast doors, weathered** (`?map=m1`, 2026-10-31): no longer the
+  Imperial base's dark panels. The door is Nar Shaddaa's X-braced door
+  (NDPIPES4) and the beam its grilled plate (NWEXT06), in sun-bleached
+  steel with rust running along the braces and soot over it; the frame's
+  strips streaky plate (NWGREY01), its foot faded warning stripes
+  (NPWRNFAD); rubble, litter and a rusty canister in the corners
+  (`blast-*` in `derive.mjs`). To judge: how rusty, whether the door's
+  three repeats show too much, and whether it wants sand drifted against
+  it (the drifts stop a tile short of a door today).
+
 - **Mos Eisley opens in stages** (`?map=m1`, 2026-10-31): when you land the
   blast doors are shut (a stand-in: a rising Imperial gate under a steel
   beam over the street), and so are plank gates across the alley between
@@ -448,6 +458,17 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
         (the ways round).
   - [ ] Objectives, if Mark wants them: an `objective` action, its line
         shown when it changes and at the top of the automap.
+- [ ] **The gates, weathered** (Mark, 2026-10-31): the blast doors and the
+      checkpoint looked clean and new, the Imperial base's dark panels and
+      bright stripes. Make them dirty, rusty and lived-in like the town,
+      one at a time, a commit and a check-in after each.
+  - [x] The blast doors: sand-scoured, rust-streaked steel (DF's grimy Nar
+        Shaddaa doors and walls, recoloured), faded hazard stripes, rubble
+        and litter against them.
+  - [ ] Waiting on Mark.
+  - [ ] The checkpoint: the barricades and floodlights dusty and chipped
+        (Mos Eisley's own copies, so m3's stay as they are), and the
+        troopers' setup made of what they found in town.
 - [ ] **Then each area in detail**, in the order the blockout suggests:
   - [ ] The cantina: entrance, steps down, the main room, the bar,
         booths, bandstand, back rooms. In detail after Mark's references
