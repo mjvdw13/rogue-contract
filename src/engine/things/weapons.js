@@ -230,25 +230,37 @@ export function weaponThink(world, pt, input, dt) {
 
 /**
  * (`track`) A tracker's light: a blink and a beep every so often, quicker
- * the nearer the signal, its `litFacing` blink when the player faces it.
+ * the nearer the signal, in the colour of how near the player faces it:
+ * `litFacing` on it, `litWarm` roughly toward it, `lit` else. Turning into
+ * another band blinks at once (no sooner than the nearest blink rate), so
+ * the light answers the turn instead of waiting out a long blink far off.
  * Dark with no signal.
  */
 function track(world, pt, def, ws, dt) {
   const s = world.signalAt();
   if (!s) {
     ws.blink = 0;
+    ws.band = null;
     if (ws.animName !== 'idle') ws.setAnim('idle');
     return;
   }
-  ws.blink -= dt;
-  if (ws.blink > 0) return;
-  const { near, far, blink, facing } = def.track;
+  const { near, far, blink, facing, warm } = def.track;
   const d = Math.hypot(s.x - pt.x, s.y - pt.y);
   const k = Math.min(1, Math.max(0, (d - near) / Math.max(far - near, 1e-6)));
-  ws.blink = blink[0] + (blink[1] - blink[0]) * k;
+  // A [near, far] pair at this distance, in proportion (a number stays put).
+  const at = (v) => (Array.isArray(v) ? v[0] + (v[1] - v[0]) * k : v);
   let off = Math.abs(Math.atan2(s.y - pt.y, s.x - pt.x) - pt.angle) % (2 * Math.PI);
   if (off > Math.PI) off = 2 * Math.PI - off;
-  if (!(off <= (facing * Math.PI) / 180 && ws.setAnim('litFacing'))) ws.setAnim('lit');
+  off = (off * 180) / Math.PI;
+  const anims = def.anims;
+  const band = anims.litFacing && off <= at(facing) ? 'litFacing' : anims.litWarm && warm != null && off <= at(warm) ? 'litWarm' : 'lit';
+  ws.blink -= dt;
+  ws.sinceBlink = (ws.sinceBlink ?? Infinity) + dt;
+  if (ws.blink > 0 && (band === ws.band || ws.sinceBlink < blink[0])) return;
+  ws.blink = blink[0] + (blink[1] - blink[0]) * k;
+  ws.sinceBlink = 0;
+  ws.band = band;
+  ws.setAnim(band);
   if (def.sounds.beep) world.playSound(def.sounds.beep);
 }
 

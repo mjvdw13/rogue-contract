@@ -202,9 +202,15 @@ function concussionPickup() {
 /**
  * The Guild's tracking fob held up in the right hand: a dark rounded puck,
  * a steel rim, a grille and a lens on top that blinks with the signal.
- * `light` is null (dark), 'amber' or 'green'. 96x96, the arm in from the
- * bottom right.
+ * `light` is null (dark), 'red', 'yellow' or 'green'. 96x96, the arm in
+ * from the bottom right.
  */
+// Each light's core and the edge of its glow.
+const FOB_LIGHTS = {
+  red: [G('red', 1), G('red', 0)],
+  yellow: [G('yellow', 0.6), G('yellow', 0.35)],
+  green: [G('green', 1), G('green', 0)],
+};
 function fobFrame(light = null) {
   const m = new Model(96, 96, { seed: 117 });
   const metal = { ...MAT.metal, spec: 0.5, shine: 22, grain: 0.06 };
@@ -216,19 +222,19 @@ function fobFrame(light = null) {
   // The lens on its top plate, and the light in it.
   const [lx, ly] = [48, 37];
   m.sphere(lx, ly, 21, 5, C('gray', 0.1), MAT.glass);
-  if (light) m.sphere(lx, ly, 22, 3.6, G(light, 1), MAT.glow);
+  if (light) m.sphere(lx, ly, 22, 3.6, FOB_LIGHTS[light][0], MAT.glow);
   else m.sphere(lx, ly, 22, 3.6, C('rust', 0.25), MAT.glass);
   // The gloved hand round its lower half, thumb across the front.
   m.ellipsoid(62, 70, 18, 11, 12, 8, GLOVE, MAT.leather);
   for (let k = 0; k < 4; k++) m.capsule(66, 60 + k * 4.5, 20, 58, 58 + k * 5, 22, 3, 2.6, lighten(GLOVE, 0.05), MAT.leather);
   m.capsule(54, 76, 22, 40, 64, 22, 3.4, 2.8, GLOVE, MAT.leather); // thumb
   const c = m.render(RENDER);
-  if (light) flash(c, lx, ly, 7, G(light, 1), G(light, 0), 3);
+  if (light) flash(c, lx, ly, 7, ...FOB_LIGHTS[light], 3);
   return c;
 }
 
 function fobSheet() {
-  return sheet([fobFrame(), fobFrame('amber'), fobFrame('green')]);
+  return sheet([fobFrame(), fobFrame('red'), fobFrame('yellow'), fobFrame('green')]);
 }
 
 export default [

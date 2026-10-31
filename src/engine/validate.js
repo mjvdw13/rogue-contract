@@ -11,7 +11,7 @@ import { BODY } from './things/player.js';
 const PICKUP_MODIFIERS = ['maxHealth', 'armorClass', 'maxArmor', 'duration', 'always'];
 const TRIGGER_EVENTS = ['start', 'enter', 'use', 'killed', 'pickup', 'hostile', 'talk'];
 const TALK_FIELDS = ['if', 'unless', 'lines', 'set'];
-const TRACK_FIELDS = ['near', 'far', 'blink', 'facing'];
+const TRACK_FIELDS = ['near', 'far', 'blink', 'facing', 'warm'];
 /** Faces per model before the validator warns (render cost). */
 const MODEL_BUDGET = 400;
 
@@ -298,7 +298,13 @@ export function validateContent(reg) {
       for (const k of Object.keys(t)) if (!TRACK_FIELDS.includes(k)) err(`${owner}: track has unknown field "${k}" (it takes ${TRACK_FIELDS.join(', ')})`);
       if (!(t.near >= 0 && t.far > t.near)) err(`${owner}: track needs near (tiles, 0 or more) below far`);
       if (!(Array.isArray(t.blink) && t.blink.length === 2 && t.blink.every((b) => b > 0))) err(`${owner}: track blink must be [near, far] seconds between blinks, above 0`);
-      if (!(t.facing >= 0 && t.facing <= 180)) err(`${owner}: track facing must be 0 to 180 degrees`);
+      // (Degrees, or [at near, at far].)
+      const angles = (v) => (typeof v === 'number' || (Array.isArray(v) && v.length === 2)) && [].concat(v).every((a) => a >= 0 && a <= 180);
+      if (!angles(t.facing)) err(`${owner}: track facing must be 0 to 180 degrees, or [near, far] of them`);
+      if (t.warm != null) {
+        if (!angles(t.warm)) err(`${owner}: track warm must be 0 to 180 degrees, or [near, far] of them`);
+        if (!w.anims.litWarm) err(`${owner}: track warm needs a "litWarm" animation (its blink when roughly facing the signal)`);
+      }
       if (!w.anims.lit) err(`${owner}: a tracker needs a "lit" animation (its blink)`);
     }
     for (const s of Object.values(w.sounds ?? {})) checkSound(owner, s);

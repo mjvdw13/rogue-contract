@@ -308,19 +308,26 @@ tracking fob (`fob.js`):
 ```js
 anims: {
   idle: [0],                                                    // dark
-  lit: { frames: [1, 0], durations: [0.09, 0.01], fullbright: [0] },       // a blink
-  litFacing: { frames: [2, 0], durations: [0.09, 0.01], fullbright: [0] }, // facing it
+  lit: { frames: [1, 0], durations: [0.09, 0.01], fullbright: [0] },       // a blink: turned away
+  litWarm: { frames: [2, 0], durations: [0.09, 0.01], fullbright: [0] },   // roughly toward it
+  litFacing: { frames: [3, 0], durations: [0.09, 0.01], fullbright: [0] }, // facing it
 },
-track: { near: 4, far: 80, blink: [0.15, 1.4], facing: 15 },
+track: { near: 4, far: 80, blink: [0.15, 1.4], facing: [45, 25], warm: [100, 70] },
 sounds: { beep: 'fob-beep' },
 ```
 
-Held, it plays `lit` and its `beep` sound every `blink[0]` seconds at
+Held, it blinks and plays its `beep` sound every `blink[0]` seconds at
 `near` tiles from the signal or closer, every `blink[1]` at `far` or
 further, and in proportion between (in a straight line, through walls).
-Facing within `facing` degrees of the signal, it plays `litFacing`
-instead (if it has one). With no signal it stays on `idle`. Give it with
-the `giveWeapon` action and take it back with `takeWeapon`.
+Each blink shows how near the player faces the signal: `litFacing` within
+`facing` degrees, `litWarm` within `warm` degrees, else `lit`. Leave out
+`litFacing` or `warm` (and `litWarm`) for fewer bands. `facing` and `warm`
+are degrees, or `[at near, at far]` in proportion as `blink` is, so the
+bands can widen as the player closes in. Turning into another band blinks
+at once (but no sooner than `blink[0]` after the last), so far off the
+light answers a turn without waiting out a long blink. With no signal it
+stays on `idle`. Give it with the `giveWeapon` action and take it back
+with `takeWeapon`.
 
 `charge: { time: 1, min: 0.2, sink: 36, pull: 0.18 }` throws when fire is
 let go instead of when it's pressed. Pressing fire pulls the hand back,

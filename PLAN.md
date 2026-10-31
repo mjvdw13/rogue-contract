@@ -28,6 +28,21 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
+- **The way home** (`?map=m1`, 2026-10-31): at the switch customs locks
+  Docking Bay 87's door. Back on the lane in front of it Jan says its
+  controls are in the customs house; use its terminal (past the two
+  troopers) to unlock it, and walking under the Crow ends the level. To
+  judge: Jan's stand-in lines, and whether the terminal wants a lit screen
+  or a sound of its own.
+
+- **The fob, easier to read** (`?map=m1`, slot 8, 2026-10-31): red turned
+  away, yellow roughly toward the signal, green facing it. Far off (80
+  tiles or more) green is within 25 degrees and yellow within 70; close by
+  (4 tiles) 45 and 100, in proportion between. And it was slow to answer:
+  far off it blinks every 1.4 s, so a turn showed only at the next blink.
+  Now turning into another colour blinks at once. To judge: the angles
+  (`track` in `weapons/fob.js`) and the yellow.
+
 - **The blast doors, weathered** (`?map=m1`, 2026-10-31): no longer the
   Imperial base's dark panels. The door is Nar Shaddaa's X-braced door
   (NDPIPES4) and the beam its grilled plate (NWEXT06), in sun-bleached
@@ -472,16 +487,6 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
         (the ways round).
   - [ ] Objectives, if Mark wants them: an `objective` action, its line
         shown when it changes and at the top of the automap.
-- [ ] **The way home, and an easier fob** (Mark, 2026-10-31):
-  - [x] Engine: `lockDoors` and `unlockDoors` actions (a door the player
-        could open, locked by the story, and unlocked again); use reaches
-        a raised floor's face, so a town wall can be a control.
-  - [x] The bay door locks at the switch, the customs house's terminal
-        unlocks it (Mark chose the customs house as the control room), and
-        the level ends back under the Crow, not on killing customs.
-  - [ ] The fob: red, yellow and green (turned away, roughly toward, on
-        it), each band wider the nearer the signal, and a change of band
-        shown at once rather than at the next blink.
 - [ ] **The gates, weathered** (Mark, 2026-10-31): the blast doors and the
       checkpoint looked clean and new, the Imperial base's dark panels and
       bright stripes. Make them dirty, rusty and lived-in like the town,
