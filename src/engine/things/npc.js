@@ -3,6 +3,7 @@ import { F_SOLID, F_DOOR, F_DAMAGE } from '../world/tilemap.js';
 import { Rng } from '../core/rng.js';
 import { UNREACHABLE } from '../world/nav.js';
 import { pickLine, readyToReact } from './talk.js';
+import { shoveRate } from './push.js';
 
 /**
  * Friendly characters (townsfolk, coworkers). They are solid, and monsters
@@ -95,11 +96,15 @@ function startWalk(world, t) {
   t.stuck = 0;
 }
 
-/** Move a little, staying inside the NPC's area. Returns false if it couldn't. */
+/**
+ * Move a little, not leaving the NPC's area (pushed out of it, it may walk
+ * back in; with no area, it stays put). Returns false if it couldn't.
+ */
 function step(world, t, dx, dy) {
   const { x, y } = t;
+  const inside = (x, y) => t.area.has(world.map.index(Math.floor(x), Math.floor(y)));
   if (!world.tryMove(t, dx, dy, true)) return false;
-  if (!t.area.has(world.map.index(Math.floor(t.x), Math.floor(t.y)))) {
+  if (!inside(t.x, t.y) && (inside(x, y) || t.area.size === 0)) {
     t.x = x;
     t.y = y;
     return false;
@@ -195,7 +200,7 @@ function flee(world, t, dt) {
 }
 
 export function npcThink(world, t, dt) {
-  t.stepAnim(dt, (ev) => {
+  t.stepAnim(dt * shoveRate(t, t.def.speed), (ev) => {
     if (ev.startsWith('sound:')) world.playSoundFrom(ev.slice(6), t);
     else t.def.hooks?.onEvent?.(world, t, ev);
   });
@@ -206,6 +211,15 @@ export function npcThink(world, t, dt) {
     if (npcReact(world, t)) return;
   }
   if (t.def.hooks?.onThink?.(world, t, dt) === true) return;
+  if (t.shoved > 0) {
+    // Giving way to the player's push (push.js moves it), then back to what it was doing.
+    t.shoved -= dt;
+    if (t.shoved <= 0) {
+      if (t.scared) startFlee(t);
+      else idle(world, t);
+    }
+    return;
+  }
 
   switch (t.state) {
     case 'pain':

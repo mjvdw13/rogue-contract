@@ -28,6 +28,18 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
+- **Pushing past people** (`?map=m1`, 2026-10-31): walk into someone in the
+  cantina (a villager, a Jawa, a trooper, Bossk) and keep walking. After
+  0.3 s they give way, facing you and stepping back on their walk, slowed
+  to the push, while you follow at their pace: 1.2 tiles a second, times
+  100 / their mass (a Jawa 3, Bossk 0.8). Off-centre, they step aside and
+  you slip by. Against a wall, the bar or someone else they stop, and you
+  slide round them. They stay where you leave them (strollers walk back
+  to their area). The first bump still says a line; a long push says no
+  more. To judge: the speed (`body.pushSpeed` in `hero.js`), the delay
+  (`body.pushDelay`), and whether pushing someone into a crowd should push
+  the crowd too (today it stops at the next body).
+
 - **Conversations** (`?map=m1`, 2026-10-31): press use on someone to talk;
   each use says the next line. The broker (in the cantina's west back
   alcove) gives the contract on Rusk in four lines and points you at the

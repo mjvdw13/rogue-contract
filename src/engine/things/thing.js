@@ -25,6 +25,9 @@ export class Thing extends Animated {
     this.vx = 0;
     this.vy = 0;
     this.vz = 0;
+    /** Seconds left of giving way to the player's push, and how fast (push.js). */
+    this.shoved = 0;
+    this.shoveSpeed = 0;
     this.removed = false;
     this.hidden = false;
     this.dead = false;

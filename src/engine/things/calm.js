@@ -149,6 +149,12 @@ export function calmThink(world, m, dt) {
     world.playerBumped = null;
     if (calmReact(world, m)) return;
   }
+  if (m.shoved > 0) {
+    // Giving way to the player's push (push.js moves it), then it stands (a patrol walks on after).
+    m.shoved -= dt;
+    if (m.shoved <= 0) stand(m);
+    return;
+  }
   switch (c.mode) {
     case 'react':
       c.timer -= dt;
@@ -192,9 +198,10 @@ function walk(world, m, dt) {
   const s = Math.min(td, c.speed * dt);
   const { x, y } = m;
   m.angle = a;
+  const inside = (x, y) => m.area.has(world.map.index(Math.floor(x), Math.floor(y)));
   let moved = world.tryMove(m, Math.cos(a) * s, Math.sin(a) * s, true);
-  // A stroll stays inside its area, as a friendly's does.
-  if (moved && !c.route && !m.area.has(world.map.index(Math.floor(m.x), Math.floor(m.y)))) {
+  // A stroll stays inside its area, as a friendly's does (pushed out, it may walk back in).
+  if (moved && !c.route && inside(x, y) && !inside(m.x, m.y)) {
     m.x = x;
     m.y = y;
     moved = false;

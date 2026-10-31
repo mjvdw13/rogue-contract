@@ -148,7 +148,8 @@ Options). Bullets and projectiles stop at floors, ceilings and the faces of
 steps and ledges, and shots into the sky simply vanish. Explosions measure
 3D distance, so a blast on the floor below a ledge doesn't reach over it.
 
-**Other fields:** `scale` (sprite size), `height`, `mass` (knockback),
+**Other fields:** `scale` (sprite size), `height`, `mass` (knockback, and how
+quickly a calm one gives way to a push: see *Friendly characters*),
 `sightRange`, `splashImmune`, `bleeds: false` (a puff instead of `blood` when hit: droids), `infighting: false`, `boss: true`,
 `renderStyle: 'fuzz'` (shimmering, partly invisible), `countKill: false`,
 `stepHeight`, `dropHeight`, `flying: true` with `z` and `flySpeed` (see
@@ -213,6 +214,17 @@ again. A frightened friendly says nothing when bumped or used. `flee` is its
 running animation (else `walk`), `death` its fall (it lies there; without
 one it vanishes), and `sounds.pain` and `sounds.death` its cries. Killing
 one doesn't count as a kill. Knockback uses `mass` as for monsters.
+
+**Pushing.** Walk into a friendly or a calm monster and keep walking, and
+after `pushDelay` seconds (0.3) they give way: they turn to face you and
+step back on their `walk`, slowed to the pace, at `pushSpeed` (1.2 tiles a
+second) times 100 / their `mass` (default 100, so a 40 Jawa goes 3 and
+Bossk at 150 goes 0.8), while you follow at their pace. They go along the
+line between you, so a push off-centre moves them aside and lets you by.
+Walls, ledges they wouldn't walk off and other bodies stop them, and then
+you slide round them. Let go, and they stand where they were pushed; one
+that strolls walks back into its area. The two speeds are the hero's
+(`body` in `hero.js`). Monsters fighting can't be pushed.
 
 ```js
 defineNpc({
@@ -1030,7 +1042,10 @@ to 0.8 are walked up, a jump rises about 1.26, and anything up to about 1.56
 can be jumped onto. The standing body is 1.7 tall and 1 wide (radius 0.5), or
 1 tall crouched. A space must be at least that tall to move through, measured
 as the lowest ceiling minus the highest floor under the player. Falls faster
-than 18 units per second (about a 6-unit drop) hurt.
+than 18 units per second (about a 6-unit drop) hurt. Pressing against a
+friendly or a calm monster for `pushDelay` (0.3 s) pushes them back at
+`pushSpeed` (1.2, see *Pushing* under Friendly characters). The validator
+rejects unknown `body` fields and negative values.
 
 Monsters walk up steps of up to 0.8 (their `stepHeight`) and won't walk off a
 drop deeper than their `dropHeight` (by default the same as the step), so a

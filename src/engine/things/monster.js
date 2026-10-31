@@ -1,6 +1,7 @@
 import { performAttack } from '../combat/attacks.js';
 import { canSeeBody } from '../combat/aim.js';
 import { calmThink } from './calm.js';
+import { shoveRate } from './push.js';
 
 /**
  * Definition-driven monster AI, in the spirit of Doom's:
@@ -167,8 +168,9 @@ function calmWalkRate(m) {
 export function monsterThink(world, m, dt) {
   applyMomentum(world, m, dt);
   // A calm stroll is slower than a chase: its walk plays to match, so the feet
-  // don't slide. With a stride, one cycle covers that many tiles.
-  const rate = m.calm && m.animName === 'walk' ? calmWalkRate(m) : 1;
+  // don't slide. With a stride, one cycle covers that many tiles. Pushed, it
+  // plays at the push's pace.
+  const rate = m.calm && m.animName === 'walk' ? calmWalkRate(m) * shoveRate(m, m.calm.speed) : 1;
   const finished = m.stepAnim(dt * rate, (ev) => {
     if (ev === 'fire') fireAttack(world, m);
     else if (ev.startsWith('sound:')) world.playSoundFrom(ev.slice(6), m);

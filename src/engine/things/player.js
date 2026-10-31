@@ -1,6 +1,7 @@
 import { EYE_HEIGHT, TICK } from '../config.js';
 import { WeaponState, weaponThink, bestWeapon } from './weapons.js';
 import { COLORMAP_INVERSE } from '../gfx/palette.js';
+import { pushThink } from './push.js';
 
 /** Doom's ground friction, converted from 35 Hz tics to our 60 Hz ticks. */
 const FRICTION = Math.pow(0.90625, 35 / 60);
@@ -21,6 +22,8 @@ export const BODY = {
   gravity: 28, // units per second squared
   fallDamageSpeed: 18, // landing faster than this hurts...
   fallDamagePerSpeed: 4, // ...this much per unit/s over it
+  pushSpeed: 1.2, // units per second someone gives way when pushed (at mass 100)...
+  pushDelay: 0.3, // ...after pressing against them this long (push.js)
 };
 
 /** Furthest the view can tilt up or down, in pixels of horizon shift. */
@@ -72,6 +75,9 @@ export class PlayerState {
     this.viewOffset = 0;
     this.crouching = false;
     this.onGround = true;
+    /** Whoever the player is pressing against, and for how long (push.js). */
+    this.pushing = null;
+    this.pushTime = 0;
     this.bobPhase = 0;
     this.bobAmount = 0;
     this.weaponState = new WeaponState();
@@ -187,6 +193,7 @@ export function playerThink(world, pt, input, dt, settings = {}) {
     pt.x += pt.vx * dt;
     pt.y += pt.vy * dt;
   } else {
+    pushThink(world, pt, wishX, wishY, dt);
     world.tryMove(pt, pt.vx * dt, pt.vy * dt);
   }
   verticalMove(world, pt, dt);

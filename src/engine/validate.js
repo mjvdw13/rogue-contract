@@ -6,6 +6,7 @@ import { BUILTIN_ATTACKS } from './combat/attacks.js';
 import { BUILTIN_PICKUPS } from './things/pickups.js';
 import { PARTICLE_BLENDS, PARTICLE_FLOORS, PARTICLE_SHAPES, PARTICLE_WALLS, POINT_CAP, DISC_CAP } from './world/particles.js';
 import { Hangings, HANGING_SHAPES, HANGING_PINS } from './world/hangings.js';
+import { BODY } from './things/player.js';
 
 const PICKUP_MODIFIERS = ['maxHealth', 'armorClass', 'maxArmor', 'duration', 'always'];
 const TRIGGER_EVENTS = ['start', 'enter', 'use', 'killed', 'pickup', 'hostile', 'talk'];
@@ -308,6 +309,10 @@ export function validateContent(reg) {
   else {
     for (const w of hero.startWeapons ?? []) if (!reg.weapons.has(w)) err(`hero: unknown start weapon "${w}"`);
     for (const a of Object.keys(hero.startAmmo ?? {})) if (!reg.ammo.has(a)) err(`hero: unknown start ammo "${a}"`);
+    for (const [k, v] of Object.entries(hero.body ?? {})) {
+      if (!(k in BODY)) err(`hero: unknown body field "${k}"`);
+      else if (typeof v !== 'number' || !(v >= 0) || v === Infinity) err(`hero: body.${k} must be a number, 0 or more`);
+    }
   }
 
   // Story flags: a flag, or a list of them.

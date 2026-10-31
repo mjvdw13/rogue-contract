@@ -378,7 +378,8 @@ export function defineMonster(def) {
  * tiles from where they were placed (staying out of doorways, narrow passages
  * and hazards), and react when the player bumps into them or uses them: they
  * turn to the player, play `react` and say one of their `lines`. Monsters
- * never target them.
+ * never target them. Pushed on, they give way, quicker the lighter their
+ * `mass` (see things/push.js).
  * With no `health` they can't be hurt: bullets, projectiles and explosions
  * pass through them. With `health` they can be shot (and the player's aim
  * locks on to them as it does to monsters); the first hit plays `pain`, then
