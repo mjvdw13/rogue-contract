@@ -43,6 +43,9 @@ import { ModelBuilder } from './lib/build.js';
 // `cantina-lamp`: a bare bulb glowing on a cord, hung from a ceiling: the
 // origin at the bulb's foot, the cord LAMP_CORD up to the ceiling.
 //
+// `cantina-datapad`: a datapad lying on something, its screen glowing: the
+// smuggler's ledger in the secret back room. The origin under its middle.
+//
 // `cantina-canopy`: the ring round the well in the ceiling over the bar, an
 // oval band in the ceiling's planks hanging below it and rising to the
 // well's top, so the well's edge, stepped by the tiles, is hidden behind
@@ -200,6 +203,13 @@ const CORNER_GRIME = [
   ['grime-blotch-2', -0.6, 1.7, 2.4, 1.6], ['grime-smudge', 1.6, 1.3, 1, 1.25], ['grime-smudge', -3.3, 1.2, 0.9, 1.1],
 ];
 
+function datapad() {
+  const m = new ModelBuilder('cantina-datapad');
+  m.box([-0.2, -0.14, 0], [0.2, 0.14, 0.04], { ...STEEL, bottom: false });
+  m.box([-0.15, -0.1, 0.04], [0.15, 0.1, 0.045], { color: [120, 220, 150], glow: true, bottom: false });
+  return m.build();
+}
+
 function corner() {
   const m = new ModelBuilder('cantina-corner');
   const [a, h] = [CORNER.len / 2, CORNER.h];
@@ -262,4 +272,4 @@ function canopy() {
   return m.build();
 }
 
-export default [bar(), taps(), stool(), booth(), corner(), detector(), sign(), lamp(), shelves(), canopy()];
+export default [bar(), taps(), stool(), booth(), corner(), detector(), sign(), lamp(), datapad(), shelves(), canopy()];

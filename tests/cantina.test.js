@@ -29,3 +29,12 @@ test('the cantina leads from its street door round the bar to its back door', ()
   assert.ok(reached(98, 110) || reached(99, 110), "the back-bar's door");
   assert.ok(reached(125, 106), 'the passage to the back door');
 });
+
+test("behind the storeroom a secret door in the plaster opens into the secret back room", () => {
+  const a = analyseLevel(registry, cantinaAlone());
+  const { map } = a.built;
+  const door = map.doors[map.doorIndex[map.index(113, 103)]];
+  assert.ok(door?.secret, 'a secret door in the storeroom\'s north wall');
+  assert.ok(a.reached[map.index(114, 100)] === 1, 'the room behind it is reached');
+  assert.deepEqual(a.problems.filter((p) => p.includes('secret')), [], 'and counted as a secret that can be reached');
+});

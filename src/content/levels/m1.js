@@ -639,6 +639,26 @@ const roofOver = (x0, y0, x1, y1, ceilZ, h) => p.rect(x0, y0, x1, y1, (_, __, c)
   );
   lights.push({ x: 99.5, y: 113.5, z: F + 2.5, radius: 5, light: 40 }, { x: 108.5, y: 113.5, z: F + 2.5, radius: 5, light: 40 }, { x: 113.5, y: 107.5, z: F + 2.5, radius: 4, light: 32 });
   p.light(117, 103, 125, 108, light);
+  // The secret back room (docs/mission1.md, Secrets 2): behind the
+  // storeroom, through a secret door in the plaster of its north wall, half
+  // hidden by its crates. A smuggler's hidey-hole, low and dim: a stash of
+  // crates and drums, power cells, a bare bulb, and a ledger on a crate
+  // (step up to it to read it).
+  const HIDE = F + 3.25;
+  town.room(112, 97, 117, 103, { h, floorZ: F, ceilZ: HIDE, wall, light: 96 });
+  p.rect(112, 97, 117, 103, (_, __, c) => ({ ...c, secret: true }));
+  town.arch(113, 103, 115, 104, { h, lintel: 2.5, floorZ: F, wall, floor: 'flagstone', light });
+  p.rect(113, 103, 115, 104, (_, __, c) => ({ ...c, door: wall, style: 'rise', secret: true }));
+  p.rect(112, 98, 115, 100, (_, __, c) => ({ ...c, tag: 'ledger' }));
+  town.things.push(
+    at('crate-tan', 112.9, 97.7, { angle: 8 }), at('cantina-datapad', 112.9, 97.75, { z: F + 0.9, angle: 20 }),
+    at('crate-tan', 116.35, 97.7, { angle: 92 }), at('crate-grey-small', 116.35, 97.7, { z: F + 0.9, angle: 15 }),
+    at('barrel-rust', 116.4, 99.4), at('barrel-grey', 116.4, 100.2), at('canister-rust', 112.5, 101.9),
+    at('power-cell', 114.3, 98.3), at('power-cell', 114.9, 98.8), at('power-cell', 113.8, 100.6),
+    at('litter-small', 115, 101.2, { angle: 30 }),
+    at('cantina-lamp', 114.5, 100, { z: HIDE - LAMP_CORD }),
+  );
+  lights.push({ x: 114.5, y: 100, z: F + 2.2, radius: 3.5, light: 36 });
 }
 
 // 17. Docking Bay 86, next door: a pit like Bay 87, its door at the end of
@@ -999,6 +1019,14 @@ export default defineLevel({
       do: [
         { action: 'message', text: "BROKER (STAND-IN): THE GUILD'S CONTRACT ON RUSK, AND A TRACKING FOB." },
         { action: 'message', text: 'BROKER: HE WIPED HIS CODE. THE JAWAS TAG WHAT THEY SELL: TRY THE JUNK YARD.' },
+      ],
+    },
+    {
+      on: 'enter',
+      tag: 'ledger',
+      do: [
+        { action: 'message', text: "A LEDGER: 'PASSAGE FOR A SCOUT. NO NAME. PAID IN IMPERIAL SCRIP.'" },
+        { action: 'message', text: "'WANTS OFF-WORLD BEFORE THE IMPERIALS' NEXT FIELD TEST IN THE JUNDLAND.'" },
       ],
     },
     { on: 'enter', tag: 'informant', do: [{ action: 'message', text: 'INFORMANT (STAND-IN): HERE IS A PASS. THE CHECKPOINT WILL LET YOU THROUGH.' }, { action: 'openDoors', tag: 'checkpoint' }] },
