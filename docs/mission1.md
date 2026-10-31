@@ -85,8 +85,9 @@ main street → Bay 87, where the Crow comes down.
 
 - The checkpoint's gate opens for the pass, and at the switch.
 - The freighter's hold in the derelict bay stays shut until the fob has
-  the signal, so going over the rooftops early finds nothing. (Not yet:
-  in the blockout the hold is open, and stepping into it turns the town.)
+  the signal, so going over the rooftops early finds nothing. (In the
+  blockout the hold is open: stepping into it does nothing until the fob
+  tracks Rusk, then it takes the fob and turns the town.)
 - The Jawa trader has nothing to say until Kyle carries the fob.
 - The blast doors shut at the switch, so the way home is round them.
 

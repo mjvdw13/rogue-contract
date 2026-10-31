@@ -1,5 +1,7 @@
 import { openDoor, closeDoor } from './doors.js';
 import { startLift } from './lifts.js';
+import { BUILTIN_PICKUPS } from '../things/pickups.js';
+import { bestWeapon } from '../things/weapons.js';
 
 /**
  * Built-in trigger actions. Triggers in a level run lists of these:
@@ -86,6 +88,25 @@ export const BUILTIN_ACTIONS = {
   setFlag(world, { flag, value = true }) {
     if (value) world.flags.add(flag);
     else world.flags.delete(flag);
+  },
+  /**
+   * Point tracker weapons (a weapon's `track`) at a placed thing with the tag
+   * (else the tiles with it), or at the nearest thing of a type; with
+   * neither, they go dark.
+   */
+  setSignal(world, { tag, thing }) {
+    world.signal = tag ? { tag } : thing ? { thing } : null;
+  },
+  /** Give the player a weapon, and switch to it (as picking it up does). */
+  giveWeapon(world, { weapon }) {
+    if (world.player) BUILTIN_PICKUPS.weapon(world, world.player.player, weapon);
+  },
+  /** Take a weapon from the player; held, they switch to their best one. */
+  takeWeapon(world, { weapon }) {
+    const p = world.player?.player;
+    if (!p || !p.weapons.delete(weapon)) return;
+    if (p.pendingWeapon === weapon) p.pendingWeapon = null;
+    if (p.weapon === weapon) p.pendingWeapon = bestWeapon(world.registry, p);
   },
   /** Change the music. */
   music(world, { id }) {

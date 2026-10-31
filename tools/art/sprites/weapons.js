@@ -197,6 +197,40 @@ function concussionPickup() {
   return m.render({ ...RENDER, light: [-0.4, -0.8, 0.45] });
 }
 
+// ------------------------------------------------------------------ tracking fob
+
+/**
+ * The Guild's tracking fob held up in the right hand: a dark rounded puck,
+ * a steel rim, a grille and a lens on top that blinks with the signal.
+ * `light` is null (dark), 'amber' or 'green'. 96x96, the arm in from the
+ * bottom right.
+ */
+function fobFrame(light = null) {
+  const m = new Model(96, 96, { seed: 117 });
+  const metal = { ...MAT.metal, spec: 0.5, shine: 22, grain: 0.06 };
+  forearm(m, [112, 124, 4], [70, 78, 14], 10);
+  // The body: a rounded slab, stood up and leaning a little right.
+  m.slab([[34, 26], [56, 22], [62, 30], [64, 66], [58, 72], [40, 74], [34, 68], [30, 34]], 14, C('gray', 0.16), metal, { bevel: 3, thickness: 4 });
+  m.slab([[38, 30], [54, 27], [58, 33], [59, 46], [40, 49], [37, 40]], 19, C('steel', 0.34), metal, { bevel: 1.5, thickness: 1.5 });
+  for (let k = 0; k < 4; k++) m.paint(42 + k * 4, 58 + k * 0.4, 1.2, 4, C('gray', 0.05));
+  // The lens on its top plate, and the light in it.
+  const [lx, ly] = [48, 37];
+  m.sphere(lx, ly, 21, 5, C('gray', 0.1), MAT.glass);
+  if (light) m.sphere(lx, ly, 22, 3.6, G(light, 1), MAT.glow);
+  else m.sphere(lx, ly, 22, 3.6, C('rust', 0.25), MAT.glass);
+  // The gloved hand round its lower half, thumb across the front.
+  m.ellipsoid(62, 70, 18, 11, 12, 8, GLOVE, MAT.leather);
+  for (let k = 0; k < 4; k++) m.capsule(66, 60 + k * 4.5, 20, 58, 58 + k * 5, 22, 3, 2.6, lighten(GLOVE, 0.05), MAT.leather);
+  m.capsule(54, 76, 22, 40, 64, 22, 3.4, 2.8, GLOVE, MAT.leather); // thumb
+  const c = m.render(RENDER);
+  if (light) flash(c, lx, ly, 7, G(light, 1), G(light, 0), 3);
+  return c;
+}
+
+function fobSheet() {
+  return sheet([fobFrame(), fobFrame('amber'), fobFrame('green')]);
+}
+
 export default [
   { name: 'fists', out: W('fists'), draw: fistsSheet, dither: 'fs' },
   { name: 'blaster', out: W('blaster'), draw: blasterSheet, dither: 'fs' },
@@ -206,5 +240,6 @@ export default [
   { name: 'det-pickup', out: 'assets/sprites/items/thermal-detonator.png', draw: detonatorBall, dither: 'fs' },
   { name: 'detonator-belt', out: 'assets/sprites/items/detonator-belt.png', draw: detonatorBelt, dither: 'fs' },
   { name: 'concussion-rifle', out: W('concussion-rifle'), draw: concussionSheet, dither: 'fs' },
+  { name: 'fob', out: W('fob'), draw: fobSheet, dither: 'fs' },
   { name: 'pickup-concussion-rifle', out: 'assets/sprites/items/concussion-rifle.png', draw: concussionPickup, dither: 'fs' },
 ];
