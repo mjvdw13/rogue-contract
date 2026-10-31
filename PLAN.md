@@ -45,8 +45,9 @@ These need Mark to try something, or to decide. Don't start them without him.
   code into it and it tracks Rusk, in the derelict bay's hold: an amber
   blink and a beep, every 1.4 s from across town down to 0.15 s up close,
   green when you face him. Stepping into the hold (now only once it
-  tracks him) takes it from you and turns the town. If the town turns
-  first, it tracks Rusk anyway. The sprite is a generated stand-in (a dark
+  tracks him) takes it from you and turns the town. Until then your
+  weapons stay holstered (Mark, 2026-10-30), so the town can't turn early.
+  The sprite is a generated stand-in (a dark
   puck in the gloved hand, the lens on top) held up right of centre; the
   beep is synthesized. To judge: the look, the beep, the blink's speeds and
   how wide "facing" is (15 degrees either side), and the trader's lines.
@@ -440,6 +441,15 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
       stand-in reinforcements). Calm troopers and Jawas are placed.
 - [ ] **Air and sound:** dust, emitters, ambient sound, the cantina band
       (sections 2 and 3).
+- [ ] **The story in order** (Mark, 2026-10-30): nothing made the junk
+      yard come before the checkpoint, so the pass or the roofs found Rusk
+      before the fob did.
+  - [x] Weapons holstered until the town turns: a level's `holster`
+        (defs, weapons.js, validator, MODDING.md, a test). `m1` uses it,
+        so the town can't turn early; its early-turn trigger goes.
+  - [ ] The informant gives the pass only once the fob has the signal.
+  - [ ] The hold shut (a door in the freighter's stern) until the
+        trader keys his code in.
 - [ ] **The story:** the drop-off and pickup and the loud half (section
       5), in place of the blockout's last stand-ins: Rusk's hold (open
       now; it takes the fob and turns the town once the fob tracks him),

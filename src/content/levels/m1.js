@@ -1050,6 +1050,9 @@ export default defineLevel({
   lights,
   hangings: [...hangings, ...town.hangings],
   par: 600,
+  // Kyle's blaster stays holstered until the town turns, so it turns only
+  // when he finds Rusk (Mark, 2026-10-30).
+  holster: true,
   // The story so far: the broker's contract and the informant's pass are
   // conversations (the pass opens the checkpoint). Stand-ins until the fob
   // and the drop-off exist (docs/story.md): finding Rusk turns the town,
@@ -1079,8 +1082,6 @@ export default defineLevel({
         { action: 'hostile' },
       ],
     },
-    // Turned early (gunfire), the trader is no use: the fob finds Rusk anyway.
-    { on: 'hostile', unless: 'signal', do: [{ action: 'setSignal', tag: 'rusk' }, { action: 'setFlag', flag: 'signal' }] },
     {
       on: 'hostile',
       do: [

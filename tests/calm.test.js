@@ -4,6 +4,7 @@ import content from '../src/content/index.js';
 import { Registry } from '../src/engine/registry.js';
 import { defineLevel } from '../src/engine/defs.js';
 import { validateContent } from '../src/engine/validate.js';
+import { runActions } from '../src/engine/world/actions.js';
 import { makeWorld, mockInput, room, run } from './helpers.js';
 
 // A long open hall, 30 x 7, the player at its west end facing east.
@@ -228,6 +229,34 @@ test('with no calm monsters, gunfire runs no hostile trigger', () => {
   assert.equal(w.messages.filter((m) => m === 'THE TOWN TURNS.').length, 0);
 });
 
+test('with holster, weapons that attack stay down until the town turns; the fob still comes up', () => {
+  const w = makeWorld(town({ holster: true }));
+  const p = w.player.player;
+  const ammo = p.ammo.energy;
+  const input = mockInput();
+  input.hold('fire');
+  run(w, input, 2);
+  input.tap('weapon1');
+  run(w, input, 2);
+  input.release('fire');
+  assert.equal(p.weapon, 'fists', 'the number keys still switch');
+  assert.equal(p.weaponState.state, 'holster');
+  assert.equal(p.ammo.energy, ammo, 'the blaster never fired');
+  assert.equal(w.hostile, false, 'and the town stays calm');
+
+  runActions(w, [{ action: 'giveWeapon', weapon: 'fob' }]);
+  run(w, mockInput(), 1.5);
+  assert.equal(p.weaponState.state, 'ready', 'a weapon with no attack comes up');
+
+  runActions(w, [{ action: 'takeWeapon', weapon: 'fob' }, 'hostile']);
+  run(w, mockInput(), 1.5);
+  assert.equal(p.weapon, 'blaster');
+  assert.equal(p.weaponState.state, 'ready', 'drawn once the town turns');
+  input.hold('fire');
+  run(w, input, 0.5);
+  assert.ok(p.ammo.energy < ammo, 'and it fires');
+});
+
 test('the validator checks calm placements and patrols', () => {
   const level = defineLevel({
     ...hall([
@@ -248,5 +277,18 @@ test('the validator checks calm placements and patrols', () => {
     'Level "bad": a jawa at (8.5, 2.5): "calm" must be true or an object',
     'Level "bad": a jawa at (10.5, 2.5): calm stride must be above 0 (tiles a walk cycle covers)',
     'Level "bad": a med-kit at (9.5, 2.5) is placed "calm", which only monsters take (friendlies are always calm)',
+  ]);
+});
+
+test('the validator checks holster', () => {
+  const levels = [
+    defineLevel({ ...town({ holster: 'yes' }), id: 'odd-holster' }),
+    defineLevel({ ...town({ holster: true }), id: 'stuck-holster' }),
+    defineLevel({ ...town({ holster: true, triggers: [{ on: 'start', do: ['hostile'] }] }), id: 'good-holster' }),
+  ];
+  const { errors } = validateContent(new Registry({ ...content, levels }));
+  assert.deepEqual(errors.filter((e) => e.includes('holster')), [
+    'Level "odd-holster": "holster" must be true or false',
+    'Level "stuck-holster": "holster" keeps weapons down until the town turns, but no trigger or switch has the "hostile" action',
   ]);
 });

@@ -180,6 +180,12 @@ calm: {
 },
 ```
 
+A level with `holster: true` keeps the player's weapons that attack down
+(out of sight, unable to fire) until the town turns, so the player can't
+turn it early: only the `hostile` action does (the validator wants one).
+Number keys still switch weapons, and one with no attack (a tracker)
+comes up as usual.
+
 **Hooks** run your own code: `onSpawn(world, self)`, `onSight(world, self)`,
 `onThink(world, self, dt)` (return `true` to skip the normal AI that tick),
 `onAttack(world, self, attack)`, `onPain(world, self, source, amount)`,
@@ -759,6 +765,7 @@ export default defineLevel({
   haze: { color: [32, 24, 64], half: 40 }, // outdoors, fade to this colour
   weather: { type: 'glint', count: 60 }, // particles in the air round you, outdoors
   hangings: [],              // ropes, cables and cloth (see Hangings)
+  holster: false,            // true: weapons stay down until the town turns (see Calm)
   tiles: [
     '###########',
     '#....#....#',

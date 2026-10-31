@@ -67,6 +67,11 @@ export function cycleWeapon(registry, p, dir) {
   p.pendingWeapon = next.id === p.weapon ? null : next.id;
 }
 
+/** (A level's `holster`) Is `def` kept down: a weapon that attacks, in a town that hasn't turned? */
+function holstered(world, def) {
+  return !!(def?.fire && world.level?.holster && !world.hostile);
+}
+
 function fire(world, pt, def, ws) {
   const p = pt.player;
   if (def.ammo) {
@@ -108,6 +113,7 @@ export function weaponThink(world, pt, input, dt) {
   }
   if (!def) return;
   if (ws.state === 'ready' && p.pendingWeapon && p.pendingWeapon !== p.weapon) ws.state = 'lower';
+  if (ws.state !== 'lower' && ws.state !== 'holster' && holstered(world, def)) ws.state = 'holster';
 
   switch (ws.state) {
     case 'lower':
@@ -119,8 +125,20 @@ export function weaponThink(world, pt, input, dt) {
         def = reg.weapons.get(p.weapon);
         ws.def = def;
         ws.setAnim('idle');
+        ws.state = holstered(world, def) ? 'holster' : 'raise';
+        if (ws.state === 'raise' && def?.sounds.raise) world.playSound(def.sounds.raise);
+      }
+      break;
+    case 'holster':
+      // (The level's `holster`) Down out of sight until the town turns. A
+      // switch still goes through, so a weapon that doesn't attack (a
+      // tracker) comes up.
+      ws.y = Math.min(BOTTOM, ws.y + LOWER_SPEED * dt);
+      if (p.pendingWeapon && p.pendingWeapon !== p.weapon) {
+        ws.state = 'lower';
+      } else if (!holstered(world, def)) {
         ws.state = 'raise';
-        if (def?.sounds.raise) world.playSound(def.sounds.raise);
+        if (def.sounds.raise) world.playSound(def.sounds.raise);
       }
       break;
     case 'raise':

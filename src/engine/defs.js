@@ -621,12 +621,15 @@ export function defineSong(def) {
  * branches `{ if?, unless?, lines, set? }` picked by story flags, each
  * setting its `set` flags once its last line is said. `name` is who they
  * speak as, instead of their type's name. `triggers` may have `if` and
- * `unless` (a story flag or a list): see world/triggers.js.
+ * `unless` (a story flag or a list): see world/triggers.js. `holster: true`
+ * keeps the player's weapons that attack down until the town turns (the
+ * `hostile` action): a calm town can't be turned early, and a weapon with
+ * no attack (a tracker) still comes up.
  * @param {{id:string, name:string, tiles:string[], things?:string[], legend?:object,
  *   thingLegend?:object, list?:object[], triggers?:object[], music?:string, sky?:string,
  *   fog?:number, haze?:{color:number[], half?:number},
  *   weather?:{type:string, count:number, range?:number, z?:number[], drift?:number[], wind?:number[]},
- *   par?:number, next?:string,
+ *   par?:number, next?:string, holster?:boolean,
  *   secretNext?:string, defaults?:object}} def
  */
 export function defineLevel(def) {
@@ -641,6 +644,7 @@ export function defineLevel(def) {
     triggers: [],
     fog: 0.05,
     par: 0,
+    holster: false,
     defaults: {},
     ...def,
     type: 'level',

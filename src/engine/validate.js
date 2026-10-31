@@ -477,6 +477,11 @@ export function validateContent(reg) {
       if (level.haze.half !== undefined && !(level.haze.half > 0)) err(`${owner}: haze "half" (the distance in tiles at which it's halfway) must be above 0`);
     }
     if (level.weather) checkWeather(reg, level.weather, owner, err);
+    if (typeof level.holster !== 'boolean') err(`${owner}: "holster" must be true or false`);
+    else if (level.holster) {
+      const actions = [...(level.triggers ?? []).flatMap((t) => [].concat(t.do ?? [])), ...[...map.uses.values()].flatMap((u) => u.actions)];
+      if (!actions.some((a) => (typeof a === 'string' ? a : a?.action) === 'hostile')) err(`${owner}: "holster" keeps weapons down until the town turns, but no trigger or switch has the "hostile" action`);
+    }
     if (level.hangings !== undefined) checkHangings(reg, level, map, owner, err);
     for (const id of [level.next, level.secretNext]) if (id && !reg.levels.has(id)) err(`${owner}: next level "${id}" does not exist`);
   }

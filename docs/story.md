@@ -157,12 +157,10 @@ bump or use them ("Move along." "Hunter."), and don't attack. Townsfolk,
 Jawa traders and the cantina's customers are friendly characters, as the
 engine has today.
 
-**One switch.** The town turns hostile all at once, and it has two causes:
-
-- **The story:** Kyle finds Rusk, and a trigger flips it.
-- **You:** fire a weapon or hit anyone, and the town flips early. That
-  doesn't fail the mission. The fob still leads to Rusk, and the hunt for
-  him becomes a fight.
+**One switch.** The town turns hostile all at once, when Kyle finds Rusk
+and a trigger flips it. Until then Kyle's blaster stays holstered (Mark,
+2026-10-30): he can't draw it, so he can't turn the town early (the
+level's `holster`).
 
 When it flips, every calm trooper becomes a normal monster, blast doors
 close across the main street, reinforcements come in from the edge of town,
