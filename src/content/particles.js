@@ -37,26 +37,6 @@ export default [
     onFloor: 'die',
     cap: 200,
   }),
-  // Flames licking up off something molten or burning (the smelter's
-  // melt): small glowing discs that rise quickly and shrink as they cool
-  // from yellow to red.
-  defineParticle({
-    id: 'flame-lick',
-    colors: [['glow-yellow', 5], { ramp: 'glow-yellow', from: 4, to: 0 }, { ramp: 'glow-red', from: 2, to: 0 }],
-    life: [0.3, 0.7],
-    size: 0.28,
-    grow: 0.35,
-    maxPx: 24,
-    shape: 'disc',
-    blend: 'add',
-    fade: true,
-    fullbright: true,
-    gravity: -2.5,
-    drag: 3,
-    wind: 0.3,
-    onFloor: 'die',
-    cap: 80,
-  }),
   // Shrapnel: bits of metal that fly, bounce once or twice and lie a moment.
   defineParticle({
     id: 'shrapnel',

@@ -92,14 +92,14 @@ These need Mark to try something, or to decide. Don't start them without him.
   heap's foot, its rim 0.8 high, full of glowing melt with a dark crust
   (`melt`, from Robotics' acid floor) and scrap half sunk in it, on a
   heater with glowing slots, a spout trickling into a mould of ingots, a
-  chute from the heap and hoses to a power unit. Embers, flames, sparks
-  now and then and a little smoke come off it (a decoration's new
-  `emit`). The crane is gone; a repulsorlift cargo skiff
+  chute from the heap and hoses to a power unit. Embers and now and then
+  a spit of sparks come off it (a decoration's new `emit`; the flames
+  and smoke were too much, Mark, 2026-10-31). The crane is gone; a repulsorlift cargo skiff
   is parked in the court's west end along the west heap instead, hovering
   and bobbing: a flat hull with a blunt bow, a rail round its deck, a
   steering post at the stern, two engine pods, crates, a drum and a dome
   on its deck. To judge: both their looks, the skiff's size (5.8 long),
-  and how much fire comes off the melt.
+  and whether the embers are right now.
   Droids for sale stand in a row along the court's south wall, west of
   the steps (models, `astromech-blue`, `-red`, `-rust`, `power-droid`,
   `-rust`, about a Jawa's height), a Jawa minding them and another by the
@@ -617,7 +617,7 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
           hold's racks and clutter.
     - [x] Mark's notes (2026-10-31: the crane and furnace don't look Star
           Wars): no crane, a cargo skiff parked in the court instead; the
-          furnace a vat of molten metal giving off embers and flames.
+          furnace a vat of molten metal giving off embers and sparks.
     - [ ] Waiting on Mark.
   - [ ] The back alleys and the back lane.
   - [ ] The checkpoint and the rooftops.

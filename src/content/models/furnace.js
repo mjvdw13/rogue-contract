@@ -3,12 +3,12 @@ import { rod } from './junk-pile.js';
 
 // `furnace`: the Jawas' smelter in the junk yard's court (levels/m1.js),
 // against the foot of the east heap (Mark, 2026-10-31: a trough of molten
-// metal, embers and flames coming off it). An open vat of rusty plate,
+// metal, embers coming off it). An open vat of rusty plate,
 // wider at its rim, on a heater with glowing slots, full of melt (`melt`,
 // drawn glowing) with scrap half sunk in it. A spout at its east end runs
 // a trickle down into a mould of ingots on the ground; a chute comes down
 // from the heap behind; hoses run from a power unit at its west end to the
-// heater. Its embers, flames, sparks and smoke are the decoration's `emit`
+// heater. Its embers and sparks are the decoration's `emit`
 // (decor.js, at the spots in FURNACE). The origin on the floor under the
 // vat's middle; at angle 0 its long side faces south.
 export const FURNACE = {
