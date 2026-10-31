@@ -115,6 +115,9 @@ export const TOWN = [
   // The junk yard's cage fence (models/junk-pile.js): Dark Forces' diamond
   // mesh in its frame, rusted, its holes kept (`holes`).
   { out: 'cage-rust', df: 'ICDELEV', holes: true, gradient: [[30, 16, 8], [74, 40, 18], [120, 66, 32], [160, 96, 52], [190, 130, 82]], keep: 0, contrast: 1, rust: [{ color: [52, 26, 12], amount: 0.5, cell: 16, seed: 131 }, { color: [18, 14, 10], amount: 0.4, cell: 16, seed: 133, from: 0.55 }] },
+  // The smelter's melt (models/furnace.js), drawn glowing: Robotics' acid
+  // floor run hot, dark red crust to yellow-white where it's hottest.
+  { out: 'melt', df: 'RPACID01', gradient: [[48, 10, 4], [120, 24, 6], [200, 60, 10], [236, 112, 20], [250, 170, 50]], keep: 0, contrast: 1.4 },
   // The cargo pod's hull (models/clutter.js): the galvanised tin again, rusty
   // and scorched with soot.
   { out: 'pod-hull', df: 'ZWGRUV1', crop: [0, 0, 32, 64], tile: [2, 1], gradient: [[40, 40, 40], [88, 86, 82], [130, 126, 118], [166, 160, 150], [196, 190, 178]], keep: 0, contrast: 0.9, rust: [{ color: [120, 64, 30], amount: 0.5, cell: 16, seed: 2 }, ...WORN(16, 61, 0.8)] },

@@ -158,8 +158,23 @@ export default [
   // outlines, as high as their crests, too tall to climb.
   ...Object.entries(JUNK_PILES).map(([id, p]) => defineDecoration({ id, model: id, solid: true, height: pileHeight(p), fixed: true })),
   defineDecoration({ id: JUNK_CAGE.id, model: JUNK_CAGE.id, solid: true, height: JUNK_CAGE.height, fixed: true }),
-  // The junk yard's scrap furnace (models/furnace.js), colliding as its plinth.
-  defineDecoration({ id: 'furnace', model: 'furnace', solid: true, height: FURNACE.top, fixed: true }),
+  // The junk yard's smelter (models/furnace.js), colliding as its outline,
+  // as high as its rim: embers and flames off its melt, sparks spitting now
+  // and then, a little smoke, and embers where the trickle meets the mould.
+  defineDecoration({
+    id: 'furnace',
+    model: 'furnace',
+    solid: true,
+    height: FURNACE.rim,
+    fixed: true,
+    emit: [
+      ...[-1.1, 0.4].map((x) => ({ type: 'ember', count: 2, every: [0.1, 0.25], at: [x, 0, FURNACE.melt + 0.1], radius: 0.6, dir: [0, 0, 1], spread: 0.5, speed: [0.4, 1.2] })),
+      ...[-1.2, 0, 1.2].map((x) => ({ type: 'flame-lick', count: 2, every: [0.05, 0.12], at: [x, 0, FURNACE.melt + 0.1], radius: 0.6, dir: [0, 0, 1], spread: 0.4, speed: [0.2, 0.6] })),
+      { type: 'spark', count: 6, every: [1.5, 4], at: [0, 0, FURNACE.melt + 0.1], radius: 0.8, dir: [0, 0, 1], spread: 0.7, speed: [1.5, 3] },
+      { type: 'smoke', count: 1, every: [0.8, 1.6], at: [0, 0, FURNACE.rim + 0.4], radius: 0.6, dir: [0, 0, 1], spread: 0.3, speed: [0.2, 0.4] },
+      { type: 'ember', count: 1, every: [0.2, 0.5], at: [FURNACE.spout[0], 0, 0.25], radius: 0.1, dir: [0, 0, 1], spread: 0.8, speed: [0.3, 0.8] },
+    ],
+  }),
   // The Jawas' cargo skiff parked in the court (models/skiff.js), hovering
   // and bobbing like the landspeeder: it collides as its hull, as high as its rail.
   defineDecoration({ id: 'cargo-skiff', model: 'cargo-skiff', solid: true, height: SKIFF.rail, fixed: true, bob: { height: 0.03, period: 3.6 } }),

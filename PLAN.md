@@ -90,17 +90,20 @@ These need Mark to try something, or to decide. Don't start them without him.
   (`cage-rust`), panels about 2 wide and 2.6 high between leaning posts,
   a quarter of them patched with a sheet of plate. To judge: its height,
   how orange the rust is, and whether it should stand further out.
-  The furnace is a smelter vessel now (Mark, 2026-10-31: the kiln and
-  the crane didn't look Star Wars): a round-bellied tank on four struts
-  against the east heap's foot, 3.6 tall, domed, its seams banded, a
-  round port glowing orange in a dark collar, a crucible of melt under
-  its spout, vents on the dome, a chute from the heap into its back and
-  hoses to a power unit. The crane is gone; a repulsorlift cargo skiff
+  The smelter is a vat of molten metal now (Mark, 2026-10-31: first the
+  kiln and crane didn't look Star Wars, then make it a trough of melt
+  with embers and fire): an open trough of rusty plate against the east
+  heap's foot, its rim 0.8 high, full of glowing melt with a dark crust
+  (`melt`, from Robotics' acid floor) and scrap half sunk in it, on a
+  heater with glowing slots, a spout trickling into a mould of ingots, a
+  chute from the heap and hoses to a power unit. Embers, flames, sparks
+  now and then and a little smoke come off it (a decoration's new
+  `emit`). The crane is gone; a repulsorlift cargo skiff
   is parked in the court's west end by the cage fence instead, hovering
   and bobbing: a flat hull with a blunt bow, a rail round its deck, a
   steering post at the stern, two engine pods, crates, a drum and a dome
-  on its deck. To judge: both their looks, and the skiff's size (5.8
-  long).
+  on its deck. To judge: both their looks, the skiff's size (5.8 long),
+  and how much fire comes off the melt.
   Droids for sale stand in a row along the court's south wall, west of
   the steps (models, `astromech-blue`, `-red`, `-rust`, `power-droid`,
   `-rust`, about a Jawa's height), a Jawa minding them and another by the
@@ -621,7 +624,7 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
           hold's racks and clutter.
     - [x] Mark's notes (2026-10-31: the crane and furnace don't look Star
           Wars): no crane, a cargo skiff parked in the court instead; the
-          furnace a smelter vessel.
+          furnace a vat of molten metal giving off embers and flames.
     - [ ] Waiting on Mark.
   - [ ] The back alleys and the back lane.
   - [ ] The checkpoint and the rooftops.

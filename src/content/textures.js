@@ -52,6 +52,8 @@ const TOWN = [
   'crawler-hull',
   // The junk yard's cage fence, see-through (models/junk-pile.js).
   'cage-rust',
+  // The smelter's melt, drawn glowing (models/furnace.js).
+  'melt',
   // Sooted drums and canisters.
   'drum-rust', 'drum-grey',
   // The condenser tower's plain dark bands (models/market.js).

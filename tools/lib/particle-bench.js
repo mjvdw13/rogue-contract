@@ -17,6 +17,7 @@ export const BENCH_KINDS = {
   'bolt-spark': { label: 'Bolt sparks (streak, glowing, add)', vel: (r) => [r(-3, 3), r(-3, 3), r(1, 4)] },
   'ion-spark': { label: 'Ion sparks (streak, glowing, add)', vel: (r) => [r(-5, 5), r(-5, 5), r(-3, 4)] },
   ember: { label: 'Embers (dot, glowing, add)', vel: (r) => [r(-0.3, 0.3), r(-0.3, 0.3), r(0.2, 1)] },
+  'flame-lick': { label: 'Flame licks (disc, glowing, add, shrinking)', vel: (r) => [r(-0.2, 0.2), r(-0.2, 0.2), r(0.2, 0.6)], z: [0.3, 1] },
   mote: { label: 'Motes (dot, glowing, add)', vel: (r) => [r(-0.1, 0.1), r(-0.1, 0.1), r(-0.05, 0.1)], z: [0.3, 3] },
   'rock-chip': { label: 'Rock chips (square, lit, solid)', vel: (r) => [r(-1.5, 1.5), r(-1.5, 1.5), r(1, 3.5)] },
   smoke: { label: 'Smoke (disc, lit, half)', vel: (r) => [r(-0.2, 0.2), r(-0.2, 0.2), r(0.2, 0.6)] },
