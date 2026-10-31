@@ -67,6 +67,15 @@ These need Mark to try something, or to decide. Don't start them without him.
   pale the barricades are, and whether the terminal (still clean) wants
   the same wear.
 
+- **The junk yard, deeper** (`?map=m1`, 2026-10-31, blocked out): the
+  trader is no longer at the gate. Down into a front court, then a
+  passage slanting up between two heaps of scrap (3 to 5 wide, too tall
+  to see over) to a lane along the north wall, through a breach and up
+  the sandcrawler's ramp into its hold: dim, the length of the crawler,
+  the trader at its far west end. To judge: the passage's length and
+  width, whether the hold should be the crawler's (or a hideaway in the
+  junk), and how much the court wants before the detail.
+
 - **Mos Eisley opens in stages** (`?map=m1`, 2026-10-31): when you land the
   blast doors are shut (a stand-in: a rising Imperial gate under a steel
   beam over the street), and so are plank gates across the alley between
@@ -113,8 +122,8 @@ These need Mark to try something, or to decide. Don't start them without him.
   line wants to stay up longer.
 
 - **The tracking fob** (`?map=m1`, 2026-10-31, slot 8): the broker hands
-  it over at the end of his lines, dark. The Jawa trader just inside the
-  junk yard's gate has only "Utinni!" until you carry it; then he keys a
+  it over at the end of his lines, dark. The Jawa trader in the
+  sandcrawler's hold has only "Utinni!" until you carry it; then he keys a
   code into it and it tracks Rusk, in the derelict bay's hold: an amber
   blink and a beep, every 1.4 s from across town down to 0.15 s up close,
   green when you face him. The hold's door, in the freighter's stern, is
@@ -551,6 +560,12 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
     - [ ] Waiting on Mark.
   - [ ] Bay 86, the dewback stable and the speeder garage.
   - [ ] The Jawa junk yard and the sandcrawler.
+    - [x] Laid out deeper (Mark, 2026-10-31: the trader shouldn't stand
+          at the gate): a front court, a passage slanting north-west to
+          north-east between two heaps of scrap, a lane along the north
+          wall, a breach in it, and the sandcrawler's ramp up into its
+          hold, where the trader is. Blocked out.
+    - [ ] Waiting on Mark, then the detail.
   - [ ] The back alleys and the back lane.
   - [ ] The checkpoint and the rooftops.
   - [ ] The comm tower.

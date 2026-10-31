@@ -715,12 +715,13 @@ town.house(64, 107, 80, 117, { h: BAY86.floorZ + 3, r: 2, ...HULL });
 
 // 4. The Jawa junk yard, north of the market: in by the alley between H and
 // I, through a gate (shut until the broker hands over the fob) and two
-// steps down. A heap of scrap slants across
-// its west side (the cage fence goes along it with the detail), a crane
-// (a stand-in post) and the furnace (a stand-in block). A side gate east
-// into the back alleys. Over its low north wall, the town's edge: the
-// sandcrawler (a stand-in block) parked in the desert, seen from the
-// market over I's low roof.
+// steps down into a front court, the furnace (a stand-in block) on its
+// north side and a side gate east into the back alleys. The trader isn't
+// there (Mark, 2026-10-31): a passage slants up its north-west corner
+// between two heaps of scrap, too tall to see over, to a lane along the
+// low north wall, a crane (a stand-in post) over it. Through a breach in
+// the wall, the sandcrawler (a stand-in block, seen from the market over
+// I's low roof) has its ramp down, and the trader is in its hold.
 const JUNK = -0.5;
 const SCRAP = { wall: 'metal-rust', roof: 'metal-rust', skirt: null };
 p.rect(54, 1, 101, 16, town.street(0, { floor: 'desert-sand' }));
@@ -741,14 +742,25 @@ town.stair(82, 37, 84, 40, { up: 'E', from: JUNK, top: 0, rise: 0.25, floor: 'fl
 // signal and lets Kyle out the back (the alleys lead past the blast doors).
 p.rect(84, 37, 86, 40, (_, __, c) => ({ ...c, door: 'door-planks-rising', style: 'rise', lock: 'remote' }));
 gateTag(84, 37, 86, 40, 'side-gate');
+// The two heaps, the passage between them 3 to 5 wide; the east one taller.
 town.slanted([[56, 18], [74, 18], [62, 32], [56, 32]], { ...SCRAP, h: JUNK + 2.5 });
-town.block(77, 21, 78, 22, { ...SCRAP, h: 14 });
-town.block(78, 29, 82, 33, { ...SCRAP, h: JUNK + 2 });
-// The trader who sold Rusk a power coupling, just inside the gate: with the
-// fob in hand, he keys its transponder code in (the signal).
+town.slanted([[78, 21], [84, 21], [84, 31], [67, 31]], { ...SCRAP, h: JUNK + 3 });
+town.block(81, 22, 82, 23, { ...SCRAP, h: 14 });
+town.block(78, 31, 82, 33, { ...SCRAP, h: JUNK + 2 });
+// The breach (two steps up to the desert) and the ramp (two more, in
+// metal) into the hold, junk piled either side so the desert stays out of
+// reach. The hold is the crawler's lower deck, dim, the length of it.
+town.stair(79, 16, 82, 18, { up: 'N', from: JUNK, top: 0, rise: 0.25, floor: 'flagstone', side: 'adobe-brick' });
+town.stair(79, 14, 82, 16, { up: 'N', from: 0, top: 0.5, rise: 0.25, floor: 'imp-grate', side: 'metal-rust' });
+town.block(54, 14, 79, 16, { ...SCRAP, h: 2.5 }).block(82, 14, 101, 16, { ...SCRAP, h: 2.5 });
+town.room(66, 6, 95, 13, { h: 20, floorZ: 0.5, ceilZ: 5, floor: 'imp-grate', ceiling: 'imp-panel-dark', wall: 'metal-rust', light: 96 });
+town.arch(79, 13, 82, 14, { h: 20, lintel: 3.5, floorZ: 0.5, wall: 'metal-rust', roof: 'metal-rust', floor: 'imp-grate', light: 96 });
+// The trader who sold Rusk a power coupling, at the hold's far west end,
+// a turn left at the top of the ramp: with the fob in hand, he keys its
+// transponder code in (the signal).
 list.push(
-  at('jawa', 70.5, 35.5, {
-    angle: 270,
+  at('jawa', 68.5, 9.5, {
+    angle: 0,
     tag: 'trader',
     name: 'Jawa trader',
     calm: { wander: 0 },

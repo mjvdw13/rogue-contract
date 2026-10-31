@@ -17,6 +17,8 @@ function talk(w, x, y, angle) {
 function takeContract(w) {
   for (let i = 0; i < 10 && !w.player.player.weapons.has('fob'); i++) talk(w, 92, 104.6, 270);
 }
+/** Talk to the Jawa trader in the sandcrawler's hold, from the top of its ramp's turn. */
+const trader = (w) => talk(w, 71, 9.5, 180);
 const door = (w, tag) => w.map.doors.find((d) => d.tag === tag);
 const shut = (w, tag) => door(w, tag).state === 'closed';
 const said = (w, who) => w.messages.filter((m) => m.startsWith(`${who}: `));
@@ -24,17 +26,16 @@ const said = (w, who) => w.messages.filter((m) => m.startsWith(`${who}: `));
 test('in Mos Eisley the informant has no pass, and the hold stays shut, until the trader keys in the signal', () => {
   const w = makeWorld('m1');
   const informant = () => talk(w, 141.5, 55.5, 0);
-  const trader = () => talk(w, 70.5, 37.5, 90);
 
   for (let i = 0; i < 3; i++) informant();
   assert.ok(!w.flags.has('pass') && shut(w, 'checkpoint'), 'the informant sends Kyle away');
-  trader();
+  trader(w);
   assert.ok(!w.flags.has('signal'), 'the trader has nothing for him without the contract');
   assert.ok(shut(w, 'hold-door'));
 
   takeContract(w);
   assert.ok(w.player.player.weapons.has('fob'), 'the broker hands over the fob');
-  for (let i = 0; i < 2; i++) trader();
+  for (let i = 0; i < 2; i++) trader(w);
   assert.ok(w.flags.has('signal'));
   assert.equal(w.signalAt()?.tag, 'rusk', 'the fob tracks Rusk');
   assert.ok(!shut(w, 'hold-door'), 'and the hold opens');
@@ -54,7 +55,7 @@ test('Mos Eisley opens in stages: the junk yard waits for the fob, the east for 
   run(w, mockInput(), 1);
   assert.equal(door(w, 'junk-gate').state, 'open', 'the fob opens the junk yard, for good');
   for (const tag of east) assert.ok(shut(w, tag), `${tag} still waits for the signal`);
-  for (let i = 0; i < 2; i++) talk(w, 70.5, 37.5, 90);
+  for (let i = 0; i < 2; i++) trader(w);
   run(w, mockInput(), 3);
   for (const tag of east) assert.equal(door(w, tag).state, 'open', `the signal opens ${tag}, for good`);
   assert.ok(shut(w, 'cantina-back'), "the cantina's back door stays locked while the town is calm");
@@ -78,7 +79,7 @@ test('in Mos Eisley people point the way: Jan on landing, the informant at the c
   assert.ok(said(w, 'JAN').length > 0, 'Jan names the first stop on landing');
 
   takeContract(w);
-  for (let i = 0; i < 2; i++) talk(w, 70.5, 37.5, 90);
+  for (let i = 0; i < 2; i++) trader(w);
   foot();
   foot();
   assert.equal(said(w, 'INFORMANT').length, 1, 'with the signal, the informant calls Kyle over, once');
@@ -107,7 +108,7 @@ test('the way home from Mos Eisley: customs locks the bay at the switch, the cus
   assert.equal(w.exitRequested ?? null, null, 'the Crow is no way out while the town is calm');
 
   takeContract(w);
-  for (let i = 0; i < 2; i++) talk(w, 70.5, 37.5, 90);
+  for (let i = 0; i < 2; i++) trader(w);
   Object.assign(w.player, { x: 184, y: 134.5 });
   run(w, mockInput(), 3);
   assert.equal(w.hostile, true);
