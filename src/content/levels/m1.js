@@ -742,10 +742,13 @@ town.stair(82, 37, 84, 40, { up: 'E', from: JUNK, top: 0, rise: 0.25, floor: 'fl
 // signal and lets Kyle out the back (the alleys lead past the blast doors).
 p.rect(84, 37, 86, 40, (_, __, c) => ({ ...c, door: 'door-planks-rising', style: 'rise', lock: 'remote' }));
 gateTag(84, 37, 86, 40, 'side-gate');
-// The two heaps, the passage between them 3 to 5 wide; the east one taller.
+// The two heaps, the passage between them 4 wide at its foot and opening
+// out at the top into a clearing at the ramp's foot (Mark, 2026-10-31: the
+// ramp mustn't touch the heaps), 3 tiles clear of it; the east one taller,
+// the crane standing in it.
 town.slanted([[56, 18], [74, 18], [62, 32], [56, 32]], { ...SCRAP, h: JUNK + 2.5 });
-town.slanted([[78, 21], [84, 21], [84, 31], [67, 31]], { ...SCRAP, h: JUNK + 3 });
-town.block(81, 22, 82, 23, { ...SCRAP, h: 14 });
+town.slanted([[80, 24], [84, 24], [84, 31], [67, 31]], { ...SCRAP, h: JUNK + 3 });
+town.block(82, 26, 83, 27, { ...SCRAP, h: 14 });
 town.block(78, 31, 82, 33, { ...SCRAP, h: JUNK + 2 });
 // The sandcrawler: the model is its outside, the tiles inside it its hold
 // (the crawler's lower deck, dim, the length of it, up on its treads at 3)
