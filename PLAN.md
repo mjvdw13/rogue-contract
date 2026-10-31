@@ -73,6 +73,9 @@ These need Mark to try something, or to decide. Don't start them without him.
   I and J and the junk yard's side gate. So the west end, the market, the
   cantina and the junk yard are all there is until the trader keys in
   the signal, which opens all three (the blast doors slowly, 2 s). The
+  junk yard's own gate (planks in the arch off the alley between H and I)
+  is shut too until the broker hands over the fob (Mark, 2026-10-31), so
+  the cantina comes first. The
   cantina's back door is locked until the switch, which shuts the blast
   doors again. To judge: whether the shut town reads as "not yet", the
   beam's look, and whether the alleys should open before the signal

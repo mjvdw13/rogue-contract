@@ -714,7 +714,8 @@ p.fence(73, 98, 77, 99, 'N', { tex: 'imp-bars', height: 4 });
 town.house(64, 107, 80, 117, { h: BAY86.floorZ + 3, r: 2, ...HULL });
 
 // 4. The Jawa junk yard, north of the market: in by the alley between H and
-// I, through a gate and two steps down. A heap of scrap slants across
+// I, through a gate (shut until the broker hands over the fob) and two
+// steps down. A heap of scrap slants across
 // its west side (the cage fence goes along it with the detail), a crane
 // (a stand-in post) and the furnace (a stand-in block). A side gate east
 // into the back alleys. Over its low north wall, the town's edge: the
@@ -729,6 +730,10 @@ town.block(56, 16, 84, 18, { h: 2, wall: 'adobe-brick', skirt: null });
 p.rect(56, 18, 84, 41, town.street(JUNK));
 p.rect(71, 44, 73, 49, town.street());
 town.arch(71, 41, 73, 44, { h: 5, wall: 'adobe-brick' });
+// Its gate is planks like the side gate's, shut until the broker hands Kyle
+// the fob: the junk yard is the fob's first stop (Mark, 2026-10-31).
+p.rect(71, 41, 73, 44, (_, __, c) => ({ ...c, door: 'door-planks-rising', style: 'rise', lock: 'remote' }));
+gateTag(71, 41, 73, 44, 'junk-gate');
 town.stair(71, 39, 73, 41, { up: 'S', from: JUNK, top: 0, rise: 0.25, floor: 'flagstone', side: 'adobe-brick' });
 town.arch(84, 37, 86, 40, { h: 5, wall: 'adobe-brick' });
 town.stair(82, 37, 84, 40, { up: 'E', from: JUNK, top: 0, rise: 0.25, floor: 'flagstone', side: 'adobe-brick' });
@@ -1152,11 +1157,11 @@ export default defineLevel({
     { on: 'talk', tag: 'informant', if: 'pass', do: [{ action: 'openDoors', tag: 'checkpoint' }] },
     // At the checkpoint's foot with the signal and no pass, the informant calls Kyle over from his den.
     { on: 'enter', tag: 'checkpoint-foot', if: 'signal', unless: ['pass', 'loud'], do: [{ action: 'message', text: 'INFORMANT: PSST. HUNTER. WANT A PASS?' }] },
-    // The fob: the broker gives it (dark), the trader's code points it at
-    // Rusk, opens the hold and opens the east (the blast doors, and the
-    // alleys from the market and the junk yard), and in the hold Rusk pulls
-    // its Imperial tracer and the town turns.
-    { on: 'talk', tag: 'broker', if: 'contract', do: [{ action: 'giveWeapon', weapon: 'fob' }, { action: 'message', text: 'THE BROKER HANDS YOU A TRACKING FOB.' }] },
+    // The fob: the broker gives it (dark) and the junk yard's gate opens,
+    // the trader's code points it at Rusk, opens the hold and opens the east
+    // (the blast doors, and the alleys from the market and the junk yard),
+    // and in the hold Rusk pulls its Imperial tracer and the town turns.
+    { on: 'talk', tag: 'broker', if: 'contract', do: [{ action: 'giveWeapon', weapon: 'fob' }, { action: 'message', text: 'THE BROKER HANDS YOU A TRACKING FOB.' }, { action: 'openDoors', tag: 'junk-gate' }] },
     {
       on: 'talk',
       tag: 'trader',

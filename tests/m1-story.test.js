@@ -45,12 +45,15 @@ test('in Mos Eisley the informant has no pass, and the hold stays shut, until th
   assert.equal(w.hostile, false, 'the town is calm all the while');
 });
 
-test('Mos Eisley opens in stages: the east waits for the signal, and the switch shuts the blast doors and opens the cantina\'s back door', () => {
+test('Mos Eisley opens in stages: the junk yard waits for the fob, the east for the signal, and the switch shuts the blast doors and opens the cantina\'s back door', () => {
   const w = makeWorld('m1');
   const east = ['blast-doors', 'side-gate', 'alley-gate'];
-  for (const tag of [...east, 'cantina-back']) assert.ok(shut(w, tag), `${tag} is shut when Kyle lands`);
+  for (const tag of ['junk-gate', ...east, 'cantina-back']) assert.ok(shut(w, tag), `${tag} is shut when Kyle lands`);
 
   takeContract(w);
+  run(w, mockInput(), 1);
+  assert.equal(door(w, 'junk-gate').state, 'open', 'the fob opens the junk yard, for good');
+  for (const tag of east) assert.ok(shut(w, tag), `${tag} still waits for the signal`);
   for (let i = 0; i < 2; i++) talk(w, 70.5, 37.5, 90);
   run(w, mockInput(), 3);
   for (const tag of east) assert.equal(door(w, tag).state, 'open', `the signal opens ${tag}, for good`);

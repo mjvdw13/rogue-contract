@@ -89,8 +89,11 @@ its controls are the terminal in the customs house, past its two troopers
   holds the next stop. When Kyle lands the blast doors are shut, and so
   are the plank gates across the alley between I and J and the junk
   yard's side gate: the west end, the market, the cantina and the junk
-  yard are all there is. The trader's signal opens all three, and the
-  east with them. The cantina's back door is locked until the switch.
+  yard are all there is. The junk yard's own gate (the arch off the alley
+  between H and I) stays shut until the broker hands over the fob (Mark,
+  2026-10-31), so the cantina comes first. The trader's signal opens the
+  other three, and the east with them. The cantina's back door is locked
+  until the switch.
 - Kyle's blaster stays holstered until the switch (Mark, 2026-10-30), so
   the town can't turn early: it turns when he finds Rusk.
 - The Jawa trader has nothing to say until Kyle carries the fob.
