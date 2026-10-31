@@ -65,13 +65,15 @@ function hood(id, w, tex) {
     m.box([x0, 0, 0], [x1, d, spring], { ...s, top: false, bottom: false, side: (i) => [false, s, front, s][i] });
     m.line(x0, 0, x0, d).line(x0, d, x1, d).line(x1, d, x1, 0);
   }
-  // The half circle: a block a segment, its outer face, front and soffit
-  // (the joints between segments and its back against the wall hidden).
+  // The half circle: a block a segment, its outer face, front, soffit and
+  // back (the joints between segments hidden). The back faces the wall, so
+  // it only shows through the opening behind, once a door there opens (the
+  // checkpoint's): without it the band's corners were see-through.
   for (let k = 0; k < STEPS; k++) {
     const [t0, t1] = [(k / STEPS) * Math.PI, ((k + 1) / STEPS) * Math.PI];
     const at = (r, t) => [Math.cos(t) * r, spring + Math.sin(t) * r];
     const outline = [at(a, t0), at(a + b, t0), at(a + b, t1), at(a, t1)];
-    m.prism(outline, 0, d, { ...s, axis: 'y', top: front, bottom: false, side: (i) => (i === 0 || i === 2 ? false : s) });
+    m.prism(outline, 0, d, { ...s, axis: 'y', top: front, bottom: s, side: (i) => (i === 0 || i === 2 ? false : s) });
   }
   return m.build();
 }
