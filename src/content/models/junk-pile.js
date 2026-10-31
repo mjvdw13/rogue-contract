@@ -25,7 +25,7 @@ const PLATES = ['metal-rust', 'metal-grey', 'bay-plate', 'crawler-hull'];
 const PIPES = ['metal-rust', 'pump-hose', 'metal-grey'];
 
 /** A small seeded random number generator (mulberry32), 0..1. */
-function rng(seed) {
+export function rng(seed) {
   let a = seed >>> 0;
   return () => {
     a = (a + 0x6d2b79f5) >>> 0;

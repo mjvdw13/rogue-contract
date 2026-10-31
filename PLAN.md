@@ -104,6 +104,12 @@ These need Mark to try something, or to decide. Don't start them without him.
   `-rust`, about a Jawa's height), a Jawa minding them and another by the
   furnace. To judge: whether the row should be messier or spread round
   the court, and the paint (the white is dusty grey).
+  The hold is furnished: racks of shelves along both walls loaded with
+  boxes, drums, domes and pipes (`rack-a`, `-b`, `-c`, each laid out
+  differently), droids for sale across from the doorway, crates and
+  drums, junk at the east end, a power unit and a crate behind the
+  trader, three lamps down the middle. To judge: whether it's too
+  cluttered or too tidy, and whether the hold is too dark.
 
 - **Mos Eisley opens in stages** (`?map=m1`, 2026-10-31): when you land the
   blast doors are shut (a stand-in: a rising Imperial gate under a steel
@@ -608,13 +614,10 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
     - [x] The cage fence along the west heap: a model on the slant
           from the north wall to the west, rusty diamond mesh between
           posts, some panels patched with plate.
-    - [ ] The court and the hold, a step at a time:
-      - [x] The furnace on the court's north side: a model, a squat
-            rusty kiln, its mouth glowing, a stack and a hopper.
-      - [x] The crane on the east heap: a model, a rusty mast and jib
-            with a hook hanging.
-      - [x] Droids for sale in the court, and Jawas minding them.
-      - [ ] The hold's racks and clutter.
+    - [x] The court and the hold: the furnace and the crane as models,
+          droids for sale in the court with Jawas minding them, the
+          hold's racks and clutter.
+    - [ ] Waiting on Mark.
   - [ ] The back alleys and the back lane.
   - [ ] The checkpoint and the rooftops.
   - [ ] The comm tower.

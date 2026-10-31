@@ -778,6 +778,21 @@ town.arch(76, 12, 80, 13, { h: 8, lintel: 4, floorZ: 3, wall: 'metal-rust', roof
 town.stair(76, 13, 80, 20, { up: 'N', from: JUNK, top: 3, rise: 0.5, floor: 'imp-grate', side: 'metal-rust' });
 town.block(75, 13, 76, 18, { ...SCRAP, h: 5 }).block(80, 13, 81, 18, { ...SCRAP, h: 5 });
 town.block(54, 14, 75, 16, { ...SCRAP, h: 2.5 }).block(81, 14, 101, 16, { ...SCRAP, h: 2.5 });
+// The hold's wares: racks of shelves along both walls (the doorway kept
+// clear), droids for sale across from the doorway, crates and drums, junk
+// at the east end, a power unit and a crate bench behind the trader, and
+// lamps down the middle. The floor is at 3, so things stacked on others
+// are placed by their z.
+list.push(
+  at('rack-a', 69, 4.05, { angle: 0 }), at('rack-b', 72.4, 4.05, { angle: 0 }), at('rack-c', 83.6, 4.05, { angle: 0 }), at('rack-a', 87, 4.05, { angle: 0 }),
+  at('rack-c', 70, 11.95, { angle: 180 }), at('rack-b', 73.3, 11.95, { angle: 180 }), at('rack-a', 83, 11.95, { angle: 180 }), at('rack-b', 86.4, 11.95, { angle: 180 }),
+  at('barrel-rust', 75.2, 4.6), at('astromech-rust', 76.7, 5.1, { angle: 280 }), at('power-droid', 78.1, 5, { angle: 265 }),
+  at('astromech-red', 79.5, 5.1, { angle: 255 }), at('barrel-grey', 81.2, 4.6),
+  at('power-unit', 65.05, 9.6, { angle: 90 }), at('crate-rust-long', 65.5, 6.2, { angle: 90 }), at('droid-dome', 65.5, 5.9, { z: 3.7, angle: 40 }),
+  at('crate-tan', 67.6, 10.5, { angle: 10 }), at('crate-grey-small', 67.6, 10.5, { z: 3.9, angle: 35 }),
+  at('junk-heap', 87.6, 8, { angle: 80 }), at('canister-rust', 88.5, 10.2), at('barrel-rust', 88.4, 5.8),
+  at('ceiling-lamp', 70, 8), at('ceiling-lamp', 78, 8), at('ceiling-lamp', 86, 8),
+);
 // The trader who sold Rusk a power coupling, at the hold's far west end,
 // a turn left at the top of the ramp: with the fob in hand, he keys its
 // transponder code in (the signal).
