@@ -599,13 +599,19 @@ export function defineSong(def) {
  * floor with a random speed of up to `drift` ([0.3, 0.1]: across, up or
  * down), carried by `wind` ([x, y, z] units per second; still by default).
  * `list` places things at exact spots: `{ type, x, y, angle?, z?, tag?,
- * skill?, drops?, ambush?, wander?, calm? }`; a friendly's `wander` (tiles, 0
+ * skill?, drops?, ambush?, wander?, calm?, talk?, name? }`; a friendly's `wander` (tiles, 0
  * stands still) replaces its type's for that one. A monster's `calm` (true,
  * or `{ lines?, speed?, wander?, idleTime?, patrol?, loop? }` over its
  * type's `calm`) places it calm: it never attacks until the town turns
  * hostile (world.turnHostile: hurt, or gunfire). `patrol` is a
  * list of two or more [x, y] points it walks between in straight lines,
  * pausing at each, there and back, or round with `loop: true`.
+ * A friendly's or calm monster's `talk` is a conversation (things/talk.js):
+ * a list of lines said one per use, staying on the last, or a list of
+ * branches `{ if?, unless?, lines, set? }` picked by story flags, each
+ * setting its `set` flags once its last line is said. `name` is who they
+ * speak as, instead of their type's name. `triggers` may have `if` and
+ * `unless` (a story flag or a list): see world/triggers.js.
  * @param {{id:string, name:string, tiles:string[], things?:string[], legend?:object,
  *   thingLegend?:object, list?:object[], triggers?:object[], music?:string, sky?:string,
  *   fog?:number, haze?:{color:number[], half?:number},

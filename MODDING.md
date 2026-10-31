@@ -1266,6 +1266,34 @@ The validator checks that every patrol point has room for the body and
 that each walk, from the spot to the nearest point too, is a clear
 straight line.
 
+A friendly or a calm monster can hold a conversation. `talk` is a list
+of lines: each press of use says the next, and it stays on the last.
+Bumping into them repeats what they last said without moving on (and says
+nothing before you've spoken). `name` is who they speak as, instead of
+their type's name (`SPACER` standing in for the broker):
+
+```js
+{ type: 'villager-man', x: 92.5, y: 104.5, wander: 0, tag: 'broker', name: 'BROKER',
+  talk: ["Katarn. Sit.", "The Guild wants a deserter. Rusk.", "Take the fob. Go."] },
+```
+
+For lines that depend on the story, `talk` is a list of branches instead.
+Each use takes the first branch whose story flags allow it (`if` and
+`unless`, as on triggers), says its next line (each branch keeps its own
+place) and, once its last line has been said, sets its `set` flags:
+
+```js
+talk: [
+  { unless: 'contract', lines: ["Katarn. Sit.", "Take the fob. Go."], set: 'contract' },
+  { lines: ["You've got the fob. Go."] },
+],
+```
+
+A conversation stops when they can't talk any more: a friendly who's been
+hurt, or a calm monster once the town turns. The player can talk to
+someone up to 3.5 tiles off (doors and switches: 2.6), so across a booth's
+table or the bar; use picks the nearest character in line.
+
 ### Triggers and actions
 
 ```js
@@ -1288,8 +1316,23 @@ Events:
 - `killed`: every monster of that type (`thing`) or with that tag is dead.
 - `hostile`: the calm monsters turn (see *Calm* under Monsters), by the
   `hostile` action or the player's gunfire.
+- `talk`: the player uses a friendly or calm monster of that type
+  (`thing`) or with that tag, and they react (each line of a conversation;
+  bumping into them doesn't count). A conversation's `set` flags are set
+  before its talk triggers run, so `if` on the flag fires on its last line.
 
 A trigger fires once unless you add `once: false`.
+
+Story flags tie triggers and conversations together. The `setFlag` action
+sets one; `if` and `unless` on any trigger (a flag, or a list) let it fire
+only while every `if` flag is set and no `unless` flag is. A `once`
+trigger skipped for its flags stays armed. Flags last for the level. The
+validator rejects a flag that's read but that nothing in the level sets.
+
+```js
+{ on: 'talk', tag: 'broker', if: 'contract', do: [{ action: 'message', text: 'GOT THE FOB.' }] },
+{ on: 'enter', tag: 'checkpoint', unless: 'pass', do: [{ action: 'message', text: 'NO PASS, NO ENTRY.' }], once: false },
+```
 
 Actions:
 
@@ -1309,6 +1352,8 @@ Actions:
 - `teleport` `{ tag, angle }`: moves the player to the first tile with the tag
 - `hostile`: the town's switch: every calm monster turns normal at once,
   and the `on: 'hostile'` triggers run (only the first time)
+- `setFlag` `{ flag, value? }`: sets a story flag (`value: false` clears
+  it)
 
 ### Checking a level
 

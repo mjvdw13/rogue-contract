@@ -8,7 +8,8 @@ import { PARTICLE_BLENDS, PARTICLE_FLOORS, PARTICLE_SHAPES, PARTICLE_WALLS, POIN
 import { Hangings, HANGING_SHAPES, HANGING_PINS } from './world/hangings.js';
 
 const PICKUP_MODIFIERS = ['maxHealth', 'armorClass', 'maxArmor', 'duration', 'always'];
-const TRIGGER_EVENTS = ['start', 'enter', 'use', 'killed', 'pickup', 'hostile'];
+const TRIGGER_EVENTS = ['start', 'enter', 'use', 'killed', 'pickup', 'hostile', 'talk'];
+const TALK_FIELDS = ['if', 'unless', 'lines', 'set'];
 /** Faces per model before the validator warns (render cost). */
 const MODEL_BUDGET = 400;
 
@@ -299,9 +300,39 @@ export function validateContent(reg) {
     for (const a of Object.keys(hero.startAmmo ?? {})) if (!reg.ammo.has(a)) err(`hero: unknown start ammo "${a}"`);
   }
 
+  // Story flags: a flag, or a list of them.
+  const isFlags = (v) => (typeof v === 'string' ? v !== '' : Array.isArray(v) && v.length > 0 && v.every((f) => typeof f === 'string' && f !== ''));
+  // `if` and `unless` on a trigger or a conversation's branch; the flags read go in `reads` to check they're set somewhere.
+  const checkConditions = (who, spec, reads) => {
+    for (const k of ['if', 'unless']) {
+      if (spec[k] === undefined) continue;
+      if (!isFlags(spec[k])) err(`${who}: "${k}" must be a story flag or a list of them`);
+      else for (const f of [].concat(spec[k])) reads.push({ who, flag: f });
+    }
+  };
+  // A placement's conversation (things/talk.js): a list of lines, or of branches.
+  const checkTalk = (who, talk, reads, sets) => {
+    if (!Array.isArray(talk) || talk.length === 0) return err(`${who}: "talk" must be a list of lines, or of branches like { if, lines }`);
+    if (talk.every((l) => typeof l === 'string')) return;
+    talk.forEach((b, i) => {
+      const where = `${who}: talk branch ${i + 1}`;
+      if (!b || typeof b !== 'object' || Array.isArray(b)) return err(`${who}: "talk" is either all lines or all branches like { if, lines }, not a mix`);
+      for (const k of Object.keys(b)) if (!TALK_FIELDS.includes(k)) err(`${where} has unknown field "${k}" (it takes ${TALK_FIELDS.join(', ')})`);
+      if (!(Array.isArray(b.lines) && b.lines.length > 0 && b.lines.every((l) => typeof l === 'string'))) err(`${where} needs "lines", a list of one or more strings`);
+      checkConditions(where, b, reads);
+      if (b.set !== undefined) {
+        if (!isFlags(b.set)) err(`${where}: "set" must be a story flag or a list of them`);
+        else for (const f of [].concat(b.set)) sets.add(f);
+      }
+    });
+  };
+
   for (const level of reg.levels.values()) {
     const owner = `Level "${level.id}"`;
     const keysPlaced = new Set();
+    // Story flags the level sets, and where it reads them.
+    const flagsSet = new Set();
+    const flagReads = [];
     let built = null;
     for (let skill = 1; skill <= 5; skill++) {
       let b;
@@ -332,6 +363,16 @@ export function validateContent(reg) {
         if (sp.wander !== null && skill === 3) {
           if (def.kind !== 'npc') err(`${owner}: a ${sp.type} at (${sp.x}, ${sp.y}) has "wander", which only friendly characters take`);
           else if (!(typeof sp.wander === 'number' && sp.wander >= 0)) err(`${owner}: a ${sp.type} at (${sp.x}, ${sp.y}): "wander" must be a number of tiles, 0 or more`);
+        }
+        if ((sp.talk !== null || sp.name !== null) && skill === 3) {
+          const who = `${owner}: a ${sp.type} at (${sp.x}, ${sp.y})`;
+          const field = sp.talk !== null ? 'talk' : 'name';
+          if (def.kind !== 'npc' && !(def.kind === 'monster' && sp.calm)) err(`${who} has "${field}", which only friendlies and calm monsters take`);
+          if (sp.name !== null && !(typeof sp.name === 'string' && sp.name !== '')) err(`${who}: "name" must be a name to speak under`);
+          if (sp.talk !== null) checkTalk(who, sp.talk, flagReads, flagsSet);
+        } else if (sp.talk !== null) {
+          // Flags set on other skills count as set.
+          for (const b of Array.isArray(sp.talk) ? sp.talk : []) for (const f of [].concat(b?.set ?? [])) if (typeof f === 'string') flagsSet.add(f);
         }
         if (sp.calm !== null && skill === 3) {
           const who = `${owner}: a ${sp.type} at (${sp.x}, ${sp.y})`;
@@ -392,17 +433,28 @@ export function validateContent(reg) {
         if (name === 'explode' && !reg.explosions?.has(a.explosion)) err(`${owner}: ${where} sets off unknown explosion "${a.explosion}"`);
         if (a.action === 'music' && a.id && !reg.songs.has(a.id)) warn(`${owner}: ${where} plays unknown song "${a.id}"`);
         if (a.action === 'setLight' && a.lightFx !== undefined && LIGHT_FX[a.lightFx] === undefined) err(`${owner}: ${where} sets unknown lightFx "${a.lightFx}"`);
+        if (name === 'setFlag') {
+          if (!(typeof a.flag === 'string' && a.flag !== '')) err(`${owner}: ${where} sets a flag but has no "flag" name`);
+          if (a.value !== undefined && typeof a.value !== 'boolean') err(`${owner}: ${where}: setFlag "value" must be true or false`);
+        }
       }
     };
+    for (const t of level.triggers ?? []) for (const a of [].concat(t.do ?? [])) if (a?.action === 'setFlag' && typeof a.flag === 'string') flagsSet.add(a.flag);
+    for (const u of map.uses.values()) for (const a of u.actions) if (a?.action === 'setFlag' && typeof a.flag === 'string') flagsSet.add(a.flag);
     (level.triggers ?? []).forEach((t, i) => {
       const where = `trigger #${i + 1}`;
       if (!TRIGGER_EVENTS.includes(t.on)) err(`${owner}: ${where} has unknown event "${t.on}"`);
       if (t.on === 'killed' && t.tag) {
         if (!built.spawns.some((sp) => sp.tag === t.tag)) err(`${owner}: ${where} waits for monsters tagged "${t.tag}" but none are placed`);
+      } else if (t.on === 'talk') {
+        if (!t.thing && !t.tag) err(`${owner}: ${where} listens for talk but names no "thing" or "tag"`);
+        else if (t.tag && !built.spawns.some((sp) => sp.tag === t.tag)) err(`${owner}: ${where} listens for talk from "${t.tag}" but nothing placed has that tag`);
       } else if (t.tag && !map.tags.has(t.tag)) err(`${owner}: ${where} refers to tag "${t.tag}" which no tile has`);
       if (t.thing && !reg.things.has(t.thing)) err(`${owner}: ${where} refers to unknown thing "${t.thing}"`);
+      checkConditions(`${owner}: ${where}`, t, flagReads);
       checkActions(where, t.do);
     });
+    for (const r of flagReads) if (!flagsSet.has(r.flag)) err(`${r.who} waits for flag "${r.flag}", which nothing in the level sets (a setFlag action, or a talk branch's "set")`);
     for (const u of map.uses.values()) checkActions('a switch', u.actions);
     if (level.music && !reg.songs.has(level.music)) warn(`${owner}: unknown music "${level.music}"`);
     if (level.sky && !reg.textures.has(level.sky)) err(`${owner}: unknown sky texture "${level.sky}"`);

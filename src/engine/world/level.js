@@ -466,6 +466,9 @@ export function buildLevel(registry, level, opts = {}) {
       lit: spec.lit ?? null,
       // A monster that starts calm (things/calm.js): true, or fields over its type's `calm`.
       calm: spec.calm ?? null,
+      // A conversation (things/talk.js), and the name they speak under.
+      talk: spec.talk ?? null,
+      name: spec.name ?? null,
     });
   };
 
