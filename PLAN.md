@@ -629,6 +629,11 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
           the trader.
     - [x] Mark's note (2026-10-31: the things in the hold are dark, its
           walls bright): the walls in the hold's light, its lamps lit.
+    - [x] Mark's note (2026-10-31: a shelf in a wall, the doorway's frame
+          flickers from inside): the rack on the west bulkhead turned
+          round; the door's jambs off the doorway's walls, no sill box.
+    - [ ] Mark's note (2026-10-31: make the yard feel alive): smoke
+          rising from the heaps, steam at the sandcrawler's door.
     - [ ] Waiting on Mark.
   - [ ] The back alleys and the back lane.
   - [ ] The checkpoint and the rooftops.

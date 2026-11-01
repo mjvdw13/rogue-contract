@@ -113,10 +113,13 @@ function sandcrawler() {
     const ya = across0 + k * 1.5;
     m.face([[lipX(v0), ya, v0], [lipX(v0), ya + 1, v0], [lipX(v1), ya + 1, v1], [lipX(v1), ya, v1]], HOLE, [0, ya + 0.5, (v0 + v1) / 2]);
   }
-  // The door's jambs and head, dark, and the sill under it.
-  m.face([[d0, INNER, CRAWLER.doorTop], [d1, INNER, CRAWLER.doorTop], [d1, Y + L, CRAWLER.doorTop], [d0, Y + L, CRAWLER.doorTop]], { ...DARK, twoSided: true });
-  for (const x of [d0, d1]) m.face([[x, INNER, G], [x, Y + L, G], [x, Y + L, CRAWLER.doorTop], [x, INNER, CRAWLER.doorTop]], { ...DARK, twoSided: true });
-  m.box([d0, INNER, G], [d1, Y + L, CRAWLER.deck], DARK);
+  // The door's jambs and head, dark. The jambs stand a hair in from the
+  // doorway's walls: level with them, the two flicker through each other.
+  // (No sill: the steps' tiles are its floor, and a model under a floor
+  // still shows through it.)
+  const [j0, j1] = [d0 + 0.04, d1 - 0.04];
+  m.face([[j0, INNER, CRAWLER.doorTop], [j1, INNER, CRAWLER.doorTop], [j1, Y + L, CRAWLER.doorTop], [j0, Y + L, CRAWLER.doorTop]], { ...DARK, twoSided: true });
+  for (const x of [j0, j1]) m.face([[x, INNER, G], [x, Y + L, G], [x, Y + L, CRAWLER.doorTop], [x, INNER, CRAWLER.doorTop]], { ...DARK, twoSided: true });
   // The ramp: a thick plate from the sill down and out, the hold's level at
   // the top and the ground's at its foot.
   const z = (y) => CRAWLER.deck + 0.3 - (y - (Y + L)) * CRAWLER.slope;

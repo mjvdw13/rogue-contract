@@ -792,7 +792,7 @@ town.block(54, 14, 75, 16, { ...SCRAP, h: 2.5 }).block(81, 14, 101, 16, { ...SCR
 // The floor is at 3, so things stacked on others are placed by their z.
 town.block(73, 7, 74, 12, HOLD).block(84, 4, 85, 9, HOLD);
 list.push(
-  at('rack-b', 66.6, 4.05, { angle: 0 }), at('rack-c', 74.05, 10, { angle: 270 }), at('rack-a', 82.5, 11.95, { angle: 180 }),
+  at('rack-b', 66.6, 4.05, { angle: 0 }), at('rack-c', 74.05, 10, { angle: 90 }), at('rack-a', 82.5, 11.95, { angle: 180 }),
   at('rack-a', 87, 4.05, { angle: 0 }), at('rack-c', 87.3, 11.95, { angle: 180 }),
   at('barrel-rust', 71.6, 4.6), at('canister-rust', 70.5, 4.5), at('barrel-grey', 75, 4.6), at('crate-grey-small', 76.1, 4.6, { angle: 20 }),
   at('power-unit', 65.05, 8.4, { angle: 90 }), at('crate-rust-long', 65.5, 6.2, { angle: 90 }), at('droid-dome', 65.5, 5.9, { z: 3.7, angle: 40 }),
