@@ -28,6 +28,12 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
+- **Sliding along angled walls and objects** (any map, 2026-10-31): you
+  should glide along a diagonal wall or a turned barricade as you do along
+  a flat wall, instead of sticking. Bodies are now round against solid
+  tiles too, so outer corners are rounded off. To judge: the feel, and
+  whether rounded corners are welcome.
+
 - **The way home** (`?map=m1`, 2026-10-31): at the switch customs locks
   Docking Bay 87's door. Back on the lane in front of it Jan says its
   controls are in the customs house; use its terminal (past the two

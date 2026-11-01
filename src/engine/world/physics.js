@@ -231,9 +231,9 @@ export function lineOfSight(map, x0, y0, x1, y1) {
 }
 
 /**
- * Does a box of half-size r centred at (x, y) overlap any blocking tile or the
- * closed panel of a rising door, or a circle of radius r overlap the solid side
- * of an angled wall?
+ * Does a circle of radius r at (x, y) overlap any blocking tile or the solid
+ * side of an angled wall, or a box of half-size r the closed panel of a
+ * rising door?
  */
 export function blockedByMap(map, x, y, r) {
   const x0 = Math.floor(x - r);
@@ -242,7 +242,15 @@ export function blockedByMap(map, x, y, r) {
   const y1 = Math.max(y0, Math.ceil(y + r) - 1);
   for (let ty = y0; ty <= y1; ty++) {
     for (let tx = x0; tx <= x1; tx++) {
-      if (map.blocks(tx, ty)) return true;
+      if (map.blocks(tx, ty)) {
+        // A body is round against solid tiles too, as against angled walls:
+        // a box's corner would catch on the corners of the tiles behind an
+        // angled wall, which sit on its line.
+        const nx = x < tx ? tx : x > tx + 1 ? tx + 1 : x;
+        const ny = y < ty ? ty : y > ty + 1 ? ty + 1 : y;
+        if ((x - nx) * (x - nx) + (y - ny) * (y - ny) < r * r - 1e-9) return true;
+        continue;
+      }
       if (map.flags[ty * map.w + tx] & F_DOOR && map.panelBlocks(tx, ty, x, y, r)) return true;
       if (map.flags[ty * map.w + tx] & F_SLANT && map.slants[map.slantIndex[ty * map.w + tx]].touchesCircle(x, y, r)) return true;
     }
@@ -274,16 +282,6 @@ export function fenceBlocks(map, x, y, r, bottom, top) {
         const by = edge === 0 ? ty : ty + 1;
         if (segDist2(x, y, ax, ay, bx, by) < r2 - 1e-9) return true;
       }
-    }
-  }
-  return false;
-}
-
-/** Is there an angled wall in any tile a box of half-size r at (x, y) touches? */
-export function slantNear(map, x, y, r) {
-  for (let ty = Math.floor(y - r); ty <= Math.max(Math.floor(y - r), Math.ceil(y + r) - 1); ty++) {
-    for (let tx = Math.floor(x - r); tx <= Math.max(Math.floor(x - r), Math.ceil(x + r) - 1); tx++) {
-      if (map.inBounds(tx, ty) && map.flags[ty * map.w + tx] & F_SLANT) return true;
     }
   }
   return false;

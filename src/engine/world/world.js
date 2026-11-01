@@ -2,7 +2,7 @@ import { buildLevel } from './level.js';
 import { F_SECRET, F_DAMAGE, F_EXIT, F_USE } from './tilemap.js';
 import { Backdrop } from './backdrop.js';
 import { initNpc, npcThink, npcReact, npcPain } from '../things/npc.js';
-import { castRay, traceRay3D, blockedByMap, fenceBlocks, rayCircle, slantNear } from './physics.js';
+import { castRay, traceRay3D, blockedByMap, fenceBlocks, rayCircle } from './physics.js';
 import { updateDoors, openDoor, closeDoor } from './doors.js';
 import { updateLifts, startLift, liftAt } from './lifts.js';
 import { LightEffects } from './lights.js';
@@ -22,6 +22,7 @@ import { PlayerState, playerThink, playerCamera } from '../things/player.js';
 import { monsterThink, wakeMonster, monsterPain, applyMomentum } from '../things/monster.js';
 import { makeCalm, endCalm, calmReact } from '../things/calm.js';
 import { makeTalk } from '../things/talk.js';
+import { pushable } from '../things/push.js';
 import { projectileThink, launchProjectile, effectThink } from '../things/projectile.js';
 import { tryPickup } from '../things/pickups.js';
 import { damage, radiusDamage, hitscan, meleeTarget, corpseThink } from '../combat/damage.js';
@@ -52,6 +53,8 @@ const FLOOR_DAMAGE_INTERVAL = 0.9;
 const GRAVITY = 28;
 /** How far a walking body may hang over the edge of a drop it won't step off. */
 const OVERHANG = 0.15;
+/** The widest turn a blocked move tries when sliding (80 degrees): a push nearly straight into a wall stops. */
+const SLIDE_TURN = (80 * Math.PI) / 180;
 /** A sprite frame's height in world units, as the sprite renderer draws it. */
 const spriteHeight = (sheet, def) => (sheet.fh * (def?.scale ?? 1) * (sheet.scale ?? 1)) / TEXELS_PER_UNIT;
 /** While a lift moves, flow fields are refreshed this often (seconds). */
@@ -474,45 +477,108 @@ export class World {
 
   _slide(t, dx, dy, walk = false) {
     const steps = Math.max(1, Math.ceil(Math.max(Math.abs(dx), Math.abs(dy)) / 0.4));
+    const sx = dx / steps;
+    const sy = dy / steps;
     let moved = false;
     for (let i = 0; i < steps; i++) {
-      const sx = dx / steps;
-      const sy = dy / steps;
       if (this.checkPosition(t, t.x + sx, t.y + sy, walk)) {
         t.x += sx;
         t.y += sy;
         moved = true;
         continue;
       }
-      // (Tiny components, like cos(90 degrees), don't count as a slide.)
-      let slid = false;
-      if (Math.abs(sx) > 1e-9 && this.checkPosition(t, t.x + sx, t.y, walk)) {
-        t.x += sx;
-        slid = true;
-      } else if (t.player) t.vx = 0;
-      if (Math.abs(sy) > 1e-9 && this.checkPosition(t, t.x, t.y + sy, walk)) {
-        t.y += sy;
-        slid = true;
-      } else if (t.player) t.vy = 0;
-      // Against an angled wall, slide along it: try the move turned 45 degrees each way.
-      if (!slid && slantNear(this.map, t.x, t.y, t.radius + 0.25)) {
-        for (const turn of [Math.PI / 4, -Math.PI / 4]) {
-          const c = Math.cos(turn) * Math.SQRT1_2;
-          const s = Math.sin(turn) * Math.SQRT1_2;
-          const mx = sx * c - sy * s;
-          const my = sx * s + sy * c;
-          if (this.checkPosition(t, t.x + mx, t.y + my, walk)) {
-            t.x += mx;
-            t.y += my;
-            slid = true;
-            break;
-          }
-        }
+      // Blocked: first close the gap to what's in the way (to a sixteenth of
+      // the step), so the slide starts touching it and turns the right way.
+      let f = 0;
+      for (let h = 0.5; h > 0.05; h /= 2) {
+        if (this.checkPosition(t, t.x + sx * (f + h), t.y + sy * (f + h), walk)) f += h;
       }
-      moved = moved || slid;
-      if (!slid) break;
+      if (f > 0) {
+        t.x += sx * f;
+        t.y += sy * f;
+        moved = true;
+      }
+      const m = this._slideMove(t, sx * (1 - f), sy * (1 - f), walk);
+      if (!m) {
+        if (t.player) t.vx = t.vy = 0;
+        break;
+      }
+      t.x += m[0];
+      t.y += m[1];
+      moved = true;
+      // The player keeps only the part of its velocity along the slide, so
+      // pressing into a wall at any angle doesn't brake it.
+      if (t.player) {
+        const len = Math.hypot(m[0], m[1]);
+        const ux = m[0] / len;
+        const uy = m[1] / len;
+        const v = Math.max(0, t.vx * ux + t.vy * uy);
+        t.vx = v * ux;
+        t.vy = v * uy;
+      }
     }
     return moved;
+  }
+
+  /**
+   * A blocked move (sx, sy): the free move that gets furthest along it, or
+   * null. Tries each axis (exact along a flat wall) and, on each side, the
+   * move turned toward the wall's line and shortened by the cosine of the
+   * turn, bisecting for the smallest turn that's free (within 2.5 degrees):
+   * close to the move projected on the surface, whatever its angle or shape.
+   */
+  _slideMove(t, sx, sy, walk) {
+    const d2 = sx * sx + sy * sy;
+    let best = null;
+    // (Gain is how far a move gets along the step, times the step's length.
+    // Under a hundredth of the step, like cos(90 degrees), isn't a slide: a
+    // body creeping along a wall by a hair each tick hasn't moved.)
+    let gain = d2 * 1e-4;
+    if (sx * sx > gain && this.checkPosition(t, t.x + sx, t.y, walk)) {
+      best = [sx, 0];
+      gain = sx * sx;
+    }
+    if (sy * sy > gain && this.checkPosition(t, t.x, t.y + sy, walk)) {
+      best = [0, sy];
+      gain = sy * sy;
+    }
+    // (Walking into someone who gives way (push.js), the player leans on
+    // them rather than slipping round them.)
+    if (t.player && this._pushableAt(t, t.x + sx, t.y + sy)) return best;
+    for (const side of [1, -1]) {
+      let lo = 0;
+      let hi = SLIDE_TURN;
+      if (!this._turnFree(t, sx, sy, side * hi, walk)) continue;
+      for (let k = 0; k < 5; k++) {
+        const mid = (lo + hi) / 2;
+        if (this._turnFree(t, sx, sy, side * mid, walk)) hi = mid;
+        else lo = mid;
+      }
+      const g = d2 * Math.cos(hi) ** 2;
+      if (g > gain) {
+        const c = Math.cos(side * hi);
+        const s = Math.sin(side * hi);
+        best = [(sx * c - sy * s) * c, (sx * s + sy * c) * c];
+        gain = g;
+      }
+    }
+    return best;
+  }
+
+  /** Is someone the player can push in the way of body `t` at (x, y)? */
+  _pushableAt(t, x, y) {
+    for (const o of this.things) {
+      if (o === t || !pushable(o) || o.z >= t.z + t.height || t.z >= o.z + o.height) continue;
+      if (overlap(o, x, y, t.radius) > 0) return true;
+    }
+    return false;
+  }
+
+  /** Is the move (sx, sy) turned by `turn` and shortened by its cosine free? */
+  _turnFree(t, sx, sy, turn, walk) {
+    const c = Math.cos(turn);
+    const s = Math.sin(turn);
+    return this.checkPosition(t, t.x + (sx * c - sy * s) * c, t.y + (sx * s + sy * c) * c, walk);
   }
 
   /** Is any solid thing standing in tile (tx, ty)? */
