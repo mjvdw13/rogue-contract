@@ -499,22 +499,25 @@ town.circle(DERELICT.cx, DERELICT.cy, DERELICT.r, {
   seam: 90,
 });
 town.arch(183, 104, 189, 110, { h: DERELICT.rim, lintel: 4, floorZ: OQ, wall: 'derelict-wall', floor: 'derelict-floor' });
-// The landing, 3 deep, fenced on its open side by a parapet a tile tall.
-// West of it the flight: ten steps of 0.5, each a tile along the wall,
-// with the parapet stepping down beside them; east of it a ledge along the
-// wall, as wide and fenced the same way, to the wash's breach
-// (lib/town.js, wallStair and wallLedge).
-const LANDING = town.street(OQ, { floor: 'derelict-floor', side: 'bay-step' });
+// West of the gate the flight: ten steps of 0.5, each a tile along the
+// wall, a parapet a tile tall stepping down beside them (lib/town.js,
+// wallStair). From the gate east to the wash's breach the balcony
+// (Mark, 2026-11-01): one deck at the old quarter's height out over the
+// pit, a slab with the sand under it, fenced by one straight railing you
+// see the ship through, not a parapet stepping along the curve of the
+// wall. The wall stands on the deck where it crosses it.
+const LANDING = town.street(OQ, { floor: 'derelict-floor', side: 'derelict-wall' });
+const BALCONY = { x0: 183, x1: 199, y1: 117 };
 const BALCONY_RAIL = { tex: 'rail-rust', height: 1 };
-const ALONG = { against: 'N', width: 4, floor: 'derelict-floor', side: 'bay-step', parapet: 'derelict-wall' };
-p.rect(183, 110, 189, 113, LANDING);
-// The balcony (Mark, 2026-11-01): the landing runs on 3 tiles out over the
-// pit on a thin deck (a slab, the sand under it), fenced by a railing you
-// see the ship through instead of the parapet.
-p.rect(183, 113, 189, 116, (_, __, c) => ({ ...c, slab: { bottom: OQ - 0.35, top: OQ, floor: 'derelict-floor', ceiling: 'metal-rust', side: 'metal-rust', light: town.light } }));
-p.fence(183, 115, 189, 116, 'S', BALCONY_RAIL).fence(183, 113, 184, 116, 'W', BALCONY_RAIL).fence(188, 113, 189, 116, 'E', BALCONY_RAIL);
-town.wallStair(DERELICT.cx, DERELICT.cy, DERELICT.r, { ...ALONG, at: 182, run: 'W', top: OQ, from: DERELICT.floorZ });
-town.wallLedge(DERELICT.cx, DERELICT.cy, DERELICT.r, { ...ALONG, at: 189, run: 'E', z: OQ, length: 10 });
+const BALCONY_DECK = { bottom: OQ - 0.35, top: OQ, floor: 'derelict-floor', ceiling: 'yard-plate-rust', side: 'band-steel', light: town.light };
+p.rect(183, 110, 189, 111, LANDING);
+p.rect(BALCONY.x0, 110, BALCONY.x1, BALCONY.y1, (x, y, c) => {
+  if (c.line) return { ...c, floorZ: OQ, floor: 'derelict-floor', side: 'derelict-wall' };
+  return c.floorZ === DERELICT.floorZ ? { ...c, slab: BALCONY_DECK } : c;
+});
+p.fence(BALCONY.x0, BALCONY.y1 - 1, BALCONY.x1, BALCONY.y1, 'S', BALCONY_RAIL).fence(BALCONY.x0, 113, BALCONY.x0 + 1, BALCONY.y1, 'W', BALCONY_RAIL);
+for (let y = 110; y < BALCONY.y1; y++) if (p.get(BALCONY.x1 - 1, y).slab) p.fence(BALCONY.x1 - 1, y, BALCONY.x1, y + 1, 'E', BALCONY_RAIL);
+town.wallStair(DERELICT.cx, DERELICT.cy, DERELICT.r, { against: 'N', width: 4, floor: 'derelict-floor', side: 'bay-step', parapet: 'derelict-wall', at: 182, run: 'W', top: OQ, from: DERELICT.floorZ });
 // The breach: the wash runs on through the rim, 4 wide, a step down from
 // the ledge, and the wall is gone where it meets it.
 for (let x = 194; x < 198; x++) {
@@ -539,6 +542,7 @@ for (let x = 192; x < 198; x++) {
   for (let y = 108; y < 120; y++) {
     const c = p.get(x, y);
     if (c.floorZ === OQ && (x > 192 || c.line)) p.set(x, y, { ...c, floor: 'desert-sand' });
+    else if (c.slab && x > 192 && y < 115) p.set(x, y, { ...c, slab: { ...c.slab, floor: 'desert-sand' } });
   }
 }
 list.push(
