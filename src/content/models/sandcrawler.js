@@ -26,6 +26,8 @@ export const CRAWLER = {
   /** How far out from the side the lowered ramp reaches, and its slope (down per tile). */
   ramp: 7.3,
   slope: 0.5,
+  /** The steam vents either side of the door, high on the side over the band: their middles (x, z). */
+  vents: [[-4.75, 6.3], [0.75, 6.3]],
 };
 
 // Rusty plating, a panel about a tile (derive.mjs); the door and housings'
@@ -104,6 +106,11 @@ function sandcrawler() {
   for (const s of [-1, 1]) {
     hole(-7, -5.6, 11, 12.4, Y + 0.04, s);
     for (let x = -16.5; x < 10; x += 3) if (s < 0 || x + 0.35 < d0 - 0.5 || x > d1 + 0.5) hole(x, x + 0.35, 3.9, 4.25, Y + L + 0.03, s);
+  }
+  // The steam vents by the door: a grille, dark between grey slats.
+  for (const [x, zz] of CRAWLER.vents) {
+    hole(x - 0.3, x + 0.3, zz - 0.25, zz + 0.25, Y + 0.03, 1);
+    for (const dz of [-0.12, 0, 0.12]) m.box([x - 0.3, Y, zz + dz - 0.03], [x + 0.3, Y + 0.08, zz + dz + 0.03], DARK);
   }
   // Vents in a row along the prow's lip, a hair in front of it.
   const lipX = (zz) => C[0] + ((zz - C[1]) * (D[0] - C[0])) / (D[1] - C[1]) + 0.04;

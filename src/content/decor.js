@@ -10,6 +10,7 @@ import { CLUTTER } from './models/clutter.js';
 import { JUNK_PILES, pileHeight } from './models/junk-pile.js';
 import { FURNACE } from './models/furnace.js';
 import { SKIFF } from './models/skiff.js';
+import { CRAWLER } from './models/sandcrawler.js';
 import { DROIDS } from './models/droids.js';
 import { RACK, RACKS } from './models/rack.js';
 import { BAY_WALL, BAY_HOSES } from './models/bay.js';
@@ -152,11 +153,33 @@ export default [
   // you walk under the rest.
   defineDecoration({ id: 'moldy-crow', model: 'moldy-crow', solid: true, height: 8.2, scale: 0.8, fixed: true, bob: { height: 0.04, period: 4, roll: 0.6 } }),
   // The Jawas' sandcrawler (models/sandcrawler.js): the level's tiles are its
-  // hold and collide; the model is its outside.
-  defineDecoration({ id: 'sandcrawler', model: 'sandcrawler', fixed: true }),
+  // hold and collide; the model is its outside. Steam wisps from the vents
+  // either side of its door, and every few seconds one hisses out a jet.
+  defineDecoration({
+    id: 'sandcrawler',
+    model: 'sandcrawler',
+    fixed: true,
+    emit: CRAWLER.vents.flatMap(([x, z]) => {
+      const at = [x, CRAWLER.half + 0.2, z];
+      return [
+        { type: 'steam', count: 2, every: [0.2, 0.4], at, radius: 0.15, dir: [0, 1, 0.5], spread: 0.4, speed: [0.4, 0.8] },
+        { type: 'steam', count: 16, every: [3, 8], at, radius: 0.1, dir: [0, 1, 0.15], spread: 0.35, speed: [2, 3.5] },
+      ];
+    }),
+  }),
   // The junk yard's heaps (models/junk-pile.js), colliding as their
-  // outlines, as high as their crests, too tall to climb.
-  ...Object.entries(JUNK_PILES).map(([id, p]) => defineDecoration({ id, model: id, solid: true, height: pileHeight(p), fixed: true })),
+  // outlines, as high as their crests, too tall to climb; the yard's
+  // smoulder, thin smoke rising off them here and there.
+  ...Object.entries(JUNK_PILES).map(([id, p]) =>
+    defineDecoration({
+      id,
+      model: id,
+      solid: true,
+      height: pileHeight(p),
+      fixed: true,
+      ...(p.vents.length && { emit: p.vents.map((at) => ({ type: 'smoulder', count: 1, every: [0.3, 0.5], at, radius: 0.3, dir: [0.2, 0, 1], spread: 0.3, speed: [0.2, 0.4] })) }),
+    }),
+  ),
   // The junk yard's smelter (models/furnace.js), colliding as its outline,
   // as high as its rim: embers off its melt, sparks spitting now and then,
   // and embers where the trickle meets the mould (Mark, 2026-10-31: no

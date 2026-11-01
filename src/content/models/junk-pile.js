@@ -13,10 +13,12 @@ import { ModelBuilder } from './lib/build.js';
 // outline's middle, at z 0. `step` is how far apart the rim's points are
 // (closer is lumpier) and `junk` the share of the slope's patches with
 // junk sticking out: the hold's small heaps need both, or in its dim
-// light they read as smooth boulders.
+// light they read as smooth boulders. `smoke` is how many spots up its
+// slope it smoulders from (Mark, 2026-10-31: make the yard feel alive);
+// they're in JUNK_PILES as `vents`, in the model's frame.
 const PILES = {
-  'junk-pile-west': { outline: [[56, 18], [74, 18], [62, 32], [56, 32]], floor: -0.5, rise: 4.2, seed: 7 },
-  'junk-pile-east': { outline: [[80, 24], [84, 24], [84, 31], [67, 31]], floor: -0.5, rise: 4.6, seed: 11 },
+  'junk-pile-west': { outline: [[56, 18], [74, 18], [62, 32], [56, 32]], floor: -0.5, rise: 4.2, seed: 7, smoke: 2 },
+  'junk-pile-east': { outline: [[80, 24], [84, 24], [84, 31], [67, 31]], floor: -0.5, rise: 4.6, seed: 11, smoke: 2 },
   'junk-pile-hold': { outline: [[77, 4], [84, 4], [84, 6.5], [81.5, 8.6], [78, 8.2], [76.8, 6]], floor: 3, rise: 2.4, seed: 13, step: 1.4, junk: 0.7, inside: true },
   'junk-pile-hold-west': { outline: [[67.8, 12], [73, 12], [73, 9], [71.2, 7.2], [69, 7], [68, 9.2]], floor: 3, rise: 2.3, seed: 19, step: 1.4, junk: 0.7, inside: true },
 };
@@ -24,8 +26,12 @@ const PILES = {
 /** The middle of an outline (its points' average). */
 const middle = (pts) => [pts.reduce((s, q) => s + q[0], 0) / pts.length, pts.reduce((s, q) => s + q[1], 0) / pts.length];
 
-/** Each heap's outline (tiles), its floor, how high the pile rises off it, and where the model goes. */
-export const JUNK_PILES = Object.fromEntries(Object.entries(PILES).map(([id, p]) => [id, { ...p, at: middle(p.outline) }]));
+/**
+ * Each heap's outline (tiles), its floor, how high the pile rises off it,
+ * where the model goes, and (once its model is built, below) the spots it
+ * smoulders from.
+ */
+export const JUNK_PILES = Object.fromEntries(Object.entries(PILES).map(([id, p]) => [id, { ...p, at: middle(p.outline), vents: [] }]));
 
 const JUNK = { tex: 'junk' };
 const PLATES = ['metal-rust', 'metal-grey', 'bay-plate', 'crawler-hull'];
@@ -68,7 +74,7 @@ export function rod(m, a, b, r, sides, style) {
   m.face(hi, { color: ['gray', 0.12] }, mid);
 }
 
-function pile(id, { outline, floor, rise, seed, step = 2, junk: often = 0.35 }) {
+function pile(id, { outline, floor, rise, seed, step = 2, junk: often = 0.35, smoke = 0 }) {
   const m = new ModelBuilder(id);
   const rnd = rng(seed);
   const [cx, cy] = middle(outline);
@@ -115,6 +121,11 @@ function pile(id, { outline, floor, rise, seed, step = 2, junk: often = 0.35 }) 
       if (out[0] * a[0] + out[1] * a[1] < 0) out = [-out[0], -out[1], 0];
       junk(m, rnd, at, out);
     }
+  }
+  // Where it smoulders: spread round it, on the ring part way up the slope.
+  for (let k = 0; k < smoke; k++) {
+    const [x, y, z] = rings[2][Math.floor((N * (k + 0.5)) / smoke)];
+    JUNK_PILES[id].vents.push([x, y, z + 0.1]);
   }
   m.outlineLines(rim);
   return m.build();

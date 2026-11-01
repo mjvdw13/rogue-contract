@@ -65,6 +65,27 @@ export default [
     onFloor: 'die',
     cap: 100,
   }),
+  // Smoke off smouldering scrap: dark grey puffs rising slowly, swelling,
+  // paling and thinning out over the second half of their lives (the junk
+  // yard's heaps).
+  defineParticle({
+    id: 'smoulder',
+    colors: [{ ramp: 'gray', from: 6, to: 10 }],
+    life: [4, 6],
+    size: 0.5,
+    grow: 3,
+    maxPx: 32,
+    shape: 'disc',
+    blend: 'half',
+    fade: true,
+    fadeIn: 0.1,
+    fadeOut: 0.5,
+    gravity: -0.6,
+    drag: 0.5,
+    wind: 0.8,
+    onFloor: 'die',
+    cap: 70,
+  }),
   // Steam: pale, dithered puffs that rise fast and vanish.
   defineParticle({
     id: 'steam',

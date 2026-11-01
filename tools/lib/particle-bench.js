@@ -20,6 +20,7 @@ export const BENCH_KINDS = {
   mote: { label: 'Motes (dot, glowing, add)', vel: (r) => [r(-0.1, 0.1), r(-0.1, 0.1), r(-0.05, 0.1)], z: [0.3, 3] },
   'rock-chip': { label: 'Rock chips (square, lit, solid)', vel: (r) => [r(-1.5, 1.5), r(-1.5, 1.5), r(1, 3.5)] },
   smoke: { label: 'Smoke (disc, lit, half)', vel: (r) => [r(-0.2, 0.2), r(-0.2, 0.2), r(0.2, 0.6)] },
+  smoulder: { label: 'Smoulder (disc, lit, half, fades)', vel: (r) => [r(-0.1, 0.1), r(-0.1, 0.1), r(0.2, 0.4)] },
   steam: { label: 'Steam (disc, lit, dither)', vel: (r) => [r(-0.3, 0.3), r(-0.3, 0.3), r(0.5, 1.5)] },
   'dust-puff': { label: 'Dust puffs (disc, lit, half, fading)', vel: (r) => [r(-0.6, 0.6), r(-0.6, 0.6), r(0.1, 0.6)], z: [0.05, 0.4] },
   mist: { label: 'Mist (disc, lit, half, fading)', vel: (r) => [r(-0.15, 0.15), r(-0.15, 0.15), 0], z: [0.05, 0.35] },

@@ -117,6 +117,11 @@ These need Mark to try something, or to decide. Don't start them without him.
   its three lamps lights a pool round it (5 tiles, +56), the corners
   between dim. To judge: whether the way round is long enough, and the
   light.
+  The yard smoulders: dark smoke rises from two spots on each big heap
+  (`smoulder`, 4-6 s, swelling and thinning as it goes), and steam wisps
+  from grilles either side of the sandcrawler's door, a jet hissing out of
+  one every 3-8 s. To judge: how thick the smoke is (Mark found the
+  smelter's too much), and whether the steam reads from across the yard.
 
 - **Mos Eisley opens in stages** (`?map=m1`, 2026-10-31): when you land the
   blast doors are shut (a stand-in: a rising Imperial gate under a steel
@@ -632,7 +637,7 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
     - [x] Mark's note (2026-10-31: a shelf in a wall, the doorway's frame
           flickers from inside): the rack on the west bulkhead turned
           round; the door's jambs off the doorway's walls, no sill box.
-    - [ ] Mark's note (2026-10-31: make the yard feel alive): smoke
+    - [x] Mark's note (2026-10-31: make the yard feel alive): smoke
           rising from the heaps, steam at the sandcrawler's door.
     - [ ] Waiting on Mark.
   - [ ] The back alleys and the back lane.
