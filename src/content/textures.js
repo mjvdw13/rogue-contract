@@ -39,7 +39,7 @@ const TOWN = [
   // Corrugated tin for lean-to roofs, rusty and galvanised.
   'metal-rust', 'metal-grey',
   // The derelict bay's gutted freighter (models/freighter.js).
-  'freighter-hull', 'freighter-engine',
+  'freighter-hull', 'freighter-engine', 'hold-wall', 'hold-ceiling', 'hold-floor', 'hold-guts', 'hold-pipes',
   // Docking bays: duracrete walls (buttressed at the foot), floor and stair risers.
   'bay-wall', 'bay-wall-ribbed', 'bay-floor', 'bay-step',
   // The derelict bay's, dirtier.

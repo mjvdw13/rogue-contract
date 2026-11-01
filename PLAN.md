@@ -724,6 +724,13 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
             stored under it.
       - [x] The ship dirtier: streaks down its sides.
       - [x] Sparks spitting from something in the bay.
+    - [ ] The freighter's interior (Mark, 2026-11-01), a commit each:
+      - [x] A ship's hold, derelict: dirty ship panelling, a mesh deck,
+            ribs across it, panels gone from the walls and ceiling.
+      - [x] Wires hanging from the holes, a lamp flickering, broken
+            fittings and junk (in the same commit).
+      - [ ] Holes in the hull you see in and out through (not big enough
+            to climb through, so the hold's door still gates Rusk).
     - [ ] Waiting on Mark.
   - [ ] The skyline: dunes and mesas in the backdrop, the town's edges.
 - [ ] **Life:** the cantina's customers, the customs officer, the

@@ -206,6 +206,14 @@ export const TOWN = [
   // and rust; its engines darker and scorched.
   { out: 'freighter-hull', df: 'IWGREYC2', gradient: [[34, 30, 26], [84, 78, 70], [126, 120, 110], [154, 148, 136], [176, 170, 156]], keep: 0, contrast: 0.7, rust: [{ color: [118, 66, 34], amount: 0.35, cell: 8, seed: 151, from: 0.6 }, { color: [26, 22, 18], amount: 0.45, cell: 8, seed: 161, from: 0.5 }] },
   { out: 'freighter-engine', df: 'IWGREYC2', gradient: [[14, 12, 10], [40, 36, 32], [70, 64, 58], [96, 90, 82], [120, 112, 102]], keep: 0, contrast: 0.8, rust: [{ color: [96, 50, 26], amount: 0.5, cell: 16, seed: 153 }, { color: [8, 6, 4], amount: 0.8, cell: 16, seed: 163, from: 0.4 }] },
+  // The freighter's hold (m1.js, Mark 2026-11-01: a derelict ship inside):
+  // Jabba's ship's grey panelling, mesh deck and ceiling, grimed and rusted;
+  // its machinery and pipes, dark, where panels are gone.
+  { out: 'hold-wall', df: 'ZWJABPI1', gradient: [[22, 20, 18], [56, 52, 46], [92, 86, 76], [122, 114, 100], [144, 134, 118]], keep: 0.1, contrast: 0.85, rust: [{ color: [96, 54, 28], amount: 0.15, cell: 32, seed: 191 }, { color: [14, 12, 10], amount: 0.6, cell: 32, seed: 193, from: 0.55 }] },
+  { out: 'hold-ceiling', df: 'JWBIG01', crop: [0, 128, 128, 128], gradient: [[16, 15, 14], [42, 40, 36], [70, 66, 60], [94, 88, 80], [112, 104, 94]], keep: 0, contrast: 0.85, rust: [{ color: [10, 9, 8], amount: 0.6, cell: 32, seed: 195 }] },
+  { out: 'hold-floor', df: 'ZPJABMES', gradient: [[10, 9, 8], [36, 33, 30], [66, 60, 54], [94, 86, 76], [112, 102, 90]], keep: 0, contrast: 0.9, rust: [{ color: [70, 40, 22], amount: 0.4, cell: 16, seed: 197 }, { color: [6, 5, 4], amount: 0.6, cell: 32, seed: 199 }] },
+  { out: 'hold-guts', df: 'JPMACH1', crop: [0, 12, 64, 40], scale: [64, 64], gradient: [[6, 6, 6], [30, 27, 24], [60, 54, 46], [92, 82, 68], [118, 104, 84]], keep: 0.15, contrast: 1 },
+  { out: 'hold-pipes', df: 'ZPJABPI1', gradient: [[6, 6, 6], [28, 26, 24], [58, 54, 48], [88, 80, 70], [110, 100, 86]], keep: 0.1, contrast: 1, rust: [{ color: [90, 48, 24], amount: 0.35, cell: 16, seed: 201 }] },
   { out: 'speeder-intake', df: 'IWENGBAC', crop: [16, 12, 104, 104], scale: [32, 32], gradient: [[8, 8, 8], [34, 32, 30], [76, 72, 66], [128, 122, 112], [170, 164, 152]], keep: 0.2, contrast: 1 },
   // A scrapped astromech's dome (models/clutter.js, droid-dome): the
   // landspeeder's mottled panel in dirty white paint and in faded blue,

@@ -16,6 +16,7 @@ import { RACK, RACKS } from './models/rack.js';
 import { BAY_WALL, DERELICT_WALL, BAY_HOSES } from './models/bay.js';
 import { SCAFFOLDS, scaffoldHeight } from './models/scaffold.js';
 import { BALCONY_FRAME } from './models/balcony.js';
+import { WIRES, CONSOLE } from './models/hold.js';
 import { TOWER_HEIGHT } from './models/market.js';
 import { BAR, TAPS, CORNER } from './models/cantina.js';
 import { POD } from './models/pod.js';
@@ -115,6 +116,17 @@ export default [
   // Scaffolding left against its wall and the freighter (models/scaffold.js),
   // colliding as its footprint, as high as its poles.
   ...Object.keys(SCAFFOLDS).map((id) => defineDecoration({ id, model: id, solid: true, height: scaffoldHeight(id), fixed: true })),
+  // The freighter's hold (models/hold.js): ribs, panels fallen off the
+  // walls and wires hanging from the ceiling's holes, all out of the way;
+  // a dead console, solid. The live wires spit sparks.
+  ...['hold-rib', 'hold-panel-leaning', 'hold-panel-down'].map((id) => defineDecoration({ id, model: id, fixed: true })),
+  ...Object.entries(WIRES).map(([id, w]) => defineDecoration({
+    id,
+    model: id,
+    fixed: true,
+    ...(w.spark && { emit: [{ type: 'spark', count: 8, every: [0.8, 3], at: w.spark, radius: 0.05, dir: [0, 0, -1], spread: 0.9, speed: [0.5, 2.5] }] }),
+  })),
+  defineDecoration({ id: 'hold-console', model: 'hold-console', solid: true, height: CONSOLE.height, fixed: true }),
   // The steelwork under the derelict bay's balcony (models/balcony.js), colliding as its posts' base plates.
   // A junction box on it shorts out now and then, and its cut cable spits sparks.
   defineDecoration({

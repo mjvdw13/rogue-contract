@@ -564,10 +564,23 @@ const HULL = { wall: 'freighter-hull', roof: 'freighter-hull', skirt: null };
 // tiles inside it its hold and the hold's walls.
 town.house(172, 130, 190, 139, { h: DERELICT.floorZ + 5, r: 2, ...HULL });
 list.push(at('freighter', 181, 134.5, { angle: 0, z: DERELICT.floorZ, lit: town.light }));
-town.room(174, 131, 188, 138, { h: DERELICT.floorZ + 5, floorZ: DERELICT.floorZ, ceilZ: DERELICT.floorZ + 3.25, floor: 'imp-floor', ceiling: 'imp-panel-dark', wall: 'freighter-hull', light: 120 });
-town.arch(188, 132, 189, 137, { h: DERELICT.floorZ + 5, lintel: 3, floorZ: DERELICT.floorZ, wall: 'freighter-hull', floor: 'imp-floor' });
+town.room(174, 131, 188, 138, { h: DERELICT.floorZ + 5, floorZ: DERELICT.floorZ, ceilZ: DERELICT.floorZ + 3.25, floor: 'hold-floor', ceiling: 'hold-ceiling', wall: 'hold-guts', light: 96 });
+// Inside it's a ship's hold, left to rot (Mark, 2026-11-01): grimy
+// panelling (the hull's walls inside are the hold's; outside the model
+// covers them), a mesh deck, a frame across it every 2.5, panels gone from
+// the walls and the ceiling so the ship's guts show, wires hanging out of
+// the holes. (models/hold.js; the junk and the lamp further down.)
+p.rect(172, 130, 191, 139, (_, __, c) => (c.side === 'freighter-hull' && c.floorZ > DERELICT.floorZ ? { ...c, side: 'hold-wall' } : c));
+for (const [x, y] of [[175, 130], [182, 130], [183, 130], [178, 138], [186, 138], [173, 134]]) p.set(x, y, { ...p.get(x, y), side: 'hold-guts' });
+const HOLD_HOLES = [[176, 132], [177, 132], [182, 136], [183, 136], [183, 137], [186, 133]];
+for (const [x, y] of HOLD_HOLES) {
+  const c = p.get(x, y);
+  p.set(x, y, { ...c, slab: { ...c.slab, bottom: DERELICT.floorZ + 4, ceiling: 'hold-pipes', side: 'hold-guts' } });
+}
+for (const x of [175.5, 178, 180.6, 183, 185.5, 187.6]) list.push(at('hold-rib', x, 134.5, { z: DERELICT.floorZ, angle: 0, lit: 96 }));
+town.arch(188, 132, 189, 137, { h: DERELICT.floorZ + 5, lintel: 3, floorZ: DERELICT.floorZ, wall: 'hold-wall', floor: 'hold-floor' });
 town.door(190, 134.5, 'E', { h: DERELICT.floorZ + 5, tex: 'door-grey', width: 5, jamb: false, sign: false, panel: false, step: false, floorZ: DERELICT.floorZ, wall: 'freighter-hull' });
-p.rect(189, 132, 190, 137, (_, __, c) => ({ ...c, floor: 'imp-floor', tag: 'hold-door', stayOpen: true }));
+p.rect(189, 132, 190, 137, (_, __, c) => ({ ...c, floor: 'hold-floor', tag: 'hold-door', stayOpen: true }));
 p.rect(174, 131, 188, 138, (_, __, c) => ({ ...c, tag: 'hold' }));
 // Fitted out as Bay 87 was, and left: its ribs up the wall every 30
 // degrees (a tile taller, the pit being deeper), clear of the stair, the
@@ -1122,6 +1135,24 @@ town.grime();
 // Inside the cantina, filthy (Mark): soot, dirt, stains and smudges thick on
 // every wall from floor to ceiling.
 town.grimeIndoors(87, 82, 127, 119, { amount: 4 });
+// The freighter's hold: grime on its walls, a lamp still flickering, and
+// what was left: dead consoles, panels off the walls, wires out of the
+// ceiling's holes (one live), junk. Rusk's spot in the middle stays clear.
+town.grimeIndoors(172, 130, 191, 139, { amount: 3, seed: 29 });
+lights.push({ x: 184.5, y: 134.5, z: DERELICT.floorZ + 3, radius: 5, light: 64, fx: 'flicker', min: 8 });
+list.push(
+  at('ceiling-lamp', 184.5, 134.5),
+  at('hold-wires', 176.9, 132.5, { z: DERELICT.floorZ, angle: 30, lit: 96 }), at('hold-wires-live', 183.4, 136.6, { z: DERELICT.floorZ, angle: 0, lit: 96 }),
+  at('hold-wires', 186.5, 133.5, { z: DERELICT.floorZ, angle: 200, lit: 96 }),
+  at('hold-console', 178.6, 131, { z: DERELICT.floorZ, angle: 0, lit: 96 }), at('hold-console', 176.2, 138, { z: DERELICT.floorZ, angle: 180, lit: 96 }),
+  at('hold-panel-leaning', 182.5, 131, { z: DERELICT.floorZ, angle: 0, lit: 96 }), at('hold-panel-leaning', 185.9, 138, { z: DERELICT.floorZ, angle: 180, lit: 96 }),
+  at('hold-panel-down', 185, 134.6, { z: DERELICT.floorZ, angle: 20, lit: 96 }), at('hold-panel-down', 178.2, 136.4, { z: DERELICT.floorZ, angle: 75, lit: 96 }),
+  at('junk-heap', 174.9, 132, { z: DERELICT.floorZ, angle: 30 }), at('droid-dome', 187.2, 131.7, { z: DERELICT.floorZ, angle: 140 }),
+  at('barrel-rust', 174.7, 137.3, { z: DERELICT.floorZ }), at('canister-rust', 175.4, 137.4, { z: DERELICT.floorZ }),
+  at('crate-grey-small', 187.2, 137.3, { z: DERELICT.floorZ, angle: 20 }), at('rubble', 181.6, 137.2, { z: DERELICT.floorZ, angle: 110 }),
+  at('oil', 182.2, 133.2, { z: DERELICT.floorZ, angle: 40 }), at('oil-small', 176.6, 134.9, { z: DERELICT.floorZ, angle: 150 }),
+  at('litter-small', 179.4, 136.9, { z: DERELICT.floorZ, angle: 60 }), at('litter-small', 186.4, 135.9, { z: DERELICT.floorZ, angle: 200 }),
+);
 // Crates, drums, canisters, cargo pods, junk and litter along the walls
 // (lib/town.js), but none yet in the blocked-out middle and east third.
 town.clutter({ keep: [[126, 92, 130, 122], [130, 86, 150, 122], [136, 44, W, H], [54, 1, 146, 49], [57, 94, 87, 131], [87, 82, 126, 122], [85, 76, 102, 82]] });
