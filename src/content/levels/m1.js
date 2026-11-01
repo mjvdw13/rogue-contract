@@ -436,17 +436,12 @@ p.rect(136, 73, 148, 86, town.street());
 town.house(136, 73, 141, 86, { h: 8, r: 1, skirt: 'plinth' });
 town.house(141, 73, 148, 86, { h: 9.5, r: 1, wall: 'adobe-pale' });
 
-// 6. The rooftops, the way over the checkpoint. The back lane runs on
-// south to rubble where a wall fell, which climbs onto the first roof.
-// Running jumps over light wells 3 wide (their floors open to the lane, so
-// a fall walks back) lead east to the last roof, which drops into a yard
-// in the old quarter; a stair climbs back up from the yard. The roofs stand
-// clear of anything within a jump, so they lead nowhere else.
+// 6. The rooftops east of the back lane's end, out of reach (Mark,
+// 2026-11-01: no way up; the rubble that climbed onto them and the stair
+// from the yard are gone). Light wells 3 wide between them, open to the lane.
 p.rect(126, 92, 130, 118, town.street());
 p.rect(130, 86, 149, 118, town.street());
 town.house(118, 92, 126, 120, { h: 8 });
-const RUBBLE = { wall: 'adobe-brick', skirt: null };
-[0.75, 1.75, 2.75, 3.75].forEach((h, k) => town.block(126, 110 + k * 2, 130, 112 + k * 2, { ...RUBBLE, h }));
 town.house(130, 102, 138, 118, { h: 4.75 });
 town.house(138, 102, 149, 118, { h: 5.75, wall: 'adobe-ochre' });
 town.house(130, 86, 140, 99, { h: 4.75, wall: 'adobe-pale' });
@@ -456,8 +451,8 @@ town.block(126, 118, 150, 122, { h: 8 }).block(149, 96, 162, 118, { h: 8 });
 // 9. The old quarter, on its rise: a square inside the gate, a north
 // street along its north side, and the main street slanting
 // south-east from the square to the derelict bay's gate, its houses
-// following the slant. The yard the roofs drop into opens onto the main
-// street by an alley.
+// following the slant. A yard under the roofs opens onto the main street
+// by an alley.
 p.rect(148, 53, 188, 60, town.street(OQ));
 p.rect(148, 60, 160, 76, town.street(OQ));
 // (Between its two edges, y = 64 + 1.2 (x - 160) and 12 further south,
@@ -468,7 +463,6 @@ p.rect(160, 60, 196, 104, (x, y, c) => {
 });
 p.rect(149, 86, 157, 96, town.street(OQ));
 p.rect(157, 88, 174, 92, town.street(OQ));
-town.stair(149, 86, 151, 96, { up: 'N', from: OQ, top: 4 });
 town.house(148, 76, 157, 86, { h: 8, r: 1, wall: 'adobe-grey' });
 town.house(149, 96, 157, 104, { h: 7.5, wall: 'adobe-ochre' });
 town.slanted([[160, 60], [170, 60], [170, 76], [160, 64]], { h: OQ + 5 });

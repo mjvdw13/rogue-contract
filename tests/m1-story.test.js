@@ -4,7 +4,7 @@ import { makeWorld, mockInput, run } from './helpers.js';
 
 // Mos Eisley's calm half in order: the broker's fob, the trader's signal,
 // then the informant's pass. Before the signal the checkpoint and the hold
-// stay shut, so the roofs or the gate can't find Rusk first.
+// stay shut, so nothing can find Rusk first.
 
 /** Stand the player at (x, y) facing `angle` (content degrees), press use, let a moment pass. */
 function talk(w, x, y, angle) {

@@ -203,7 +203,7 @@ These need Mark to try something, or to decide. Don't start them without him.
   code into it and it tracks Rusk, in the derelict bay's hold: an amber
   blink and a beep, every 1.4 s from across town down to 0.15 s up close,
   green when you face him. The hold's door, in the freighter's stern, is
-  shut until then (2026-10-30), so the roofs can't find him first.
+  shut until then (2026-10-30), so nothing can find him first.
   Stepping into the hold takes the fob and turns the town. Until then your
   weapons stay holstered (2026-10-30), so the town can't turn early. The
   sprite is a generated stand-in (a dark puck in the gloved hand, the lens
@@ -257,16 +257,15 @@ These need Mark to try something, or to decide. Don't start them without him.
 - **Mos Eisley's east third, blocked out** (`?map=m1`, 2026-10-29; the
   areas in `docs/mission1.md`): plain volumes to try the route, no detail.
   Walk east past the blast doors: the street climbs two steps to the
-  checkpoint's gate. Two ways past it: the informant's den, open to the
+  checkpoint's gate. The way past it: the informant's den, open to the
   alleys' mouth north of the street (the informant's pass opens the gate:
-  use him), or the back lane to the rubble at its end, up onto the
-  roofs, two running jumps and a drop into a yard in the old quarter.
+  use him). The rooftops behind it are out of reach (Mark, 2026-11-01: the
+  rubble up onto them and the stair down into the old quarter are gone).
   Then the slanting main street (or the dry wash, down steps at the north
   street's end) to the derelict bay; stepping into the stand-in hull's
   hold (Rusk) turns the town: the gate opens, troopers come over the
   bay's rim, in at the old quarter's north street and onto a roof. The stand-in ending: clear customs' two troopers in their office
-  by Bay 87. To judge: the distances and the climb, the slant, whether
-  the roofs read as a way over from the checkpoint, the derelict bay's
+  by Bay 87. To judge: the distances and the climb, the slant, the derelict bay's
   depth. The comm tower stand-in (22 tall) is hidden from the market by
   K; the real one is a model and can stand taller. Also: grime and
   clutter now take a seed per wall, so building elsewhere no longer

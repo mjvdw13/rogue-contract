@@ -209,16 +209,15 @@ sketch (a bigger map, more areas), is `docs/mission1.md`.
           |                 |                ║        |
   ======= 2 main street (market) =======  [5 checkpoint] == 9 old quarter == [10 derelict bay: Rusk]
           |                 |                ║
-  [1 Docking Bay 87]   [3 cantina]           ║  [6 rooftops: a way over 5]
+  [1 Docking Bay 87]   [3 cantina]           ║  [6 rooftops]              
 ```
 
 **Going east (calm):** the Crow drops Kyle in the bay → the cantina
 (contract and fob) → the junk yard (a signal) → past the checkpoint, with
-a pass or over the roofs → the old quarter → the derelict bay (Rusk).
+a pass → the old quarter → the derelict bay (Rusk).
 
 **Coming back west (loud):** the derelict bay → the old quarter → through
-the checkpoint (now open) or over the roofs, with troopers on the roofs this
-time → the main street's blast doors are shut, so through the cantina or
+the checkpoint (now open), with a sniper on the roofs → the main street's blast doors are shut, so through the cantina or
 the back alleys → the bay, where the Crow lands.
 
 | # | Area | Calm | Loud |
@@ -228,7 +227,7 @@ the back alleys → the bay, where the Crow lands.
 | 3 | The cantina | A dark entrance, then a couple of steps down into a wide main room, its front corners cut at a slant (after the film and a fan floor plan: `docs/mission1.md`). A long U-shaped bar stands in the middle, its taps on an island inside it, under an opening lit from above. Booths sit in niches round the edge under lower ceilings. The band has its own music, which starts when you walk in (the existing `music` action). There's a bartender, other customers, and two troopers whose patrol passes through. The broker's booth is at the back: the contract and the fob. | The way round the blast doors: in by the front, out behind the bar and through a back room to the back lane. The customers have gone, and troopers come down the steps. |
 | 4 | Jawa junk yard | A yard of droid parts behind a cage fence, with Jawa traders. A trader remembers selling Rusk a power coupling, and for a price gives Kyle its transponder code. The fob lights up. | The Jawas have bolted. A side gate leads round to the alleys. |
 | 5 | Checkpoint | Barricades across the street (low railings and 3D barrier models) and a closed gate. "Old quarter's sealed, hunter." | The gate is open, and the checkpoint's troopers fight from behind the barricades. |
-| 6 | Rooftops | Crates and a collapsed wall let you climb onto flat roofs. You cross them with running jumps (up to 4 tiles) and drop down past the checkpoint. | Snipers on the roofs. |
+| 6 | Rooftops | Flat roofs by the checkpoint, out of reach (Mark, 2026-11-01: no way over them). | Snipers on the roofs. |
 | 7 | Back alleys | Narrow, angled and dark (light 120). An informant sells a pass for the checkpoint, if Kyle collects a debt from a thug in a back room first. | The quiet way past the blast doors, and an ambush. |
 | 8 | Comm tower | The town's landmark. The Empire has no buildings in town (Mark, 2026-10-30: the prefecture was dropped): a terminal at the checkpoint's guard post shows Rusk's wanted file, "Jundland Range security", the first hint of the garrison. | Reinforcements come in at the old quarter's north street. |
 | 9 | Old quarter | Half-empty streets, sand drifting through broken walls, a few squatters. | A running fight with the squad that took Rusk. |
