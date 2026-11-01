@@ -578,6 +578,35 @@ list.push(
   onDerelictWall('bay-crate-grey', 328, 1.4), onDerelictWall('crate-tan', 333.5, 0.6),
   onDerelictWall('junk-heap', 2, 1.5), onDerelictWall('scrap', 26), onDerelictWall('barrel-rust', 30.5, 0.5),
 );
+// More of it (Mark, 2026-11-01: fill the bay with junk): scaffolding left up
+// against the freighter's flank over a hole in its plating and against the
+// pit's wall; big cargo crates stacked south of the hull and by the wall,
+// drums and canisters in huddles, a cargo pod, junk and scrap. The way from
+// the stair's foot round to the hold's door stays open.
+list.push(
+  at('scaffold', 185.2, 129.45, { z: DERELICT.floorZ, angle: 180 }),
+  onDerelictWall('scaffold-tall', 285, 0.35),
+  // South of the hull: a stack of big crates, a long one, small ones round them.
+  at('bay-crate-grey', 176, 142.4, { z: DERELICT.floorZ, angle: 0 }),
+  at('bay-crate-tan', 176.2, 142.3, { z: DERELICT.floorZ + 2, angle: 10 }),
+  at('bay-crate-rust-long', 180.4, 142.8, { z: DERELICT.floorZ, angle: 0 }),
+  at('crate-tan', 178.6, 140.6, { z: DERELICT.floorZ, angle: 20 }),
+  at('crate-grey-small', 182.6, 141.1, { z: DERELICT.floorZ, angle: 45 }),
+  at('crate-rust-long', 184.6, 142.6, { z: DERELICT.floorZ, angle: 80 }),
+  at('barrel-rust', 173.4, 141.2, { z: DERELICT.floorZ }), at('barrel-grey', 172.7, 142, { z: DERELICT.floorZ }),
+  // East of the door's way: crates and drums by the wall.
+  at('bay-crate-grey', 201.4, 131.6, { z: DERELICT.floorZ, angle: 15 }),
+  at('crate-tan', 200.3, 134.2, { z: DERELICT.floorZ, angle: 30 }), at('crate-grey-small', 201.8, 135.3, { z: DERELICT.floorZ, angle: 0 }),
+  at('barrel-rust', 199.6, 124.6, { z: DERELICT.floorZ }), at('canister-rust', 200.3, 125.3, { z: DERELICT.floorZ }),
+  at('barrel-rust', 200.8, 124.4, { z: DERELICT.floorZ }), at('canister', 199.2, 125.6, { z: DERELICT.floorZ }),
+  // West, past the cockpit's nose: a cargo pod, drums and a crate.
+  at('cargo-pod', 166.2, 135.5, { z: DERELICT.floorZ, angle: 75 }),
+  at('barrel-grey', 168.4, 139.5, { z: DERELICT.floorZ }), at('barrel-rust', 167.7, 140.3, { z: DERELICT.floorZ }),
+  at('crate-rust-long', 167.4, 130.4, { z: DERELICT.floorZ, angle: 100 }),
+  // Junk and scrap about.
+  at('junk-heap', 170.6, 128.4, { z: DERELICT.floorZ, angle: 200 }),
+  at('rubble', 197.4, 141.6, { z: DERELICT.floorZ, angle: 60 }), at('droid-dome', 198.6, 140.2, { z: DERELICT.floorZ, angle: 130 }),
+);
 // Litter and rubble about the floor, from a fixed seed: on the open sand,
 // clear of the hull, its door and the foot of the stair.
 {

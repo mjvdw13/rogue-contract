@@ -706,7 +706,7 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
       - [x] The top of the stairs a balcony out over the pit, with a
             railing you see the ship through (not a solid parapet).
       - [x] The ship less patterned: the hull's plating and the engines.
-      - [ ] More junk: scaffolding, cargo boxes, etc.
+      - [x] More junk: scaffolding, cargo boxes, etc.
       - [ ] Everything dirtier.
     - [ ] Waiting on Mark.
   - [ ] The skyline: dunes and mesas in the backdrop, the town's edges.
