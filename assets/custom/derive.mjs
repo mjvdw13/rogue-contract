@@ -115,6 +115,12 @@ export const TOWN = [
   // The smelter's melt (models/furnace.js), drawn glowing: Robotics' acid
   // floor run hot, dark red crust to yellow-white where it's hottest.
   { out: 'melt', df: 'RPACID01', gradient: [[48, 10, 4], [120, 24, 6], [200, 60, 10], [236, 112, 20], [250, 170, 50]], keep: 0, contrast: 1.4 },
+  // The junk yard's ground (models/clutter.js, the deck plates): salvaged
+  // plates laid on the sand to walk on. Generic's riveted plate in dusty
+  // grey-brown, rusty and oily; and Sewers' rust-eaten sheet, its own rust
+  // kept.
+  { out: 'yard-plate', df: 'ZPRIVET1', gradient: [[34, 30, 26], [72, 66, 58], [112, 104, 92], [146, 136, 120], [174, 164, 146]], keep: 0, contrast: 1, rust: WORN(16, 141, 0.8) },
+  { out: 'yard-plate-rust', df: 'SPMETAL1', gradient: [[30, 24, 20], [70, 60, 52], [108, 98, 86], [140, 130, 114]], keep: 0.6, contrast: 1, rust: WORN(16, 143, 0.4) },
   // The cargo pod's hull (models/clutter.js): the galvanised tin again, rusty
   // and scorched with soot.
   { out: 'pod-hull', df: 'ZWGRUV1', crop: [0, 0, 32, 64], tile: [2, 1], gradient: [[40, 40, 40], [88, 86, 82], [130, 126, 118], [166, 160, 150], [196, 190, 178]], keep: 0, contrast: 0.9, rust: [{ color: [120, 64, 30], amount: 0.5, cell: 16, seed: 2 }, ...WORN(16, 61, 0.8)] },
@@ -223,6 +229,7 @@ export const TOWN = [
  * (a round top as wide as it) or `'round'` (corners of radius `r`), and
  * `rim` darkens a border `width` texels wide toward `color`: the shadow of
  * the opening's reveal, so a flat decal looks set into the wall.
+ * `rust` stains it as it does the textures above, before the cut.
  */
 const REVEAL = { width: 3, color: [52, 38, 26] };
 /** Grey metal that has been out in the suns: rust in its darks. */
@@ -261,6 +268,20 @@ export const DECALS = [
   { out: 'vent-round', df: 'SPGRATE1', size: [32, 32], gradient: RUSTY_GREY, keep: 0.5, contrast: 1, mask: 'round', r: 16, rim: { width: 2, color: [30, 24, 18] } },
   { out: 'wall-fan', df: 'IATRKDEV', crop: [0, 0, 64, 64], size: [32, 32], gradient: [[24, 20, 16], [70, 62, 52], [120, 110, 94], [170, 160, 140]], keep: 0.4, contrast: 1, mask: 'round', r: 3 },
   { out: 'wall-meter', df: 'SWSWITCH', size: [8, 32], mask: 'round', r: 1 },
+  // Sheet metal the Jawas have patched the junk yard's walls with: Sewers'
+  // rust-eaten sheet, Generic's bolted panel gone rusty and sooty, and the
+  // lean-tos' corrugated tin, each with a dark edge where it stands off the
+  // wall.
+  { out: 'patch-rust', df: 'SPMETAL1', size: [48, 64], gradient: [[30, 22, 16], [72, 56, 44], [112, 94, 76], [146, 128, 106]], keep: 0.6, contrast: 1, mask: 'round', r: 2, rim: { width: 1, color: [40, 28, 18] } },
+  { out: 'patch-plate', df: 'ZPPANEL1', size: [48, 40], gradient: [[36, 34, 30], [80, 76, 68], [124, 118, 106], [160, 152, 138], [186, 178, 162]], keep: 0, contrast: 1, rust: WORN(16, 145), mask: 'round', r: 3, rim: { width: 1.5, color: [24, 18, 12] } },
+  { out: 'patch-tin', df: 'ZWGRUV1', crop: [0, 0, 32, 64], size: [40, 72], gradient: [[30, 16, 8], [74, 40, 18], [120, 66, 32], [160, 96, 52], [190, 130, 82]], keep: 0, contrast: 0.9, rust: WORN(16, 147, 0.7), mask: 'round', r: 1, rim: { width: 1, color: [40, 24, 14] } },
+  // Brick bared where the plaster has fallen off a wall: the town's mud
+  // brick cut to a ragged blob, crumbling at its edge.
+  { out: 'brick-bare-1', df: 'ZPBRICK1', size: [64, 48], gradient: [[30, 20, 12], [80, 56, 36], [130, 96, 64], [168, 132, 92], [196, 164, 120]], keep: 0.1, contrast: 1, mask: 'blob', seed: 5 },
+  { out: 'brick-bare-2', df: 'ZPBRICK1', crop: [0, 0, 48, 64], size: [48, 64], gradient: [[30, 20, 12], [80, 56, 36], [130, 96, 64], [168, 132, 92], [196, 164, 120]], keep: 0.1, contrast: 1, mask: 'blob', seed: 8 },
+  // Oil soaked into the junk yard's sand (the `oil` models lie on it):
+  // Robotics' acid pool near black, a dark sheen, cut to a ragged blob.
+  { out: 'oil', df: 'RPACID01', size: [64, 64], gradient: [[8, 6, 4], [18, 14, 10], [30, 24, 18], [48, 40, 32]], keep: 0, contrast: 1, mask: 'blob', seed: 11 },
   // The landspeeder's intakes (models/speeder.js): Nar Shaddaa's slatted
   // vent, dark and rusty, framed in the hull's peach paint.
   { out: 'speeder-grille', df: 'NPVENTS2', size: [64, 32], gradient: [[14, 12, 10], [40, 34, 28], [76, 66, 56], [112, 100, 86]], keep: 0.3, contrast: 1, rim: { width: 2.5, color: [212, 164, 136] } },
@@ -572,7 +593,9 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     if (spec.crop) img = cropped(img, spec.crop);
     img = resized(img, spec.size);
     for (let i = 3; i < img.data.length; i += 4) img.data[i] = 255;
-    img = masked(spec.gradient ? gradientMap(img, spec) : img, spec);
+    if (spec.gradient) img = gradientMap(img, spec);
+    for (const r of [spec.rust ?? []].flat()) img = rusted(img, r);
+    img = masked(img, spec);
     made.set(spec.out, img);
     fs.writeFileSync(path.join(texDir, `${spec.out}.png`), encodePNG(img.width, img.height, img.data));
     console.log(`${spec.out}.png from ${spec.df} (${img.width}x${img.height}, a decal)`);

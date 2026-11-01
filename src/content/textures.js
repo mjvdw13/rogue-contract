@@ -48,6 +48,8 @@ const TOWN = [
   'dome-white', 'dome-blue',
   // The cargo pod's hull.
   'pod-hull',
+  // The junk yard's deck plates on the sand (models/clutter.js).
+  'yard-plate', 'yard-plate-rust',
   // The sandcrawler's hull (models/sandcrawler.js).
   'crawler-hull',
   // The smelter's melt, drawn glowing (models/furnace.js).
@@ -87,6 +89,11 @@ const TOWN_DECALS = [
   'vent-grille', 'vent-slats', 'vent-round', 'wall-fan', 'wall-meter',
   // Litter on the ground: the clutter's `litter` models wear it.
   'litter',
+  // Sheet metal patching the junk yard's walls (m1.js).
+  'patch-rust', 'patch-plate', 'patch-tin',
+  // Bare brick where the plaster has fallen, and oil in the sand (the
+  // clutter's `oil` models wear it).
+  'brick-bare-1', 'brick-bare-2', 'oil',
 ];
 
 // Grime: darkens the walls it's on (tools/art/textures/grime.js); the town

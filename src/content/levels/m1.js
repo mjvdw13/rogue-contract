@@ -728,17 +728,30 @@ const JUNK = -0.5;
 const SCRAP = { wall: 'metal-rust', roof: 'metal-rust', skirt: null };
 p.rect(54, 1, 101, 16, town.street(0, { floor: 'desert-sand' }));
 town.block(54, 16, 88, 46, { h: 5, wall: 'adobe-brick', skirt: null });
+// Walled in by the backs of the town's houses, in their plasters and
+// heights, rather than one long brick wall (Mark, 2026-10-31: the walls
+// were bare and flat); a dome over the tallest. Their heights are whole
+// tiles over the court, for the downpipes. The north wall stays low brick,
+// the town's edge.
+town.block(54, 16, 56, 46, { h: 5.5, wall: 'adobe-grey', skirt: 'plinth' });
+town.block(54, 41, 62, 46, { h: 6.5, wall: 'adobe-ochre', skirt: 'plinth' });
+town.block(62, 41, 69, 46, { h: 4.5, wall: 'adobe', skirt: 'dirt' });
+town.block(69, 41, 76, 46, { h: 5.5, wall: 'adobe-pale', skirt: 'dirt' });
+town.block(76, 41, 88, 46, { h: 6.5, wall: 'adobe-grey', skirt: null });
+town.dome(82, 43.5, 6.5, 4.5, { wall: 'adobe-grey' });
+town.block(84, 16, 88, 30, { h: 4.5, wall: 'adobe-rose', skirt: 'dirt' });
+town.block(84, 30, 88, 41, { h: 5.5, wall: 'adobe', skirt: 'plinth' });
 town.block(56, 16, 84, 18, { h: 2, wall: 'adobe-brick', skirt: null });
 p.rect(56, 18, 84, 41, town.street(JUNK));
 p.rect(71, 44, 73, 49, town.street());
-town.arch(71, 41, 73, 44, { h: 5, wall: 'adobe-brick' });
+town.arch(71, 41, 73, 44, { h: 5.5, wall: 'adobe-pale' });
 // Its gate is planks like the side gate's, shut until the broker hands Kyle
 // the fob: the junk yard is the fob's first stop (Mark, 2026-10-31).
 p.rect(71, 41, 73, 44, (_, __, c) => ({ ...c, door: 'door-planks-rising', style: 'rise', lock: 'remote' }));
 gateTag(71, 41, 73, 44, 'junk-gate');
-town.stair(71, 39, 73, 41, { up: 'S', from: JUNK, top: 0, rise: 0.25, floor: 'flagstone', side: 'adobe-brick' });
-town.arch(84, 37, 86, 40, { h: 5, wall: 'adobe-brick' });
-town.stair(82, 37, 84, 40, { up: 'E', from: JUNK, top: 0, rise: 0.25, floor: 'flagstone', side: 'adobe-brick' });
+town.stair(71, 39, 73, 41, { up: 'S', from: JUNK, top: 0, rise: 0.25, floor: 'flagstone', side: 'adobe-pale' });
+town.arch(84, 37, 86, 40, { h: 5.5, wall: 'adobe' });
+town.stair(82, 37, 84, 40, { up: 'E', from: JUNK, top: 0, rise: 0.25, floor: 'flagstone', side: 'adobe' });
 // The side gate is weathered planks, shut until the trader keys in the
 // signal and lets Kyle out the back (the alleys lead past the blast doors).
 p.rect(84, 37, 86, 40, (_, __, c) => ({ ...c, door: 'door-planks-rising', style: 'rise', lock: 'remote' }));
@@ -753,13 +766,16 @@ for (const [id, { at: [x, y], inside }] of Object.entries(JUNK_PILES)) list.push
 // heap's foot, hovering, its bow to the court.
 list.push(at('cargo-skiff', 59.5, 35.1, { angle: 0, z: JUNK, lit: town.light }));
 // The droids for sale in a row along the court's south wall, west of the
-// steps from the gate, facing in, and two Jawas minding them: one by the
-// row and one by the furnace (calm, so they stay put).
+// steps from the gate, facing in, on a low deck of plating a step up off
+// the sand, and two Jawas minding them: one by the row and one by the
+// furnace (calm, so they stay put).
+const DECK = JUNK + 0.25;
+p.rect(56, 39, 68, 41, town.street(DECK, { floor: 'yard-plate', side: 'metal-rust' }));
 list.push(
   at('astromech-blue', 58, 40.1, { angle: 90 }), at('power-droid-rust', 59.3, 40.15, { angle: 80 }),
   at('astromech-rust', 60.6, 40.1, { angle: 100 }), at('astromech-red', 61.9, 40.1, { angle: 85 }),
   at('power-droid', 63.3, 40.15, { angle: 95 }), at('astromech-blue', 64.6, 40.1, { angle: 75 }),
-  at('crate-grey-small', 66.1, 40.3, { angle: 5 }), at('droid-dome', 66.1, 40.3, { z: JUNK + 0.6, angle: 160 }),
+  at('crate-grey-small', 66.1, 40.3, { angle: 5 }), at('droid-dome', 66.1, 40.3, { z: DECK + 0.6, angle: 160 }),
   at('astromech-rust', 57.2, 38.8, { angle: 20 }),
   at('jawa', 62.4, 38.4, { angle: 45, calm: { wander: 0 } }), at('jawa', 76.2, 35, { angle: 30, calm: { wander: 0 } }),
 );
@@ -818,6 +834,102 @@ list.push(
       { lines: ['Utinni!'] },
     ],
   }),
+);
+
+// The yard's ground and walls (Mark, 2026-10-31: bare and flat). A trodden
+// path of salvaged deck plates laid on the sand from the foot of the gate's
+// steps across the court, up the passage between the heaps to the ramp's
+// foot; oil spilled into the sand, burns round the smelter, litter and odd
+// scrap about. The walls patched with sheet metal here and there (decals,
+// over their grime: the yard's walls are grimier than the town's), and
+// drums, crates and scrap against them. Scattered from a fixed seed, kept
+// off the heaps.
+{
+  let s = 4100;
+  const rnd = () => (s = (s * 1103515245 + 12345) % 2147483648) / 2147483648;
+  const r2 = (v) => Math.round(v * 100) / 100;
+  const inPoly = (x, y, poly) => {
+    let inside = false;
+    for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+      const [[xi, yi], [xj, yj]] = [poly[i], poly[j]];
+      if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) inside = !inside;
+    }
+    return inside;
+  };
+  const heaps = [JUNK_PILES['junk-pile-west'].outline, JUNK_PILES['junk-pile-east'].outline];
+  const ground = (x, y, pad = 0.6) => {
+    const c = p.get(Math.floor(x), Math.floor(y));
+    if (!c || c.wall || c.floorZ !== JUNK) return false;
+    for (const [dx, dy] of [[0, 0], [pad, 0], [-pad, 0], [0, pad], [0, -pad]]) if (heaps.some((h) => inPoly(x + dx, y + dy, h))) return false;
+    return true;
+  };
+  // The path, a plate every 1.5 tiles or so, some across it and some along,
+  // turned a little, a few missing; each a hair above the last so their
+  // overlaps don't flicker.
+  const PATH = [[72, 38.4], [68.6, 35.6], [65.4, 32.6], [68.6, 28.6], [72.2, 25], [75.4, 22.3], [78, 20.7]];
+  const PLATES = ['deck-plate', 'deck-plate-long', 'deck-plate-rust', 'deck-plate', 'deck-plate-rust'];
+  let k = 0;
+  for (let i = 0; i + 1 < PATH.length; i++) {
+    const [[x0, y0], [x1, y1]] = [PATH[i], PATH[i + 1]];
+    const len = Math.hypot(x1 - x0, y1 - y0);
+    const heading = (Math.atan2(y0 - y1, x1 - x0) * 180) / Math.PI;
+    for (let t = rnd() * 0.5; t < len; t += 1.4 + rnd() * 0.5) {
+      if (rnd() < 0.15) continue;
+      const side = (rnd() - 0.5) * 0.7;
+      const x = x0 + ((x1 - x0) * t) / len + ((y1 - y0) / len) * side;
+      const y = y0 + ((y1 - y0) * t) / len - ((x1 - x0) / len) * side;
+      const across = rnd() < 0.6 ? 90 : 0;
+      list.push(at(PLATES[Math.floor(rnd() * PLATES.length)], r2(x), r2(y), { z: JUNK + (k++ % 3) * 0.015, angle: Math.round(heading + across + (rnd() - 0.5) * 40) }));
+    }
+  }
+  // Oil soaked into the sand all over the court, more under the skiff (it
+  // drips), and burns round the smelter where melt has slopped.
+  const scatter = (types, n, [x0, y0, x1, y1], pad) => {
+    for (let j = 0; j < n; j++) {
+      const [x, y] = [x0 + rnd() * (x1 - x0), y0 + rnd() * (y1 - y0)];
+      const type = types[Math.floor(rnd() * types.length)];
+      const angle = Math.floor(rnd() * 24) * 15;
+      if (ground(x, y, pad)) list.push(at(type, r2(x), r2(y), { z: JUNK, angle }));
+    }
+  };
+  scatter(['oil', 'oil-small', 'oil-small'], 16, [56, 18, 84, 39], 0.6);
+  scatter(['oil', 'oil-small'], 4, [57, 33.5, 62, 37], 0.4);
+  scatter(['floor-burn-1', 'floor-burn-2', 'oil-small'], 7, [75, 34, 84, 37.5], 0.6);
+  scatter(['litter', 'litter-small', 'litter-small', 'rubble'], 18, [56, 18, 84, 39], 0.4);
+}
+// On the walls round the court and the lane: sheet metal patching them
+// and brick bared where their plaster has fallen (decals: x or y along the
+// wall, z the middle's height over the court, the texture and its scale),
+// windows, downpipes and a box unit.
+for (const [x, y, z, face, tex, scale] of [
+  // The south wall, behind the droids and east of the gate's steps.
+  [57.3, 41, 1.7, 'N', 'patch-tin', 1], [60.4, 41, 2.2, 'N', 'patch-plate', 1.1], [57.4, 41, 5, 'N', 'brick-bare-1', 1],
+  [63.4, 41, 1.6, 'N', 'patch-rust', 1.1], [64.9, 41, 3.4, 'N', 'brick-bare-2', 1], [68.2, 41, 2.7, 'N', 'patch-plate', 1],
+  [70, 41, 4.2, 'N', 'brick-bare-1', 0.9], [75, 41, 1.5, 'N', 'patch-rust', 1],
+  [79, 41, 5.1, 'N', 'brick-bare-2', 1.1], [82.4, 41, 2.6, 'N', 'patch-plate', 0.9], [83.2, 41, 1.4, 'N', 'patch-tin', 1],
+  // The west wall, behind the skiff.
+  [56, 34.6, 2.2, 'E', 'patch-rust', 1.2], [56, 36.6, 3.8, 'E', 'brick-bare-1', 1], [56, 37.9, 1.3, 'E', 'patch-plate', 1],
+  // The east wall, by the smelter and the side gate, and by the lane.
+  [84, 33, 2.4, 'W', 'patch-tin', 1.2], [84, 31.6, 4.4, 'W', 'brick-bare-2', 1], [84, 36.3, 2.7, 'W', 'patch-plate', 1.1],
+  [84, 21.6, 1.8, 'W', 'patch-rust', 1], [84, 23, 3.4, 'W', 'brick-bare-1', 0.8],
+  // The lane's low north wall, east of the ramp.
+  [82.3, 18, 0.8, 'S', 'patch-plate', 1],
+]) town.decals.push({ x, y, z: JUNK + z, face, tex, ...(scale !== 1 && { scale }) });
+town.window(58.5, 41, 'N', { z: JUNK + 4.2 }).window(80.5, 41, 'N', { z: JUNK + 4.4, tex: 'window-louvre' }).window(84, 19.5, 'W', { z: JUNK + 3.4 });
+town.pipe(61.5, 41, 'N', { floorZ: JUNK }).pipe(77.2, 41, 'N', { floorZ: JUNK });
+town.fixture('wall-unit', 66.6, 41, 'N', { z: JUNK + 2.2 });
+// The yard's walls weather twice as much as the town's (`grime()`).
+town.grimeBoxes.push([54, 16, 88, 46, 2]);
+// Against the walls: drums and crates, scrap sheets leant on them, a power
+// unit and a heap of junk, clear of the gates, the deck and the ramp.
+list.push(
+  at('barrel-rust', 74.1, 40.45), at('barrel-grey', 74.85, 40.6), at('canister-rust', 74.5, 39.85),
+  at('scrap', 77.4, 40.99, { angle: 180 }), at('crate-tan', 79, 40.4, { angle: 184 }), at('crate-grey-small', 79.05, 40.4, { z: JUNK + 0.9, angle: 170 }),
+  at('junk-heap', 80.9, 40, { angle: 200 }), at('droid-dome', 81.6, 39.3, { angle: 60 }),
+  at('power-unit', 83.99, 35.9, { angle: 270 }), at('barrel-rust', 83.5, 34.7), at('canister', 83.55, 36.85),
+  at('scrap', 56.01, 38.2, { angle: 90 }), at('barrel-rust', 56.5, 33.1),
+  at('crate-rust-long', 83.45, 20.4, { angle: 90 }), at('barrel-rust', 83.5, 22.1), at('scrap', 81.6, 18.01, { angle: 0 }),
+  at('canister-rust', 80.9, 18.5), at('litter', 82.4, 19.4, { angle: 40 }),
 );
 
 // 7. The back alleys: from the market between I and J into a yard behind J

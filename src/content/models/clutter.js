@@ -2,9 +2,10 @@ import { ModelBuilder } from './lib/build.js';
 
 // Things found on Mos Eisley's streets (lib/town.js, clutter()): cargo
 // crates, drums, pressure canisters, a cargo pod, a power unit, junk and
-// litter with a droid's dome, rubble, scrap and a vaporator. Spacers' and
-// traders' leftovers: no clay jars or grain sacks (Mark, 2026-10-18: it
-// must feel Star Wars, not a desert village). Low-poly, most of them a few
+// litter with a droid's dome, rubble, scrap, a vaporator and the junk
+// yard's deck plates and oil. Spacers' and traders' leftovers: no clay jars or
+// grain sacks (Mark, 2026-10-18: it must feel Star Wars, not a desert
+// village). Low-poly, most of them a few
 // faces. Each is listed in CLUTTER with its decoration's size (solid ones
 // block you and your shots). The origin is on the floor under the thing's
 // middle, except for `scrap` and `power-unit`, built looking south (+y)
@@ -131,13 +132,23 @@ function heap() {
   return m.build();
 }
 
-/** Litter: the litter texture flat on the ground, `s` across (its gaps see-through). */
-function litter(id, s) {
+/** Litter (or a patch of oil): its texture flat on the ground, `s` across (its gaps see-through). */
+function litter(id, s, tex = 'litter') {
   const m = new ModelBuilder(id);
   m.face([[-s / 2, -s / 2, 0.02], [s / 2, -s / 2, 0.02], [s / 2, s / 2, 0.02], [-s / 2, s / 2, 0.02]], {
-    tex: 'litter',
+    tex,
     uv: [[0, 0], [1, 0], [1, 1], [0, 1]],
   }, [0, 0, -1]);
+  return m.build();
+}
+
+/**
+ * A deck plate lying on the ground, `w` x `d` and a few centimetres thick:
+ * salvage the Jawas have laid on the sand of their yard to walk on.
+ */
+function plate(id, tex, [w, d]) {
+  const m = new ModelBuilder(id);
+  m.box([-w / 2, -d / 2, 0], [w / 2, d / 2, 0.05], { tex, bottom: false });
   return m.build();
 }
 
@@ -211,8 +222,13 @@ export const CLUTTER = {
   'junk-heap': { model: heap, radius: 1.1, height: 0.5, depth: 1.6 },
   litter: { model: () => litter('litter', 1.6), radius: 0.8, height: 0, depth: 1.6 },
   'litter-small': { model: () => litter('litter-small', 1), radius: 0.5, height: 0, depth: 1 },
+  oil: { model: () => litter('oil', 1.6, 'oil'), radius: 0.8, height: 0, depth: 1.6 },
+  'oil-small': { model: () => litter('oil-small', 1.2, 'oil'), radius: 0.6, height: 0, depth: 1.2 },
   rubble: { model: rubble, radius: 0.7, height: 0.26, depth: 0.9 },
   scrap: { model: scrap, radius: 0.9, height: 1.6, depth: 0.7 },
+  'deck-plate': { model: () => plate('deck-plate', 'yard-plate', [2, 1.5]), radius: 1.25, height: 0.05, depth: 1.5 },
+  'deck-plate-long': { model: () => plate('deck-plate-long', 'yard-plate', [2.6, 1]), radius: 1.4, height: 0.05, depth: 1 },
+  'deck-plate-rust': { model: () => plate('deck-plate-rust', 'yard-plate-rust', [1.4, 1.2]), radius: 0.92, height: 0.05, depth: 1.2 },
   vaporator: { model: vaporator, solid: true, radius: 0.45, height: 3.7, depth: 1.1 },
 };
 

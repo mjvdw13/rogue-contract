@@ -122,6 +122,19 @@ These need Mark to try something, or to decide. Don't start them without him.
   from grilles either side of the sandcrawler's door, a jet hissing out of
   one every 3-8 s. To judge: how thick the smoke is (Mark found the
   smelter's too much), and whether the steam reads from across the yard.
+  The ground and walls less bare: the brick wall is now the backs of
+  houses, each its own plaster and height (5 to 7 over the court), a dome
+  over the grey one, grimier than the town's, a brick plinth or dirty foot,
+  windows, two downpipes and a box unit; sheet metal patches (`patch-*`,
+  from Sewers' rusty sheet, a bolted panel and the lean-tos' tin) and
+  brick bared where plaster has fallen (`brick-bare-*`). On the ground, a
+  trodden path of deck plates (`deck-plate*`, from Generic's riveted plate
+  and the rusty sheet) from the gate's steps up the passage to the ramp,
+  black oil soaked into the sand (`oil`), burns by the smelter, litter, and
+  drums, crates and scrap against the walls. The droids stand on a deck of
+  plating a step up. To judge: whether the patches read as sheet metal
+  (their dark edge can look like a frame), how black the oil is (paler
+  turns olive), and the plaster colours.
 
 - **Mos Eisley opens in stages** (`?map=m1`, 2026-10-31): when you land the
   blast doors are shut (a stand-in: a rising Imperial gate under a steel
@@ -453,8 +466,8 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
           smudges by doors, cracks, blotches, dust), and a house's `grime`
           says how much (0 clean to 2 neglected). Frame time before and
           after.
-    - [ ] Bare brick where the plaster has fallen: ordinary decals cut
-          from `adobe-brick` with ragged edges.
+    - [ ] Bare brick where the plaster has fallen: the decals are made
+          (`brick-bare-1`, `-2`, in the junk yard); spread them over the town.
     - [x] In Mos Eisley: snapshots, then Waiting on Mark.
   - [ ] **Docking Bay 87's fittings, textured** (Mark, 2026-10-20, the
         look guideline in CLAUDE.md): one object at a time from the DF
@@ -639,6 +652,16 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
           round; the door's jambs off the doorway's walls, no sill box.
     - [x] Mark's note (2026-10-31: make the yard feel alive): smoke
           rising from the heaps, steam at the sandcrawler's door.
+    - [x] Mark's note (2026-10-31: the ground and walls are bare and
+          flat): a trodden path of salvaged deck plates from the gate to
+          the ramp, oil, burns and litter on the sand, the droids for sale
+          on a low deck of plating; the walls the backs of houses, patched
+          with sheet metal and bare brick, junk and drums against them.
+    - [ ] Mark's note (2026-10-31: hard to find from the cantina): the
+          alley between H and I wider, its mouth flared open onto the
+          market (I's corner cut back), the stall in front of it moved
+          aside, and the Jawas' junk spilling out of it with a Jawa at
+          the mouth. Then ask Mark about a second way in (through I).
     - [ ] Waiting on Mark.
   - [ ] The back alleys and the back lane.
   - [ ] The checkpoint and the rooftops.
