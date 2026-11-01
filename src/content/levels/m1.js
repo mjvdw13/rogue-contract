@@ -527,6 +527,50 @@ town.arch(188, 132, 189, 137, { h: DERELICT.floorZ + 5, lintel: 3, floorZ: DEREL
 town.door(190, 134.5, 'E', { h: DERELICT.floorZ + 5, tex: 'door-grey', width: 5, jamb: false, sign: false, panel: false, step: false, floorZ: DERELICT.floorZ, wall: 'metal-grey' });
 p.rect(189, 132, 190, 137, (_, __, c) => ({ ...c, floor: 'imp-floor', tag: 'hold-door', stayOpen: true }));
 p.rect(174, 131, 188, 138, (_, __, c) => ({ ...c, tag: 'hold' }));
+// Fitted out as Bay 87 was, and left: its ribs up the wall every 30
+// degrees (a tile taller, the pit being deeper), clear of the stair, the
+// ledge and the breach (45 to 135 degrees round); the lamps on the rim
+// dead; soot scars; and against the wall what nobody took: scrap sheets
+// leant on it, drums, crates broken open, junk and rubble, litter blown
+// round the floor. Nothing in the way down the stair or to the hold.
+const onDerelictWall = (type, deg, inset = 0.02, z = DERELICT.floorZ) => {
+  const a = (deg * Math.PI) / 180;
+  const r = DERELICT.r - inset;
+  return at(type, Math.round((DERELICT.cx + r * Math.cos(a)) * 100) / 100, Math.round((DERELICT.cy - r * Math.sin(a)) * 100) / 100, { z, angle: (deg + 270) % 360 });
+};
+for (let deg = 15; deg < 360; deg += 30) if (deg < 45 || deg > 135) list.push(onDerelictWall('derelict-rib', deg));
+for (const deg of [15, 195, 255, 345]) list.push(onDerelictWall('bay-rim-lamp-dead', deg, 0.02, DERELICT.rim));
+list.push(
+  onDerelictWall('scrap', 180), onDerelictWall('barrel-rust', 186, 0.5), onDerelictWall('canister-rust', 188.5, 0.4),
+  onDerelictWall('bay-crate-rust-long', 206, 1.1), onDerelictWall('crate-grey-small', 209.5, 0.5),
+  onDerelictWall('scrap', 232), onDerelictWall('junk-heap', 238, 1.4),
+  onDerelictWall('barrel-rust', 262, 0.5), onDerelictWall('barrel-grey', 264.6, 0.5), onDerelictWall('canister-rust', 266.8, 0.4),
+  onDerelictWall('scrap', 298), onDerelictWall('rubble', 303, 0.9), onDerelictWall('rubble', 307.5, 1.4),
+  onDerelictWall('bay-crate-grey', 328, 1.4), onDerelictWall('crate-tan', 333.5, 0.6),
+  onDerelictWall('junk-heap', 2, 1.5), onDerelictWall('scrap', 26), onDerelictWall('barrel-rust', 30.5, 0.5),
+);
+// Litter and rubble about the floor, from a fixed seed: on the open sand,
+// clear of the hull, its door and the foot of the stair.
+{
+  let s = 7300;
+  const rnd = () => (s = (s * 1103515245 + 12345) % 2147483648) / 2147483648;
+  const clear = [[170, 128, 192, 141], [189, 128, 198, 141], [164, 110, 178, 125]];
+  for (let j = 0; j < 26; j++) {
+    const a = rnd() * Math.PI * 2;
+    const d = DERELICT.r - 1.5 - rnd() * 9;
+    const [x, y] = [DERELICT.cx + d * Math.cos(a), DERELICT.cy - d * Math.sin(a)];
+    const c = p.get(Math.floor(x), Math.floor(y));
+    if (c.floorZ !== DERELICT.floorZ || c.line || clear.some(([x0, y0, x1, y1]) => x > x0 && x < x1 && y > y0 && y < y1)) continue;
+    const type = ['litter', 'litter-small', 'litter-small', 'rubble'][Math.floor(rnd() * 4)];
+    list.push(at(type, Math.round(x * 100) / 100, Math.round(y * 100) / 100, { z: DERELICT.floorZ, angle: Math.floor(rnd() * 24) * 15 }));
+  }
+}
+// Soot round the wall from old exhausts and fires (degrees round from
+// east, height, picture, size), more of it than in Bay 87.
+const derelictDecals = [[8, -2, 1, 3.4], [33, 0.5, 2, 2.6], [152, -1.5, 2, 3.2], [176, 1, 1, 2.8], [214, -2.5, 1, 3.6], [243, 0, 2, 2.4], [271, -1.5, 1, 3.2], [292, 1.5, 2, 2.6], [322, -2, 1, 3.4], [352, 1, 2, 2.2]].map(([deg, z, k, scale]) => {
+  const a = (deg * Math.PI) / 180;
+  return { x: DERELICT.cx + DERELICT.r * Math.cos(a), y: DERELICT.cy - DERELICT.r * Math.sin(a), z, face: 'angled', tex: `grime-scorch-${k}`, scale };
+});
 // Where the loud half's troopers come in: over the rim, and through the gate.
 tagTile(170, 112, 'derelict-rim');
 tagTile(205, 128, 'derelict-rim');
@@ -1339,7 +1383,7 @@ export default defineLevel({
   // distracted, and Mark halved that twice to 60. 90 on trial (Mark,
   // 2026-10-18).
   weather: { type: 'glint', count: 90 },
-  decals: [...town.decals, ...bayDecals, ...pitDecals],
+  decals: [...town.decals, ...bayDecals, ...pitDecals, ...derelictDecals],
   lights,
   hangings: [...hangings, ...town.hangings],
   par: 600,

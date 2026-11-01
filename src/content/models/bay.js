@@ -12,15 +12,16 @@ const IRON = ['gray', 0.22];
 
 /** How tall the pit's wall is, floor to rim. */
 export const BAY_WALL = 11;
+/** The derelict bay's wall, floor to rim: a tile deeper (its rib is as tall). */
+export const DERELICT_WALL = 12;
 
 /**
  * A rib up the wall, floor to rim: a plinth, a buttress sloping back into a
  * square shaft, an iron band at street level and a cap block on the rim.
  * It collides as its plinth's outline.
  */
-function rib() {
-  const m = new ModelBuilder('bay-rib');
-  const h = BAY_WALL;
+function rib(id = 'bay-rib', h = BAY_WALL) {
+  const m = new ModelBuilder(id);
   m.box([-0.6, 0, 0], [0.6, 1.1, 0.6], WALL);
   m.loft([[-0.45, 0], [0.45, 0], [0.45, 0.95], [-0.45, 0.95]], 0.6, [[-0.4, 0], [0.4, 0], [0.4, 0.45], [-0.4, 0.45]], 3, { ...WALL, bottom: false });
   m.box([-0.4, 0, 3], [0.4, 0.45, h - 0.4], { ...WALL, top: false, bottom: false });
@@ -112,17 +113,18 @@ function fuelPump() {
 
 /**
  * A lamp on the rim, out over the pit: a post on the wall's top, an arm
- * reaching out and a lamp head at its end, its lens glowing down.
+ * reaching out and a lamp head at its end, its lens glowing down. A dead
+ * one (`lit` false) has a dark lens and marker.
  */
-function rimLamp() {
-  const m = new ModelBuilder('bay-rim-lamp');
+function rimLamp(id = 'bay-rim-lamp', lit = true) {
+  const m = new ModelBuilder(id);
   m.box([-0.3, -0.7, 0], [0.3, -0.1, 0.12], { color: IRON, bottom: false });
   m.box([-0.08, -0.48, 0.12], [0.08, -0.32, 1.5], { color: ['steel', 0.45], bottom: false });
   m.box([-0.07, -0.48, 1.36], [0.07, 1.3, 1.5], { color: ['steel', 0.45] });
   // A strut from the post up to the arm.
   m.loft([[-0.04, -0.46], [0.04, -0.46], [0.04, -0.38], [-0.04, -0.38]], 0.6, [[-0.04, 0.42], [0.04, 0.42], [0.04, 0.5], [-0.04, 0.5]], 1.36, { color: ['steel', 0.35], top: false, bottom: false });
-  m.box([-0.22, 1.05, 1.1], [0.22, 1.55, 1.42], { color: ['gray', 0.3], bottom: { color: [255, 250, 200], glow: true } });
-  m.box([-0.04, 1.26, 1.5], [0.04, 1.34, 1.58], { color: [255, 60, 40], glow: true, bottom: false });
+  m.box([-0.22, 1.05, 1.1], [0.22, 1.55, 1.42], { color: ['gray', 0.3], bottom: lit ? { color: [255, 250, 200], glow: true } : { color: ['gray', 0.14] } });
+  m.box([-0.04, 1.26, 1.5], [0.04, 1.34, 1.58], { ...(lit ? { color: [255, 60, 40], glow: true } : { color: [70, 30, 25] }), bottom: false });
   return m.build();
 }
 
@@ -275,6 +277,7 @@ function hose({ id, end, tex, path }) {
 
 export default [
   rib(), fuelLine(), fuelPump(), rimLamp(),
+  rib('derelict-rib', DERELICT_WALL), rimLamp('bay-rim-lamp-dead', false),
   bigCrate('bay-crate-grey', 'crate-grey', [2, 2, 2]), bigCrate('bay-crate-tan', 'crate-tan', [2, 2, 2]), bigCrate('bay-crate-rust-long', 'crate-rust', [3.2, 1.6, 1.6]),
   ...BAY_HOSES.map(hose),
 ];

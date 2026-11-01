@@ -13,7 +13,7 @@ import { SKIFF } from './models/skiff.js';
 import { CRAWLER } from './models/sandcrawler.js';
 import { DROIDS } from './models/droids.js';
 import { RACK, RACKS } from './models/rack.js';
-import { BAY_WALL, BAY_HOSES } from './models/bay.js';
+import { BAY_WALL, DERELICT_WALL, BAY_HOSES } from './models/bay.js';
 import { TOWER_HEIGHT } from './models/market.js';
 import { BAR, TAPS, CORNER } from './models/cantina.js';
 import { POD } from './models/pod.js';
@@ -107,6 +107,9 @@ export default [
   defineDecoration({ id: 'bay-fuel-line', model: 'bay-fuel-line', fixed: true }),
   defineDecoration({ id: 'bay-fuel-pump', model: 'bay-fuel-pump', solid: true, height: 1.7, fixed: true }),
   defineDecoration({ id: 'bay-rim-lamp', model: 'bay-rim-lamp', fixed: true }),
+  // The derelict bay's: its ribs a tile taller (its pit is deeper), its lamps dead.
+  defineDecoration({ id: 'derelict-rib', model: 'derelict-rib', solid: true, height: DERELICT_WALL, fixed: true }),
+  defineDecoration({ id: 'bay-rim-lamp-dead', model: 'bay-rim-lamp-dead', fixed: true }),
   // On its floor: big crates (they stack: place one 2 up on another),
   // colliding as their outlines; hoses out from the pumps, underfoot.
   defineDecoration({ id: 'bay-crate-grey', model: 'bay-crate-grey', solid: true, height: 2, fixed: true }),

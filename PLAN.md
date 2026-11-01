@@ -692,6 +692,19 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
           flight down a round pit's wall that hugs it, a step per tile
           column, a parapet on its open side; a short landing at the gate
           with a parapet, the flight running west along the wall.
+    - [x] One way down (Mark, 2026-11-01: no straight steps): the wash's
+          sand steps gone, its breach onto a ledge along the wall to the
+          landing (`town.wallLedge`), so both ways in take the one flight.
+    - [x] The pit fitted out as Bay 87 was, and left: ribs (a tile
+          taller), dead lamps on the rim, soot scars, scrap, drums, crates
+          and junk against the wall, litter and rubble on the sand.
+    - [ ] The breach: broken edges where the wall gave, sand spilt
+          through it onto the ledge.
+    - [ ] The crane on the rim (a model, in place of the stand-in post).
+    - [ ] The gutted freighter (a model, in place of the stand-in hull),
+          Rusk's hold in its stern.
+    - [ ] Scaffolding against the hull or the wall.
+    - [ ] Waiting on Mark.
   - [ ] The skyline: dunes and mesas in the backdrop, the town's edges.
 - [ ] **Life:** the cantina's customers, the customs officer, the
       dewback with the patrol; the blast doors shutting and the music at
