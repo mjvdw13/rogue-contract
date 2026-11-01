@@ -555,8 +555,8 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
   - [x] The middle: the cantina's shell (its back door on the back lane,
         built with the rooftops), the alleys (on to the mouth by the
         checkpoint), the junk yard, Bay 86 to look into.
-  - [ ] Play both halves (rough troopers for the loud half), then
-        Waiting on Mark.
+  - [x] Play both halves (Mark played the whole level, 2026-11-01: no
+        notes).
 - [ ] **Guiding the player** (Mark, 2026-10-31): the town opens in stages,
       so the open part always holds the next stop, and people say where
       to go. Landing to the trader: the west end, the market, the cantina
@@ -634,6 +634,9 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
           the nook, the pod by the cut corner, the dome back.
     - [ ] Waiting on Mark.
   - [ ] Bay 86, the dewback stable and the speeder garage.
+    - [ ] Bay 86 dressed as Bay 87 is: ribs, rim lamps (some dead),
+          fuel lines and pumps, ribbed foot, scorch marks, crates opened
+          round the freighter; the gate with a hood and buttresses.
   - [ ] The Jawa junk yard and the sandcrawler.
     - [x] Laid out deeper (Mark, 2026-10-31: the trader shouldn't stand
           at the gate): a front court, a passage slanting north-west to
@@ -684,6 +687,11 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
   - [ ] The comm tower.
   - [ ] The old quarter and the dry wash.
   - [ ] The derelict bay and the gutted freighter.
+    - [x] Its stairs (Mark, 2026-11-01: the flight ran 12 tiles straight
+          out to the middle of the pit): a kit piece, `town.wallStair`, a
+          flight down a round pit's wall that hugs it, a step per tile
+          column, a parapet on its open side; a short landing at the gate
+          with a parapet, the flight running west along the wall.
   - [ ] The skyline: dunes and mesas in the backdrop, the town's edges.
 - [ ] **Life:** the cantina's customers, the customs officer, the
       dewback with the patrol; the blast doors shutting and the music at

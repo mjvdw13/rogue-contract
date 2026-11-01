@@ -485,7 +485,8 @@ tagTile(198, 55, 'quarter-north');
 // 10. The derelict bay: an old docking bay half full of sand, a pit like
 // Bay 87. Its gate is at the main street's end: a
 // passage through its building onto a landing at the old quarter's height,
-// and stairs down. The wash breaks in on the north-east, down sand steps.
+// and a flight down along the wall to the west (Mark, 2026-11-01: not out
+// across the floor). The wash breaks in on the north-east, down sand steps.
 // A stand-in hull for the freighter (Rusk in its hold, behind a door in
 // the stern that opens once the fob has his signal), and a stand-in crane
 // on the rim, seen down the street.
@@ -497,8 +498,13 @@ town.circle(DERELICT.cx, DERELICT.cy, DERELICT.r, {
   seam: 90,
 });
 town.arch(183, 104, 189, 110, { h: DERELICT.rim, lintel: 4, floorZ: OQ, wall: 'bay-wall', floor: 'bay-floor' });
-p.rect(183, 110, 189, 113, (_, __, c) => ({ ...c, floor: 'bay-floor', floorZ: OQ }));
-town.stair(183, 113, 189, 125, { up: 'N', from: DERELICT.floorZ, top: OQ, floor: 'bay-floor', side: 'bay-wall' });
+// The landing, 3 deep, fenced on its open sides by a parapet a tile tall,
+// open on the west to the flight: ten steps of 0.5, each a tile along the
+// wall, with the parapet stepping down beside them (lib/town.js, wallStair).
+const LANDING = town.street(OQ, { floor: 'bay-floor', side: 'bay-step' });
+const PARAPET = town.street(OQ + 1, { floor: 'bay-floor', side: 'bay-wall' });
+p.rect(183, 110, 189, 113, LANDING).rect(183, 113, 190, 114, PARAPET).rect(189, 110, 190, 113, PARAPET);
+town.wallStair(DERELICT.cx, DERELICT.cy, DERELICT.r, { at: 182, run: 'W', against: 'N', top: OQ, from: DERELICT.floorZ, width: 4, floor: 'bay-floor', side: 'bay-step', parapet: 'bay-wall' });
 p.rect(194, 104, 202, 112, town.street(WASH, { floor: 'desert-sand', side: 'bay-wall' }));
 town.stair(194, 112, 202, 122, { up: 'N', from: DERELICT.floorZ, top: WASH, floor: 'desert-sand', side: 'bay-wall' });
 town.block(191, 106, 192, 107, { h: 18, wall: 'metal-rust', roof: 'metal-rust', skirt: null });

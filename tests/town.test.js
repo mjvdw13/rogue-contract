@@ -63,6 +63,32 @@ test("a building's walls, straight and rounded, have the skirt at their foot", (
   assert.ok(!skirt(p.get(20, 20)), 'not the street');
 });
 
+test("a stair down a round pit's wall hugs it, a step down per tile, fenced on its open side", () => {
+  const { p, town } = kit();
+  p.rect(1, 1, 39, 39, town.roofCell({ h: 6 }));
+  town.circle(20, 20, 12, { inside: town.street(-3), wall: { wall: 'adobe', wallTop: 6 } });
+  p.rect(19, 7, 23, 11, town.street(0));
+  town.wallStair(20, 20, 12, { at: 18, run: 'W', against: 'N', top: 0, from: -3, width: 4 });
+  const steps = [];
+  for (let k = 0; k < 5; k++) {
+    const x = 18 - k;
+    const z = -0.5 * (k + 1);
+    const col = [];
+    for (let y = 0; y < 20; y++) if (p.get(x, y).floorZ < 6) col.push(p.get(x, y));
+    assert.ok(col[0].line, `step ${k}: the wall stands on it`);
+    assert.equal(col[0].floorZ, z, `step ${k} is ${z} at the wall`);
+    assert.ok(col.some((c) => c.floorZ === z + 1), `step ${k}: a parapet a tile over the tread`);
+    for (let y = 0; y < 20; y++) if (p.get(x, y).floorZ === z) steps.push([x, y, z]);
+  }
+  for (const [x, y, z] of steps) {
+    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+      assert.ok(p.get(x + dx, y + dy).floorZ >= z - 0.5, `no drop off the step at (${x}, ${y}) toward (${x + dx}, ${y + dy})`);
+    }
+  }
+  assert.equal(p.get(20, 20).floorZ, -3, 'the floor stays clear');
+  assert.throws(() => town.wallStair(20, 20, 12, { at: 18, run: 'W', against: 'E', top: 0, from: -5 }), /against/);
+});
+
 test('a building with a slanting side stands an angled wall along it, its roof inside and the street outside', () => {
   const { p, town } = kit();
   town.slanted([[4, 4], [16, 4], [16, 10], [4, 14]], { h: 6 });

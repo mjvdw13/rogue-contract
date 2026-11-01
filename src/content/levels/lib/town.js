@@ -324,6 +324,62 @@ export class Town {
   }
 
   /**
+   * A flight of steps down the inside of a round pit's wall (the circle at
+   * `cx`, `cy`, radius `r`), hugging it so the floor stays clear: from a
+   * landing at `top` it runs toward `run` ('N', 'E', 'S' or 'W') a step
+   * per tile, along the pit's `against` side (the wall it's on: 'N' or 'S'
+   * for a flight running east or west, 'E' or 'W' for one running north
+   * or south), down to the floor at `from`. `at` is the first step's
+   * column (or row), beside the landing. Each step reaches `width` tiles
+   * out from the wall, the innermost a parapet `guard` above the tread
+   * (taller than a step, so the open side is fenced), widened where the
+   * wall curves away so it meets the step above's. The wall's own tiles
+   * keep their wall, standing on the step. Keep the flight within about
+   * 45 degrees of `against`, where the wall still runs along it; further
+   * round the steps grow long across the run.
+   */
+  wallStair(cx, cy, r, { at, run, against, top, from, rise = 0.5, width = 3, guard = 1, floor = this.floor, side = this.wall, parapet = side }) {
+    const n = Math.round((top - from) / rise) - 1;
+    if (n < 1 || Math.abs((n + 1) * rise - (top - from)) > 1e-6) throw new Error(`Town: a wall stair at ${at} goes down from ${top} to ${from}, not a whole number of ${rise} steps`);
+    const ew = run === 'E' || run === 'W';
+    if (!(ew ? against === 'N' || against === 'S' : (run === 'N' || run === 'S') && (against === 'E' || against === 'W'))) {
+      throw new Error(`Town: a wall stair running "${run}" can't be against the "${against}" wall`);
+    }
+    if (guard <= 0.8) throw new Error(`Town: a wall stair's parapet (${guard}) must stand taller than a step (0.8)`);
+    // In (u, v): u along the run, v across it; `s` is the way in from the wall.
+    const [cu, cv] = ew ? [cx, cy] : [cy, cx];
+    const dir = run === 'E' || run === 'S' ? 1 : -1;
+    const s = against === 'N' || against === 'W' ? 1 : -1;
+    const get = (u, v) => (ew ? this.p.get(u, v) : this.p.get(v, u));
+    const set = (u, v, c) => (ew ? this.p.set(u, v, c) : this.p.set(v, u, c));
+    const step = (c, z, tex) => (c.line ? { ...c, floorZ: z, floor, side: tex } : this.street(z, { floor, side: tex }));
+    let edge;
+    for (let k = 0; k < n; k++) {
+      const u = at + dir * k;
+      const du = u + 0.5 - cu;
+      if (Math.abs(du) >= r - width) throw new Error(`Town: a wall stair's step at ${u} is too far round the wall`);
+      const z = top - (k + 1) * rise;
+      // The tiles across the column from the wall in, to `width` out.
+      const band = [];
+      for (let v = Math.floor(cv - s * (r + 1)); s * (v - cv) <= 0; v += s) {
+        const c = get(u, v);
+        const d = ew ? Math.hypot(du, v + 0.5 - cv) : Math.hypot(v + 0.5 - cv, du);
+        if (d >= r - width && (c.line || d < r)) band.push(v);
+      }
+      if (!band.length) throw new Error(`Town: a wall stair's step at ${u} finds no wall`);
+      // The parapet: the innermost tile, and on in to meet the one above.
+      const inner = band.at(-1);
+      const first = s * (edge === undefined ? inner : Math.min(s * inner, s * edge + 1) * s);
+      for (const v of band) {
+        const fence = s * v >= first;
+        set(u, v, step(get(u, v), fence ? z + guard : z, fence ? parapet : side));
+      }
+      edge = inner;
+    }
+    return this;
+  }
+
+  /**
    * A doorway or arch through a building's outside wall: open below
    * `lintel`, the wall over it up to the roof at `h` (a slab, so the street's
    * sky doesn't put a wall above the roofline). A door panel, if any, goes
