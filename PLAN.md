@@ -722,7 +722,7 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
             no stepped parapet along the wall.
       - [x] Under the balcony: posts, girders and a better underside, junk
             stored under it.
-      - [ ] The ship dirtier: streaks down its sides.
+      - [x] The ship dirtier: streaks down its sides.
       - [ ] Sparks spitting from something in the bay.
     - [ ] Waiting on Mark.
   - [ ] The skyline: dunes and mesas in the backdrop, the town's edges.

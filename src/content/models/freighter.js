@@ -88,6 +88,37 @@ function freighter() {
   patch(5.2, 7.6, 1.4, 3.2, 1);
   patch(-3.2, -0.8, 3.9, 4.7, 1);
 
+  // Grime (Mark, 2026-11-01: dirtier, streaks): soot and rust streaked
+  // down the sides from the shoulder, dust along the foot, soot down the
+  // stern from the engines. Grime faces a hair proud of the plate darken
+  // it. [picture, middle along the hull, width, top, height]
+  const SIDE_GRIME = [
+    ['grime-streaks-1', -8.4, 1.8, 4.85, 3], ['grime-drip-1', -6.6, 1.2, 4.8, 2.4], ['grime-streaks-3', -4.6, 2.2, 4.85, 2.6], ['grime-streaks-2', -2.4, 1.6, 4.85, 3.3],
+    ['grime-drip-2', -0.6, 1.3, 4.8, 2.2], ['grime-streaks-1', 1.3, 2, 4.85, 3.1], ['grime-streaks-3', 3.6, 1.8, 4.85, 2.4], ['grime-drip-1', 5.4, 1.2, 4.8, 2.8],
+    ['grime-streaks-2', 7.2, 2, 4.85, 3.4],
+    ['grime-dust-1', -6, 4, 2.4, 1.2], ['grime-dust-2', -1.5, 4, 2.3, 1.1], ['grime-dust-1', 3, 4, 2.4, 1.2], ['grime-dust-2', 7, 3.6, 2.3, 1.1],
+  ];
+  const grimeFace = (pts, tex, inside) => m.face(pts, { tex, uv: [[0, 1], [1, 1], [1, 0], [0, 0]] }, inside);
+  for (const s of [-1, 1]) {
+    SIDE_GRIME.forEach(([tex, x, w, top, h], i) => {
+      // The other side's are shifted along, so the two don't match.
+      const xm = s > 0 ? x : -x + 0.7 * (i % 3);
+      const [x0, x1, z0, z1] = [xm - w / 2, xm + w / 2, top - h, top];
+      // The streaks twice over, a hair apart, to read through the plate's stains.
+      for (const off of tex.startsWith('grime-dust') ? [0.04] : [0.04, 0.07]) {
+        const y = (z) => s * (side(z) + off);
+        const pts = [[x0, y(z0), z0], [x1, y(z0), z0], [x1, y(z1), z1], [x0, y(z1), z1]];
+        grimeFace(s > 0 ? pts : [pts[1], pts[0], pts[3], pts[2]], tex, [xm, 0, (z0 + z1) / 2]);
+      }
+    });
+  }
+  // Down the stern under the engines, either side of the hatch.
+  for (const [tex, y, w] of [['grime-scorch-1', -2.3, 2.2], ['grime-streaks-2', -3.9, 1.4], ['grime-scorch-2', 2.3, 2.2], ['grime-streaks-1', 3.8, 1.6]]) {
+    const z1 = ROOF - 0.15;
+    const z0 = Math.max(ht + 0.3, z1 - 2.6);
+    grimeFace([[X + 0.03, y + w / 2, z0], [X + 0.03, y - w / 2, z0], [X + 0.03, y - w / 2, z1], [X + 0.03, y + w / 2, z1]], tex, MID);
+  }
+
   // The cockpit: a pod along the starboard side forward, its windows round
   // its nose, dark, and a neck back into the hull.
   const POD = { y: -5.9, z: 3.5, r: 1.25 };
