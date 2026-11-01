@@ -15,6 +15,7 @@ import { DROIDS } from './models/droids.js';
 import { RACK, RACKS } from './models/rack.js';
 import { BAY_WALL, DERELICT_WALL, BAY_HOSES } from './models/bay.js';
 import { SCAFFOLDS, scaffoldHeight } from './models/scaffold.js';
+import { BALCONY_FRAME } from './models/balcony.js';
 import { TOWER_HEIGHT } from './models/market.js';
 import { BAR, TAPS, CORNER } from './models/cantina.js';
 import { POD } from './models/pod.js';
@@ -114,6 +115,8 @@ export default [
   // Scaffolding left against its wall and the freighter (models/scaffold.js),
   // colliding as its footprint, as high as its poles.
   ...Object.keys(SCAFFOLDS).map((id) => defineDecoration({ id, model: id, solid: true, height: scaffoldHeight(id), fixed: true })),
+  // The steelwork under the derelict bay's balcony (models/balcony.js), colliding as its posts' base plates.
+  defineDecoration({ id: 'balcony-frame', model: 'balcony-frame', solid: true, height: BALCONY_FRAME.height, fixed: true }),
   // On its floor: big crates (they stack: place one 2 up on another),
   // colliding as their outlines; hoses out from the pumps, underfoot.
   defineDecoration({ id: 'bay-crate-grey', model: 'bay-crate-grey', solid: true, height: 2, fixed: true }),

@@ -32,5 +32,6 @@ import droids from './droids.js';
 import racks from './rack.js';
 import freighter from './freighter.js';
 import scaffolds from './scaffold.js';
+import balcony from './balcony.js';
 
-export default [terminal, reactorRing, coolantTank, shuttle, ...barricades, boulderLarge, boulderSmall, ...floodlightTowers, sensorMast, sensorDish, ...domes, doorJamb, ...doorLips, ...arches, ...buttresses, ...awnings, ...tin, ...pipes, ...clutter, landspeeder, ...bay, moldyCrow, ...market, ...cantina, ...hitching, ...pod, ...stains, ...sandcrawler, ...junkPiles, ...furnace, ...skiff, ...droids, ...racks, ...freighter, ...scaffolds];
+export default [terminal, reactorRing, coolantTank, shuttle, ...barricades, boulderLarge, boulderSmall, ...floodlightTowers, sensorMast, sensorDish, ...domes, doorJamb, ...doorLips, ...arches, ...buttresses, ...awnings, ...tin, ...pipes, ...clutter, landspeeder, ...bay, moldyCrow, ...market, ...cantina, ...hitching, ...pod, ...stains, ...sandcrawler, ...junkPiles, ...furnace, ...skiff, ...droids, ...racks, ...freighter, ...scaffolds, ...balcony];

@@ -507,16 +507,25 @@ town.arch(183, 104, 189, 110, { h: DERELICT.rim, lintel: 4, floorZ: OQ, wall: 'd
 // see the ship through, not a parapet stepping along the curve of the
 // wall. The wall stands on the deck where it crosses it.
 const LANDING = town.street(OQ, { floor: 'derelict-floor', side: 'derelict-wall' });
-const BALCONY = { x0: 183, x1: 199, y1: 117 };
+// Under it the steelwork holding it up (models/balcony.js), in its shade.
+const BALCONY = { x0: 183, x1: 199, y1: 117, under: 120 };
 const BALCONY_RAIL = { tex: 'rail-rust', height: 1 };
-const BALCONY_DECK = { bottom: OQ - 0.35, top: OQ, floor: 'derelict-floor', ceiling: 'yard-plate-rust', side: 'band-steel', light: town.light };
+const BALCONY_DECK = { bottom: OQ - 0.35, top: OQ, floor: 'derelict-floor', ceiling: 'metal-rust', side: 'band-steel', light: town.light };
 p.rect(183, 110, 189, 111, LANDING);
 p.rect(BALCONY.x0, 110, BALCONY.x1, BALCONY.y1, (x, y, c) => {
   if (c.line) return { ...c, floorZ: OQ, floor: 'derelict-floor', side: 'derelict-wall' };
-  return c.floorZ === DERELICT.floorZ ? { ...c, slab: BALCONY_DECK } : c;
+  return c.floorZ === DERELICT.floorZ ? { ...c, slab: BALCONY_DECK, light: BALCONY.under } : c;
 });
 p.fence(BALCONY.x0, BALCONY.y1 - 1, BALCONY.x1, BALCONY.y1, 'S', BALCONY_RAIL).fence(BALCONY.x0, 113, BALCONY.x0 + 1, BALCONY.y1, 'W', BALCONY_RAIL);
 for (let y = 110; y < BALCONY.y1; y++) if (p.get(BALCONY.x1 - 1, y).slab) p.fence(BALCONY.x1 - 1, y, BALCONY.x1, y + 1, 'E', BALCONY_RAIL);
+list.push(at('balcony-frame', BALCONY.x0, BALCONY.y1, { angle: 0, z: DERELICT.floorZ, lit: BALCONY.under }));
+// Stores left under it: crates stacked, drums, a pod on its side.
+list.push(
+  at('bay-crate-grey', 189.6, 113.4, { z: DERELICT.floorZ, angle: 0 }), at('crate-tan', 189.4, 115.3, { z: DERELICT.floorZ, angle: 15 }),
+  at('crate-rust-long', 185.6, 114.2, { z: DERELICT.floorZ, angle: 90 }), at('crate-grey-small', 185.7, 114.4, { z: DERELICT.floorZ + 0.7, angle: 30 }),
+  at('barrel-rust', 193.4, 114.6, { z: DERELICT.floorZ }), at('barrel-grey', 194.1, 115.3, { z: DERELICT.floorZ }), at('canister-rust', 193.2, 115.6, { z: DERELICT.floorZ }),
+  at('junk-heap', 197, 115.2, { z: DERELICT.floorZ, angle: 160 }),
+);
 town.wallStair(DERELICT.cx, DERELICT.cy, DERELICT.r, { against: 'N', width: 4, floor: 'derelict-floor', side: 'bay-step', parapet: 'derelict-wall', at: 182, run: 'W', top: OQ, from: DERELICT.floorZ });
 // The breach: the wash runs on through the rim, 4 wide, a step down from
 // the ledge, and the wall is gone where it meets it.

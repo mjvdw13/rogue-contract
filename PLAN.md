@@ -720,7 +720,7 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
     - [ ] Mark's second notes (2026-11-01), a commit each:
       - [x] The balcony runs on east to the breach, one straight railing,
             no stepped parapet along the wall.
-      - [ ] Under the balcony: posts, girders and a better underside, junk
+      - [x] Under the balcony: posts, girders and a better underside, junk
             stored under it.
       - [ ] The ship dirtier: streaks down its sides.
       - [ ] Sparks spitting from something in the bay.
