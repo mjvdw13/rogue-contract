@@ -698,9 +698,8 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
     - [x] The pit fitted out as Bay 87 was, and left: ribs (a tile
           taller), dead lamps on the rim, soot scars, scrap, drums, crates
           and junk against the wall, litter and rubble on the sand.
-    - [ ] The breach: broken edges where the wall gave, sand spilt
+    - [x] The breach: broken edges where the wall gave, sand spilt
           through it onto the ledge.
-    - [ ] The crane on the rim (a model, in place of the stand-in post).
     - [ ] The gutted freighter (a model, in place of the stand-in hull),
           Rusk's hold in its stern.
     - [ ] Scaffolding against the hull or the wall.

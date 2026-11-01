@@ -519,6 +519,27 @@ for (let x = 194; x < 198; x++) {
     else if (c.floorZ === DERELICT.rim) p.set(x, y, town.street(WASH, { floor: 'desert-sand', side: 'bay-wall' }));
   }
 }
+// The wall gave there: the rim either side broken down toward the gap (a
+// tile lower at the pit's face, and still too tall to climb from the
+// ledge or the wash), rubble along the gap's sides, and the wash's sand
+// spilt through it across the ledge.
+for (const [x, h] of [[192, 6], [193, 4.5], [198, 4.5], [199, 6]]) {
+  for (let y = 104; y < 120; y++) {
+    const c = p.get(x, y);
+    if (c.line) p.set(x, y, { ...c, wallTop: h - 1 });
+    else if (c.floorZ === DERELICT.rim) p.set(x, y, { ...c, floorZ: h + (y < 107 ? 0.5 : 0) });
+  }
+}
+for (let x = 192; x < 198; x++) {
+  for (let y = 108; y < 120; y++) {
+    const c = p.get(x, y);
+    if (c.floorZ === OQ && (x > 192 || c.line)) p.set(x, y, { ...c, floor: 'desert-sand' });
+  }
+}
+list.push(
+  at('rubble', 194.55, 105.6, { z: WASH, angle: 30 }), at('rubble', 197.4, 107.9, { z: WASH, angle: 200 }), at('rubble', 194.6, 109.8, { z: WASH, angle: 120 }),
+  at('rubble', 193.6, 112.5, { z: OQ, angle: 75 }), at('litter-small', 196, 113.6, { z: OQ, angle: 15 }),
+);
 town.block(191, 106, 192, 107, { h: 18, wall: 'metal-rust', roof: 'metal-rust', skirt: null });
 const HULL = { wall: 'metal-grey', roof: 'metal-grey', skirt: null };
 town.house(172, 130, 190, 139, { h: DERELICT.floorZ + 5, r: 2, ...HULL });
