@@ -14,6 +14,15 @@ export const FREIGHTER = {
   stern: 9.05,
   /** The stern hatch: half its width, and its top (the hold's door). */
   hatch: [2.5, 3],
+  /**
+   * Where the hold's walls and ceiling are open behind the holes in the
+   * plating, so you see in and out (levels/m1.js opens the tiles): [x0,
+   * x1, z0, z1, side] (side -1 north, 1 south) up to the hold's ceiling
+   * at 3.25, their feet out of a jump's reach from the sand (1.8) and too
+   * low to crawl through (under 1.5); and the roof's, [x0, x1, y0, y1].
+   */
+  windows: [[-4, -2, 1.8, 3.25, -1], [3, 5, 2.4, 3.25, -1], [1, 3, 1.8, 3.25, 1]],
+  skylight: [-4, -1, -1.5, 0.5],
 };
 
 // Plain plate, not corrugated tin (Mark, 2026-11-01: too patterned).
@@ -57,7 +66,9 @@ function freighter() {
   const { stern: X, hatch: [hw, ht] } = FREIGHTER;
   const MID = [0, 0, 3];
   // The hull, the raked nose before it (no underside: it's on the ground).
-  m.prism(SECTION, -6, X, { ...HULL, axis: 'x', top: false, bottom: false, side: (i) => (i === 0 ? false : undefined) });
+  // Its upper sides (edges 2 and 6) and roof (4) are laid in pieces round
+  // the windows and the skylight, below.
+  m.prism(SECTION, -6, X, { ...HULL, axis: 'x', top: false, bottom: false, side: (i) => (i === 0 || i === 2 || i === 4 || i === 6 ? false : undefined) });
   m.loft(FRONT, -9.3, SECTION, -6, { ...HULL, axis: 'x', top: false, side: (i) => (i === 0 ? false : undefined) });
   // The stern, round the hatch: either side of it, and over it.
   for (const piece of [clip(SECTION, ([y]) => -hw - y), clip(SECTION, ([y]) => y - hw), clip(clip(clip(SECTION, ([y]) => y + hw), ([y]) => hw - y), ([, z]) => z - ht)]) {
@@ -68,13 +79,33 @@ function freighter() {
   for (const s of [-1, 1]) m.box([X, s > 0 ? hw : -hw - 0.2, 0], [X + 0.15, s > 0 ? hw + 0.2 : -hw, ht], FRAME);
 
   // Where the plating's gone: dark holes a hair proud of the side (s: -1
-  // north, 1 south) or the roof, frames across them every 0.8.
+  // north, 1 south) or the roof, frames across them every 0.8. Where the
+  // hold is open behind one (a window), the dark is left out round it, so
+  // you see through.
+  /** Rectangles ([a0, a1, b0, b1]) less the ones given: each cut leaves up to four. */
+  const less = (rects, holes) => holes.reduce((out, o) => out.flatMap(([a0, a1, b0, b1]) => {
+    const [p0, p1, q0, q1] = [Math.max(a0, o[0]), Math.min(a1, o[1]), Math.max(b0, o[2]), Math.min(b1, o[3])];
+    if (p1 <= p0 || q1 <= q0) return [[a0, a1, b0, b1]];
+    return [[a0, p0, b0, b1], [p1, a1, b0, b1], [p0, p1, b0, q0], [p0, p1, q1, b1]].filter(([u0, u1, v0, v1]) => u1 - u0 > 1e-6 && v1 - v0 > 1e-6);
+  }), rects);
+  // The hull's upper sides between chine and shoulder, and its roof, round the openings.
+  for (const sd of [-1, 1]) {
+    const wins = FREIGHTER.windows.filter((w) => w[4] === sd);
+    for (const [a0, a1, b0, b1] of less([[-6, X, 1.2, 4.9]], wins)) {
+      m.face([[a0, sd * side(b0), b0], [a1, sd * side(b0), b0], [a1, sd * side(b1), b1], [a0, sd * side(b1), b1]], HULL, MID);
+    }
+  }
+  for (const [a0, a1, b0, b1] of less([[-6, X, -3.6, 3.6]], [FREIGHTER.skylight])) m.face([[a0, b0, ROOF], [a1, b0, ROOF], [a1, b1, ROOF], [a0, b1, ROOF]], HULL, MID);
   const sideHole = (x0, x1, z0, z1, s) => {
-    m.face([[x0, s * (side(z0) + 0.03), z0], [x1, s * (side(z0) + 0.03), z0], [x1, s * (side(z1) + 0.03), z1], [x0, s * (side(z1) + 0.03), z1]], HOLE, [(x0 + x1) / 2, 0, (z0 + z1) / 2]);
+    for (const [a0, a1, b0, b1] of less([[x0, x1, z0, z1]], FREIGHTER.windows.filter((w) => w[4] === s))) {
+      m.face([[a0, s * (side(b0) + 0.03), b0], [a1, s * (side(b0) + 0.03), b0], [a1, s * (side(b1) + 0.03), b1], [a0, s * (side(b1) + 0.03), b1]], HOLE, [(a0 + a1) / 2, 0, (b0 + b1) / 2]);
+    }
     for (let x = x0 + 0.4; x < x1 - 0.2; x += 0.8) m.box([x - 0.07, s > 0 ? side(z0) - 0.05 : -side(z0) - 0.1, z0], [x + 0.07, s > 0 ? side(z0) + 0.1 : -side(z0) + 0.05, z1], FRAME);
   };
   const roofHole = (x0, x1, y0, y1) => {
-    m.face([[x0, y0, ROOF + 0.03], [x1, y0, ROOF + 0.03], [x1, y1, ROOF + 0.03], [x0, y1, ROOF + 0.03]], HOLE, [(x0 + x1) / 2, (y0 + y1) / 2, 0]);
+    for (const [a0, a1, b0, b1] of less([[x0, x1, y0, y1]], [FREIGHTER.skylight])) {
+      m.face([[a0, b0, ROOF + 0.03], [a1, b0, ROOF + 0.03], [a1, b1, ROOF + 0.03], [a0, b1, ROOF + 0.03]], HOLE, [(a0 + a1) / 2, (b0 + b1) / 2, 0]);
+    }
     for (let x = x0 + 0.4; x < x1 - 0.2; x += 0.8) m.box([x - 0.07, y0, ROOF - 0.05], [x + 0.07, y1, ROOF + 0.1], FRAME);
   };
   sideHole(-4.4, -1.2, 1.8, 4.3, -1);

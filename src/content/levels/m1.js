@@ -5,6 +5,7 @@ import { Town } from './lib/town.js';
 import { CISTERN } from '../models/market.js';
 import { BAY_HOSES } from '../models/bay.js';
 import { JUNK_PILES } from '../models/junk-pile.js';
+import { FREIGHTER } from '../models/freighter.js';
 
 // MISSION 1: MOS EISLEY. The layout, route and numbers are in
 // docs/mission1.md (area numbers below match its table). Painted in code on
@@ -576,6 +577,21 @@ const HOLD_HOLES = [[176, 132], [177, 132], [182, 136], [183, 136], [183, 137], 
 for (const [x, y] of HOLD_HOLES) {
   const c = p.get(x, y);
   p.set(x, y, { ...c, slab: { ...c.slab, bottom: DERELICT.floorZ + 4, ceiling: 'hold-pipes', side: 'hold-guts' } });
+}
+// Where the hull's plating is gone the hold is open behind it
+// (FREIGHTER.windows): the wall's tiles cut down to a sill, the ceiling
+// over them, so you see the bay from the hold and the hold from the bay;
+// and in the roof's hole the ceiling is gone, the sky over a shaft.
+const holdAt = (mx, my) => [181 + mx, 134.5 + my];
+const HOLD_SLAB = p.get(180, 134).slab;
+for (const [x0, x1, z0, , s] of FREIGHTER.windows) {
+  const y = s < 0 ? 130 : 138;
+  for (let x = holdAt(x0, 0)[0]; x < holdAt(x1, 0)[0]; x++) p.set(x, y, { ...p.get(x, y), floorZ: DERELICT.floorZ + z0, side: 'hold-wall', slab: { ...HOLD_SLAB, side: 'hold-wall' }, light: 96 });
+}
+{
+  const [sx0, sx1, sy0, sy1] = FREIGHTER.skylight;
+  const [[x0, y0], [x1, y1]] = [holdAt(sx0, sy0), holdAt(sx1, sy1)];
+  p.rect(x0, y0, x1, y1, (_, __, c) => ({ ...c, slab: undefined, ceilZ: DERELICT.floorZ + 5.75, light: 140 }));
 }
 for (const x of [175.5, 178, 180.6, 183, 185.5, 187.6]) list.push(at('hold-rib', x, 134.5, { z: DERELICT.floorZ, angle: 0, lit: 96 }));
 town.arch(188, 132, 189, 137, { h: DERELICT.floorZ + 5, lintel: 3, floorZ: DERELICT.floorZ, wall: 'hold-wall', floor: 'hold-floor' });

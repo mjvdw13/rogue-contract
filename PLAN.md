@@ -30,12 +30,14 @@ These need Mark to try something, or to decide. Don't start them without him.
 
 - **The derelict bay, after your second notes** (`?map=m1`, 2026-11-01):
   the balcony runs from the gate to the wash's breach under one straight
-  rusty railing, no stepped parapet; under it rusty I-beam posts, girders,
-  joists and braces (`models/balcony.js`), a sagging cable, stores in its
-  shade, and a shorted junction box on a post whose cut cable spits
-  sparks; the freighter streaked down its sides and sooty down its stern.
-  To judge: the frame's look, how often the sparks come, and whether the
-  wall's stepped face under the deck shows too much.
+  rusty railing; under it a rusty steel frame, stores, and a shorted
+  junction box spitting sparks; the freighter streaked and sooty. Inside
+  the freighter a derelict hold (`models/hold.js`, `hold-*` textures):
+  ship panelling, mesh deck, frames, panels gone from walls and ceiling,
+  hanging wires (one live), a flickering lamp, dead consoles; three holes
+  in the plating and one in the roof you see through, in and out. To
+  judge: the hold's look and darkness, the sparks, and whether the wall's
+  stepped face under the balcony shows too much.
 
 - **Sliding along angled walls and objects** (any map, 2026-10-31): you
   should glide along a diagonal wall or a turned barricade as you do along
@@ -729,7 +731,7 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
             ribs across it, panels gone from the walls and ceiling.
       - [x] Wires hanging from the holes, a lamp flickering, broken
             fittings and junk (in the same commit).
-      - [ ] Holes in the hull you see in and out through (not big enough
+      - [x] Holes in the hull you see in and out through (not big enough
             to climb through, so the hold's door still gates Rusk).
     - [ ] Waiting on Mark.
   - [ ] The skyline: dunes and mesas in the backdrop, the town's edges.
