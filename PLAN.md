@@ -112,8 +112,11 @@ These need Mark to try something, or to decide. Don't start them without him.
   west along the north wall and back south round the west heap to the
   trader in the far corner. East of the doorway is a dead end with the
   droids for sale. A few racks of wares where there's wall for them,
-  crates and drums about, a lamp over each part. To judge: whether the
-  way round is long enough, and whether the hold is too dark.
+  crates and drums about. Its walls are lit as dimly as the hold (they
+  had the sun's light, bright over the dark things in it), and each of
+  its three lamps lights a pool round it (5 tiles, +56), the corners
+  between dim. To judge: whether the way round is long enough, and the
+  light.
 
 - **Mos Eisley opens in stages** (`?map=m1`, 2026-10-31): when you land the
   blast doors are shut (a stand-in: a rising Imperial gate under a steel
@@ -624,6 +627,8 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
     - [x] Mark's note (2026-10-31: the hold is too organised): bulkheads
           and heaps of scrap on its floor, so you wind round them to find
           the trader.
+    - [x] Mark's note (2026-10-31: the things in the hold are dark, its
+          walls bright): the walls in the hold's light, its lamps lit.
     - [ ] Waiting on Mark.
   - [ ] The back alleys and the back lane.
   - [ ] The checkpoint and the rooftops.

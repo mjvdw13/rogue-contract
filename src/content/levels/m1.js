@@ -771,7 +771,11 @@ list.push(at('furnace', 79.5, 32.7, { angle: 0, z: JUNK, lit: town.light }));
 // under the model's plate from the lane, junk piled either side of it and
 // along the wall's outside so the desert stays out of reach.
 list.push(at('sandcrawler', 80, 8, { angle: 0, z: 0, lit: town.light }));
-town.block(64, 3, 90, 13, { ...SCRAP, h: 8 });
+// (The hold's walls and bulkheads in its light, not the sun's: their faces
+// take the light between them and the floor, and in the sun's they'd be
+// lit bright over the dim things in the hold.)
+const HOLD = { ...SCRAP, h: 8, light: 96 };
+town.block(64, 3, 90, 13, HOLD);
 town.room(65, 4, 89, 12, { h: 8, floorZ: 3, ceilZ: 7.5, floor: 'imp-grate', ceiling: 'imp-panel-dark', wall: 'metal-rust', light: 96 });
 town.arch(76, 12, 80, 13, { h: 8, lintel: 4, floorZ: 3, wall: 'metal-rust', roof: 'metal-rust', floor: 'imp-grate', light: 96 });
 town.stair(76, 13, 80, 20, { up: 'N', from: JUNK, top: 3, rise: 0.5, floor: 'imp-grate', side: 'metal-rust' });
@@ -786,7 +790,7 @@ town.block(54, 14, 75, 16, { ...SCRAP, h: 2.5 }).block(81, 14, 101, 16, { ...SCR
 // the east bulkhead's gap, the droids for sale in it. Racks against what
 // wall there's room on, crates and drums about, a lamp over each part.
 // The floor is at 3, so things stacked on others are placed by their z.
-town.block(73, 7, 74, 12, { ...SCRAP, h: 8 }).block(84, 4, 85, 9, { ...SCRAP, h: 8 });
+town.block(73, 7, 74, 12, HOLD).block(84, 4, 85, 9, HOLD);
 list.push(
   at('rack-b', 66.6, 4.05, { angle: 0 }), at('rack-c', 74.05, 10, { angle: 270 }), at('rack-a', 82.5, 11.95, { angle: 180 }),
   at('rack-a', 87, 4.05, { angle: 0 }), at('rack-c', 87.3, 11.95, { angle: 180 }),
@@ -795,8 +799,10 @@ list.push(
   at('crate-tan', 65.9, 11.3, { angle: 10 }), at('crate-grey-small', 65.9, 11.3, { z: 3.9, angle: 35 }),
   at('astromech-rust', 85.9, 6.2, { angle: 200 }), at('power-droid', 86.3, 9.5, { angle: 170 }), at('astromech-red', 88.2, 9.9, { angle: 150 }),
   at('junk-heap', 88, 7, { angle: 80 }), at('barrel-rust', 83.3, 8.2), at('canister-rust', 80.6, 9.1),
-  at('ceiling-lamp', 75.5, 9.5), at('ceiling-lamp', 68, 8.5), at('ceiling-lamp', 86.5, 8),
+  at('ceiling-lamp', 78.5, 9.6), at('ceiling-lamp', 68, 8.5), at('ceiling-lamp', 86.5, 8),
 );
+// Each lamp lights a pool of the hold round it; the corners between stay dim.
+for (const [x, y] of [[78.5, 9.6], [68, 8.5], [86.5, 8]]) lights.push({ x, y, z: 5.5, radius: 5, light: 56 });
 // The trader who sold Rusk a power coupling, in the hold's far south-west
 // corner behind the west heap: with the fob in hand, he keys its
 // transponder code in (the signal).
