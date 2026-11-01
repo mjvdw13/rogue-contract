@@ -89,6 +89,18 @@ test("a stair down a round pit's wall hugs it, a step down per tile, fenced on i
   assert.throws(() => town.wallStair(20, 20, 12, { at: 18, run: 'W', against: 'E', top: 0, from: -5 }), /against/);
 });
 
+test("a ledge along a round pit's wall stays level and is fenced across its far end", () => {
+  const { p, town } = kit();
+  p.rect(1, 1, 39, 39, town.roofCell({ h: 6 }));
+  town.circle(20, 20, 12, { inside: town.street(-3), wall: { wall: 'adobe', wallTop: 6 } });
+  town.wallLedge(20, 20, 12, { at: 20, run: 'E', against: 'N', z: 0, length: 5, width: 4 });
+  const column = (x) => [...Array(20).keys()].map((y) => p.get(x, y)).filter((c) => c.floorZ < 6);
+  for (let x = 20; x < 24; x++) assert.ok(column(x).some((c) => c.floorZ === 0), `level along the wall at ${x}`);
+  const end = column(24).filter((c) => c.floorZ > -3);
+  assert.ok(end.length > 0 && end.every((c) => c.floorZ === 1), 'the far end is all parapet');
+  assert.equal(column(25)[0].floorZ, -3, 'past it, the floor');
+});
+
 test('a building with a slanting side stands an angled wall along it, its roof inside and the street outside', () => {
   const { p, town } = kit();
   town.slanted([[4, 4], [16, 4], [16, 10], [4, 14]], { h: 6 });

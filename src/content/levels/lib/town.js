@@ -338,14 +338,29 @@ export class Town {
    * 45 degrees of `against`, where the wall still runs along it; further
    * round the steps grow long across the run.
    */
-  wallStair(cx, cy, r, { at, run, against, top, from, rise = 0.5, width = 3, guard = 1, floor = this.floor, side = this.wall, parapet = side }) {
+  wallStair(cx, cy, r, { top, from, rise = 0.5, ...opts }) {
     const n = Math.round((top - from) / rise) - 1;
-    if (n < 1 || Math.abs((n + 1) * rise - (top - from)) > 1e-6) throw new Error(`Town: a wall stair at ${at} goes down from ${top} to ${from}, not a whole number of ${rise} steps`);
+    if (n < 1 || Math.abs((n + 1) * rise - (top - from)) > 1e-6) throw new Error(`Town: a wall stair at ${opts.at} goes down from ${top} to ${from}, not a whole number of ${rise} steps`);
+    return this._alongWall(cx, cy, r, Array.from({ length: n }, (_, k) => top - (k + 1) * rise), opts);
+  }
+
+  /**
+   * A ledge along the inside of a round pit's wall at `z`, `length` tiles
+   * from `at` toward `run`, otherwise as `wallStair()`: a walk along the
+   * wall from one way in to another, or to the head of a stair. The
+   * parapet closes its far end.
+   */
+  wallLedge(cx, cy, r, { z, length, ...opts }) {
+    return this._alongWall(cx, cy, r, Array(length).fill(z), { ...opts, cap: true });
+  }
+
+  /** A tile across the wall for each of `heights` (see `wallStair`); `cap` fences the last across. */
+  _alongWall(cx, cy, r, heights, { at, run, against, width = 3, guard = 1, floor = this.floor, side = this.wall, parapet = side, cap = false }) {
     const ew = run === 'E' || run === 'W';
     if (!(ew ? against === 'N' || against === 'S' : (run === 'N' || run === 'S') && (against === 'E' || against === 'W'))) {
-      throw new Error(`Town: a wall stair running "${run}" can't be against the "${against}" wall`);
+      throw new Error(`Town: a flight along a wall running "${run}" can't be against the "${against}" wall`);
     }
-    if (guard <= 0.8) throw new Error(`Town: a wall stair's parapet (${guard}) must stand taller than a step (0.8)`);
+    if (guard <= 0.8) throw new Error(`Town: a flight along a wall has a parapet (${guard}) no taller than a step (0.8)`);
     // In (u, v): u along the run, v across it; `s` is the way in from the wall.
     const [cu, cv] = ew ? [cx, cy] : [cy, cx];
     const dir = run === 'E' || run === 'S' ? 1 : -1;
@@ -354,11 +369,10 @@ export class Town {
     const set = (u, v, c) => (ew ? this.p.set(u, v, c) : this.p.set(v, u, c));
     const step = (c, z, tex) => (c.line ? { ...c, floorZ: z, floor, side: tex } : this.street(z, { floor, side: tex }));
     let edge;
-    for (let k = 0; k < n; k++) {
+    heights.forEach((z, k) => {
       const u = at + dir * k;
       const du = u + 0.5 - cu;
-      if (Math.abs(du) >= r - width) throw new Error(`Town: a wall stair's step at ${u} is too far round the wall`);
-      const z = top - (k + 1) * rise;
+      if (Math.abs(du) >= r - width) throw new Error(`Town: a flight along a wall at ${u} is too far round it`);
       // The tiles across the column from the wall in, to `width` out.
       const band = [];
       for (let v = Math.floor(cv - s * (r + 1)); s * (v - cv) <= 0; v += s) {
@@ -366,16 +380,16 @@ export class Town {
         const d = ew ? Math.hypot(du, v + 0.5 - cv) : Math.hypot(v + 0.5 - cv, du);
         if (d >= r - width && (c.line || d < r)) band.push(v);
       }
-      if (!band.length) throw new Error(`Town: a wall stair's step at ${u} finds no wall`);
-      // The parapet: the innermost tile, and on in to meet the one above.
+      if (!band.length) throw new Error(`Town: a flight along a wall at ${u} finds no wall`);
+      // The parapet: the innermost tile, and on in to meet the one before.
       const inner = band.at(-1);
-      const first = s * (edge === undefined ? inner : Math.min(s * inner, s * edge + 1) * s);
+      const first = cap && k === heights.length - 1 ? -Infinity : s * (edge === undefined ? inner : Math.min(s * inner, s * edge + 1) * s);
       for (const v of band) {
         const fence = s * v >= first;
         set(u, v, step(get(u, v), fence ? z + guard : z, fence ? parapet : side));
       }
       edge = inner;
-    }
+    });
     return this;
   }
 

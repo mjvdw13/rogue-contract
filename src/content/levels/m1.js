@@ -486,7 +486,8 @@ tagTile(198, 55, 'quarter-north');
 // Bay 87. Its gate is at the main street's end: a
 // passage through its building onto a landing at the old quarter's height,
 // and a flight down along the wall to the west (Mark, 2026-11-01: not out
-// across the floor). The wash breaks in on the north-east, down sand steps.
+// across the floor). The wash breaks in on the north-east, onto a ledge
+// along the wall to the landing, so both ways in go down the one flight.
 // A stand-in hull for the freighter (Rusk in its hold, behind a door in
 // the stern that opens once the fob has his signal), and a stand-in crane
 // on the rim, seen down the street.
@@ -498,15 +499,26 @@ town.circle(DERELICT.cx, DERELICT.cy, DERELICT.r, {
   seam: 90,
 });
 town.arch(183, 104, 189, 110, { h: DERELICT.rim, lintel: 4, floorZ: OQ, wall: 'bay-wall', floor: 'bay-floor' });
-// The landing, 3 deep, fenced on its open sides by a parapet a tile tall,
-// open on the west to the flight: ten steps of 0.5, each a tile along the
-// wall, with the parapet stepping down beside them (lib/town.js, wallStair).
+// The landing, 3 deep, fenced on its open side by a parapet a tile tall.
+// West of it the flight: ten steps of 0.5, each a tile along the wall,
+// with the parapet stepping down beside them; east of it a ledge along the
+// wall, as wide and fenced the same way, to the wash's breach
+// (lib/town.js, wallStair and wallLedge).
 const LANDING = town.street(OQ, { floor: 'bay-floor', side: 'bay-step' });
 const PARAPET = town.street(OQ + 1, { floor: 'bay-floor', side: 'bay-wall' });
-p.rect(183, 110, 189, 113, LANDING).rect(183, 113, 190, 114, PARAPET).rect(189, 110, 190, 113, PARAPET);
-town.wallStair(DERELICT.cx, DERELICT.cy, DERELICT.r, { at: 182, run: 'W', against: 'N', top: OQ, from: DERELICT.floorZ, width: 4, floor: 'bay-floor', side: 'bay-step', parapet: 'bay-wall' });
-p.rect(194, 104, 202, 112, town.street(WASH, { floor: 'desert-sand', side: 'bay-wall' }));
-town.stair(194, 112, 202, 122, { up: 'N', from: DERELICT.floorZ, top: WASH, floor: 'desert-sand', side: 'bay-wall' });
+const ALONG = { against: 'N', width: 4, floor: 'bay-floor', side: 'bay-step', parapet: 'bay-wall' };
+p.rect(183, 110, 189, 113, LANDING).rect(183, 113, 189, 114, PARAPET);
+town.wallStair(DERELICT.cx, DERELICT.cy, DERELICT.r, { ...ALONG, at: 182, run: 'W', top: OQ, from: DERELICT.floorZ });
+town.wallLedge(DERELICT.cx, DERELICT.cy, DERELICT.r, { ...ALONG, at: 189, run: 'E', z: OQ, length: 10 });
+// The breach: the wash runs on through the rim, 4 wide, a step down from
+// the ledge, and the wall is gone where it meets it.
+for (let x = 194; x < 198; x++) {
+  for (let y = 104; y < 120; y++) {
+    const c = p.get(x, y);
+    if (c.line) p.set(x, y, LANDING);
+    else if (c.floorZ === DERELICT.rim) p.set(x, y, town.street(WASH, { floor: 'desert-sand', side: 'bay-wall' }));
+  }
+}
 town.block(191, 106, 192, 107, { h: 18, wall: 'metal-rust', roof: 'metal-rust', skirt: null });
 const HULL = { wall: 'metal-grey', roof: 'metal-grey', skirt: null };
 town.house(172, 130, 190, 139, { h: DERELICT.floorZ + 5, r: 2, ...HULL });
