@@ -505,9 +505,14 @@ town.arch(183, 104, 189, 110, { h: DERELICT.rim, lintel: 4, floorZ: OQ, wall: 'b
 // wall, as wide and fenced the same way, to the wash's breach
 // (lib/town.js, wallStair and wallLedge).
 const LANDING = town.street(OQ, { floor: 'bay-floor', side: 'bay-step' });
-const PARAPET = town.street(OQ + 1, { floor: 'bay-floor', side: 'bay-wall' });
+const BALCONY_RAIL = { tex: 'rail-rust', height: 1 };
 const ALONG = { against: 'N', width: 4, floor: 'bay-floor', side: 'bay-step', parapet: 'bay-wall' };
-p.rect(183, 110, 189, 113, LANDING).rect(183, 113, 189, 114, PARAPET);
+p.rect(183, 110, 189, 113, LANDING);
+// The balcony (Mark, 2026-11-01): the landing runs on 3 tiles out over the
+// pit on a thin deck (a slab, the sand under it), fenced by a railing you
+// see the ship through instead of the parapet.
+p.rect(183, 113, 189, 116, (_, __, c) => ({ ...c, slab: { bottom: OQ - 0.35, top: OQ, floor: 'bay-floor', ceiling: 'metal-rust', side: 'metal-rust', light: town.light } }));
+p.fence(183, 115, 189, 116, 'S', BALCONY_RAIL).fence(183, 113, 184, 116, 'W', BALCONY_RAIL).fence(188, 113, 189, 116, 'E', BALCONY_RAIL);
 town.wallStair(DERELICT.cx, DERELICT.cy, DERELICT.r, { ...ALONG, at: 182, run: 'W', top: OQ, from: DERELICT.floorZ });
 town.wallLedge(DERELICT.cx, DERELICT.cy, DERELICT.r, { ...ALONG, at: 189, run: 'E', z: OQ, length: 10 });
 // The breach: the wash runs on through the rim, 4 wide, a step down from

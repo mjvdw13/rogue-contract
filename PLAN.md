@@ -702,7 +702,12 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
           through it onto the ledge.
     - [x] The gutted freighter (a model, in place of the stand-in hull),
           Rusk's hold in its stern.
-    - [ ] Scaffolding against the hull or the wall.
+    - [ ] Mark's notes (2026-11-01), a commit each:
+      - [x] The top of the stairs a balcony out over the pit, with a
+            railing you see the ship through (not a solid parapet).
+      - [ ] The ship less patterned: the hull's plating and the engines.
+      - [ ] More junk: scaffolding, cargo boxes, etc.
+      - [ ] Everything dirtier.
     - [ ] Waiting on Mark.
   - [ ] The skyline: dunes and mesas in the backdrop, the town's edges.
 - [ ] **Life:** the cantina's customers, the customs officer, the

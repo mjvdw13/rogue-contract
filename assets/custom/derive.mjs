@@ -209,6 +209,9 @@ export const TOWN = [
   // faded warning stripes for the frame's foot. The door keeps a little of
   // its stripes' yellow (`keep`).
   { out: 'blast-door-rising', df: 'NDPIPES4', gradient: [[22, 18, 14], [62, 54, 44], [104, 96, 84], [142, 134, 118], [178, 170, 150]], keep: 0.35, contrast: 1, rust: [{ color: [128, 64, 28], amount: 0.6, cell: 32, seed: 101 }, { color: [18, 14, 10], amount: 0.6, cell: 16, seed: 111, from: 0.45 }] },
+  // The derelict bay's balcony railing (m1.js): DF's grate as a railing, as
+  // the Imperial one is, in rusty, sooted steel.
+  { out: 'rail-rust', df: 'ZMGRATE1', scale: [64, 24], holes: true, gradient: [[26, 18, 12], [70, 54, 40], [112, 90, 70], [146, 124, 100]], keep: 0.2, contrast: 1.1, rust: WORN(8, 149, 1) },
   { out: 'blast-steel', df: 'NWGREY01', tile: [2, 1], gradient: [[30, 24, 18], [74, 66, 56], [112, 104, 92], [146, 138, 122], [176, 168, 150]], keep: 0, contrast: 1.1, rust: [{ color: [128, 64, 28], amount: 0.6, cell: 32, seed: 103 }, { color: [18, 14, 10], amount: 0.5, cell: 16, seed: 113, from: 0.55 }] },
   { out: 'blast-beam', df: 'NWEXT06', gradient: [[26, 20, 16], [68, 60, 50], [108, 100, 88], [144, 136, 120], [174, 166, 148]], keep: 0.2, contrast: 1.1, rust: WORN(16, 105, 0.7) },
   { out: 'blast-hazard', df: 'NPWRNFAD', gradient: [[34, 28, 20], [80, 70, 56], [128, 116, 94], [164, 150, 120]], keep: 0.6, contrast: 1, rust: WORN(16, 107, 1) },

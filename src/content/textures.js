@@ -96,6 +96,9 @@ const TOWN_DECALS = [
   'brick-bare-1', 'brick-bare-2', 'oil',
 ];
 
+// Mos Eisley's fences, derive.mjs: the derelict bay's rusty railing.
+const TOWN_FENCES = ['rail-rust'];
+
 // Grime: darkens the walls it's on (tools/art/textures/grime.js); the town
 // kit weathers Mos Eisley's walls with it (lib/town.js, grime()).
 const GRIME = [
@@ -132,6 +135,7 @@ export default [
   ...TOWN.map((id) => defineTexture({ id, src: `assets/custom/textures/${id}.png`, fullbright: false })),
   ...CROW.map((id) => defineTexture({ id, src: `assets/custom/textures/${id}.png`, fullbright: false })),
   defineTexture({ id: 'crow-engine', src: 'assets/custom/textures/crow-engine.png' }),
+  ...TOWN_FENCES.map((id) => defineTexture({ id, src: `assets/custom/textures/${id}.png`, fence: true, fullbright: false })),
   ...TOWN_DECALS.map((id) => defineTexture({ id, src: `assets/custom/textures/${id}.png`, decal: true, fullbright: false })),
   defineTexture({ id: 'sky-night', src: 'assets/textures/sky-night.png', sky: true }),
   defineTexture({ id: 'sky-day', src: 'assets/custom/textures/sky-day.png', sky: true }),
