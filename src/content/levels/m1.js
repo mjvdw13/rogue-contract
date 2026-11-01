@@ -488,9 +488,9 @@ tagTile(198, 55, 'quarter-north');
 // and a flight down along the wall to the west (Mark, 2026-11-01: not out
 // across the floor). The wash breaks in on the north-east, onto a ledge
 // along the wall to the landing, so both ways in go down the one flight.
-// A stand-in hull for the freighter (Rusk in its hold, behind a door in
-// the stern that opens once the fob has his signal), and a stand-in crane
-// on the rim, seen down the street.
+// The gutted freighter (Rusk in its hold, behind a door in the stern that
+// opens once the fob has his signal), and a stand-in crane on the rim,
+// seen down the street.
 const DERELICT = { cx: 186, cy: 128, r: 18, floorZ: -5, rim: 7 };
 p.rect(162, 104, W - 1, H - 1, town.roofCell({ h: DERELICT.rim, wall: 'bay-wall', skirt: null }));
 town.circle(DERELICT.cx, DERELICT.cy, DERELICT.r, {
@@ -542,7 +542,10 @@ list.push(
 );
 town.block(191, 106, 192, 107, { h: 18, wall: 'metal-rust', roof: 'metal-rust', skirt: null });
 const HULL = { wall: 'metal-grey', roof: 'metal-grey', skirt: null };
+// The freighter: the model is its outside (models/freighter.js), the
+// tiles inside it its hold and the hold's walls.
 town.house(172, 130, 190, 139, { h: DERELICT.floorZ + 5, r: 2, ...HULL });
+list.push(at('freighter', 181, 134.5, { angle: 0, z: DERELICT.floorZ, lit: town.light }));
 town.room(174, 131, 188, 138, { h: DERELICT.floorZ + 5, floorZ: DERELICT.floorZ, ceilZ: DERELICT.floorZ + 3.25, floor: 'imp-floor', ceiling: 'imp-panel-dark', wall: 'metal-grey', light: 120 });
 town.arch(188, 132, 189, 137, { h: DERELICT.floorZ + 5, lintel: 3, floorZ: DERELICT.floorZ, wall: 'metal-grey', floor: 'imp-floor' });
 town.door(190, 134.5, 'E', { h: DERELICT.floorZ + 5, tex: 'door-grey', width: 5, jamb: false, sign: false, panel: false, step: false, floorZ: DERELICT.floorZ, wall: 'metal-grey' });

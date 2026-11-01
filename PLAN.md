@@ -700,7 +700,7 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
           and junk against the wall, litter and rubble on the sand.
     - [x] The breach: broken edges where the wall gave, sand spilt
           through it onto the ledge.
-    - [ ] The gutted freighter (a model, in place of the stand-in hull),
+    - [x] The gutted freighter (a model, in place of the stand-in hull),
           Rusk's hold in its stern.
     - [ ] Scaffolding against the hull or the wall.
     - [ ] Waiting on Mark.

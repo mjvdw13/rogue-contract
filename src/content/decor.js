@@ -155,6 +155,9 @@ export default [
   // canon size: only its gun pod is low enough to collide (as its outline);
   // you walk under the rest.
   defineDecoration({ id: 'moldy-crow', model: 'moldy-crow', solid: true, height: 8.2, scale: 0.8, fixed: true, bob: { height: 0.04, period: 4, roll: 0.6 } }),
+  // The gutted freighter in the derelict bay (models/freighter.js): the
+  // level's tiles are its hold and collide; the model is its outside.
+  defineDecoration({ id: 'freighter', model: 'freighter', fixed: true }),
   // The Jawas' sandcrawler (models/sandcrawler.js): the level's tiles are its
   // hold and collide; the model is its outside. Steam wisps from the vents
   // either side of its door, and every few seconds one hisses out a jet.
