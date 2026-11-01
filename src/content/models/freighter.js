@@ -18,8 +18,10 @@ export const FREIGHTER = {
    * Where the hold's walls and ceiling are open behind the holes in the
    * plating, so you see in and out (levels/m1.js opens the tiles): [x0,
    * x1, z0, z1, side] (side -1 north, 1 south) up to the hold's ceiling
-   * at 3.25, their feet out of a jump's reach from the sand (1.8) and too
-   * low to crawl through (under 1.5); and the roof's, [x0, x1, y0, y1].
+   * at 3.25, their sills out of a jump's reach from the sand (1.8; a jump
+   * reaches about 1.56), so the stern door still gates the hold. (Crouched,
+   * 1 tall, you could crawl through from inside, onto the console under
+   * the first.) The roof's: [x0, x1, y0, y1].
    */
   windows: [[-4, -2, 1.8, 3.25, -1], [3, 5, 2.4, 3.25, -1], [1, 3, 1.8, 3.25, 1]],
   skylight: [-4, -1, -1.5, 0.5],
