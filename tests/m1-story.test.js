@@ -18,7 +18,7 @@ function takeContract(w) {
   for (let i = 0; i < 10 && !w.player.player.weapons.has('fob'); i++) talk(w, 92, 104.6, 270);
 }
 /** Talk to the Jawa trader in the sandcrawler's hold, from the top of its ramp's turn. */
-const trader = (w) => talk(w, 69, 8, 180);
+const trader = (w) => talk(w, 66.6, 8, 270);
 const door = (w, tag) => w.map.doors.find((d) => d.tag === tag);
 const shut = (w, tag) => door(w, tag).state === 'closed';
 const said = (w, who) => w.messages.filter((m) => m.startsWith(`${who}: `));

@@ -748,7 +748,7 @@ gateTag(84, 37, 86, 40, 'side-gate');
 // ramp mustn't touch the heaps), 3 tiles clear of it; the east one taller.
 // Each is a pile of junk (models/junk-pile.js)
 // on the yard's floor, colliding as its outline.
-for (const [id, { at: [x, y] }] of Object.entries(JUNK_PILES)) list.push(at(id, x, y, { angle: 0, z: 0, lit: town.light }));
+for (const [id, { at: [x, y], inside }] of Object.entries(JUNK_PILES)) list.push(at(id, x, y, { angle: 0, z: 0, ...(!inside && { lit: town.light }) }));
 // The Jawas' cargo skiff parked in the court's west end, along the west
 // heap's foot, hovering, its bow to the court.
 list.push(at('cargo-skiff', 59.5, 35.1, { angle: 0, z: JUNK, lit: town.light }));
@@ -777,27 +777,32 @@ town.arch(76, 12, 80, 13, { h: 8, lintel: 4, floorZ: 3, wall: 'metal-rust', roof
 town.stair(76, 13, 80, 20, { up: 'N', from: JUNK, top: 3, rise: 0.5, floor: 'imp-grate', side: 'metal-rust' });
 town.block(75, 13, 76, 18, { ...SCRAP, h: 5 }).block(80, 13, 81, 18, { ...SCRAP, h: 5 });
 town.block(54, 14, 75, 16, { ...SCRAP, h: 2.5 }).block(81, 14, 101, 16, { ...SCRAP, h: 2.5 });
-// The hold's wares: racks of shelves along both walls (the doorway kept
-// clear), droids for sale across from the doorway, crates and drums, junk
-// at the east end, a power unit and a crate bench behind the trader, and
-// lamps down the middle. The floor is at 3, so things stacked on others
-// are placed by their z.
+// The hold isn't laid out tidily (Mark, 2026-10-31: too organised): a
+// bulkhead west of the doorway and another at the east end, and heaps of
+// scrap on the floor (junk-pile-hold, -west), so from the top of the ramp
+// you wind north round the heap ahead, through the gap past the bulkhead,
+// west along the north wall and back south round the west heap to find
+// the trader in the far corner. East of the doorway a dead end through
+// the east bulkhead's gap, the droids for sale in it. Racks against what
+// wall there's room on, crates and drums about, a lamp over each part.
+// The floor is at 3, so things stacked on others are placed by their z.
+town.block(73, 7, 74, 12, { ...SCRAP, h: 8 }).block(84, 4, 85, 9, { ...SCRAP, h: 8 });
 list.push(
-  at('rack-a', 69, 4.05, { angle: 0 }), at('rack-b', 72.4, 4.05, { angle: 0 }), at('rack-c', 83.6, 4.05, { angle: 0 }), at('rack-a', 87, 4.05, { angle: 0 }),
-  at('rack-c', 70, 11.95, { angle: 180 }), at('rack-b', 73.3, 11.95, { angle: 180 }), at('rack-a', 83, 11.95, { angle: 180 }), at('rack-b', 86.4, 11.95, { angle: 180 }),
-  at('barrel-rust', 75.2, 4.6), at('astromech-rust', 76.7, 5.1, { angle: 280 }), at('power-droid', 78.1, 5, { angle: 265 }),
-  at('astromech-red', 79.5, 5.1, { angle: 255 }), at('barrel-grey', 81.2, 4.6),
-  at('power-unit', 65.05, 9.6, { angle: 90 }), at('crate-rust-long', 65.5, 6.2, { angle: 90 }), at('droid-dome', 65.5, 5.9, { z: 3.7, angle: 40 }),
-  at('crate-tan', 67.6, 10.5, { angle: 10 }), at('crate-grey-small', 67.6, 10.5, { z: 3.9, angle: 35 }),
-  at('junk-heap', 87.6, 8, { angle: 80 }), at('canister-rust', 88.5, 10.2), at('barrel-rust', 88.4, 5.8),
-  at('ceiling-lamp', 70, 8), at('ceiling-lamp', 78, 8), at('ceiling-lamp', 86, 8),
+  at('rack-b', 66.6, 4.05, { angle: 0 }), at('rack-c', 74.05, 10, { angle: 270 }), at('rack-a', 82.5, 11.95, { angle: 180 }),
+  at('rack-a', 87, 4.05, { angle: 0 }), at('rack-c', 87.3, 11.95, { angle: 180 }),
+  at('barrel-rust', 71.6, 4.6), at('canister-rust', 70.5, 4.5), at('barrel-grey', 75, 4.6), at('crate-grey-small', 76.1, 4.6, { angle: 20 }),
+  at('power-unit', 65.05, 8.4, { angle: 90 }), at('crate-rust-long', 65.5, 6.2, { angle: 90 }), at('droid-dome', 65.5, 5.9, { z: 3.7, angle: 40 }),
+  at('crate-tan', 65.9, 11.3, { angle: 10 }), at('crate-grey-small', 65.9, 11.3, { z: 3.9, angle: 35 }),
+  at('astromech-rust', 85.9, 6.2, { angle: 200 }), at('power-droid', 86.3, 9.5, { angle: 170 }), at('astromech-red', 88.2, 9.9, { angle: 150 }),
+  at('junk-heap', 88, 7, { angle: 80 }), at('barrel-rust', 83.3, 8.2), at('canister-rust', 80.6, 9.1),
+  at('ceiling-lamp', 75.5, 9.5), at('ceiling-lamp', 68, 8.5), at('ceiling-lamp', 86.5, 8),
 );
-// The trader who sold Rusk a power coupling, at the hold's far west end,
-// a turn left at the top of the ramp: with the fob in hand, he keys its
+// The trader who sold Rusk a power coupling, in the hold's far south-west
+// corner behind the west heap: with the fob in hand, he keys its
 // transponder code in (the signal).
 list.push(
-  at('jawa', 66.5, 8, {
-    angle: 0,
+  at('jawa', 66.6, 10.2, {
+    angle: 80,
     tag: 'trader',
     name: 'Jawa trader',
     calm: { wander: 0 },

@@ -105,12 +105,15 @@ These need Mark to try something, or to decide. Don't start them without him.
   `-rust`, about a Jawa's height), a Jawa minding them and another by the
   furnace. To judge: whether the row should be messier or spread round
   the court, and the paint (the white is dusty grey).
-  The hold is furnished: racks of shelves along both walls loaded with
-  boxes, drums, domes and pipes (`rack-a`, `-b`, `-c`, each laid out
-  differently), droids for sale across from the doorway, crates and
-  drums, junk at the east end, a power unit and a crate behind the
-  trader, three lamps down the middle. To judge: whether it's too
-  cluttered or too tidy, and whether the hold is too dark.
+  The hold is no longer tidy (Mark: too organised): a bulkhead west of
+  the doorway and one at the east end, and two heaps of scrap on its
+  floor (`junk-pile-hold`, `-west`, too tall to see over). From the ramp
+  you go north round the heap ahead, through the gap past the bulkhead,
+  west along the north wall and back south round the west heap to the
+  trader in the far corner. East of the doorway is a dead end with the
+  droids for sale. A few racks of wares where there's wall for them,
+  crates and drums about, a lamp over each part. To judge: whether the
+  way round is long enough, and whether the hold is too dark.
 
 - **Mos Eisley opens in stages** (`?map=m1`, 2026-10-31): when you land the
   blast doors are shut (a stand-in: a rising Imperial gate under a steel
@@ -618,6 +621,9 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
     - [x] Mark's notes (2026-10-31: the crane and furnace don't look Star
           Wars): no crane, a cargo skiff parked in the court instead; the
           furnace a vat of molten metal giving off embers and sparks.
+    - [x] Mark's note (2026-10-31: the hold is too organised): bulkheads
+          and heaps of scrap on its floor, so you wind round them to find
+          the trader.
     - [ ] Waiting on Mark.
   - [ ] The back alleys and the back lane.
   - [ ] The checkpoint and the rooftops.
