@@ -42,6 +42,8 @@ const TOWN = [
   'freighter-hull', 'freighter-engine',
   // Docking bays: duracrete walls (buttressed at the foot), floor and stair risers.
   'bay-wall', 'bay-wall-ribbed', 'bay-floor', 'bay-step',
+  // The derelict bay's, dirtier.
+  'derelict-wall', 'derelict-floor',
   // The bay's fuel pumps (models/bay.js).
   'pump-front', 'pump-side', 'pump-hazard', 'pump-hose', 'bay-plate',
   // Its fuel lines.

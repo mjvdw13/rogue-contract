@@ -171,6 +171,10 @@ export const TOWN = [
   // foot, under a pale worn nosing and its shadow line (`lip`). A face's top
   // row sits at the step's edge, so every step gets the lip and reads
   // against the lit treads above and below it.
+  // The derelict bay's (m1.js, Mark 2026-11-01: dirtier): Bay 87's wall and
+  // floor, darker and stained with soot, oil and rust.
+  { out: 'derelict-wall', df: 'TWCAP01', crop: [0, 0, 128, 64], gradient: [[40, 30, 22], [86, 72, 54], [128, 110, 84], [160, 142, 112], [184, 168, 138]], keep: 0.1, contrast: 0.85, rust: [{ color: [110, 60, 30], amount: 0.2, cell: 64, seed: 171, from: 0.55 }, { color: [20, 16, 12], amount: 0.4, cell: 64, seed: 181, from: 0.5 }] },
+  { out: 'derelict-floor', df: 'ZPCMENT2', scale: [128, 128], gradient: [[44, 32, 22], [92, 72, 50], [132, 106, 76], [162, 136, 100], [184, 160, 124]], keep: 0.1, contrast: 0.65, rust: [{ color: [16, 12, 8], amount: 0.7, cell: 32, seed: 173, from: 0.5 }, { color: [96, 56, 30], amount: 0.35, cell: 16, seed: 183 }] },
   { out: 'bay-step', df: 'TWCAP01', crop: [0, 0, 128, 32], gradient: [[62, 46, 28], [104, 80, 52], [128, 100, 68], [150, 120, 82]], keep: 0, contrast: 0.7, fade: { color: [62, 46, 28], from: 0.3 }, lip: [{ rows: 3, color: [232, 214, 176], amount: 0.7 }, { rows: 2, color: [28, 20, 12], amount: 0.7 }] },
   // Docking Bay 87's fuel pump (models/bay.js), cut from FuelStat's panels
   // and left in their own colours: the gauges and valve wheel for its front,

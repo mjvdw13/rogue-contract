@@ -492,26 +492,26 @@ tagTile(198, 55, 'quarter-north');
 // opens once the fob has his signal), and a stand-in crane on the rim,
 // seen down the street.
 const DERELICT = { cx: 186, cy: 128, r: 18, floorZ: -5, rim: 7 };
-p.rect(162, 104, W - 1, H - 1, town.roofCell({ h: DERELICT.rim, wall: 'bay-wall', skirt: null }));
+p.rect(162, 104, W - 1, H - 1, town.roofCell({ h: DERELICT.rim, wall: 'derelict-wall', skirt: null }));
 town.circle(DERELICT.cx, DERELICT.cy, DERELICT.r, {
-  inside: town.street(DERELICT.floorZ, { floor: 'desert-sand', side: 'bay-wall' }),
-  wall: { wall: 'bay-wall', wallTop: DERELICT.rim },
+  inside: town.street(DERELICT.floorZ, { floor: 'desert-sand', side: 'derelict-wall' }),
+  wall: { wall: 'derelict-wall', wallTop: DERELICT.rim },
   seam: 90,
 });
-town.arch(183, 104, 189, 110, { h: DERELICT.rim, lintel: 4, floorZ: OQ, wall: 'bay-wall', floor: 'bay-floor' });
+town.arch(183, 104, 189, 110, { h: DERELICT.rim, lintel: 4, floorZ: OQ, wall: 'derelict-wall', floor: 'derelict-floor' });
 // The landing, 3 deep, fenced on its open side by a parapet a tile tall.
 // West of it the flight: ten steps of 0.5, each a tile along the wall,
 // with the parapet stepping down beside them; east of it a ledge along the
 // wall, as wide and fenced the same way, to the wash's breach
 // (lib/town.js, wallStair and wallLedge).
-const LANDING = town.street(OQ, { floor: 'bay-floor', side: 'bay-step' });
+const LANDING = town.street(OQ, { floor: 'derelict-floor', side: 'bay-step' });
 const BALCONY_RAIL = { tex: 'rail-rust', height: 1 };
-const ALONG = { against: 'N', width: 4, floor: 'bay-floor', side: 'bay-step', parapet: 'bay-wall' };
+const ALONG = { against: 'N', width: 4, floor: 'derelict-floor', side: 'bay-step', parapet: 'derelict-wall' };
 p.rect(183, 110, 189, 113, LANDING);
 // The balcony (Mark, 2026-11-01): the landing runs on 3 tiles out over the
 // pit on a thin deck (a slab, the sand under it), fenced by a railing you
 // see the ship through instead of the parapet.
-p.rect(183, 113, 189, 116, (_, __, c) => ({ ...c, slab: { bottom: OQ - 0.35, top: OQ, floor: 'bay-floor', ceiling: 'metal-rust', side: 'metal-rust', light: town.light } }));
+p.rect(183, 113, 189, 116, (_, __, c) => ({ ...c, slab: { bottom: OQ - 0.35, top: OQ, floor: 'derelict-floor', ceiling: 'metal-rust', side: 'metal-rust', light: town.light } }));
 p.fence(183, 115, 189, 116, 'S', BALCONY_RAIL).fence(183, 113, 184, 116, 'W', BALCONY_RAIL).fence(188, 113, 189, 116, 'E', BALCONY_RAIL);
 town.wallStair(DERELICT.cx, DERELICT.cy, DERELICT.r, { ...ALONG, at: 182, run: 'W', top: OQ, from: DERELICT.floorZ });
 town.wallLedge(DERELICT.cx, DERELICT.cy, DERELICT.r, { ...ALONG, at: 189, run: 'E', z: OQ, length: 10 });
@@ -521,7 +521,7 @@ for (let x = 194; x < 198; x++) {
   for (let y = 104; y < 120; y++) {
     const c = p.get(x, y);
     if (c.line) p.set(x, y, LANDING);
-    else if (c.floorZ === DERELICT.rim) p.set(x, y, town.street(WASH, { floor: 'desert-sand', side: 'bay-wall' }));
+    else if (c.floorZ === DERELICT.rim) p.set(x, y, town.street(WASH, { floor: 'desert-sand', side: 'derelict-wall' }));
   }
 }
 // The wall gave there: the rim either side broken down toward the gap (a
@@ -613,13 +613,13 @@ list.push(
   let s = 7300;
   const rnd = () => (s = (s * 1103515245 + 12345) % 2147483648) / 2147483648;
   const clear = [[170, 128, 192, 141], [189, 128, 198, 141], [164, 110, 178, 125]];
-  for (let j = 0; j < 26; j++) {
+  for (let j = 0; j < 52; j++) {
     const a = rnd() * Math.PI * 2;
     const d = DERELICT.r - 1.5 - rnd() * 9;
     const [x, y] = [DERELICT.cx + d * Math.cos(a), DERELICT.cy - d * Math.sin(a)];
     const c = p.get(Math.floor(x), Math.floor(y));
     if (c.floorZ !== DERELICT.floorZ || c.line || clear.some(([x0, y0, x1, y1]) => x > x0 && x < x1 && y > y0 && y < y1)) continue;
-    const type = ['litter', 'litter-small', 'litter-small', 'rubble'][Math.floor(rnd() * 4)];
+    const type = ['litter', 'litter-small', 'litter-small', 'rubble', 'oil', 'oil-small'][Math.floor(rnd() * 6)];
     list.push(at(type, Math.round(x * 100) / 100, Math.round(y * 100) / 100, { z: DERELICT.floorZ, angle: Math.floor(rnd() * 24) * 15 }));
   }
 }
@@ -629,6 +629,16 @@ const derelictDecals = [[8, -2, 1, 3.4], [33, 0.5, 2, 2.6], [152, -1.5, 2, 3.2],
   const a = (deg * Math.PI) / 180;
   return { x: DERELICT.cx + DERELICT.r * Math.cos(a), y: DERELICT.cy - DERELICT.r * Math.sin(a), z, face: 'angled', tex: `grime-scorch-${k}`, scale };
 });
+// And dirtier (Mark, 2026-11-01): streaks and drips run down from the rim
+// all the way round, and blotches of oil and damp low on the wall.
+const DERELICT_STREAKS = ['grime-streaks-1', 'grime-drip-1', 'grime-streaks-2', 'grime-streaks-3', 'grime-drip-2'];
+for (let deg = 4, k = 0; deg < 360; deg += 17, k++) {
+  if (Math.abs(deg - 55) < 4 || Math.abs(deg - 89) < 4) continue; // the breach and the gate
+  const a = (deg * Math.PI) / 180;
+  const [x, y] = [DERELICT.cx + DERELICT.r * Math.cos(a), DERELICT.cy - DERELICT.r * Math.sin(a)];
+  derelictDecals.push({ x, y, z: DERELICT.rim - 1.8 - (k % 3) * 0.4, face: 'angled', tex: DERELICT_STREAKS[k % 5], scale: 3 + (k % 2) * 0.6 });
+  if (k % 2 && (deg < 45 || deg > 135)) derelictDecals.push({ x, y, z: DERELICT.floorZ + 1.1, face: 'angled', tex: k % 4 === 1 ? 'grime-blotch-1' : 'grime-blotch-2', scale: 2.4 });
+}
 // Where the loud half's troopers come in: over the rim, and through the gate.
 tagTile(170, 112, 'derelict-rim');
 tagTile(205, 128, 'derelict-rim');

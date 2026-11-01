@@ -28,6 +28,15 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
+- **The derelict bay, after your notes** (`?map=m1`, 2026-11-01): the top
+  of the stairs is a balcony 3 tiles out over the pit with a rusty railing
+  you see the ship through; the freighter is plain worn plate (no tin
+  stripes), its engines dark and scorched; scaffolding against the hull and
+  the south-east wall, more crates, drums and junk; the wall and landing
+  in their own grimier textures (`derelict-*` in `derive.mjs`), streaks
+  down from the rim, oil on the sand. To judge: how dirty, and whether the
+  balcony wants struts under it.
+
 - **Sliding along angled walls and objects** (any map, 2026-10-31): you
   should glide along a diagonal wall or a turned barricade as you do along
   a flat wall, instead of sticking. Bodies are now round against solid
@@ -707,7 +716,7 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
             railing you see the ship through (not a solid parapet).
       - [x] The ship less patterned: the hull's plating and the engines.
       - [x] More junk: scaffolding, cargo boxes, etc.
-      - [ ] Everything dirtier.
+      - [x] Everything dirtier.
     - [ ] Waiting on Mark.
   - [ ] The skyline: dunes and mesas in the backdrop, the town's edges.
 - [ ] **Life:** the cantina's customers, the customs officer, the
