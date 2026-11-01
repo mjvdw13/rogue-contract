@@ -28,14 +28,14 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
-- **The derelict bay, after your notes** (`?map=m1`, 2026-11-01): the top
-  of the stairs is a balcony 3 tiles out over the pit with a rusty railing
-  you see the ship through; the freighter is plain worn plate (no tin
-  stripes), its engines dark and scorched; scaffolding against the hull and
-  the south-east wall, more crates, drums and junk; the wall and landing
-  in their own grimier textures (`derelict-*` in `derive.mjs`), streaks
-  down from the rim, oil on the sand. To judge: how dirty, and whether the
-  balcony wants struts under it.
+- **The derelict bay, after your second notes** (`?map=m1`, 2026-11-01):
+  the balcony runs from the gate to the wash's breach under one straight
+  rusty railing, no stepped parapet; under it rusty I-beam posts, girders,
+  joists and braces (`models/balcony.js`), a sagging cable, stores in its
+  shade, and a shorted junction box on a post whose cut cable spits
+  sparks; the freighter streaked down its sides and sooty down its stern.
+  To judge: the frame's look, how often the sparks come, and whether the
+  wall's stepped face under the deck shows too much.
 
 - **Sliding along angled walls and objects** (any map, 2026-10-31): you
   should glide along a diagonal wall or a turned barricade as you do along
@@ -723,7 +723,7 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
       - [x] Under the balcony: posts, girders and a better underside, junk
             stored under it.
       - [x] The ship dirtier: streaks down its sides.
-      - [ ] Sparks spitting from something in the bay.
+      - [x] Sparks spitting from something in the bay.
     - [ ] Waiting on Mark.
   - [ ] The skyline: dunes and mesas in the backdrop, the town's edges.
 - [ ] **Life:** the cantina's customers, the customs officer, the

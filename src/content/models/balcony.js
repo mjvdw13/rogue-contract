@@ -3,7 +3,9 @@ import { ModelBuilder } from './lib/build.js';
 // `balcony-frame`: the steelwork holding up the derelict bay's balcony
 // (levels/m1.js), rusty I-beam posts along its open edge, a girder over
 // them, joists back to the pit's wall and knee braces, with a power cable
-// slung along the girder. Built in the balcony's own frame: the origin on
+// slung along the girder, and a junction box on a post, its panel hanging
+// open and a cut cable dangling out of it, still live (its sparks are the
+// decoration's `emit`, decor.js). Built in the balcony's own frame: the origin on
 // the sand under its south-west corner, x east along its edge, -y north
 // back to the wall, z up to the deck's underside.
 export const BALCONY_FRAME = {
@@ -13,6 +15,8 @@ export const BALCONY_FRAME = {
   posts: [0.6, 4.6, 8.6, 12.6, 15.5],
   /** How far each post's joist runs back (north) to the wall. */
   joists: [6.9, 7, 6.2, 4.4, 2],
+  /** Where the shorted junction box on the fourth post spits sparks: its open front, and its cut cable's end. */
+  sparks: [[12.6, 0.15, 3], [12.85, 0.25, 1.75]],
 };
 
 const STEEL = { tex: 'metal-rust', texScale: 0.5 };
@@ -74,6 +78,18 @@ function frame() {
       strap(m, [a + (b - a) * u0, EDGE + 0.22, sag(u0)], [a + (b - a) * u1, EDGE + 0.22, sag(u1)], 0.07, CABLE, 'z');
     }
   }
+  // The junction box on the fourth post's south face: its panel hanging
+  // open off one hinge, the cable dropping out of its foot, cut short.
+  const bx = posts[3];
+  const y0 = EDGE + 0.17;
+  m.box([bx - 0.3, y0, 2.6], [bx + 0.3, y0 + 0.25, 3.4], { ...STEEL, side: (i) => (i === 2 ? { color: [16, 14, 12] } : undefined) });
+  m.face([[bx + 0.3, y0 + 0.25, 2.65], [bx + 0.55, y0 + 0.75, 2.72], [bx + 0.55, y0 + 0.75, 3.42], [bx + 0.3, y0 + 0.25, 3.35]], { ...STEEL, twoSided: true });
+  // Inside, burnt-out boards and a contact still glowing.
+  m.box([bx - 0.22, y0 + 0.2, 2.7], [bx + 0.22, y0 + 0.24, 3.3], { color: [44, 40, 34], bottom: false, top: false });
+  m.box([bx - 0.08, y0 + 0.24, 2.95], [bx + 0.06, y0 + 0.26, 3.05], { color: [255, 180, 90], glow: true, bottom: false, top: false });
+  const [cx, cy] = [bx + 0.15, y0 + 0.12];
+  strap(m, [cx, cy, 2.6], [cx + 0.05, cy + 0.05, 2.1], 0.07, CABLE, 'x');
+  strap(m, [cx + 0.05, cy + 0.05, 2.1], [BALCONY_FRAME.sparks[1][0], BALCONY_FRAME.sparks[1][1], BALCONY_FRAME.sparks[1][2]], 0.07, CABLE, 'x');
   return m.build();
 }
 

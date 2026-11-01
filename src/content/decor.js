@@ -116,7 +116,18 @@ export default [
   // colliding as its footprint, as high as its poles.
   ...Object.keys(SCAFFOLDS).map((id) => defineDecoration({ id, model: id, solid: true, height: scaffoldHeight(id), fixed: true })),
   // The steelwork under the derelict bay's balcony (models/balcony.js), colliding as its posts' base plates.
-  defineDecoration({ id: 'balcony-frame', model: 'balcony-frame', solid: true, height: BALCONY_FRAME.height, fixed: true }),
+  // A junction box on it shorts out now and then, and its cut cable spits sparks.
+  defineDecoration({
+    id: 'balcony-frame',
+    model: 'balcony-frame',
+    solid: true,
+    height: BALCONY_FRAME.height,
+    fixed: true,
+    emit: [
+      { type: 'spark', count: 16, every: [1, 3.5], at: BALCONY_FRAME.sparks[0], radius: 0.15, dir: [0, 1, 0.3], spread: 0.6, speed: [1.5, 3.5] },
+      { type: 'spark', count: 4, every: [0.3, 1.2], at: BALCONY_FRAME.sparks[1], radius: 0.05, dir: [0, 0, -1], spread: 0.9, speed: [0.5, 2] },
+    ],
+  }),
   // On its floor: big crates (they stack: place one 2 up on another),
   // colliding as their outlines; hoses out from the pumps, underfoot.
   defineDecoration({ id: 'bay-crate-grey', model: 'bay-crate-grey', solid: true, height: 2, fixed: true }),
