@@ -132,7 +132,17 @@ These need Mark to try something, or to decide. Don't start them without him.
   and the rusty sheet) from the gate's steps up the passage to the ramp,
   black oil soaked into the sand (`oil`), burns by the smelter, litter, and
   drums, crates and scrap against the walls. The droids stand on a deck of
-  plating a step up. To judge: whether the patches read as sheet metal
+  plating a step up. The way there easier to find: the alley between H
+  and I is 4 tiles wide (was 2), and I's west corner is cut back at 45
+  degrees so its mouth opens 7 wide onto the market; the gate is 4 wide
+  too. The olive stall that stood in front of it is on the market's south
+  side now; the Jawas' junk spills out of the mouth (a scrapped astromech,
+  a power droid, junk, a drum), a long rag hangs down I's cut corner and a
+  Jawa stands there ("Utinni!", and once the broker has sent you, he waves
+  you up the alley). The broker says "Across the market, up the alley by
+  the Jawas" instead of "Look for the sandcrawler": it can't be seen from
+  the market (I's roof hides it, even with the roofs behind lowered). To
+  judge: the patches read as sheet metal
   (their dark edge can look like a frame), how black the oil is (paler
   turns olive), and the plaster colours.
 
@@ -657,11 +667,12 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
           the ramp, oil, burns and litter on the sand, the droids for sale
           on a low deck of plating; the walls the backs of houses, patched
           with sheet metal and bare brick, junk and drums against them.
-    - [ ] Mark's note (2026-10-31: hard to find from the cantina): the
+    - [x] Mark's note (2026-10-31: hard to find from the cantina): the
           alley between H and I wider, its mouth flared open onto the
           market (I's corner cut back), the stall in front of it moved
           aside, and the Jawas' junk spilling out of it with a Jawa at
-          the mouth. Then ask Mark about a second way in (through I).
+          the mouth.
+    - [ ] Ask Mark about a second way in (through I's shop).
     - [ ] Waiting on Mark.
   - [ ] The back alleys and the back lane.
   - [ ] The checkpoint and the rooftops.

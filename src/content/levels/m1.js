@@ -134,7 +134,7 @@ town.tarp(46, 80, 50, 84, { z: 2.75, face: 'W', rise: 0.5, cloth: 'red' });
 p.rect(62, 58, 102, 82, town.street());
 p.rect(102, 58, 136, 80, town.street());
 // Alleys off the market, between its houses.
-p.rect(71, 49, 73, 58, town.street());
+p.rect(71, 49, 75, 58, town.street());
 p.rect(86, 49, 88, 58, town.street());
 p.rect(61, 82, 63, 96, town.street());
 p.rect(73, 82, 87, 94, town.street());
@@ -151,11 +151,14 @@ town.house(62, 48, 71, 58, { h: 6, r: 2, wall: 'adobe-pale', skirt: 'plinth', ti
 town.door(66, 58, 'S', { h: 6, tex: 'door-grey', wall: 'adobe-pale', floorZ: 0.375 });
 town.hood(66, 58, 'S', { h: 6, wall: 'adobe-pale' });
 town.window(68.5, 58, 'S', { z: 3.2 }).window(66.5, 54, 'S', { z: 7.2, tex: 'window-louvre' });
-// I: a long low house, a wide shutter and a door under an awning.
-town.house(73, 51, 86, 58, { h: 4.5, r: 1, skirt: 'plinth', dome: true });
-town.door(76.5, 58, 'S', { h: 4.5, tex: 'shutter', tall: 2.25, width: 3, jamb: false, sign: false, panel: false });
-town.door(82, 58, 'S', { h: 4.5 });
-town.awning(74, 58, 86, 60, { z: 3, face: 'S', cloth: 'olive' });
+// I: a long low house, a wide shutter and a door under an awning. Its
+// west corner is cut back at 45 degrees, so the alley to the junk yard
+// opens wide onto the market and shows from across it (Mark, 2026-10-31:
+// the way from the cantina was hard to find).
+town.slanted([[75, 51], [86, 51], [86, 58], [78, 58], [75, 55]], { h: 4.5, skirt: 'plinth', dome: true });
+town.door(80.5, 58, 'S', { h: 4.5, tex: 'shutter', tall: 2.25, width: 3, jamb: false, sign: false, panel: false });
+town.door(84, 58, 'S', { h: 4.5 });
+town.awning(78, 58, 86, 60, { z: 3, face: 'S', cloth: 'olive' });
 // J: a tall house over a garage door, its upper storey at the back.
 town.house(88, 47, 101, 58, { h: 7, r: 2, wall: 'adobe-grey', skirt: null, tiers: [{ box: [90, 47, 101, 53], h: 10, r: 2 }], dome: true });
 town.door(94.5, 58, 'S', { h: 7, tex: 'shutter', tall: 2.25, width: 3, jamb: false, sign: false, panel: false, wall: 'adobe-grey' });
@@ -222,7 +225,7 @@ town.window(130, 79.5, 'W', { z: 4.4, tex: 'window-louvre' });
 // and a rack of wares under a canvas roof with the stallholder between
 // them; and in the north-east corner the droid seller's pen, behind a cage.
 // None in front of the cantina: that's open ground in Mark's stills.
-town.stall(62, 60, 65, 64, 'E', { cloth: 'umber' }).stall(68, 59, 72, 62, 'S', { cloth: 'olive' }).stall(62, 76, 65, 80, 'E', { cloth: 'teal' });
+town.stall(62, 60, 65, 64, 'E', { cloth: 'umber' }).stall(62, 76, 65, 80, 'E', { cloth: 'teal' }).stall(66, 77, 70, 80, 'N', { cloth: 'olive' });
 town.stall(89, 59, 93, 62, 'S', { cloth: 'sand' });
 // 13. The water plaza, in the market's middle: a round paving round the
 // moisture condenser tower (models/market.js), the landmark, the water
@@ -743,13 +746,13 @@ town.block(84, 16, 88, 30, { h: 4.5, wall: 'adobe-rose', skirt: 'dirt' });
 town.block(84, 30, 88, 41, { h: 5.5, wall: 'adobe', skirt: 'plinth' });
 town.block(56, 16, 84, 18, { h: 2, wall: 'adobe-brick', skirt: null });
 p.rect(56, 18, 84, 41, town.street(JUNK));
-p.rect(71, 44, 73, 49, town.street());
-town.arch(71, 41, 73, 44, { h: 5.5, wall: 'adobe-pale' });
+p.rect(71, 44, 75, 49, town.street());
+town.arch(71, 41, 75, 44, { h: 5.5, wall: 'adobe-pale' });
 // Its gate is planks like the side gate's, shut until the broker hands Kyle
 // the fob: the junk yard is the fob's first stop (Mark, 2026-10-31).
-p.rect(71, 41, 73, 44, (_, __, c) => ({ ...c, door: 'door-planks-rising', style: 'rise', lock: 'remote' }));
-gateTag(71, 41, 73, 44, 'junk-gate');
-town.stair(71, 39, 73, 41, { up: 'S', from: JUNK, top: 0, rise: 0.25, floor: 'flagstone', side: 'adobe-pale' });
+p.rect(71, 41, 75, 44, (_, __, c) => ({ ...c, door: 'door-planks-rising', style: 'rise', lock: 'remote' }));
+gateTag(71, 41, 75, 44, 'junk-gate');
+town.stair(71, 39, 75, 41, { up: 'S', from: JUNK, top: 0, rise: 0.25, floor: 'flagstone', side: 'adobe-pale' });
 town.arch(84, 37, 86, 40, { h: 5.5, wall: 'adobe' });
 town.stair(82, 37, 84, 40, { up: 'E', from: JUNK, top: 0, rise: 0.25, floor: 'flagstone', side: 'adobe' });
 // The side gate is weathered planks, shut until the trader keys in the
@@ -866,7 +869,7 @@ list.push(
   // The path, a plate every 1.5 tiles or so, some across it and some along,
   // turned a little, a few missing; each a hair above the last so their
   // overlaps don't flicker.
-  const PATH = [[72, 38.4], [68.6, 35.6], [65.4, 32.6], [68.6, 28.6], [72.2, 25], [75.4, 22.3], [78, 20.7]];
+  const PATH = [[73, 38.4], [68.6, 35.6], [65.4, 32.6], [68.6, 28.6], [72.2, 25], [75.4, 22.3], [78, 20.7]];
   const PLATES = ['deck-plate', 'deck-plate-long', 'deck-plate-rust', 'deck-plate', 'deck-plate-rust'];
   let k = 0;
   for (let i = 0; i + 1 < PATH.length; i++) {
@@ -905,7 +908,7 @@ for (const [x, y, z, face, tex, scale] of [
   // The south wall, behind the droids and east of the gate's steps.
   [57.3, 41, 1.7, 'N', 'patch-tin', 1], [60.4, 41, 2.2, 'N', 'patch-plate', 1.1], [57.4, 41, 5, 'N', 'brick-bare-1', 1],
   [63.4, 41, 1.6, 'N', 'patch-rust', 1.1], [64.9, 41, 3.4, 'N', 'brick-bare-2', 1], [68.2, 41, 2.7, 'N', 'patch-plate', 1],
-  [70, 41, 4.2, 'N', 'brick-bare-1', 0.9], [75, 41, 1.5, 'N', 'patch-rust', 1],
+  [70, 41, 4.2, 'N', 'brick-bare-1', 0.9], [76.7, 41, 1.5, 'N', 'patch-rust', 1],
   [79, 41, 5.1, 'N', 'brick-bare-2', 1.1], [82.4, 41, 2.6, 'N', 'patch-plate', 0.9], [83.2, 41, 1.4, 'N', 'patch-tin', 1],
   // The west wall, behind the skiff.
   [56, 34.6, 2.2, 'E', 'patch-rust', 1.2], [56, 36.6, 3.8, 'E', 'brick-bare-1', 1], [56, 37.9, 1.3, 'E', 'patch-plate', 1],
@@ -916,16 +919,16 @@ for (const [x, y, z, face, tex, scale] of [
   [82.3, 18, 0.8, 'S', 'patch-plate', 1],
 ]) town.decals.push({ x, y, z: JUNK + z, face, tex, ...(scale !== 1 && { scale }) });
 town.window(58.5, 41, 'N', { z: JUNK + 4.2 }).window(80.5, 41, 'N', { z: JUNK + 4.4, tex: 'window-louvre' }).window(84, 19.5, 'W', { z: JUNK + 3.4 });
-town.pipe(61.5, 41, 'N', { floorZ: JUNK }).pipe(77.2, 41, 'N', { floorZ: JUNK });
+town.pipe(61.5, 41, 'N', { floorZ: JUNK }).pipe(79.3, 41, 'N', { floorZ: JUNK });
 town.fixture('wall-unit', 66.6, 41, 'N', { z: JUNK + 2.2 });
 // The yard's walls weather twice as much as the town's (`grime()`).
 town.grimeBoxes.push([54, 16, 88, 46, 2]);
 // Against the walls: drums and crates, scrap sheets leant on them, a power
 // unit and a heap of junk, clear of the gates, the deck and the ramp.
 list.push(
-  at('barrel-rust', 74.1, 40.45), at('barrel-grey', 74.85, 40.6), at('canister-rust', 74.5, 39.85),
-  at('scrap', 77.4, 40.99, { angle: 180 }), at('crate-tan', 79, 40.4, { angle: 184 }), at('crate-grey-small', 79.05, 40.4, { z: JUNK + 0.9, angle: 170 }),
-  at('junk-heap', 80.9, 40, { angle: 200 }), at('droid-dome', 81.6, 39.3, { angle: 60 }),
+  at('barrel-rust', 75.9, 40.45), at('barrel-grey', 76.65, 40.6), at('canister-rust', 76.3, 39.85),
+  at('scrap', 78.2, 40.99, { angle: 180 }), at('crate-tan', 80.7, 40.4, { angle: 184 }), at('crate-grey-small', 80.75, 40.4, { z: JUNK + 0.9, angle: 170 }),
+  at('junk-heap', 82.4, 40.1, { angle: 200 }), at('droid-dome', 83, 39.4, { angle: 60 }),
   at('power-unit', 83.99, 35.9, { angle: 270 }), at('barrel-rust', 83.5, 34.7), at('canister', 83.55, 36.85),
   at('scrap', 56.01, 38.2, { angle: 90 }), at('barrel-rust', 56.5, 33.1),
   at('crate-rust-long', 83.45, 20.4, { angle: 90 }), at('barrel-rust', 83.5, 22.1), at('scrap', 81.6, 18.01, { angle: 0 }),
@@ -1011,6 +1014,23 @@ list.push(
   at('condenser-tower', PLAZA.cx, PLAZA.cy, { angle: 0 }),
   at('canister', 80.7, 72.4, { angle: 20 }), at('canister', 81.15, 72.75, { angle: 70 }), at('crate-grey-small', 81.1, 73.6, { angle: 12 }),
   at('water-trough', 80, 63.4, { angle: 0 }),
+);
+
+// The mouth of the alley to the junk yard: the Jawas' junk spilling out of
+// it onto the market, a scrapped droid by I's cut corner and a Jawa
+// standing at it, who waves you up the alley once the broker has sent you.
+list.push(
+  at('canister-rust', 71.5, 57.3), at('crate-grey-small', 71.6, 58.4, { angle: 15 }), at('droid-dome', 71.6, 58.4, { z: 0.6, angle: 230 }),
+  at('junk-heap', 76.7, 57.5, { angle: 45 }), at('astromech-rust', 75.9, 56.8, { angle: 300 }), at('power-droid-rust', 77.9, 58.7, { angle: 250 }),
+  at('litter', 73.6, 59.6, { angle: 120 }), at('litter-small', 72.4, 54.2, { angle: 10 }),
+  at('jawa', 75.4, 59.4, {
+    angle: 270,
+    calm: { wander: 0 },
+    talk: [
+      { unless: 'contract', lines: ['Utinni!'] },
+      { lines: ['Utinni! (He waves you up the alley, to the junk yard.)'] },
+    ],
+  }),
 );
 
 // The market: wares on the stalls' counters, and in the droid seller's pen
@@ -1181,11 +1201,11 @@ list.push(
           'The Guild has a contract on a deserter. A scout trooper, Rusk.',
           'He wiped his ID code, so this fob has nothing to track. Yet.',
           'The Jawas tag what they sell. Try their junk yard.',
-          'North of the market. Look for the sandcrawler.',
+          'Across the market, up the alley by the Jawas.',
         ],
         set: 'contract',
       },
-      { lines: ["You've got the job. Go.", 'The junk yard, Katarn. Look for the sandcrawler.'] },
+      { lines: ["You've got the job. Go.", 'The junk yard, Katarn. Up the alley by the Jawas.'] },
     ],
   }),
   at('villager-woman', 96.83, 94.86, { angle: 288, wander: 0 }), at('villager-wanderer', 100.17, 94.86, { angle: 252, wander: 0 }),
@@ -1284,8 +1304,12 @@ const hangings = [
   { type: 'cable', from: [128.5, 61.05, 7.5], to: [125, 72.95, 4.6], sag: 1 },
   // A long banner down J's front, by the garage door.
   { type: 'rag', from: [91.6, 58.05, 6.2], to: [92.8, 58.05, 6.2], length: 2.6 },
-  // A sheet across the alley between H and I.
-  { type: 'cloth-pale', from: [71.05, 55, 4.1], to: [72.95, 55.6, 4.1], length: 1, pin: 'corners' },
+  // A sheet across the alley between H and I, and a rag strung over its
+  // mouth.
+  { type: 'cloth-pale', from: [71.05, 52, 4.1], to: [74.95, 52.6, 4.1], length: 1, pin: 'corners' },
+  { type: 'rag', from: [71.05, 57.4, 3.9], to: [76.6, 56.6, 3.7], length: 1.1 },
+  // A long banner down I's cut corner, marking the way to the Jawas.
+  { type: 'rag', from: [75.91, 56.09, 4.4], to: [76.91, 57.09, 4.4], length: 2.8 },
 ];
 
 export default defineLevel({
