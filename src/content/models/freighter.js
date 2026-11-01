@@ -16,9 +16,14 @@ export const FREIGHTER = {
   hatch: [2.5, 3],
 };
 
-const HULL = { tex: 'metal-grey', texScale: 2 };
-const PATCH = { tex: 'metal-rust', texScale: 1 };
-const FRAME = { tex: 'metal-rust', texScale: 0.5 };
+// Plain plate, not corrugated tin (Mark, 2026-11-01: too patterned).
+const HULL = { tex: 'freighter-hull', texScale: 2 };
+const PATCH = { tex: 'yard-plate-rust', texScale: 1.5 };
+const FRAME = { tex: 'freighter-hull', texScale: 0.5 };
+// The engines: scorched dark plate, bands round them, a grille in the intake.
+const ENGINE_SKIN = { tex: 'freighter-engine', texScale: 2 };
+const BAND = { tex: 'band-steel', texScale: 1 };
+const INTAKE = { tex: 'speeder-intake', texScale: 2 };
 const HOLE = { color: [18, 15, 12] };
 const GUTS = { color: ['gray', 0.22] };
 const GLASS = { color: [34, 46, 54] };
@@ -97,14 +102,15 @@ function freighter() {
   // nozzle dark; the north one stripped to its rings, the rails between
   // them and the core.
   const ENGINE = { x0: 1.4, x1: 9.6, z: 6.6, r: 1.05 };
-  m.cylinder([ENGINE.x0, 2.3, ENGINE.z], ENGINE.r, ENGINE.x1 - ENGINE.x0, { ...HULL, axis: 'x', segments: 8, turn: Math.PI / 8, top: HOLE, bottom: HOLE });
-  m.box([ENGINE.x0 + 1, 1.9, ROOF - 0.1], [ENGINE.x1 - 1, 2.7, ENGINE.z - 0.6], FRAME);
+  m.cylinder([ENGINE.x0, 2.3, ENGINE.z], ENGINE.r, ENGINE.x1 - ENGINE.x0, { ...ENGINE_SKIN, axis: 'x', segments: 8, turn: Math.PI / 8, top: HOLE, bottom: INTAKE });
+  for (const x of [ENGINE.x0 + 0.3, ENGINE.x1 - 0.7]) m.cylinder([x, 2.3, ENGINE.z], ENGINE.r + 0.06, 0.4, { ...BAND, axis: 'x', segments: 8, turn: Math.PI / 8, top: false, bottom: false });
+  m.box([ENGINE.x0 + 1, 1.9, ROOF - 0.1], [ENGINE.x1 - 1, 2.7, ENGINE.z - 0.6], ENGINE_SKIN);
   for (const x of [ENGINE.x0, 3.4, 5.4, 7.4, ENGINE.x1 - 0.2]) {
-    m.cylinder([x, -2.3, ENGINE.z], ENGINE.r, 0.2, { ...FRAME, axis: 'x', segments: 8, turn: Math.PI / 8, top: false, bottom: false, twoSided: true });
+    m.cylinder([x, -2.3, ENGINE.z], ENGINE.r, 0.2, { ...BAND, axis: 'x', segments: 8, turn: Math.PI / 8, top: false, bottom: false, twoSided: true });
   }
-  for (const [y, z] of [[-2.3, ENGINE.z + 0.97], [-3.27, ENGINE.z], [-1.33, ENGINE.z]]) m.box([ENGINE.x0, y - 0.06, z - 0.06], [ENGINE.x1, y + 0.06, z + 0.06], FRAME);
+  for (const [y, z] of [[-2.3, ENGINE.z + 0.97], [-3.27, ENGINE.z], [-1.33, ENGINE.z]]) m.box([ENGINE.x0, y - 0.06, z - 0.06], [ENGINE.x1, y + 0.06, z + 0.06], BAND);
   m.cylinder([ENGINE.x0 + 0.6, -2.3, ENGINE.z], 0.42, ENGINE.x1 - ENGINE.x0 - 1.6, { ...GUTS, axis: 'x', segments: 6 });
-  m.box([ENGINE.x0 + 1, -2.7, ROOF - 0.1], [ENGINE.x1 - 1, -1.9, ENGINE.z - 0.6], FRAME);
+  m.box([ENGINE.x0 + 1, -2.7, ROOF - 0.1], [ENGINE.x1 - 1, -1.9, ENGINE.z - 0.6], ENGINE_SKIN);
   return m.build();
 }
 

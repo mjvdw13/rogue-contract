@@ -546,14 +546,14 @@ list.push(
   at('rubble', 193.6, 112.5, { z: OQ, angle: 75 }), at('litter-small', 196, 113.6, { z: OQ, angle: 15 }),
 );
 town.block(191, 106, 192, 107, { h: 18, wall: 'metal-rust', roof: 'metal-rust', skirt: null });
-const HULL = { wall: 'metal-grey', roof: 'metal-grey', skirt: null };
+const HULL = { wall: 'freighter-hull', roof: 'freighter-hull', skirt: null };
 // The freighter: the model is its outside (models/freighter.js), the
 // tiles inside it its hold and the hold's walls.
 town.house(172, 130, 190, 139, { h: DERELICT.floorZ + 5, r: 2, ...HULL });
 list.push(at('freighter', 181, 134.5, { angle: 0, z: DERELICT.floorZ, lit: town.light }));
-town.room(174, 131, 188, 138, { h: DERELICT.floorZ + 5, floorZ: DERELICT.floorZ, ceilZ: DERELICT.floorZ + 3.25, floor: 'imp-floor', ceiling: 'imp-panel-dark', wall: 'metal-grey', light: 120 });
-town.arch(188, 132, 189, 137, { h: DERELICT.floorZ + 5, lintel: 3, floorZ: DERELICT.floorZ, wall: 'metal-grey', floor: 'imp-floor' });
-town.door(190, 134.5, 'E', { h: DERELICT.floorZ + 5, tex: 'door-grey', width: 5, jamb: false, sign: false, panel: false, step: false, floorZ: DERELICT.floorZ, wall: 'metal-grey' });
+town.room(174, 131, 188, 138, { h: DERELICT.floorZ + 5, floorZ: DERELICT.floorZ, ceilZ: DERELICT.floorZ + 3.25, floor: 'imp-floor', ceiling: 'imp-panel-dark', wall: 'freighter-hull', light: 120 });
+town.arch(188, 132, 189, 137, { h: DERELICT.floorZ + 5, lintel: 3, floorZ: DERELICT.floorZ, wall: 'freighter-hull', floor: 'imp-floor' });
+town.door(190, 134.5, 'E', { h: DERELICT.floorZ + 5, tex: 'door-grey', width: 5, jamb: false, sign: false, panel: false, step: false, floorZ: DERELICT.floorZ, wall: 'freighter-hull' });
 p.rect(189, 132, 190, 137, (_, __, c) => ({ ...c, floor: 'imp-floor', tag: 'hold-door', stayOpen: true }));
 p.rect(174, 131, 188, 138, (_, __, c) => ({ ...c, tag: 'hold' }));
 // Fitted out as Bay 87 was, and left: its ribs up the wall every 30

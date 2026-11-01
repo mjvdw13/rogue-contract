@@ -197,6 +197,11 @@ export const TOWN = [
   { out: 'speeder-paint', df: 'IWGREYC2', gradient: [[110, 72, 54], [176, 128, 102], [212, 164, 136], [228, 186, 158], [238, 204, 180]], keep: 0, contrast: 0.6, rust: [{ color: [120, 62, 34], amount: 0.7, cell: 16, seed: 5, from: 0.64 }, { color: [118, 120, 98], amount: 0.5, cell: 8, seed: 7, from: 0.66 }] },
   { out: 'speeder-red', df: 'IWGREYC2', gradient: [[74, 32, 24], [130, 58, 46], [168, 84, 68], [188, 104, 86], [204, 124, 104]], keep: 0, contrast: 0.6, rust: { color: [80, 38, 20], amount: 0.6, cell: 16, seed: 6, from: 0.62 } },
   { out: 'speeder-metal', df: 'IWGREYC2', gradient: [[28, 24, 20], [66, 60, 54], [104, 98, 90], [134, 128, 118], [160, 154, 142]], keep: 0, contrast: 0.8, rust: { color: [112, 54, 28], amount: 0.6, cell: 16, seed: 8, from: 0.56 } },
+  // The gutted freighter (models/freighter.js): plain plate, a seam a tile
+  // (Mark, 2026-11-01: the tin was too patterned), sun-faded grey under soot
+  // and rust; its engines darker and scorched.
+  { out: 'freighter-hull', df: 'IWGREYC2', gradient: [[34, 30, 26], [84, 78, 70], [126, 120, 110], [154, 148, 136], [176, 170, 156]], keep: 0, contrast: 0.7, rust: [{ color: [118, 66, 34], amount: 0.35, cell: 8, seed: 151, from: 0.6 }, { color: [26, 22, 18], amount: 0.45, cell: 8, seed: 161, from: 0.5 }] },
+  { out: 'freighter-engine', df: 'IWGREYC2', gradient: [[14, 12, 10], [40, 36, 32], [70, 64, 58], [96, 90, 82], [120, 112, 102]], keep: 0, contrast: 0.8, rust: [{ color: [96, 50, 26], amount: 0.5, cell: 16, seed: 153 }, { color: [8, 6, 4], amount: 0.8, cell: 16, seed: 163, from: 0.4 }] },
   { out: 'speeder-intake', df: 'IWENGBAC', crop: [16, 12, 104, 104], scale: [32, 32], gradient: [[8, 8, 8], [34, 32, 30], [76, 72, 66], [128, 122, 112], [170, 164, 152]], keep: 0.2, contrast: 1 },
   // A scrapped astromech's dome (models/clutter.js, droid-dome): the
   // landspeeder's mottled panel in dirty white paint and in faded blue,
