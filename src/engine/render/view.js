@@ -30,11 +30,16 @@ export class View {
     this.H = Math.round(VIEW_H * scale);
     /**
      * Per column, the uncovered windows of rows after each tile the ray crossed
-     * (for sprite clipping): one batch per boundary, usually a single window,
-     * more where slabs split the view. 48 of them, and room after for one
-     * last batch where a ray stops at the skyline (columns.js).
+     * (for sprite clipping): a batch per boundary where they changed, usually
+     * a single window, more where slabs split the view. 128 of them, and room
+     * after for one last batch where a ray stops at the skyline (columns.js).
+     * Over Mos Eisley's roofs a column can change its windows 130 times (the
+     * sky's ceiling takes a row at nearly every tile out to 50 or so), but
+     * past the 96th nothing is near enough to tell: a column out of room
+     * clips things beyond with windows too wide, and they show through
+     * nearer walls. (At most 255: segCount is bytes.)
      */
-    this.SEG = 48 + 8;
+    this.SEG = 128 + 8;
     this.resize(width);
     this.lightStart = new Float32Array(256);
     this.x = 0;

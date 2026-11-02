@@ -86,3 +86,19 @@ test('a thing taller than the skyline shows over it, past where the rays stop', 
     map.constructor.prototype.computeSkyline = saved;
   }
 });
+
+test('a far thing behind a roof stays hidden, however often the view narrows on the way', async () => {
+  const { shot } = await headlessRenderer();
+  // A long yard under the full sky: the sky's ceiling takes a row of the
+  // view at nearly every tile for 50 out, and a roof (3) across it 70 out
+  // hides a med kit on the ground beyond. The rays carry on over the roof,
+  // so only the rows they kept open hide it.
+  const rows = Array.from({ length: 7 }, (_, y) => [...Array(90)].map((_, x) => (x === 0 || y === 0 || x === 89 || y === 6 ? '#' : x >= 70 && x < 73 ? 'R' : '.')).join(''));
+  const level = room(rows, ['', '', '', ' >'], { legend: { '.': OPEN, R: { ...OPEN, floorZ: 3 } }, sky: 'sky-night' });
+  const cam = { x: 2.5, y: 3.5, angle: 0, z: 1.25 };
+  const kit = { ...level, list: [{ type: 'med-kit', x: 76.5, y: 3.5 }] };
+  assert.deepEqual(shot(kit, cam), shot(level, cam), 'no part of it shows');
+  // (With the roof gone, it shows: it's in view.)
+  const flat = { ...level, legend: { ...level.legend, R: OPEN } };
+  assert.notDeepEqual(shot({ ...flat, list: kit.list }, cam), shot(flat, cam));
+});

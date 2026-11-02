@@ -202,6 +202,9 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
     let clipBot = H;
     let nw = 0;
     let nseg = 0;
+    // The last batch recorded: where it starts, and how many windows.
+    let lastStart = 0;
+    let lastN = 0;
     const segBase = x * SEG;
     let cur = mapX >= 0 && mapY >= 0 && mapX < mw && mapY < mh ? mapY * mw + mapX : -1;
     let tEnter = 0;
@@ -458,9 +461,22 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
         if (b > clipTop) clipTop = b > clipBot ? clipBot : b;
       }
     };
-    // Record the open windows at distance t, as one batch (if it fits).
+    // Whether the open windows are the last batch recorded.
+    const sameAsLast = () => {
+      if (nw !== lastN) return false;
+      for (let k = 0; k < nw; k++) {
+        if (segTop[segBase + lastStart + k] !== wTop[k] || segBot[segBase + lastStart + k] !== wBot[k]) return false;
+      }
+      return true;
+    };
+    // Record the open windows at distance t, as one batch (if it fits). Not
+    // if they're the last batch again: things beyond are clipped the same by
+    // either, and over a town most boundaries change nothing, so the room
+    // lasts into the distance.
     const record = (t) => {
-      if (nseg + nw > FILL) return;
+      if (nseg + nw > FILL || sameAsLast()) return;
+      lastStart = nseg;
+      lastN = nw;
       for (let k = 0; k < nw; k++) {
         segDist[segBase + nseg] = t;
         segTop[segBase + nseg] = wTop[k];
@@ -840,7 +856,9 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
       }
       if (nw === 1) {
         // (The usual case, without slabs: one window.)
-        if (nseg < FILL) {
+        if (nseg < FILL && !(lastN === 1 && segTop[segBase + lastStart] === wTop[0] && segBot[segBase + lastStart] === wBot[0])) {
+          lastStart = nseg;
+          lastN = 1;
           segDist[segBase + nseg] = tExit;
           segTop[segBase + nseg] = wTop[0];
           segBot[segBase + nseg] = wBot[0];
@@ -875,7 +893,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
           // shows in them, held to them by these windows. They must be the
           // last batch recorded: if the column's windows are full, in the
           // room kept for it.)
-          if (!(nseg && segDist[segBase + nseg - 1] === Math.fround(tExit))) {
+          if (!sameAsLast()) {
             for (let k = 0; k < nw; k++) {
               segDist[segBase + nseg] = tExit;
               segTop[segBase + nseg] = wTop[k];

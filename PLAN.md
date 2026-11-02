@@ -1018,16 +1018,67 @@ blocks of frames: separate runs on this machine drift by up to 20%.
       and ropes can be 1 pixel thin at 2x, the dithering is finer), and
       whether the menu should warn that 2x needs a fast machine.
 
+### 9. Frame time (Mark, 2026-11-02)
+
+Measured headless (Node, Chrome's V8), Mos Eisley at 320 columns over 40
+seeded random views: 12.6 ms a frame on average, 25 at the 90th
+percentile, 33 at worst, and the tick 2.4 ms on top (1385 things). m3 is
+4 ms. Walls, floors and sky are 70% of it, models 27%; sprites, hangings,
+particles and the palette pass are under 0.4 ms together. Widescreen adds
+a third, 2x multiplies by 2.5.
+
+Why Mos Eisley costs so much: it's 98% sky tiles and its buildings are
+raised floors, so a ray that clears a roofline goes on tile by tile until
+the sky's ceiling (24) closes its window: 76 tiles a column on average
+(m3: 17). The skyline stop never fires there, as the comm tower stand-in
+(22) sets one skyline for the whole town. Models behind buildings aren't
+culled by the walls' depth either (the rays went on over the roofs): of
+1276, 23 draw in a view on average, and 62% of the models' time (1.8 of
+2.9 ms) goes on ones that draw nothing.
+
+Steps, most value first, each timed before and after in one process and
+its renders compared:
+
+- [x] Far models showing through nearer walls (the pop-in): a column kept
+      48 batches of windows, one per tile boundary, and over the roofs it
+      needed up to 330; things further off were clipped by the last one,
+      too wide. Now a batch is kept only where the windows change, and
+      there's room for 128: no view of 120 differs from unlimited room.
+- [ ] Models hidden behind buildings: before transforming a model, test
+      its screen box against the windows of the last batch nearer than it
+      in each column it covers, and skip it if none overlap. Up to 1.8 ms
+      a view in Mos Eisley, more in the worst (models 9.6 ms there).
+- [ ] Collisions: `checkPosition` tests all 1385 things for every move of
+      each of the 92 movers, half the tick (about 1.3 ms). A grid of solid
+      things by block. It counts twice in a slow frame, which runs two
+      ticks.
+- [ ] Smooth motion: the camera is drawn where the last 60 Hz tick left
+      it, so on a 120 or 144 Hz screen movement steps (frames repeat a
+      spot), and at 60 Hz a frame that gets no tick or two judders. Draw
+      it between the last two ticks (turning with the mouse is already per
+      frame). No frame-time cost.
+- [ ] A skyline per ray: the highest thing in each 8x8 block, and a ray
+      stops once it looks out over everything still ahead of it. The
+      prototype: walls and floors 9.1 to 7.6 ms in Mos Eisley, but 587
+      pixels differ over 40 views (tall models no longer cut off by the
+      sky's ceiling?); look before taking it.
+- [ ] `preserveDrawingBuffer: false` in the WebGL presenter: nothing reads
+      the canvas back, and keeping it can cost a copy a frame.
+- [ ] To measure: `drawWorld`'s per-column closures (13 a column, 4000 a
+      frame) as module functions; static models' world-space vertices
+      kept instead of transformed every frame.
+- [ ] Chromium numbers at 1x and 2x for the record (with section 8's).
+
+The other kind of far pop-in: things under a pixel wide are point
+sampled, so thin far things (poles, cables, small sprites) can flicker in
+and out as you move. Not planned unless Mark sees it.
+
 ## Small fixes and known rough edges
 
 - [ ] A second `Registry` built from the same content pack finds no sprite
       sheets: the first replaces each def's inline `sheet` with a `{ ref }` in
       the shared objects. Only tools building two registries hit it; copy the
       defs instead of changing them.
-- [ ] Long views over Mos Eisley fill a column's 48 windows (`view.SEG`),
-      and things further off are then clipped by stale ones: a few hundred
-      pixels a view differ from a renderer with room for all of them,
-      mostly far models showing a pixel or two through nearer walls.
 - [ ] Angled-wall tiles count as fully open for reachability, so a gap
       squeezed between two angled walls isn't checked.
 - [ ] A walker chasing the player round the small rock in the sandbox's
