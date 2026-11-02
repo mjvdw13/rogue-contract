@@ -28,6 +28,16 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
+- **The ways to the derelict bay, less straight** (`?map=m1`, 2026-11-01):
+  the old quarter's street now runs east out of the gate square to a house
+  front, bends south-east, then turns south to the bay's gate; a little
+  square opens where it turns, the yard's alley coming into it. The wash
+  winds: south, a jog west, south, a jog east, then it narrows into the
+  breach. Each stretch hides the next, both stay 8 wide, and the crane
+  post shows over the roofs ahead. To judge: whether it's still easy to
+  find the way, and whether the street wants a step up or down at the
+  little square (both routes are flat today).
+
 - **The derelict bay, after your second notes** (`?map=m1`, 2026-11-01):
   the balcony runs from the gate to the wash's breach under one straight
   rusty railing; under it a rusty steel frame, stores, and a shorted

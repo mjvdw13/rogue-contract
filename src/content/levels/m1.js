@@ -449,34 +449,75 @@ town.house(130, 86, 140, 99, { h: 4.75, wall: 'adobe-pale' });
 town.house(143, 86, 149, 102, { h: 5.25, wall: 'adobe-rose' });
 town.block(126, 118, 150, 122, { h: 8 }).block(149, 96, 162, 118, { h: 8 });
 
+// Open ground in a convex polygon ([x, y] tile corners): every tile it
+// touches, so the houses can cut their slanting walls into the ones on
+// its edge.
+const openPolygon = (points, cell) => {
+  const n = points.length;
+  const side = (i, x, y) => {
+    const [[ax, ay], [bx, by]] = [points[i], points[(i + 1) % n]];
+    return (bx - ax) * (y - ay) - (by - ay) * (x - ax);
+  };
+  const sign = Math.sign(side(0, ...points[2]));
+  const inside = (x, y) => points.every((_, i) => side(i, x, y) * sign > 0);
+  const xs = points.map((q) => q[0]);
+  const ys = points.map((q) => q[1]);
+  const at = [0.02, 0.5, 0.98];
+  p.rect(Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys), (x, y, c) =>
+    at.some((u) => at.some((v) => inside(x + u, y + v))) ? cell : c,
+  );
+};
+
 // 9. The old quarter, on its rise: a square inside the gate, a north
-// street along its north side, and the main street slanting
-// south-east from the square to the derelict bay's gate, its houses
-// following the slant. A yard under the roofs opens onto the main street
-// by an alley.
+// street along its north side, and the main street to the derelict bay's
+// gate. It isn't one straight run (Mark, 2026-11-01): out of the square
+// it heads east to a house front, bends south-east, then turns south to
+// the gate, so each stretch hides the next and only the last shows the
+// gate. Where it turns south a little square opens on its west side; a
+// yard under the roofs comes into it by an alley. The crane over the
+// bay's rim stands above the roofs ahead the whole way.
 p.rect(148, 53, 188, 60, town.street(OQ));
 p.rect(148, 60, 160, 76, town.street(OQ));
-// (Between its two edges, y = 64 + 1.2 (x - 160) and 12 further south,
-// and a tile beyond them: the houses cut their slanting walls into it.)
-p.rect(160, 60, 196, 104, (x, y, c) => {
-  const k = y + 0.5 - 1.2 * (x + 0.5 - 160);
-  return k > 62 && k < 78 ? town.street(OQ) : c;
-});
+const QUARTER = town.street(OQ);
+openPolygon([[160, 64], [170, 64], [170, 76], [160, 76]], QUARTER);
+// The bend: its walls y = x - 106 (north-east) and y = x - 94 (south-west).
+openPolygon([[170, 64], [189, 83], [189, 87], [181, 87], [170, 76]], QUARTER);
+openPolygon([[181, 87], [189, 87], [189, 104], [181, 104]], QUARTER);
+// The little square, its south side slanting down to the gate's forecourt.
+openPolygon([[174, 88], [183, 88], [183, 99], [174, 95]], QUARTER);
 p.rect(149, 86, 157, 96, town.street(OQ));
 p.rect(157, 88, 174, 92, town.street(OQ));
 town.house(148, 76, 157, 86, { h: 8, r: 1, wall: 'adobe-grey' });
 town.house(149, 96, 157, 104, { h: 7.5, wall: 'adobe-ochre' });
-town.slanted([[160, 60], [170, 60], [170, 76], [160, 64]], { h: OQ + 5 });
-town.slanted([[170, 60], [180, 60], [180, 88], [170, 76]], { h: OQ + 6.5, wall: 'adobe-pale', dome: true });
-town.slanted([[180, 60], [186, 60], [186, 95], [180, 88]], { h: OQ + 5.5, wall: 'adobe-rose' });
-town.slanted([[186, 60], [194, 60], [194, 104], [193, 104], [186, 95]], { h: OQ + 7.5, dome: true });
-town.slanted([[157, 76], [160, 76], [170, 88], [157, 88]], { h: OQ + 5.5, wall: 'adobe-ochre' });
-town.slanted([[157, 92], [173, 92], [175, 94], [183, 104], [157, 104]], { h: OQ + 6, wall: 'adobe-pale', dome: true });
+// South and west of it (north and east of it below, once the wash is cut).
+town.slanted([[157, 76], [170, 76], [181, 87], [181, 88], [157, 88]], { h: OQ + 5.5, wall: 'adobe-ochre' });
+town.house(157, 92, 174, 104, { h: OQ + 6, wall: 'adobe-pale', dome: true });
+town.slanted([[174, 95], [183, 99], [183, 104], [174, 104]], { h: OQ + 5, wall: 'adobe-grey' });
 
 // 18. The dry wash, two steps below the old quarter: from the houses
 // north of it south into the derelict bay. Steps go down into it at the north
-// street's east end; it's the low way to the bay.
-p.rect(194, 53, 202, 116, town.street(WASH, { floor: 'desert-sand' }));
+// street's east end; it's the low way to the bay. It winds (Mark, 2026-11-01):
+// south, a jog west, south, a jog east, south, then it narrows into the
+// breach, 8 wide all along (5.7 across the jogs), so no stretch shows the next.
+const WASH_CELL = town.street(WASH, { floor: 'desert-sand' });
+p.rect(194, 53, 202, 60, WASH_CELL);
+openPolygon([[194, 60], [202, 60], [197, 65], [189, 65]], WASH_CELL);
+p.rect(189, 65, 197, 73, WASH_CELL);
+openPolygon([[189, 73], [197, 73], [204, 80], [196, 80]], WASH_CELL);
+p.rect(196, 80, 204, 96, WASH_CELL);
+openPolygon([[196, 96], [204, 96], [198, 104], [194, 104]], WASH_CELL);
+// Between the wash and the street, after both are cut.
+town.house(160, 60, 170, 64, { h: OQ + 5 });
+town.slanted([[170, 60], [176, 60], [176, 70], [170, 64]], { h: OQ + 5.5, wall: 'adobe-rose' });
+town.slanted([[176, 60], [184, 60], [184, 78], [176, 70]], { h: OQ + 6.5, wall: 'adobe-pale', dome: true });
+town.slanted([[184, 60], [194, 60], [189, 65], [184, 65]], { h: OQ + 5 });
+town.house(184, 65, 189, 73, { h: OQ + 6, wall: 'adobe-ochre' });
+town.slanted([[184, 73], [189, 73], [196, 80], [196, 83], [189, 83], [184, 78]], { h: OQ + 5.5, wall: 'adobe-rose' });
+town.slanted([[189, 83], [196, 83], [196, 96], [194, 104], [189, 104]], { h: OQ + 7.5, dome: true });
+// Its east bank: houses whose backs slant with it.
+town.slanted([[202, 60], [207, 60], [207, 65], [197, 65]], { h: 7, wall: 'adobe-pale' });
+town.slanted([[197, 73], [207, 73], [207, 80], [204, 80]], { h: 6.5, wall: 'adobe-grey' });
+town.slanted([[204, 96], [207, 96], [207, 104], [198, 104]], { h: 8, wall: 'adobe-ochre' });
 town.stair(188, 53, 194, 60, { up: 'W', from: WASH, top: OQ, rise: 0.25, floor: 'flagstone', side: 'adobe-brick' });
 // Where the loud half's reinforcements come in: the north street's east
 // end and the wash's north end.
@@ -1294,7 +1335,7 @@ list.push(
 // villager too) in the freighter's hold. Customs' two troopers stand in
 // their office, by the terminal that unlocks the bay at the end.
 const CHECKPOINT_LINES = ["Old quarter's sealed, hunter.", 'No pass, no way through.'];
-const QUARTER_PATROL = [[153.5, 68], [165.5, 79], [178.5, 94]];
+const QUARTER_PATROL = [[153.5, 68], [165, 70], [178, 78], [185, 90]];
 list.push(
   at('sandtrooper', 144.6, 65.7, { angle: 180, calm: { wander: 0, lines: CHECKPOINT_LINES } }),
   at('sandtrooper', 144.6, 68.3, { angle: 180, calm: { wander: 0, lines: CHECKPOINT_LINES } }),
