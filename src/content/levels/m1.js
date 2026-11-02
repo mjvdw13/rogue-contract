@@ -681,6 +681,15 @@ for (let deg = 4, k = 0; deg < 360; deg += 17, k++) {
   derelictDecals.push({ x, y, z: DERELICT.rim - 1.8 - (k % 3) * 0.4, face: 'angled', tex: DERELICT_STREAKS[k % 5], scale: 3 + (k % 2) * 0.6 });
   if (k % 2 && (deg < 45 || deg > 135)) derelictDecals.push({ x, y, z: DERELICT.floorZ + 1.1, face: 'angled', tex: k % 4 === 1 ? 'grime-blotch-1' : 'grime-blotch-2', scale: 2.4 });
 }
+// Shore power, never unplugged (Mark, 2026-11-01): nothing strung across
+// the pit, where it would foul a ship coming down, only the bay's lines to
+// the ship it fed, slack and heavy. One off the balcony's girder (where its
+// power run is) down to the freighter's flank, one from a socket low on a
+// rib to its stern. The ship's roof is at 0.8 (models/freighter.js).
+const derelictHangings = [
+  { type: 'cable', from: [191, 117.1, 0.05], to: [187.6, 130.3, 0.4], sag: 3.5 },
+  { type: 'cable', from: [202.76, 132.49, -2.6], to: [189.2, 134.2, 0.82], sag: 1.8 },
+];
 // Where the loud half's troopers come in: over the rim, and through the gate.
 tagTile(170, 112, 'derelict-rim');
 tagTile(205, 128, 'derelict-rim');
@@ -1513,7 +1522,7 @@ export default defineLevel({
   weather: { type: 'glint', count: 90 },
   decals: [...town.decals, ...bayDecals, ...pitDecals, ...derelictDecals],
   lights,
-  hangings: [...hangings, ...town.hangings],
+  hangings: [...hangings, ...derelictHangings, ...town.hangings],
   par: 600,
   // Kyle's blaster stays holstered until the town turns, so it turns only
   // when he finds Rusk (Mark, 2026-10-30).

@@ -36,7 +36,8 @@ These need Mark to try something, or to decide. Don't start them without him.
   ship panelling, mesh deck, frames, panels gone from walls and ceiling,
   hanging wires (one live), a flickering lamp, dead consoles; three holes
   in the plating and one in the roof you see through, in and out. To
-  judge: the hold's look and darkness, the sparks, and whether the wall's
+  judge: the hold's look and darkness, the sparks, the two shore-power
+  cables (balcony girder and east wall to the ship), and whether the wall's
   stepped face under the balcony shows too much.
 
 - **Sliding along angled walls and objects** (any map, 2026-10-31): you
