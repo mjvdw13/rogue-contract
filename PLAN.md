@@ -54,6 +54,17 @@ These need Mark to try something, or to decide. Don't start them without him.
   the informant's den furnished, with a window onto the checkpoint. To
   judge: whether the bunks read, and the square's game without a sitting
   pose.
+  The old quarter's gate square and north street: older and emptier
+  (grime 1.6, bare brick, boarded round-topped doors, buttresses). The
+  house south of the gate square has lost its dome (a new broken-dome
+  model) and its rubble lies below, a squatter's bedroll under it, a
+  hitching ring on the next house. Along the north street, houses in place
+  of blank blocks: one boarded up, one propped by buttresses, one turned
+  off the street's line, and a roofless ruin breached on the street where
+  a hermit sleeps under a tarp and keeps a shrine of flickering candles in
+  a niche (stand-in lines when you use him). To judge: whether the broken
+  dome reads from the square (the house's front hides all but its jagged
+  crown), and the hermit's words.
 
 - **The ways to the derelict bay, less straight** (`?map=m1`, 2026-11-01):
   the old quarter's street now runs east out of the gate square to a house
@@ -742,7 +753,7 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
           room (Secrets, 4).
     - [x] The alleys' east half: the hostel's yard, the second lane, the
           thug's square, the mouth and the informant's den.
-    - [ ] The old quarter: the gate square and the north street.
+    - [x] The old quarter: the gate square and the north street.
     - [ ] The old quarter: the street's bends, the little square, the yard
           and its alley (ruins, the shrine, squatters).
     - [ ] The dry wash: the culvert (Secrets, 5), what the floods left at

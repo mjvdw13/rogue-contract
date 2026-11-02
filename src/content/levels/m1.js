@@ -592,6 +592,92 @@ town.stair(188, 53, 194, 60, { up: 'W', from: WASH, top: OQ, rise: 0.25, floor: 
 tagTile(186, 55, 'quarter-north');
 tagTile(198, 55, 'quarter-north');
 
+// 9. The old quarter in detail (2026-11-01): older and emptier than the
+// town below it. Its plaster weathers more and has fallen to the brick in
+// places, doors are boarded up, old walls are propped with buttresses.
+// The gate square: the house on its south side has lost its dome, fallen
+// in (dome-broken, models/dome.js), its rubble come down into the square;
+// a squatter sleeps against the wall under it; a hitching ring by a door
+// nobody rides up to now. The north street, along its north side, in
+// place of the blocks behind it: a rose house with its door boarded; a
+// ruin whose roof fell in long ago, its walls broken to different heights
+// and breached on the street, sand over its floor, where a hermit keeps a
+// shrine of candles in a niche of its back wall and sleeps under a tarp; a
+// tall house propped by buttresses, its door under a hood; one whose front
+// is turned off the street's line; a grey one by the steps down to the wash.
+town.grimeBoxes.push([148, 40, 196, 106, 1.6]);
+town.window(148, 62.5, 'E', { z: OQ + 3.2 }).window(148, 70.5, 'E', { z: OQ + 4, tex: 'window-louvre' });
+town.door(152.5, 76, 'N', { h: 8, floorZ: OQ, tex: 'door-planks', width: 3, tall: 4, round: true, jamb: false, sign: false, panel: false, wall: 'adobe-grey' });
+town.things.push({ type: 'dome-broken-7-grey', x: 152.5, y: 80.5, z: 8, angle: 270 });
+town.caster(152.5, 80.5, 3.5, 8, 3.3);
+town.fixture('hitching-ring', 160, 61.8, 'W', { z: OQ + 1.5 });
+// The north street's south side: the backs of the houses on the main street.
+town.window(162.5, 60, 'N', { z: OQ + 2.6 }).pipe(168.6, 60, 'N', { floorZ: OQ });
+town.door(173, 60, 'N', { h: OQ + 5.5, floorZ: OQ, wall: 'adobe-rose' });
+town.window(179.5, 60, 'N', { z: OQ + 3.4, tex: 'window-louvre' }).buttress(182.4, 60, 'N', { h: OQ + 6.5, floorZ: OQ, wall: 'adobe-pale' });
+town.door(187.5, 60, 'N', { h: OQ + 5, floorZ: OQ, tex: 'door-planks', width: 3, tall: 4, round: true, jamb: false, sign: false, panel: false });
+// Its north side.
+town.house(148, 45, 155, 53, { h: 6.5, wall: 'adobe-rose', skirt: 'plinth' });
+town.door(151.5, 53, 'S', { h: 6.5, floorZ: OQ, tex: 'door-planks', width: 3, tall: 4, round: true, jamb: false, sign: false, panel: false, wall: 'adobe-rose' });
+town.window(148.5, 53, 'S', { z: OQ + 3.4, tex: 'window-louvre' }).pipe(154.4, 53, 'S', { floorZ: OQ });
+// The ruin: its floor drifted sand, open to the sky; its walls each broken
+// down to its own height, lower toward the street, breached at 158..160.
+p.rect(156, 46, 162, 53, town.street(OQ, { floor: 'desert-sand' }));
+for (const [x0, y0, x1, y1, h] of [
+  [155, 45, 163, 46, 5], [155, 46, 156, 49, 5.5], [155, 49, 156, 53, 4.5],
+  [162, 46, 163, 48, 4.5], [162, 48, 163, 51, 3], [162, 51, 163, 53, 2],
+  [156, 52, 157, 53, 4], [157, 52, 158, 53, 2.25], [160, 52, 161, 53, 1.5], [161, 52, 162, 53, 3.25],
+]) town.block(x0, y0, x1, y1, { h: OQ + h, wall: 'adobe-pale', skirt: 'dirt' });
+// The shrine: a round-topped niche in the back wall, its shelf a little up.
+town.arch(156, 45, 159, 46, { h: OQ + 5, lintel: 3.4, floorZ: OQ + 0.75, wall: 'adobe-pale', floor: 'flagstone', round: 'S' });
+town.tarp(159, 46, 162, 49, { z: 2.5, face: 'S', rise: 0.5, cloth: 'umber', poles: 'front', floorZ: OQ });
+lights.push({ x: 157.5, y: 45.8, z: OQ + 1.3, radius: 3, light: 48, fx: 'flicker', min: 30 });
+town.house(163, 44, 172, 53, { h: 7, wall: 'adobe', skirt: 'dirt', tiers: [{ box: [165, 44, 172, 49], h: 10 }], dome: true });
+town.door(168, 53, 'S', { h: 7, floorZ: OQ, tex: 'door-grey' }).hood(168, 53, 'S', { h: 7, floorZ: OQ });
+town.buttress(164.4, 53, 'S', { h: 7, floorZ: OQ }).buttress(171.2, 53, 'S', { h: 7, floorZ: OQ });
+town.window(169.5, 49, 'S', { z: 8.4, tex: 'window-louvre' });
+p.rect(172, 52, 180, 53, town.street(OQ));
+town.slanted([[172, 46], [180, 46], [180, 52], [172, 53]], { h: 6.5, wall: 'adobe-rose', dome: true });
+town.house(180, 46, 188, 53, { h: 7.5, wall: 'adobe-grey', skirt: null });
+town.door(184, 53, 'S', { h: 7.5, floorZ: OQ, tex: 'door-grey', wall: 'adobe-grey' });
+town.window(181.5, 53, 'S', { z: OQ + 3 }).pipe(187.4, 53, 'S', { floorZ: OQ });
+// Plaster fallen to the brick, on the ruin and round the square and street.
+for (const [x, y, z, face, tex, scale] of [
+  [160.6, 46, 4.3, 'S', 'brick-bare-1', 1], [156, 48.3, 2.6, 'E', 'brick-bare-2', 1], [162, 47.4, 3.4, 'W', 'brick-bare-2', 0.8],
+  [161.5, 53, 2.2, 'S', 'brick-bare-1', 0.7], [156.5, 53, 3.3, 'S', 'brick-bare-2', 0.7],
+  [149.8, 76, 3.2, 'N', 'brick-bare-1', 1.1], [155.6, 76, 5.6, 'N', 'brick-bare-2', 0.9], [148, 63.6, 1.9, 'E', 'brick-bare-2', 0.8],
+  [153.3, 53, 4.7, 'S', 'brick-bare-2', 0.9], [186.3, 53, 2.1, 'S', 'brick-bare-1', 0.9], [165.9, 60, 3.1, 'N', 'brick-bare-1', 0.8],
+]) town.decals.push({ x, y, z, face, tex, ...(scale !== 1 && { scale }) });
+list.push(
+  // The gate square: the dome's rubble, the squatter's bed under the wall.
+  at('rubble', 150.4, 75.15, { angle: 20 }), at('rubble', 155.1, 75.3, { angle: 140 }), at('rubble', 152.9, 74.6, { angle: 75 }),
+  at('litter', 156.4, 73.2, { angle: 200 }), at('litter-small', 150.6, 71.4, { angle: 30 }),
+  at('bedroll', 149.9, 75.42, { angle: 0 }), at('canister', 148.6, 75.4), at('crate-grey-small', 155.9, 75.4, { angle: 8 }),
+  // The ruin: rubble, and the hermit's things under his tarp; the candles
+  // in the niche. Rubble spilt out of the breach.
+  at('rubble', 157.1, 50.7, { angle: 40 }), at('rubble', 161.2, 51.3, { angle: 200 }), at('rubble', 156.8, 47.6, { angle: 110 }),
+  at('rubble', 158.7, 53.7, { angle: 10 }), at('rubble', 157.4, 53.45, { angle: 300 }), at('litter-small', 160.2, 54.4, { angle: 90 }),
+  at('bedroll', 160.6, 47.2, { angle: 0 }), at('crate-tan', 161.3, 49.7, { angle: 20 }), at('canister-rust', 160.15, 49.95),
+  at('candles', 157.5, 45.45, { z: OQ + 0.75, angle: 0 }), at('candles', 156.7, 45.6, { z: OQ + 0.75, angle: 140 }),
+  at('villager-wanderer', 158.3, 48.3, {
+    angle: 90,
+    wander: 1,
+    name: 'HERMIT',
+    talk: [{ lines: ['The suns burn the same on all of us.', 'The quarter was full, once. Before the checkpoint.'] }],
+  }),
+  // The north street.
+  at('barrel-rust', 186.3, 53.45), at('canister', 187.05, 53.4), at('vaporator', 175.6, 54.2),
+  at('junk-heap', 149.6, 59.2, { angle: 80 }), at('litter', 170.4, 56.6, { angle: 60 }), at('litter-small', 179.2, 57.8, { angle: 250 }),
+  at('rubble', 163.3, 59.4, { angle: 300 }),
+  at('villager-woman', 166, 56.5, { wander: 4 }),
+);
+town.hangings.push(
+  { type: 'rag', from: [165.4, 53.05, 5.9], to: [166.6, 53.05, 5.9], length: 2.4 },
+  { type: 'cable', from: [185.5, 53.05, 6.6], to: [186.6, 59.95, 4.9], sag: 0.8 },
+  { type: 'cable', from: [169.6, 53.05, 6.3], to: [174.5, 59.95, 5.4], sag: 0.9 },
+  { type: 'rag', from: [150.2, 75.95, 6.6], to: [151, 75.95, 6.6], length: 1.6 },
+);
+
 // 10. The derelict bay: an old docking bay half full of sand, a pit like
 // Bay 87. Its gate is at the main street's end: a
 // passage through its building onto a landing at the old quarter's height,
@@ -1598,7 +1684,7 @@ list.push(
       { lines: ['Go on, before someone sees us talking.'] },
     ],
   }),
-  at('villager-man', 152, 73),
+  at('villager-man', 152, 73, { wander: 2 }),
   // Rusk, in the freighter's hold: what the fob tracks once the trader's code is in.
   at('villager-man', 180, 134.5, { angle: 0, wander: 0, tag: 'rusk', name: 'RUSK' }),
   at('barricade-worn', 137.6, 63.6, { angle: 20 }), at('barricade-worn', 137.6, 69.8, { angle: 335 }),

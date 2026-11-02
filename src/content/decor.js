@@ -1,5 +1,5 @@
 import { defineDecoration } from '../engine/defs.js';
-import { DOMES } from './models/dome.js';
+import { DOMES, BROKEN_DOMES } from './models/dome.js';
 import { ARCH_MODELS } from './models/arch.js';
 import { LIP_WALLS, LIP_FEET } from './models/door-jamb.js';
 import { BUTTRESS_MODELS } from './models/buttress.js';
@@ -83,6 +83,8 @@ export default [
   defineDecoration({ id: 'sensor-dish', model: 'sensor-dish', spin: 0.9 }),
   // Mos Eisley's domes, on roofs and over round buildings.
   ...DOMES.map((d) => defineDecoration({ id: d.id, model: d.id, solid: true, radius: d.radius, height: d.height })),
+  // Fallen in, in the old quarter.
+  ...BROKEN_DOMES.map((d) => defineDecoration({ id: d.id, model: d.id, solid: true, radius: d.radius, height: d.height })),
   // The tiled jamb of a Mos Eisley doorway (inside the wall's recess, so it needn't be solid).
   defineDecoration({ id: 'door-jamb', model: 'door-jamb' }),
   // Its bevelled corners on the wall's face, in the wall's plaster (on the wall, so `fixed`).
@@ -110,6 +112,9 @@ export default [
   defineDecoration({ id: 'speeder-engine', model: 'speeder-engine', solid: true, radius: ENGINE.r, height: ENGINE.top, fixed: true }),
   // Bunks in the spacers' hostel (models/hostel.js), colliding as their outlines.
   ...Object.keys(BUNKS).map((id) => defineDecoration({ id, model: id, solid: true, height: BUNK.top, fixed: true })),
+  // The old quarter's: the hermit's candles (models/quarter.js) and a squatter's bedroll.
+  defineDecoration({ id: 'candles', model: 'candles', fixed: true }),
+  defineDecoration({ id: 'bedroll', model: 'bedroll', fixed: true }),
   // Docking Bay 87's fittings (models/bay.js): ribs up its wall and pumps (colliding as
   // their outlines), fuel lines down to the pumps, lamps on its rim.
   defineDecoration({ id: 'bay-rib', model: 'bay-rib', solid: true, height: BAY_WALL, fixed: true }),

@@ -45,4 +45,38 @@ for (let width = 11; width >= 3; width--) {
   }
 }
 
-export default DOMES.map((d) => dome(d.id, d.radius, d.tex));
+/**
+ * A dome fallen in (the old quarter, levels/m1.js): its crown gone and a
+ * ragged hole torn down one side, the plaster drawn on both faces so you
+ * see its inside through the hole. `cut` gives, for each of its 16 sides,
+ * how many of its 6 bands still stand.
+ */
+function brokenDome(id, radius, tex, cut) {
+  const m = new ModelBuilder(id);
+  const sides = 16;
+  const ring = (r) => Array.from({ length: sides }, (_, i) => [Math.cos((i / sides) * Math.PI * 2) * r, Math.sin((i / sides) * Math.PI * 2) * r]);
+  const r = radius - 0.25;
+  const drum = Math.min(0.5, r * 0.15);
+  m.prism(ring(radius), 0, LIP, { tex, bottom: false });
+  m.prism(ring(r), LIP, LIP + drum, { tex, bottom: false, top: false });
+  const bands = 6;
+  const at = (k) => (k / bands) * (Math.PI / 2) * 0.92;
+  const pt = (i, a) => {
+    const [x, y] = ring(r * Math.cos(a))[i % sides];
+    return [x, y, LIP + drum + r * RISE * Math.sin(a)];
+  };
+  for (let i = 0; i < sides; i++) {
+    for (let k = 0; k < cut[i]; k++) {
+      m.face([pt(i, at(k)), pt(i + 1, at(k)), pt(i + 1, at(k + 1)), pt(i, at(k + 1))], { tex, twoSided: true }, [0, 0, 0]);
+    }
+  }
+  return m.build();
+}
+
+/** The fallen-in domes: `id`, `radius`, `height` (as it stood) and `tex`. */
+export const BROKEN_DOMES = [{ id: 'dome-broken-7-grey', radius: 3.5, tex: 'adobe-grey', cut: [6, 6, 6, 5, 4, 2, 1, 1, 0, 1, 2, 2, 4, 5, 6, 6] }].map((d) => {
+  const r = d.radius - 0.25;
+  return { ...d, height: Math.round((LIP + Math.min(0.5, r * 0.15) + r * RISE) * 100) / 100 };
+});
+
+export default [...DOMES.map((d) => dome(d.id, d.radius, d.tex)), ...BROKEN_DOMES.map((d) => brokenDome(d.id, d.radius, d.tex, d.cut))];
