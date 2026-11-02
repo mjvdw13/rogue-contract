@@ -23,6 +23,7 @@ import { POD } from './models/pod.js';
 import { POST } from './models/ring.js';
 import { STAINS } from './models/stains.js';
 import { ENGINE } from './models/garage.js';
+import { BUNK, BUNKS } from './models/hostel.js';
 
 // Scenery. Solid ones block movement; ones with health can be shot (and
 // `explode`).
@@ -107,6 +108,8 @@ export default [
   defineDecoration({ id: 'landspeeder', model: 'landspeeder', solid: true, height: 1.22, fixed: true, bob: { height: 0.02, period: 3.2 } }),
   // One of its engines, pulled and laid on trestles in the garage's yard (models/garage.js).
   defineDecoration({ id: 'speeder-engine', model: 'speeder-engine', solid: true, radius: ENGINE.r, height: ENGINE.top, fixed: true }),
+  // Bunks in the spacers' hostel (models/hostel.js), colliding as their outlines.
+  ...Object.keys(BUNKS).map((id) => defineDecoration({ id, model: id, solid: true, height: BUNK.top, fixed: true })),
   // Docking Bay 87's fittings (models/bay.js): ribs up its wall and pumps (colliding as
   // their outlines), fuel lines down to the pumps, lamps on its rim.
   defineDecoration({ id: 'bay-rib', model: 'bay-rib', solid: true, height: BAY_WALL, fixed: true }),

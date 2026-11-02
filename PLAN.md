@@ -46,6 +46,14 @@ These need Mark to try something, or to decide. Don't start them without him.
   fourth secret (a door in the notch's west wall, half behind a crate: a
   rack, a thermal detonator, power cells). To judge: the engine, and
   whether the secret door is too easy or too hard to find.
+  The alleys' east half: the hostel's yard (a hooded door, open windows
+  onto bunks, a new model, and spacers; an astromech and luggage outside;
+  a tin lean-to and a vaporator), the second lane's power tap (a box on
+  the wall, cables fanning out from it), the thug's square (his back room
+  of contraband through a round arch, his men at sabacc on a crate), and
+  the informant's den furnished, with a window onto the checkpoint. To
+  judge: whether the bunks read, and the square's game without a sitting
+  pose.
 
 - **The ways to the derelict bay, less straight** (`?map=m1`, 2026-11-01):
   the old quarter's street now runs east out of the gate square to a house
@@ -732,7 +740,7 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
     - [x] The alleys' west half: the gate, the yard behind J (the
           garage's back), the first slanting lane; the gun shop's back
           room (Secrets, 4).
-    - [ ] The alleys' east half: the hostel's yard, the second lane, the
+    - [x] The alleys' east half: the hostel's yard, the second lane, the
           thug's square, the mouth and the informant's den.
     - [ ] The old quarter: the gate square and the north street.
     - [ ] The old quarter: the street's bends, the little square, the yard

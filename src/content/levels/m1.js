@@ -25,6 +25,8 @@ const PLASTERS = ['adobe', 'adobe', 'adobe-pale', 'adobe-pale', 'adobe-ochre', '
 // The feet of the walls (lib/town.js, SKIRTS): not every house has one.
 const SKIRTS = ['dirt', 'dirt', 'plinth', null];
 const list = [];
+// Light sources (lamps indoors), for the level's `lights`.
+const lights = [];
 
 // Everything not painted is the rest of the town, out of reach: blocks of
 // different heights, so the skyline past the streets steps up and down
@@ -430,8 +432,28 @@ town.tarp(140.2, 69.9, 142.9, 72.9, { z: OQ + 2.75, face: 'N', cloth: 'sand', fl
 // the middle, below) and the informant's den, open to it.
 p.rect(136, 48, 139, 61, town.street());
 town.house(139, 48, 148, 61, { h: 7, r: 1, wall: 'adobe-grey', skirt: null });
-town.room(140, 52, 146, 59, { h: 7, wall: 'adobe-grey', light: 128 });
+town.room(140, 52, 146, 60, { h: 7, wall: 'adobe-grey', light: 128 });
 town.arch(139, 54, 140, 57, { h: 7, lintel: 3, wall: 'adobe-grey' });
+// The informant's den: a crate for a table with his datapad, a stool, his
+// stock in crates, and a window onto the checkpoint's steps he watches
+// from (too small to climb through), a terminal under it; a rag hung
+// half across his doorway. The mouth outside: a downpipe and a window on
+// the house opposite, crates at the foot of the steps, a cable over.
+windowThrough(140, 142, 60, { sill: 1.4, top: 2.3, light: 128 });
+p.light(140, 51, 147, 52, 128).light(146, 52, 147, 60, 128);
+town.window(136, 55.5, 'E', { z: 3.4, tex: 'window-louvre' }).pipe(136, 58.4, 'E');
+list.push(
+  at('crate-tan', 144.6, 53.2, { angle: 6 }), at('cantina-datapad', 144.55, 53.2, { z: 0.9, angle: 30 }), at('cantina-stool', 143.6, 53.95),
+  at('crate-rust-long', 145.2, 57.7, { angle: 90 }), at('crate-grey-small', 145.35, 56.2, { angle: 12 }), at('canister-rust', 140.6, 52.6),
+  at('terminal', 142.7, 59.4, { angle: 90 }),
+  at('cantina-lamp', 143, 55.5, { z: 4.5 - LAMP_CORD }),
+  at('crate-tan', 136.55, 49.1, { angle: 85 }), at('barrel-rust', 136.45, 50.35), at('litter-small', 137.6, 52.4, { angle: 15 }),
+);
+lights.push({ x: 143, y: 55.5, z: 2.5, radius: 4, light: 32 });
+town.hangings.push(
+  { type: 'rag', from: [139.5, 54.1, 2.95], to: [139.5, 55.6, 2.95], length: 1.6 },
+  { type: 'cable', from: [136.05, 53.4, 6.6], to: [138.95, 50.6, 5.8], sag: 0.4 },
+);
 // South of it, too tall to climb from the roofs behind.
 p.rect(136, 73, 148, 86, town.street());
 town.house(136, 73, 141, 86, { h: 8, r: 1, skirt: 'plinth' });
@@ -802,7 +824,6 @@ tagTile(143, 110, 'roof-sniper');
 // room and a passage up two steps to the back door on the back lane, east
 // of the blast doors.
 /** Light sources (lamps), added area by area. */
-const lights = [];
 const CANTINA = { floorZ: -0.5, ceilZ: 3.5, h: 6, wall: WALL, light: 104 };
 // A ceiling at `ceilZ` over the open floor in a box, the roof at `h` on
 // it (as room() paints), for floors painted some other way: steps, a room
@@ -1305,18 +1326,102 @@ town.hangings.push(
   { type: 'rope', ...acrossLane(109.2, 4.6, 4.2), sag: 0.4 },
 );
 list.push(at('villager-woman', 107.4, 38.2, { wander: 2 }));
+// The second yard, a step up, is the spacers': their hostel on its north
+// side, a flophouse of bunks (models/hostel.js) you see through its open
+// windows, its door under a hood with the striped sign in it; a spacer's
+// astromech waits outside with the luggage. A tin lean-to on the south
+// side keeps the hostel's water, a vaporator beside it; a house door in
+// the west wall.
 p.rect(112, 22, 126, 36, town.street(0.25, { side: 'adobe-brick' }));
-town.house(112, 12, 126, 22, { h: 8, r: 1, wall: 'adobe-rose' });
+town.house(112, 12, 126, 22, { h: 8, r: 1, wall: 'adobe-rose', dome: true });
 town.room(113, 13, 125, 21, { h: 8, floorZ: 0.25, ceilZ: 5, wall: 'adobe-rose', light: 120 });
 town.arch(118, 21, 120, 22, { h: 8, lintel: 3.5, floorZ: 0.25, wall: 'adobe-rose' });
+town.hood(119, 22, 'S', { h: 8, floorZ: 0.25, wall: 'adobe-rose' });
+town.decals.push({ x: 119, y: 22, z: 4.15, face: 'S', tex: 'door-sign' });
+windowThrough(114, 116, 21, { sill: 1.4, top: 2.3, light: 120 });
+windowThrough(122, 124, 21, { sill: 1.4, top: 2.3, light: 120 });
+// (Its walls inside in its light, where they've no face outside.)
+p.light(112, 12, 126, 13, 120).light(112, 13, 113, 21, 120).light(125, 13, 126, 21, 120);
+town.house(114, 33, 120, 36, { h: 4, wall: 'adobe-grey', skirt: null });
+town.leanTo(114, 33, 120, 36, { h: 3.75, face: 'N', floorZ: 0.25, seed: 21 });
+town.door(116, 33, 'N', { h: 4, floorZ: 0.25, tex: 'door-grey', wall: 'adobe-grey' });
+town.door(112, 28, 'E', { h: 5.5, floorZ: 0.25, wall: 'adobe-rose' });
+town.fixture('wall-tank', 123.5, 36, 'N', { z: 2.8 }).pipe(124.4, 22, 'S', { floorZ: 0.25 });
+list.push(
+  at('bunk', 114.45, 13.52, { angle: 0 }), at('bunk-b', 116.95, 13.52, { angle: 0 }),
+  at('bunk-b', 121.05, 13.52, { angle: 0 }), at('bunk', 123.55, 13.52, { angle: 0 }), at('bunk', 113.52, 17.6, { angle: 90 }),
+  at('cargo-pod', 124.1, 18.2, { angle: 85 }), at('crate-grey-small', 124.35, 20.3, { angle: 10 }), at('canister', 113.5, 20.4),
+  at('cantina-lamp', 116, 16.8, { z: 5 - LAMP_CORD }), at('cantina-lamp', 122, 16.8, { z: 5 - LAMP_CORD }),
+  at('villager-adventurer', 118.6, 16.2, { angle: 20, wander: 0 }), at('villager-wanderer', 122.6, 15.8, { angle: 250, wander: 0 }),
+  // Outside: the astromech and the luggage, the water shed's vaporator.
+  at('astromech-blue', 121.4, 23.2, { angle: 200 }),
+  at('cargo-pod', 115.6, 23.0, { angle: 2 }), at('crate-grey-small', 116.95, 22.75, { angle: 14 }), at('crate-grey-small', 116.9, 22.8, { z: 0.85, angle: 40 }),
+  at('barrel-rust', 124.6, 22.7), at('litter-small', 119.8, 27.4, { angle: 70 }), at('litter', 123.5, 31.5, { angle: 200 }),
+  at('vaporator', 121.6, 34.6), at('canister-rust', 122.45, 35.3),
+  at('villager-adventurer', 118.2, 27.5, { wander: 3 }),
+);
+lights.push({ x: 116, y: 16.8, z: 3, radius: 4.5, light: 40 }, { x: 122, y: 16.8, z: 3, radius: 4.5, light: 40 });
+// The second lane slants down south-east to the square, between four
+// houses, and the alley's power comes off a box on its north wall: cables
+// strung from it across the lane, along it and up to the roofs, each to a
+// house that's tapped in.
 lane(126, 23, 136, 39, 0.5, 26, 31, 0.25);
-town.slanted([[126, 18], [136, 18], [136, 31], [126, 26]], { h: 7 });
-town.slanted([[126, 31], [136, 36], [136, 44], [126, 44]], { h: 6, wall: 'adobe-pale' });
+town.slanted([[126, 18], [130, 18], [130, 28], [126, 26]], { h: 7 });
+town.slanted([[130, 18], [136, 18], [136, 31], [130, 28]], { h: 8.5, wall: 'adobe-ochre', dome: true });
+town.slanted([[126, 31], [132, 34], [132, 44], [126, 44]], { h: 6, wall: 'adobe-pale' });
+town.slanted([[132, 34], [136, 36], [136, 44], [132, 44]], { h: 5, wall: 'adobe-grey', skirt: 'plinth' });
+{
+  // A point on the north wall at x (y = 26 + (x - 126) / 2), or on the
+  // south one (y = 31 + ...), `out` into the lane.
+  const n = [-1 / Math.sqrt(5), 2 / Math.sqrt(5)];
+  const r = (v) => Math.round(v * 1000) / 1000;
+  const north = (x, out, z) => [r(x + n[0] * out), r(26 + (x - 126) / 2 + n[1] * out), z];
+  const south = (x, out, z) => [r(x - n[0] * out), r(31 + (x - 126) / 2 - n[1] * out), z];
+  const [bx, by] = north(131.5, 0.01, 0);
+  list.push(
+    at('wall-unit', bx, by, { z: 2.5, angle: 333 }),
+    at('barrel-grey', ...north(130.3, 0.42, 0).slice(0, 2)), at('junk-heap', ...south(128.6, 0.75, 0).slice(0, 2), { angle: 25 }),
+    at('litter-small', 133.4, 32.4, { angle: 120 }),
+  );
+  town.decals.push({ x: r(130.7), y: r(28.35), z: 1.7, face: 'angled', tex: 'wall-meter' });
+  town.hangings.push(
+    { type: 'cable', from: north(131.45, 0.05, 3.1), to: south(129, 0.05, 4.4), sag: 0.5 },
+    { type: 'cable', from: north(131.6, 0.05, 3.1), to: south(134, 0.05, 3.7), sag: 0.4 },
+    { type: 'cable', from: north(131.7, 0.05, 3.2), to: north(133.5, 0.05, 8.3), sag: 0.2 },
+    { type: 'cable', from: north(131.3, 0.05, 3.1), to: north(127.5, 0.05, 4.9), sag: 0.3 },
+  );
+}
+// The square at the alleys' east end is the thug's: his back room off its
+// north side through a round-topped arch, stacked with what he deals in
+// (a rack of it, big crates, a terminal), the thug inside under a lamp, and
+// his men at a game of sabacc on a crate in the square, cards on it, a
+// stool left empty. Houses on its east and south sides.
 p.rect(136, 30, 146, 42, town.street(OQ));
 town.stair(136, 30, 138, 42, { up: 'E', from: 0.25, top: OQ, rise: 0.25, floor: 'flagstone', side: 'adobe-brick' });
-town.house(136, 20, 146, 30, { h: 8, r: 1, wall: 'adobe-grey' });
+town.house(136, 20, 146, 30, { h: 8, r: 1, wall: 'adobe-grey', dome: true });
 town.room(137, 21, 145, 29, { h: 8, floorZ: OQ, ceilZ: 5.5, wall: 'adobe-grey', light: 112 });
-town.arch(140, 29, 143, 30, { h: 8, lintel: 3, floorZ: OQ, wall: 'adobe-grey' });
+town.arch(140, 29, 143, 30, { h: 8, lintel: 3.5, floorZ: OQ, wall: 'adobe-grey', round: 'S' });
+windowThrough(137, 139, 29, { sill: 4.4, top: 5.2, light: 112 });
+p.light(136, 20, 146, 21, 112).light(136, 21, 137, 29, 112).light(145, 21, 146, 29, 112);
+town.house(146, 30, 152, 42, { h: 8, wall: 'adobe' });
+town.door(146, 36, 'W', { h: 8, floorZ: OQ, tex: 'door-red' }).buttress(146, 39.6, 'W', { h: 8, floorZ: OQ });
+town.house(139, 42, 147, 47, { h: 7.5, wall: 'adobe-rose', skirt: 'dirt' });
+town.window(143.5, 42, 'N', { z: OQ + 2.8, tex: 'window-louvre' }).pipe(145.4, 42, 'N', { floorZ: OQ });
+town.door(136, 39, 'E', { h: 5, floorZ: OQ, tex: 'door-grey', wall: 'adobe-grey' });
+list.push(
+  at('rack-c', 140, 21.05, { angle: 0 }), at('bay-crate-grey', 138.1, 24.1, { angle: 4 }), at('bay-crate-tan', 143.9, 22.5, { angle: 352 }),
+  at('crate-rust-long', 144.2, 26.7, { angle: 90 }), at('crate-tan', 137.8, 26.9, { angle: 12 }), at('crate-grey-small', 137.8, 26.9, { z: OQ + 0.9, angle: 50 }),
+  at('terminal', 143.6, 24.6, { angle: 180 }),
+  at('cantina-lamp', 141.5, 25, { z: 5.5 - LAMP_CORD }),
+  at('villager-adventurer', 141.6, 23.6, { angle: 270, wander: 0 }),
+  // The game.
+  at('crate-tan', 141.6, 35.2, { angle: 30 }), at('cantina-datapad', 141.55, 35.15, { z: OQ + 0.9, angle: 75 }), at('canister', 142.75, 34.2),
+  at('cantina-stool', 141.4, 36.6), at('cantina-stool', 142.8, 36.1),
+  at('villager-man', 140.15, 35.4, { angle: 0, wander: 0 }), at('villager-adventurer', 143.05, 35.0, { angle: 180, wander: 0 }),
+  at('villager-wanderer', 141.75, 33.55, { angle: 270, wander: 0 }),
+  at('barrel-rust', 145.5, 30.7), at('barrel-rust', 145.55, 31.5), at('litter', 138.6, 39.6, { angle: 300 }),
+);
+lights.push({ x: 141.5, y: 25, z: 3.5, radius: 5, light: 36 });
 town.stair(136, 42, 139, 48, { up: 'N', top: OQ, rise: 0.25, floor: 'flagstone', side: 'adobe-brick' });
 
 // Domes on the blocks of town the streets left whole, two in three.
