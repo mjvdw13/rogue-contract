@@ -65,6 +65,16 @@ These need Mark to try something, or to decide. Don't start them without him.
   a niche (stand-in lines when you use him). To judge: whether the broken
   dome reads from the square (the house's front hides all but its jagged
   crown), and the hermit's words.
+  The old quarter's bends, alley, yard and little square: the bend's long
+  south-west wall is three houses now; doors, windows and odds and ends
+  along the way, cargo left by the bay's gate. The alley runs under a room
+  that bridges it (a round-topped vault). The yard under the roofs holds
+  the quarter's water (three vaporators, a tank, drums, a woman minding
+  them). The little square is one step (0.25) down from the street, which
+  answers the question of a step there below, and it's the squatters':
+  a tarp over bedrolls, a fire in a drum (embers, a thin smoke, a
+  flickering light), scrap sheets against the wind, washing. To judge: the
+  step, and the fire (its particle flames were too big and came out).
 
 - **The ways to the derelict bay, less straight** (`?map=m1`, 2026-11-01):
   the old quarter's street now runs east out of the gate square to a house
@@ -754,7 +764,7 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
     - [x] The alleys' east half: the hostel's yard, the second lane, the
           thug's square, the mouth and the informant's den.
     - [x] The old quarter: the gate square and the north street.
-    - [ ] The old quarter: the street's bends, the little square, the yard
+    - [x] The old quarter: the street's bends, the little square, the yard
           and its alley (ruins, the shrine, squatters).
     - [ ] The dry wash: the culvert (Secrets, 5), what the floods left at
           the bends, the flood line.

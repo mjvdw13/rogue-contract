@@ -24,6 +24,7 @@ import { POST } from './models/ring.js';
 import { STAINS } from './models/stains.js';
 import { ENGINE } from './models/garage.js';
 import { BUNK, BUNKS } from './models/hostel.js';
+import { FIRE_DRUM } from './models/quarter.js';
 
 // Scenery. Solid ones block movement; ones with health can be shot (and
 // `explode`).
@@ -115,6 +116,19 @@ export default [
   // The old quarter's: the hermit's candles (models/quarter.js) and a squatter's bedroll.
   defineDecoration({ id: 'candles', model: 'candles', fixed: true }),
   defineDecoration({ id: 'bedroll', model: 'bedroll', fixed: true }),
+  // The squatters' fire in a drum: embers and a thin smoke off it (its flames are the model's).
+  defineDecoration({
+    id: 'fire-drum',
+    model: 'fire-drum',
+    solid: true,
+    radius: FIRE_DRUM.r + 0.02,
+    height: FIRE_DRUM.h,
+    fixed: true,
+    emit: [
+      { type: 'ember', count: 1, every: [0.2, 0.5], at: [0, 0, FIRE_DRUM.h], radius: 0.18, dir: [0, 0, 1], spread: 0.4, speed: [0.4, 1] },
+      { type: 'smoke-wisp', count: 1, every: [0.6, 1.2], at: [0, 0, FIRE_DRUM.h + 0.3], radius: 0.1, dir: [0, 0, 1], spread: 0.3, speed: [0.2, 0.4] },
+    ],
+  }),
   // Docking Bay 87's fittings (models/bay.js): ribs up its wall and pumps (colliding as
   // their outlines), fuel lines down to the pumps, lamps on its rim.
   defineDecoration({ id: 'bay-rib', model: 'bay-rib', solid: true, height: BAY_WALL, fixed: true }),

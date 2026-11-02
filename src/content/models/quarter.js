@@ -9,7 +9,13 @@ import { ModelBuilder } from './lib/build.js';
 // `bedroll`: a squatter's bedding on the ground, a canvas roll laid out
 // with its end rolled up for a pillow, built along x (BEDROLL.half each
 // way), not solid.
+//
+// `fire-drum`: the squatters' fire, in a rusty drum with its lid cut off:
+// a bed of glowing coals near its rim and a few tongues of flame over them
+// (its embers and flames as particles are the decoration's `emit`).
+// FIRE_DRUM.h is its rim.
 export const BEDROLL = { half: 0.95, w: 0.38 };
+export const FIRE_DRUM = { r: 0.32, h: 1 };
 
 const WAX = { color: [196, 184, 150] };
 const POOL = { color: [170, 156, 120] };
@@ -39,4 +45,21 @@ function bedroll() {
   return m.build();
 }
 
-export default [candles(), bedroll()];
+function fireDrum() {
+  const m = new ModelBuilder('fire-drum');
+  const { r, h } = FIRE_DRUM;
+  m.cylinder([0, 0, 0], r, h, { segments: 10, tex: 'drum-rust', twoSided: true, top: false, bottom: false });
+  for (const z of [0.3, 0.68]) m.cylinder([0, 0, z], r + 0.02, 0.05, { segments: 10, color: ['gray', 0.25], top: false, bottom: false });
+  m.cylinder([0, 0, h - 0.14], r - 0.01, 0.01, { segments: 10, color: [210, 84, 24], glow: true, bottom: false });
+  // [angle round, out from the middle, height]
+  for (const [a, d, t] of [[0.4, 0.1, 0.42], [2.5, 0.14, 0.3], [4.4, 0.08, 0.36], [5.6, 0.16, 0.24]]) {
+    const [x, y] = [Math.cos(a) * d, Math.sin(a) * d];
+    const z = h - 0.13;
+    const w = 0.06;
+    m.face([[x - w, y, z + t * 0.3], [x, y, z], [x + w, y, z + t * 0.3], [x, y, z + t]], { ...FLAME, twoSided: true });
+    m.face([[x, y - w, z + t * 0.3], [x, y, z], [x, y + w, z + t * 0.3], [x, y, z + t]], { ...FLAME, twoSided: true });
+  }
+  return m.build();
+}
+
+export default [candles(), bedroll(), fireDrum()];

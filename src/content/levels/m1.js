@@ -20,6 +20,9 @@ const SKY = 24;
 const p = new Painter(W, H, { wall: 'adobe' });
 const town = new Town(p, { sky: SKY });
 const at = (type, x, y, extra = {}) => ({ type, x, y, ...extra });
+// A decal on a slanting wall from a to b, `t` of the way along it, its
+// middle at height z.
+const onSlant = ([ax, ay], [bx, by], t, z, tex, scale = 1) => ({ x: ax + (bx - ax) * t, y: ay + (by - ay) * t, z, face: 'angled', tex, ...(scale !== 1 && { scale }) });
 // The plasters, plain ones the most common.
 const PLASTERS = ['adobe', 'adobe', 'adobe-pale', 'adobe-pale', 'adobe-ochre', 'adobe-rose', 'adobe-grey'];
 // The feet of the walls (lib/town.js, SKIRTS): not every house has one.
@@ -551,16 +554,24 @@ openPolygon([[160, 64], [170, 64], [170, 76], [160, 76]], QUARTER);
 // The bend: its walls y = x - 106 (north-east) and y = x - 94 (south-west).
 openPolygon([[170, 64], [189, 83], [189, 87], [181, 87], [170, 76]], QUARTER);
 openPolygon([[181, 87], [189, 87], [189, 104], [181, 104]], QUARTER);
-// The little square, its south side slanting down to the gate's forecourt.
-openPolygon([[174, 88], [183, 88], [183, 99], [174, 95]], QUARTER);
+// The little square, its south side slanting down to the gate's forecourt,
+// a step down from the street (2026-11-01: the sand drifts into it).
+openPolygon([[174, 88], [183, 88], [183, 99], [174, 95]], town.street(OQ - 0.25));
+// (The street past it stays up: the step is at its edge, x 181.)
+p.rect(181, 88, 183, 100, (_, __, c) => (c.floorZ === OQ - 0.25 ? QUARTER : c));
 p.rect(149, 86, 157, 96, town.street(OQ));
 p.rect(157, 88, 174, 92, town.street(OQ));
 town.house(148, 76, 157, 86, { h: 8, r: 1, wall: 'adobe-grey' });
 town.house(149, 96, 157, 104, { h: 7.5, wall: 'adobe-ochre' });
-// South and west of it (north and east of it below, once the wash is cut).
-town.slanted([[157, 76], [170, 76], [181, 87], [181, 88], [157, 88]], { h: OQ + 5.5, wall: 'adobe-ochre' });
+// South and west of it (north and east of it below, once the wash is cut):
+// three houses along the bend's south-west side, each its own.
+town.house(157, 76, 166, 88, { h: OQ + 5.5, wall: 'adobe-ochre' });
+town.slanted([[166, 76], [170, 76], [175, 81], [175, 88], [166, 88]], { h: OQ + 6.5, wall: 'adobe-pale', dome: true });
+town.slanted([[175, 81], [181, 87], [181, 88], [175, 88]], { h: OQ + 5, wall: 'adobe-rose', skirt: 'plinth' });
 town.house(157, 92, 174, 104, { h: OQ + 6, wall: 'adobe-pale', dome: true });
 town.slanted([[174, 95], [183, 99], [183, 104], [174, 104]], { h: OQ + 5, wall: 'adobe-grey' });
+// A room bridges the alley halfway, its underside a round-topped vault.
+town.arch(164, 88, 168, 92, { h: OQ + 6, lintel: 3.5, floorZ: OQ, wall: 'adobe-pale', round: 'E' });
 
 // 18. The dry wash, two steps below the old quarter: from the houses
 // north of it south into the derelict bay. Steps go down into it at the north
@@ -676,6 +687,61 @@ town.hangings.push(
   { type: 'cable', from: [185.5, 53.05, 6.6], to: [186.6, 59.95, 4.9], sag: 0.8 },
   { type: 'cable', from: [169.6, 53.05, 6.3], to: [174.5, 59.95, 5.4], sag: 0.9 },
   { type: 'rag', from: [150.2, 75.95, 6.6], to: [151, 75.95, 6.6], length: 1.6 },
+);
+
+// The street on from the gate square, its bends and the way to the bay:
+// doors and windows on the houses' straight faces, odds and ends in the
+// bend, and by the derelict bay's gate cargo nobody came back for. The
+// alley under its bridge to the yard, doors along it. The yard under the
+// roofs keeps the quarter's last water: three vaporators, a tank on the
+// wall and drums under it, a woman minding them. The little square, a step
+// down, is the squatters': a tarp tied to a wall over their bedrolls, a
+// fire in a drum (models/quarter.js), scrap sheets propped against the
+// wind, washing.
+town.door(166, 64, 'S', { h: OQ + 5, floorZ: OQ, tex: 'door-red' }).window(162.5, 64, 'S', { z: OQ + 2.6, tex: 'window-louvre' });
+town.door(161, 76, 'N', { h: OQ + 5.5, floorZ: OQ, tex: 'door-grey', wall: 'adobe-ochre' }).hood(161, 76, 'N', { h: OQ + 5.5, floorZ: OQ, wall: 'adobe-ochre' });
+town.window(164.5, 76, 'N', { z: OQ + 3.2, tex: 'window-louvre' }).window(168.5, 76, 'N', { z: OQ + 3.8 });
+town.door(160, 88, 'S', { h: OQ + 5.5, floorZ: OQ, wall: 'adobe-ochre' }).window(170.5, 88, 'S', { z: OQ + 3.4 });
+town.door(171, 92, 'N', { h: OQ + 6, floorZ: OQ, tex: 'door-grey', wall: 'adobe-pale' }).pipe(162.6, 92, 'N', { floorZ: OQ });
+town.door(178, 88, 'S', { h: OQ + 5, floorZ: OQ - 0.25, wall: 'adobe-rose' });
+town.door(189, 92, 'W', { h: OQ + 7.5, floorZ: OQ, tex: 'door-red' }).window(189, 97.5, 'W', { z: OQ + 3.4 }).buttress(189, 100.6, 'W', { h: OQ + 7.5, floorZ: OQ });
+town.window(183, 101.5, 'E', { z: OQ + 2.6 });
+town.fixture('wall-tank', 153.5, 86, 'S', { z: OQ + 2.4 }).window(150.5, 86, 'S', { z: OQ + 4.2 });
+town.door(153, 96, 'N', { h: 7.5, floorZ: OQ, wall: 'adobe-ochre', tex: 'door-grey' });
+town.decals.push(
+  onSlant([170, 76], [175, 81], 0.5, OQ + 3, 'brick-bare-2', 0.9), onSlant([176, 70], [184, 78], 0.3, OQ + 2.4, 'brick-bare-1'),
+  onSlant([176, 70], [184, 78], 0.78, OQ + 1.8, 'patch-plate', 0.9), onSlant([175, 81], [181, 87], 0.6, OQ + 3.4, 'brick-bare-2', 0.8),
+);
+{
+  // Scrap sheets leant on the little square's slanting south side.
+  const slant = (x, out) => {
+    const n = [4 / Math.hypot(4, 9), -9 / Math.hypot(4, 9)];
+    const y = 95 + ((x - 174) * 4) / 9;
+    return [Math.round((x + n[0] * out) * 1000) / 1000, Math.round((y + n[1] * out) * 1000) / 1000];
+  };
+  list.push(at('scrap', ...slant(177.5, 0.01), { angle: 156 }), at('scrap', ...slant(179.3, 0.01), { angle: 156 }));
+}
+list.push(
+  // The bend: odds and ends, out of the patrol's way.
+  at('junk-heap', 171.6, 74.4, { angle: 135 }), at('cargo-pod', 186.6, 84.4, { angle: 45 }), at('litter', 176.5, 77.6, { angle: 40 }),
+  at('rubble', 182.8, 79.6, { angle: 210 }), at('litter-small', 166.4, 70.9, { angle: 100 }),
+  // By the bay's gate.
+  at('crate-tan', 188.4, 101.2, { angle: 6 }), at('crate-grey-small', 188.45, 101.15, { z: OQ + 0.9, angle: 30 }), at('crate-rust-long', 188.5, 99.3, { angle: 88 }),
+  at('canister-rust', 183.6, 99.6),
+  // The yard's water.
+  at('vaporator', 151.2, 88.3), at('vaporator', 155.3, 89.2), at('vaporator', 151.5, 93.4),
+  at('barrel-grey', 154.2, 86.45), at('barrel-grey', 154.95, 86.5), at('barrel-rust', 152.5, 86.45), at('canister', 156.3, 94.6),
+  at('villager-woman', 153.6, 91.4, { angle: 180, wander: 1 }),
+  // The squatters.
+  at('bedroll', 175.0, 93.5, { angle: 90 }), at('bedroll', 176.2, 93.7, { angle: 85 }),
+  at('fire-drum', 178.7, 93.1), at('canister', 175.4, 91.2), at('crate-tan', 177.6, 91.0, { angle: 20 }), at('junk-heap', 181.6, 90.3, { angle: 300 }),
+  at('villager-woman', 176.6, 90.6, { wander: 2 }), at('villager-boy', 180.2, 92.2, { wander: 3 }), at('villager-man', 179.7, 94.3, { angle: 140, wander: 0 }),
+);
+lights.push({ x: 178.7, y: 93.1, z: 1.65, radius: 3.5, light: 40, fx: 'flicker', min: 24 });
+town.tarp(174, 92, 177, 95, { z: 2.5, face: 'E', rise: 0.5, cloth: 'teal', poles: 'front', floorZ: OQ - 0.25 });
+town.hangings.push(
+  { type: 'rag', from: [174.05, 92.4, 3.7], to: [176.5, 88.05, 3.9], length: 0.9 },
+  { type: 'cable', from: [181.6, 87.95, 4.9], to: [188.95, 90.4, 6.2], sag: 0.9 },
 );
 
 // 10. The derelict bay: an old docking bay half full of sand, a pit like
@@ -1389,8 +1455,7 @@ town.door(104, 33, 'S', { h: 7.5, tex: 'shutter', tall: 2.25, width: 2, jamb: fa
   lights.push({ x: 102.5, y: 30, z: 2.5, radius: 4, light: 32 });
 }
 // Bare brick and patches where the lane's plaster has given way (decals on
-// the slanting walls, at points along them).
-const onSlant = ([ax, ay], [bx, by], t, z, tex, scale = 1) => ({ x: ax + (bx - ax) * t, y: ay + (by - ay) * t, z, face: 'angled', tex, ...(scale !== 1 && { scale }) });
+// the slanting walls, at points along them: onSlant, at the top).
 town.decals.push(
   onSlant([98, 38], [102, 36], 0.5, 2.1, 'brick-bare-2'), onSlant([104, 40], [112, 36], 0.3, 3.6, 'brick-bare-1', 1.1),
   onSlant([104, 40], [112, 36], 0.72, 3.4, 'patch-rust', 0.9), onSlant([106, 34], [112, 31], 0.6, 2.8, 'brick-bare-2', 0.9),
