@@ -28,6 +28,15 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
+- **The remaining streets, detailed** (`?map=m1`, 2026-11-01): each its
+  own place, built from the town's pieces.
+  The back lane: the cantina's empties by its back door, its rubbish
+  across the lane with a Jawa in it, its power unit, conduit, tank and fan
+  on the back wall; washing in the rooftops' light wells (a vaporator in
+  the north one, the south one's corner cut back); a house door two steps
+  up on a paved yard at the dead end, crates of bottles stacked there.
+  To judge: whether it's too tidy or too busy for a back lane.
+
 - **The ways to the derelict bay, less straight** (`?map=m1`, 2026-11-01):
   the old quarter's street now runs east out of the gate square to a house
   front, bends south-east, then turns south to the bay's gate; a little
@@ -704,10 +713,23 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
           the mouth.
     - [ ] Ask Mark about a second way in (through I's shop).
     - [ ] Waiting on Mark.
-  - [ ] The back alleys and the back lane.
-  - [ ] The checkpoint and the rooftops.
+  - [ ] The remaining streets in detail (Mark, 2026-11-01: every house
+        Mos Eisley's, none of them copies, each area its own content). A
+        commit each, in the order you walk them:
+    - [x] The back lane: the cantina's empties and rubbish, its machinery
+          on the back wall, a raised yard at the dead end, washing in the
+          light well; the rooftops' faces on the lane.
+    - [ ] The alleys' west half: the gate, the yard behind J (the
+          garage's back), the first slanting lane.
+    - [ ] The alleys' east half: the hostel's yard, the second lane, the
+          thug's square, the mouth and the informant's den; the gun shop's
+          back room (Secrets, 4).
+    - [ ] The old quarter: the gate square and the north street.
+    - [ ] The old quarter: the street's bends, the little square, the yard
+          and its alley (ruins, the shrine, squatters).
+    - [ ] The dry wash: the culvert (Secrets, 5), what the floods left at
+          the bends, the flood line.
   - [ ] The comm tower.
-  - [ ] The old quarter and the dry wash.
   - [ ] The derelict bay and the gutted freighter.
     - [x] Its stairs (Mark, 2026-11-01: the flight ran 12 tiles straight
           out to the middle of the pit): a kit piece, `town.wallStair`, a

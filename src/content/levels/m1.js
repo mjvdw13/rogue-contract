@@ -443,11 +443,57 @@ town.house(141, 73, 148, 86, { h: 9.5, r: 1, wall: 'adobe-pale' });
 p.rect(126, 92, 130, 118, town.street());
 p.rect(130, 86, 149, 118, town.street());
 town.house(118, 92, 126, 120, { h: 8 });
-town.house(130, 102, 138, 118, { h: 4.75 });
+town.slanted([[132, 102], [138, 102], [138, 118], [130, 118], [130, 104]], { h: 4.75 });
 town.house(138, 102, 149, 118, { h: 5.75, wall: 'adobe-ochre' });
 town.house(130, 86, 140, 99, { h: 4.75, wall: 'adobe-pale' });
 town.house(143, 86, 149, 102, { h: 5.25, wall: 'adobe-rose' });
 town.block(126, 118, 150, 122, { h: 8 }).block(149, 96, 162, 118, { h: 8 });
+
+// 19. The back lane: the cantina's service lane, in the shade of its back
+// wall. Its empties wait by the back door for the brewer, its rubbish is
+// piled across from them (a Jawa picking through it), and its machinery
+// hangs on the wall: a power unit and its conduit, a water tank, the fan
+// that draws the smoke out of the room. The rooftops' houses back onto the
+// lane's east side, their washing strung across the light well between them
+// (the corner at its mouth cut back, so it opens off the lane). The lane
+// ends at a house whose door stands two steps up, on a little paved yard.
+town.platform(126, 112, 130, 118, { h: 0.5, steps: 'N' });
+town.door(128, 118, 'N', { h: 8, tex: 'door-grey', floorZ: 0.5 });
+town.window(130, 92.5, 'W', { z: 2.6, tex: 'window-louvre' }).window(130, 108.5, 'W', { z: 2.4 }).window(140, 94.5, 'E', { z: 2.6 });
+town.pipe(126, 89.5, 'E').pipe(130, 97.6, 'W').pipe(130, 115.5, 'W', { floorZ: 0.5 });
+town.fixture('conduit-6', 126, 95.5, 'E', { z: 2.2 }).fixture('wall-tank', 126, 99.6, 'E', { z: 3.2 });
+town.vent(126, 96.2, 'E', { z: 5.6, tex: 'wall-fan' }).vent(126, 110.2, 'E', { z: 4.4, tex: 'vent-grille' }).vent(126, 94.3, 'E', { z: 1.5, tex: 'wall-meter' });
+// (The lane and the wells are backs: twice as weathered as the street.)
+town.grimeBoxes.push([118, 86, 149, 122, 2]);
+list.push(
+  // The cantina's power, against its wall under the conduit.
+  at('power-unit', 126.01, 92.4, { angle: 90 }),
+  // Empties by the back door: kegs (drums), a canister or two, stacked crates.
+  at('barrel-rust', 126.45, 100.9), at('barrel-grey', 126.5, 101.65), at('barrel-rust', 127.2, 101.25),
+  at('barrel-rust', 126.45, 102.4), at('canister', 126.4, 103.2), at('canister-rust', 126.85, 103.35, { angle: 40 }),
+  at('floor-spill-1', 127.3, 104.2, { angle: 30 }), at('floor-spill-2', 127.6, 107.4, { angle: 200 }),
+  // The rubbish across the lane: a heap, a broken crate, scrap and litter,
+  // grease soaked into the sand, and a Jawa going through it.
+  at('junk-heap', 129.2, 108.6, { angle: 95 }), at('crate-rust-long', 129.5, 106.7, { angle: 78 }), at('scrap', 129.99, 110.4, { angle: 270 }),
+  at('litter', 128.5, 109.8, { angle: 160 }), at('litter-small', 128.9, 105.9, { angle: 20 }), at('oil-small', 128.6, 107.9, { angle: 60 }),
+  at('droid-dome', 128.7, 110.5, { angle: 300 }),
+  at('jawa', 128.35, 108.2, { angle: 345, calm: { wander: 0 } }),
+  // On the yard at the end: crates of bottles stacked against the cantina.
+  at('crate-tan', 126.55, 113.6, { angle: 4 }), at('crate-grey-small', 126.5, 113.55, { z: 1.4, angle: 350 }),
+  at('crate-rust-long', 126.5, 115.6, { angle: 92 }), at('crate-grey-small', 129.45, 116.9, { angle: 15 }),
+  // The light well: a vaporator for the houses either side, a tank on the wall.
+  at('vaporator', 141.7, 88.2), at('canister-rust', 142.4, 89.1),
+);
+town.fixture('wall-tank', 143, 96.6, 'W', { z: 2.2 });
+town.hangings.push(
+  // A cable over the lane from the cantina's roof to the house opposite,
+  // and a rope down its back wall.
+  { type: 'cable', from: [126.05, 97.5, 7.3], to: [129.95, 95.5, 4.4], sag: 0.6 },
+  { type: 'rope', from: [126.05, 111.6, 7.6], length: 2.2 },
+  // Washing across the light well: a sheet and a rag.
+  { type: 'cloth-pale', from: [134.5, 99.05, 3.5], to: [134.9, 101.95, 3.5], length: 1.3, pin: 'corners' },
+  { type: 'rag', from: [140.05, 91.2, 3.6], to: [142.95, 91.5, 3.6], length: 0.9 },
+);
 
 // Open ground in a convex polygon ([x, y] tile corners): every tile it
 // touches, so the houses can cut their slanting walls into the ones on
