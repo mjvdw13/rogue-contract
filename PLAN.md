@@ -75,6 +75,13 @@ These need Mark to try something, or to decide. Don't start them without him.
   a tarp over bedrolls, a fire in a drum (embers, a thin smoke, a
   flickering light), scrap sheets against the wind, washing. To judge: the
   step, and the fire (its particle flames were too big and came out).
+  The dry wash: at its north end a culvert under a domed house, a
+  round-topped drain with a rusty grate (the bay's railing) over half its
+  mouth; at its back a crawl into a dark cistern, the fifth secret (a med
+  kit and energy). A flood line along the foot of every wall, downpipes
+  draining into it, and rocks, scrap, half-sunk drums and junk left at the
+  bends. To judge: whether the flood line reads as one (it's close to the
+  walls' dirt skirts), and the grate (the railing stretched to 3 tall).
 
 - **The ways to the derelict bay, less straight** (`?map=m1`, 2026-11-01):
   the old quarter's street now runs east out of the gate square to a house
@@ -766,7 +773,7 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
     - [x] The old quarter: the gate square and the north street.
     - [x] The old quarter: the street's bends, the little square, the yard
           and its alley (ruins, the shrine, squatters).
-    - [ ] The dry wash: the culvert (Secrets, 5), what the floods left at
+    - [x] The dry wash: the culvert (Secrets, 5), what the floods left at
           the bends, the flood line.
   - [ ] The comm tower.
   - [ ] The derelict bay and the gutted freighter.

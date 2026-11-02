@@ -744,6 +744,62 @@ town.hangings.push(
   { type: 'cable', from: [181.6, 87.95, 4.9], to: [188.95, 90.4, 6.2], sag: 0.9 },
 );
 
+// 18. The dry wash in detail (2026-11-01): a flood channel, dry now. At its
+// north end the floods come out of a culvert under a house, a round-topped
+// drain with its bars torn out on one side; at its back a low crawl goes on
+// into an old cistern, dark, where someone hid a med kit and energy (the
+// secret, docs/mission1.md, Secrets 5). The last flood's line is a dirty
+// band along the foot of every wall, the houses' downpipes run down into
+// it, and what the water brought is left at the bends: rocks, scrap, drums
+// half sunk in the sand, junk.
+town.house(192, 42, 204, 53, { h: 8.5, wall: 'adobe-grey', skirt: null, dome: true });
+town.arch(196, 49, 200, 53, { h: 8.5, lintel: 3.4, floorZ: WASH, wall: 'adobe-grey', floor: 'desert-sand', light: 88, round: 'S' });
+p.fence(198, 53, 200, 54, 'N', { tex: 'rail-rust', height: 3 });
+town.arch(197, 47, 199, 49, { h: 8.5, lintel: 1.2, floorZ: WASH, wall: 'adobe-grey', floor: 'desert-sand', light: 56 });
+town.room(195, 43, 201, 47, { h: 8.5, floorZ: WASH, ceilZ: 2.4, floor: 'desert-sand', ceiling: 'adobe-roof', wall: 'adobe-grey', light: 56 });
+p.rect(195, 43, 201, 49, (_, __, c) => (c.slab ? { ...c, secret: true } : c));
+// (The culvert's and the cistern's walls in their own dark: no lower,
+// or the dome's shadow on the roof over them takes it under nothing.)
+p.light(194, 42, 202, 52, 88);
+town.pipe(202, 57.5, 'W', { floorZ: WASH }).pipe(197, 69.6, 'W', { floorZ: WASH }).pipe(196, 87.5, 'E', { floorZ: WASH }).pipe(204, 85.5, 'W', { floorZ: WASH });
+{
+  // The flood line: dirt from the floor up to a tide mark about 1.3 up, the
+  // same height along every wall, on its straight runs ([face, line, from,
+  // to]) and its slants.
+  // (grime-dust-2 is 4 wide and 1.25 tall: spaced evenly along each run,
+  // overlapping, its middles 2 in from the ends.)
+  const along = (len) => {
+    const n = Math.max(1, Math.ceil((len - 4) / 2.6) + 1);
+    return Array.from({ length: n }, (_, k) => (n === 1 ? len / 2 : 2 + ((len - 4) * k) / (n - 1)));
+  };
+  let flip = false;
+  for (const [face, line, a0, a1] of [['W', 202, 53, 60], ['E', 189, 65, 73], ['W', 197, 65, 73], ['E', 196, 80, 96], ['W', 204, 80, 96]]) {
+    for (const d of along(a1 - a0)) {
+      const a = Math.round((a0 + d) * 100) / 100;
+      town.decals.push({ ...(face === 'N' || face === 'S' ? { x: a, y: line } : { x: line, y: a }), z: WASH + 0.68, face, tex: 'grime-dust-2', ...((flip = !flip) && { flip }) });
+    }
+  }
+  for (const [a, b] of [[[194, 60], [189, 65]], [[202, 60], [197, 65]], [[189, 73], [196, 80]], [[197, 73], [204, 80]], [[196, 96], [194, 104]], [[204, 96], [198, 104]]]) {
+    const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+    for (const d of along(len)) town.decals.push({ ...onSlant(a, b, Math.round((d / len) * 1000) / 1000, WASH + 0.68, 'grime-dust-2'), ...((flip = !flip) && { flip }) });
+  }
+}
+list.push(
+  // The cistern: what someone hid there.
+  at('med-kit', 197.4, 44.6), at('energy-pack', 199.6, 45.3), at('canister-rust', 195.6, 43.6), at('litter-small', 198.6, 46.2, { angle: 40 }),
+  // The culvert's mouth: the bars torn out, junk washed against the rest.
+  at('scrap', 196.4, 53.6, { angle: 200 }), at('litter', 199.2, 54.2, { angle: 120 }), at('rubble', 195.3, 54.1, { angle: 60 }),
+  // At the bends.
+  at('boulder-small', 200.6, 61.4, { angle: 30 }), at('junk-heap', 199.2, 62.6, { angle: 210 }), at('barrel-rust', 201.1, 60.6, { z: -0.35 }),
+  at('boulder-large', 190.8, 67.2, { angle: 75 }), at('canister-rust', 192.4, 66.1, { z: -0.25 }), at('litter', 193.4, 68.6, { angle: 300 }),
+  at('crate-rust-long', 196.3, 75.1, { angle: 40 }), at('scrap', 199.2, 76.9, { angle: 225 }), at('barrel-grey', 201.4, 78.6, { z: -0.4 }),
+  at('boulder-small', 197.4, 81.6, { angle: 140 }), at('rubble', 198.6, 82.4, { angle: 20 }), at('litter-small', 200.4, 86.9, { angle: 160 }),
+  at('junk-heap', 202.6, 94.1, { angle: 20 }), at('barrel-rust', 203.2, 92.6, { z: -0.3 }), at('boulder-small', 197.2, 98.2, { angle: 250 }),
+  at('litter', 199.6, 90.4, { angle: 70 }),
+);
+// Its walls weather like the old quarter's above it.
+town.grimeBoxes.push([186, 40, 208, 106, 1.6]);
+
 // 10. The derelict bay: an old docking bay half full of sand, a pit like
 // Bay 87. Its gate is at the main street's end: a
 // passage through its building onto a landing at the old quarter's height,
