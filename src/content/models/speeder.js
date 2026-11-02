@@ -116,11 +116,12 @@ for (const s of [-1, 1]) {
 }
 
 /**
- * An engine `len` long, its intake at x (facing forward) and its centre at
- * (y, z): a rose cowl round the intake, the grey body with a rose band, and
- * a tapered exhaust.
+ * An engine `len` long into the builder `m`, its intake at x (facing
+ * forward) and its centre at (y, z): a rose cowl round the intake, the grey
+ * body with a rose band, and a tapered exhaust. (Exported for the one pulled
+ * out of a speeder in the garage's yard, models/garage.js.)
  */
-function engine(x, y, z, len = 0.99) {
+export function engine(m, x, y, z, len = 0.99) {
   const r = 0.18;
   const R = r + 0.02;
   const ring = (k) => Array.from({ length: 8 }, (_, i) => {
@@ -136,13 +137,13 @@ function engine(x, y, z, len = 0.99) {
   m.loft(ring(1), x - len + 0.14, ring(0.66), x - len, { axis: 'x', ...METAL, bottom: false, top: DARK });
 }
 for (const s of [-1, 1]) {
-  engine(-0.2, s * 1.07, 0.72);
+  engine(m, -0.2, s * 1.07, 0.72);
   // Its pylon: swept back from the hull's flank to the engine, rose along its leading edge.
   m.loft([[-0.23, 0.62], [-1.15, 0.62], [-1.15, 0.84], [-0.23, 0.84]], s * 0.6, [[-0.55, 0.66], [-1.05, 0.66], [-1.05, 0.79], [-0.55, 0.79]], s * 0.93, {
     axis: 'y', side: (i) => [PAINT, METAL, PAINT, RED][i], top: false, bottom: false,
   });
 }
-engine(-1.1, 0, 1.24);
+engine(m, -1.1, 0, 1.24);
 // The centre engine's fin, raked back from the rear deck.
 m.loft([[-0.84, -0.07], [-1.24, -0.07], [-1.24, 0.07], [-0.84, 0.07]], ZT - 0.02, [[-1.22, -0.05], [-1.68, -0.05], [-1.68, 0.05], [-1.22, 0.05]], 1.1, {
   side: (i) => [PAINT, METAL, PAINT, RED][i], top: false, bottom: false,

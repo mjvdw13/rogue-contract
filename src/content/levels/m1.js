@@ -1215,9 +1215,96 @@ p.rect(86, 36, 98, 49, town.street());
 // gate is.
 town.door(87, 56, 'S', { h: 4.5, tex: 'door-planks', jamb: false, sign: false, panel: false, step: false });
 gateTag(86, 55, 88, 56, 'alley-gate');
+town.pipe(88, 51.5, 'W');
+// The yard behind J is the garage's back yard: J's back shutter opens onto
+// it, and the mechanic works out here in the light, an engine pulled out of
+// a speeder laid on trestles over deck plates (models/garage.js), a power
+// unit's hose run out to it, a power droid helping, fuel drums against the
+// junk yard's wall, oil in the sand. A house on its north side, its door
+// under a hood.
+town.door(94.5, 49, 'N', { h: 10, tex: 'shutter', tall: 2.25, width: 3, jamb: false, sign: false, panel: false, wall: 'adobe-grey' });
+town.window(91.5, 49, 'N', { z: 6.6 });
+town.house(88, 29, 98, 36, { h: 6, wall: 'adobe-pale', tiers: [{ box: [89, 29, 97, 34], h: 8.5 }], dome: true });
+town.door(91, 36, 'S', { h: 6, wall: 'adobe-pale' }).hood(91, 36, 'S', { h: 6, wall: 'adobe-pale' });
+town.window(95.5, 36, 'S', { z: 3.3, tex: 'window-louvre' }).window(94.5, 34, 'S', { z: 7.1 });
+town.window(98, 45.5, 'W', { z: 2.4 }).window(86, 43.5, 'E', { z: 3.8 });
+town.pipe(97.4, 36, 'S').pipe(86, 47.2, 'E');
+list.push(
+  at('deck-plate', 92.6, 44.7, { angle: 4 }), at('deck-plate-rust', 94.6, 45.1, { angle: 350 }),
+  at('speeder-engine', 93.5, 44.9, { angle: 12 }),
+  at('power-unit', 97.4, 48.99, { angle: 180 }), at('barrel-grey', 96.2, 48.4),
+  at('crate-grey-small', 91.1, 45.9, { angle: 20 }), at('crate-grey-small', 91.15, 45.9, { z: 0.6, angle: 55 }), at('canister', 95.8, 43.1),
+  at('power-droid', 95.2, 46.6, { angle: 165 }),
+  at('barrel-rust', 86.45, 41.9), at('barrel-grey', 86.5, 42.65), at('barrel-rust', 87.15, 42.25), at('canister-rust', 86.4, 44.6, { angle: 30 }),
+  at('scrap', 89.6, 48.99, { angle: 180 }), at('cargo-pod', 88.9, 38.2, { angle: 95 }),
+  at('oil', 93.9, 46.9, { angle: 70 }), at('oil-small', 90.2, 47.6, { angle: 10 }), at('oil-small', 96.4, 41.8, { angle: 140 }),
+  at('litter-small', 89.6, 40.1, { angle: 210 }),
+  // The mechanic, at the engine.
+  at('villager-man', 92.6, 43.3, { angle: 290, wander: 0 }),
+);
+town.hangings.push(
+  // The hose from the power unit, slack along the ground to the engine.
+  { type: 'cable', from: [97.4, 48.8, 1.2], to: [94.2, 45.1, 0.9], sag: 0.9 },
+  // A cable over the yard, J's back to the house opposite.
+  { type: 'cable', from: [96.5, 48.95, 8.4], to: [92.6, 36.05, 5.4], sag: 1.1 },
+);
+// The first lane slants up north-east between houses that each take their
+// own plaster and height (Mark, 2026-11-01: no copies), so no wall runs
+// the lane's length. On its north side the gun shop stands back from the
+// slant in a notch, its shutter down for good; its back room is a secret
+// (docs/mission1.md, Secrets 4), through a door in the plaster of the
+// notch's side wall, half behind a crate: ammo and a thermal detonator left
+// on a rack. Washing hangs across the lane.
 lane(98, 29, 112, 45, -0.5, 38, 43, 0);
-town.slanted([[98, 26], [112, 26], [112, 31], [98, 38]], { h: 6, wall: 'adobe-grey' });
-town.slanted([[98, 43], [112, 36], [112, 47], [98, 47]], { h: 5, wall: 'adobe-ochre' });
+p.rect(102, 33, 106, 36, town.street());
+town.slanted([[98, 26], [102, 26], [102, 36], [98, 38]], { h: 6, wall: 'adobe-grey' });
+town.house(102, 26, 106, 33, { h: 7.5, wall: 'adobe-pale', skirt: null });
+town.slanted([[106, 26], [112, 26], [112, 31], [106, 34]], { h: 5.5, wall: 'adobe-rose', dome: true });
+town.slanted([[98, 43], [104, 40], [104, 47], [98, 47]], { h: 4.5, wall: 'adobe-rose', skirt: 'plinth' });
+town.slanted([[104, 40], [112, 36], [112, 47], [104, 47]], { h: 6.5, wall: 'adobe-ochre', dome: true });
+town.door(104, 33, 'S', { h: 7.5, tex: 'shutter', tall: 2.25, width: 2, jamb: false, panel: false, wall: 'adobe-pale' });
+{
+  const GUNS = { h: 6, wall: 'adobe-grey', light: 88, ceilZ: 3.75 };
+  town.room(99, 28, 101, 36, GUNS).room(101, 29, 102, 32, GUNS).room(102, 27, 105, 32, { ...GUNS, h: 7.5, wall: 'adobe-pale' });
+  town.arch(101, 33, 102, 35, { h: 6, lintel: 3, wall: 'adobe-grey' });
+  p.rect(101, 33, 102, 35, (_, __, c) => ({ ...c, door: 'adobe-grey', style: 'rise', secret: true }));
+  p.rect(99, 28, 105, 36, (_, __, c) => (c.slab && !c.door ? { ...c, secret: true } : c));
+  // (Its walls in its own dim light, not the sun's, where they've no face outside.)
+  p.light(98, 26, 106, 32, GUNS.light).light(98, 32, 101, 36, GUNS.light).light(101, 32, 102, 33, GUNS.light);
+  list.push(
+    at('rack-b', 103.5, 27.05, { angle: 0 }), at('crate-tan', 99.6, 28.6, { angle: 10 }), at('crate-grey-small', 99.6, 28.6, { z: 0.9, angle: 40 }),
+    at('barrel-rust', 99.5, 34.5), at('canister-rust', 99.45, 33.6),
+    at('thermal-detonator', 103.5, 29.6), at('power-cell', 102.6, 30.8), at('power-cell', 99.8, 31),
+    at('cantina-lamp', 102.5, 29.5, { z: GUNS.ceilZ - LAMP_CORD }),
+    // Outside, a crate stood half across the door, and the shop's sign's drums.
+    at('crate-tan', 102.62, 34.8, { angle: 8 }), at('canister', 105.3, 33.6), at('barrel-grey', 105.45, 34.5),
+  );
+  lights.push({ x: 102.5, y: 30, z: 2.5, radius: 4, light: 32 });
+}
+// Bare brick and patches where the lane's plaster has given way (decals on
+// the slanting walls, at points along them).
+const onSlant = ([ax, ay], [bx, by], t, z, tex, scale = 1) => ({ x: ax + (bx - ax) * t, y: ay + (by - ay) * t, z, face: 'angled', tex, ...(scale !== 1 && { scale }) });
+town.decals.push(
+  onSlant([98, 38], [102, 36], 0.5, 2.1, 'brick-bare-2'), onSlant([104, 40], [112, 36], 0.3, 3.6, 'brick-bare-1', 1.1),
+  onSlant([104, 40], [112, 36], 0.72, 3.4, 'patch-rust', 0.9), onSlant([106, 34], [112, 31], 0.6, 2.8, 'brick-bare-2', 0.9),
+  onSlant([98, 43], [104, 40], 0.4, 3.1, 'patch-plate', 0.9),
+);
+// Washing across the lane: a tie point on each wall, square across from
+// the north wall's at `x`, 0.05 out from both.
+const acrossLane = (x, z0, z1) => {
+  const [nx, ny] = [1 / Math.sqrt(5), 2 / Math.sqrt(5)];
+  const y = 38 - 0.5 * (x - 98);
+  const d = 5 / Math.sqrt(1.25) - 0.1;
+  const r = (v) => Math.round(v * 100) / 100;
+  return { from: [r(x + 0.05 * nx), r(y + 0.05 * ny), z0], to: [r(x + (0.05 + d) * nx), r(y + (0.05 + d) * ny), z1] };
+};
+town.hangings.push(
+  { type: 'cloth-pale', ...acrossLane(99.6, 3.7, 3.5), length: 1.1, pin: 'corners' },
+  { type: 'rag', ...acrossLane(106.9, 4, 3.8), length: 1 },
+  { type: 'cable', ...acrossLane(103.3, 5.6, 4.1), sag: 0.5 },
+  { type: 'rope', ...acrossLane(109.2, 4.6, 4.2), sag: 0.4 },
+);
+list.push(at('villager-woman', 107.4, 38.2, { wander: 2 }));
 p.rect(112, 22, 126, 36, town.street(0.25, { side: 'adobe-brick' }));
 town.house(112, 12, 126, 22, { h: 8, r: 1, wall: 'adobe-rose' });
 town.room(113, 13, 125, 21, { h: 8, floorZ: 0.25, ceilZ: 5, wall: 'adobe-rose', light: 120 });

@@ -34,5 +34,6 @@ import freighter from './freighter.js';
 import scaffolds from './scaffold.js';
 import balcony from './balcony.js';
 import hold from './hold.js';
+import garage from './garage.js';
 
-export default [terminal, reactorRing, coolantTank, shuttle, ...barricades, boulderLarge, boulderSmall, ...floodlightTowers, sensorMast, sensorDish, ...domes, doorJamb, ...doorLips, ...arches, ...buttresses, ...awnings, ...tin, ...pipes, ...clutter, landspeeder, ...bay, moldyCrow, ...market, ...cantina, ...hitching, ...pod, ...stains, ...sandcrawler, ...junkPiles, ...furnace, ...skiff, ...droids, ...racks, ...freighter, ...scaffolds, ...balcony, ...hold];
+export default [terminal, reactorRing, coolantTank, shuttle, ...barricades, boulderLarge, boulderSmall, ...floodlightTowers, sensorMast, sensorDish, ...domes, doorJamb, ...doorLips, ...arches, ...buttresses, ...awnings, ...tin, ...pipes, ...clutter, landspeeder, ...bay, moldyCrow, ...market, ...cantina, ...hitching, ...pod, ...stains, ...sandcrawler, ...junkPiles, ...furnace, ...skiff, ...droids, ...racks, ...freighter, ...scaffolds, ...balcony, ...hold, ...garage];

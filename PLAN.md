@@ -36,6 +36,16 @@ These need Mark to try something, or to decide. Don't start them without him.
   the north one, the south one's corner cut back); a house door two steps
   up on a paved yard at the dead end, crates of bottles stacked there.
   To judge: whether it's too tidy or too busy for a back lane.
+  The alleys' west half: the yard behind J is the garage's back yard (J's
+  back shutter, a speeder's engine pulled and laid on trestles, a new model
+  reusing the speeder's, with a hose to a power unit, a power droid, the
+  mechanic, fuel drums and oil); a house with a hooded door on its north
+  side. The first lane's two long walls are now five houses of different
+  plaster and height, with bare brick, patches and washing. The gun shop
+  stands back from it in a notch, shutter down; its back room is the
+  fourth secret (a door in the notch's west wall, half behind a crate: a
+  rack, a thermal detonator, power cells). To judge: the engine, and
+  whether the secret door is too easy or too hard to find.
 
 - **The ways to the derelict bay, less straight** (`?map=m1`, 2026-11-01):
   the old quarter's street now runs east out of the gate square to a house
@@ -719,11 +729,11 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
     - [x] The back lane: the cantina's empties and rubbish, its machinery
           on the back wall, a raised yard at the dead end, washing in the
           light well; the rooftops' faces on the lane.
-    - [ ] The alleys' west half: the gate, the yard behind J (the
-          garage's back), the first slanting lane.
+    - [x] The alleys' west half: the gate, the yard behind J (the
+          garage's back), the first slanting lane; the gun shop's back
+          room (Secrets, 4).
     - [ ] The alleys' east half: the hostel's yard, the second lane, the
-          thug's square, the mouth and the informant's den; the gun shop's
-          back room (Secrets, 4).
+          thug's square, the mouth and the informant's den.
     - [ ] The old quarter: the gate square and the north street.
     - [ ] The old quarter: the street's bends, the little square, the yard
           and its alley (ruins, the shrine, squatters).
