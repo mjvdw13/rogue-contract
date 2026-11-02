@@ -82,6 +82,13 @@ These need Mark to try something, or to decide. Don't start them without him.
   draining into it, and rocks, scrap, half-sunk drums and junk left at the
   bends. To judge: whether the flood line reads as one (it's close to the
   walls' dirt skirts), and the grate (the railing stretched to 3 tall).
+  New models: `speeder-engine` (models/garage.js, the landspeeder's own
+  engine), `bunk`, `bunk-b` (models/hostel.js), `dome-broken-7-grey`
+  (models/dome.js), `candles`, `bedroll`, `fire-drum` (models/quarter.js).
+  Cost: 1.1 to 2.4 ms a frame more over eight views of the new streets
+  (headless, both builds timed in one process, best of six blocks); one
+  view, into the ruin, 5.3, mostly because it now sees past the breach
+  instead of a blank wall a tile away.
 
 - **The ways to the derelict bay, less straight** (`?map=m1`, 2026-11-01):
   the old quarter's street now runs east out of the gate square to a house
@@ -775,6 +782,7 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
           and its alley (ruins, the shrine, squatters).
     - [x] The dry wash: the culvert (Secrets, 5), what the floods left at
           the bends, the flood line.
+    - [ ] Waiting on Mark.
   - [ ] The comm tower.
   - [ ] The derelict bay and the gutted freighter.
     - [x] Its stairs (Mark, 2026-11-01: the flight ran 12 tiles straight
