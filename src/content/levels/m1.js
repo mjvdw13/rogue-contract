@@ -612,11 +612,18 @@ town.slanted([[176, 61], [184, 61], [184, 78], [176, 70]], { h: OQ + 6.5, wall: 
 town.slanted([[184, 60], [194, 60], [189, 65], [184, 65]], { h: OQ + 5 });
 town.house(184, 65, 189, 73, { h: OQ + 6, wall: 'adobe-ochre' });
 town.slanted([[184, 73], [189, 73], [196, 80], [196, 83], [189, 83], [184, 78]], { h: OQ + 5.5, wall: 'adobe-rose' });
-town.house(189, 83, 196, 93, { h: OQ + 7.5, dome: true });
+// (The domed house's back stands a tile back from the wash's bank.)
+p.rect(195, 83, 196, 93, WASH_CELL);
+town.house(189, 83, 195, 93, { h: OQ + 7.5, dome: true });
 town.slanted([[192, 93], [196, 93], [196, 96], [194, 104], [190, 104], [190, 95]], { h: OQ + 6.5, wall: 'adobe-ochre', skirt: 'plinth' });
 // Its east bank: houses whose backs slant with it.
 town.slanted([[202, 60], [207, 60], [207, 65], [197, 65]], { h: 7, wall: 'adobe-pale' });
 town.slanted([[197, 73], [207, 73], [207, 80], [204, 80]], { h: 6.5, wall: 'adobe-grey' });
+// Along its long straight stretch two houses, not the town's blocks in one
+// line: a rose one, a slot, and a pale one a tile further back.
+p.rect(204, 87, 206, 88, WASH_CELL).rect(204, 88, 205, 96, WASH_CELL);
+town.house(204, 80, 207, 87, { h: 7, wall: 'adobe-rose', skirt: 'plinth' }).block(206, 87, 207, 88, { h: 7, wall: 'adobe-rose', skirt: 'plinth' });
+town.house(205, 88, 207, 96, { h: 5.5, wall: 'adobe-pale' });
 town.slanted([[204, 96], [207, 96], [207, 104], [198, 104]], { h: 8, wall: 'adobe-ochre' });
 town.stair(188, 53, 194, 60, { up: 'W', from: WASH, top: OQ, rise: 0.25, floor: 'flagstone', side: 'adobe-brick' });
 // Where the loud half's reinforcements come in: the north street's east
@@ -783,7 +790,7 @@ p.rect(195, 43, 201, 49, (_, __, c) => (c.slab ? { ...c, secret: true } : c));
 // (The culvert's and the cistern's walls in their own dark: no lower,
 // or the dome's shadow on the roof over them takes it under nothing.)
 p.light(194, 42, 202, 52, 88);
-town.pipe(202, 57.5, 'W', { floorZ: WASH }).pipe(197, 69.6, 'W', { floorZ: WASH }).pipe(196, 87.5, 'E', { floorZ: WASH }).pipe(204, 85.5, 'W', { floorZ: WASH });
+town.pipe(202, 57.5, 'W', { floorZ: WASH }).pipe(197, 69.6, 'W', { floorZ: WASH }).pipe(195, 87.5, 'E', { floorZ: WASH }).pipe(204, 85.5, 'W', { floorZ: WASH });
 {
   // The flood line: dirt from the floor up to a tide mark about 1.3 up, the
   // same height along every wall, on its straight runs ([face, line, from,
@@ -795,7 +802,7 @@ town.pipe(202, 57.5, 'W', { floorZ: WASH }).pipe(197, 69.6, 'W', { floorZ: WASH 
     return Array.from({ length: n }, (_, k) => (n === 1 ? len / 2 : 2 + ((len - 4) * k) / (n - 1)));
   };
   let flip = false;
-  for (const [face, line, a0, a1] of [['W', 202, 53, 60], ['E', 189, 65, 73], ['W', 197, 65, 73], ['E', 196, 80, 96], ['W', 204, 80, 96]]) {
+  for (const [face, line, a0, a1] of [['W', 202, 53, 60], ['E', 189, 65, 73], ['W', 197, 65, 73], ['E', 196, 80, 83], ['E', 195, 83, 93], ['E', 196, 93, 96], ['W', 204, 80, 87], ['W', 205, 88, 96]]) {
     for (const d of along(a1 - a0)) {
       const a = Math.round((a0 + d) * 100) / 100;
       town.decals.push({ ...(face === 'N' || face === 'S' ? { x: a, y: line } : { x: line, y: a }), z: WASH + 0.68, face, tex: 'grime-dust-2', ...((flip = !flip) && { flip }) });
@@ -816,7 +823,7 @@ list.push(
   at('boulder-large', 190.8, 67.2, { angle: 75 }), at('canister-rust', 192.4, 66.1, { z: -0.25 }), at('litter', 193.4, 68.6, { angle: 300 }),
   at('crate-rust-long', 196.3, 75.1, { angle: 40 }), at('scrap', 199.2, 76.9, { angle: 225 }), at('barrel-grey', 201.4, 78.6, { z: -0.4 }),
   at('boulder-small', 197.4, 81.6, { angle: 140 }), at('rubble', 198.6, 82.4, { angle: 20 }), at('litter-small', 200.4, 86.9, { angle: 160 }),
-  at('junk-heap', 202.6, 94.1, { angle: 20 }), at('barrel-rust', 203.2, 92.6, { z: -0.3 }), at('boulder-small', 197.2, 98.2, { angle: 250 }),
+  at('junk-heap', 203.4, 94.1, { angle: 20 }), at('barrel-rust', 204.1, 92.6, { z: -0.3 }), at('boulder-small', 197.2, 98.2, { angle: 250 }),
   at('litter', 199.6, 90.4, { angle: 70 }),
 );
 // Its walls weather like the old quarter's above it.

@@ -797,7 +797,7 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
             square.
       - [x] The old quarter: the north street, the bends, the way to the
             bay's gate.
-      - [ ] The dry wash: its banks.
+      - [x] The dry wash: its banks.
       - [ ] The back lane: the rooftops' faces.
     - [ ] Waiting on Mark.
   - [ ] The comm tower.
