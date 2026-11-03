@@ -86,6 +86,16 @@ These need Mark to try something, or to decide. Don't start them without him.
   judge: whether it's enough (the slots show best close up; from along a
   street the steps do the work), and whether some slots should be wide
   enough to step into.
+  Then (2026-11-03, Mark: still too short, still on rails), the old
+  quarter's north street as a trial of real gaps: an alley 1.5 m wide and
+  9 tiles deep between the buttressed house and the turned one (washing
+  across it, a water drum at the end), one 1 m wide past the turned one
+  ending at the comm tower's foot, the grey house pushed 1 m out into the
+  street so its side shows, the first house on the south side on its own
+  with rounded corners and a passage 1.5 m wide past it through to the
+  main street, and the pale domed house 1.5 m back behind a paved yard a
+  step up (its vaporator there). To judge: whether this is the right
+  medicine before it goes on to the other streets.
 - **The remaining streets, detailed** (`?map=m1`, 2026-11-01): each its
   own place, built from the town's pieces.
   The back lane: the cantina's empties by its back door, its rubbish
@@ -596,6 +606,18 @@ The story's Map A. The design (areas, light, the town kit, art and sound
 lists) is `docs/mission1.md`. It pulls in the story pieces it needs from
 section 5 as it goes (calm troopers, the town's switch, conversations, the
 fob). Each step is a commit with snapshots, playable at `?map=m1`.
+
+- [ ] **Buildings apart, take two** (Mark, 2026-11-03: the half-metre
+      slots read as short cracks; the houses still don't feel
+      free-standing, the streets on rails). Real alleys 1 to 1.5 m wide
+      running 4 to 9 tiles back (dead ends, or through where a street is
+      close behind), and houses pushed out into the street or set back
+      behind a yard, so their ends show from along it. One street, then a
+      check-in with Mark before the rest.
+  - [x] The old quarter's north street.
+  - [ ] The old quarter's main street, bend and way to the bay's gate.
+  - [ ] The back alleys' two lanes and the thug's square.
+  - [ ] The dry wash and the back lane.
 
 - [x] Design: `docs/mission1.md`.
 - [x] **Daylight and the kit:** `sky-day` and a warm haze; DF textures

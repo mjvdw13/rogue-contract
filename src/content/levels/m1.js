@@ -644,18 +644,21 @@ openPolygon([[189, 73], [197, 73], [204, 80], [196, 80]], WASH_CELL);
 p.rect(196, 80, 204, 96, WASH_CELL);
 openPolygon([[196, 96], [204, 96], [198, 104], [194, 104]], WASH_CELL);
 // Between the wash and the street, after both are cut. Not one wall on
-// either street (Mark, 2026-11-02): on the north street a slot between the
-// first two, closed by a low brick wall two tiles back, and the pale one
-// set back a tile; on the bend the rose one set back from the pale one's
-// line; on the way to the bay's gate two houses, not one, a slot between
-// them and the second a tile back from the street.
-p.rect(170, 60, 171, 62, QUARTER).rect(176, 60, 184, 61, QUARTER);
+// either street (Mark, 2026-11-02): on the north street the first house
+// stands on its own, a passage 1.5 m wide through to the main street past
+// it (2026-11-03: a slot half a metre wide didn't read as a gap), and the
+// pale one set back behind a yard; on the bend the rose one set back from the
+// pale one's line; on the way to the bay's gate two houses, not one, a
+// slot between them and the second a tile back from the street.
+p.rect(168, 60, 171, 64, QUARTER);
 openPolygon([[170, 64], [171, 64], [176, 69], [176, 70]], QUARTER);
 p.rect(189, 93, 192, 95, QUARTER).rect(189, 95, 190, 104, QUARTER);
-town.house(160, 60, 170, 64, { h: OQ + 5 });
-town.block(170, 62, 171, 64, { h: OQ + 3.5, wall: 'adobe-brick', skirt: null });
+town.house(160, 60, 168, 64, { h: OQ + 5, r: 1 });
 town.slanted([[171, 60], [176, 60], [176, 69], [171, 64]], { h: OQ + 5.5, wall: 'adobe-rose' });
-town.slanted([[176, 61], [184, 61], [184, 78], [176, 70]], { h: OQ + 6.5, wall: 'adobe-pale', dome: true });
+// The pale one 1.5 m back from the street behind a paved yard a step up, its
+// neighbours' ends showing either side.
+town.platform(176, 60, 184, 63, { h: OQ + 0.25 });
+town.slanted([[176, 63], [184, 63], [184, 78], [176, 70]], { h: OQ + 6.5, wall: 'adobe-pale', dome: true });
 town.slanted([[184, 60], [194, 60], [189, 65], [184, 65]], { h: OQ + 5 });
 town.house(184, 65, 189, 73, { h: OQ + 6, wall: 'adobe-ochre' });
 town.slanted([[184, 73], [189, 73], [196, 80], [196, 83], [189, 83], [184, 78]], { h: OQ + 5.5, wall: 'adobe-rose' });
@@ -675,7 +678,7 @@ town.slanted([[204, 96], [207, 96], [207, 104], [198, 104]], { h: 8, wall: 'adob
 town.stair(188, 53, 194, 60, { up: 'W', from: WASH, top: OQ, rise: 0.25, floor: 'flagstone', side: 'adobe-brick' });
 // Where the loud half's reinforcements come in: the north street's east
 // end and the wash's north end.
-tagTile(186, 55, 'quarter-north');
+tagTile(186, 57, 'quarter-north');
 tagTile(198, 55, 'quarter-north');
 
 // 9. The old quarter in detail (2026-11-01): older and emptier than the
@@ -698,9 +701,9 @@ town.things.push({ type: 'dome-broken-7-grey', x: 152.5, y: 80.5, z: 8, angle: 2
 town.caster(152.5, 80.5, 3.5, 8, 3.3);
 town.fixture('hitching-ring', 160, 61.8, 'W', { z: OQ + 1.5 });
 // The north street's south side: the backs of the houses on the main street.
-town.window(162.5, 60, 'N', { z: OQ + 2.6 }).pipe(168.6, 60, 'N', { floorZ: OQ });
+town.window(162.5, 60, 'N', { z: OQ + 2.6 }).pipe(166.6, 60, 'N', { floorZ: OQ });
 town.door(173, 60, 'N', { h: OQ + 5.5, floorZ: OQ, wall: 'adobe-rose' });
-town.window(179.5, 61, 'N', { z: OQ + 3.4, tex: 'window-louvre' }).buttress(182.4, 61, 'N', { h: OQ + 6.5, floorZ: OQ, wall: 'adobe-pale' });
+town.window(179.5, 63, 'N', { z: OQ + 3.4, tex: 'window-louvre' }).buttress(182.4, 63, 'N', { h: OQ + 6.5, floorZ: OQ + 0.25, wall: 'adobe-pale' });
 town.door(187.5, 60, 'N', { h: OQ + 5, floorZ: OQ, tex: 'door-planks', width: 3, tall: 4, round: true, jamb: false, sign: false, panel: false });
 // Its north side.
 town.house(148, 45, 155, 53, { h: 6.5, wall: 'adobe-rose', skirt: 'plinth' });
@@ -718,22 +721,32 @@ for (const [x0, y0, x1, y1, h] of [
 town.arch(156, 45, 159, 46, { h: OQ + 5, lintel: 3.4, floorZ: OQ + 0.75, wall: 'adobe-pale', floor: 'flagstone', round: 'S' });
 town.tarp(159, 46, 162, 49, { z: 2.5, face: 'S', rise: 0.5, cloth: 'umber', poles: 'front', floorZ: OQ });
 lights.push({ x: 157.5, y: 45.8, z: OQ + 1.3, radius: 3, light: 48, fx: 'flicker', min: 30 });
-town.house(163, 44, 172, 53, { h: 7, wall: 'adobe', skirt: 'dirt', tiers: [{ box: [165, 44, 172, 49], h: 10 }], dome: true });
+// Alleys back from the street either side of the turned house, dead ends
+// (Mark, 2026-11-03: slots half a metre wide read as cracks, not gaps): one
+// 1.5 m wide back 9 tiles to the town behind, the tall house's washing
+// hung across it and its water drum at the end; one 1 m wide past the
+// grey house, ending at the foot of the comm tower.
+p.rect(171, 44, 174, 53, QUARTER).rect(174, 52, 180, 53, QUARTER).rect(180, 46, 182, 53, QUARTER);
+town.house(163, 44, 171, 53, { h: 7, wall: 'adobe', skirt: 'dirt', tiers: [{ box: [165, 44, 171, 49], h: 10 }], dome: true });
 town.door(168, 53, 'S', { h: 7, floorZ: OQ, tex: 'door-grey' }).hood(168, 53, 'S', { h: 7, floorZ: OQ });
-town.buttress(164.4, 53, 'S', { h: 7, floorZ: OQ }).buttress(171.2, 53, 'S', { h: 7, floorZ: OQ });
+town.buttress(164.4, 53, 'S', { h: 7, floorZ: OQ }).buttress(170.2, 53, 'S', { h: 7, floorZ: OQ });
 town.window(169.5, 49, 'S', { z: 8.4, tex: 'window-louvre' });
-// (A slot between it and the next, closed at the back by the next's own wall.)
-p.rect(172, 48, 180, 53, (x, y, c) => (x === 172 || y === 52 ? town.street(OQ) : c));
-town.slanted([[173, 46], [180, 46], [180, 52], [173, 53]], { h: 6.5, wall: 'adobe-rose', dome: true }).block(172, 45, 173, 48, { h: 6.5, wall: 'adobe-rose' });
-town.house(180, 46, 188, 53, { h: 7.5, wall: 'adobe-grey', skirt: null });
-town.door(184, 53, 'S', { h: 7.5, floorZ: OQ, tex: 'door-grey', wall: 'adobe-grey' });
-town.window(181.5, 53, 'S', { z: OQ + 3 }).pipe(187.4, 53, 'S', { floorZ: OQ });
+town.slanted([[174, 46], [180, 46], [180, 52], [174, 53]], { h: 6.5, wall: 'adobe-rose', dome: true });
+town.house(182, 46, 188, 55, { h: 7.5, wall: 'adobe-grey', skirt: null });
+town.door(184, 55, 'S', { h: 7.5, floorZ: OQ, tex: 'door-grey', wall: 'adobe-grey' });
+town.window(186.5, 55, 'S', { z: OQ + 3 }).pipe(187.4, 55, 'S', { floorZ: OQ });
+town.window(171, 47.5, 'E', { z: OQ + 3.6, tex: 'window-louvre' });
+list.push(at('barrel-grey', 172.5, 44.45), at('canister', 173.4, 44.5));
+town.hangings.push(
+  { type: 'cloth-pale', from: [171.05, 49.6, 3.9], to: [173.95, 50.2, 3.7], length: 1.2, pin: 'corners' },
+  { type: 'rag', from: [171.05, 46.9, 4.4], to: [173.95, 46.6, 4.3], length: 0.9 },
+);
 // Plaster fallen to the brick, on the ruin and round the square and street.
 for (const [x, y, z, face, tex, scale] of [
   [160.6, 46, 4.3, 'S', 'brick-bare-1', 1], [156, 48.3, 2.6, 'E', 'brick-bare-2', 1], [162, 47.4, 3.4, 'W', 'brick-bare-2', 0.8],
   [161.5, 53, 2.2, 'S', 'brick-bare-1', 0.7], [156.5, 53, 3.3, 'S', 'brick-bare-2', 0.7],
   [149.8, 76, 3.2, 'N', 'brick-bare-1', 1.1], [155.6, 76, 5.6, 'N', 'brick-bare-2', 0.9], [148, 63.6, 1.9, 'E', 'brick-bare-2', 0.8],
-  [153.3, 53, 4.7, 'S', 'brick-bare-2', 0.9], [186.3, 53, 2.1, 'S', 'brick-bare-1', 0.9], [165.9, 60, 3.1, 'N', 'brick-bare-1', 0.8],
+  [153.3, 53, 4.7, 'S', 'brick-bare-2', 0.9], [183.6, 55, 5.5, 'S', 'brick-bare-1', 0.9], [165.9, 60, 3.1, 'N', 'brick-bare-1', 0.8],
 ]) town.decals.push({ x, y, z, face, tex, ...(scale !== 1 && { scale }) });
 list.push(
   // The gate square: the dome's rubble, the squatter's bed under the wall.
@@ -753,14 +766,14 @@ list.push(
     talk: [{ lines: ['The suns burn the same on all of us.', 'The quarter was full, once. Before the checkpoint.'] }],
   }),
   // The north street.
-  at('barrel-rust', 186.3, 53.45), at('canister', 187.05, 53.4), at('vaporator', 175.6, 54.2),
+  at('barrel-rust', 186.3, 55.45), at('canister', 187.05, 55.4), at('vaporator', 177.4, 61.4), at('canister-rust', 178.3, 62.3),
   at('junk-heap', 149.6, 59.2, { angle: 80 }), at('litter', 170.4, 56.6, { angle: 60 }), at('litter-small', 179.2, 57.8, { angle: 250 }),
   at('rubble', 163.3, 59.4, { angle: 300 }),
   at('villager-woman', 166, 56.5, { wander: 4 }),
 );
 town.hangings.push(
   { type: 'rag', from: [165.4, 53.05, 5.9], to: [166.6, 53.05, 5.9], length: 2.4 },
-  { type: 'cable', from: [185.5, 53.05, 6.6], to: [186.6, 59.95, 4.9], sag: 0.8 },
+  { type: 'cable', from: [185.5, 55.05, 6.6], to: [186.6, 59.95, 4.9], sag: 0.6 },
   { type: 'cable', from: [169.6, 53.05, 6.3], to: [174.5, 59.95, 5.4], sag: 0.9 },
   { type: 'rag', from: [150.2, 75.95, 6.6], to: [151, 75.95, 6.6], length: 1.6 },
 );
