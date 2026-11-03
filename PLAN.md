@@ -787,6 +787,18 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
           and its alley (ruins, the shrine, squatters).
     - [x] The dry wash: the culvert (Secrets, 5), what the floods left at
           the bends, the flood line.
+    - [ ] **Buildings, not one wall** (Mark, 2026-11-02: the detailed
+          streets lost "buildings should feel like buildings"; they're an
+          unbroken run of fronts). Some may touch, but break the runs: a
+          slot between houses (0.5 to 1 m, needn't be walkable), a house
+          set back from its neighbour, rounded corners at the breaks. A
+          commit each:
+      - [x] The back alleys: the first and second lanes, the thug's
+            square.
+      - [ ] The old quarter: the north street, the bends, the way to the
+            bay's gate.
+      - [ ] The dry wash: its banks.
+      - [ ] The back lane: the rooftops' faces.
     - [ ] Waiting on Mark.
   - [ ] The comm tower.
   - [ ] The derelict bay and the gutted freighter.

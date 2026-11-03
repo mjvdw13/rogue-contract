@@ -1489,8 +1489,11 @@ p.rect(102, 33, 106, 36, town.street());
 town.slanted([[98, 26], [102, 26], [102, 36], [98, 38]], { h: 6, wall: 'adobe-grey' });
 town.house(102, 26, 106, 33, { h: 7.5, wall: 'adobe-pale', skirt: null });
 town.slanted([[106, 26], [112, 26], [112, 31], [106, 34]], { h: 5.5, wall: 'adobe-rose', dome: true });
+// The south side two houses, not one wall: a slot half a metre wide
+// between them, and the ochre one set back half a tile.
+p.rect(104, 40, 105, 47, town.street());
 town.slanted([[98, 43], [104, 40], [104, 47], [98, 47]], { h: 4.5, wall: 'adobe-rose', skirt: 'plinth' });
-town.slanted([[104, 40], [112, 36], [112, 47], [104, 47]], { h: 6.5, wall: 'adobe-ochre', dome: true });
+town.slanted([[105, 40], [111, 37], [112, 37], [112, 47], [105, 47]], { h: 6.5, wall: 'adobe-ochre', dome: true });
 town.door(104, 33, 'S', { h: 7.5, tex: 'shutter', tall: 2.25, width: 2, jamb: false, panel: false, wall: 'adobe-pale' });
 {
   const GUNS = { h: 6, wall: 'adobe-grey', light: 88, ceilZ: 3.75 };
@@ -1513,24 +1516,25 @@ town.door(104, 33, 'S', { h: 7.5, tex: 'shutter', tall: 2.25, width: 2, jamb: fa
 // Bare brick and patches where the lane's plaster has given way (decals on
 // the slanting walls, at points along them: onSlant, at the top).
 town.decals.push(
-  onSlant([98, 38], [102, 36], 0.5, 2.1, 'brick-bare-2'), onSlant([104, 40], [112, 36], 0.3, 3.6, 'brick-bare-1', 1.1),
-  onSlant([104, 40], [112, 36], 0.72, 3.4, 'patch-rust', 0.9), onSlant([106, 34], [112, 31], 0.6, 2.8, 'brick-bare-2', 0.9),
+  onSlant([98, 38], [102, 36], 0.5, 2.1, 'brick-bare-2'), onSlant([105, 40], [111, 37], 0.25, 3.6, 'brick-bare-1', 1.1),
+  onSlant([105, 40], [111, 37], 0.75, 3.4, 'patch-rust', 0.9), onSlant([106, 34], [112, 31], 0.6, 2.8, 'brick-bare-2', 0.9),
   onSlant([98, 43], [104, 40], 0.4, 3.1, 'patch-plate', 0.9),
 );
 // Washing across the lane: a tie point on each wall, square across from
-// the north wall's at `x`, 0.05 out from both.
+// the north wall's at `x`, 0.05 out from both (past x 105 the south wall is
+// the ochre house, set back half a tile).
 const acrossLane = (x, z0, z1) => {
   const [nx, ny] = [1 / Math.sqrt(5), 2 / Math.sqrt(5)];
   const y = 38 - 0.5 * (x - 98);
-  const d = 5 / Math.sqrt(1.25) - 0.1;
+  const d = 5 / Math.sqrt(1.25) - 0.1 + (x + 2 > 105 ? 0.5 * ny : 0);
   const r = (v) => Math.round(v * 100) / 100;
   return { from: [r(x + 0.05 * nx), r(y + 0.05 * ny), z0], to: [r(x + (0.05 + d) * nx), r(y + (0.05 + d) * ny), z1] };
 };
 town.hangings.push(
   { type: 'cloth-pale', ...acrossLane(99.6, 3.7, 3.5), length: 1.1, pin: 'corners' },
-  { type: 'rag', ...acrossLane(106.9, 4, 3.8), length: 1 },
+  { type: 'rag', ...acrossLane(106.2, 4, 3.8), length: 1 },
   { type: 'cable', ...acrossLane(103.3, 5.6, 4.1), sag: 0.5 },
-  { type: 'rope', ...acrossLane(109.2, 4.6, 4.2), sag: 0.4 },
+  { type: 'rope', ...acrossLane(108.6, 4.6, 4.2), sag: 0.4 },
 );
 list.push(at('villager-woman', 107.4, 38.2, { wander: 2 }));
 // The second yard, a step up, is the spacers': their hostel on its north
@@ -1573,29 +1577,33 @@ lights.push({ x: 116, y: 16.8, z: 3, radius: 4.5, light: 40 }, { x: 122, y: 16.8
 // strung from it across the lane, along it and up to the roofs, each to a
 // house that's tapped in.
 lane(126, 23, 136, 39, 0.5, 26, 31, 0.25);
+// Two houses a side, a slot between each pair (staggered), the second of
+// each set back half a tile: not one wall down either side.
+p.rect(130, 21, 131, 28, town.street(0.25)).rect(132, 34, 133, 44, town.street(0.25));
 town.slanted([[126, 18], [130, 18], [130, 28], [126, 26]], { h: 7 });
-town.slanted([[130, 18], [136, 18], [136, 31], [130, 28]], { h: 8.5, wall: 'adobe-ochre', dome: true });
+town.slanted([[131, 18], [136, 18], [136, 30], [135, 30], [131, 28]], { h: 8.5, wall: 'adobe-ochre', dome: true });
 town.slanted([[126, 31], [132, 34], [132, 44], [126, 44]], { h: 6, wall: 'adobe-pale' });
-town.slanted([[132, 34], [136, 36], [136, 44], [132, 44]], { h: 5, wall: 'adobe-grey', skirt: 'plinth' });
+town.slanted([[133, 35], [135, 36], [136, 36], [136, 44], [133, 44]], { h: 5, wall: 'adobe-grey', skirt: 'plinth' });
 {
   // A point on the north wall at x (y = 26 + (x - 126) / 2), or on the
-  // south one (y = 31 + ...), `out` into the lane.
+  // south one (y = 31 + ...), `out` into the lane; past the slots, on the
+  // house set back half a tile.
   const n = [-1 / Math.sqrt(5), 2 / Math.sqrt(5)];
   const r = (v) => Math.round(v * 1000) / 1000;
-  const north = (x, out, z) => [r(x + n[0] * out), r(26 + (x - 126) / 2 + n[1] * out), z];
-  const south = (x, out, z) => [r(x - n[0] * out), r(31 + (x - 126) / 2 - n[1] * out), z];
-  const [bx, by] = north(131.5, 0.01, 0);
+  const north = (x, out, z) => [r(x + n[0] * out), r(26 + (x - 126) / 2 - (x > 131 ? 0.5 : 0) + n[1] * out), z];
+  const south = (x, out, z) => [r(x - n[0] * out), r(31 + (x - 126) / 2 + (x > 133 ? 0.5 : 0) - n[1] * out), z];
+  const [bx, by] = north(132.6, 0.01, 0);
   list.push(
     at('wall-unit', bx, by, { z: 2.5, angle: 333 }),
-    at('barrel-grey', ...north(130.3, 0.42, 0).slice(0, 2)), at('junk-heap', ...south(128.6, 0.75, 0).slice(0, 2), { angle: 25 }),
+    at('barrel-grey', ...north(128.9, 0.42, 0).slice(0, 2)), at('junk-heap', ...south(128.6, 0.75, 0).slice(0, 2), { angle: 25 }),
     at('litter-small', 133.4, 32.4, { angle: 120 }),
   );
-  town.decals.push({ x: r(130.7), y: r(28.35), z: 1.7, face: 'angled', tex: 'wall-meter' });
+  town.decals.push({ x: r(131.8), y: r(28.4), z: 1.7, face: 'angled', tex: 'wall-meter' });
   town.hangings.push(
-    { type: 'cable', from: north(131.45, 0.05, 3.1), to: south(129, 0.05, 4.4), sag: 0.5 },
-    { type: 'cable', from: north(131.6, 0.05, 3.1), to: south(134, 0.05, 3.7), sag: 0.4 },
-    { type: 'cable', from: north(131.7, 0.05, 3.2), to: north(133.5, 0.05, 8.3), sag: 0.2 },
-    { type: 'cable', from: north(131.3, 0.05, 3.1), to: north(127.5, 0.05, 4.9), sag: 0.3 },
+    { type: 'cable', from: north(132.55, 0.05, 3.1), to: south(129.6, 0.05, 4.4), sag: 0.5 },
+    { type: 'cable', from: north(132.7, 0.05, 3.1), to: south(134.6, 0.05, 3.7), sag: 0.4 },
+    { type: 'cable', from: north(132.8, 0.05, 3.2), to: north(134.4, 0.05, 8.3), sag: 0.2 },
+    { type: 'cable', from: north(132.4, 0.05, 3.1), to: north(128.3, 0.05, 4.9), sag: 0.3 },
   );
 }
 // The square at the alleys' east end is the thug's: his back room off its
@@ -1610,10 +1618,12 @@ town.room(137, 21, 145, 29, { h: 8, floorZ: OQ, ceilZ: 5.5, wall: 'adobe-grey', 
 town.arch(140, 29, 143, 30, { h: 8, lintel: 3.5, floorZ: OQ, wall: 'adobe-grey', round: 'S' });
 windowThrough(137, 139, 29, { sill: 4.4, top: 5.2, light: 112 });
 p.light(136, 20, 146, 21, 112).light(136, 21, 137, 29, 112).light(145, 21, 146, 29, 112);
-town.house(146, 30, 152, 42, { h: 8, wall: 'adobe' });
+// The south-east corner a slot between the two houses, not a joint.
+p.rect(145, 42, 146, 47, town.street(OQ));
+town.house(146, 30, 152, 47, { h: 8, wall: 'adobe' });
 town.door(146, 36, 'W', { h: 8, floorZ: OQ, tex: 'door-red' }).buttress(146, 39.6, 'W', { h: 8, floorZ: OQ });
-town.house(139, 42, 147, 47, { h: 7.5, wall: 'adobe-rose', skirt: 'dirt' });
-town.window(143.5, 42, 'N', { z: OQ + 2.8, tex: 'window-louvre' }).pipe(145.4, 42, 'N', { floorZ: OQ });
+town.house(139, 42, 145, 47, { h: 7.5, wall: 'adobe-rose', skirt: 'dirt' });
+town.window(142.5, 42, 'N', { z: OQ + 2.8, tex: 'window-louvre' }).pipe(144.4, 42, 'N', { floorZ: OQ });
 town.door(136, 39, 'E', { h: 5, floorZ: OQ, tex: 'door-grey', wall: 'adobe-grey' });
 list.push(
   at('rack-c', 140, 21.05, { angle: 0 }), at('bay-crate-grey', 138.1, 24.1, { angle: 4 }), at('bay-crate-tan', 143.9, 22.5, { angle: 352 }),
