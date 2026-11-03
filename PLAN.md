@@ -1018,65 +1018,14 @@ blocks of frames: separate runs on this machine drift by up to 20%.
 - [ ] A setting in the options menu (1x or 2x, saved with the others),
       switching without a reload: rebuild the surface, the renderer's
       view, the presenter's buffers and the melt.
-- [ ] Frame time in Chromium at 1x and 2x (Mos Eisley, m3, widescreen
-      and 4:3) for the record; then Waiting on Mark: the look (sparks
-      and ropes can be 1 pixel thin at 2x, the dithering is finer), and
-      whether the menu should warn that 2x needs a fast machine.
-
-### 9. Frame time (Mark, 2026-11-02)
-
-Measured headless (Node, Chrome's V8), Mos Eisley at 320 columns over 40
-seeded random views: 12.6 ms a frame on average, 25 at the 90th
-percentile, 33 at worst, and the tick 2.4 ms on top (1385 things). m3 is
-4 ms. Walls, floors and sky are 70% of it, models 27%; sprites, hangings,
-particles and the palette pass are under 0.4 ms together. Widescreen adds
-a third, 2x multiplies by 2.5.
-
-Why Mos Eisley costs so much: it's 98% sky tiles and its buildings are
-raised floors, so a ray that clears a roofline goes on tile by tile until
-the sky's ceiling (24) closes its window: 76 tiles a column on average
-(m3: 17). The skyline stop never fires there, as the comm tower stand-in
-(22) sets one skyline for the whole town. Models behind buildings aren't
-culled by the walls' depth either (the rays went on over the roofs): of
-1276, 23 draw in a view on average, and 62% of the models' time (1.8 of
-2.9 ms) goes on ones that draw nothing.
-
-Steps, most value first, each timed before and after in one process and
-its renders compared:
-
-- [x] Far models showing through nearer walls (the pop-in): a column kept
-      48 batches of windows, one per tile boundary, and over the roofs it
-      needed up to 330; things further off were clipped by the last one,
-      too wide. Now a batch is kept only where the windows change, and
-      there's room for 128: no view of 120 differs from unlimited room.
-- [x] Models hidden behind buildings: before transforming a model, test
-      its screen box against the windows open at its depth in each column
-      it covers, and skip it if none overlap. Mos Eisley 13.4 to 12.25 ms
-      a frame, renders unchanged.
-- [x] Collisions: `checkPosition` tested all 1385 things for every move
-      of each of the 92 movers. Now a grid of solid things by 4x4 block:
-      Mos Eisley's tick 1.54 to 0.51 ms, play unchanged.
-- [x] Smooth motion: the camera was drawn where the last 60 Hz tick left
-      it, so on a 120 or 144 Hz screen movement stepped, and at 60 Hz a
-      frame that got no tick or two juddered. Now it's drawn between the
-      last two ticks. Monsters and NPCs still move in 60 Hz steps; if
-      that shows on a fast screen, they could be blended the same way.
-- [x] A skyline per ray: the highest surface in each 8x8 block, and a ray
-      stops once it looks out over every block still ahead of it. Mos
-      Eisley's walls and floors 7.1 to 6.1 ms (worst 10% of views 13.5 to
-      11.1), m3 and the sandbox unchanged, renders unchanged. (The
-      prototype's differences were a bug: secret rising doors stood as
-      columns up to the sky's ceiling, fixed first.)
-- [x] `preserveDrawingBuffer: false` in the WebGL presenter: nothing reads
-      the canvas back, and keeping it can cost a copy a frame.
-- [ ] To measure: `drawWorld`'s per-column closures (13 a column, 4000 a
-      frame) as module functions; static models' world-space vertices
-      kept instead of transformed every frame.
-- [ ] Chromium numbers at 1x and 2x for the record (with section 8's).
-
-The other kind of far pop-in: things under a pixel wide are point
-sampled, so thin far things (poles, cables, small sprites) can flicker in
-and out as you move. Not planned unless Mark sees it.
+- [x] Frame time in headless Chromium (2026-11-02, the render alone, 40
+      seeded views each, best of 3): Mos Eisley 7.6 ms on average at 1x
+      4:3 (90th percentile 13.4, worst 17.9), 16.8 at 2x (28.0, 39.4),
+      10.1 widescreen (16.8, 24.4); m3 3.0 at 1x (4.7, 7.7), 9.9 at 2x
+      (17.6, 26.2), 6.0 widescreen (10.5, 11.3). The tick: 0.75 and 0.1.
+- [ ] Waiting on Mark: the look (sparks and ropes can be 1 pixel thin at
+      2x, the dithering is finer), and whether the menu should warn that
+      2x needs a fast machine.
 
 ## Small fixes and known rough edges
 
@@ -1110,6 +1059,15 @@ Kept so they aren't lost; none is scheduled.
 - Particles: a sound per burst, blood as particles, rain, scorch decals.
 - Glints: stronger when the source is on the viewer's side, shiny model
   faces, glints on the sandtrooper.
+- Thin far things (poles, cables, small sprites) under a pixel wide are
+  point sampled, so they can flicker in and out as you move.
+- Rendering throws away about 1.6 MB a frame (Mos Eisley, 2026-11-02):
+  numbers boxed for calls to `drawWorld`'s closures too big to inline,
+  and the 15 closures made per column. The collections cost about 0.1 ms
+  a frame on average, with the odd pause up to 7.5 ms headless. Passing
+  those numbers another way would mean restructuring `drawWorld`.
+  Caching static models' world-space vertices would save about 2% of a
+  frame.
 - `tools/import-texture.mjs` for outside art (resize, snap to the palette,
   check the tiling).
 - Recorded music (a composer or orchestral samples).
