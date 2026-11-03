@@ -31,6 +31,11 @@ export class Loop {
     this.running = false;
   }
 
+  /** How far this frame is from the last tick to the next (0 to 1). */
+  get alpha() {
+    return this.acc >= TICK ? 1 : this.acc / TICK;
+  }
+
   _frame(now) {
     if (!this.running) return;
     let dt = (now - this.last) / 1000;

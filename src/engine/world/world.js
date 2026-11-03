@@ -60,6 +60,8 @@ const SLIDE_TURN = (80 * Math.PI) / 180;
 const spriteHeight = (sheet, def) => (sheet.fh * (def?.scale ?? 1) * (sheet.scale ?? 1)) / TEXELS_PER_UNIT;
 /** While a lift moves, flow fields are refreshed this often (seconds). */
 const NAV_REFRESH = 0.25;
+/** Further than this between two ticks, the eye jumped (a teleport): drawn there, not between. */
+const CAM_SNAP = 2;
 
 /**
  * One running level: the map, every thing in it, and the rules that tie
@@ -122,6 +124,8 @@ export class World {
     this.floorTimer = 0;
     /** The friendly NPC the player last walked into (it reacts on its next think). */
     this.playerBumped = null;
+    /** Where the eye was before the last tick ({ x, y, z }), for camera(). */
+    this.camFrom = null;
     /** Story flags (the setFlag action), for triggers' and conversations' `if` and `unless`. */
     this.flags = new Set();
     /** What a tracker weapon tracks (the setSignal action): `{ tag }` or `{ thing }`, or null. */
@@ -858,6 +862,9 @@ export class World {
     this.lights.update(dt);
     updateDoors(this, dt);
     updateLifts(this, dt);
+    // Where the eye was, for frames drawn before the next tick (camera()).
+    const was = playerCamera(this, this.player);
+    this.camFrom = { x: was.x, y: was.y, z: was.z };
     // (Moves keep the collision grid up to date; this catches anything moved
     // some other way, turned non-solid or removed since.)
     this.grid.sync(this.things);
@@ -1002,8 +1009,27 @@ export class World {
 
   // ------------------------------------------------------------ rendering helpers
 
-  camera() {
-    return playerCamera(this, this.player);
+  /**
+   * The player's view. Ticks run at 60 Hz and frames at the screen's rate,
+   * so a frame `f` of the way (0 to 1) from the last tick to the next is
+   * drawn from between where the last two ticks left the eye: steady motion
+   * on a 120 or 144 Hz screen, and no judder when a frame gets no tick or
+   * two. Turning and looking (per frame, with the mouse) aren't blended,
+   * nor is a jump of more than a couple of tiles (a teleport, a respawn).
+   */
+  camera(f = 1) {
+    const cam = playerCamera(this, this.player);
+    const a = this.camFrom;
+    if (f >= 1 || !a) return cam;
+    const dx = cam.x - a.x;
+    const dy = cam.y - a.y;
+    const dz = cam.z - a.z;
+    if (dx * dx + dy * dy + dz * dz > CAM_SNAP * CAM_SNAP) return cam;
+    const g = f > 0 ? 1 - f : 1;
+    cam.x -= dx * g;
+    cam.y -= dy * g;
+    cam.z -= dz * g;
+    return cam;
   }
 
   psprites() {

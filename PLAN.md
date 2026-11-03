@@ -28,6 +28,11 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
+- **Smooth motion** (2026-11-02): the view is now drawn between the last
+  two ticks, so walking should look steady on a 120 or 144 Hz screen and
+  never judder at 60. To judge: whether it feels smoother, and whether the
+  movement lag it adds (up to a sixtieth of a second; turning has none)
+  shows. Monsters and NPCs still step at 60 Hz.
 - **The remaining streets, detailed** (`?map=m1`, 2026-11-01): each its
   own place, built from the town's pieces.
   The back lane: the cantina's empties by its back door, its rubbish
@@ -1051,11 +1056,11 @@ its renders compared:
 - [x] Collisions: `checkPosition` tested all 1385 things for every move
       of each of the 92 movers. Now a grid of solid things by 4x4 block:
       Mos Eisley's tick 1.54 to 0.51 ms, play unchanged.
-- [ ] Smooth motion: the camera is drawn where the last 60 Hz tick left
-      it, so on a 120 or 144 Hz screen movement steps (frames repeat a
-      spot), and at 60 Hz a frame that gets no tick or two judders. Draw
-      it between the last two ticks (turning with the mouse is already per
-      frame). No frame-time cost.
+- [x] Smooth motion: the camera was drawn where the last 60 Hz tick left
+      it, so on a 120 or 144 Hz screen movement stepped, and at 60 Hz a
+      frame that got no tick or two juddered. Now it's drawn between the
+      last two ticks. Monsters and NPCs still move in 60 Hz steps; if
+      that shows on a fast screen, they could be blended the same way.
 - [ ] A skyline per ray: the highest thing in each 8x8 block, and a ray
       stops once it looks out over everything still ahead of it. The
       prototype: walls and floors 9.1 to 7.6 ms in Mos Eisley, but 587

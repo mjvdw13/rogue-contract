@@ -1,6 +1,6 @@
 import { World } from '../world/world.js';
 import { clampPitch } from '../things/player.js';
-import { VIEW_H } from '../config.js';
+import { VIEW_H, TICK } from '../config.js';
 import { HUD_CLEAR } from '../ui/hud.js';
 import { PAL_NORMAL, PAL_RED_START, NUM_RED, PAL_BONUS_START, NUM_BONUS, PAL_HAZARD, PAL_NIGHTVISION } from '../gfx/palette.js';
 
@@ -17,6 +17,8 @@ export class LevelScene {
     this.skill = opts.skill;
     this.snapshot = opts.snapshot ?? null;
     this.world = null;
+    /** The game time of the world's last tick. */
+    this.tickedAt = -Infinity;
   }
 
   get wantsPointerLock() {
@@ -72,6 +74,7 @@ export class LevelScene {
       if (input.isDown('zoomOut')) g.hud.mapScale = Math.max(1, g.hud.mapScale / (1 + dt * 2));
     }
     w.tick(dt, input);
+    this.tickedAt = g.time;
     g.hud.update(dt);
     if (w.exitRequested) g.levelComplete(this, w.exitRequested);
     else if (w.restartRequested) g.restartLevel();
@@ -93,7 +96,11 @@ export class LevelScene {
     const g = this.game;
     const w = this.world;
     if (g.hud.automap) g.hud.drawAutomap(w);
-    else g.renderer.render(w, w.camera(), { psprites: w.psprites(), skip: w.player });
+    else {
+      // How far from the world's last tick to its next (it doesn't tick while paused).
+      const f = Math.min(1, (g.time - this.tickedAt) / TICK + g.loop.alpha);
+      g.renderer.render(w, w.camera(f), { psprites: w.psprites(), skip: w.player });
+    }
     g.hud.drawHud(w);
     g.hud.drawMessages();
     const p = w.player.player;
