@@ -33,6 +33,25 @@ These need Mark to try something, or to decide. Don't start them without him.
   never judder at 60. To judge: whether it feels smoother, and whether the
   movement lag it adds (up to a sixtieth of a second; turning has none)
   shows. Monsters and NPCs still step at 60 Hz.
+- **Buildings, not one wall** (`?map=m1`, 2026-11-02, after Mark's note
+  that the detailed streets had become unbroken runs of fronts): where
+  houses stood butted together on one line, a slot half a metre wide now
+  runs back between them (closed a few tiles in, never through to the
+  next street), and often the second house stands half a tile to a tile
+  back, so the joint shows as a step and a dark crack. The back alleys:
+  the first lane's south side, both sides of the second lane, the thug's
+  square's south-east corner. The old quarter: three breaks along the
+  north street (one closed by a low brick wall, the pale house a tile
+  back), the ochre house on the gate square between two slots, the rose
+  houses on the bend set back from their neighbours' slanting fronts,
+  the alley's south side two houses, and the way to the bay's gate two
+  houses where there was one 21 tiles long. The wash: the domed house's
+  back a tile back, and two houses with a slot on the east bank instead
+  of the town's filler blocks. The back lane: south of the back door the
+  cantina's storehouse is its own lower building, a slot between. To
+  judge: whether it's enough (the slots show best close up; from along a
+  street the steps do the work), and whether some slots should be wide
+  enough to step into.
 - **The remaining streets, detailed** (`?map=m1`, 2026-11-01): each its
   own place, built from the town's pieces.
   The back lane: the cantina's empties by its back door, its rubbish
@@ -787,18 +806,6 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
           and its alley (ruins, the shrine, squatters).
     - [x] The dry wash: the culvert (Secrets, 5), what the floods left at
           the bends, the flood line.
-    - [ ] **Buildings, not one wall** (Mark, 2026-11-02: the detailed
-          streets lost "buildings should feel like buildings"; they're an
-          unbroken run of fronts). Some may touch, but break the runs: a
-          slot between houses (0.5 to 1 m, needn't be walkable), a house
-          set back from its neighbour, rounded corners at the breaks. A
-          commit each:
-      - [x] The back alleys: the first and second lanes, the thug's
-            square.
-      - [x] The old quarter: the north street, the bends, the way to the
-            bay's gate.
-      - [x] The dry wash: its banks.
-      - [ ] The back lane: the rooftops' faces.
     - [ ] Waiting on Mark.
   - [ ] The comm tower.
   - [ ] The derelict bay and the gutted freighter.

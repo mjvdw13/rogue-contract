@@ -468,6 +468,11 @@ town.house(141, 73, 148, 86, { h: 9.5, r: 1, wall: 'adobe-pale' });
 p.rect(126, 92, 130, 118, town.street());
 p.rect(130, 86, 149, 118, town.street());
 town.house(118, 92, 126, 120, { h: 8 });
+// South of the back door the cantina's storehouse, lower and its own, a
+// slot between them (Mark, 2026-11-02: not one wall down the lane), so the
+// cantina's back rises over its roof.
+p.rect(124, 109, 126, 110, town.street());
+town.house(121, 110, 126, 120, { h: 5.5, wall: 'adobe-pale', skirt: 'plinth' });
 town.slanted([[132, 102], [138, 102], [138, 118], [130, 118], [130, 104]], { h: 4.75 });
 town.house(138, 102, 149, 118, { h: 5.75, wall: 'adobe-ochre' });
 town.house(130, 86, 140, 99, { h: 4.75, wall: 'adobe-pale' });
@@ -514,7 +519,7 @@ town.hangings.push(
   // A cable over the lane from the cantina's roof to the house opposite,
   // and a rope down its back wall.
   { type: 'cable', from: [126.05, 97.5, 7.3], to: [129.95, 95.5, 4.4], sag: 0.6 },
-  { type: 'rope', from: [126.05, 111.6, 7.6], length: 2.2 },
+  { type: 'rope', from: [126.05, 108.3, 7.6], length: 2.2 },
   // Washing across the light well: a sheet and a rag.
   { type: 'cloth-pale', from: [134.5, 99.05, 3.5], to: [134.9, 101.95, 3.5], length: 1.3, pin: 'corners' },
   { type: 'rag', from: [140.05, 91.2, 3.6], to: [142.95, 91.5, 3.6], length: 0.9 },
