@@ -54,6 +54,9 @@ export class Model {
       };
     });
     this.lines = (def.lines ?? []).map((l) => Float32Array.from(l));
+    /** How far the lines reach from the origin (model units), for the collision grid. */
+    this.linesReach = 0;
+    for (const l of this.lines) this.linesReach = Math.max(this.linesReach, Math.hypot(l[0], l[1]), Math.hypot(l[2], l[3]));
   }
 }
 

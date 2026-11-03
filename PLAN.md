@@ -1048,10 +1048,9 @@ its renders compared:
       its screen box against the windows open at its depth in each column
       it covers, and skip it if none overlap. Mos Eisley 13.4 to 12.25 ms
       a frame, renders unchanged.
-- [ ] Collisions: `checkPosition` tests all 1385 things for every move of
-      each of the 92 movers, half the tick (about 1.3 ms). A grid of solid
-      things by block. It counts twice in a slow frame, which runs two
-      ticks.
+- [x] Collisions: `checkPosition` tested all 1385 things for every move
+      of each of the 92 movers. Now a grid of solid things by 4x4 block:
+      Mos Eisley's tick 1.54 to 0.51 ms, play unchanged.
 - [ ] Smooth motion: the camera is drawn where the last 60 Hz tick left
       it, so on a 120 or 144 Hz screen movement steps (frames repeat a
       spot), and at 60 Hz a frame that gets no tick or two judders. Draw

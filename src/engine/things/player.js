@@ -192,6 +192,7 @@ export function playerThink(world, pt, input, dt, settings = {}) {
   if (p.noclip) {
     pt.x += pt.vx * dt;
     pt.y += pt.vy * dt;
+    world.grid.update(pt);
   } else {
     pushThink(world, pt, wishX, wishY, dt);
     world.tryMove(pt, pt.vx * dt, pt.vy * dt);

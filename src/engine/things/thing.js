@@ -29,6 +29,11 @@ export class Thing extends Animated {
     this.shoved = 0;
     this.shoveSpeed = 0;
     this.removed = false;
+    /** The blocks of the world's collision grid it's listed in (world/thinggrid.js), -1 for none. */
+    this.gx0 = -1;
+    this.gy0 = -1;
+    this.gx1 = -1;
+    this.gy1 = -1;
     this.hidden = false;
     this.dead = false;
     /** @type {import('../gfx/sheet.js').Sheet|null} */

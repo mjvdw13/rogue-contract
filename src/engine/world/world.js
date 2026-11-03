@@ -29,6 +29,7 @@ import { damage, radiusDamage, hitscan, meleeTarget, corpseThink } from '../comb
 import { emitThink } from '../things/emit.js';
 import { weaponSprites, bestWeapon } from '../things/weapons.js';
 import { TEXELS_PER_UNIT } from '../config.js';
+import { ThingGrid } from './thinggrid.js';
 
 /** Difficulty settings (1 = easiest .. 5 = nightmare). Placement per skill is up to each level. */
 export const SKILLS = {
@@ -132,6 +133,8 @@ export class World {
     const built = buildLevel(this.registry, level, { skill, textureSlot: slot });
     this.buildErrors = built.errors;
     this.map = built.map;
+    /** Solid things by block, for checkPosition. */
+    this.grid = new ThingGrid(this.map.w, this.map.h);
     this.fog = level.fog ?? 0.05;
     /** Outdoors, surfaces fade toward this colour with distance (halfway at `half` tiles) instead of darkening. */
     this.haze = level.haze ? { color: level.haze.color, half: level.haze.half ?? 40 } : null;
@@ -194,6 +197,7 @@ export class World {
     this.player.pitch = 0;
     this.player.health = this.player.player.health;
     this.things.push(this.player);
+    this.grid.update(this.player);
     this._lastTile = -1;
 
     for (const s of built.spawns) {
@@ -278,6 +282,7 @@ export class World {
     else if (def.kind !== 'projectile' && def.kind !== 'effect') t.z = this.map.floorAt(x, y, 0, reach) + (def.z ?? 0);
     this.things.push(t);
     def.hooks?.onSpawn?.(this, t);
+    this.grid.update(t);
     return t;
   }
 
@@ -296,6 +301,7 @@ export class World {
         if (!blockedByMap(this.map, x, y, t.radius)) {
           t.x = x;
           t.y = y;
+          this.grid.update(t);
           return;
         }
       }
@@ -304,6 +310,7 @@ export class World {
 
   remove(t) {
     t.removed = true;
+    this.grid.update(t);
   }
 
   spawnEffect(id, x, y, z = 0) {
@@ -375,18 +382,28 @@ export class World {
       if (straddle > this.dropHeight(t) + 1e-6 && straddle > now - 1e-6) return false;
     }
     if (ceil - Math.max(floor, t.z) < t.height) return false;
-    if (!t.solid) return true;
-    for (const o of this.things) {
-      if (o === t || !o.solid || o.removed) continue;
-      if (t.kind === 'projectile' || o.kind === 'projectile') continue;
-      if (o.z >= t.z + t.height || t.z >= o.z + o.height) continue;
-      // (Model scenery with `lines` collides as those walls, others as cylinders.)
-      const depth = overlap(o, x, y, t.radius);
-      if (depth > 0) {
-        // Allow moving apart if already overlapping.
-        if (depth > overlap(o, t.x, t.y, t.radius)) {
-          if (t === this.player && (o.kind === 'npc' || o.calm)) this.playerBumped = o;
-          return false;
+    if (!t.solid || t.kind === 'projectile') return true;
+    // The solid things listed in the blocks round the body (thinggrid.js).
+    const g = this.grid;
+    if (!g.fresh) g.sync(this.things);
+    const x1 = g.col(x + t.radius);
+    const y1 = g.row(y + t.radius);
+    for (let by = g.row(y - t.radius); by <= y1; by++) {
+      for (let bx = g.col(x - t.radius); bx <= x1; bx++) {
+        const cell = g.cells[by * g.bw + bx];
+        for (let i = 0; i < cell.length; i++) {
+          const o = cell[i];
+          if (o === t || !o.solid || o.removed || o.kind === 'projectile') continue;
+          if (o.z >= t.z + t.height || t.z >= o.z + o.height) continue;
+          // (Model scenery with `lines` collides as those walls, others as cylinders.)
+          const depth = overlap(o, x, y, t.radius);
+          if (depth > 0) {
+            // Allow moving apart if already overlapping.
+            if (depth > overlap(o, t.x, t.y, t.radius)) {
+              if (t === this.player && (o.kind === 'npc' || o.calm)) this.playerBumped = o;
+              return false;
+            }
+          }
         }
       }
     }
@@ -517,6 +534,7 @@ export class World {
         t.vy = v * uy;
       }
     }
+    if (moved) this.grid.update(t);
     return moved;
   }
 
@@ -840,6 +858,10 @@ export class World {
     this.lights.update(dt);
     updateDoors(this, dt);
     updateLifts(this, dt);
+    // (Moves keep the collision grid up to date; this catches anything moved
+    // some other way, turned non-solid or removed since.)
+    this.grid.sync(this.things);
+    this.grid.fresh = true;
 
     const pt = this.player;
     playerThink(this, pt, input, dt, this.settings);
@@ -881,7 +903,10 @@ export class World {
           t.def.hooks?.onThink?.(this, t, dt);
       }
     }
-    if (list.some((t) => t.removed)) this.things = list.filter((t) => !t.removed);
+    if (list.some((t) => t.removed)) {
+      for (const t of list) if (t.removed) this.grid.update(t);
+      this.things = list.filter((t) => !t.removed);
+    }
     this.explosions.update(dt);
     this.particles.update(dt);
     this.weather?.update(pt.x, pt.y);
@@ -896,6 +921,7 @@ export class World {
     const refresh = this.navRefresh <= 0 && this.map.lifts.some((l) => l.state === 'moving');
     if (refresh) this.navRefresh = NAV_REFRESH;
     for (const field of this.navFields.values()) field.update(Math.floor(pt.x), Math.floor(pt.y), refresh, this.reach(pt));
+    this.grid.fresh = false;
   }
 
   /**

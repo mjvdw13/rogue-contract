@@ -107,6 +107,7 @@ function step(world, t, dx, dy) {
   if (!inside(t.x, t.y) && (inside(x, y) || t.area.size === 0)) {
     t.x = x;
     t.y = y;
+    world.grid.update(t);
     return false;
   }
   return true;

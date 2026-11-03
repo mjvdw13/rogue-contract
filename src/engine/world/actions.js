@@ -87,6 +87,7 @@ export const BUILTIN_ACTIONS = {
     if (i === undefined || !world.player) return;
     world.player.x = (i % world.map.w) + 0.5;
     world.player.y = Math.floor(i / world.map.w) + 0.5;
+    world.grid.update(world.player);
     if (angle !== undefined) world.player.angle = (-angle * Math.PI) / 180;
     if (world.registry.things.has('teleport-fog')) world.spawn('teleport-fog', world.player.x, world.player.y);
     world.playSound('teleport');
