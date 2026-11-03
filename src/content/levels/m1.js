@@ -101,9 +101,10 @@ town.door(58, 54, 'E', { h: 10, wall: 'adobe-rose', floorZ: 3.5 });
 // house open along its front between timber posts under a beam, a slatted
 // roof the suns fall through in stripes, dim and dusty under the slats.
 // Four stalls along the back wall behind plank rails, each 7 wide, the posts
-// in line with the rails. In the first two the patrol's spare dewbacks,
-// nose to nose through the rails, each tied to a ring on the back wall with
-// a water trough and a feed trough (a halved drum). The third is being
+// in line with the rails, a ring and a water trough in each. The patrol's
+// spare dewbacks stand out in the aisle in the middle (their sprites are 6
+// wide, so in a stall they cut through the rails), nose to nose at a feed
+// trough (a halved drum), tied to the middle post. The third stall is being
 // mucked out by the stable hand; the fourth holds the patrol's saddles on a
 // rack, feed canisters and an Imperial supply crate.
 const STABLE = { x0: 22, y0: 31, x1: 50, y1: 44 };
@@ -115,14 +116,14 @@ town.slats(STABLE.x0, STABLE.y0, STABLE.x1, STABLE.y1 - 1, { z: 4.5 });
 const STALL_RAILS = [29, 36, 43];
 // (The rails are 6 long, placed by their middle.)
 for (const x of STALL_RAILS) list.push(at('stall-rails', x, STABLE.y0 + 3), at('stable-post', x, STABLE.y1 - 0.5));
-// The dewbacks, their rings and troughs. (Things against the back wall are
-// lit as under the slats: the light at the wall's foot is darker.)
+// The rings and troughs, and the dewbacks a sprite's half-width (3) or more
+// clear of the rails and posts. (Things against the back wall are lit as
+// under the slats: the light at the wall's foot is darker.)
 const UNDER = 128;
 town.fixture('hitching-ring', 27.5, STABLE.y0, 'S', { z: 1.3 }).fixture('hitching-ring', 30.5, STABLE.y0, 'S', { z: 1.3 });
 list.push(
-  at('dewback', 25.6, 34, { angle: 0 }), at('dewback', 32.6, 34.4, { angle: 180 }),
+  at('dewback', 32.5, 41, { angle: 0 }), at('dewback', 39.5, 41, { angle: 180 }), at('feed-trough', 36, 40.9),
   at('water-trough', 25, 31.55, { lit: UNDER }), at('water-trough', 33, 31.55, { lit: UNDER }), at('water-trough', 39.5, 31.55, { lit: UNDER }),
-  at('feed-trough', 28.3, 34.2, { angle: 90 }), at('feed-trough', 29.75, 34.4, { angle: 90 }),
   // The third stall, being mucked out.
   at('villager-man', 39.2, 35.6, { angle: 200, wander: 0 }), at('litter', 40.6, 34.4, { angle: 60 }), at('oil-small', 38.2, 33.6, { angle: 130 }),
   // The fourth: the patrol's tack and feed.
@@ -133,8 +134,8 @@ list.push(
 );
 list.push(at('saddle-rack', 46.5, STABLE.y0 + 0.01, { lit: UNDER }));
 town.hangings.push(
-  { type: 'cable', from: [27.5, 31.1, 1.6], to: [27.9, 33.7, 1.35], sag: 0.35 },
-  { type: 'cable', from: [30.5, 31.1, 1.6], to: [30.2, 34.1, 1.35], sag: 0.35 },
+  { type: 'cable', from: [35.95, 43.35, 1.6], to: [34.9, 41.1, 1.35], sag: 0.35 },
+  { type: 'cable', from: [36.05, 43.35, 1.6], to: [37.1, 40.9, 1.35], sag: 0.35 },
 );
 
 // South row.

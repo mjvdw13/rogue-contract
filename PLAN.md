@@ -32,11 +32,13 @@ These need Mark to try something, or to decide. Don't start them without him.
   lane from B to D, open from the start. Its front is open between timber
   posts under a beam, and the suns fall through its slatted roof in
   stripes (dim under the slats, walls too). Four stalls behind plank
-  rails: the patrol's two spare dewbacks nose to nose, tied to rings, with
-  water and feed troughs; a stall being mucked out by the stable hand; the
-  patrol's saddles on a rack with feed and an Imperial crate. To judge:
-  the light (stripes, how dim), whether the aisle in front of the stalls
-  is too big and empty, and the saddles and troughs at that size.
+  rails, each with a ring and a water trough; one being mucked out by the
+  stable hand, one with the patrol's saddles on a rack, feed and an
+  Imperial crate. The patrol's two spare dewbacks stand in the aisle in the
+  middle, nose to nose at a feed trough, tied to the middle post (moved out
+  of the stalls: their sprites cut through the rails). To judge:
+  the light (stripes, how dim), the dewbacks in the aisle, and the saddles
+  and troughs at that size.
 - **Smooth motion** (2026-11-02): the view is now drawn between the last
   two ticks, so walking should look steady on a 120 or 144 Hz screen and
   never judder at 60. To judge: whether it feels smoother, and whether the
