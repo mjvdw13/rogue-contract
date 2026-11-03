@@ -1,4 +1,4 @@
-import { F_SOLID, F_DOOR, F_SKY, F_SLANT, F_SLAB } from '../world/tilemap.js';
+import { F_SOLID, F_DOOR, F_SKY, F_SLANT, F_SLAB, SKY_BLOCK } from '../world/tilemap.js';
 import { DIMINISH, MAX_BRIGHTEN, LIGHT_BLACK, HAZE_RES, HAZE_LEN } from './view.js';
 import { HAZE_ROW, HAZE_STEPS } from '../gfx/palette.js';
 import { LightMap } from '../world/lightmap.js';
@@ -20,6 +20,50 @@ const fenceU = new Float32Array(MAX_FENCES);
 const fenceTop = new Float32Array(MAX_FENCES);
 const fenceLv = new Float32Array(MAX_FENCES);
 const fenceHz = new Float32Array(MAX_FENCES);
+// The blocks of map.blockTops a ray has still to cross, from where it
+// might first stop: where it leaves each, and the highest of it and every
+// one after.
+const MAX_RUN = 256;
+const runEnd = new Float64Array(MAX_RUN);
+const runTop = new Float64Array(MAX_RUN);
+
+/**
+ * Walk the blocks of map.blockTops along a ray from (qx, qy), t along it,
+ * into runEnd and runTop: where it leaves each, and the highest top of it
+ * and every one after. Returns how many.
+ */
+function walkBlocks(map, qx, qy, rdx, rdy, t) {
+  const { blockTops, blockW, blockH } = map;
+  let bx = Math.floor(qx / SKY_BLOCK);
+  let by = Math.floor(qy / SKY_BLOCK);
+  bx = bx < 0 ? 0 : bx >= blockW ? blockW - 1 : bx;
+  by = by < 0 ? 0 : by >= blockH ? blockH - 1 : by;
+  const bdx = rdx !== 0 ? Math.abs(SKY_BLOCK / rdx) : Infinity;
+  const bdy = rdy !== 0 ? Math.abs(SKY_BLOCK / rdy) : Infinity;
+  let sx = rdx > 0 ? ((bx + 1) * SKY_BLOCK - qx) / rdx : rdx < 0 ? (qx - bx * SKY_BLOCK) / -rdx : Infinity;
+  let sy = rdy > 0 ? ((by + 1) * SKY_BLOCK - qy) / rdy : rdy < 0 ? (qy - by * SKY_BLOCK) / -rdy : Infinity;
+  const stepX = rdx > 0 ? 1 : -1;
+  const stepY = rdy > 0 ? 1 : -1;
+  let n = 0;
+  while (n < MAX_RUN) {
+    runTop[n] = blockTops[by * blockW + bx];
+    if (sx < sy) {
+      runEnd[n++] = t + sx;
+      sx += bdx;
+      bx += stepX;
+      if (bx < 0 || bx >= blockW) break;
+    } else {
+      runEnd[n++] = t + sy;
+      sy += bdy;
+      by += stepY;
+      if (by < 0 || by >= blockH) break;
+    }
+  }
+  // (Out of room before the map's edge: the rest at the level's highest.)
+  if (n === MAX_RUN) runTop[n - 1] = map.skyline - map.skyMargin;
+  for (let j = n - 2; j >= 0; j--) if (runTop[j + 1] > runTop[j]) runTop[j] = runTop[j + 1];
+  return n;
+}
 /**
  * Ordered (4x4 Bayer) dithering between colormap levels, so smooth light
  * doesn't band: a level's fraction picks the brighter or darker colormap per
@@ -108,8 +152,9 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
   const { fences, fenceAt } = map;
   const { slabBot, slabTop, slabTopTex, slabUnderTex, slabSideTex } = map;
   const { bandIndex, bandSets } = map;
-  // Nothing in the level stands higher (TileMap.computeSkyline).
+  // Nothing in the level stands higher (TileMap.computeSkyline), nor in each block of it than its blockTops.
   const skyline = map.skyline;
+  const { blockTops, blockW, blockH, skyMargin } = map;
   if (map.decalsDirty) layoutDecals(map, textures);
   const { edgeDecals, decalEdge, slantDecals } = map;
   const hasDecals = map.decals.length > 0;
@@ -188,6 +233,9 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
       sdy = (mapY + 1 - py) * ddy;
     }
     const skyCol = sky ? view.skyU[x] : 0;
+    // The blocks still ahead on the ray (none until it might stop), and the one it's in.
+    let nRun = 0;
+    let jRun = 0;
     // The rows that show sky (marked in bdBuf), for the backdrop.
     let skyLo = H;
     let skyHi = 0;
@@ -875,13 +923,31 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
       // Looking out over the skyline: whatever lies further shows below the
       // rows still open, so they can only be sky. Fill them and stop (over a
       // town, rays would otherwise cross the rooftops to the map's edge).
+      // The skyline ahead is the highest block of the map the ray has still
+      // to cross, plus the margin: over a town of roofs with one tower, the
+      // rays stop over the roofs away from it. The blocks are walked once a
+      // ray might stop in the one it's in, from there.
       if (camZ < skyline) {
-        const r = rowOf(skyline, tExit);
-        let over = true;
-        for (let k = 0; k < nw; k++) {
-          if (wBot[k] > r) {
-            over = false;
-            break;
+        let lo = 0;
+        for (let k = 0; k < nw; k++) if (wBot[k] > lo) lo = wBot[k];
+        let over = lo <= rowOf(skyline, tExit);
+        if (!over && blockTops) {
+          // (Only once the open rows are above the eye: the blocks ahead
+          // stand taller than it, or almost everywhere they do, and it
+          // saves the test at every tile of most rays. Rays inside the
+          // map: | 0 floors.)
+          if (nRun === 0 && lo < horizon + 1) {
+            const qx = px + rdx * tExit;
+            const qy = py + rdy * tExit;
+            let bx = (qx / SKY_BLOCK) | 0;
+            let by = (qy / SKY_BLOCK) | 0;
+            if (bx >= blockW) bx = blockW - 1;
+            if (by >= blockH) by = blockH - 1;
+            if (lo <= Math.ceil(horizon + ((camZ - blockTops[by * blockW + bx] - skyMargin) * fy) / tExit - 0.5)) nRun = walkBlocks(map, qx, qy, rdx, rdy, tExit);
+          }
+          if (nRun > 0) {
+            while (jRun < nRun - 1 && runEnd[jRun] <= tExit) jRun++;
+            over = lo <= rowOf(runTop[jRun] + skyMargin, tExit);
           }
         }
         if (over) {

@@ -1061,11 +1061,12 @@ its renders compared:
       frame that got no tick or two juddered. Now it's drawn between the
       last two ticks. Monsters and NPCs still move in 60 Hz steps; if
       that shows on a fast screen, they could be blended the same way.
-- [ ] A skyline per ray: the highest thing in each 8x8 block, and a ray
-      stops once it looks out over everything still ahead of it. The
-      prototype: walls and floors 9.1 to 7.6 ms in Mos Eisley, but 587
-      pixels differ over 40 views (tall models no longer cut off by the
-      sky's ceiling?); look before taking it.
+- [x] A skyline per ray: the highest surface in each 8x8 block, and a ray
+      stops once it looks out over every block still ahead of it. Mos
+      Eisley's walls and floors 7.1 to 6.1 ms (worst 10% of views 13.5 to
+      11.1), m3 and the sandbox unchanged, renders unchanged. (The
+      prototype's differences were a bug: secret rising doors stood as
+      columns up to the sky's ceiling, fixed first.)
 - [ ] `preserveDrawingBuffer: false` in the WebGL presenter: nothing reads
       the canvas back, and keeping it can cost a copy a frame.
 - [ ] To measure: `drawWorld`'s per-column closures (13 a column, 4000 a

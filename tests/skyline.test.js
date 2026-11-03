@@ -25,7 +25,7 @@ test("a level's skyline is its highest surface, with room for the things on it",
 });
 
 test('stopping rays at the skyline leaves the picture as it was', async () => {
-  const { shot } = await headlessRenderer();
+  const { shot, renderer } = await headlessRenderer();
   // Blocks of roofs under the full sky, and a ring of low sky by the walls
   // (so they stand no taller than the roofs): rays look out over the
   // rooftops, and stop once they're over the skyline.
@@ -39,10 +39,15 @@ test('stopping rays at the skyline leaves the picture as it was', async () => {
     sky: 'sky-night',
   });
   assert.equal(buildLevel(registry, town).map.skyline, 4.25 + 3);
-  for (const level of [town, yard]) {
+  // The same with a tower in a far corner (20 tall): the level's skyline is
+  // over it, but rays looking away from it stop over the roofs.
+  const tower = { ...town, tiles: town.tiles.map((r, y) => (y === H - 3 ? r.slice(0, W - 3) + 'T' + r.slice(W - 2) : r)), legend: { ...town.legend, T: { ...OPEN, floorZ: 20 } } };
+  assert.equal(buildLevel(registry, tower).map.skyline, 20 + 3);
+  for (const level of [town, yard, tower]) {
     const { map } = buildLevel(registry, level);
     for (const cam of [{ x: 2.5, y: 2.5, angle: 0.6, z: 1.25 }, { x: 20.5, y: 15.5, angle: 2.5, z: 1.25 }, { x: 6.5, y: 4.5, angle: 0.2, z: 1.25 }]) {
       const stopped = shot(level, cam);
+      if (level === tower && cam.x === 20.5) assert.ok(renderer.view.zbuf.some((d) => d >= 1e6), 'some rays stopped over the roofs');
       const saved = map.constructor.prototype.computeSkyline;
       map.constructor.prototype.computeSkyline = function () {
         this.skyline = Infinity;

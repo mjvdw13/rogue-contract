@@ -16,6 +16,9 @@ export const F_SLANT = 256;
  */
 export const F_SLAB = 512;
 
+/** Tiles a side of a block of `TileMap.blockTops`. */
+export const SKY_BLOCK = 8;
+
 /** Tile edges, in the order of `TileMap.fenceAt`: north, east, south, west. */
 export const EDGES = 'NESW';
 /** The neighbour across each edge, and the edge that faces back. */
@@ -182,6 +185,17 @@ export class TileMap {
      * ray looking out over it sees only sky, so the renderer stops it there.
      */
     this.skyline = Infinity;
+    /**
+     * The same by block of SKY_BLOCK x SKY_BLOCK tiles, without the margin:
+     * a ray stops once it looks out over every block it has still to cross
+     * (render/columns.js). Null until computeSkyline.
+     * @type {Float64Array|null}
+     */
+    this.blockTops = null;
+    this.blockW = 0;
+    this.blockH = 0;
+    /** What the skyline adds to the highest surface (computeSkyline). */
+    this.skyMargin = 0;
     /** tile index -> {actions, switchTo, repeat, used} for usable walls */
     this.uses = new Map();
   }
@@ -281,11 +295,17 @@ export class TileMap {
    * slabs, angled walls, fences, ceilings indoors, a solid wall as tall as
    * the ceilings beside it, lifts at their highest stop), plus `margin`.
    * Things may stand taller: a ray stopped here leaves its depth far, so
-   * they still show over it.
+   * they still show over it. The same by block, in `blockTops`.
    */
   computeSkyline(margin = 3) {
-    let top = -Infinity;
     const { w, h } = this;
+    const bw = Math.ceil(w / SKY_BLOCK);
+    const bh = Math.ceil(h / SKY_BLOCK);
+    const tops = new Float64Array(bw * bh).fill(-Infinity);
+    const put = (i, t) => {
+      const b = Math.floor(Math.floor(i / w) / SKY_BLOCK) * bw + Math.floor((i % w) / SKY_BLOCK);
+      if (t > tops[b]) tops[b] = t;
+    };
     for (let i = 0; i < w * h; i++) {
       const f = this.flags[i];
       if (f & F_VOID) continue;
@@ -308,13 +328,22 @@ export class TileMap {
           t = Math.max(t, s.top < this.ceilZ[i] ? s.top : this.ceilZ[i]);
         }
       }
-      if (t > top) top = t;
+      put(i, t);
     }
-    for (const fe of this.fences) top = Math.max(top, this.fenceTop(fe));
+    // (A fence on a tile's edge, in the blocks of the tiles both sides.)
+    for (let i = 0; i < w * h; i++) {
+      for (let k = 0; k < 4; k++) if (this.fenceAt[i * 4 + k] >= 0) put(i, this.fenceTop(this.fences[this.fenceAt[i * 4 + k]]));
+    }
     for (const lift of this.lifts) {
       const rise = Math.max(...lift.stops) - Math.min(...lift.stops);
-      for (const i of lift.tiles) top = Math.max(top, Math.max(...lift.stops), lift.moves === 'both' ? this.ceilZ[i] + rise : -Infinity);
+      for (const i of lift.tiles) put(i, Math.max(Math.max(...lift.stops), lift.moves === 'both' ? this.ceilZ[i] + rise : -Infinity));
     }
+    let top = -Infinity;
+    for (const t of tops) if (t > top) top = t;
+    this.blockTops = tops;
+    this.blockW = bw;
+    this.blockH = bh;
+    this.skyMargin = margin;
     this.skyline = top + margin;
     return this.skyline;
   }
