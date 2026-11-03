@@ -25,6 +25,7 @@ import { STAINS } from './models/stains.js';
 import { ENGINE } from './models/garage.js';
 import { BUNK, BUNKS } from './models/hostel.js';
 import { FIRE_DRUM } from './models/quarter.js';
+import { STALL, STABLE_POST, FEED } from './models/stable.js';
 
 // Scenery. Solid ones block movement; ones with health can be shot (and
 // `explode`).
@@ -116,6 +117,13 @@ export default [
   // The old quarter's: the hermit's candles (models/quarter.js) and a squatter's bedroll.
   defineDecoration({ id: 'candles', model: 'candles', fixed: true }),
   defineDecoration({ id: 'bedroll', model: 'bedroll', fixed: true }),
+  // The dewback stable's (models/stable.js): rails between its stalls (colliding as
+  // their outline), the posts along its open front, a feed trough, the patrol's
+  // saddles on a rack (on a wall, so not solid).
+  defineDecoration({ id: 'stall-rails', model: 'stall-rails', solid: true, height: STALL.top, fixed: true }),
+  defineDecoration({ id: 'stable-post', model: 'stable-post', solid: true, radius: STABLE_POST.w + 0.03, height: STABLE_POST.h, fixed: true }),
+  defineDecoration({ id: 'feed-trough', model: 'feed-trough', solid: true, height: FEED.top, fixed: true }),
+  defineDecoration({ id: 'saddle-rack', model: 'saddle-rack', fixed: true }),
   // The squatters' fire in a drum: embers and a thin smoke off it (its flames are the model's).
   defineDecoration({
     id: 'fire-drum',

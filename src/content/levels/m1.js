@@ -97,6 +97,46 @@ town.window(48.5, 63, 'S', { z: 3.6 }).window(55.5, 63, 'S', { z: 3.6 }).window(
 town.stair(58, 53, 60, 61, { up: 'N', top: 3.5, side: 'adobe-rose' });
 town.door(58, 54, 'E', { h: 10, wall: 'adobe-rose', floorZ: 3.5 });
 
+// 11. The dewback stable, across the north back lane from B to D: a long low
+// house open along its front between timber posts under a beam, a slatted
+// roof the suns fall through in stripes, dim and dusty under the slats.
+// Four stalls along the back wall behind plank rails, each 7 wide, the posts
+// in line with the rails. In the first two the patrol's spare dewbacks,
+// nose to nose through the rails, each tied to a ring on the back wall with
+// a water trough and a feed trough (a halved drum). The third is being
+// mucked out by the stable hand; the fourth holds the patrol's saddles on a
+// rack, feed canisters and an Imperial supply crate.
+const STABLE = { x0: 22, y0: 31, x1: 50, y1: 44 };
+town.house(STABLE.x0 - 2, STABLE.y0 - 2, STABLE.x1 + 2, STABLE.y1, { h: 6, r: 1, wall: 'adobe-ochre' });
+p.rect(STABLE.x0, STABLE.y0, STABLE.x1, STABLE.y1, town.street());
+// The beam along the front, then the slats behind it.
+p.rect(STABLE.x0, STABLE.y1 - 1, STABLE.x1, STABLE.y1, (x, y, c) => ({ ...c, slab: { bottom: 4.25, top: 5, floor: 'planks', ceiling: 'planks', side: 'planks', light: 144 } }));
+town.slats(STABLE.x0, STABLE.y0, STABLE.x1, STABLE.y1 - 1, { z: 4.5 });
+const STALL_RAILS = [29, 36, 43];
+// (The rails are 6 long, placed by their middle.)
+for (const x of STALL_RAILS) list.push(at('stall-rails', x, STABLE.y0 + 3), at('stable-post', x, STABLE.y1 - 0.5));
+// The dewbacks, their rings and troughs. (Things against the back wall are
+// lit as under the slats: the light at the wall's foot is darker.)
+const UNDER = 128;
+town.fixture('hitching-ring', 27.5, STABLE.y0, 'S', { z: 1.3 }).fixture('hitching-ring', 30.5, STABLE.y0, 'S', { z: 1.3 });
+list.push(
+  at('dewback', 25.6, 34, { angle: 0 }), at('dewback', 32.6, 34.4, { angle: 180 }),
+  at('water-trough', 25, 31.55, { lit: UNDER }), at('water-trough', 33, 31.55, { lit: UNDER }), at('water-trough', 39.5, 31.55, { lit: UNDER }),
+  at('feed-trough', 28.3, 34.2, { angle: 90 }), at('feed-trough', 29.75, 34.4, { angle: 90 }),
+  // The third stall, being mucked out.
+  at('villager-man', 39.2, 35.6, { angle: 200, wander: 0 }), at('litter', 40.6, 34.4, { angle: 60 }), at('oil-small', 38.2, 33.6, { angle: 130 }),
+  // The fourth: the patrol's tack and feed.
+  at('crate-tan', 44.2, 32, { lit: UNDER }), at('canister-rust', 49.3, 32, { lit: UNDER }), at('canister-rust', 49.4, 32.7, { lit: UNDER }), at('canister', 48.7, 32.3, { lit: UNDER }),
+  at('supply-crate', 48.8, 35.6),
+  // In the aisle, a barrel of water by the west wall.
+  at('barrel-grey', 22.6, 40.2),
+);
+list.push(at('saddle-rack', 46.5, STABLE.y0 + 0.01, { lit: UNDER }));
+town.hangings.push(
+  { type: 'cable', from: [27.5, 31.1, 1.6], to: [27.9, 33.7, 1.35], sag: 0.35 },
+  { type: 'cable', from: [30.5, 31.1, 1.6], to: [30.2, 34.1, 1.35], sag: 0.35 },
+);
+
 // South row.
 // E: a shop you can walk into, with a dome over it, and a yard in front
 // inside knee-high walls, its gate before the door. (The side walls meet
@@ -1710,7 +1750,7 @@ list.push(
 );
 // Crates, drums, canisters, cargo pods, junk and litter along the walls
 // (lib/town.js), but none yet in the blocked-out middle and east third.
-town.clutter({ keep: [[126, 92, 130, 122], [130, 86, 150, 122], [136, 44, W, H], [54, 1, 146, 49], [57, 94, 87, 131], [87, 82, 126, 122], [85, 76, 102, 82]] });
+town.clutter({ keep: [[STABLE.x0, STABLE.y0, STABLE.x1, STABLE.y1], [126, 92, 130, 122], [130, 86, 150, 122], [136, 44, W, H], [54, 1, 146, 49], [57, 94, 87, 131], [87, 82, 126, 122], [85, 76, 102, 82]] });
 list.push(...town.things);
 
 // Hand-placed along the main street and on the square (the kit's

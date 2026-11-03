@@ -383,6 +383,25 @@ test('a tarp is a cloth tied at four corners on poles, shading the ground under 
   assert.equal(h.light, town.light, 'the cloth is in the sun');
 });
 
+test('a slatted roof is slats a tile apart; the suns fall through its gaps in stripes and its walls are in its shade', () => {
+  const { p, town } = kit();
+  // A shed open along its south side, its walls two tiles thick.
+  town.house(8, 8, 24, 20, { h: 6 });
+  p.rect(10, 10, 22, 20, town.street());
+  town.slats(10, 10, 22, 20, { z: 4.5, thick: 0.25, light: 96, sun: 200 });
+  town.finish();
+  for (let y = 10; y < 20; y++) {
+    const c = p.get(15, y);
+    if ((y - 10) % 2) assert.ok(!c.slab && c.light === 200, `row ${y} is a gap, the sun straight through it`);
+    else assert.ok(c.slab && c.slab.bottom === 4.5 && c.slab.top === 4.75 && c.slab.light === 96, `row ${y} is a slat, the floor under it in shade`);
+  }
+  assert.equal(p.get(9, 14).light, 96, 'the wall beside it is in its shade');
+  assert.equal(p.get(15, 9).light, 96, 'and the wall behind it');
+  assert.equal(p.get(8, 14).light, town.light, "the wall's outer half keeps the sun");
+  assert.equal(p.get(15, 22).light, town.light, 'the street in front of it is in the sun');
+  assert.throws(() => town.slats(10, 10, 22, 20, { run: 'z' }), /"run" must be 'x' or 'y'/);
+});
+
 test('a lean-to gets tin sheets along its front, an end at each side, and its shadow grows', () => {
   const light = (tin) => {
     const { p, town } = kit();

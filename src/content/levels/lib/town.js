@@ -141,6 +141,8 @@ export class Town {
     this.stalls = [];
     /** Hoods on a wall, lit as it in `finish()` (their faces that stand out aren't flat): { thing, wall, street } tiles. */
     this.wallLit = [];
+    /** Slatted roofs (`slats()`): the boxes, and how bright the suns are through their gaps. */
+    this.slatted = [];
   }
 
   /**
@@ -662,6 +664,27 @@ export class Town {
       const tie = (a) => (ns ? [a, e, top - 0.06] : [e, a, top - 0.06]);
       this.hangings.push({ type: valance, from: tie(a0 + 0.1), to: tie(a1 - 0.1), length: 0.5 });
     }
+    return this;
+  }
+
+  /**
+   * A slatted roof over a box open to the sky: slats `thick` deep with their
+   * undersides `z` over `floorZ`, a tile wide and a tile apart, running
+   * along `run` ('x' or 'y'), the first along the box's near edge. Each is a
+   * slab: under it the floor is `light`. The suns fall straight down
+   * through the gaps in stripes, `sun` bright (`finish()` lights them after
+   * the shadows, which would put them in the slats' shade). The buildings
+   * round the box are in the slats' shade too, so make their walls two
+   * tiles thick where their far side shows.
+   */
+  slats(x0, y0, x1, y1, { z = 4.5, thick = 0.25, floorZ = 0, run = 'x', tex = 'planks', light = 104, sun = 192 } = {}) {
+    if (run !== 'x' && run !== 'y') throw new Error(`Town: the slats at (${x0}, ${y0}): "run" must be 'x' or 'y'`);
+    this.p.rect(x0, y0, x1, y1, (x, y, old) => {
+      if (old.wall || old.door || old.slab || old.ceiling !== 'sky') return old;
+      if ((run === 'x' ? y - y0 : x - x0) % 2) return old;
+      return { ...old, slab: { bottom: floorZ + z, top: floorZ + z + thick, floor: tex, ceiling: tex, side: tex, light } };
+    });
+    this.slatted.push({ box: [x0, y0, x1, y1], top: floorZ + z + thick, light, sun });
     return this;
   }
 
@@ -1287,6 +1310,16 @@ export class Town {
    */
   finish(suns = SUNS) {
     this.seal().shadows(suns);
+    // Through a slatted roof's gaps the suns fall straight down. The walls
+    // round it (the buildings a tile outside the box, taller than the slats)
+    // are in the slats' shade: their faces are drawn halfway between their
+    // own light and the floor's in front.
+    for (const { box: [x0, y0, x1, y1], top, light, sun } of this.slatted) {
+      this.p.rect(x0, y0, x1, y1, (x, y, c) => (c.wall || c.door || c.slab || c.ceiling !== 'sky' ? c : { ...c, light: sun }));
+      const shade = (x, y, c) => (!c.wall && !c.door && (c.floorZ ?? 0) >= top ? { ...c, light } : c);
+      this.p.rect(x0 - 1, y0 - 1, x1 + 1, y0, shade).rect(x0 - 1, y1, x1 + 1, y1 + 1, shade);
+      this.p.rect(x0 - 1, y0, x0, y1, shade).rect(x1, y0, x1 + 1, y1, shade);
+    }
     // Models flush with a wall take the light the wall is drawn in where
     // they stand: halfway between its tile's and the street's in front.
     for (const { thing, wall, street } of this.wallLit) thing.lit = Math.round(((this.p.get(...wall)?.light ?? this.light) + (this.p.get(...street)?.light ?? this.light)) / 2);

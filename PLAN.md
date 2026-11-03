@@ -28,6 +28,15 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
+- **The dewback stable** (`?map=m1`, 2026-11-02): across the north back
+  lane from B to D, open from the start. Its front is open between timber
+  posts under a beam, and the suns fall through its slatted roof in
+  stripes (dim under the slats, walls too). Four stalls behind plank
+  rails: the patrol's two spare dewbacks nose to nose, tied to rings, with
+  water and feed troughs; a stall being mucked out by the stable hand; the
+  patrol's saddles on a rack with feed and an Imperial crate. To judge:
+  the light (stripes, how dim), whether the aisle in front of the stalls
+  is too big and empty, and the saddles and troughs at that size.
 - **Smooth motion** (2026-11-02): the view is now drawn between the last
   two ticks, so walking should look steady on a 120 or 144 Hz screen and
   never judder at 60. To judge: whether it feels smoother, and whether the
@@ -745,6 +754,19 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
     - [ ] Bay 86 dressed as Bay 87 is: ribs, rim lamps (some dead),
           fuel lines and pumps, ribbed foot, scorch marks, crates opened
           round the freighter; the gate with a hood and buttresses.
+    - [x] The dewback stable (Mark, 2026-11-02): a long low house off the
+          north back lane, behind B to D, its front open between timber
+          posts, a slatted plank roof the suns fall through in stripes
+          (`town.slats()`); stalls along the back behind plank rails
+          (`models/stable.js`), two dewbacks (the patrol's spare mounts),
+          water and feed, the patrol's saddles, a stable hand.
+    - [ ] The speeder garage (Mark, 2026-11-02): J hollowed into a
+          workshop, its market shutter rolled up so you walk in (the back
+          shutter onto the yard stays down: the yard waits for the
+          signal); an X-34 on blocks with an engine gone (the one on the
+          trestles in the yard), a swoop on a hoist, a bench and tools, a
+          pit droid, a lamp, oil on the floor.
+    - [ ] Waiting on Mark.
   - [ ] The Jawa junk yard and the sandcrawler.
     - [x] Laid out deeper (Mark, 2026-10-31: the trader shouldn't stand
           at the gate): a front court, a passage slanting north-west to
