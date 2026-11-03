@@ -1044,10 +1044,10 @@ its renders compared:
       needed up to 330; things further off were clipped by the last one,
       too wide. Now a batch is kept only where the windows change, and
       there's room for 128: no view of 120 differs from unlimited room.
-- [ ] Models hidden behind buildings: before transforming a model, test
-      its screen box against the windows of the last batch nearer than it
-      in each column it covers, and skip it if none overlap. Up to 1.8 ms
-      a view in Mos Eisley, more in the worst (models 9.6 ms there).
+- [x] Models hidden behind buildings: before transforming a model, test
+      its screen box against the windows open at its depth in each column
+      it covers, and skip it if none overlap. Mos Eisley 13.4 to 12.25 ms
+      a frame, renders unchanged.
 - [ ] Collisions: `checkPosition` tests all 1385 things for every move of
       each of the 92 movers, half the tick (about 1.3 ms). A grid of solid
       things by block. It counts twice in a slow frame, which runs two

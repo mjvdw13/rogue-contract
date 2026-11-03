@@ -75,19 +75,56 @@ export function drawModels(view, things, map, textures, fb, fbW, colormaps, skip
     if (cDepth + r < NEAR) continue;
     const cTx = invDet * (dirY * cdx - dirX * cdy);
     if (Math.abs(cTx) - r > cDepth + r) continue;
-    // Hidden behind the walls in every column it could cover (its nearest
-    // point is no nearer than where they end): nothing would draw.
+    // Hidden in every column it could cover, behind the walls (its nearest
+    // point is no nearer than where they end) or behind ledges and roofs (no
+    // window open at its depth meets the rows it could cover): nothing would
+    // draw. Over a town's roofs the rays go on past the buildings, so most
+    // hidden models are only caught by the windows.
     const dMin = cDepth - r > NEAR ? cDepth - r : NEAR;
     const dMax = cDepth + r;
     const rl = r / view.planeLen;
     const qLo = Math.min((cTx - rl) / dMin, (cTx - rl) / dMax);
     const qHi = Math.max((cTx + rl) / dMin, (cTx + rl) / dMax);
+    // Its rows: the box from its lowest to its highest point (all rows for a
+    // rolling thing, which may reach further, and a cloth, which has no
+    // height range).
+    let yLo = 0;
+    let yHi = H;
+    if (!t.bobRoll && model.zMax !== undefined) {
+      const z0 = (t.z ?? 0) + model.zMin * s;
+      const bz = t.bobZ ?? 0;
+      const a = z0 + (bz > 0 ? 0 : bz) - camZ;
+      const b = z0 + (model.zMax - model.zMin) * s + (bz > 0 ? bz : 0) - camZ;
+      yLo = Math.floor(horizon - (b * fy) / (b > 0 ? dMin : dMax)) - 1;
+      yHi = Math.ceil(horizon - (a * fy) / (a < 0 ? dMin : dMax)) + 2;
+    }
     let hidden = true;
     for (let x = Math.max(0, Math.floor(halfW * (1 + qLo)) - 1), x1 = Math.min(W, Math.ceil(halfW * (1 + qHi)) + 1); x < x1; x++) {
-      if (zbuf[x] > dMin - 1e-6) {
+      if (zbuf[x] <= dMin - 1e-6) continue;
+      // The windows of the last batch nearer than its nearest point, and of
+      // every batch within its depth.
+      const sb = x * SEG;
+      const ns = segCount[x];
+      let k = 0;
+      let hi = ns;
+      while (k < hi) {
+        const mid = (k + hi) >> 1;
+        if (segDist[sb + mid] < dMin) k = mid + 1;
+        else hi = mid;
+      }
+      if (k === 0) {
         hidden = false;
         break;
       }
+      k--;
+      while (k > 0 && !segFirst[sb + k]) k--;
+      for (; k < ns && (segDist[sb + k] < dMax || !segFirst[sb + k]); k++) {
+        if (segTop[sb + k] < yHi && segBot[sb + k] > yLo) {
+          hidden = false;
+          break;
+        }
+      }
+      if (!hidden) break;
     }
     if (hidden) continue;
 
