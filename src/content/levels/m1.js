@@ -973,7 +973,9 @@ for (const [x, y] of HOLD_HOLES) {
 // Where the hull's plating is gone the hold is open behind it
 // (FREIGHTER.windows): the wall's tiles cut down to a sill, the ceiling
 // over them, so you see the bay from the hold and the hold from the bay;
-// and in the roof's hole the ceiling is gone, the sky over a shaft.
+// and in the roof's hole the ceiling is gone, the sky over a shaft. (The
+// sky at its full height: a sky lower than your eye hides everything
+// beyond it above that height, and the balcony looks down over the hole.)
 const holdAt = (mx, my) => [181 + mx, 134.5 + my];
 const HOLD_SLAB = p.get(180, 134).slab;
 for (const [x0, x1, z0, , s] of FREIGHTER.windows) {
@@ -983,7 +985,7 @@ for (const [x0, x1, z0, , s] of FREIGHTER.windows) {
 {
   const [sx0, sx1, sy0, sy1] = FREIGHTER.skylight;
   const [[x0, y0], [x1, y1]] = [holdAt(sx0, sy0), holdAt(sx1, sy1)];
-  p.rect(x0, y0, x1, y1, (_, __, c) => ({ ...c, slab: undefined, ceilZ: DERELICT.floorZ + 5.75, light: 140 }));
+  p.rect(x0, y0, x1, y1, (_, __, c) => ({ ...c, slab: undefined, ceilZ: SKY, light: 140 }));
 }
 for (const x of [175.5, 178, 180.6, 183, 185.5, 187.6]) list.push(at('hold-rib', x, 134.5, { z: DERELICT.floorZ, angle: 0, lit: 96 }));
 town.arch(188, 132, 189, 137, { h: DERELICT.floorZ + 5, lintel: 3, floorZ: DERELICT.floorZ, wall: 'hold-wall', floor: 'hold-floor' });
