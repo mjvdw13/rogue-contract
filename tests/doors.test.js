@@ -134,7 +134,7 @@ await assets.loadAll();
 const renderer = new Renderer(new Surface(SCREEN_W, VIEW_H), assets, palette);
 
 /** Render a doorway from 3 tiles in front of its panel, looking at its middle. */
-function frame(level, y, open = 0) {
+function frame(level, y, open = 0, pitch = 0) {
   const w = new World({ registry, assets, rng: new Rng(1), settings: { noMonsters: true } }, level, { skill: 3 });
   for (const d of w.map.doors) d.open = open;
   const pt = w.player;
@@ -142,6 +142,7 @@ function frame(level, y, open = 0) {
   pt.y = y;
   pt.z = 0;
   pt.angle = contentAngle(0);
+  pt.pitch = pitch;
   renderer.surface.clear(0);
   renderer.render(w, w.camera(), { skip: pt });
   return { px: Uint8Array.from(renderer.surface.px), zbuf: Float32Array.from(renderer.view.zbuf) };
@@ -238,6 +239,21 @@ test('a door under the sky shows sky above its roof, and once open looks like an
   assert.ok(top > 0);
   assert.deepEqual(shut.px.subarray(0, top * SCREEN_W), arch.px.subarray(0, top * SCREEN_W), 'nothing above the opening changes');
   assert.notDeepEqual(shut.px, arch.px, 'the panel shows below it');
+});
+
+test('a secret rising door under the sky shows only below the wall over it, and rises like any other', () => {
+  // Looking up, to see over the roof.
+  const secret = building('S', { S: { ...SKY_DOOR, secret: true } });
+  const shut = frame(secret, 5, 0, 150);
+  const arch = frame(building('A'), 5, 0, 150);
+  const { horizon, fy } = renderer.view;
+  const top = Math.ceil(horizon + ((1.25 - 3) * fy) / 3 - 0.5);
+  // (Compared as bytes: a failed deepEqual of two frames prints too much.)
+  const same = (a, b) => Buffer.compare(a, b) === 0;
+  assert.ok(same(shut.px.subarray(0, top * SCREEN_W), arch.px.subarray(0, top * SCREEN_W)), 'nothing above the opening changes');
+  assert.ok(!same(shut.px, arch.px), 'the panel shows below it');
+  assert.ok(!same(shut.px, frame(building(), 5, 0, 150).px), 'flush with the wall, not set back like a plain door');
+  assert.ok(same(frame(secret, 5, 1, 150).px, arch.px), 'open, it is the arch');
 });
 
 test('lockDoors shuts the player out of a door they could open, triggers still open it, and unlockDoors frees it, a key door too', () => {

@@ -597,11 +597,12 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
         const door = doors[doorIndex[cur]];
         if (door.style === 'rise') {
           // A rising door's panel stands back in its doorway (perhaps on the
-          // edge between two of its tiles: drawn once). Below its bottom edge
-          // the ray carries on under it. Under a slab (the wall over a door
-          // under the sky) it rises into the slab, and windows looking over
-          // the slab don't see it.
-          const t = door.axis === 'x' ? (rdx !== 0 ? (door.plane - px) / rdx : -1) : rdy !== 0 ? (door.plane - py) / rdy : -1;
+          // edge between two of its tiles: drawn once); a secret one is flush
+          // with the wall, where the ray came into the doorway. Below its
+          // bottom edge the ray carries on under it. Under a slab (the wall
+          // over a door under the sky) it rises into the slab, and windows
+          // looking over the slab don't see it.
+          const t = door.secret ? tEnter : door.axis === 'x' ? (rdx !== 0 ? (door.plane - px) / rdx : -1) : rdy !== 0 ? (door.plane - py) / rdy : -1;
           if (door.group !== panelDone && t > 1e-4 && t >= tEnter - 1e-6 && t <= tExit + 1e-6) {
             panelDone = door.group;
             const bz = door.bottomZ;
@@ -740,8 +741,9 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
       }
       if (f & F_DOOR) {
         const door = doors[doorIndex[next]];
-        if (door.secret) {
-          // Secret doors sit flush with the wall around them and slide sideways.
+        if (door.secret && door.style !== 'rise') {
+          // Secret doors sit flush with the wall around them and slide sideways
+          // (a rising one is drawn in its tile, below).
           let du = door.axis === 'x' ? py + rdy * tExit - mapY : px + rdx * tExit - mapX;
           if (du >= door.open) {
             du -= door.open;
