@@ -1067,7 +1067,7 @@ its renders compared:
       11.1), m3 and the sandbox unchanged, renders unchanged. (The
       prototype's differences were a bug: secret rising doors stood as
       columns up to the sky's ceiling, fixed first.)
-- [ ] `preserveDrawingBuffer: false` in the WebGL presenter: nothing reads
+- [x] `preserveDrawingBuffer: false` in the WebGL presenter: nothing reads
       the canvas back, and keeping it can cost a copy a frame.
 - [ ] To measure: `drawWorld`'s per-column closures (13 a column, 4000 a
       frame) as module functions; static models' world-space vertices

@@ -168,7 +168,9 @@ export class Presenter {
       alpha: false,
       depth: false,
       stencil: false,
-      preserveDrawingBuffer: true,
+      // (Every frame draws the whole canvas and nothing reads it back:
+      // keeping the buffer can cost a copy a frame.)
+      preserveDrawingBuffer: false,
       powerPreference: 'low-power',
     });
     if (!gl) throw new Error('no webgl context');
