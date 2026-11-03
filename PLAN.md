@@ -795,7 +795,7 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
           commit each:
       - [x] The back alleys: the first and second lanes, the thug's
             square.
-      - [ ] The old quarter: the north street, the bends, the way to the
+      - [x] The old quarter: the north street, the bends, the way to the
             bay's gate.
       - [ ] The dry wash: its banks.
       - [ ] The back lane: the rooftops' faces.
