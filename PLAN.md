@@ -105,6 +105,18 @@ These need Mark to try something, or to decide. Don't start them without him.
   on the bend and the ruin now wears a dome (twelve more), from 3 to 6
   wide. To judge: the domes from the streets (they show best across the
   gate square and down the bend), and the new way through the yard.
+  Then the back alleys: on the first lane the south slot is an alley
+  1.5 m wide back to the market's houses, and the gun shop's house stands
+  on its own, an alley 1 m wide up its east side with washing across it;
+  on the second lane an alley each side, facing across the lane halfway
+  (1 m on the north, the ochre house past it a tile back; 1.5 m on the
+  south), the power box and its cables moved with the ochre wall; the
+  thug's square's corners alleys 1 m wide (his men's drums in the east
+  one). Seven more domes: 3 wide on the lanes' narrow houses (all but
+  the lowest grey one), 3 and 4 on the square's rose and east houses. To
+  judge: whether the second lane's alleys facing each other read as a
+  crossing (they could be staggered, with narrower houses), and the small
+  domes on 2 m houses.
 - **The remaining streets, detailed** (`?map=m1`, 2026-11-01): each its
   own place, built from the town's pieces.
   The back lane: the cantina's empties by its back door, its rubbish
@@ -628,7 +640,7 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
   - [x] The old quarter's north street.
   - [x] The old quarter's main street, bend and way to the bay's gate,
         and domes on its houses.
-  - [ ] The back alleys' two lanes and the thug's square.
+  - [x] The back alleys' two lanes and the thug's square, with domes.
   - [ ] The dry wash and the back lane.
 
 - [x] Design: `docs/mission1.md`.
