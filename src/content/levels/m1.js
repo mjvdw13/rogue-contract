@@ -608,26 +608,31 @@ openPolygon([[174, 88], [183, 88], [183, 99], [174, 95]], town.street(OQ - 0.25)
 p.rect(181, 88, 183, 100, (_, __, c) => (c.floorZ === OQ - 0.25 ? QUARTER : c));
 p.rect(149, 86, 157, 96, town.street(OQ));
 p.rect(157, 88, 174, 92, town.street(OQ));
-// (Ground under its rounded north-east corner, for the slot beside it.)
-p.rect(156, 76, 158, 79, QUARTER);
-town.house(148, 76, 157, 86, { h: 8, r: 1, wall: 'adobe-grey' });
-town.house(149, 96, 157, 104, { h: 7.5, wall: 'adobe-ochre' });
+// The gate square's south side houses stand apart (Mark, 2026-11-03: the
+// slots half a metre wide read as cracks): a passage 1 m wide runs from
+// the square's corner past the grey house to the yard, so the yard is a
+// way round to the little square as well as a dead end off it.
+p.rect(156, 76, 158, 88, QUARTER);
+town.house(148, 76, 156, 86, { h: 8, r: 1, wall: 'adobe-grey' });
+town.house(149, 96, 157, 104, { h: 7.5, wall: 'adobe-ochre', dome: true });
 // South and west of it (north and east of it below, once the wash is cut):
-// three houses along the bend's south-west side, each its own and not one
-// wall (Mark, 2026-11-02): the ochre one stands between slots half a
-// metre wide, closed a few tiles back, and the rose one is set back from
-// the pale one's slanting front, so its end shows.
-p.rect(166, 76, 167, 79, QUARTER);
+// three houses along the bend's south-west side, each its own (Mark,
+// 2026-11-02): the ochre one between the passage and a dead-end alley 1 m
+// wide and 9 tiles deep, closed by its own low back room, where it keeps
+// its stores; the rose one set back from the pale one's slanting front,
+// so its end shows.
+p.rect(165, 76, 167, 85, QUARTER);
 openPolygon([[175, 81], [181, 87], [181, 88], [175, 82]], QUARTER);
-town.house(158, 76, 166, 88, { h: OQ + 5.5, wall: 'adobe-ochre' });
-town.block(157, 79, 158, 88, { h: OQ + 5.5, wall: 'adobe-ochre' }).block(166, 79, 167, 88, { h: OQ + 6.5, wall: 'adobe-pale' });
+town.house(158, 76, 165, 88, { h: OQ + 5.5, wall: 'adobe-ochre', dome: true });
+town.block(165, 85, 167, 88, { h: OQ + 3.5, wall: 'adobe-ochre' }).pipe(165, 79.5, 'E', { floorZ: OQ });
+list.push(at('crate-grey-small', 165.55, 84.45, { angle: 8 }), at('canister-rust', 166.45, 84.5), at('litter-small', 166.2, 81.6, { angle: 140 }));
 town.slanted([[167, 76], [170, 76], [175, 81], [175, 88], [167, 88]], { h: OQ + 6.5, wall: 'adobe-pale', dome: true });
 town.slanted([[175, 82], [181, 88], [175, 88]], { h: OQ + 5, wall: 'adobe-rose', skirt: 'plinth' });
 // The alley's south side two houses, a slot between them.
 p.rect(162, 92, 163, 95, QUARTER);
-town.house(157, 92, 162, 104, { h: OQ + 5, wall: 'adobe', skirt: 'plinth' });
+town.house(157, 92, 162, 104, { h: OQ + 5, wall: 'adobe', skirt: 'plinth', dome: true });
 town.house(163, 92, 174, 104, { h: OQ + 6, wall: 'adobe-pale', dome: true }).block(162, 95, 163, 104, { h: OQ + 6, wall: 'adobe-pale' });
-town.slanted([[174, 95], [183, 99], [183, 104], [174, 104]], { h: OQ + 5, wall: 'adobe-grey' });
+town.slanted([[174, 95], [183, 99], [183, 104], [174, 104]], { h: OQ + 5, wall: 'adobe-grey', dome: true });
 // A room bridges the alley halfway, its underside a round-topped vault.
 town.arch(164, 88, 168, 92, { h: OQ + 6, lintel: 3.5, floorZ: OQ, wall: 'adobe-pale', round: 'E' });
 
@@ -647,25 +652,32 @@ openPolygon([[196, 96], [204, 96], [198, 104], [194, 104]], WASH_CELL);
 // either street (Mark, 2026-11-02): on the north street the first house
 // stands on its own, a passage 1.5 m wide through to the main street past
 // it (2026-11-03: a slot half a metre wide didn't read as a gap), and the
-// pale one set back behind a yard; on the bend the rose one set back from the
-// pale one's line; on the way to the bay's gate two houses, not one, a
-// slot between them and the second a tile back from the street.
-p.rect(168, 60, 171, 64, QUARTER);
+// pale one set back behind a yard; on the bend the rose one set back from
+// the pale one's line, and a dead-end alley 1 m wide running 10 tiles back
+// between the pale one and the ochre one, the ochre one's side door in it;
+// on the way to the bay's gate two houses, not one, a slot between them and
+// the second a tile back from the street. Every house but the smallest
+// wears a dome (Mark, 2026-11-03: Mos Eisley's toppers).
+p.rect(168, 60, 171, 64, QUARTER).rect(182, 66, 184, 78, QUARTER);
 openPolygon([[170, 64], [171, 64], [176, 69], [176, 70]], QUARTER);
-p.rect(189, 93, 192, 95, QUARTER).rect(189, 95, 190, 104, QUARTER);
-town.house(160, 60, 168, 64, { h: OQ + 5, r: 1 });
-town.slanted([[171, 60], [176, 60], [176, 69], [171, 64]], { h: OQ + 5.5, wall: 'adobe-rose' });
+p.rect(187, 93, 192, 95, QUARTER).rect(189, 95, 190, 104, QUARTER);
+town.house(160, 60, 168, 64, { h: OQ + 5, r: 1 }).dome(164, 62, OQ + 5, 3);
+town.slanted([[171, 60], [176, 60], [176, 69], [171, 64]], { h: OQ + 5.5, wall: 'adobe-rose', dome: true });
 // The pale one 1.5 m back from the street behind a paved yard a step up, its
 // neighbours' ends showing either side.
 town.platform(176, 60, 184, 63, { h: OQ + 0.25 });
-town.slanted([[176, 63], [184, 63], [184, 78], [176, 70]], { h: OQ + 6.5, wall: 'adobe-pale', dome: true });
-town.slanted([[184, 60], [194, 60], [189, 65], [184, 65]], { h: OQ + 5 });
-town.house(184, 65, 189, 73, { h: OQ + 6, wall: 'adobe-ochre' });
-town.slanted([[184, 73], [189, 73], [196, 80], [196, 83], [189, 83], [184, 78]], { h: OQ + 5.5, wall: 'adobe-rose' });
+town.slanted([[176, 63], [182, 63], [182, 76], [176, 70]], { h: OQ + 6.5, wall: 'adobe-pale', dome: true }).block(182, 63, 184, 66, { h: OQ + 6.5, wall: 'adobe-pale' });
+town.slanted([[184, 60], [194, 60], [189, 65], [184, 65]], { h: OQ + 5, dome: true });
+town.house(184, 65, 189, 73, { h: OQ + 6, wall: 'adobe-ochre', dome: true });
+town.door(184, 69, 'W', { h: OQ + 6, floorZ: OQ, tex: 'door-grey', wall: 'adobe-ochre', sign: false });
+list.push(at('crate-tan', 182.6, 66.6, { angle: 12 }), at('barrel-grey', 183.45, 66.5));
+town.slanted([[184, 73], [189, 73], [196, 80], [196, 83], [189, 83], [184, 78]], { h: OQ + 5.5, wall: 'adobe-rose', dome: true });
 // (The domed house's back stands a tile back from the wash's bank.)
 p.rect(195, 83, 196, 93, WASH_CELL);
-town.house(189, 83, 195, 93, { h: OQ + 7.5, dome: true });
-town.slanted([[192, 93], [196, 93], [196, 96], [194, 104], [190, 104], [190, 95]], { h: OQ + 6.5, wall: 'adobe-ochre', skirt: 'plinth' });
+// (The domed one 1 m out into the street, so its end and the ochre one's
+// set-back front show from the gate.)
+town.house(187, 83, 195, 93, { h: OQ + 7.5, dome: true });
+town.slanted([[192, 93], [196, 93], [196, 96], [194, 104], [190, 104], [190, 95]], { h: OQ + 6.5, wall: 'adobe-ochre', skirt: 'plinth', dome: true });
 // Its east bank: houses whose backs slant with it.
 town.slanted([[202, 60], [207, 60], [207, 65], [197, 65]], { h: 7, wall: 'adobe-pale' });
 town.slanted([[197, 73], [207, 73], [207, 80], [204, 80]], { h: 6.5, wall: 'adobe-grey' });
@@ -697,8 +709,8 @@ tagTile(198, 55, 'quarter-north');
 town.grimeBoxes.push([148, 40, 196, 106, 1.6]);
 town.window(148, 62.5, 'E', { z: OQ + 3.2 }).window(148, 70.5, 'E', { z: OQ + 4, tex: 'window-louvre' });
 town.door(152.5, 76, 'N', { h: 8, floorZ: OQ, tex: 'door-planks', width: 3, tall: 4, round: true, jamb: false, sign: false, panel: false, wall: 'adobe-grey' });
-town.things.push({ type: 'dome-broken-7-grey', x: 152.5, y: 80.5, z: 8, angle: 270 });
-town.caster(152.5, 80.5, 3.5, 8, 3.3);
+town.things.push({ type: 'dome-broken-7-grey', x: 152, y: 80.5, z: 8, angle: 270 });
+town.caster(152, 80.5, 3.5, 8, 3.3);
 town.fixture('hitching-ring', 160, 61.8, 'W', { z: OQ + 1.5 });
 // The north street's south side: the backs of the houses on the main street.
 town.window(162.5, 60, 'N', { z: OQ + 2.6 }).pipe(166.6, 60, 'N', { floorZ: OQ });
@@ -706,7 +718,7 @@ town.door(173, 60, 'N', { h: OQ + 5.5, floorZ: OQ, wall: 'adobe-rose' });
 town.window(179.5, 63, 'N', { z: OQ + 3.4, tex: 'window-louvre' }).buttress(182.4, 63, 'N', { h: OQ + 6.5, floorZ: OQ + 0.25, wall: 'adobe-pale' });
 town.door(187.5, 60, 'N', { h: OQ + 5, floorZ: OQ, tex: 'door-planks', width: 3, tall: 4, round: true, jamb: false, sign: false, panel: false });
 // Its north side.
-town.house(148, 45, 155, 53, { h: 6.5, wall: 'adobe-rose', skirt: 'plinth' });
+town.house(148, 45, 155, 53, { h: 6.5, wall: 'adobe-rose', skirt: 'plinth', dome: true });
 town.door(151.5, 53, 'S', { h: 6.5, floorZ: OQ, tex: 'door-planks', width: 3, tall: 4, round: true, jamb: false, sign: false, panel: false, wall: 'adobe-rose' });
 town.window(148.5, 53, 'S', { z: OQ + 3.4, tex: 'window-louvre' }).pipe(154.4, 53, 'S', { floorZ: OQ });
 // The ruin: its floor drifted sand, open to the sky; its walls each broken
@@ -732,7 +744,7 @@ town.door(168, 53, 'S', { h: 7, floorZ: OQ, tex: 'door-grey' }).hood(168, 53, 'S
 town.buttress(164.4, 53, 'S', { h: 7, floorZ: OQ }).buttress(170.2, 53, 'S', { h: 7, floorZ: OQ });
 town.window(169.5, 49, 'S', { z: 8.4, tex: 'window-louvre' });
 town.slanted([[174, 46], [180, 46], [180, 52], [174, 53]], { h: 6.5, wall: 'adobe-rose', dome: true });
-town.house(182, 46, 188, 55, { h: 7.5, wall: 'adobe-grey', skirt: null });
+town.house(182, 46, 188, 55, { h: 7.5, wall: 'adobe-grey', skirt: null, dome: true });
 town.door(184, 55, 'S', { h: 7.5, floorZ: OQ, tex: 'door-grey', wall: 'adobe-grey' });
 town.window(186.5, 55, 'S', { z: OQ + 3 }).pipe(187.4, 55, 'S', { floorZ: OQ });
 town.window(171, 47.5, 'E', { z: OQ + 3.6, tex: 'window-louvre' });
@@ -745,7 +757,7 @@ town.hangings.push(
 for (const [x, y, z, face, tex, scale] of [
   [160.6, 46, 4.3, 'S', 'brick-bare-1', 1], [156, 48.3, 2.6, 'E', 'brick-bare-2', 1], [162, 47.4, 3.4, 'W', 'brick-bare-2', 0.8],
   [161.5, 53, 2.2, 'S', 'brick-bare-1', 0.7], [156.5, 53, 3.3, 'S', 'brick-bare-2', 0.7],
-  [149.8, 76, 3.2, 'N', 'brick-bare-1', 1.1], [155.6, 76, 5.6, 'N', 'brick-bare-2', 0.9], [148, 63.6, 1.9, 'E', 'brick-bare-2', 0.8],
+  [149.8, 76, 3.2, 'N', 'brick-bare-1', 1.1], [154.6, 76, 5.6, 'N', 'brick-bare-2', 0.9], [148, 63.6, 1.9, 'E', 'brick-bare-2', 0.8],
   [153.3, 53, 4.7, 'S', 'brick-bare-2', 0.9], [183.6, 55, 5.5, 'S', 'brick-bare-1', 0.9], [165.9, 60, 3.1, 'N', 'brick-bare-1', 0.8],
 ]) town.decals.push({ x, y, z, face, tex, ...(scale !== 1 && { scale }) });
 list.push(
@@ -789,17 +801,17 @@ town.hangings.push(
 // wind, washing.
 town.door(166, 64, 'S', { h: OQ + 5, floorZ: OQ, tex: 'door-red' }).window(162.5, 64, 'S', { z: OQ + 2.6, tex: 'window-louvre' });
 town.door(161, 76, 'N', { h: OQ + 5.5, floorZ: OQ, tex: 'door-grey', wall: 'adobe-ochre' }).hood(161, 76, 'N', { h: OQ + 5.5, floorZ: OQ, wall: 'adobe-ochre' });
-town.window(164.5, 76, 'N', { z: OQ + 3.2, tex: 'window-louvre' }).window(168.5, 76, 'N', { z: OQ + 3.8 });
+town.window(163.5, 76, 'N', { z: OQ + 3.2, tex: 'window-louvre' }).window(168.5, 76, 'N', { z: OQ + 3.8 });
 town.door(160, 88, 'S', { h: OQ + 5.5, floorZ: OQ, wall: 'adobe-ochre' }).window(170.5, 88, 'S', { z: OQ + 3.4 });
 town.door(171, 92, 'N', { h: OQ + 6, floorZ: OQ, tex: 'door-grey', wall: 'adobe-pale' }).pipe(161.4, 92, 'N', { floorZ: OQ });
 town.door(178, 88, 'S', { h: OQ + 5, floorZ: OQ - 0.25, wall: 'adobe-rose' });
-town.door(189, 89.5, 'W', { h: OQ + 7.5, floorZ: OQ, tex: 'door-red' }).window(190, 98.5, 'W', { z: OQ + 3.4 }).buttress(190, 101.4, 'W', { h: OQ + 6.5, floorZ: OQ, wall: 'adobe-ochre' });
+town.door(187, 89.5, 'W', { h: OQ + 7.5, floorZ: OQ, tex: 'door-red' }).window(190, 98.5, 'W', { z: OQ + 3.4 }).buttress(190, 101.4, 'W', { h: OQ + 6.5, floorZ: OQ, wall: 'adobe-ochre' });
 town.window(183, 101.5, 'E', { z: OQ + 2.6 });
 town.fixture('wall-tank', 153.5, 86, 'S', { z: OQ + 2.4 }).window(150.5, 86, 'S', { z: OQ + 4.2 });
 town.door(153, 96, 'N', { h: 7.5, floorZ: OQ, wall: 'adobe-ochre', tex: 'door-grey' });
 town.decals.push(
-  onSlant([170, 76], [175, 81], 0.5, OQ + 3, 'brick-bare-2', 0.9), onSlant([176, 70], [184, 78], 0.3, OQ + 2.4, 'brick-bare-1'),
-  onSlant([176, 70], [184, 78], 0.78, OQ + 1.8, 'patch-plate', 0.9), onSlant([175, 82], [181, 88], 0.6, OQ + 3.4, 'brick-bare-2', 0.8),
+  onSlant([170, 76], [175, 81], 0.5, OQ + 3, 'brick-bare-2', 0.9), onSlant([176, 70], [182, 76], 0.4, OQ + 2.4, 'brick-bare-1'),
+  onSlant([176, 70], [182, 76], 0.75, OQ + 1.8, 'patch-plate', 0.9), onSlant([175, 82], [181, 88], 0.6, OQ + 3.4, 'brick-bare-2', 0.8),
 );
 {
   // Scrap sheets leant on the little square's slanting south side.
@@ -812,7 +824,7 @@ town.decals.push(
 }
 list.push(
   // The bend: odds and ends, out of the patrol's way.
-  at('junk-heap', 171.6, 74.4, { angle: 135 }), at('cargo-pod', 186.6, 84.4, { angle: 45 }), at('litter', 176.5, 77.6, { angle: 40 }),
+  at('junk-heap', 171.6, 74.4, { angle: 135 }), at('cargo-pod', 184.6, 82.6, { angle: 45 }), at('litter', 176.5, 77.6, { angle: 40 }),
   at('rubble', 182.8, 79.6, { angle: 210 }), at('litter-small', 166.4, 70.9, { angle: 100 }),
   // By the bay's gate.
   at('crate-tan', 189.4, 102.2, { angle: 6 }), at('crate-grey-small', 189.45, 102.15, { z: OQ + 0.9, angle: 30 }), at('crate-rust-long', 189.5, 100.1, { angle: 88 }),
@@ -830,7 +842,7 @@ lights.push({ x: 178.7, y: 93.1, z: 1.65, radius: 3.5, light: 40, fx: 'flicker',
 town.tarp(174, 92, 177, 95, { z: 2.5, face: 'E', rise: 0.5, cloth: 'teal', poles: 'front', floorZ: OQ - 0.25 });
 town.hangings.push(
   { type: 'rag', from: [174.05, 92.4, 3.7], to: [176.5, 88.05, 3.9], length: 0.9 },
-  { type: 'cable', from: [181.6, 87.95, 4.9], to: [188.95, 90.4, 6.2], sag: 0.9 },
+  { type: 'cable', from: [181.6, 87.95, 4.9], to: [186.95, 90.4, 6.2], sag: 0.8 },
 );
 
 // 18. The dry wash in detail (2026-11-01): a flood channel, dry now. At its

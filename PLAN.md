@@ -94,8 +94,17 @@ These need Mark to try something, or to decide. Don't start them without him.
   street so its side shows, the first house on the south side on its own
   with rounded corners and a passage 1.5 m wide past it through to the
   main street, and the pale domed house 1.5 m back behind a paved yard a
-  step up (its vaporator there). To judge: whether this is the right
-  medicine before it goes on to the other streets.
+  step up (its vaporator there). Mark OK'd it. Then the rest of the old
+  quarter: a passage 1 m wide from the gate square's corner past the grey
+  house to the water yard (a second way to the little square), a dead-end
+  alley 1 m wide between the ochre and pale houses on the main street,
+  closed by the ochre one's low back room (its stores at the end), one
+  off the bend's north-east side between the pale and ochre houses (the
+  ochre one's side door in it), and the domed house by the bay's gate 1 m
+  out into the street. Every house in the quarter but the rose triangle
+  on the bend and the ruin now wears a dome (twelve more), from 3 to 6
+  wide. To judge: the domes from the streets (they show best across the
+  gate square and down the bend), and the new way through the yard.
 - **The remaining streets, detailed** (`?map=m1`, 2026-11-01): each its
   own place, built from the town's pieces.
   The back lane: the cantina's empties by its back door, its rubbish
@@ -613,9 +622,12 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
       running 4 to 9 tiles back (dead ends, or through where a street is
       close behind), and houses pushed out into the street or set back
       behind a yard, so their ends show from along it. One street, then a
-      check-in with Mark before the rest.
+      check-in with Mark before the rest (he OK'd it, 2026-11-03). And
+      domes on the houses (Mark, 2026-11-03: Mos Eisley's toppers), all
+      but the smallest.
   - [x] The old quarter's north street.
-  - [ ] The old quarter's main street, bend and way to the bay's gate.
+  - [x] The old quarter's main street, bend and way to the bay's gate,
+        and domes on its houses.
   - [ ] The back alleys' two lanes and the thug's square.
   - [ ] The dry wash and the back lane.
 
