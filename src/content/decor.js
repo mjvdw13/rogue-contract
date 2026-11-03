@@ -22,7 +22,7 @@ import { BAR, TAPS, CORNER } from './models/cantina.js';
 import { POD } from './models/pod.js';
 import { POST } from './models/ring.js';
 import { STAINS } from './models/stains.js';
-import { ENGINE } from './models/garage.js';
+import { ENGINE, HOIST, BENCH, PIT_DROID } from './models/garage.js';
 import { BUNK, BUNKS } from './models/hostel.js';
 import { FIRE_DRUM } from './models/quarter.js';
 import { STALL, STABLE_POST, FEED } from './models/stable.js';
@@ -112,6 +112,14 @@ export default [
   defineDecoration({ id: 'landspeeder', model: 'landspeeder', solid: true, height: 1.22, fixed: true, bob: { height: 0.02, period: 3.2 } }),
   // One of its engines, pulled and laid on trestles in the garage's yard (models/garage.js).
   defineDecoration({ id: 'speeder-engine', model: 'speeder-engine', solid: true, radius: ENGINE.r, height: ENGINE.top, fixed: true }),
+  // The garage in J (models/garage.js): the speeder the engine came out of,
+  // on blocks (still, no bob), the swoop on its hoist, the bench, a pit
+  // droid, and the shutter rolled up over the door.
+  defineDecoration({ id: 'landspeeder-blocks', model: 'landspeeder-blocks', solid: true, height: 1.22, fixed: true }),
+  defineDecoration({ id: 'swoop-hoist', model: 'swoop-hoist', solid: true, height: HOIST.top, fixed: true }),
+  defineDecoration({ id: 'workbench', model: 'workbench', solid: true, height: BENCH.top, fixed: true }),
+  defineDecoration({ id: 'pit-droid', model: 'pit-droid', solid: true, radius: PIT_DROID.r, height: PIT_DROID.top, fixed: true }),
+  defineDecoration({ id: 'shutter-rolled', model: 'shutter-rolled', fixed: true }),
   // Bunks in the spacers' hostel (models/hostel.js), colliding as their outlines.
   ...Object.keys(BUNKS).map((id) => defineDecoration({ id, model: id, solid: true, height: BUNK.top, fixed: true })),
   // The old quarter's: the hermit's candles (models/quarter.js) and a squatter's bedroll.

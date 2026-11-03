@@ -39,6 +39,18 @@ These need Mark to try something, or to decide. Don't start them without him.
   of the stalls: their sprites cut through the rails). To judge:
   the light (stripes, how dim), the dewbacks in the aisle, and the saddles
   and troughs at that size.
+- **The speeder garage** (`?map=m1`, 2026-11-02): J on the market, open
+  from the start, its shutter rolled up (its bottom slat under the
+  lintel, the roller's box inside). The X-34 whose engine lies in the yard
+  sits on timber blocks, its right-hand side engine gone and the cut wires
+  hanging, a pit droid (a new model) at them with a spanner; a red swoop
+  (new) hangs on chains from a hoist on a rusty gantry; a steel bench
+  along the back wall with a vice, tools and a board of tools over it; one
+  lamp over the speeder; a steel-plate floor, oil and soot. The back
+  shutter onto the yard stays down. A plaster pillar stands in the room,
+  under the upper storey's window (a window can't be cut over a room).
+  To judge: the swoop (does it read?), the pillar, and whether the inside
+  shows enough from the market (it's dim against the sun).
 - **Smooth motion** (2026-11-02): the view is now drawn between the last
   two ticks, so walking should look steady on a 120 or 144 Hz screen and
   never judder at 60. To judge: whether it feels smoother, and whether the
@@ -762,7 +774,7 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
           (`town.slats()`); stalls along the back behind plank rails
           (`models/stable.js`), two dewbacks (the patrol's spare mounts),
           water and feed, the patrol's saddles, a stable hand.
-    - [ ] The speeder garage (Mark, 2026-11-02): J hollowed into a
+    - [x] The speeder garage (Mark, 2026-11-02): J hollowed into a
           workshop, its market shutter rolled up so you walk in (the back
           shutter onto the yard stays down: the yard waits for the
           signal); an X-34 on blocks with an engine gone (the one on the

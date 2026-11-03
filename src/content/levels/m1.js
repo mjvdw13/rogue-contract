@@ -206,9 +206,10 @@ town.slanted([[75, 51], [86, 51], [86, 58], [78, 58], [75, 55]], { h: 4.5, skirt
 town.door(80.5, 58, 'S', { h: 4.5, tex: 'shutter', tall: 2.25, width: 3, jamb: false, sign: false, panel: false });
 town.door(84, 58, 'S', { h: 4.5 });
 town.awning(78, 58, 86, 60, { z: 3, face: 'S', cloth: 'olive' });
-// J: a tall house over a garage door, its upper storey at the back.
+// J: a tall house, its upper storey at the back, the speeder garage in it
+// (its shutter rolled up: it's with the back alleys, below, whose yard its
+// back shutter opens onto).
 town.house(88, 47, 101, 58, { h: 7, r: 2, wall: 'adobe-grey', skirt: null, tiers: [{ box: [90, 47, 101, 53], h: 10, r: 2 }], dome: true });
-town.door(94.5, 58, 'S', { h: 7, tex: 'shutter', tall: 2.25, width: 3, jamb: false, sign: false, panel: false, wall: 'adobe-grey' });
 town.window(90.5, 58, 'S', { z: 4.5 }).window(98.5, 58, 'S', { z: 4.5, tex: 'window-louvre' }).window(96.5, 53, 'S', { z: 8.4 });
 
 // The market's south side.
@@ -1554,6 +1555,39 @@ town.hangings.push(
   // A cable over the yard, J's back to the house opposite.
   { type: 'cable', from: [96.5, 48.95, 8.4], to: [92.6, 36.05, 5.4], sag: 1.1 },
 );
+// The garage inside J (Mark, 2026-11-02): its market shutter rolled up, so
+// you walk in off the market (the back shutter stays down). The X-34 the
+// yard's engine came out of sits on blocks, its right-hand side engine gone,
+// a pit droid at the cut wires; a swoop hangs on a hoist; a bench of tools
+// on the back wall; one lamp over the speeder; oil on the plates. Its walls
+// are two tiles thick where the market and the alley see them, so their
+// faces outside keep the sun (a face is lit halfway between its wall's
+// light and the floor's in front, so the inner tiles take the garage's);
+// the back and east walls are one. A pillar holds up the upper storey's
+// front wall, under its window.
+{
+  const GARAGE = { x0: 90, y0: 50, x1: 100, y1: 56, ceilZ: 4.25, light: 128 };
+  p.rect(GARAGE.x0, GARAGE.y0, GARAGE.x1, GARAGE.y1, (_, __, c) => (c.slab || c.wall ? c : {
+    ...c, floor: 'yard-plate', floorZ: 0, ceiling: 'sky', ceilZ: town.sky,
+    slab: { bottom: GARAGE.ceilZ, top: c.floorZ, floor: c.floor, ceiling: 'planks', side: 'adobe-grey', light: GARAGE.light },
+  }));
+  town.arch(93, 56, 96, 58, { h: 7, lintel: 2.25, wall: 'adobe-grey', floor: 'yard-plate' });
+  // (The two-tile walls' inner tiles, and the east wall, in its light; the
+  // back wall, whose far side shows in the yard, halfway.)
+  p.light(89, 50, 90, 57, GARAGE.light).light(89, 56, 93, 57, GARAGE.light).light(96, 56, 101, 57, GARAGE.light).light(100, 50, 101, 56, GARAGE.light);
+  p.light(89, 49, 101, 50, 168);
+  list.push(
+    at('shutter-rolled', 94.5, 58, { z: 2.25, angle: 0 }),
+    at('landspeeder-blocks', 93.2, 53.4, { angle: 6 }),
+    at('pit-droid', 92.6, 55.1, { angle: 95 }),
+    at('swoop-hoist', 98.5, 53.4, { angle: 90 }),
+    at('workbench', 91.5, 50.01, { angle: 0 }),
+    at('cantina-lamp', 93.4, 53.9, { z: GARAGE.ceilZ - LAMP_CORD }),
+    at('oil', 92.3, 54.4, { angle: 20 }), at('oil-small', 98.2, 53.1, { angle: 300 }), at('oil-small', 95.1, 51.4, { angle: 80 }),
+    at('canister', 99.45, 50.6), at('litter-small', 90.6, 51.3, { angle: 120 }),
+  );
+  lights.push({ x: 93.4, y: 53.9, z: 3, radius: 4, light: 40 });
+}
 // The first lane slants up north-east between houses that each take their
 // own plaster and height (Mark, 2026-11-01: no copies), so no wall runs
 // the lane's length. On its north side the gun shop stands back from the
@@ -1733,6 +1767,8 @@ town.grime();
 // Inside the cantina, filthy (Mark): soot, dirt, stains and smudges thick on
 // every wall from floor to ceiling.
 town.grimeIndoors(87, 82, 127, 119, { amount: 4 });
+// The garage in J: soot and oily smudges.
+town.grimeIndoors(90, 50, 100, 56, { amount: 2.5, seed: 31 });
 // The freighter's hold: grime on its walls, a lamp still flickering, and
 // what was left: dead consoles, panels off the walls, wires out of the
 // ceiling's holes (one live), junk. Rusk's spot in the middle stays clear.
@@ -1753,7 +1789,7 @@ list.push(
 );
 // Crates, drums, canisters, cargo pods, junk and litter along the walls
 // (lib/town.js), but none yet in the blocked-out middle and east third.
-town.clutter({ keep: [[STABLE.x0, STABLE.y0, STABLE.x1, STABLE.y1], [126, 92, 130, 122], [130, 86, 150, 122], [136, 44, W, H], [54, 1, 146, 49], [57, 94, 87, 131], [87, 82, 126, 122], [85, 76, 102, 82]] });
+town.clutter({ keep: [[STABLE.x0, STABLE.y0, STABLE.x1, STABLE.y1], [92, 56, 97, 61], [126, 92, 130, 122], [130, 86, 150, 122], [136, 44, W, H], [54, 1, 146, 49], [57, 94, 87, 131], [87, 82, 126, 122], [85, 76, 102, 82]] });
 list.push(...town.things);
 
 // Hand-placed along the main street and on the square (the kit's
