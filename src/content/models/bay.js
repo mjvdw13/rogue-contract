@@ -166,6 +166,50 @@ function bigCrate(id, tex, [w, d, h]) {
   return m.build();
 }
 
+/**
+ * A big crate prised open (Bay 86, where customs are going through a
+ * freighter's cargo): its walls 0.08 thick and no top, so from the gate,
+ * 11 above, you look down into it; packed to half its height with junk and
+ * a small crate on that. Its lid leans against its front (`lid: 'lean'`) or
+ * lies on the floor in front of it (`'floor'`), never colliding. The crate
+ * collides as its outline.
+ */
+function openCrate(id, tex, [w, d, h], lid) {
+  const m = new ModelBuilder(id);
+  const t = 0.08;
+  const s = h / 2;
+  const [x0, x1, y0, y1] = [-w / 2, w / 2, -d / 2, d / 2];
+  const side = { tex, texScale: s };
+  // The walls, the picture inside as out.
+  m.box([x0, y0, 0], [x1, y0 + t, h], { ...side, bottom: false });
+  m.box([x0, y1 - t, 0], [x1, y1, h], { ...side, bottom: false });
+  m.box([x0, y0 + t, 0], [x0 + t, y1 - t, h], { ...side, bottom: false });
+  m.box([x1 - t, y0 + t, 0], [x1, y1 - t, h], { ...side, bottom: false });
+  // The packing, and what customs left on it.
+  m.box([x0 + t, y0 + t, 0], [x1 - t, y1 - t, h * 0.5], { top: { tex: 'junk' }, sides: false, bottom: false });
+  m.box([x0 + 0.3, y0 + 0.25, h * 0.5], [x0 + 0.9, y0 + 0.85, h * 0.5 + 0.6], { tex: 'crate-grey', texScale: 0.3, bottom: false });
+  // The lid: a slab as big as the top, `lt` thick.
+  const lt = 0.1;
+  if (lid === 'lean') {
+    // Against the front (+y), its foot 0.7 out, its top a little under the rim.
+    const top = h - 0.15;
+    const foot = 0.7;
+    const len = Math.hypot(foot, top);
+    const [ny, nz] = [top / len, foot / len]; // the slab's normal, outward
+    const pts = [[y1 + foot, 0], [y1 + 0.02, top], [y1 + 0.02 + ny * lt, top + nz * lt], [y1 + foot + ny * lt, nz * lt]];
+    m.loft(pts, x0 + 0.05, pts, x1 - 0.05, { axis: 'x', tex, texScale: s, bottom: { tex, texScale: s } });
+  } else {
+    // On the floor in front, turned a little.
+    const a = 0.2;
+    const [c, sn] = [Math.cos(a), Math.sin(a)];
+    const cy = y1 + 0.3 + d / 2;
+    const quad = [[x0, -d / 2], [x1, -d / 2], [x1, d / 2], [x0, d / 2]].map(([x, y]) => [x * c - y * sn + 0.3, x * sn + y * c + cy]);
+    m.prism(quad, 0, lt, { tex, texScale: s, bottom: false });
+  }
+  m.outlineLines([[x0, y0], [x1, y0], [x1, y1], [x0, y1]]);
+  return m.build();
+}
+
 const vsub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
 const vcross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
 const vdot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
@@ -279,5 +323,7 @@ export default [
   rib(), fuelLine(), fuelPump(), rimLamp(),
   rib('derelict-rib', DERELICT_WALL), rimLamp('bay-rim-lamp-dead', false),
   bigCrate('bay-crate-grey', 'crate-grey', [2, 2, 2]), bigCrate('bay-crate-tan', 'crate-tan', [2, 2, 2]), bigCrate('bay-crate-rust-long', 'crate-rust', [3.2, 1.6, 1.6]),
+  openCrate('bay-crate-open-grey', 'crate-grey', [2, 2, 2], 'lean'), openCrate('bay-crate-open-tan', 'crate-tan', [2, 2, 2], 'lean'),
+  openCrate('bay-crate-open-long', 'crate-rust', [3.2, 1.6, 1.6], 'floor'),
   ...BAY_HOSES.map(hose),
 ];

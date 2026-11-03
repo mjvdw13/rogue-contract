@@ -1276,15 +1276,59 @@ const roofOver = (x0, y0, x1, y1, ceilZ, h) => p.rect(x0, y0, x1, y1, (_, __, c)
 const BAY86 = { cx: 72, cy: 113, r: 14, floorZ: -5, rim: 6 };
 const BAY86_WALL = { h: BAY86.rim, wall: 'bay-wall', skirt: null };
 town.block(62, 94, 87, 100, BAY86_WALL).block(57, 100, 87, 130, BAY86_WALL);
+// Its front on the yard in plaster, as Bay 87's is on the lane.
+p.rect(62, 94, 87, 95, town.roofCell({ h: BAY86.rim, wall: 'adobe-grey' }));
 town.circle(BAY86.cx, BAY86.cy, BAY86.r, {
-  inside: town.street(BAY86.floorZ, { floor: 'bay-floor', side: 'bay-wall' }),
-  wall: { wall: 'bay-wall', wallTop: BAY86.rim },
+  inside: town.street(BAY86.floorZ, { floor: 'bay-floor', side: 'bay-wall', bands: RIBBED }),
+  wall: { wall: 'bay-wall', wallTop: BAY86.rim, bands: RIBBED },
   seam: 90,
 });
 town.arch(73, 94, 77, 98, { h: BAY86.rim, lintel: 4, wall: 'bay-wall', floor: 'bay-floor' });
 p.rect(73, 98, 77, 100, town.street(0, { floor: 'bay-floor', side: 'bay-wall' }));
 p.fence(73, 98, 77, 99, 'N', { tex: 'imp-bars', height: 4 });
+// The gate dressed as Bay 87's door is: a round-topped hood and a buttress either side.
+town.hood(75, 94, 'N', { h: BAY86.rim, width: 4, wall: 'adobe-grey' });
+town.buttress(71.4, 94, 'N', { h: BAY86.rim, wall: 'adobe-grey' }).buttress(78.6, 94, 'N', { h: BAY86.rim, wall: 'adobe-grey' });
 town.house(64, 107, 80, 117, { h: BAY86.floorZ + 3, r: 2, ...HULL });
+// Fitted out as Bay 87 is, its pit as deep (models/bay.js): a rib every 30
+// degrees round the wall, clear of the gate (70 to 86 degrees round); a
+// lamp on the rim over every other one, two of them dead; fuel lines down
+// to pumps in four of the bays between (the pump 8 degrees round from its
+// line: 2 tiles, as in Bay 87's wider pit). Soot where exhausts hit the wall.
+const onBay86Wall = (type, deg, z, inset = 0.02) => {
+  const a = (deg * Math.PI) / 180;
+  const r = BAY86.r - inset;
+  return at(type, Math.round((BAY86.cx + r * Math.cos(a)) * 100) / 100, Math.round((BAY86.cy - r * Math.sin(a)) * 100) / 100, { z, angle: (deg + 270) % 360 });
+};
+for (let deg = 15; deg < 360; deg += 30) {
+  if (deg > 60 && deg < 100) continue;
+  list.push(onBay86Wall('bay-rib', deg, BAY86.floorZ));
+  if (deg % 60 === 15) list.push(onBay86Wall(deg === 135 || deg === 255 ? 'bay-rim-lamp-dead' : 'bay-rim-lamp', deg, BAY86.rim));
+}
+for (const deg of [30, 150, 240, 300]) list.push(onBay86Wall('bay-fuel-line', deg, BAY86.floorZ), onBay86Wall('bay-fuel-pump', deg - 8, BAY86.floorZ));
+const bay86Decals = [[22, -1.5, 1, 3], [118, 0.5, 2, 2.4], [168, -2, 1, 3.2], [212, 1, 2, 2.2], [262, -1, 1, 3], [318, 0.5, 2, 2.6]].map(([deg, z, k, scale]) => {
+  const a = (deg * Math.PI) / 180;
+  return { x: BAY86.cx + BAY86.r * Math.cos(a), y: BAY86.cy - BAY86.r * Math.sin(a), z, face: 'angled', tex: `grime-scorch-${k}`, scale };
+});
+// Customs going through the freighter's cargo: crates prised open beside
+// the hull, their lids off (models/bay.js), small crates and drums out,
+// what was in them strewn about (no pickups: you can't get in). From the
+// gate you see down past the hull's flanks, so the open crates are there,
+// their lids leant toward it; a closed one and the rest north and south.
+const onBay86Floor = (type, x, y, extra = {}) => at(type, x, y, { ...extra, z: BAY86.floorZ + (extra.z ?? 0) });
+list.push(
+  // West of the hull.
+  onBay86Floor('bay-crate-open-grey', 60.8, 111, { angle: 90 }), onBay86Floor('crate-tan', 62.7, 113.4, { angle: 25 }),
+  onBay86Floor('barrel-grey', 61, 119.1), onBay86Floor('barrel-rust', 61.7, 119.8), onBay86Floor('canister', 60.8, 120.2, { angle: 30 }),
+  onBay86Floor('litter', 62.6, 109.4, { angle: 15 }), onBay86Floor('litter-small', 63, 117.8, { angle: 60 }),
+  // East of it.
+  onBay86Floor('bay-crate-open-tan', 83.4, 117.2, { angle: 270 }), onBay86Floor('crate-rust-long', 82.8, 108.6, { angle: 95 }),
+  onBay86Floor('crate-grey-small', 81.2, 115.4, { angle: 70 }), onBay86Floor('canister-rust', 81.5, 110.4, { angle: 80 }),
+  onBay86Floor('litter-small', 81, 119.6, { angle: 45 }), onBay86Floor('oil-small', 80.9, 111.9),
+  // North and south.
+  onBay86Floor('bay-crate-grey', 67.2, 103.6, { angle: 6 }), onBay86Floor('bay-crate-open-long', 72.4, 120.2, { angle: 0 }),
+  onBay86Floor('cargo-pod', 78.6, 121.8, { angle: 120 }), onBay86Floor('litter-small', 75.5, 123, { angle: 120 }),
+);
 
 // 4. The Jawa junk yard, north of the market: in by the alley between H and
 // I, through a gate (shut until the broker hands over the fob) and two
@@ -2129,7 +2173,7 @@ export default defineLevel({
   // distracted, and Mark halved that twice to 60. 90 on trial (Mark,
   // 2026-10-18).
   weather: { type: 'glint', count: 90 },
-  decals: [...town.decals, ...bayDecals, ...pitDecals, ...derelictDecals],
+  decals: [...town.decals, ...bayDecals, ...pitDecals, ...derelictDecals, ...bay86Decals],
   lights,
   hangings: [...hangings, ...derelictHangings, ...town.hangings],
   par: 600,

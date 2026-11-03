@@ -186,6 +186,10 @@ export default [
   defineDecoration({ id: 'bay-crate-grey', model: 'bay-crate-grey', solid: true, height: 2, fixed: true }),
   defineDecoration({ id: 'bay-crate-tan', model: 'bay-crate-tan', solid: true, height: 2, fixed: true }),
   defineDecoration({ id: 'bay-crate-rust-long', model: 'bay-crate-rust-long', solid: true, height: 1.6, fixed: true }),
+  // Bay 86's, prised open by customs (no top: seen from the gate, above), their lids off.
+  defineDecoration({ id: 'bay-crate-open-grey', model: 'bay-crate-open-grey', solid: true, height: 2, fixed: true }),
+  defineDecoration({ id: 'bay-crate-open-tan', model: 'bay-crate-open-tan', solid: true, height: 2, fixed: true }),
+  defineDecoration({ id: 'bay-crate-open-long', model: 'bay-crate-open-long', solid: true, height: 1.6, fixed: true }),
   ...BAY_HOSES.map(({ id }) => defineDecoration({ id, model: id, fixed: true })),
   // Mos Eisley's market (models/market.js): a stall's counter and rack
   // (colliding, as high as the rack), the condenser tower over the water

@@ -28,6 +28,17 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
+- **Bay 86 fitted out** (`?map=m1`, 2026-11-03; through the barred gate
+  at the end of the yard past R): ribs, rim lamps (two dead), four fuel
+  lines and pumps, the ribbed foot and soot, as in Bay 87. Customs' search:
+  big crates prised open (`bay-crate-open-*`, no top, the lid leant
+  against the side or lying in front), small crates, drums and litter.
+  The gate's front is grey plaster now, with a hood and a buttress either
+  side. The stand-in hull hides most of the floor from the gate, so the
+  open crates are on its flanks, where you can see down to them. To
+  judge: whether you see enough of the search from the gate, and whether
+  the hull should become a real ship (a model) next.
+
 - **The dewback stable** (`?map=m1`, 2026-11-02): across the north back
   lane from B to D, open from the start. Its front is open between timber
   posts under a beam, and the suns fall through its slatted roof in
@@ -765,7 +776,7 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
           the nook, the pod by the cut corner, the dome back.
     - [ ] Waiting on Mark.
   - [ ] Bay 86, the dewback stable and the speeder garage.
-    - [ ] Bay 86 dressed as Bay 87 is: ribs, rim lamps (some dead),
+    - [x] Bay 86 dressed as Bay 87 is: ribs, rim lamps (some dead),
           fuel lines and pumps, ribbed foot, scorch marks, crates opened
           round the freighter; the gate with a hood and buttresses.
     - [x] The dewback stable (Mark, 2026-11-02): a long low house off the
