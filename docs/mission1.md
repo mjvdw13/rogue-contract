@@ -315,7 +315,7 @@ Mandalorian, Outlaws, and the Special Edition's wide shots):
   wall is an arch with a rising door in it (its tiles carry the slab), and
   the raised floor beside it counts as its walls.
 - **Domes** are the toppers on the roofs, Tatooine's mark: models
-  (`models/dome.js`, a half-sphere on a drum over a lip) in nine widths, 3 to 11
+  (`models/dome.js`, a dome on a short drum over a lip) in nine widths, 3 to 11
   tiles across, in each plaster (`dome-9`, `dome-9-pale`).
   `house({ dome: true })` tops a building with one as wide as its highest
   storey, its lip on the wall tops (no rim since 2026-11-03: with one they

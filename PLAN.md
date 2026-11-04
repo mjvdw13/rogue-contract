@@ -117,12 +117,9 @@ These need Mark to try something, or to decide. Don't start them without him.
   judge: whether the second lane's alleys facing each other read as a
   crossing (they could be staggered, with narrower houses).
   Then (2026-11-03, Mark: the domes were small) every dome is as wide as
-  its roof, its lip on the wall tops with no rim, and a full half-sphere on
-  a drum twice as tall, so it stands clear of the roof's edge: the lanes'
-  2 m houses wear 2 m domes 1.3 m high (were 1.5 m and 0.8 m), the big
-  houses' mostly 4.5 m (were 3.5 m). To judge: whether they're big enough
-  now, from the lanes and across the squares, before the oval ones on long
-  houses.
+  its roof, its lip on the wall tops with no rim (the lanes' 2 m houses
+  wear 2 m domes, were 1.5 m; the big houses' mostly 4.5 m, were 3.5 m).
+  A taller profile went back out (Mark: just taller, not wider, worse).
 - **The remaining streets, detailed** (`?map=m1`, 2026-11-01): each its
   own place, built from the town's pieces.
   The back lane: the cantina's empties by its back door, its rubbish

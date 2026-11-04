@@ -1,18 +1,18 @@
 import { ModelBuilder } from './lib/build.js';
 
-// Mos Eisley's domes: the toppers on its roofs. A plaster half-sphere on a
+// Mos Eisley's domes: the toppers on its roofs. A plaster dome on a short
 // drum, over a lip a little wider than the drum, as on the film's houses.
-// The drum lifts the dome clear of the roof's edge, so it shows from the
-// street below (Mark, 2026-11-03: they were too small).
+// Not taller: a full half-sphere on a tall drum read as a tall bump rather
+// than a bigger dome (Mark, 2026-11-03).
 // Built at size rather than scaled, so the plaster keeps the walls' texel
 // size: one per width (3 to 11 tiles across) in each plaster.
 // The town kit picks the widest that fits a roof (lib/town.js).
 
 /** How high a dome rises for its radius, over its lip and drum. */
-const RISE = 1;
+const RISE = 0.9;
 const LIP = 0.3;
 /** The drum's height for a dome of radius `r` (inside the lip). */
-const drumOf = (r) => Math.min(1, r * 0.3);
+const drumOf = (r) => Math.min(0.5, r * 0.15);
 
 function dome(id, radius, tex) {
   const m = new ModelBuilder(id);
