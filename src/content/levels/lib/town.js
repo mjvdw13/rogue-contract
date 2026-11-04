@@ -147,7 +147,7 @@ export class Town {
 
   /**
    * A dome on a roof at `z`, centred on (x, y): the widest that's no more
-   * than `width` tiles across (3 to 11), in plaster `wall` (any of the
+   * than `width` tiles across (6 to 11: none on a narrower roof), in plaster `wall` (any of the
    * domes' plasters, else plain 'adobe'). It casts a shadow. Keep it inside
    * its roof: one hanging over a lower roof is clipped.
    */
@@ -895,7 +895,7 @@ export class Town {
    * tile can hold one slanting side, so two may only meet at a corner where
    * they go off into different tiles. Otherwise as `house()` without
    * `tiers`: `h`, `wall`, `roof`, `skirt`, `light`, `grime`, and `dome`
-   * tops it with the widest dome that fits round its middle. A slanting
+   * tops it with the widest dome that fits inside it. A slanting
    * wall's plaster runs on from tile to tile (`wallU`), so its decals can
    * cross tiles, and `grime()` weathers it; it gets no doors, windows or
    * clutter.
@@ -939,9 +939,16 @@ export class Town {
     }
     for (const [a, b] of slants) this.slants.push({ a, b, top: h, inward: [cx, cy], skirt: bands?.[0]?.to ?? 0 });
     if (dome) {
-      // As wide as the nearest side is from the middle allows.
-      const reach = Math.min(...edges.map(([a, b]) => Math.abs(side(a, b, cx, cy)) / Math.hypot(b[0] - a[0], b[1] - a[1])));
-      this.dome(cx, cy, h, reach * 2, { wall: typeof dome === 'string' ? dome : opts.wall });
+      // The widest that fits inside: on a lopsided outline the corners'
+      // average sits near a side, so try centres on a quarter-tile grid
+      // and take the one nearest the middle that fits the widest dome.
+      const reach = (x, y) => Math.min(...edges.map(([a, b]) => Math.abs(side(a, b, x, y)) / Math.hypot(b[0] - a[0], b[1] - a[1])));
+      const spots = [[cx, cy, reach(cx, cy)]];
+      for (let y = y0; y <= y1; y += 0.25) for (let x = x0; x <= x1; x += 0.25) if (within(x, y)) spots.push([x, y, reach(x, y)]);
+      const width = Math.floor(Math.max(...spots.map((s) => s[2] * 2)) + 1e-9);
+      const fits = spots.filter((s) => s[2] * 2 >= width - 1e-9);
+      const [dx, dy] = fits.reduce((best, s) => (Math.hypot(s[0] - cx, s[1] - cy) < Math.hypot(best[0] - cx, best[1] - cy) ? s : best));
+      this.dome(dx, dy, h, width, { wall: typeof dome === 'string' ? dome : opts.wall });
     }
     return this;
   }

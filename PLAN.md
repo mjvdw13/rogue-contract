@@ -117,9 +117,18 @@ These need Mark to try something, or to decide. Don't start them without him.
   judge: whether the second lane's alleys facing each other read as a
   crossing (they could be staggered, with narrower houses).
   Then (2026-11-03, Mark: the domes were small) every dome is as wide as
-  its roof, its lip on the wall tops with no rim (the lanes' 2 m houses
-  wear 2 m domes, were 1.5 m; the big houses' mostly 4.5 m, were 3.5 m).
-  A taller profile went back out (Mark: just taller, not wider, worse).
+  its roof, its lip on the wall tops with no rim (the big houses' mostly
+  4.5 m, were 3.5 m; a taller profile went back out, Mark: just taller,
+  not wider). And none on a roof under 3 m across (Mark: fewer is fine,
+  as long as they're somewhere): 17 went, the lanes' and the old quarter's
+  narrow houses, 82 left. A slanting house's dome goes where the widest
+  fits, so seven grew (the first lane's ochre house 3.5 m, two by the
+  market 4.5 and 5.5 m), and two set-back storeys are a tile deeper to
+  take a 3 m one (the yard behind J, the old quarter's north street). No
+  houses combined: the second lane has none of its own, but the hostel's
+  and the thug's domes show at either end. To judge: whether the skyline
+  has enough domes, and whether some lane should get a bigger house with
+  one.
 - **The remaining streets, detailed** (`?map=m1`, 2026-11-01): each its
   own place, built from the town's pieces.
   The back lane: the cantina's empties by its back door, its rubbish
@@ -644,11 +653,8 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
   - [x] The old quarter's main street, bend and way to the bay's gate,
         and domes on its houses.
   - [x] The back alleys' two lanes and the thug's square, with domes.
-  - [ ] Domes bigger (Mark, 2026-11-03: the new ones were small, 1.5 m
-        across on 2 m houses, hidden by the roof's edge from the lanes).
-    - [x] As wide as the roof, no rim; a full half-sphere on a taller
-          drum. Snapshots from a lane and a square.
-    - [ ] Then oval domes on long, narrow houses.
+  - [x] Domes bigger (Mark, 2026-11-03: the new ones were small): as
+        wide as the roof, and only on houses 3 m across or more.
   - [ ] The dry wash and the back lane.
 
 - [x] Design: `docs/mission1.md`.

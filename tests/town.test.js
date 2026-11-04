@@ -45,6 +45,16 @@ test('a dome casts a shadow', () => {
   assert.ok(light(true) < light(false));
 });
 
+test("a slanting house's dome is the widest that fits inside it, even off the corners' average", () => {
+  const { town } = kit();
+  // A 10-tile square with a long point on its east side: the corners'
+  // average is out towards the point, where only a narrower dome fits.
+  town.slanted([[4, 10], [14, 10], [36, 15], [14, 20], [4, 20]], { h: 6, dome: true });
+  const d = town.things[0];
+  assert.equal(registry.things.get(d.type).radius * 2, 10);
+  assert.ok(d.x >= 9 && d.x <= 13.5 && d.y === 15, `inside the square, not at (${d.x}, ${d.y})`);
+});
+
 test('a roof too small for any dome gets none', () => {
   const { town } = kit();
   town.house(4, 4, 6, 10, { h: 6, dome: true });

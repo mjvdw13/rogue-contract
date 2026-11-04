@@ -5,7 +5,9 @@ import { ModelBuilder } from './lib/build.js';
 // Not taller: a full half-sphere on a tall drum read as a tall bump rather
 // than a bigger dome (Mark, 2026-11-03).
 // Built at size rather than scaled, so the plaster keeps the walls' texel
-// size: one per width (3 to 11 tiles across) in each plaster.
+// size: one per width (6 to 11 tiles across) in each plaster. None smaller:
+// a dome under 3 m across on a narrow house read as a bump (Mark,
+// 2026-11-03), so narrow houses go without.
 // The town kit picks the widest that fits a roof (lib/town.js).
 
 /** How high a dome rises for its radius, over its lip and drum. */
@@ -40,7 +42,7 @@ export const PLASTERS = { '': 'adobe', '-pale': 'adobe-pale', '-ochre': 'adobe-o
 
 /** Every dome: `id` (`dome-<width>`, then its plaster's suffix), `radius`, `height` and `tex`, widest first. */
 export const DOMES = [];
-for (let width = 11; width >= 3; width--) {
+for (let width = 11; width >= 6; width--) {
   const radius = width / 2;
   const r = radius - 0.25;
   const height = LIP + drumOf(r) + r * RISE;

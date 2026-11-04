@@ -630,7 +630,7 @@ town.slanted([[167, 76], [170, 76], [175, 81], [175, 88], [167, 88]], { h: OQ + 
 town.slanted([[175, 82], [181, 88], [175, 88]], { h: OQ + 5, wall: 'adobe-rose', skirt: 'plinth' });
 // The alley's south side two houses, a slot between them.
 p.rect(162, 92, 163, 95, QUARTER);
-town.house(157, 92, 162, 104, { h: OQ + 5, wall: 'adobe', skirt: 'plinth', dome: true });
+town.house(157, 92, 162, 104, { h: OQ + 5, wall: 'adobe', skirt: 'plinth' });
 town.house(163, 92, 174, 104, { h: OQ + 6, wall: 'adobe-pale', dome: true }).block(162, 95, 163, 104, { h: OQ + 6, wall: 'adobe-pale' });
 town.slanted([[174, 95], [183, 99], [183, 104], [174, 104]], { h: OQ + 5, wall: 'adobe-grey', dome: true });
 // A room bridges the alley halfway, its underside a round-topped vault.
@@ -656,19 +656,19 @@ openPolygon([[196, 96], [204, 96], [198, 104], [194, 104]], WASH_CELL);
 // the pale one's line, and a dead-end alley 1 m wide running 10 tiles back
 // between the pale one and the ochre one, the ochre one's side door in it;
 // on the way to the bay's gate two houses, not one, a slot between them and
-// the second a tile back from the street. Every house but the smallest
-// wears a dome (Mark, 2026-11-03: Mos Eisley's toppers).
+// the second a tile back from the street. The houses 3 m across or more
+// wear domes (Mark, 2026-11-03: Mos Eisley's toppers, but not small ones).
 p.rect(168, 60, 171, 64, QUARTER).rect(182, 66, 184, 78, QUARTER);
 openPolygon([[170, 64], [171, 64], [176, 69], [176, 70]], QUARTER);
 p.rect(187, 93, 192, 95, QUARTER).rect(189, 95, 190, 104, QUARTER);
-town.house(160, 60, 168, 64, { h: OQ + 5, r: 1 }).dome(164, 62, OQ + 5, 4);
-town.slanted([[171, 60], [176, 60], [176, 69], [171, 64]], { h: OQ + 5.5, wall: 'adobe-rose', dome: true });
+town.house(160, 60, 168, 64, { h: OQ + 5, r: 1 });
+town.slanted([[171, 60], [176, 60], [176, 69], [171, 64]], { h: OQ + 5.5, wall: 'adobe-rose' });
 // The pale one 1.5 m back from the street behind a paved yard a step up, its
 // neighbours' ends showing either side.
 town.platform(176, 60, 184, 63, { h: OQ + 0.25 });
 town.slanted([[176, 63], [182, 63], [182, 76], [176, 70]], { h: OQ + 6.5, wall: 'adobe-pale', dome: true }).block(182, 63, 184, 66, { h: OQ + 6.5, wall: 'adobe-pale' });
-town.slanted([[184, 60], [194, 60], [189, 65], [184, 65]], { h: OQ + 5, dome: true });
-town.house(184, 65, 189, 73, { h: OQ + 6, wall: 'adobe-ochre', dome: true });
+town.slanted([[184, 60], [194, 60], [189, 65], [184, 65]], { h: OQ + 5 });
+town.house(184, 65, 189, 73, { h: OQ + 6, wall: 'adobe-ochre' });
 town.door(184, 69, 'W', { h: OQ + 6, floorZ: OQ, tex: 'door-grey', wall: 'adobe-ochre', sign: false });
 list.push(at('crate-tan', 182.6, 66.6, { angle: 12 }), at('barrel-grey', 183.45, 66.5));
 town.slanted([[184, 73], [189, 73], [196, 80], [196, 83], [189, 83], [184, 78]], { h: OQ + 5.5, wall: 'adobe-rose', dome: true });
@@ -677,7 +677,7 @@ p.rect(195, 83, 196, 93, WASH_CELL);
 // (The domed one 1 m out into the street, so its end and the ochre one's
 // set-back front show from the gate.)
 town.house(187, 83, 195, 93, { h: OQ + 7.5, dome: true });
-town.slanted([[192, 93], [196, 93], [196, 96], [194, 104], [190, 104], [190, 95]], { h: OQ + 6.5, wall: 'adobe-ochre', skirt: 'plinth', dome: true });
+town.slanted([[192, 93], [196, 93], [196, 96], [194, 104], [190, 104], [190, 95]], { h: OQ + 6.5, wall: 'adobe-ochre', skirt: 'plinth' });
 // Its east bank: houses whose backs slant with it.
 town.slanted([[202, 60], [207, 60], [207, 65], [197, 65]], { h: 7, wall: 'adobe-pale' });
 town.slanted([[197, 73], [207, 73], [207, 80], [204, 80]], { h: 6.5, wall: 'adobe-grey' });
@@ -739,7 +739,7 @@ lights.push({ x: 157.5, y: 45.8, z: OQ + 1.3, radius: 3, light: 48, fx: 'flicker
 // hung across it and its water drum at the end; one 1 m wide past the
 // grey house, ending at the foot of the comm tower.
 p.rect(171, 44, 174, 53, QUARTER).rect(174, 52, 180, 53, QUARTER).rect(180, 46, 182, 53, QUARTER);
-town.house(163, 44, 171, 53, { h: 7, wall: 'adobe', skirt: 'dirt', tiers: [{ box: [165, 44, 171, 49], h: 10 }], dome: true });
+town.house(163, 44, 171, 53, { h: 7, wall: 'adobe', skirt: 'dirt', tiers: [{ box: [165, 44, 171, 50], h: 10 }], dome: true });
 town.door(168, 53, 'S', { h: 7, floorZ: OQ, tex: 'door-grey' }).hood(168, 53, 'S', { h: 7, floorZ: OQ });
 town.buttress(164.4, 53, 'S', { h: 7, floorZ: OQ }).buttress(170.2, 53, 'S', { h: 7, floorZ: OQ });
 town.window(169.5, 49, 'S', { z: 8.4, tex: 'window-louvre' });
@@ -1379,7 +1379,6 @@ town.block(54, 41, 62, 46, { h: 6.5, wall: 'adobe-ochre', skirt: 'plinth' });
 town.block(62, 41, 69, 46, { h: 4.5, wall: 'adobe', skirt: 'dirt' });
 town.block(69, 41, 76, 46, { h: 5.5, wall: 'adobe-pale', skirt: 'dirt' });
 town.block(76, 41, 88, 46, { h: 6.5, wall: 'adobe-grey', skirt: null });
-town.dome(82, 43.5, 6.5, 5, { wall: 'adobe-grey' });
 town.block(84, 16, 88, 30, { h: 4.5, wall: 'adobe-rose', skirt: 'dirt' });
 town.block(84, 30, 88, 41, { h: 5.5, wall: 'adobe', skirt: 'plinth' });
 town.block(56, 16, 84, 18, { h: 2, wall: 'adobe-brick', skirt: null });
@@ -1600,7 +1599,7 @@ town.pipe(88, 51.5, 'W');
 // under a hood.
 town.door(94.5, 49, 'N', { h: 10, tex: 'shutter', tall: 2.25, width: 3, jamb: false, sign: false, panel: false, wall: 'adobe-grey' });
 town.window(91.5, 49, 'N', { z: 6.6 });
-town.house(88, 29, 98, 36, { h: 6, wall: 'adobe-pale', tiers: [{ box: [89, 29, 97, 34], h: 8.5 }], dome: true });
+town.house(88, 29, 98, 36, { h: 6, wall: 'adobe-pale', tiers: [{ box: [89, 29, 97, 35], h: 8.5 }], dome: true });
 town.door(91, 36, 'S', { h: 6, wall: 'adobe-pale' }).hood(91, 36, 'S', { h: 6, wall: 'adobe-pale' });
 town.window(95.5, 36, 'S', { z: 3.3, tex: 'window-louvre' }).window(94.5, 34, 'S', { z: 7.1 });
 town.window(98, 45.5, 'W', { z: 2.4 }).window(86, 43.5, 'E', { z: 3.8 });
@@ -1669,13 +1668,13 @@ lane(98, 29, 112, 45, -0.5, 38, 43, 0);
 // with alleys you can walk into, and domes): the notch in front, an alley
 // 1 m wide up its east side, 8 tiles back, washing across it.
 p.rect(102, 33, 106, 36, town.street()).rect(106, 26, 108, 34, town.street());
-town.slanted([[98, 26], [102, 26], [102, 36], [98, 38]], { h: 6, wall: 'adobe-grey' }).dome(100, 30, 6, 4, { wall: 'adobe-grey' });
-town.house(102, 26, 106, 33, { h: 7.5, wall: 'adobe-pale', skirt: null }).dome(104, 29.5, 7.5, 4, { wall: 'adobe-pale' });
-town.slanted([[108, 26], [112, 26], [112, 31], [108, 33]], { h: 5.5, wall: 'adobe-rose' }).dome(110, 28.5, 5.5, 4, { wall: 'adobe-rose' });
+town.slanted([[98, 26], [102, 26], [102, 36], [98, 38]], { h: 6, wall: 'adobe-grey' });
+town.house(102, 26, 106, 33, { h: 7.5, wall: 'adobe-pale', skirt: null });
+town.slanted([[108, 26], [112, 26], [112, 31], [108, 33]], { h: 5.5, wall: 'adobe-rose' });
 // The south side two houses with an alley 1.5 m wide between them, back to
 // the market's houses, and the ochre one set back half a tile.
 p.rect(102, 41, 105, 47, town.street());
-town.slanted([[98, 43], [102, 41], [102, 47], [98, 47]], { h: 4.5, wall: 'adobe-rose', skirt: 'plinth' }).dome(100, 44.5, 4.5, 4, { wall: 'adobe-rose' });
+town.slanted([[98, 43], [102, 41], [102, 47], [98, 47]], { h: 4.5, wall: 'adobe-rose', skirt: 'plinth' });
 town.slanted([[105, 40], [111, 37], [112, 37], [112, 47], [105, 47]], { h: 6.5, wall: 'adobe-ochre', dome: true });
 town.door(104, 33, 'S', { h: 7.5, tex: 'shutter', tall: 2.25, width: 2, jamb: false, panel: false, wall: 'adobe-pale' });
 {
@@ -1764,11 +1763,11 @@ lane(126, 23, 136, 39, 0.5, 26, 31, 0.25);
 // slots were cracks), the two facing across the lane halfway down: on the
 // north 1 m wide and 10 tiles back, the ochre house past it set back a
 // tile; on the south 1.5 m wide and 10 back, the grey house past it set
-// back half a tile. Domes on all but the grey one, the lowest.
+// back half a tile. Too narrow for domes (none under 3 m across).
 p.rect(130, 18, 132, 29, town.street(0.25)).rect(132, 27, 136, 31, town.street(0.25)).rect(130, 33, 133, 44, town.street(0.25));
-town.slanted([[126, 18], [130, 18], [130, 28], [126, 26]], { h: 7 }).dome(128, 22, 7, 4);
-town.slanted([[132, 18], [136, 18], [136, 30], [132, 28]], { h: 8.5, wall: 'adobe-ochre' }).dome(134, 23, 8.5, 4, { wall: 'adobe-ochre' });
-town.slanted([[126, 31], [130, 33], [130, 44], [126, 44]], { h: 6, wall: 'adobe-pale' }).dome(128, 39, 6, 4, { wall: 'adobe-pale' });
+town.slanted([[126, 18], [130, 18], [130, 28], [126, 26]], { h: 7 });
+town.slanted([[132, 18], [136, 18], [136, 30], [132, 28]], { h: 8.5, wall: 'adobe-ochre' });
+town.slanted([[126, 31], [130, 33], [130, 44], [126, 44]], { h: 6, wall: 'adobe-pale' });
 town.slanted([[133, 35], [135, 36], [136, 36], [136, 44], [133, 44]], { h: 5, wall: 'adobe-grey', skirt: 'plinth' });
 {
   // A point on the north wall at x (y = 26 + (x - 126) / 2), or on the
@@ -1810,7 +1809,7 @@ p.light(136, 20, 146, 21, 112).light(136, 21, 137, 29, 112).light(145, 21, 146, 
 p.rect(146, 30, 152, 32, town.street(OQ)).rect(144, 42, 146, 47, town.street(OQ));
 town.house(146, 32, 152, 47, { h: 8, wall: 'adobe', dome: true });
 town.door(146, 36, 'W', { h: 8, floorZ: OQ, tex: 'door-red' }).buttress(146, 39.6, 'W', { h: 8, floorZ: OQ });
-town.house(139, 42, 144, 47, { h: 7.5, wall: 'adobe-rose', skirt: 'dirt', dome: true });
+town.house(139, 42, 144, 47, { h: 7.5, wall: 'adobe-rose', skirt: 'dirt' });
 town.window(142.5, 42, 'N', { z: OQ + 2.8, tex: 'window-louvre' }).pipe(143.6, 42, 'N', { floorZ: OQ });
 town.door(136, 39, 'E', { h: 5, floorZ: OQ, tex: 'door-grey', wall: 'adobe-grey' });
 list.push(
