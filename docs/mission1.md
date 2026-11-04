@@ -577,6 +577,16 @@ when the level is populated. The plan:
 | Bay 87 | customs troopers | | the customs officer fights | |
 
 Med kits and ammo along the way back west, more on skills 1-2, as in `m3`.
+Every dead end holds something (Mark's play test, 2026-11-03: an empty
+alley was a wrong turn in a maze): the eight empty dead-end alleys off
+the ways back (the second lane's two, off the thug's square, the first
+lane's south one, the gun shop's, the north street's to the comm tower's
+foot, the wash's east bank and the cantina storehouse's slot) each keep a
+med kit or cells at the far end, in sight from the mouth, with one thing
+that says why (a crate, a bedroll, a pod off a speeder); a second med kit,
+cell or energy pack in three of them on skills 1-2. The others already have
+their dressing (the water drum, the ochre house's stores, the thug's men's
+drums).
 
 ## Build order
 

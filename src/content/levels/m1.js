@@ -1965,6 +1965,33 @@ list.push(
   at('shield-unit', 38.5, 124), // secret: the crawlspace off the bay's maintenance pit
 );
 
+// Every dead end holds something (Mark's play test, 2026-11-03: the town
+// felt like a maze, and an empty alley was a wrong turn). The empty ones
+// off the ways back west keep the loud half's med kits and ammo at their
+// far ends, each with one thing that says why it's there; the rest already
+// have their dressing (the water drum on the north street, the ochre
+// house's stores, the thug's men's drums). Med kits wait on the floor at
+// full health, so the calm half leaves them for the fight; the easy skills
+// find a little more.
+list.push(
+  // The second lane's south alley: a spacer's crate, two cells on it.
+  at('crate-tan', 130.5, 43.5, { angle: 3 }), at('power-cell', 131.6, 43.4), at('power-cell', 132.4, 43.1),
+  // Its north alley: someone sleeps rough at its end, their med kit by them.
+  at('bedroll', 131, 19.6, { angle: 90 }), at('med-kit', 131, 18.7), at('med-kit', 130.6, 20.6, { skill: [1, 2] }),
+  // Off the thug's square: his men's spare cells by a crate.
+  at('crate-grey-small', 144.6, 46.4, { angle: 350 }), at('power-cell', 145.5, 46.3), at('power-cell', 145.4, 45.6, { skill: [1, 2] }),
+  // The first lane's south alley, behind the garage: a pack off a speeder.
+  at('cargo-pod', 104.5, 46.2, { angle: 90 }), at('energy-pack', 102.8, 46.3),
+  // The gun shop's alley: its overflow, a cell left on a crate's lid.
+  at('crate-rust-long', 106.45, 26.8, { angle: 90 }), at('power-cell', 107.5, 26.6),
+  // The north street's alley to the comm tower's foot: a med kit in a canister's shade.
+  at('canister-rust', 180.6, 46.6), at('med-kit', 181.4, 46.8),
+  // The wash's east bank: what the last flood left at the alley's end.
+  at('crate-rust-long', 203.4, 70.35, { angle: 90 }), at('med-kit', 202.4, 69.7), at('energy-pack', 202.3, 70.5, { skill: [1, 2] }),
+  // Beside the cantina's storehouse, off the back lane: its spare cells.
+  at('crate-grey-small', 121.6, 109.4, { angle: 8 }), at('power-cell', 122.5, 109.3), at('power-cell', 122.4, 108.6),
+);
+
 // Calm until the town turns (things/calm.js, docs/story.md): sandtroopers
 // and Jawas about town, none of them after you yet. Most stand about. One
 // patrol, a commander and a trooper side by side, walks the main street

@@ -28,6 +28,29 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
+- **Finding the way** (`?map=m1`, 2026-11-03, after Mark's play test:
+  maze-like, unclear who to talk to, the fob pointing down alleys). Four
+  of the eleven proposals:
+  - The fob follows the route, not the straight line: from the junk yard
+    it leads to the market, east through the blast doors to the
+    checkpoint's gate (green at the barricades), then through the old
+    quarter's bends and down into the bay. Round a corner it points at the
+    corner. Its beeps quicken by the distance along the route.
+  - Names on screen: face the broker, the Jawa trader, the informant, the
+    hermit or Rusk within 3.5 tiles and their name shows under the middle
+    of the view. Townsfolk show none.
+  - The back lane is shut by a gate of planks four tiles in until the
+    switch, which opens it with the cantina's back door.
+  - The eight empty dead-end alleys each hold a med kit or cells at their
+    far end, in sight from the mouth, with a crate, bedroll or pod.
+  To judge: whether the fob now leads where you'd expect, the name's place
+  and colour (it sits over the person's chest), the lane's gate, and
+  whether the alleys' finds are worth the walk. Still open from the list:
+  the automap draws nothing of the town (houses are raised floor), the
+  people who matter calling you over, Jan naming each next step,
+  objectives, townsfolk's hints, real landmarks (the comm tower, the
+  crane), and the blast doors opening as an event.
+
 - **Bay 86 fitted out** (`?map=m1`, 2026-11-03; through the barred gate
   at the end of the yard past R): ribs, rim lamps (two dead), four fuel
   lines and pumps, the ribbed foot and soot, as in Bay 87. Customs' search:
@@ -643,22 +666,6 @@ lists) is `docs/mission1.md`. It pulls in the story pieces it needs from
 section 5 as it goes (calm troopers, the town's switch, conversations, the
 fob). Each step is a commit with snapshots, playable at `?map=m1`.
 
-- [ ] **Finding the way** (Mark's play test, 2026-11-03: maze-like, unclear
-      who to talk to, the fob points down alleys instead of at the
-      checkpoint). Mark picked these four of eleven:
-  - [x] The fob follows the route: it points along the walkable path to
-        its signal (a flow field, doors counted open), at the furthest
-        point of the path in sight, not straight at Rusk, which is green
-        down the back lane and red up the alleys to the informant.
-  - [x] Names on aim: look at someone with a `name` within talking range
-        and it shows under the crosshair (BROKER, JAWA TRADER, INFORMANT).
-        Townsfolk have none, so a name means "talk to this one".
-  - [x] The back lane gated until the switch: planks a few tiles in from
-        the street, opening with the cantina's back door, so the calm half
-        can see down it but not walk 45 tiles to a dead end.
-  - [ ] Every dead end earns its place: each alley off the route goes
-        through, shows its end from its mouth, or holds something (the
-        loud half's med kits and ammo).
 - [x] Design: `docs/mission1.md`.
 - [x] **Daylight and the kit:** `sky-day` and a warm haze; DF textures
       recoloured; `lib/town.js`; a bigger glyph pool; `m1` with a first
