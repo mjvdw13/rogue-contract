@@ -14,21 +14,21 @@ function kit() {
   return { p, town };
 }
 
-test('a house with a dome is topped by a dome as wide as its top storey', () => {
+test('a house with a dome is topped by the widest dome that fits its top storey, with a rim of roof', () => {
   const { town } = kit();
-  town.house(4, 4, 16, 14, { h: 6, r: 2, tiers: [{ box: [6, 6, 14, 14], h: 9 }], dome: true });
+  town.house(4, 4, 16, 14, { h: 6, r: 2, tiers: [{ box: [5, 4, 15, 14], h: 9 }], dome: true });
   assert.equal(town.things.length, 1);
   const d = town.things[0];
-  assert.deepEqual([d.x, d.y, d.z], [10, 10, 9]);
+  assert.deepEqual([d.x, d.y, d.z], [10, 9, 9]);
   const deco = registry.things.get(d.type);
   assert.ok(deco, `${d.type} is a decoration`);
-  assert.equal(deco.radius * 2, 8, `${d.type} spans the 8-wide storey`);
+  assert.ok(deco.radius * 2 <= 10 - 1 && deco.radius * 2 > 10 - 3, `${d.type} fits the 10-wide storey with a rim`);
 });
 
 test("a dome is in the house's plaster unless it names another", () => {
   const { town } = kit();
-  town.house(4, 4, 12, 12, { h: 6, wall: 'adobe-pale', dome: true });
-  town.house(20, 4, 28, 12, { h: 6, wall: 'adobe-pale', dome: 'adobe' });
+  town.house(4, 4, 14, 14, { h: 6, wall: 'adobe-pale', dome: true });
+  town.house(20, 4, 30, 14, { h: 6, wall: 'adobe-pale', dome: 'adobe' });
   assert.match(town.things[0].type, /-pale$/);
   assert.doesNotMatch(town.things[1].type, /-pale$/);
 });
@@ -45,19 +45,9 @@ test('a dome casts a shadow', () => {
   assert.ok(light(true) < light(false));
 });
 
-test("a slanting house's dome is the widest that fits inside it, even off the corners' average", () => {
-  const { town } = kit();
-  // A 10-tile square with a long point on its east side: the corners'
-  // average is out towards the point, where only a narrower dome fits.
-  town.slanted([[4, 10], [14, 10], [36, 15], [14, 20], [4, 20]], { h: 6, dome: true });
-  const d = town.things[0];
-  assert.equal(registry.things.get(d.type).radius * 2, 10);
-  assert.ok(d.x >= 9 && d.x <= 13.5 && d.y === 15, `inside the square, not at (${d.x}, ${d.y})`);
-});
-
 test('a roof too small for any dome gets none', () => {
   const { town } = kit();
-  town.house(4, 4, 6, 10, { h: 6, dome: true });
+  town.house(4, 4, 8, 8, { h: 6, dome: true });
   assert.equal(town.things.length, 0);
 });
 

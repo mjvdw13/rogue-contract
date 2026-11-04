@@ -101,10 +101,7 @@ These need Mark to try something, or to decide. Don't start them without him.
   closed by the ochre one's low back room (its stores at the end), one
   off the bend's north-east side between the pale and ochre houses (the
   ochre one's side door in it), and the domed house by the bay's gate 1 m
-  out into the street. Every house in the quarter but the rose triangle
-  on the bend and the ruin now wears a dome (twelve more), from 3 to 6
-  wide. To judge: the domes from the streets (they show best across the
-  gate square and down the bend), and the new way through the yard.
+  out into the street. To judge: the new way through the yard.
   Then the back alleys: on the first lane the south slot is an alley
   1.5 m wide back to the market's houses, and the gun shop's house stands
   on its own, an alley 1 m wide up its east side with washing across it;
@@ -112,35 +109,29 @@ These need Mark to try something, or to decide. Don't start them without him.
   (1 m on the north, the ochre house past it a tile back; 1.5 m on the
   south), the power box and its cables moved with the ochre wall; the
   thug's square's corners alleys 1 m wide (his men's drums in the east
-  one). Seven more domes: 3 wide on the lanes' narrow houses (all but
-  the lowest grey one), 3 and 4 on the square's rose and east houses. To
-  judge: whether the second lane's alleys facing each other read as a
-  crossing (they could be staggered, with narrower houses).
-  Then (2026-11-03, Mark: the domes were small) every dome is as wide as
-  its roof, its lip on the wall tops with no rim (the big houses' mostly
-  4.5 m, were 3.5 m; a taller profile went back out, Mark: just taller,
-  not wider). And none on a roof under 3 m across (Mark: fewer is fine,
-  as long as they're somewhere): 17 went, the lanes' and the old quarter's
-  narrow houses, 82 left. A slanting house's dome goes where the widest
-  fits, so seven grew (the first lane's ochre house 3.5 m, two by the
-  market 4.5 and 5.5 m), and two set-back storeys are a tile deeper to
-  take a 3 m one (the yard behind J, the old quarter's north street). No
-  houses combined: the second lane has none of its own, but the hostel's
-  and the thug's domes show at either end. To judge: whether the skyline
-  has enough domes, and whether some lane should get a bigger house with
-  one.
+  one). To judge: whether the second lane's alleys facing each other
+  read as a crossing (they could be staggered, with narrower houses).
   Then the dry wash and the back lane (2026-11-03). The wash: a passage
   1 m wide from the main street down two steps into it, between the rose
-  house and the domed one; on the east bank the pale house at the bend
-  runs back to the town's edge under a 4 m dome, a dead-end alley 1 m wide
-  and 7 back between it and the grey one, and the rose house 1 m out into
+  house and the tall one; on the east bank the pale house at the bend
+  runs back to the town's edge, a dead-end alley 1 m wide and 7 back
+  between it and the grey one, and the rose house 1 m out into
   the wash, so its ends show from along it (the wash 3 m wide there). The
   back lane: an alley 1 m wide from the lane through to the north light
   well; the storehouse's slot an alley 1 m wide and 5 back; the last house
   on the east side 1 m back behind a wider paved yard, so the one before
-  shows its end; domes on the two big rooftop houses (5 and 5.5 m). To
-  judge: whether the wash's new way up to the street is wanted (it's a
-  third way between them), and the big domes on the low rooftops.
+  shows its end. To judge: whether the wash's new way up to the street
+  is wanted (it's a third way between them).
+- **Domes: only the big ones** (`?map=m1`, 2026-11-03). Mark didn't like
+  the day's bigger domes (as wide as the roof, the taller profile, placed
+  where the widest fits): they're back as they were, a rim of roof round
+  each, and none under 3.5 m across (Mark: the small ones read as bumps).
+  47 went and 51 are left: 14 in the streets (the market's round houses,
+  the cantina, the hostel, the thug's back room, the old quarter's big
+  pale house and the culvert house, three at the west end), the fallen-in
+  one, and 36 on the town's blocks round the edge. The narrow houses (the
+  lanes, most of the old quarter, the market's two-storey ones) go
+  without. To judge: whether the streets have enough.
 - **The remaining streets, detailed** (`?map=m1`, 2026-11-01): each its
   own place, built from the town's pieces.
   The back lane: the cantina's empties by its back door, its rubbish
@@ -326,8 +317,8 @@ These need Mark to try something, or to decide. Don't start them without him.
   one every 3-8 s. To judge: how thick the smoke is (Mark found the
   smelter's too much), and whether the steam reads from across the yard.
   The ground and walls less bare: the brick wall is now the backs of
-  houses, each its own plaster and height (5 to 7 over the court), a dome
-  over the grey one, grimier than the town's, a brick plinth or dirty foot,
+  houses, each its own plaster and height (5 to 7 over the court),
+  grimier than the town's, a brick plinth or dirty foot,
   windows, two downpipes and a box unit; sheet metal patches (`patch-*`,
   from Sewers' rusty sheet, a bolted panel and the lean-tos' tin) and
   brick bared where plaster has fallen (`brick-bare-*`). On the ground, a

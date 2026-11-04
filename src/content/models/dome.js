@@ -2,26 +2,22 @@ import { ModelBuilder } from './lib/build.js';
 
 // Mos Eisley's domes: the toppers on its roofs. A plaster dome on a short
 // drum, over a lip a little wider than the drum, as on the film's houses.
-// Not taller: a full half-sphere on a tall drum read as a tall bump rather
-// than a bigger dome (Mark, 2026-11-03).
 // Built at size rather than scaled, so the plaster keeps the walls' texel
-// size: one per width (6 to 11 tiles across) in each plaster. None smaller:
-// a dome under 3 m across on a narrow house read as a bump (Mark,
-// 2026-11-03), so narrow houses go without.
+// size: one per width (7 to 11 tiles across) in each plaster. None smaller:
+// under 3.5 m across they read as bumps on the roofs (Mark, 2026-11-03), so
+// a roof too narrow for a 7 goes without.
 // The town kit picks the widest that fits a roof (lib/town.js).
 
 /** How high a dome rises for its radius, over its lip and drum. */
 const RISE = 0.9;
 const LIP = 0.3;
-/** The drum's height for a dome of radius `r` (inside the lip). */
-const drumOf = (r) => Math.min(0.5, r * 0.15);
 
 function dome(id, radius, tex) {
   const m = new ModelBuilder(id);
   const sides = radius >= 3 ? 16 : 12;
   const ring = (r) => Array.from({ length: sides }, (_, i) => [Math.cos((i / sides) * Math.PI * 2) * r, Math.sin((i / sides) * Math.PI * 2) * r]);
   const r = radius - 0.25;
-  const drum = drumOf(r);
+  const drum = Math.min(0.5, r * 0.15);
   m.prism(ring(radius), 0, LIP, { tex, bottom: false });
   m.prism(ring(r), LIP, LIP + drum, { tex, bottom: false, top: false });
   const bands = radius >= 3 ? 6 : 5;
@@ -42,10 +38,10 @@ export const PLASTERS = { '': 'adobe', '-pale': 'adobe-pale', '-ochre': 'adobe-o
 
 /** Every dome: `id` (`dome-<width>`, then its plaster's suffix), `radius`, `height` and `tex`, widest first. */
 export const DOMES = [];
-for (let width = 11; width >= 6; width--) {
+for (let width = 11; width >= 7; width--) {
   const radius = width / 2;
   const r = radius - 0.25;
-  const height = LIP + drumOf(r) + r * RISE;
+  const height = LIP + Math.min(0.5, r * 0.15) + r * RISE;
   for (const [suffix, tex] of Object.entries(PLASTERS)) {
     DOMES.push({ id: `dome-${width}${suffix}`, radius, height: Math.round(height * 100) / 100, tex });
   }
@@ -62,7 +58,7 @@ function brokenDome(id, radius, tex, cut) {
   const sides = 16;
   const ring = (r) => Array.from({ length: sides }, (_, i) => [Math.cos((i / sides) * Math.PI * 2) * r, Math.sin((i / sides) * Math.PI * 2) * r]);
   const r = radius - 0.25;
-  const drum = drumOf(r);
+  const drum = Math.min(0.5, r * 0.15);
   m.prism(ring(radius), 0, LIP, { tex, bottom: false });
   m.prism(ring(r), LIP, LIP + drum, { tex, bottom: false, top: false });
   const bands = 6;
@@ -82,7 +78,7 @@ function brokenDome(id, radius, tex, cut) {
 /** The fallen-in domes: `id`, `radius`, `height` (as it stood) and `tex`. */
 export const BROKEN_DOMES = [{ id: 'dome-broken-7-grey', radius: 3.5, tex: 'adobe-grey', cut: [6, 6, 6, 5, 4, 2, 1, 1, 0, 1, 2, 2, 4, 5, 6, 6] }].map((d) => {
   const r = d.radius - 0.25;
-  return { ...d, height: Math.round((LIP + drumOf(r) + r * RISE) * 100) / 100 };
+  return { ...d, height: Math.round((LIP + Math.min(0.5, r * 0.15) + r * RISE) * 100) / 100 };
 });
 
 export default [...DOMES.map((d) => dome(d.id, d.radius, d.tex)), ...BROKEN_DOMES.map((d) => brokenDome(d.id, d.radius, d.tex, d.cut))];

@@ -785,7 +785,7 @@ through them as slab arches, rooms inside them as the lower storey of a
 slab, doors (pictures, or with `door({ opens: true })` rising doors into a
 room, the wall over them a slab), cloth awnings, slatted roofs (`town.slats()`: slabs a
 tile apart, the suns straight through the gaps in stripes), round buildings, domes on the roofs (models in
-six widths, placed by `house({ dome })` or `town.dome()`), and shade from
+five widths, placed by `house({ dome })` or `town.dome()`), and shade from
 two suns (and the domes) worked out from the heights (see docs/mission1.md, "How it's
 built").
 
