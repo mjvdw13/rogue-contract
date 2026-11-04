@@ -115,8 +115,14 @@ These need Mark to try something, or to decide. Don't start them without him.
   one). Seven more domes: 3 wide on the lanes' narrow houses (all but
   the lowest grey one), 3 and 4 on the square's rose and east houses. To
   judge: whether the second lane's alleys facing each other read as a
-  crossing (they could be staggered, with narrower houses), and the small
-  domes on 2 m houses.
+  crossing (they could be staggered, with narrower houses).
+  Then (2026-11-03, Mark: the domes were small) every dome is as wide as
+  its roof, its lip on the wall tops with no rim, and a full half-sphere on
+  a drum twice as tall, so it stands clear of the roof's edge: the lanes'
+  2 m houses wear 2 m domes 1.3 m high (were 1.5 m and 0.8 m), the big
+  houses' mostly 4.5 m (were 3.5 m). To judge: whether they're big enough
+  now, from the lanes and across the squares, before the oval ones on long
+  houses.
 - **The remaining streets, detailed** (`?map=m1`, 2026-11-01): each its
   own place, built from the town's pieces.
   The back lane: the cantina's empties by its back door, its rubbish
@@ -641,6 +647,11 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
   - [x] The old quarter's main street, bend and way to the bay's gate,
         and domes on its houses.
   - [x] The back alleys' two lanes and the thug's square, with domes.
+  - [ ] Domes bigger (Mark, 2026-11-03: the new ones were small, 1.5 m
+        across on 2 m houses, hidden by the roof's edge from the lanes).
+    - [x] As wide as the roof, no rim; a full half-sphere on a taller
+          drum. Snapshots from a lane and a square.
+    - [ ] Then oval domes on long, narrow houses.
   - [ ] The dry wash and the back lane.
 
 - [x] Design: `docs/mission1.md`.

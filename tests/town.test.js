@@ -14,7 +14,7 @@ function kit() {
   return { p, town };
 }
 
-test('a house with a dome is topped by the widest dome that fits its top storey, with a rim of roof', () => {
+test('a house with a dome is topped by a dome as wide as its top storey', () => {
   const { town } = kit();
   town.house(4, 4, 16, 14, { h: 6, r: 2, tiers: [{ box: [6, 6, 14, 14], h: 9 }], dome: true });
   assert.equal(town.things.length, 1);
@@ -22,7 +22,7 @@ test('a house with a dome is topped by the widest dome that fits its top storey,
   assert.deepEqual([d.x, d.y, d.z], [10, 10, 9]);
   const deco = registry.things.get(d.type);
   assert.ok(deco, `${d.type} is a decoration`);
-  assert.ok(deco.radius * 2 <= 8 - 1 && deco.radius * 2 > 8 - 3, `${d.type} fits the 8-wide storey with a rim`);
+  assert.equal(deco.radius * 2, 8, `${d.type} spans the 8-wide storey`);
 });
 
 test("a dome is in the house's plaster unless it names another", () => {
@@ -47,7 +47,7 @@ test('a dome casts a shadow', () => {
 
 test('a roof too small for any dome gets none', () => {
   const { town } = kit();
-  town.house(4, 4, 8, 8, { h: 6, dome: true });
+  town.house(4, 4, 6, 10, { h: 6, dome: true });
   assert.equal(town.things.length, 0);
 });
 

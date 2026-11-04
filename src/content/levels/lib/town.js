@@ -870,7 +870,8 @@ export class Town {
    * inside it with its own `h` and `r`: a storey set back from the street.
    * The ground round the rounded corners keeps whatever was there.
    * `dome` tops it with a dome (a topper) on its highest box, as wide as
-   * fits with a rim of roof round it: `true` in the wall's plaster, or a
+   * the box's shorter side, its lip on the wall tops as on the film's
+   * houses: `true` in the wall's plaster, or a
    * plaster's name. `grime` says how weathered its walls are (see
    * `grime()`).
    */
@@ -882,7 +883,7 @@ export class Town {
       const t = tiers.at(-1);
       const [bx0, by0, bx1, by1] = t ? t.box : [x0, y0, x1, y1];
       const wall = typeof dome === 'string' ? dome : t?.wall ?? opts.wall;
-      this.dome((bx0 + bx1) / 2, (by0 + by1) / 2, t ? t.h : h, Math.min(bx1 - bx0, by1 - by0) - 1.5, { wall });
+      this.dome((bx0 + bx1) / 2, (by0 + by1) / 2, t ? t.h : h, Math.min(bx1 - bx0, by1 - by0), { wall });
     }
     return this;
   }
@@ -938,9 +939,9 @@ export class Town {
     }
     for (const [a, b] of slants) this.slants.push({ a, b, top: h, inward: [cx, cy], skirt: bands?.[0]?.to ?? 0 });
     if (dome) {
-      // As wide as the nearest side is from the middle allows, with a rim.
+      // As wide as the nearest side is from the middle allows.
       const reach = Math.min(...edges.map(([a, b]) => Math.abs(side(a, b, cx, cy)) / Math.hypot(b[0] - a[0], b[1] - a[1])));
-      this.dome(cx, cy, h, reach * 2 - 1.5, { wall: typeof dome === 'string' ? dome : opts.wall });
+      this.dome(cx, cy, h, reach * 2, { wall: typeof dome === 'string' ? dome : opts.wall });
     }
     return this;
   }
