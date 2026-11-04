@@ -120,7 +120,10 @@ its controls are the terminal in the customs house, past its two troopers
   `checkpoint-foot`) has the informant call Kyle over from his den.
 - At the switch, Jan: the blast doors are sealed, go round. Back at the
   checkpoint's foot she names the alleys and the cantina's back door.
-- From the junk yard on, the fob.
+- From the junk yard on, the fob: the trader's signal points it at the
+  checkpoint's gate, and through the gate (148..151, 62..73, tag
+  `past-checkpoint`) at Rusk, straight at each (Mark, 2026-11-04: the
+  route round every corner was too confusing).
 
 **Levels and slants** (above, "Off the grid, and up and down"): Mos
 Eisley is flat (Mark, 2026-10-30), so each part of town stands a couple

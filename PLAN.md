@@ -31,11 +31,11 @@ These need Mark to try something, or to decide. Don't start them without him.
 - **Finding the way** (`?map=m1`, 2026-11-03, after Mark's play test:
   maze-like, unclear who to talk to, the fob pointing down alleys). Four
   of the eleven proposals:
-  - The fob follows the route, not the straight line: from the junk yard
-    it leads to the market, east through the blast doors to the
-    checkpoint's gate (green at the barricades), then through the old
-    quarter's bends and down into the bay. Round a corner it points at the
-    corner. Its beeps quicken by the distance along the route.
+  - The fob points at two places (after Mark's note, 2026-11-04): the
+    trader's signal points it at the checkpoint's gate, and through the
+    gate at Rusk, straight at each. (Following the route round every
+    corner was too confusing; that option, `track.route`, stays in the
+    engine, unused.)
   - Names over heads (after Mark's note, 2026-11-04): the broker, the Jawa
     trader, the informant, the hermit and Rusk show their names over their
     heads while in sight, up to 24 tiles off. Townsfolk show none.
@@ -43,9 +43,9 @@ These need Mark to try something, or to decide. Don't start them without him.
     switch, which opens it with the cantina's back door.
   - The eight empty dead-end alleys each hold a med kit or cells at their
     far end, in sight from the mouth, with a crate, bedroll or pod.
-  To judge: whether the fob now leads where you'd expect, the names' size,
-  range and colour, the lane's gate, and
-  whether the alleys' finds are worth the walk. Still open from the list:
+  To judge: whether the fob's two points lead well enough, the names'
+  size, range and colour, the lane's gate, and whether the alleys' finds
+  are worth the walk. Still open from the list:
   the automap draws nothing of the town (houses are raised floor), the
   people who matter calling you over, Jan naming each next step,
   objectives, townsfolk's hints, real landmarks (the comm tower, the
@@ -658,13 +658,6 @@ These need Mark to try something, or to decide. Don't start them without him.
 ## Next up
 
 In this order unless Mark says otherwise.
-
-### 0. Finding the way: Mark's notes (2026-11-04)
-
-- [x] Names float over the heads of the people who matter, and read from
-      across a room, not only in talking range.
-- [ ] The fob points at two places only: the checkpoint's gate, then,
-      once Kyle is through it, Rusk. Straight at each, not along the route.
 
 ### 1. Mission 1: Mos Eisley
 

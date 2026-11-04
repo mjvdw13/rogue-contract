@@ -3,11 +3,12 @@ import { defineWeapon } from '../../engine/defs.js';
 // Slot 8: the Guild's tracking fob (docs/story.md), Mission 1 only. No
 // attack: held, it blinks and beeps faster the nearer the signal, red
 // turned away, yellow roughly toward it and green facing it (Mark: 15
-// degrees for green was too fussy), the bands wider the nearer you are. It
-// follows the walkable route, not the straight line (Mark's play test,
-// 2026-11-03: straight at Rusk it was green down dead-end alleys and only
-// yellow at the checkpoint). It stays dark with nothing to track. The
-// broker gives it (the giveWeapon action) and Rusk takes it (takeWeapon).
+// degrees for green was too fussy), the bands wider the nearer you are.
+// Straight at the signal: Mos Eisley points it at the checkpoint's gate,
+// then, once Kyle is through, at Rusk (Mark, 2026-11-04: following the
+// route round every corner was too confusing). It stays dark with nothing
+// to track. The broker gives it (the giveWeapon action) and Rusk takes it
+// (takeWeapon).
 export default defineWeapon({
   id: 'fob',
   name: 'TRACKING FOB',
@@ -23,7 +24,7 @@ export default defineWeapon({
     litWarm: { frames: [2, 0], durations: [0.09, 0.01], fullbright: [0] },
     litFacing: { frames: [3, 0], durations: [0.09, 0.01], fullbright: [0] },
   },
-  track: { near: 4, far: 80, blink: [0.15, 1.4], facing: [45, 25], warm: [100, 70], route: true },
+  track: { near: 4, far: 80, blink: [0.15, 1.4], facing: [45, 25], warm: [100, 70] },
   sounds: { beep: 'fob-beep' },
   bob: 0.8,
 });

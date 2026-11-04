@@ -23,7 +23,7 @@ const door = (w, tag) => w.map.doors.find((d) => d.tag === tag);
 const shut = (w, tag) => door(w, tag).state === 'closed';
 const said = (w, who) => w.messages.filter((m) => m.startsWith(`${who}: `));
 
-test('in Mos Eisley the informant has no pass, and the hold stays shut, until the trader keys in the signal', () => {
+test('in Mos Eisley the informant has no pass, and the hold stays shut, until the trader keys in the signal; the fob points at the checkpoint, then through it at Rusk', () => {
   const w = makeWorld('m1');
   const informant = () => talk(w, 141.5, 55.5, 0);
 
@@ -37,12 +37,16 @@ test('in Mos Eisley the informant has no pass, and the hold stays shut, until th
   assert.ok(w.player.player.weapons.has('fob'), 'the broker hands over the fob');
   for (let i = 0; i < 2; i++) trader(w);
   assert.ok(w.flags.has('signal'));
-  assert.equal(w.signalAt()?.tag, 'rusk', 'the fob tracks Rusk');
+  assert.equal(w.signal?.tag, 'checkpoint', "the fob points at the checkpoint's gate");
   assert.ok(!shut(w, 'hold-door'), 'and the hold opens');
 
   for (let i = 0; i < 2; i++) informant();
   assert.ok(!shut(w, 'checkpoint'), 'now the pass opens the checkpoint');
   assert.equal(said(w, 'INFORMANT').length, 5);
+  assert.equal(w.signal?.tag, 'checkpoint', 'the fob still points at the gate while Kyle is this side of it');
+  Object.assign(w.player, { x: 149.5, y: 67 });
+  run(w, mockInput(), 0.2);
+  assert.equal(w.signalAt()?.tag, 'rusk', 'through the gate, it tracks Rusk');
   assert.equal(w.hostile, false, 'the town is calm all the while');
 });
 

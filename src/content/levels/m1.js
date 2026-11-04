@@ -609,6 +609,8 @@ const openPolygon = (points, cell) => {
 // bay's rim stands above the roofs ahead the whole way.
 p.rect(148, 53, 188, 60, town.street(OQ));
 p.rect(148, 60, 160, 76, town.street(OQ));
+// Just through the checkpoint's gate, where the fob turns from the gate to Rusk.
+p.rect(148, 62, 151, 73, (_, __, c) => ({ ...c, tag: 'past-checkpoint' }));
 const QUARTER = town.street(OQ);
 openPolygon([[160, 64], [170, 64], [170, 76], [160, 76]], QUARTER);
 // The bend: its walls y = x - 106 (north-east) and y = x - 94 (south-west).
@@ -2280,22 +2282,26 @@ export default defineLevel({
     // At the checkpoint's foot with the signal and no pass, the informant calls Kyle over from his den.
     { on: 'enter', tag: 'checkpoint-foot', if: 'signal', unless: ['pass', 'loud'], do: [{ action: 'message', text: 'INFORMANT: PSST. HUNTER. WANT A PASS?' }] },
     // The fob: the broker gives it (dark) and the junk yard's gate opens,
-    // the trader's code points it at Rusk, opens the hold and opens the east
-    // (the blast doors, and the alleys from the market and the junk yard),
-    // and in the hold Rusk pulls its Imperial tracer and the town turns.
+    // the trader's code points it at the checkpoint's gate, opens the hold
+    // and opens the east (the blast doors, and the alleys from the market
+    // and the junk yard); through the gate it points at Rusk; and in the
+    // hold Rusk pulls its Imperial tracer and the town turns. Two places,
+    // straight at each (Mark, 2026-11-04: the route round the corners was
+    // too confusing).
     { on: 'talk', tag: 'broker', if: 'contract', do: [{ action: 'giveWeapon', weapon: 'fob' }, { action: 'message', text: 'THE BROKER HANDS YOU A TRACKING FOB.' }, { action: 'openDoors', tag: 'junk-gate' }] },
     {
       on: 'talk',
       tag: 'trader',
       if: 'signal',
       do: [
-        { action: 'setSignal', tag: 'rusk' },
+        { action: 'setSignal', tag: 'checkpoint' },
         { action: 'openDoors', tag: 'hold-door' },
         { action: 'openDoors', tag: 'blast-doors' },
         { action: 'openDoors', tag: 'side-gate' },
         { action: 'openDoors', tag: 'alley-gate' },
       ],
     },
+    { on: 'enter', tag: 'past-checkpoint', if: 'signal', unless: 'loud', do: [{ action: 'setSignal', tag: 'rusk' }] },
     {
       on: 'enter',
       tag: 'hold',
