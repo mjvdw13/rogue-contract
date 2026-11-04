@@ -11,6 +11,7 @@ import { BODY } from './things/player.js';
 const PICKUP_MODIFIERS = ['maxHealth', 'armorClass', 'maxArmor', 'duration', 'always'];
 const TRIGGER_EVENTS = ['start', 'enter', 'use', 'killed', 'pickup', 'hostile', 'talk'];
 const TALK_FIELDS = ['if', 'unless', 'lines', 'set'];
+const LINES_FIELDS = ['if', 'unless', 'lines'];
 const TRACK_FIELDS = ['near', 'far', 'blink', 'facing', 'warm', 'route'];
 /** Faces per model before the validator warns (render cost). */
 const MODEL_BUDGET = 400;
@@ -57,15 +58,43 @@ export function validateContent(reg) {
     if (a.lockOn !== undefined && !(a.lockOn > 0 && a.lockOn <= 90)) err(`${owner}: lockOn is degrees either side, above 0 and up to 90`);
     for (const k of ['sound', 'hitSound', 'missSound']) checkSound(owner, a[k]);
   };
+  // Story flags: a flag, or a list of them.
+  const isFlags = (v) => (typeof v === 'string' ? v !== '' : Array.isArray(v) && v.length > 0 && v.every((f) => typeof f === 'string' && f !== ''));
+  // `if` and `unless` on a trigger or a conversation's branch; the flags read go in `reads` to check they're set somewhere.
+  const checkConditions = (who, spec, reads) => {
+    for (const k of ['if', 'unless']) {
+      if (spec[k] === undefined) continue;
+      if (!isFlags(spec[k])) err(`${who}: "${k}" must be a story flag or a list of them`);
+      else for (const f of [].concat(spec[k])) reads.push({ who, flag: f });
+    }
+  };
+  // What a friendly or calm monster says when bumped (things/talk.js): lines,
+  // and story groups `{ if?, unless?, lines }` among them.
+  const checkLines = (who, lines, reads) => {
+    if (!Array.isArray(lines)) return err(`${who}: "lines" must be a list of lines, or of groups like { if, lines }`);
+    lines.forEach((l, i) => {
+      if (typeof l === 'string') return;
+      const where = `${who}: lines group ${i + 1}`;
+      if (!l || typeof l !== 'object' || Array.isArray(l)) return err(`${who}: line ${i + 1} must be a line, or a group like { if, lines }`);
+      for (const k of Object.keys(l)) if (!LINES_FIELDS.includes(k)) err(`${where} has unknown field "${k}" (it takes ${LINES_FIELDS.join(', ')})`);
+      if (!(Array.isArray(l.lines) && l.lines.length > 0 && l.lines.every((s) => typeof s === 'string'))) err(`${where} needs "lines", a list of one or more strings`);
+      checkConditions(where, l, reads);
+    });
+    return undefined;
+  };
+  // Flags read by each type's lines (type id to reads): checked in each level
+  // that places the type and tells a story (sets a flag).
+  const typeFlagReads = new Map();
+  const readsOf = (id) => typeFlagReads.get(id) ?? typeFlagReads.set(id, []).get(id);
   // A monster type's `calm`, or a placement's (which may also have a patrol).
   const CALM_FIELDS = ['lines', 'speed', 'stride', 'wander', 'idleTime', 'patrol', 'loop'];
-  const checkCalm = (owner, c, placed) => {
+  const checkCalm = (owner, c, placed, reads) => {
     if (placed && c === true) return;
     if (!c || typeof c !== 'object' || Array.isArray(c)) return err(`${owner}: "calm" must be true or an object`);
     for (const k of Object.keys(c)) {
       if (!CALM_FIELDS.includes(k)) err(`${owner}: calm has unknown field "${k}" (it takes ${CALM_FIELDS.join(', ')})`);
     }
-    if (c.lines !== undefined && !(Array.isArray(c.lines) && c.lines.every((l) => typeof l === 'string'))) err(`${owner}: calm lines must be a list of strings`);
+    if (c.lines !== undefined) checkLines(`${owner}: calm`, c.lines, reads);
     if (c.speed !== undefined && !(typeof c.speed === 'number' && c.speed > 0)) err(`${owner}: calm speed must be above 0 (tiles a second)`);
     if (c.stride !== undefined && !(typeof c.stride === 'number' && c.stride > 0)) err(`${owner}: calm stride must be above 0 (tiles a walk cycle covers)`);
     if (c.wander !== undefined && !(typeof c.wander === 'number' && c.wander >= 0)) err(`${owner}: calm wander must be a number of tiles, 0 or more`);
@@ -246,7 +275,7 @@ export function validateContent(reg) {
       checkAttack(owner, t.attack);
       checkAttack(owner, t.melee);
       for (const d of t.drops) if (!reg.things.has(d.item)) err(`${owner}: drops unknown item "${d.item}"`);
-      checkCalm(owner, t.calm, false);
+      checkCalm(owner, t.calm, false, readsOf(t.id));
     }
     if (t.kind === 'item') {
       for (const [key, value] of Object.entries(t.pickup ?? {})) {
@@ -271,7 +300,7 @@ export function validateContent(reg) {
       if (!t.anims.idle) err(`${owner}: needs an "idle" animation`);
       if ((t.wander ?? 0) > 0 && !t.anims.walk) warn(`${owner}: wanders but has no "walk" animation (it will stand still)`);
       if (t.bubble && !reg.things.has(t.bubble)) err(`${owner}: unknown speech bubble effect "${t.bubble}"`);
-      if (!Array.isArray(t.lines)) err(`${owner}: "lines" must be a list of strings`);
+      checkLines(owner, t.lines, readsOf(t.id));
       if (!(typeof t.health === 'number' && t.health >= 0)) err(`${owner}: health must be a number, 0 or more`);
       if (!(t.fleeSpeed > 0)) err(`${owner}: fleeSpeed must be above 0`);
       if (!(t.fleeDistance > 0)) err(`${owner}: fleeDistance must be above 0`);
@@ -336,16 +365,6 @@ export function validateContent(reg) {
     }
   }
 
-  // Story flags: a flag, or a list of them.
-  const isFlags = (v) => (typeof v === 'string' ? v !== '' : Array.isArray(v) && v.length > 0 && v.every((f) => typeof f === 'string' && f !== ''));
-  // `if` and `unless` on a trigger or a conversation's branch; the flags read go in `reads` to check they're set somewhere.
-  const checkConditions = (who, spec, reads) => {
-    for (const k of ['if', 'unless']) {
-      if (spec[k] === undefined) continue;
-      if (!isFlags(spec[k])) err(`${who}: "${k}" must be a story flag or a list of them`);
-      else for (const f of [].concat(spec[k])) reads.push({ who, flag: f });
-    }
-  };
   // A placement's conversation (things/talk.js): a list of lines, or of branches.
   const checkTalk = (who, talk, reads, sets) => {
     if (!Array.isArray(talk) || talk.length === 0) return err(`${who}: "talk" must be a list of lines, or of branches like { if, lines }`);
@@ -415,7 +434,7 @@ export function validateContent(reg) {
           if (def.kind !== 'monster') err(`${who} is placed "calm", which only monsters take (friendlies are always calm)`);
           else {
             const before = errors.length;
-            checkCalm(who, sp.calm, true);
+            checkCalm(who, sp.calm, true, flagReads);
             if (errors.length === before && sp.calm.patrol) checkPatrol(who, b.map, sp, def);
           }
         }
@@ -494,6 +513,11 @@ export function validateContent(reg) {
       checkActions(where, t.do);
     });
     for (const r of flagReads) if (!flagsSet.has(r.flag)) err(`${r.who} waits for flag "${r.flag}", which nothing in the level sets (a setFlag action, or a talk branch's "set")`);
+    if (flagsSet.size > 0 && built) {
+      for (const type of new Set(built.spawns.map((sp) => sp.type))) {
+        for (const r of typeFlagReads.get(type) ?? []) if (!flagsSet.has(r.flag)) err(`${owner}: ${r.who} waits for flag "${r.flag}", which nothing in the level sets`);
+      }
+    }
     for (const u of map.uses.values()) checkActions('a switch', u.actions);
     if (level.music && !reg.songs.has(level.music)) warn(`${owner}: unknown music "${level.music}"`);
     if (level.sky && !reg.textures.has(level.sky)) err(`${owner}: unknown sky texture "${level.sky}"`);

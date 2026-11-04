@@ -160,8 +160,8 @@ trooper on patrol or a Jawa about town, before the shooting starts. A calm
 monster never looks for the player, hears no gunfire and never attacks. It
 stands its post, strolls round its spot as friendly characters do (out of
 doorways and one-tile passages), or walks a patrol. Bumped or used, it
-turns to the player and says one of its `lines` (shown as `NAME: line`).
-Hurt, it turns normal and fights back, and so does the rest of the town:
+turns to the player and says one of its `lines` (shown as `NAME: line`;
+story groups among them as for friendlies, see *Story lines*). Hurt, it turns normal and fights back, and so does the rest of the town:
 every calm monster on the level turns at once (the town's switch). The
 player firing a weapon with `noise` (not fists) or hurting anyone while
 some are calm throws it too, and so does the `hostile` action; the
@@ -245,6 +245,25 @@ defineNpc({
   fleeDistance: 20,
 });
 ```
+
+**Story lines.** An entry in `lines` (a friendly's, or a calm monster's)
+can be a group, `{ if?, unless?, lines }`, whose lines join the others only
+while the story flags allow (`if` and `unless`, as on triggers). It's still
+one line at random, so one group line among five comes up about one bump in
+five: a townsperson now and then points the way to the story's next step,
+among ordinary talk.
+
+```js
+lines: [
+  'Hot suns today.',
+  "The water seller's raised his prices again.",
+  { unless: 'contract', lines: ["If it's work you want, the Guild's man drinks at the cantina."] },
+  { if: 'contract', unless: 'signal', lines: ['The Jawas tag everything they sell.'] },
+],
+```
+
+The validator wants each flag set somewhere: by the level, for a
+placement's `calm.lines`; by some level, for a type's `lines`.
 
 Animation frame events like `events: { 2: 'sound:npc-sigh' }` play a sound.
 `hooks.onReact(world, self)`, `hooks.onThink(world, self, dt)`,

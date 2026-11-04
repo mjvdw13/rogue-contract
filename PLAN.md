@@ -43,12 +43,20 @@ These need Mark to try something, or to decide. Don't start them without him.
     switch, which opens it with the cantina's back door.
   - The eight empty dead-end alleys each hold a med kit or cells at their
     far end, in sight from the mouth, with a crate, bedroll or pod.
+  - Townsfolk's hints (after Mark's note, 2026-11-04): each kind of
+    townsperson has four ordinary lines and, for some steps of the story,
+    one that points to the next (the cantina, the junk yard, the man by
+    the checkpoint, the freighter in the old bay, round the blast doors
+    and the customs house), so about one bump in five is a hint, and it
+    changes as the story moves on (`villagers.js`). The checkpoint's
+    troopers say the pass checks out once you have it.
   To judge: whether the fob's two points lead well enough, the names'
-  size, range and colour, the lane's gate, and whether the alleys' finds
-  are worth the walk. Still open from the list:
+  size, range and colour, the lane's gate, whether the alleys' finds
+  are worth the walk, and the hints' words and how often they come.
+  Still open from the list:
   the automap draws nothing of the town (houses are raised floor), the
   people who matter calling you over, Jan naming each next step,
-  objectives, townsfolk's hints, real landmarks (the comm tower, the
+  objectives, real landmarks (the comm tower, the
   crane), and the blast doors opening as an event.
 
 - **Bay 86 fitted out** (`?map=m1`, 2026-11-03; through the barred gate

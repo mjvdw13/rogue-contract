@@ -45,7 +45,7 @@ export function makeCalm(world, m, spec) {
     stuck: 0,
     dodge: 0,
     reactCooldown: 0,
-    lastLine: -1,
+    lastLine: null,
   };
   if (!route) {
     m.wanderReach = c.wander ?? 0;

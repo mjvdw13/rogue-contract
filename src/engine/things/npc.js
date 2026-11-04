@@ -68,7 +68,7 @@ export function initNpc(world, t) {
   t.timer = t.rng.range(0.3, 2);
   t.reactCooldown = 0;
   t.stuck = 0;
-  t.lastLine = -1;
+  t.lastLine = null;
   t.scared = false;
 }
 

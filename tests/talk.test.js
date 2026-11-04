@@ -111,6 +111,46 @@ test('a calm trooper talks under its placement name, and stops when the town tur
   assert.deepEqual(said(w), ['OFFICER: Papers.'], 'a hostile trooper has nothing more to say');
 });
 
+test("a story group joins someone's lines only while the story's flags allow it", () => {
+  const lines = ['Move along.', { unless: 'pass', lines: ['No pass, no way through.'] }, { if: 'pass', lines: ['Your pass checks out.'] }];
+  const w = makeWorld(hall([{ type: 'sandtrooper', x: 4.5, y: 3.5, angle: 180, name: 'Guard', calm: { wander: 0, lines } }]));
+  // Twelve uses, each after the last reaction has cooled down.
+  const twelve = () => {
+    w.messages.length = 0;
+    for (let i = 0; i < 12; i++) {
+      w.use(w.player);
+      run(w, mockInput(), 3);
+    }
+    return new Set(said(w));
+  };
+  assert.deepEqual(twelve(), new Set(['GUARD: Move along.', 'GUARD: No pass, no way through.']));
+  w.flags.add('pass');
+  assert.deepEqual(twelve(), new Set(['GUARD: Move along.', 'GUARD: Your pass checks out.']));
+});
+
+test("the validator checks story groups in lines, and that a story's level sets their flags", () => {
+  const talker = registry.things.get('villager-man');
+  const gossip = { ...talker, id: 'gossip', glyph: undefined, lines: ['Hi.', { if: 'met', lines: ['The broker sent you?'] }] };
+  const level = defineLevel({
+    ...hall(
+      [
+        { type: 'gossip', x: 3.5, y: 2.5, wander: 0 },
+        { type: 'sandtrooper', x: 5.5, y: 2.5, calm: { wander: 0, lines: ['Halt.', { when: 'now', lines: ['Hi.'] }, { if: 'never', lines: [] }, 3] } },
+      ],
+      { triggers: [{ on: 'start', do: [{ action: 'setFlag', flag: 'other' }] }] },
+    ),
+    id: 'bad',
+  });
+  const { errors } = validateContent(new Registry({ ...content, things: [...content.things, gossip], levels: [level] }));
+  assert.deepEqual(errors.filter((e) => /line|flag/.test(e)), [
+    'Level "bad": a sandtrooper at (5.5, 2.5): calm: lines group 2 has unknown field "when" (it takes if, unless, lines)',
+    'Level "bad": a sandtrooper at (5.5, 2.5): calm: lines group 3 needs "lines", a list of one or more strings',
+    'Level "bad": a sandtrooper at (5.5, 2.5): calm: line 4 must be a line, or a group like { if, lines }',
+    'Level "bad": a sandtrooper at (5.5, 2.5): calm: lines group 3 waits for flag "never", which nothing in the level sets (a setFlag action, or a talk branch\'s "set")',
+    'Level "bad": npc "gossip": lines group 2 waits for flag "met", which nothing in the level sets',
+  ]);
+});
+
 test('the validator checks conversations, flags and talk triggers', () => {
   const level = defineLevel({
     ...hall(

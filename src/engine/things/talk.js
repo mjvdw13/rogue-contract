@@ -30,7 +30,9 @@ export function readyToReact(world, t, used, cooldown) {
  * What `t` says when the player uses it (`used`) or bumps into it: the next
  * line of its conversation, or (bumped) the one it last said; with no
  * conversation, one of `lines` at random, not the same twice running
- * (`state.lastLine` remembers). Undefined when it says nothing.
+ * (`state.lastLine` remembers). A story group `{ if?, unless?, lines }` in
+ * `lines` adds its lines while the flags allow, so a townsperson can now and
+ * then point the way to the story's next step. Undefined when it says nothing.
  */
 export function pickLine(world, t, lines, state, used) {
   const talk = t.talk;
@@ -44,9 +46,20 @@ export function pickLine(world, t, lines, state, used) {
     else for (const f of [].concat(b.set ?? [])) world.flags.add(f);
     return talk.said;
   }
-  if (!lines.length) return undefined;
-  let k = t.rng.int(0, lines.length - 1);
-  if (k === state.lastLine && lines.length > 1) k = (k + 1) % lines.length;
-  state.lastLine = k;
-  return lines[k];
+  const pool = lines.some((l) => typeof l !== 'string') ? storyLines(world.flags, lines) : lines;
+  if (!pool.length) return undefined;
+  let k = t.rng.int(0, pool.length - 1);
+  if (pool[k] === state.lastLine && pool.length > 1) k = (k + 1) % pool.length;
+  state.lastLine = pool[k];
+  return pool[k];
+}
+
+/** The plain lines, and the lines of each group the story's flags allow. */
+function storyLines(flags, lines) {
+  const out = [];
+  for (const l of lines) {
+    if (typeof l === 'string') out.push(l);
+    else if (flagsAllow(flags, l)) out.push(...l.lines);
+  }
+  return out;
 }

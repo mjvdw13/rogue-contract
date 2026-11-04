@@ -2028,7 +2028,7 @@ list.push(
 // his sheet exists) in his den (use him for the pass), a squatter in the gate square, and Rusk (a
 // villager too) in the freighter's hold. Customs' two troopers stand in
 // their office, by the terminal that unlocks the bay at the end.
-const CHECKPOINT_LINES = ["Old quarter's sealed, hunter.", 'No pass, no way through.'];
+const CHECKPOINT_LINES = [{ unless: 'pass', lines: ["Old quarter's sealed, hunter.", 'No pass, no way through.'] }, { if: 'pass', lines: ['Your pass checks out. Go on.'] }];
 const QUARTER_PATROL = [[153.5, 68], [165, 70], [178, 78], [185, 90]];
 list.push(
   at('sandtrooper', 144.6, 65.7, { angle: 180, calm: { wander: 0, lines: CHECKPOINT_LINES } }),

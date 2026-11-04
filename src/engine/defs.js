@@ -24,6 +24,11 @@
  *   `glint`: colours ([r, g, b]) that catch the light (armour highlights);
  *   `glow`: colours that always shine (see gfx/image.js `quantize`).
  *
+ * @typedef {(string | {if?:string|string[], unless?:string|string[], lines:string[]})[]} LinesSpec
+ *   What a friendly or a calm monster says when bumped or used, one at
+ *   random: plain lines, and story groups whose lines join in while the
+ *   story flags allow (`if` all set, `unless` none set; see things/talk.js).
+ *
  * @typedef {{kind:string, damage?:number|number[], pellets?:number, spread?:number, range?:number,
  *   projectile?:string, count?:number, sound?:string, hitSound?:string, missSound?:string,
  *   puff?:string, berserkMultiplier?:number, [key:string]:any}} AttackSpec
@@ -349,7 +354,7 @@ function baseThing(def, kind, defaults) {
  *   splashImmune?:boolean, boss?:boolean, sounds?:Record<string,string>,
  *   death?:{particles?:BurstSpec[], explosion?:string}, corpse?:{particles:BurstSpec[], bursts?:number|[number,number],
  *   every?:number|[number,number], z?:number},
- *   calm?:{lines?:string[], speed?:number, stride?:number, wander?:number, idleTime?:[number,number]},
+ *   calm?:{lines?:LinesSpec, speed?:number, stride?:number, wander?:number, idleTime?:[number,number]},
  *   hooks?:Record<string,Function>}} def
  */
 export function defineMonster(def) {
@@ -384,7 +389,8 @@ export function defineMonster(def) {
  * A friendly character, such as a villager. They idle, wander up to `wander`
  * tiles from where they were placed (staying out of doorways, narrow passages
  * and hazards), and react when the player bumps into them or uses them: they
- * turn to the player, play `react` and say one of their `lines`. Monsters
+ * turn to the player, play `react` and say one of their `lines` (story
+ * groups among them join in while the flags allow: `LinesSpec`). Monsters
  * never target them. Pushed on, they give way, quicker the lighter their
  * `mass` (see things/push.js).
  * With no `health` they can't be hurt: bullets, projectiles and explosions
@@ -396,7 +402,7 @@ export function defineMonster(def) {
  * `walk`).
  * @param {{id:string, name:string, glyph?:string, sheet:SheetSpec,
  *   anims:{idle:AnimSpec, walk?:AnimSpec, react?:AnimSpec, pain?:AnimSpec, flee?:AnimSpec, death?:AnimSpec},
- *   lines?:string[], wander?:number, speed?:number, idleTime?:[number,number], reactTime?:number,
+ *   lines?:LinesSpec, wander?:number, speed?:number, idleTime?:[number,number], reactTime?:number,
  *   reactCooldown?:number, bubble?:string, health?:number, mass?:number, fleeSpeed?:number, fleeDistance?:number,
  *   sounds?:{react?:string, pain?:string, death?:string}, hooks?:{onReact?:Function, onPain?:Function, onDeath?:Function}}} def
  */
