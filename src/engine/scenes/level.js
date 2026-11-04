@@ -101,6 +101,7 @@ export class LevelScene {
       const f = Math.min(1, (g.time - this.tickedAt) / TICK + g.loop.alpha);
       g.renderer.render(w, w.camera(f), { psprites: w.psprites(), skip: w.player });
     }
+    g.hud.drawNameTag(w);
     g.hud.drawHud(w);
     g.hud.drawMessages();
     const p = w.player.player;

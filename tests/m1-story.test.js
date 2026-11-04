@@ -6,16 +6,16 @@ import { makeWorld, mockInput, run } from './helpers.js';
 // then the informant's pass. Before the signal the checkpoint and the hold
 // stay shut, so nothing can find Rusk first.
 
-/** Stand the player at (x, y) facing `angle` (content degrees), press use, let a moment pass. */
+/** Stand the player at (x, y) facing `angle` (content degrees), let them land, press use, let a moment pass. */
 function talk(w, x, y, angle) {
   Object.assign(w.player, { x, y, angle: (-angle * Math.PI) / 180 });
-  run(w, mockInput(), 0.1);
+  run(w, mockInput(), 0.6);
   w.use(w.player);
   run(w, mockInput(), 0.5);
 }
 /** Hear the broker out, until he hands over the fob. */
 function takeContract(w) {
-  for (let i = 0; i < 10 && !w.player.player.weapons.has('fob'); i++) talk(w, 92, 104.6, 270);
+  for (let i = 0; i < 10 && !w.player.player.weapons.has('fob'); i++) talk(w, 92.6, 104.4, 260);
 }
 /** Talk to the Jawa trader in the sandcrawler's hold, from the top of its ramp's turn. */
 const trader = (w) => talk(w, 66.6, 8, 270);

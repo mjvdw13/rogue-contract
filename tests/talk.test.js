@@ -145,6 +145,33 @@ test('the validator checks conversations, flags and talk triggers', () => {
   ]);
 });
 
+test("looking at someone with a name in talking range shows it; townsfolk, far off or behind a wall, nothing", () => {
+  const game = { registry, rng: new Rng(1), debug: {}, settings: { messages: true }, playMusic() {} };
+  const hud = new Hud(game);
+  const w = makeWorld(
+    hall([
+      { type: 'villager-man', x: 4.5, y: 3.5, wander: 0, name: 'Broker', talk: ['Sit.'] },
+      { type: 'villager-woman', x: 4.5, y: 1.5, wander: 0 },
+      { type: 'villager-man', x: 8.5, y: 5.5, wander: 0, name: 'INFORMANT' },
+    ]),
+  );
+  const look = (deg) => (w.player.angle = (-deg * Math.PI) / 180);
+  assert.equal(hud.nameTag(w), 'BROKER', 'the broker, in front');
+  look(45);
+  assert.equal(hud.nameTag(w), null, 'a villager with no name');
+  look(-21);
+  assert.equal(hud.nameTag(w), null, 'the informant, 6 tiles off');
+  w.player.x = 6.5;
+  w.player.y = 3.5;
+  look(-45);
+  assert.equal(hud.nameTag(w), 'INFORMANT', 'closer');
+  w.player.z = 2;
+  assert.equal(hud.nameTag(w), null, 'not from a roof over them');
+  w.player.z = 0;
+  hud.automap = true;
+  assert.equal(hud.nameTag(w), null, 'not over the automap');
+});
+
 test("a level's start trigger has its say on screen when the level begins", () => {
   const game = { registry, rng: new Rng(1), debug: {}, settings: { messages: true }, playMusic() {} };
   game.hud = new Hud(game);

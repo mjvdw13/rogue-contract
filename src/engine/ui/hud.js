@@ -14,6 +14,8 @@ export const CORNERS = {
 export const HUD_CLEAR = CORNERS.left.h + 4;
 
 const MESSAGE_TIME = 4;
+/** How far under the middle of the view a name tag sits (pixels), clear of what the player looks at. */
+const NAME_TAG_DROP = 14;
 
 /**
  * Dark Forces-style corner readouts, pickup messages and the automap.
@@ -98,6 +100,22 @@ export class Hud {
     this.messages.forEach((m, i) => {
       font.draw(g.surface, m.text, 3, 3 + i * 9, { remap, shadow: g.palette.ramp('gray', 0) });
     });
+  }
+
+  /**
+   * The name to show for who the player would talk to (world.talkTarget):
+   * their placement's `name`, so only the people who matter show one.
+   * Null with nobody named in reach, over the automap, or dead.
+   */
+  nameTag(world) {
+    if (this.automap || world.player.player.dead) return null;
+    return world.talkTarget(world.player)?.speaker?.toUpperCase() ?? null;
+  }
+
+  /** The name tag (nameTag) under the middle of the view, in the messages' colour. */
+  drawNameTag(world) {
+    const name = this.nameTag(world);
+    if (name) this.drawCentered(name, VIEW_H / 2 + NAME_TAG_DROP, this.game.registry.config.colors?.message ?? 'beige');
   }
 
   drawCentered(text, y, tint = 'beige') {

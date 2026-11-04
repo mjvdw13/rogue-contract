@@ -634,7 +634,8 @@ export function defineSong(def) {
  * a list of lines said one per use, staying on the last, or a list of
  * branches `{ if?, unless?, lines, set? }` picked by story flags, each
  * setting its `set` flags once its last line is said. `name` is who they
- * speak as, instead of their type's name. `triggers` may have `if` and
+ * speak as, instead of their type's name, and shows under the middle of
+ * the view when the player faces them in talking range. `triggers` may have `if` and
  * `unless` (a story flag or a list): see world/triggers.js. `holster: true`
  * keeps the player's weapons that attack down until the town turns (the
  * `hostile` action): a calm town can't be turned early, and a weapon with

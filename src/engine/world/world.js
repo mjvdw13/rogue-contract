@@ -794,24 +794,38 @@ export class World {
     return openDoor(this, d);
   }
 
-  /** The player presses "use": doors, switches and tagged walls in front of them. */
-  use(pt) {
+  /**
+   * Who use would talk to: the nearest friendly character (NPC) or calm
+   * monster on the line `pt` faces, out to TALK_RANGE (across a table or a
+   * counter) and short of the first wall, standing at `pt`'s height (not
+   * under a roof `pt` stands on). Null with none.
+   */
+  talkTarget(pt) {
     const dx = Math.cos(pt.angle);
     const dy = Math.sin(pt.angle);
-    const hit = castRay(this.map, pt.x, pt.y, dx, dy, USE_RANGE);
-    // Friendly characters (NPCs) and calm monsters in front of the player get
-    // talked to first: the nearest, out to TALK_RANGE (across a table or a counter).
     const wall = castRay(this.map, pt.x, pt.y, dx, dy, TALK_RANGE);
     let talkTo = null;
     let nearest = Math.min(wall.dist, TALK_RANGE);
     for (const t of this.things) {
       if (!(t.kind === 'npc' || t.calm) || t.removed || t.dead) continue;
+      if (t.z > pt.z + pt.height || t.z + t.height < pt.z) continue;
       const d = rayCircle(pt.x, pt.y, dx, dy, t.x, t.y, t.radius + 0.1);
       if (d >= 0 && d < nearest) {
         talkTo = t;
         nearest = d;
       }
     }
+    return talkTo;
+  }
+
+  /** The player presses "use": doors, switches and tagged walls in front of them. */
+  use(pt) {
+    const dx = Math.cos(pt.angle);
+    const dy = Math.sin(pt.angle);
+    const hit = castRay(this.map, pt.x, pt.y, dx, dy, USE_RANGE);
+    // Friendly characters (NPCs) and calm monsters in front of the player get
+    // talked to first.
+    const talkTo = this.talkTarget(pt);
     if (talkTo) {
       if (talkTo.calm ? calmReact(this, talkTo, true) : npcReact(this, talkTo, true)) this.triggers.talk(talkTo);
       return;

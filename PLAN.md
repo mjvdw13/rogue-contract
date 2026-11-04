@@ -650,7 +650,7 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
         its signal (a flow field, doors counted open), at the furthest
         point of the path in sight, not straight at Rusk, which is green
         down the back lane and red up the alleys to the informant.
-  - [ ] Names on aim: look at someone with a `name` within talking range
+  - [x] Names on aim: look at someone with a `name` within talking range
         and it shows under the crosshair (BROKER, JAWA TRADER, INFORMANT).
         Townsfolk have none, so a name means "talk to this one".
   - [ ] The back lane gated until the switch: planks a few tiles in from
