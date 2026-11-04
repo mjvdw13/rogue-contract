@@ -507,17 +507,22 @@ town.house(141, 73, 148, 86, { h: 9.5, r: 1, wall: 'adobe-pale' });
 // 6. The rooftops east of the back lane's end, out of reach (Mark,
 // 2026-11-01: no way up; the rubble that climbed onto them and the stair
 // from the yard are gone). Light wells 3 wide between them, open to the lane.
+// Apart (Mark, 2026-11-03: the slots read as cracks): an alley 1 m wide
+// from the lane through to the north well, and the last house set back
+// 1 m behind the paved yard at the lane's end, so the one before shows its
+// end. Domes on the two big ones.
 p.rect(126, 92, 130, 118, town.street());
 p.rect(130, 86, 149, 118, town.street());
 town.house(118, 92, 126, 120, { h: 8 });
-// South of the back door the cantina's storehouse, lower and its own, a
-// slot between them (Mark, 2026-11-02: not one wall down the lane), so the
-// cantina's back rises over its roof.
-p.rect(124, 109, 126, 110, town.street());
+// South of the back door the cantina's storehouse, lower and its own, an
+// alley 1 m wide between them, 5 tiles back (Mark, 2026-11-02: not one
+// wall down the lane), so the cantina's back rises over its roof.
+p.rect(121, 108, 126, 110, town.street());
 town.house(121, 110, 126, 120, { h: 5.5, wall: 'adobe-pale', skirt: 'plinth' });
-town.slanted([[132, 102], [138, 102], [138, 118], [130, 118], [130, 104]], { h: 4.75 });
-town.house(138, 102, 149, 118, { h: 5.75, wall: 'adobe-ochre' });
-town.house(130, 86, 140, 99, { h: 4.75, wall: 'adobe-pale' });
+town.slanted([[132, 102], [138, 102], [138, 110], [130, 110], [130, 104]], { h: 4.75 });
+town.house(132, 110, 138, 118, { h: 5.5, wall: 'adobe-rose' });
+town.house(138, 102, 149, 118, { h: 5.75, wall: 'adobe-ochre', dome: true });
+town.house(130, 88, 140, 99, { h: 4.75, wall: 'adobe-grey', dome: true });
 town.house(143, 86, 149, 102, { h: 5.25, wall: 'adobe-rose' });
 town.block(126, 118, 150, 122, { h: 8 }).block(149, 96, 162, 118, { h: 8 });
 
@@ -529,10 +534,10 @@ town.block(126, 118, 150, 122, { h: 8 }).block(149, 96, 162, 118, { h: 8 });
 // lane's east side, their washing strung across the light well between them
 // (the corner at its mouth cut back, so it opens off the lane). The lane
 // ends at a house whose door stands two steps up, on a little paved yard.
-town.platform(126, 112, 130, 118, { h: 0.5, steps: 'N' });
+town.platform(126, 112, 132, 118, { h: 0.5, steps: 'N' });
 town.door(128, 118, 'N', { h: 8, tex: 'door-grey', floorZ: 0.5 });
 town.window(130, 92.5, 'W', { z: 2.6, tex: 'window-louvre' }).window(130, 108.5, 'W', { z: 2.4 }).window(140, 94.5, 'E', { z: 2.6 });
-town.pipe(126, 89.5, 'E').pipe(130, 97.6, 'W').pipe(130, 115.5, 'W', { floorZ: 0.5 });
+town.pipe(126, 89.5, 'E').pipe(130, 97.6, 'W').pipe(132, 115.5, 'W', { floorZ: 0.5 });
 town.fixture('conduit-6', 126, 95.5, 'E', { z: 2.2 }).fixture('wall-tank', 126, 99.6, 'E', { z: 3.2 });
 town.vent(126, 96.2, 'E', { z: 5.6, tex: 'wall-fan' }).vent(126, 110.2, 'E', { z: 4.4, tex: 'vent-grille' }).vent(126, 94.3, 'E', { z: 1.5, tex: 'wall-meter' });
 // (The lane and the wells are backs: twice as weathered as the street.)
@@ -553,15 +558,16 @@ list.push(
   // On the yard at the end: crates of bottles stacked against the cantina.
   at('crate-tan', 126.55, 113.6, { angle: 4 }), at('crate-grey-small', 126.5, 113.55, { z: 1.4, angle: 350 }),
   at('crate-rust-long', 126.5, 115.6, { angle: 92 }), at('crate-grey-small', 129.45, 116.9, { angle: 15 }),
-  // The light well: a vaporator for the houses either side, a tank on the wall.
-  at('vaporator', 141.7, 88.2), at('canister-rust', 142.4, 89.1),
+  // The light well: a vaporator for the houses either side, a tank on the
+  // wall (clear of the alley's end).
+  at('vaporator', 142.2, 89.6), at('canister-rust', 142.5, 88.5),
 );
 town.fixture('wall-tank', 143, 96.6, 'W', { z: 2.2 });
 town.hangings.push(
   // A cable over the lane from the cantina's roof to the house opposite,
   // and a rope down its back wall.
   { type: 'cable', from: [126.05, 97.5, 7.3], to: [129.95, 95.5, 4.4], sag: 0.6 },
-  { type: 'rope', from: [126.05, 108.3, 7.6], length: 2.2 },
+  { type: 'rope', from: [126.05, 107.5, 7.6], length: 2.2 },
   // Washing across the light well: a sheet and a rag.
   { type: 'cloth-pale', from: [134.5, 99.05, 3.5], to: [134.9, 101.95, 3.5], length: 1.3, pin: 'corners' },
   { type: 'rag', from: [140.05, 91.2, 3.6], to: [142.95, 91.5, 3.6], length: 0.9 },
@@ -675,16 +681,24 @@ town.slanted([[184, 73], [189, 73], [196, 80], [196, 83], [189, 83], [184, 78]],
 // (The domed house's back stands a tile back from the wash's bank.)
 p.rect(195, 83, 196, 93, WASH_CELL);
 // (The domed one 1 m out into the street, so its end and the ochre one's
-// set-back front show from the gate.)
-town.house(187, 83, 195, 93, { h: OQ + 7.5, dome: true });
+// set-back front show from the gate.) A passage 1 m wide between it and the
+// rose one, from the street down two steps into the wash (Mark, 2026-11-03:
+// alleys you can walk into, through where a street is close behind).
+town.house(187, 85, 195, 93, { h: OQ + 7.5, dome: true });
+p.rect(187, 83, 193, 85, QUARTER);
+town.stair(193, 83, 195, 85, { up: 'W', from: WASH, top: OQ, rise: 0.25, floor: 'flagstone', side: 'adobe-brick' });
 town.slanted([[192, 93], [196, 93], [196, 96], [194, 104], [190, 104], [190, 95]], { h: OQ + 6.5, wall: 'adobe-ochre', skirt: 'plinth' });
-// Its east bank: houses whose backs slant with it.
-town.slanted([[202, 60], [207, 60], [207, 65], [197, 65]], { h: 7, wall: 'adobe-pale' });
-town.slanted([[197, 73], [207, 73], [207, 80], [204, 80]], { h: 6.5, wall: 'adobe-grey' });
+// Its east bank: houses whose backs slant with it. The pale one at the
+// bend wears a dome, a dead-end alley 1 m wide and 7 back between it and
+// the grey one (Mark, 2026-11-03: houses apart).
+p.rect(197, 69, 204, 71, WASH_CELL);
+town.slanted([[202, 60], [207, 60], [207, 69], [197, 69], [197, 65]], { h: 7, wall: 'adobe-pale', dome: true }).block(204, 69, 207, 71, { h: 7, wall: 'adobe-pale' });
+town.slanted([[197, 71], [207, 71], [207, 80], [204, 80], [197, 73]], { h: 6.5, wall: 'adobe-grey' });
 // Along its long straight stretch two houses, not the town's blocks in one
-// line: a rose one, a slot, and a pale one a tile further back.
+// line: a rose one pushed 1 m out into the wash, so its ends show from
+// along it, a slot, and a pale one 1.5 m further back.
 p.rect(204, 87, 206, 88, WASH_CELL).rect(204, 88, 205, 96, WASH_CELL);
-town.house(204, 80, 207, 87, { h: 7, wall: 'adobe-rose', skirt: 'plinth' }).block(206, 87, 207, 88, { h: 7, wall: 'adobe-rose', skirt: 'plinth' });
+town.house(202, 80, 207, 87, { h: 7, wall: 'adobe-rose', skirt: 'plinth' }).block(206, 87, 207, 88, { h: 7, wall: 'adobe-rose', skirt: 'plinth' });
 town.house(205, 88, 207, 96, { h: 5.5, wall: 'adobe-pale' });
 town.slanted([[204, 96], [207, 96], [207, 104], [198, 104]], { h: 8, wall: 'adobe-ochre' });
 town.stair(188, 53, 194, 60, { up: 'W', from: WASH, top: OQ, rise: 0.25, floor: 'flagstone', side: 'adobe-brick' });
@@ -862,7 +876,7 @@ p.rect(195, 43, 201, 49, (_, __, c) => (c.slab ? { ...c, secret: true } : c));
 // (The culvert's and the cistern's walls in their own dark: no lower,
 // or the dome's shadow on the roof over them takes it under nothing.)
 p.light(194, 42, 202, 52, 88);
-town.pipe(202, 57.5, 'W', { floorZ: WASH }).pipe(197, 69.6, 'W', { floorZ: WASH }).pipe(195, 87.5, 'E', { floorZ: WASH }).pipe(204, 85.5, 'W', { floorZ: WASH });
+town.pipe(202, 57.5, 'W', { floorZ: WASH }).pipe(197, 67.4, 'W', { floorZ: WASH }).pipe(195, 87.5, 'E', { floorZ: WASH }).pipe(202, 85.5, 'W', { floorZ: WASH });
 {
   // The flood line: dirt from the floor up to a tide mark about 1.3 up, the
   // same height along every wall, on its straight runs ([face, line, from,
@@ -874,7 +888,7 @@ town.pipe(202, 57.5, 'W', { floorZ: WASH }).pipe(197, 69.6, 'W', { floorZ: WASH 
     return Array.from({ length: n }, (_, k) => (n === 1 ? len / 2 : 2 + ((len - 4) * k) / (n - 1)));
   };
   let flip = false;
-  for (const [face, line, a0, a1] of [['W', 202, 53, 60], ['E', 189, 65, 73], ['W', 197, 65, 73], ['E', 196, 80, 83], ['E', 195, 83, 93], ['E', 196, 93, 96], ['W', 204, 80, 87], ['W', 205, 88, 96]]) {
+  for (const [face, line, a0, a1] of [['W', 202, 53, 60], ['E', 189, 65, 73], ['W', 197, 65, 69], ['S', 69, 197, 204], ['N', 71, 197, 204], ['E', 196, 80, 83], ['E', 195, 85, 93], ['E', 196, 93, 96], ['W', 202, 80, 87], ['S', 87, 202, 206], ['W', 205, 88, 96]]) {
     for (const d of along(a1 - a0)) {
       const a = Math.round((a0 + d) * 100) / 100;
       town.decals.push({ ...(face === 'N' || face === 'S' ? { x: a, y: line } : { x: line, y: a }), z: WASH + 0.68, face, tex: 'grime-dust-2', ...((flip = !flip) && { flip }) });

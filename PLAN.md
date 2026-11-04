@@ -129,6 +129,18 @@ These need Mark to try something, or to decide. Don't start them without him.
   and the thug's domes show at either end. To judge: whether the skyline
   has enough domes, and whether some lane should get a bigger house with
   one.
+  Then the dry wash and the back lane (2026-11-03). The wash: a passage
+  1 m wide from the main street down two steps into it, between the rose
+  house and the domed one; on the east bank the pale house at the bend
+  runs back to the town's edge under a 4 m dome, a dead-end alley 1 m wide
+  and 7 back between it and the grey one, and the rose house 1 m out into
+  the wash, so its ends show from along it (the wash 3 m wide there). The
+  back lane: an alley 1 m wide from the lane through to the north light
+  well; the storehouse's slot an alley 1 m wide and 5 back; the last house
+  on the east side 1 m back behind a wider paved yard, so the one before
+  shows its end; domes on the two big rooftop houses (5 and 5.5 m). To
+  judge: whether the wash's new way up to the street is wanted (it's a
+  third way between them), and the big domes on the low rooftops.
 - **The remaining streets, detailed** (`?map=m1`, 2026-11-01): each its
   own place, built from the town's pieces.
   The back lane: the cantina's empties by its back door, its rubbish
@@ -639,23 +651,6 @@ The story's Map A. The design (areas, light, the town kit, art and sound
 lists) is `docs/mission1.md`. It pulls in the story pieces it needs from
 section 5 as it goes (calm troopers, the town's switch, conversations, the
 fob). Each step is a commit with snapshots, playable at `?map=m1`.
-
-- [ ] **Buildings apart, take two** (Mark, 2026-11-03: the half-metre
-      slots read as short cracks; the houses still don't feel
-      free-standing, the streets on rails). Real alleys 1 to 1.5 m wide
-      running 4 to 9 tiles back (dead ends, or through where a street is
-      close behind), and houses pushed out into the street or set back
-      behind a yard, so their ends show from along it. One street, then a
-      check-in with Mark before the rest (he OK'd it, 2026-11-03). And
-      domes on the houses (Mark, 2026-11-03: Mos Eisley's toppers), all
-      but the smallest.
-  - [x] The old quarter's north street.
-  - [x] The old quarter's main street, bend and way to the bay's gate,
-        and domes on its houses.
-  - [x] The back alleys' two lanes and the thug's square, with domes.
-  - [x] Domes bigger (Mark, 2026-11-03: the new ones were small): as
-        wide as the roof, and only on houses 3 m across or more.
-  - [ ] The dry wash and the back lane.
 
 - [x] Design: `docs/mission1.md`.
 - [x] **Daylight and the kit:** `sky-day` and a warm haze; DF textures
