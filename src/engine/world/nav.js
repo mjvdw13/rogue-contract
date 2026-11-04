@@ -6,7 +6,12 @@ const DIRS = [
   [1, 1], [1, -1], [-1, 1], [-1, -1],
 ];
 
-/** The body a flow field plans for: walkers by default. */
+/**
+ * The body a flow field plans for: walkers by default. `doors`, if given,
+ * picks the doors it plans through whatever their lock (a tracker's route
+ * goes through doors the story will open); else it takes any door that
+ * isn't locked or secret.
+ */
 export const WALKER = { step: 0.8, drop: 0.8, height: 1.7, flying: false };
 
 /**
@@ -35,6 +40,7 @@ export class FlowField {
     if (f & F_SOLID) return false;
     if (f & F_DOOR) {
       const d = this.map.doors[this.map.doorIndex[i]];
+      if (this.profile.doors) return this.profile.doors(d) || d.passable;
       return (!d.lock && !d.secret) || d.passable;
     }
     return true;
@@ -162,6 +168,7 @@ export class FlowField {
     let best = here;
     let bx = -1;
     let by = -1;
+    let bn = -1;
     for (const [dx, dy] of DIRS) {
       const nx = tx + dx;
       const ny = ty + dy;
@@ -177,10 +184,50 @@ export class FlowField {
         best = d;
         bx = nx;
         by = ny;
+        bn = to;
       }
     }
     if (bx < 0) return null;
-    return { x: bx + 0.5, y: by + 0.5, tx: bx, ty: by };
+    return { x: bx + 0.5, y: by + 0.5, tx: bx, ty: by, node: bn };
+  }
+
+  /**
+   * Can this body walk in a straight line from (ax, ay), reaching up to
+   * `reach`, to the middle of tile (tx, ty)? Each tile the line crosses must
+   * be one it can step into from the last (through a corner, the tile across
+   * the x edge first). Returns the node it ends in, or -1.
+   */
+  straight(ax, ay, reach, tx, ty) {
+    const map = this.map;
+    const N = this.n;
+    let x = Math.floor(ax);
+    let y = Math.floor(ay);
+    if (!map.inBounds(x, y)) return -1;
+    let node = this.nodeAt(x, y, reach);
+    const dx = tx + 0.5 - ax;
+    const dy = ty + 0.5 - ay;
+    const sx = Math.sign(dx);
+    const sy = Math.sign(dy);
+    const ddx = sx ? Math.abs(1 / dx) : Infinity;
+    const ddy = sy ? Math.abs(1 / dy) : Infinity;
+    let mx = sx > 0 ? (x + 1 - ax) * ddx : sx < 0 ? (ax - x) * ddx : Infinity;
+    let my = sy > 0 ? (y + 1 - ay) * ddy : sy < 0 ? (ay - y) * ddy : Infinity;
+    for (let k = 0; (x !== tx || y !== ty) && k < 512; k++) {
+      if (mx <= my) {
+        x += sx;
+        mx += ddx;
+      } else {
+        y += sy;
+        my += ddy;
+      }
+      const i = y * map.w + x;
+      if (!map.inBounds(x, y) || !this.passable(i)) return -1;
+      let into = -1;
+      for (let n = i, last = map.flags[i] & F_SLAB ? N + i : i; n <= last && into < 0; n += N) if (this.canStep(node, n)) into = n;
+      if (into < 0) return -1;
+      node = into;
+    }
+    return node;
   }
 }
 

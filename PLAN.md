@@ -643,6 +643,22 @@ lists) is `docs/mission1.md`. It pulls in the story pieces it needs from
 section 5 as it goes (calm troopers, the town's switch, conversations, the
 fob). Each step is a commit with snapshots, playable at `?map=m1`.
 
+- [ ] **Finding the way** (Mark's play test, 2026-11-03: maze-like, unclear
+      who to talk to, the fob points down alleys instead of at the
+      checkpoint). Mark picked these four of eleven:
+  - [x] The fob follows the route: it points along the walkable path to
+        its signal (a flow field, doors counted open), at the furthest
+        point of the path in sight, not straight at Rusk, which is green
+        down the back lane and red up the alleys to the informant.
+  - [ ] Names on aim: look at someone with a `name` within talking range
+        and it shows under the crosshair (BROKER, JAWA TRADER, INFORMANT).
+        Townsfolk have none, so a name means "talk to this one".
+  - [ ] The back lane gated until the switch: planks a few tiles in from
+        the street, opening with the cantina's back door, so the calm half
+        can see down it but not walk 45 tiles to a dead end.
+  - [ ] Every dead end earns its place: each alley off the route goes
+        through, shows its end from its mouth, or holds something (the
+        loud half's med kits and ammo).
 - [x] Design: `docs/mission1.md`.
 - [x] **Daylight and the kit:** `sky-day` and a warm haze; DF textures
       recoloured; `lib/town.js`; a bigger glyph pool; `m1` with a first

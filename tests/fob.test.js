@@ -113,6 +113,54 @@ test('turning onto the signal lights the fob at once, not at its next blink', ()
   });
 });
 
+// Rusk two tiles south of the player through a wall; the way round is east
+// through a gate (G) and back west along the lower hall.
+const BEHIND_WALL = ['#########', '#.......#', '#######G#', '#.......#', '#########'];
+/** The fob in hand in BEHIND_WALL, tracking Rusk; `opens`: a trigger can open the gate. */
+function trackingRound(opens) {
+  const w = holding({
+    ...room(BEHIND_WALL, [], {
+      legend: { G: { base: 'D', lock: 'remote', tag: 'gate' } },
+      triggers: opens ? [{ on: 'start', if: 'never', do: [{ action: 'openDoors', tag: 'gate' }] }] : [],
+    }),
+    list: [{ type: 'player', x: 1.5, y: 1.5, angle: 0 }, { type: 'villager-man', x: 1.5, y: 3.5, wander: 0, tag: 'rusk' }],
+  });
+  runActions(w, [{ action: 'setSignal', tag: 'rusk' }]);
+  return w;
+}
+
+test('a fob that follows the route points the way round, through a shut gate the story opens', () => {
+  withTrack({ facing: 20, warm: 60, route: true }, () => {
+    const w = trackingRound(true);
+    assert.deepEqual(blinks(w), ['litFacing'], 'east, along the hall to the gate');
+    turn(w, -90);
+    assert.deepEqual(blinks(w), ['lit'], 'not south, through the wall');
+  });
+});
+
+test("a fob that follows the route doesn't count a door that stays locked, and points straight with no way round", () => {
+  withTrack({ facing: 20, warm: 60, route: true }, () => {
+    const w = trackingRound(false);
+    turn(w, -90);
+    assert.deepEqual(blinks(w), ['litFacing'], 'south, straight at him');
+  });
+});
+
+test('a fob that follows the route blinks for how far it is along the route', () => {
+  const beeps = (route) => {
+    let n = 0;
+    withTrack({ route }, () => {
+      const w = trackingRound(true);
+      run(w, mockInput(), 10);
+      n = w.beeps;
+    });
+    return n;
+  };
+  const straight = beeps(false);
+  const round = beeps(true);
+  assert.ok(round < straight, `2 tiles straight: ${straight} blinks; 16 round: ${round}`);
+});
+
 test('the signal follows a tagged thing, else its tiles, or the nearest of a type; none goes dark', () => {
   const w = makeWorld(
     hall(
@@ -164,7 +212,7 @@ test('the validator checks trackers and the fob actions', () => {
     slot: 7,
     sheet: { src: 'assets/sprites/weapons/fob.png', frameWidth: 96, frameHeight: 96 },
     anims: { idle: [0] },
-    track: { near: 10, far: 5, blink: [0], facing: 200, warm: [10, 200], beep: true },
+    track: { near: 10, far: 5, blink: [0], facing: 200, warm: [10, 200], beep: true, route: 'yes' },
     charge: { time: 1 },
   });
   const level = defineLevel({
@@ -186,8 +234,9 @@ test('the validator checks trackers and the fob actions', () => {
   const { errors } = validateContent(new Registry({ ...content, weapons: [...content.weapons, tracker], levels: [level] }));
   assert.deepEqual(errors.filter((e) => e.includes('bad')), [
     'weapon "bad-tracker": has no "fire" attack, so charge and reraise do nothing',
-    'weapon "bad-tracker": track has unknown field "beep" (it takes near, far, blink, facing, warm)',
+    'weapon "bad-tracker": track has unknown field "beep" (it takes near, far, blink, facing, warm, route)',
     'weapon "bad-tracker": track needs near (tiles, 0 or more) below far',
+    'weapon "bad-tracker": track route must be true or false',
     'weapon "bad-tracker": track blink must be [near, far] seconds between blinks, above 0',
     'weapon "bad-tracker": track facing must be 0 to 180 degrees, or [near, far] of them',
     'weapon "bad-tracker": track warm must be 0 to 180 degrees, or [near, far] of them',

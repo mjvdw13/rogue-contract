@@ -11,7 +11,7 @@ import { BODY } from './things/player.js';
 const PICKUP_MODIFIERS = ['maxHealth', 'armorClass', 'maxArmor', 'duration', 'always'];
 const TRIGGER_EVENTS = ['start', 'enter', 'use', 'killed', 'pickup', 'hostile', 'talk'];
 const TALK_FIELDS = ['if', 'unless', 'lines', 'set'];
-const TRACK_FIELDS = ['near', 'far', 'blink', 'facing', 'warm'];
+const TRACK_FIELDS = ['near', 'far', 'blink', 'facing', 'warm', 'route'];
 /** Faces per model before the validator warns (render cost). */
 const MODEL_BUDGET = 400;
 
@@ -311,6 +311,7 @@ export function validateContent(reg) {
       const t = w.track;
       for (const k of Object.keys(t)) if (!TRACK_FIELDS.includes(k)) err(`${owner}: track has unknown field "${k}" (it takes ${TRACK_FIELDS.join(', ')})`);
       if (!(t.near >= 0 && t.far > t.near)) err(`${owner}: track needs near (tiles, 0 or more) below far`);
+      if (typeof t.route !== 'boolean') err(`${owner}: track route must be true or false`);
       if (!(Array.isArray(t.blink) && t.blink.length === 2 && t.blink.every((b) => b > 0))) err(`${owner}: track blink must be [near, far] seconds between blinks, above 0`);
       // (Degrees, or [at near, at far].)
       const angles = (v) => (typeof v === 'number' || (Array.isArray(v) && v.length === 2)) && [].concat(v).every((a) => a >= 0 && a <= 180);

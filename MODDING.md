@@ -312,15 +312,16 @@ anims: {
   litWarm: { frames: [2, 0], durations: [0.09, 0.01], fullbright: [0] },   // roughly toward it
   litFacing: { frames: [3, 0], durations: [0.09, 0.01], fullbright: [0] }, // facing it
 },
-track: { near: 4, far: 80, blink: [0.15, 1.4], facing: [45, 25], warm: [100, 70] },
+track: { near: 4, far: 80, blink: [0.15, 1.4], facing: [45, 25], warm: [100, 70], route: true },
 sounds: { beep: 'fob-beep' },
 ```
 
 Held, it blinks and plays its `beep` sound every `blink[0]` seconds at
 `near` tiles from the signal or closer, every `blink[1]` at `far` or
-further, and in proportion between (in a straight line, through walls).
-Each blink shows how near the player faces the signal: `litFacing` within
-`facing` degrees, `litWarm` within `warm` degrees, else `lit`. Leave out
+further, and in proportion between (in a straight line, through walls,
+unless it follows the `route`). Each blink shows how near the player
+faces the signal: `litFacing` within `facing` degrees, `litWarm` within
+`warm` degrees, else `lit`. Leave out
 `litFacing` or `warm` (and `litWarm`) for fewer bands. `facing` and `warm`
 are degrees, or `[at near, at far]` in proportion as `blink` is, so the
 bands can widen as the player closes in. Turning into another band blinks
@@ -328,6 +329,16 @@ at once (but no sooner than `blink[0]` after the last), so far off the
 light answers a turn without waiting out a long blink. With no signal it
 stays on `idle`. Give it with the `giveWeapon` action and take it back
 with `takeWeapon`.
+
+`route: true` (default false) points it along the way a walker would go
+instead of straight at the signal: at the furthest point of the route the
+player could walk to in a straight line (so round the next corner, it
+points at the corner), and `near` and `far` count along the route too. The
+route goes through open and unlocked doors, keyed doors, and doors locked
+for triggers only (`lock: 'remote'`) when a trigger or a switch opens or
+unlocks them by their tag, shut or not: so it leads to a gate the story
+will open, and never round by one that stays shut. Never through a secret
+door. With no route at all, it points straight at the signal.
 
 `charge: { time: 1, min: 0.2, sink: 36, pull: 0.18 }` throws when fire is
 let go instead of when it's pressed. Pressing fire pulls the hand back,

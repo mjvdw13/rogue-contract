@@ -234,18 +234,19 @@ export function weaponThink(world, pt, input, dt) {
  * `litFacing` on it, `litWarm` roughly toward it, `lit` else. Turning into
  * another band blinks at once (no sooner than the nearest blink rate), so
  * the light answers the turn instead of waiting out a long blink far off.
- * Dark with no signal.
+ * With `route` it faces and measures along the walkable route instead of
+ * the straight line (world.signalWay). Dark with no signal.
  */
 function track(world, pt, def, ws, dt) {
-  const s = world.signalAt();
+  const { near, far, blink, facing, warm, route } = def.track;
+  const s = route ? world.signalWay(pt) : world.signalAt();
   if (!s) {
     ws.blink = 0;
     ws.band = null;
     if (ws.animName !== 'idle') ws.setAnim('idle');
     return;
   }
-  const { near, far, blink, facing, warm } = def.track;
-  const d = Math.hypot(s.x - pt.x, s.y - pt.y);
+  const d = route ? s.d : Math.hypot(s.x - pt.x, s.y - pt.y);
   const k = Math.min(1, Math.max(0, (d - near) / Math.max(far - near, 1e-6)));
   // A [near, far] pair at this distance, in proportion (a number stays put).
   const at = (v) => (Array.isArray(v) ? v[0] + (v[1] - v[0]) * k : v);

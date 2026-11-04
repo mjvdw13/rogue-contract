@@ -12,7 +12,7 @@ import { Weather } from './weather.js';
 import { Hangings } from './hangings.js';
 import { Explosions } from './explosions.js';
 import { GLINT_REACH } from './lightsources.js';
-import { FlowField, WALKER } from './nav.js';
+import { FlowField, WALKER, UNREACHABLE } from './nav.js';
 import { noiseAlert } from './noise.js';
 import { Triggers } from './triggers.js';
 import { runActions } from './actions.js';
@@ -60,6 +60,8 @@ const SLIDE_TURN = (80 * Math.PI) / 180;
 const spriteHeight = (sheet, def) => (sheet.fh * (def?.scale ?? 1) * (sheet.scale ?? 1)) / TEXELS_PER_UNIT;
 /** While a lift moves, flow fields are refreshed this often (seconds). */
 const NAV_REFRESH = 0.25;
+/** How many steps along the route signalWay looks for the furthest one in a straight walk. */
+const ROUTE_AHEAD = 48;
 /** Further than this between two ticks, the eye jumped (a teleport): drawn there, not between. */
 const CAM_SNAP = 2;
 
@@ -130,6 +132,8 @@ export class World {
     this.flags = new Set();
     /** What a tracker weapon tracks (the setSignal action): `{ tag }` or `{ thing }`, or null. */
     this.signal = null;
+    /** The flow field toward the signal, for trackers that follow the route (signalWay); made when first wanted. */
+    this.signalNav = null;
     /** Has the town's switch been thrown (turnHostile)? */
     this.hostile = false;
 
@@ -681,6 +685,67 @@ export class World {
     return best;
   }
 
+  /**
+   * Which way the route to the signal goes from `t`, for a tracker that
+   * follows it (`track.route`): the furthest point along the walkable route
+   * that `t` can walk to in a straight line, looking up to ROUTE_AHEAD steps
+   * on, and `d`, how far the signal is along the route from `t`. The route
+   * is a walker's, through the doors that are open or can be (routeDoor), so
+   * it leads to a shut gate the story opens, never round by a door that
+   * stays locked. Straight at the signal where there's no route, and null
+   * with no signal.
+   * @returns {{x:number, y:number, d:number}|null}
+   */
+  signalWay(t = this.player) {
+    const s = this.signalAt();
+    if (!s) return null;
+    const map = this.map;
+    const straight = { x: s.x, y: s.y, d: Math.hypot(s.x - t.x, s.y - t.y) };
+    const [sx, sy] = [Math.floor(s.x), Math.floor(s.y)];
+    if (!map.inBounds(sx, sy)) return straight;
+    const field = (this.signalNav ??= new FlowField(map, { ...WALKER, doors: (d) => this.routeDoor(d) }));
+    field.update(sx, sy, false, (s.z ?? map.floorZ[sy * map.w + sx]) + WALKER.step);
+    const reach = this.reach(t);
+    const from = field.nodeAt(Math.floor(t.x), Math.floor(t.y), reach);
+    if (field.dist[from] === UNREACHABLE) return straight;
+    if (field.dist[from] === 0) return straight;
+    // Walk the route a step at a time, keeping the furthest step t can walk
+    // to in a straight line (the first always: it's next door).
+    const N = field.n;
+    let aim = null;
+    let [x, y, r] = [t.x, t.y, reach];
+    for (let k = 0; k < ROUTE_AHEAD; k++) {
+      const n = field.next(x, y, r);
+      if (!n || (aim && field.straight(t.x, t.y, reach, n.tx, n.ty) < 0)) break;
+      aim = n;
+      if (field.dist[n.node] === 0) return straight;
+      [x, y] = [n.x, n.y];
+      r = map.storeyFloor(n.node % N, n.node >= N ? 1 : 0) + WALKER.step;
+    }
+    if (!aim) return straight;
+    return { x: aim.x, y: aim.y, d: Math.hypot(aim.x - t.x, aim.y - t.y) + field.dist[aim.node] };
+  }
+
+  /**
+   * Is door `d` on a tracker's route, shut or not? Not a secret one; and if
+   * it's locked by triggers only ('remote'), only one a trigger or a switch
+   * opens or unlocks (by its tag), so the many locked doors with nothing
+   * behind them (or a way that stays shut) don't count.
+   */
+  routeDoor(d) {
+    if (d.secret) return false;
+    if (d.lock !== 'remote') return true;
+    if (!this.openedTags) {
+      this.openedTags = new Set();
+      const scan = (actions) => {
+        for (const a of actions ?? []) if ((a.action === 'openDoors' || a.action === 'unlockDoors') && a.tag) this.openedTags.add(a.tag);
+      };
+      for (const t of this.triggers.list) scan([].concat(t.do ?? []));
+      for (const u of this.map.uses.values()) scan(u.actions);
+    }
+    return d.tag != null && this.openedTags.has(d.tag);
+  }
+
   npcPain(t) {
     npcPain(this, t);
   }
@@ -928,6 +993,8 @@ export class World {
     const refresh = this.navRefresh <= 0 && this.map.lifts.some((l) => l.state === 'moving');
     if (refresh) this.navRefresh = NAV_REFRESH;
     for (const field of this.navFields.values()) field.update(Math.floor(pt.x), Math.floor(pt.y), refresh, this.reach(pt));
+    // (The signal's route is planned again the next time it's wanted.)
+    if (refresh && this.signalNav) this.signalNav.origin = -1;
     this.grid.fresh = false;
   }
 

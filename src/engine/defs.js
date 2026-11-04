@@ -255,10 +255,14 @@ export function defineAmmo(def) {
  * degrees of the signal, `litWarm` within `warm` degrees (if it has both),
  * else `lit`; `facing` and `warm` are degrees, or [at near, at far] in
  * proportion as `blink` is. Turning into another band blinks at once.
+ * `route: true` points it along the walkable route to the signal instead of
+ * straight at it (a walker's, through any door but a secret one, shut or
+ * not), at the furthest point of the route it could walk to in a straight
+ * line, and measures `near` and `far` along the route.
  * With no signal it stays on `idle` (dark).
  * @param {{id:string, name:string, slot:number, ammo?:string|null, ammoPerShot?:number,
  *   sheet: SheetSpec, anims: {idle:AnimSpec, fire?:AnimSpec, lit?:AnimSpec, litWarm?:AnimSpec, litFacing?:AnimSpec}, fire?: AttackSpec,
- *   track?:{near?:number, far?:number, blink?:[number,number], facing?:number|[number,number], warm?:number|[number,number]|null},
+ *   track?:{near?:number, far?:number, blink?:[number,number], facing?:number|[number,number], warm?:number|[number,number]|null, route?:boolean},
  *   offset?:[number,number], flashLight?:number, light?:{radius:number, light:number},
  *   noise?:boolean, priority?:number,
  *   accurateFirstShot?:boolean, sounds?:Record<string,string>, bob?:number, reraise?:boolean,
@@ -283,7 +287,7 @@ export function defineWeapon(def) {
     anims: normalizeAnims(def.anims),
     fire: normalizeAttack(def.fire),
     charge: def.charge ? { time: 1, min: 0.3, sink: 36, pull: 0.18, ...def.charge } : null,
-    track: def.track ? { near: 4, far: 80, blink: [0.15, 1.5], facing: 15, warm: null, ...def.track } : null,
+    track: def.track ? { near: 4, far: 80, blink: [0.15, 1.5], facing: 15, warm: null, route: false, ...def.track } : null,
   };
 }
 
