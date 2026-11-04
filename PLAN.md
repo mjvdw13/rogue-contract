@@ -653,7 +653,7 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
   - [x] Names on aim: look at someone with a `name` within talking range
         and it shows under the crosshair (BROKER, JAWA TRADER, INFORMANT).
         Townsfolk have none, so a name means "talk to this one".
-  - [ ] The back lane gated until the switch: planks a few tiles in from
+  - [x] The back lane gated until the switch: planks a few tiles in from
         the street, opening with the cantina's back door, so the calm half
         can see down it but not walk 45 tiles to a dead end.
   - [ ] Every dead end earns its place: each alley off the route goes

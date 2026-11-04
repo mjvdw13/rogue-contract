@@ -46,10 +46,10 @@ test('in Mos Eisley the informant has no pass, and the hold stays shut, until th
   assert.equal(w.hostile, false, 'the town is calm all the while');
 });
 
-test('Mos Eisley opens in stages: the junk yard waits for the fob, the east for the signal, and the switch shuts the blast doors and opens the cantina\'s back door', () => {
+test('Mos Eisley opens in stages: the junk yard waits for the fob, the east for the signal, and the switch shuts the blast doors and opens the back lane and the cantina\'s back door', () => {
   const w = makeWorld('m1');
   const east = ['blast-doors', 'side-gate', 'alley-gate'];
-  for (const tag of ['junk-gate', ...east, 'cantina-back']) assert.ok(shut(w, tag), `${tag} is shut when Kyle lands`);
+  for (const tag of ['junk-gate', ...east, 'lane-gate', 'cantina-back']) assert.ok(shut(w, tag), `${tag} is shut when Kyle lands`);
 
   takeContract(w);
   run(w, mockInput(), 1);
@@ -58,14 +58,14 @@ test('Mos Eisley opens in stages: the junk yard waits for the fob, the east for 
   for (let i = 0; i < 2; i++) trader(w);
   run(w, mockInput(), 3);
   for (const tag of east) assert.equal(door(w, tag).state, 'open', `the signal opens ${tag}, for good`);
-  assert.ok(shut(w, 'cantina-back'), "the cantina's back door stays locked while the town is calm");
+  assert.ok(shut(w, 'cantina-back') && shut(w, 'lane-gate'), "the back lane and the cantina's back door stay shut while the town is calm");
 
   // Into the freighter's hold: Rusk, and the switch.
   Object.assign(w.player, { x: 184, y: 134.5 });
   run(w, mockInput(), 3);
   assert.equal(w.hostile, true);
   assert.ok(shut(w, 'blast-doors'), 'the blast doors shut behind Kyle');
-  assert.ok(!shut(w, 'cantina-back') && !shut(w, 'side-gate') && !shut(w, 'alley-gate'), 'the ways round them are open');
+  assert.ok(['lane-gate', 'cantina-back', 'side-gate', 'alley-gate'].every((tag) => !shut(w, tag)), 'the ways round them are open');
 });
 
 test('in Mos Eisley people point the way: Jan on landing, the informant at the checkpoint, Jan again at the switch', () => {

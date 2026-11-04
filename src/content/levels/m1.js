@@ -534,6 +534,13 @@ town.block(126, 118, 150, 122, { h: 8 }).block(149, 96, 162, 118, { h: 8 });
 // lane's east side, their washing strung across the light well between them
 // (the corner at its mouth cut back, so it opens off the lane). The lane
 // ends at a house whose door stands two steps up, on a little paved yard.
+// A gate of planks across it four tiles in, as the junk yard's are, shut
+// until the switch opens it with the cantina's back door: in the calm half
+// it was 45 tiles of sunlit lane to a dead end right before the checkpoint
+// (Mark's play test, 2026-11-03).
+town.arch(126, 77, 130, 78, { h: 5, wall: 'adobe-grey' });
+p.rect(126, 77, 130, 78, (_, __, c) => ({ ...c, door: 'door-planks-rising', style: 'rise', lock: 'remote' }));
+gateTag(126, 77, 130, 78, 'lane-gate');
 town.platform(126, 112, 132, 118, { h: 0.5, steps: 'N' });
 town.door(128, 118, 'N', { h: 8, tex: 'door-grey', floorZ: 0.5 });
 town.window(130, 92.5, 'W', { z: 2.6, tex: 'window-louvre' }).window(130, 108.5, 'W', { z: 2.4 }).window(140, 94.5, 'E', { z: 2.6 });
@@ -2282,6 +2289,7 @@ export default defineLevel({
         { action: 'message', text: "JAN: THEY'VE SEALED THE BLAST DOORS. GO ROUND THEM." },
         { action: 'closeDoors', tag: 'blast-doors' },
         { action: 'lockDoors', tag: 'bay-door' },
+        { action: 'openDoors', tag: 'lane-gate' },
         { action: 'openDoors', tag: 'cantina-back' },
         { action: 'openDoors', tag: 'checkpoint' },
         { action: 'spawn', thing: 'sandtrooper', tag: 'derelict-rim' },
