@@ -119,6 +119,20 @@ export class View {
     }
   }
 
+  /**
+   * Where a point in the world lands in the view, in view pixels, as the
+   * sprite renderer places it, and its depth; null behind the camera.
+   * @returns {{x:number, y:number, depth:number}|null}
+   */
+  project(x, y, z) {
+    const dx = x - this.x;
+    const dy = y - this.y;
+    const depth = dx * this.dirX + dy * this.dirY;
+    if (depth < 0.08) return null;
+    const tx = (dy * this.dirX - dx * this.dirY) / this.planeLen;
+    return { x: (this.W / 2) * (1 + tx / depth), y: this.horizon + ((this.camZ - z) * this.fy) / depth, depth };
+  }
+
   /** The haze step (fractional) at a distance. */
   hazeF(dist) {
     const k = (dist * HAZE_RES) | 0;

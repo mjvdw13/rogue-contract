@@ -1351,10 +1351,10 @@ A friendly or a calm monster can hold a conversation. `talk` is a list
 of lines: each press of use says the next, and it stays on the last.
 Bumping into them repeats what they last said without moving on (and says
 nothing before you've spoken). `name` is who they speak as, instead of
-their type's name (`SPACER` standing in for the broker), and it shows
-under the middle of the view, in capitals, when the player faces them in
-talking range (3.5 tiles). Give a name only to the people who matter, so
-a name on screen means "talk to this one":
+their type's name (`SPACER` standing in for the broker), and it floats
+over their head, in capitals, while the player can see them, up to 24
+tiles off (across a big room or a square). Give a name only to the
+people who matter, so a name over a head means "talk to this one":
 
 ```js
 { type: 'villager-man', x: 92.5, y: 104.5, wander: 0, tag: 'broker', name: 'BROKER',

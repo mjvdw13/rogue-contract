@@ -100,8 +100,8 @@ export class LevelScene {
       // How far from the world's last tick to its next (it doesn't tick while paused).
       const f = Math.min(1, (g.time - this.tickedAt) / TICK + g.loop.alpha);
       g.renderer.render(w, w.camera(f), { psprites: w.psprites(), skip: w.player });
+      g.hud.drawNameTags(w, g.renderer.view);
     }
-    g.hud.drawNameTag(w);
     g.hud.drawHud(w);
     g.hud.drawMessages();
     const p = w.player.player;

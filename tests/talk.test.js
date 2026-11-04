@@ -6,6 +6,7 @@ import { defineLevel } from '../src/engine/defs.js';
 import { validateContent } from '../src/engine/validate.js';
 import { LevelScene } from '../src/engine/scenes/level.js';
 import { Hud } from '../src/engine/ui/hud.js';
+import { View } from '../src/engine/render/view.js';
 import { Rng } from '../src/engine/core/rng.js';
 import { makeWorld, mockInput, registry, room, run } from './helpers.js';
 
@@ -145,31 +146,44 @@ test('the validator checks conversations, flags and talk triggers', () => {
   ]);
 });
 
-test("looking at someone with a name in talking range shows it; townsfolk, far off or behind a wall, nothing", () => {
+test("the people who matter show their names from across a room; townsfolk, far off or behind a wall, none", () => {
   const game = { registry, rng: new Rng(1), debug: {}, settings: { messages: true }, playMusic() {} };
   const hud = new Hud(game);
-  const w = makeWorld(
-    hall([
-      { type: 'villager-man', x: 4.5, y: 3.5, wander: 0, name: 'Broker', talk: ['Sit.'] },
-      { type: 'villager-woman', x: 4.5, y: 1.5, wander: 0 },
-      { type: 'villager-man', x: 8.5, y: 5.5, wander: 0, name: 'INFORMANT' },
-    ]),
-  );
-  const look = (deg) => (w.player.angle = (-deg * Math.PI) / 180);
-  assert.equal(hud.nameTag(w), 'BROKER', 'the broker, in front');
-  look(45);
-  assert.equal(hud.nameTag(w), null, 'a villager with no name');
-  look(-21);
-  assert.equal(hud.nameTag(w), null, 'the informant, 6 tiles off');
-  w.player.x = 6.5;
-  w.player.y = 3.5;
-  look(-45);
-  assert.equal(hud.nameTag(w), 'INFORMANT', 'closer');
-  w.player.z = 2;
-  assert.equal(hud.nameTag(w), null, 'not from a roof over them');
-  w.player.z = 0;
+  // A long hall, a pillar near the west end (x 8, y 4 and 5).
+  const rows = Array.from({ length: 7 }, (_, y) => (y === 0 || y === 6 ? '#'.repeat(42) : `#${'.'.repeat(40)}#`));
+  for (const y of [4, 5]) rows[y] = `${rows[y].slice(0, 8)}#${rows[y].slice(9)}`;
+  const w = makeWorld({
+    ...room(rows, []),
+    list: [
+      { type: 'player', x: 2.5, y: 3.5, angle: 0 },
+      { type: 'villager-man', x: 14.5, y: 3.5, wander: 0, name: 'Broker' },
+      { type: 'villager-woman', x: 5.5, y: 2.5, wander: 0 },
+      { type: 'villager-man', x: 10.5, y: 5.5, wander: 0, name: 'HERMIT' },
+      { type: 'villager-man', x: 39.5, y: 3.5, wander: 0, name: 'INFORMANT' },
+    ],
+  });
+  const names = () => hud.nameTags(w).map((n) => n.name);
+  assert.deepEqual(names(), ['BROKER'], 'the broker, 12 tiles off; not the villager, nor the hermit behind the pillar, nor the informant 37 tiles off');
+  w.player.x = 20.5;
+  assert.deepEqual(names(), ['INFORMANT', 'HERMIT', 'BROKER'], 'past the pillar, the hermit and the informant too, farthest first');
+  w.player.angle = Math.PI;
+  assert.equal(names().length, 3, 'looking away too (only the drawing leaves out who is behind)');
   hud.automap = true;
-  assert.equal(hud.nameTag(w), null, 'not over the automap');
+  assert.deepEqual(names(), [], 'none over the automap');
+  hud.automap = false;
+  w.player.player.dead = true;
+  assert.deepEqual(names(), [], 'none when dead');
+});
+
+test("a name floats over the person's head, where the view puts them", () => {
+  const view = new View();
+  view.setup({ x: 0, y: 0, angle: 0, z: 1.25 });
+  const head = view.project(10, 0, 1.9);
+  assert.equal(head.x, view.W / 2, 'straight ahead, in the middle');
+  assert.ok(head.y < view.horizon, 'over the horizon, the head being over the eye');
+  assert.ok(view.project(10, 2, 1.9).x > view.W / 2, 'to the right (south, facing east)');
+  assert.ok(view.project(5, 0, 1.9).y < head.y, 'nearer, higher on screen');
+  assert.equal(view.project(-3, 0, 1.9), null, 'behind, nowhere');
 });
 
 test("a level's start trigger has its say on screen when the level begins", () => {

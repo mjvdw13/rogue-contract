@@ -1,5 +1,6 @@
 import { VIEW_W, VIEW_H, SCREEN_H } from '../config.js';
 import { F_SOLID, F_DOOR, F_USE, F_EXIT, F_VOID, F_SLAB } from '../world/tilemap.js';
+import { lineOfSight3D } from '../world/physics.js';
 
 /**
  * Corner HUD layout: each panel's size and its readout insets [x, y, w, h].
@@ -14,8 +15,10 @@ export const CORNERS = {
 export const HUD_CLEAR = CORNERS.left.h + 4;
 
 const MESSAGE_TIME = 4;
-/** How far under the middle of the view a name tag sits (pixels), clear of what the player looks at. */
-const NAME_TAG_DROP = 14;
+/** How far off the people who matter show their names (tiles): across a big room or a square. */
+const NAME_RANGE = 24;
+/** How far over a person's head their name floats (pixels), the same near or far. */
+const NAME_GAP = 3;
 
 /**
  * Dark Forces-style corner readouts, pickup messages and the automap.
@@ -103,19 +106,47 @@ export class Hud {
   }
 
   /**
-   * The name to show for who the player would talk to (world.talkTarget):
-   * their placement's `name`, so only the people who matter show one.
-   * Null with nobody named in reach, over the automap, or dead.
+   * The people who matter in sight, for their names over their heads: the
+   * ones placed with a `name` (`speaker`) the player could talk to, within
+   * NAME_RANGE, that the eye can see the head or the middle of. Farthest
+   * first, so nearer names draw over them. None over the automap or dead.
+   * @returns {{thing:any, name:string, dist:number}[]}
    */
-  nameTag(world) {
-    if (this.automap || world.player.player.dead) return null;
-    return world.talkTarget(world.player)?.speaker?.toUpperCase() ?? null;
+  nameTags(world) {
+    const pt = world.player;
+    if (this.automap || pt.player.dead) return [];
+    const eye = pt.z + pt.player.viewHeight;
+    const tags = [];
+    for (const t of world.things) {
+      if (!t.speaker || !(t.kind === 'npc' || t.calm) || t.removed || t.dead) continue;
+      const dist = Math.hypot(t.x - pt.x, t.y - pt.y);
+      if (dist > NAME_RANGE) continue;
+      const see = (z) => lineOfSight3D(world.map, pt.x, pt.y, eye, t.x, t.y, z);
+      if (!see(t.z + t.height) && !see(t.z + t.height / 2)) continue;
+      tags.push({ thing: t, name: t.speaker.toUpperCase(), dist });
+    }
+    return tags.sort((a, b) => b.dist - a.dist);
   }
 
-  /** The name tag (nameTag) under the middle of the view, in the messages' colour. */
-  drawNameTag(world) {
-    const name = this.nameTag(world);
-    if (name) this.drawCentered(name, VIEW_H / 2 + NAME_TAG_DROP, this.game.registry.config.colors?.message ?? 'beige');
+  /**
+   * Each name (nameTags) floating over the person's head, where the renderer's
+   * last frame (`view`) put them, in the messages' colour.
+   * @param {import('../render/view.js').View} view
+   */
+  drawNameTags(world, view) {
+    const g = this.game;
+    const font = g.font('small');
+    if (!font) return;
+    const s = g.surface;
+    const remap = this._tint(g.registry.config.colors?.message ?? 'beige');
+    for (const { thing: t, name } of this.nameTags(world)) {
+      const at = view.project(t.x, t.y, t.z + (t.bobZ ?? 0) + t.height);
+      if (!at) continue;
+      const x = Math.round(at.x / view.scale) - s.ox;
+      const y = Math.round(at.y / view.scale) - NAME_GAP - font.cellH;
+      if (x < s.left || x >= s.w - s.ox || y < 0 || y >= VIEW_H) continue;
+      font.draw(s, name, x, y, { align: 'center', remap, shadow: 0 });
+    }
   }
 
   drawCentered(text, y, tint = 'beige') {
