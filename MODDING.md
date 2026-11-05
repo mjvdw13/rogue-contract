@@ -1163,6 +1163,12 @@ Door options:
   if it stays open, or if what opens it can be used again (`repeat` on a
   switch, `once: false` on a trigger).
 - `stayOpen: true`: once open, the door stays open.
+- `startOpen: true`: the door stands open when the level begins, with no
+  sound, as if opened before Kyle arrived. With `stayOpen` it stays so
+  until a trigger shuts it (`closeDoors`); without, it shuts after its
+  `wait`. Mos Eisley's blast doors are open until the town turns, so their
+  shutting comes as a surprise. The level checker counts one that starts
+  and stays open as a way through.
 - `speed`: how much of the door opens (or closes) per second, default 3.5:
   under 0.3 seconds, Star Wars-fast.
 - `wait`, `tag` and `sounds` are also available.

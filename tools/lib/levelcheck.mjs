@@ -148,7 +148,8 @@ export function analyseLevel(reg, level, skill = 3) {
     if (f & F_DOOR) {
       const d = map.doors[map.doorIndex[i]];
       if (!d.lock) return true;
-      if (d.lock === 'remote') return d.stayOpen ? openable.has(d.tag) : reopenable.has(d.tag);
+      // (One that starts open and stays open is a way through, though a trigger may shut it later.)
+      if (d.lock === 'remote') return d.stayOpen ? d.state === 'open' || openable.has(d.tag) : reopenable.has(d.tag);
       return keys.has(d.lock);
     }
     return !(f & F_SOLID) && !blocked[i];

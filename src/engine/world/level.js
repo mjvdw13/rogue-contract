@@ -253,6 +253,7 @@ export function buildLevel(registry, level, opts = {}) {
           });
         }
       } else if (e.door) {
+        if (e.startOpen !== undefined && typeof e.startOpen !== 'boolean') errors.push(`Door at (${x}, ${y}): "startOpen" must be true or false`);
         map.flags[i] |= F_DOOR;
         map.doorIndex[i] = map.doors.length;
         map.doors.push(
@@ -265,6 +266,7 @@ export function buildLevel(registry, level, opts = {}) {
             style: e.style,
             secret: e.secret,
             stayOpen: e.stayOpen ?? e.secret,
+            startOpen: e.startOpen === true,
             tag: e.tag ?? null,
             speed: e.speed,
             wait: e.wait,

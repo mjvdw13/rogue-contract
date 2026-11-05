@@ -371,22 +371,25 @@ These need Mark to try something, or to decide. Don't start them without him.
   (their dark edge can look like a frame), how black the oil is (paler
   turns olive), and the plaster colours.
 
-- **Mos Eisley opens in stages** (`?map=m1`, 2026-10-31): when you land the
-  blast doors are shut (a stand-in: a rising Imperial gate under a steel
-  beam over the street), and so are plank gates across the alley between
-  I and J and the junk yard's side gate. So the west end, the market, the
-  cantina and the junk yard are all there is until the trader keys in
-  the signal, which opens all three (the blast doors slowly, 2 s). The
-  junk yard's own gate (planks in the arch off the alley between H and I)
-  is shut too until the broker hands over the fob (Mark, 2026-10-31), so
-  the cantina comes first. The
+- **Mos Eisley opens in stages** (`?map=m1`, 2026-10-31; the blast doors
+  open from the start since 2026-11-04, after Mark's note that shut they
+  spoiled the surprise): the main street is open from the landing to the
+  checkpoint, through the blast doors (a stand-in: a rising gate under a
+  steel beam over the street, risen). Plank gates shut the ways off it
+  into the alleys: across the alley between I and J, the junk yard's side
+  gate, and across the alleys' east mouth past the informant's den, so
+  the street ends at the checkpoint, the den a dead end off its foot. The
+  trader's signal opens all three. The junk yard's own gate (planks in
+  the arch off the alley between H and I) is shut until the broker hands
+  over the fob (Mark, 2026-10-31), so the cantina comes first. The
   cantina's back door is locked until the switch, which shuts the blast
-  doors again. To judge: whether the shut town reads as "not yet", the
-  beam's look, and whether the alleys should open before the signal
-  (they'd be side content then: the hostel, the thug, the gun shop).
+  doors (slowly, 2 s). To judge: whether the open doors and their beam
+  give the switch away, and whether the alleys should wait for the switch
+  now (opening at the signal made them a way past the shut doors; now
+  they're side content: the hostel, the thug, the gun shop).
   People now point the way (stand-in words): Jan on landing names the
   cantina, the broker the junk yard by the sandcrawler, the guard at the
-  blast doors says they open when the garrison says so, the informant
+  blast doors moves you along, the informant
   calls "Psst. Hunter. Want a pass?" at the checkpoint's foot, and at the
   switch Jan says the blast doors are sealed, then names the alleys and
   the cantina's back door at the checkpoint. To judge: the words, and
@@ -778,21 +781,32 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
         notes).
 - [ ] **Guiding the player** (Mark, 2026-10-31): the town opens in stages,
       so the open part always holds the next stop, and people say where
-      to go. Landing to the trader: the west end, the market, the cantina
-      and the junk yard. The signal opens the east. The switch shuts the
-      blast doors and opens the ways round them.
-  - [x] Gates: the blast doors shut until the trader keys in the signal,
-        and again at the switch (a steel beam over the street for now:
-        the doors rise into it); the alley between I and J and the junk
-        yard's side gate shut until the signal; the cantina's back door
-        locked until the switch.
+      to go. Landing to the trader: the main street to the checkpoint,
+      the cantina and the junk yard. The signal opens the alleys. The
+      switch shuts the blast doors and opens the ways round them.
+  - [x] Gates: the blast doors shut at the switch (a steel beam over the
+        street for now: the doors rise into it; open until then since
+        2026-11-04); the alley between I and J, the junk yard's side gate
+        and the alleys' east mouth shut until the signal; the cantina's
+        back door locked until the switch.
   - [x] Lines that point: Jan on landing (the cantina), the broker (the
-        junk yard, by the sandcrawler), the guard at the blast doors (shut
-        until the garrison says), the informant calling Kyle over at the
+        junk yard, by the sandcrawler), the guard at the blast doors, the
+        informant calling Kyle over at the
         checkpoint's foot, Jan at the switch and again at the checkpoint
         (the ways round).
   - [ ] Objectives, if Mark wants them: an `objective` action, its line
         shown when it changes and at the top of the automap.
+  - [ ] **The main street open from the start** (Mark, 2026-11-04: shut
+        until the signal, the blast doors give away the surprise of their
+        shutting at the switch). One street from the bay to the
+        checkpoint, with fewer ways off it. A step each, checking in:
+    - [x] The blast doors stand open when Kyle lands (a door field,
+          `startOpen`) and shut at the switch; a gate of planks across
+          the alleys' east mouth past the informant's den, shut until the
+          signal as the alleys' other two are, so the street ends at the
+          checkpoint.
+    - [ ] The west end less open: the north back lane and the stable off
+          it (how, with Mark).
 - [ ] **The gates, weathered** (Mark, 2026-10-31): the blast doors and the
       checkpoint looked clean and new, the Imperial base's dark panels and
       bright stripes. Make them dirty, rusty and lived-in like the town,

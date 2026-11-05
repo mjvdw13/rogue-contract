@@ -282,3 +282,32 @@ test('lockDoors shuts the player out of a door they could open, triggers still o
   tryDoor(3.5);
   assert.notEqual(keyed.state, 'closed', 'and the key door, with no key');
 });
+
+test('a door that starts open stands open from the first tick, the player walks through, and it stays so until a trigger shuts it', () => {
+  const tiles = ['#########', '#...D...#', '#########', '#...W...#', '#########'];
+  const legend = {
+    '.': ROOM,
+    D: { ...DOOR, lock: 'remote', tag: 'gate', stayOpen: true, startOpen: true },
+    W: { ...DOOR, lock: 'remote', startOpen: true, wait: 2 },
+  };
+  const w = makeWorld(room(tiles, ['', ' >'], { legend }), { noMonsters: true });
+  const [gate, brief] = [w.map.doorAt(4, 1), w.map.doorAt(4, 3)];
+  assert.ok(gate.state === 'open' && gate.open === 1 && gate.passable, 'open before anything has run');
+  const input = mockInput();
+  input.hold('forward');
+  Object.assign(w.player, { x: 2.5, y: 1.5, angle: contentAngle(0) });
+  run(w, input, 1);
+  assert.ok(w.player.x > 5, 'the player walks straight through');
+  run(w, mockInput(), 3);
+  assert.equal(gate.state, 'open', 'it stays open');
+  assert.equal(brief.state, 'closed', 'one that does not stay open shuts after its wait');
+  runActions(w, [{ action: 'closeDoors', tag: 'gate' }]);
+  run(w, mockInput(), 1);
+  assert.equal(gate.state, 'closed', 'until a trigger shuts it');
+});
+
+test('a door\'s "startOpen" that is not true or false is an error', () => {
+  const tiles = ['#########', '#...D...#', '#########'];
+  const { errors } = buildLevel(registry, room(tiles, [' >'], { legend: { '.': ROOM, D: { ...DOOR, startOpen: 'yes' } } }), {});
+  assert.ok(errors.some((e) => /"startOpen" must be true or false/.test(e)), errors.join('\n'));
+});

@@ -65,9 +65,11 @@ export class Door {
     this.speed = spec.speed ?? 3.5; // fraction per second (Star Wars doors snap open)
     this.wait = spec.wait ?? 4;
     this.sounds = spec.sounds ?? {};
-    this.open = 0;
-    this.state = 'closed'; // closed | opening | open | closing
-    this.timer = 0;
+    // (A door that starts open, `startOpen`, stands open from the first
+    // tick, and one that doesn't stay open shuts after its wait.)
+    this.open = spec.startOpen ? 1 : 0;
+    this.state = spec.startOpen ? 'open' : 'closed'; // closed | opening | open | closing
+    this.timer = spec.startOpen ? this.wait : 0;
   }
 
   get passable() {

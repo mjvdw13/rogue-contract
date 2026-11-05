@@ -242,15 +242,15 @@ town.door(109, 61, 'S', { h: 7, tex: 'door-grey', wall: 'adobe-pale' });
 town.window(102, 61.5, 'W', { z: 3.4, tex: 'window-louvre' }).window(106.5, 64, 'S', { z: 4.6 });
 // The blast doors' frame: a strip of Imperial steel set into the walls
 // either side of the street, and a beam over it the doors rise into (a
-// stand-in for doors that slide out of the walls). Shut when Kyle lands,
-// so the town east of here waits until the fob has Rusk's signal; they
-// open then (the Empire wants him found: the fob is theirs), and shut
-// again at the switch, splitting the town in two. 12 wide and 4 high,
-// slow and heavy (2 s).
+// stand-in for doors that slide out of the walls). Open when Kyle lands,
+// and all through the calm half, so the street runs on to the checkpoint
+// (Mark, 2026-11-04: shut until the signal, they gave away the surprise of
+// their shutting); the switch shuts them, splitting the town in two. 12
+// wide and 4 high, slow and heavy (2 s).
 const GATE = { wall: 'blast-steel', roof: 'bay-plate', skirt: { tex: 'blast-hazard', to: 0.5 } };
 town.block(104, 63, 106, 64, { ...GATE, h: 7 });
 town.arch(104, 64, 106, 76, { ...GATE, wall: 'blast-beam', h: 6, lintel: 4, light: 176 });
-p.rect(104, 64, 106, 76, (_, __, c) => ({ ...c, door: 'blast-door-rising', style: 'rise', lock: 'remote', tag: 'blast-doors', stayOpen: true, speed: 0.5 }));
+p.rect(104, 64, 106, 76, (_, __, c) => ({ ...c, door: 'blast-door-rising', style: 'rise', lock: 'remote', tag: 'blast-doors', stayOpen: true, startOpen: true, speed: 0.5 }));
 town.slanted([[112, 52], [126, 52], [126, 61], [122, 61], [112, 64]], { h: 6, wall: 'adobe-ochre' });
 town.house(126, 50, 136, 61, { h: 8, r: 2, tiers: [{ box: [128, 50, 136, 57], h: 11, r: 2 }] });
 town.door(130, 61, 'S', { h: 8, tex: 'door-red' });
@@ -492,13 +492,20 @@ list.push(
   at('crate-rust-long', 145.2, 57.7, { angle: 90 }), at('crate-grey-small', 145.35, 56.2, { angle: 12 }), at('canister-rust', 140.6, 52.6),
   at('terminal', 142.7, 59.4, { angle: 90 }),
   at('cantina-lamp', 143, 55.5, { z: 4.5 - LAMP_CORD }),
-  at('crate-tan', 136.55, 49.1, { angle: 85 }), at('barrel-rust', 136.45, 50.35), at('litter-small', 137.6, 52.4, { angle: 15 }),
+  at('crate-tan', 136.55, 49.6, { angle: 85 }), at('barrel-rust', 136.45, 50.85), at('litter-small', 137.6, 52.4, { angle: 15 }),
 );
 lights.push({ x: 143, y: 55.5, z: 2.5, radius: 4, light: 32 });
 town.hangings.push(
   { type: 'rag', from: [139.5, 54.1, 2.95], to: [139.5, 55.6, 2.95], length: 1.6 },
   { type: 'cable', from: [136.05, 53.4, 6.6], to: [138.95, 50.6, 5.8], sag: 0.4 },
 );
+// A gate of planks across the mouth at the alleys' foot, past the den, as
+// their gates from the market and the junk yard are: shut until the
+// signal, so in the calm half the main street ends here, at the checkpoint
+// (Mark, 2026-11-04), and the den is a dead end off its foot.
+town.arch(136, 48, 139, 49, { h: 5, wall: 'adobe-grey' });
+p.rect(136, 48, 139, 49, (_, __, c) => ({ ...c, door: 'door-planks-rising', style: 'rise', lock: 'remote' }));
+gateTag(136, 48, 139, 49, 'mouth-gate');
 // South of it, too tall to climb from the roofs behind.
 p.rect(136, 73, 148, 86, town.street());
 town.house(136, 73, 141, 86, { h: 8, r: 1, skirt: 'plinth' });
@@ -1943,10 +1950,9 @@ list.push(
   at('crate-grey-small', 97.3, 62.8, { angle: 20 }), at('droid-dome', 97.3, 62.8, { z: 0.6, angle: 75 }),
 );
 
-// The blast doors have stood shut long enough for the street's rubbish to
-// pile against their feet: rubble and litter in the corners, a rusty
-// canister tucked in the south-west corner (the rest isn't solid, so the
-// way through stays clear when they open).
+// The street's rubbish drifts into the corners of the blast doors' frame:
+// rubble and litter, a rusty canister tucked in the south-west corner (the
+// rest isn't solid, so the way through stays clear).
 list.push(
   at('rubble', 103.4, 64.7, { angle: 20 }), at('litter-small', 103.2, 67.5, { angle: 70 }), at('canister-rust', 103.35, 75.55),
   at('litter', 102.9, 74.6, { angle: 200 }), at('rubble', 106.6, 75.3, { angle: 140 }), at('litter-small', 106.8, 65.2, { angle: 310 }),
@@ -1999,8 +2005,8 @@ list.push(
 // patrol, a commander and a trooper side by side, walks the main street
 // from the west end to the blast doors and back, passing north of the
 // condenser tower. A second commander stands talking to a trooper in the
-// market, and a guard stands at the blast doors, looking down the street:
-// use him and he says they're shut until the garrison says otherwise.
+// market, and a guard stands at the open blast doors, looking down the
+// street: use him and he moves you along (nothing that warns they shut).
 // Two Jawas haggle at the droid seller's pen and two more stand by the
 // street; one strolls the street and one the north back lane.
 const STREET_PATROL = [[12.5, 67], [60.5, 67], [101.5, 66]];
@@ -2009,14 +2015,7 @@ list.push(
   at('sandtrooper', 14.5, 68.6, { calm: { patrol: STREET_PATROL.map(([x, y]) => [x, y + 1.6]), idleTime: [3, 3] } }),
   at('sandtrooper-commander', 86.5, 61, { angle: 180, calm: { wander: 0 } }),
   at('sandtrooper', 84.5, 61, { angle: 0, calm: { wander: 0 } }),
-  at('sandtrooper', 103, 71, {
-    angle: 180,
-    calm: { wander: 0 },
-    talk: [
-      { unless: 'signal', lines: ['The east is sealed, hunter.', 'The doors open when the garrison says so.'] },
-      { lines: ['Orders came down. The east is open.'] },
-    ],
-  }),
+  at('sandtrooper', 103, 71, { angle: 180, calm: { wander: 0, lines: ['Move along, hunter.'] } }),
   at('jawa', 95, 60.6, { angle: 0, calm: { wander: 0 } }), at('jawa', 99.2, 61, { angle: 180, calm: { wander: 0 } }),
   at('jawa', 22, 70, { angle: 90, calm: { wander: 0 } }), at('jawa', 116, 68, { angle: 180, calm: { wander: 0 } }),
   at('jawa', 68, 70, { calm: { wander: 3 } }), at('jawa', 50, 47, { calm: { wander: 4 } }),
@@ -2283,8 +2282,8 @@ export default defineLevel({
     { on: 'enter', tag: 'checkpoint-foot', if: 'signal', unless: ['pass', 'loud'], do: [{ action: 'message', text: 'INFORMANT: PSST. HUNTER. WANT A PASS?' }] },
     // The fob: the broker gives it (dark) and the junk yard's gate opens,
     // the trader's code points it at the checkpoint's gate, opens the hold
-    // and opens the east (the blast doors, and the alleys from the market
-    // and the junk yard); through the gate it points at Rusk; and in the
+    // and opens the alleys (their gates from the market, the junk yard and
+    // the checkpoint's foot); through the gate it points at Rusk; and in the
     // hold Rusk pulls its Imperial tracer and the town turns. Two places,
     // straight at each (Mark, 2026-11-04: the route round the corners was
     // too confusing).
@@ -2296,9 +2295,9 @@ export default defineLevel({
       do: [
         { action: 'setSignal', tag: 'checkpoint' },
         { action: 'openDoors', tag: 'hold-door' },
-        { action: 'openDoors', tag: 'blast-doors' },
         { action: 'openDoors', tag: 'side-gate' },
         { action: 'openDoors', tag: 'alley-gate' },
+        { action: 'openDoors', tag: 'mouth-gate' },
       ],
     },
     { on: 'enter', tag: 'past-checkpoint', if: 'signal', unless: 'loud', do: [{ action: 'setSignal', tag: 'rusk' }] },
