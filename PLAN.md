@@ -71,16 +71,18 @@ These need Mark to try something, or to decide. Don't start them without him.
   the hull should become a real ship (a model) next.
 
 - **The dewback stable** (`?map=m1`, 2026-11-02): across the north back
-  lane from B to D, open from the start. Its front is open between timber
-  posts under a beam, and the suns fall through its slatted roof in
-  stripes (dim under the slats, walls too). Four stalls behind plank
+  lane from B to D, out of play since 2026-11-05 (Mark chose to wall the
+  lane off): glimpsed over the yard wall from the alleys, its top half
+  and roof (`idclip` walks through the wall to look in). Its front is
+  open between timber posts under a beam, and the suns fall through its
+  slatted roof in stripes (dim under the slats, walls too). Four stalls behind plank
   rails, each with a ring and a water trough; one being mucked out by the
   stable hand, one with the patrol's saddles on a rack, feed and an
   Imperial crate. The patrol's two spare dewbacks stand in the aisle in the
   middle, nose to nose at a feed trough, tied to the middle post (moved out
-  of the stalls: their sprites cut through the rails). To judge:
-  the light (stripes, how dim), the dewbacks in the aisle, and the saddles
-  and troughs at that size.
+  of the stalls: their sprites cut through the rails). To judge: whether
+  to keep it, now it's only glimpsed (it costs frame time only while in
+  sight), or bring it back another way.
 - **The speeder garage** (`?map=m1`, 2026-11-02): J on the market, open
   from the start, its shutter rolled up (its bottom slat under the
   lintel, the roller's box inside). The X-34 whose engine lies in the yard
@@ -383,10 +385,14 @@ These need Mark to try something, or to decide. Don't start them without him.
   the arch off the alley between H and I) is shut until the broker hands
   over the fob (Mark, 2026-10-31), so the cantina comes first. The
   cantina's back door is locked until the switch, which shuts the blast
-  doors (slowly, 2 s). To judge: whether the open doors and their beam
-  give the switch away, and whether the alleys should wait for the switch
-  now (opening at the signal made them a way past the shut doors; now
-  they're side content: the hostel, the thug, the gun shop).
+  doors (slowly, 2 s). The alleys still open at the signal (Mark,
+  2026-11-05), side content then: the hostel, the thug, the gun shop.
+  And the west end is less open (Mark, 2026-11-05): the north back lane
+  walled off behind the north row (a yard wall 2.5 tall, a storehouse 6
+  tall behind D), so its gaps are alleys ending at the wall, each dead
+  end with a find (cells by A, an energy pack between A and B, a med kit
+  past D's stair). To judge: whether the open doors and their beam give
+  the switch away, and whether the west end reads as one street now.
   People now point the way (stand-in words): Jan on landing names the
   cantina, the broker the junk yard by the sandcrawler, the guard at the
   blast doors moves you along, the informant
@@ -796,17 +802,6 @@ fob). Each step is a commit with snapshots, playable at `?map=m1`.
         (the ways round).
   - [ ] Objectives, if Mark wants them: an `objective` action, its line
         shown when it changes and at the top of the automap.
-  - [ ] **The main street open from the start** (Mark, 2026-11-04: shut
-        until the signal, the blast doors give away the surprise of their
-        shutting at the switch). One street from the bay to the
-        checkpoint, with fewer ways off it. A step each, checking in:
-    - [x] The blast doors stand open when Kyle lands (a door field,
-          `startOpen`) and shut at the switch; a gate of planks across
-          the alleys' east mouth past the informant's den, shut until the
-          signal as the alleys' other two are, so the street ends at the
-          checkpoint.
-    - [ ] The west end less open: the north back lane and the stable off
-          it (how, with Mark).
 - [ ] **The gates, weathered** (Mark, 2026-10-31): the blast doors and the
       checkpoint looked clean and new, the Imperial base's dark panels and
       bright stripes. Make them dirty, rusty and lived-in like the town,

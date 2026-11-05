@@ -137,6 +137,20 @@ town.hangings.push(
   { type: 'cable', from: [35.95, 43.35, 1.6], to: [34.9, 41.1, 1.35], sag: 0.35 },
   { type: 'cable', from: [36.05, 43.35, 1.6], to: [37.1, 40.9, 1.35], sag: 0.35 },
 );
+// The north back lane shut (Mark, 2026-11-05): with five ways through to
+// it the west end was open ground every way, a second street behind the
+// first. A yard wall along its south side behind the north row, so the
+// gaps between the houses are alleys ending at it (the two either side of
+// C's tower meeting behind it), and the lane and the stable are out of
+// play, the stable's front glimpsed over the wall. 2.5 tall, more than a
+// jump, a plaster behind each house. Behind D and past it a storehouse
+// closes the lane's east end instead, 6 tall: a running jump from D's
+// landing (3.5) would land on a wall under about 4.8.
+town.block(2, 49, 16, 50, { h: 2.5, skirt: 'dirt' });
+town.block(16, 49, 28, 50, { h: 2.5, wall: 'adobe-pale', skirt: 'dirt' });
+town.block(28, 49, 45, 50, { h: 2.75, wall: 'adobe-ochre', skirt: 'plinth' });
+town.block(45, 46, 62, 51, { h: 6, wall: 'adobe-pale', skirt: 'dirt' });
+town.window(60.5, 51, 'S', { z: 3.4, tex: 'window-louvre' });
 
 // South row.
 // E: a shop you can walk into, with a dome over it, and a yard in front
@@ -1895,7 +1909,7 @@ list.push(
 );
 // Crates, drums, canisters, cargo pods, junk and litter along the walls
 // (lib/town.js), but none yet in the blocked-out middle and east third.
-town.clutter({ keep: [[STABLE.x0, STABLE.y0, STABLE.x1, STABLE.y1], [92, 56, 97, 61], [126, 92, 130, 122], [130, 86, 150, 122], [136, 44, W, H], [54, 1, 146, 49], [57, 94, 87, 131], [87, 82, 126, 122], [85, 76, 102, 82]] });
+town.clutter({ keep: [[STABLE.x0, STABLE.y0, STABLE.x1, STABLE.y1], [2, 44, 45, 49], [92, 56, 97, 61], [126, 92, 130, 122], [130, 86, 150, 122], [136, 44, W, H], [54, 1, 146, 49], [57, 94, 87, 131], [87, 82, 126, 122], [85, 76, 102, 82]] });
 list.push(...town.things);
 
 // Hand-placed along the main street and on the square (the kit's
@@ -1998,6 +2012,13 @@ list.push(
   at('crate-rust-long', 203.4, 70.35, { angle: 90 }), at('med-kit', 202.4, 69.7), at('energy-pack', 202.3, 70.5, { skill: [1, 2] }),
   // Beside the cantina's storehouse, off the back lane: its spare cells.
   at('crate-grey-small', 121.6, 109.4, { angle: 8 }), at('power-cell', 122.5, 109.3), at('power-cell', 122.4, 108.6),
+  // The west end's alleys, since the north back lane was walled off
+  // (2026-11-05). The slot past A, by the town's wall: a crate left there, cells on it.
+  at('crate-grey-small', 2.8, 50.7, { angle: 10 }), at('power-cell', 3.4, 51.6), at('power-cell', 2.6, 51.9, { skill: [1, 2] }),
+  // Between A and B: a pack off a speeder.
+  at('cargo-pod', 15, 51.3, { angle: 90 }), at('energy-pack', 14.6, 53.2),
+  // Past D's stair, at the storehouse's wall: its stores, a med kit by them.
+  at('crate-tan', 58.7, 51.7, { angle: 5 }), at('med-kit', 60.6, 51.6), at('med-kit', 61.4, 52.1, { skill: [1, 2] }),
 );
 
 // Calm until the town turns (things/calm.js, docs/story.md): sandtroopers
@@ -2008,7 +2029,7 @@ list.push(
 // market, and a guard stands at the open blast doors, looking down the
 // street: use him and he moves you along (nothing that warns they shut).
 // Two Jawas haggle at the droid seller's pen and two more stand by the
-// street; one strolls the street and one the north back lane.
+// street; two stroll the street.
 const STREET_PATROL = [[12.5, 67], [60.5, 67], [101.5, 66]];
 list.push(
   at('sandtrooper-commander', 14.5, 67, { calm: { patrol: STREET_PATROL, idleTime: [3, 3] } }),
@@ -2018,7 +2039,7 @@ list.push(
   at('sandtrooper', 103, 71, { angle: 180, calm: { wander: 0, lines: ['Move along, hunter.'] } }),
   at('jawa', 95, 60.6, { angle: 0, calm: { wander: 0 } }), at('jawa', 99.2, 61, { angle: 180, calm: { wander: 0 } }),
   at('jawa', 22, 70, { angle: 90, calm: { wander: 0 } }), at('jawa', 116, 68, { angle: 180, calm: { wander: 0 } }),
-  at('jawa', 68, 70, { calm: { wander: 3 } }), at('jawa', 50, 47, { calm: { wander: 4 } }),
+  at('jawa', 68, 70, { calm: { wander: 3 } }), at('jawa', 50, 66, { calm: { wander: 4 } }),
 );
 
 // The east third's calm troopers, and the stand-ins for its people. The
@@ -2077,8 +2098,9 @@ list.push(
   at('villager-adventurer', 46, 71), at('villager-man', 55, 73),
   // The square and the stall.
   at('villager-man', 38, 80), at('villager-woman', 49, 87),
-  // The back lanes and the alley between E and F.
-  at('villager-woman', 34, 47), at('villager-wanderer', 30, 97), at('villager-adventurer', 18.5, 88),
+  // The south back lane and the alley between E and F (the north lane is walled off).
+  at('villager-wanderer', 30, 97), at('villager-adventurer', 18.5, 88),
+  at('villager-woman', 36, 66),
   // Indoors: the shop, B's room and G's.
   at('villager-boy', 12, 84), at('villager-woman', 22, 56), at('villager-man', 57, 84),
   // The market, and past the blast doors.
