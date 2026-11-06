@@ -28,14 +28,18 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
-- **Mission 2's third blockout** (`?map=m2`, 2026-11-05), the walled farm
-  (`docs/mission2.md`): dropped into the garden pit, the tunnels and rooms
-  with their three loops and light wells, the rubble and the barred door
-  sending Kyle up across the yard and down through the storehouse to the
-  cellar, the garage and its pit's trench out to the pad in its drifts.
-  To judge: the drop-off, the yard dash (is it a beat, or a chore?), the
-  windbreak and drifts as the edge, the pad, and where the fights are.
-  The sky and haze are still stand-ins (the night sky).
+- **Mission 2's fourth blockout** (`?map=m2`, 2026-11-06), a walk west
+  to east to the house (`docs/mission2.md`, after Mark's notes on the
+  third: small, open-ended, hunting round one yard): the garden pit, the
+  pump tunnels, the workshop pit (the way east caved in, in sight), up
+  through the generator shed into the work yard facing the gate with the
+  house's great dome over it, the officer's red key, the lane straight at
+  the dome, its stair down into the courtyard pit and the rooms round it,
+  the cellar, out by the garage, its pit and the trench to the pad. To
+  judge: whether it now reads as progress, whether the dome works as the
+  destination (seen over the gate, 6.5 m tall), the key hunt in the yard,
+  the lane (short, 10 m), and where the fights are. The sky and haze are
+  still stand-ins (the night sky).
 
 - **Finding the way** (`?map=m1`, 2026-11-03, after Mark's play test:
   maze-like, unclear who to talk to, the fob pointing down alleys). Four
@@ -1205,17 +1209,9 @@ snapshots, playable at `?map=m2`.
 - [x] The third design after Mark's notes on the second blockout
       (2026-11-05): `docs/mission2.md`, and the third blockout (128 x 140,
       the farm walled in, dropped into the garden pit).
-- [ ] The fourth design after Mark's notes on the third blockout
-      (2026-11-06: small, open-ended, hunting round one open area): the
-      farm as a walk west to east to the house, a chain of areas with one
-      way on each.
-  - [x] `docs/mission2.md` (the maps, the way through, areas, life) and
-        `docs/story.md`'s sketch.
-  - [ ] The fourth blockout: the garden pit, the pump tunnels, the
-        workshop pit, the work yard (the officer's red key), the lane, the
-        house (its dome, courtyard pit and rooms), the cellar, the garage,
-        its pit, the trench and the pad. Snapshots; measure frame time and
-        the monsters' plan.
+- [x] The fourth design after Mark's notes on the third blockout
+      (2026-11-06): `docs/mission2.md`, and the fourth blockout (208 x
+      142, a walk west to east to the house, one way on from each area).
 - [ ] **Evening:**
   - [ ] `sky-dusk` (`derive.mjs`, from RESKY01): indigo overhead to rose
         to amber at the horizon, fading into the haze.
