@@ -12,7 +12,8 @@ calls.
 - **[MODDING.md](MODDING.md)**: every content field and what it does. The
   reference for content work, and the place to document new fields.
 - `docs/story.md` (the story), `docs/mission1.md` (Mos Eisley's design and
-  the town kit), `docs/mission3.md` (Mission 3's design,
+  the town kit), `docs/mission2.md` (the Homestead's design: flow,
+  evening light, blowing sand), `docs/mission3.md` (Mission 3's design,
   per-skill placement table), `docs/plan-archive.md` (why finished features
   work the way they do: search it by feature name before redesigning one).
 

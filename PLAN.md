@@ -28,6 +28,12 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
+- **Mission 2's flow** (`docs/mission2.md`, 2026-11-05): the paper pass
+  for the Homestead at evening, before the blockout. To judge: the map
+  (the ridge, the field, the farm, the pit and the rooms under the
+  ground, the trench, the pickup), the one-way route, the ending's
+  hold-out, and the evening light and blowing sand as planned.
+
 - **Finding the way** (`?map=m1`, 2026-11-03, after Mark's play test:
   maze-like, unclear who to talk to, the fob pointing down alleys). Four
   of the eleven proposals:
@@ -1178,6 +1184,106 @@ blocks of frames: separate runs on this machine drift by up to 20%.
 - [ ] Waiting on Mark: the look (sparks and ropes can be 1 pixel thin at
       2x, the dithering is finer), and whether the menu should warn that
       2x needs a fast machine.
+
+### 9. Mission 2: the Homestead (Mark, 2026-11-05)
+
+The story's Map B, at evening instead of night, with blowing sand that
+half hides the view in gusts, Mos Eisley's styles but its own design and
+light. The design (the flow, areas, heights, light and sand, enemies by
+skill, secrets) is `docs/mission2.md`. Mark asked for the whole level's
+flow mapped before any part is built. Each step is a commit with
+snapshots, playable at `?map=m2`.
+
+- [x] Design: `docs/mission2.md` (the paper pass).
+- [ ] Waiting on Mark: his OK on the flow (the map, the route, what holds
+      the player back, the ending) before the blockout.
+- [ ] **The blockout:** `m2` (144 x 112, sky 32) as plain volumes at their
+      final heights, the real ways between them, in `levels/index.js`.
+  - [ ] The ridge: the shelf (12), the Tuskens' crag (14), leg 1 down
+        east to the landing (6), leg 2 down west to the foot (0); rock
+        out of reach round it.
+  - [ ] The vaporator field and the dunes south of it: low dunes as raised
+        sand, stand-in vaporators in slanting rows, the staging point, the
+        pump house.
+  - [ ] The farm's ground (0.5) behind its broken yard wall: the entry dome
+        with its stair round the wall and the passage, the pit (-5.5) with
+        its parapet, the generator shed, the storehouse.
+  - [ ] Under the ground: the common room, the storeroom, the workshop,
+        the cellar (-8.5) and its pool, the garage; the trench up to the
+        pickup.
+  - [ ] Message triggers standing in for the story (Jan on the shelf, the
+        recordings, the garage opening, the call, the pickup as the exit).
+  - [ ] Validate on all five skills, the play test, snapshots from the
+        shelf, the field, the rim, the courtyard, the cellar and the
+        pickup; a map view.
+- [ ] **Evening:**
+  - [ ] `sky-dusk` (`derive.mjs`, from RESKY01): indigo overhead to rose
+        to amber at the horizon, fading into the haze.
+  - [ ] The suns low in the west-south-west (`town.finish(EVENING)`: 196
+        and 204, 14 and 18 degrees up), so the shadows run 20 to 30 tiles.
+  - [ ] Light levels: ground 176, deep shade about 104, interiors 96 to
+        120, the courtyard 104, the cellar 64 to 80; the haze (amber,
+        `half: 48`), checked against the palette.
+  - [ ] A sky that wraps once round the horizon (a level's `skyWrap`:
+        defs, validator, MODDING.md, a test), so the glow is in the west
+        only; the two suns painted low on it.
+  - [ ] The vaporators' long shadows: a thin caster per vaporator in the
+        kit's `shadows()`.
+- [ ] **Blowing sand** (all cosmetic, its own RNG):
+  - [ ] `weather` takes a list of types (defs, validator, MODDING.md, a
+        test); one object still works.
+  - [ ] Gusts: `weather.gusts: { every, hold, strength }`, a clock of its
+        own driving the wind (and so every type with `wind`) and the
+        number in the air; a test that a gust carries a particle farther.
+  - [ ] The haze swells in a gust (`haze.gust`, its half distance in a
+        full gust); a test that a far wall fades more in a gust.
+  - [ ] The sky's lower part fades into the haze in a gust (measured:
+        the sky's rows are in the hot loop).
+  - [ ] The particles on the bench (`tools/particles.html`): `sand-grain`
+        (fine streaks on the wind), `sand-veil` (big faint sheets low
+        across the view), `sand-snake` (ribbons over the ground); then in
+        `m2`. Frame cost under 0.3 ms.
+  - [ ] Shelter in the courtyard, the trench and the buildings' lee: fewer,
+        or none (decide after looking).
+  - [ ] Waiting on Mark: how thick, how often the gusts come, and whether
+        troopers should see no farther than the player in one.
+- [ ] **Each area in detail,** in the order you meet them, snapshots
+      before and after each:
+  - [ ] The shelf and the path: sandstone, boulders on the lips, the
+        landing's dead speeder bikes and crates, the Tuskens' windbreak
+        and fire pit, the crag's secret.
+  - [ ] The field: a farm vaporator model (taller than the town's) and a
+        fallen one, dunes in soft outlines, the staging point (a lit
+        floodlight, crates, barricades, a comm unit), the pump house.
+  - [ ] The farm's ground and the entry dome: whitewash gone grey with
+        soot, the yard wall's gaps, skylight domes over the rooms, the
+        dome's door, lamp and stairwell, the Imperials' barricades.
+  - [ ] The courtyard and its rooms: round-topped arches, the overturned
+        table, the cart, the common room's hearth and table, the
+        storeroom's shelves and the hidey-hole (secret, Rusk's bedroll),
+        the workshop's bench and pit droid.
+  - [ ] The cellar: the vaulted cistern, its dark pool, pipes, the lamp
+        on the floor, the case behind the loose stone.
+  - [ ] The garage, the trench and the pickup: the stripped speeder, the
+        hoist, drifts on the trench's steps, the beacon lamps round the
+        spot, low rocks.
+  - [ ] The backdrop and the edges: the ridge's rock climbing away
+        (`canyonBackdrop`) and a dune variant for the west and south.
+- [ ] **Fire and smoke:** the generator shed and the storehouse burning
+      (fire decorations with fire, ember and smoke emitters, flickering
+      lights), a vaporator burning in the field, the courtyard's cart;
+      the smoke torn east by the wind.
+- [ ] **Life:** the troopers by skill (`docs/mission2.md`'s table), the
+      probe droid, items and ammo, the hold-out's waves from the field
+      and the dunes.
+- [ ] **The story:** the recordings (the data tape, section 7) start the
+      ending; footsteps and falling dust; the garage rolls open, the
+      family's speeder heard leaving; the call and `wait` (section 6) for
+      Jan's two minutes; the pickup as the exit. Stand-in words.
+- [ ] Waiting on Mark: the Tuskens' sheet (the crag) and the prototype's
+      (walking out of the sand at the end); the words.
+- [ ] **Tune and check:** light, the sand, frame time, the per-skill check;
+      update `docs/mission2.md`.
 
 ## Small fixes and known rough edges
 

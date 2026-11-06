@@ -85,7 +85,7 @@ so they know who the hunter really is. The contract has gone rogue.
 | # | Mission | Kind | Drop-off | What happens | Pickup |
 |---|---------|------|----------|--------------|--------|
 | 1 | Mos Eisley: The Puck | Free roam, then run-and-gun | The Crow lands in Docking Bay 87 and leaves before customs arrives. | **Calm:** Kyle takes the contract and the fob from the broker in the cantina. Rusk has wiped his ID code, so the fob has nothing to track. A Jawa trader sold Rusk a part tagged with their own transponder, which gives the fob a signal. It leads across town, past the closed checkpoint, to a derelict docking bay where Rusk is hiding. **Loud:** Rusk pulls the Imperial tracer out of the fob, and the shooting starts. An officer's voice: "Kyle Katarn. Customs logged your ship this morning." A squad takes Rusk, and every trooper in town turns on Kyle. Before he's dragged off, Rusk shouts where he hid what he saw: the farm, the cellar. Kyle fights back across town to the bay. | Back in Docking Bay 87. JAN: "Customs won't be checking papers now." |
-| 2 | The Homestead | Run-and-gun | On the ridge at night, above a farm that's already burning. | The Empire is cleaning up everyone Rusk talked to. Kyle fights down through the vaporator field and into the sunken courtyard, and finds Rusk's helmet recordings of the test in the cellar. Then the prototype walks out of the dark. It's far too tough to fight here: run. | Under fire. Jan is two minutes out, so Kyle holds the landing spot until the Crow sets down. |
+| 2 | The Homestead | Run-and-gun | On the ridge at dusk, above a farm that's already burning, a sandstorm coming in. | The Empire is cleaning up everyone Rusk talked to. Kyle fights down through the vaporator field and into the sunken courtyard, and finds Rusk's helmet recordings of the test in the cellar. Then the prototype walks out of the blowing sand. It's far too tough to fight here: run. | Under fire. Jan is two minutes out, so Kyle holds the landing spot until the Crow sets down. |
 | 3 | The Canyon Garrison | Run-and-gun | In the canyon's start bowl at night. | The map we've built, entered by the vent. Through the officer's barred window Kyle sees a general hurry out. He frees Rusk from a new detention block, takes the test records from the vault, and destroys the prototype in the generator chamber with the overload. | On the landing pad. The general's shuttle is gone. |
 | | Finale | Text | | The Crow gets away. The Alliance files the records as unconfirmed, and Jan brings the next job: Danuta. | |
 
@@ -195,8 +195,8 @@ sketch (a bigger map, more areas), is `docs/mission1.md`.
 - **Size:** about 150 × 110 tiles (75 × 55 m). The Canyon Garrison is
   128 × 100.
 - **Light:** sunlit streets at 200-224 under a new day sky with both suns,
-  alleys and doorways in shade at 136-152, and dim interiors. The other
-  missions are at night, so this is the only daylight map.
+  alleys and doorways in shade at 136-152, and dim interiors. Mission 2 is
+  at dusk and Mission 3 at night, so this is the only full daylight map.
 - **Buildings:** in Doom's style. The street's sky sits just above the
   rooftops, so a building's wall stops at its roofline and the sky shows
   above it. Rooftops you can walk on are raised floors under a higher sky.
@@ -239,12 +239,15 @@ and a rooftop cache with a better weapon.
 
 ## Map B: The Homestead (Mission 2)
 
-The farm that hid Rusk, at the edge of the Jundland, at night. The raid is
-already under way when Kyle arrives. All combat.
+The farm that hid Rusk, at the edge of the Jundland, at dusk (Mark,
+2026-11-05: evening, not night), with a sandstorm blowing in. The raid is
+already under way when Kyle arrives. All combat. The level's full design,
+which grows this sketch, is `docs/mission2.md`.
 
-- **Size:** about 110 × 90 tiles.
-- **Light:** the night sky we have. The farm is lit by fires (flickering
-  light around burning buildings) and by its doorways.
+- **Size:** about 110 × 90 tiles (`docs/mission2.md`: 144 × 112).
+- **Light:** a dusk sky, the suns low in the west and long shadows, sand
+  blowing in gusts. The farm is lit by fires (flickering light around
+  burning buildings) and by its doorways.
 
 ```
             [7 ridge: Tuskens]
