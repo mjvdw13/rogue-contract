@@ -1205,6 +1205,17 @@ snapshots, playable at `?map=m2`.
 - [x] The third design after Mark's notes on the second blockout
       (2026-11-05): `docs/mission2.md`, and the third blockout (128 x 140,
       the farm walled in, dropped into the garden pit).
+- [ ] The fourth design after Mark's notes on the third blockout
+      (2026-11-06: small, open-ended, hunting round one open area): the
+      farm as a walk west to east to the house, a chain of areas with one
+      way on each.
+  - [x] `docs/mission2.md` (the maps, the way through, areas, life) and
+        `docs/story.md`'s sketch.
+  - [ ] The fourth blockout: the garden pit, the pump tunnels, the
+        workshop pit, the work yard (the officer's red key), the lane, the
+        house (its dome, courtyard pit and rooms), the cellar, the garage,
+        its pit, the trench and the pad. Snapshots; measure frame time and
+        the monsters' plan.
 - [ ] **Evening:**
   - [ ] `sky-dusk` (`derive.mjs`, from RESKY01): indigo overhead to rose
         to amber at the horizon, fading into the haze.
@@ -1239,34 +1250,38 @@ snapshots, playable at `?map=m2`.
         troopers should see no farther than the player in one.
 - [ ] **Each area in detail,** in the order you meet them, snapshots
       before and after each:
-  - [ ] The garden pit: grow beds and grow lamps, the water tank, sand
-        streaming over its rim.
-  - [ ] The yard, the entry dome and the sheds: whitewash gone grey with
-        soot, skylight domes over the rooms, the light wells' kerbs, the
-        dome's door, lamp and stairwell, the staging point (a lit
-        floodlight, crates, barricades, a comm unit), a farm vaporator
-        model (taller than the town's).
-  - [ ] The courtyard and its rooms: round-topped arches, the overturned
-        table, the cart, the common room's hearth and table, the
-        storeroom's shelves, the workshop's bench and pit droid.
-  - [ ] The tunnels and the quarters: the water pipe on the ceilings,
-        lamps at the junctions, the light wells, the caved-in tunnels'
-        rubble, the barred door, the long tunnel and the hidey-hole
-        (secret, Rusk's bedroll), the well room (secret).
-  - [ ] The storehouse, the old passage and the cellar: the fire, rough
-        sandstone and the passage's niche (secret), the vaulted cistern,
-        its dark pool, the pipe, the lamp on the floor, the case behind
-        the loose stone.
+  - [ ] The garden pit and the pump tunnels: grow beds and grow lamps,
+        the water tank, sand streaming over its rim; the water pipe on the
+        tunnels' ceilings (running east to the house's cistern: the way),
+        the pump room's pump, the light wells, the hidey-hole (secret,
+        Rusk's bedroll).
+  - [ ] The workshop pit and the workshop: oil, droid parts, the
+        burning speeder, the caved-in tunnel's rubble and broken
+        support, the bench and pit droid, the shed's stairwell, the well
+        room (secret).
+  - [ ] The work yard: the generator shed (tin, its hatch), the staging
+        point (a lit floodlight, crates, barricades, a comm unit), the
+        farm's gate with the Imperials' red lock clamped on it (in place of
+        the stand-in Imperial door), the light wells' kerbs, a farm
+        vaporator model (taller than the town's).
+  - [ ] The lane and the great dome: barricades, the dome's porch, door,
+        lamp and hall, its stairwell.
+  - [ ] The courtyard and the house's rooms: round-topped arches, the
+        overturned table, the cart, the common room's hearth and table,
+        the quarters' alcoves and toy droid, the storeroom's shelves.
+  - [ ] The cellar: the vaulted cistern, its dark pool, the pipe, the
+        lamp on the floor, the case behind the loose stone, the niche
+        (secret).
   - [ ] The garage, its pit, the trench and the pad: the stripped
         speeder, the hoist, drifts on the trench's steps, the windbreak's
         gate, the beacon lamps round the spot, low rocks.
   - [ ] The windbreak, its drifts and the backdrop: sand drifted against
         the wall, the pad's drifts and cuts, the Jundland far off
         (`canyonBackdrop`) and a dune variant for the west and south.
-- [ ] **Fire and smoke:** the generator shed and the storehouse burning
+- [ ] **Fire and smoke:** the generator shed and the house's roof burning
       (fire decorations with fire, ember and smoke emitters, flickering
-      lights), the courtyard's cart;
-      the smoke torn east by the wind.
+      lights), the workshop pit's speeder and the courtyard's cart; the
+      smoke torn east by the wind.
 - [ ] **Life:** the troopers by skill (`docs/mission2.md`'s table), the
       probe droid, items and ammo, the hold-out's waves through the pad's
       three cuts.

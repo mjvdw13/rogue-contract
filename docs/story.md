@@ -244,29 +244,30 @@ The farm that hid Rusk, at the edge of the Jundland, at dusk (Mark,
 already under way when Kyle arrives. All combat. The level's full design,
 which grows this sketch, is `docs/mission2.md`.
 
-- **Size:** about 110 × 90 tiles (`docs/mission2.md`: 128 × 140, the
-  farm walled in by its windbreak, most of it under the ground, after
-  Mark played two blockouts).
+- **Size:** about 110 × 90 tiles (`docs/mission2.md`: 208 × 142, the
+  farm walled in by its windbreak, a walk west to east from the garden
+  pit to the house, after Mark played three blockouts).
 - **Light:** a dusk sky, the suns low in the west and long shadows, sand
   blowing in gusts. The farm is lit by fires (flickering light around
   burning buildings) and by its doorways.
 
 ```
-  [1 drop-off: the garden pit] -- tunnels -- [4 main courtyard, -6, sky]
-                      [5 rooms and tunnels] west, south, east
-         cellar caved in and barred: up the [3 entry dome]'s stair
-  [2 the yard, in the storm] -> the storehouse's stair -> the cellar
-                      [6 garage] -> [garage pit] -> stairs up
-                      -> [8 the landing pad, in the drifts; 7 Tuskens above]
+  [1 drop-off: the garden pit] -> the pump tunnels -> the workshop pit
+         the way east caved in: up the generator shed's stair
+  [2 the work yard, in the storm] -> the officer's key -> the gate
+         -> the lane -> [3 the house's great dome]'s stair
+  [4 the courtyard, -6, sky] -> [5 its rooms] -> the cellar
+         [6 garage] -> [garage pit] -> the trench up
+         -> [8 the landing pad, in the drifts; 7 Tuskens above]
 ```
 
 | # | Area | Notes |
 |---|------|-------|
 | 1 | Drop-off | The Crow can't land with troopers on the yard: Jan drops Kyle into the garden pit and leaves. |
-| 2 | Yard | Inside the farm's windbreak: the pits' rims, the burning sheds, the Imperials' gear, a few vaporators. Kyle crosses it once, in the storm. |
-| 3 | Entry dome | A small round building over an enclosed stairwell down to the courtyard. |
+| 2 | Work yard | A walled yard inside the farm's windbreak: the workshop pit's rim, the burning generator shed, the Imperials' staging point, a few vaporators. Kyle comes up into it in the storm and sees the house over its gate, locked with the Imperials' red lock; the officer carries the key. |
+| 3 | The great dome | The house's entrance hall at the end of the lane, the tallest thing on the farm, over a stairwell down to the courtyard. |
 | 4 | Sunken courtyard | A round pit open to the sky, about 20 across, 6 below the ground. Troopers on the rim shoot down into it, which the height grid does well. |
-| 5 | Rooms | Round the courtyard and along the tunnels to two smaller pits: a common room, a workshop, storage, and a cellar with a dark cistern, where Rusk hid his helmet recordings. |
+| 5 | Rooms | Round the courtyard: a common room, the family's quarters, the storeroom, and under it a cellar with a dark cistern, where Rusk hid his helmet recordings. |
 | 6 | Garage | The family is holed up here. Once Kyle has the recordings, they escape in their speeder (off screen), out through the garage pit. A long stair leads up out of it to the surface. |
 | 7 | Drifts | Tuskens watching from the drifts above the landing pad. If Tuskens and troopers fight each other (see factions below), it's a three-way fight. |
 | 8 | Pickup | The landing pad outside the windbreak, in a hollow of drifts, low rocks for cover. |
