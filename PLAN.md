@@ -28,15 +28,14 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
-- **Mission 2's third design** (`docs/mission2.md`, 2026-11-05), after
-  Mark's notes on the second blockout (the interior great, the exterior
-  bad): the farm walled in by its windbreak, Kyle dropped into the garden
-  pit, the tunnels kept and grown (the quarters, light wells, a secret
-  room under a light well), the cellar caved in and barred so the way to
-  it is one dash across the storm-swept yard and down through the burning
-  storehouse, and the hold-out on a landing pad in a hollow of drifts. No
-  view longer than about 60 tiles. For an OK on paper before the blockout
-  is rebuilt.
+- **Mission 2's third blockout** (`?map=m2`, 2026-11-05), the walled farm
+  (`docs/mission2.md`): dropped into the garden pit, the tunnels and rooms
+  with their three loops and light wells, the rubble and the barred door
+  sending Kyle up across the yard and down through the storehouse to the
+  cellar, the garage and its pit's trench out to the pad in its drifts.
+  To judge: the drop-off, the yard dash (is it a beat, or a chore?), the
+  windbreak and drifts as the edge, the pad, and where the fights are.
+  The sky and haze are still stand-ins (the night sky).
 
 - **Finding the way** (`?map=m1`, 2026-11-03, after Mark's play test:
   maze-like, unclear who to talk to, the fob pointing down alleys). Four
@@ -1203,20 +1202,9 @@ snapshots, playable at `?map=m2`.
 - [x] The redesign after Mark's notes (2026-11-05): `docs/mission2.md`, and the
       second blockout (288 x 256, open sand, the track, three pits and
       tunnels; the flow field plans 96 steps out, `navReach`).
-- [ ] **The third design, after Mark's notes on the second blockout**
-      (2026-11-05: the interior great, the passages with a glimpse of
-      sky; the exterior still bad, and pushing the engine):
-  - [x] On paper: `docs/mission2.md` (128 x 140, the walled farm).
-  - [ ] The blockout: the windbreak and its drifts; the yard (the entry
-        dome, the generator shed and its hatch, the storehouse and its
-        stair, the staging point, the light wells' kerbs); the tunnels
-        and rooms kept from the second blockout, moved, with the quarters,
-        the light wells, the well room, the two caved-in tunnels, the
-        barred door, the old cistern passage; the garage, its pit, the
-        trench's gate, the pad in its drifts with three cuts. Life, items
-        and triggers to match (the start in the garden pit, messages at
-        the rubble and the barred door, the barred door opening with the
-        garage). No `navReach`: the map is small.
+- [x] The third design after Mark's notes on the second blockout
+      (2026-11-05): `docs/mission2.md`, and the third blockout (128 x 140,
+      the farm walled in, dropped into the garden pit).
 - [ ] **Evening:**
   - [ ] `sky-dusk` (`derive.mjs`, from RESKY01): indigo overhead to rose
         to amber at the horizon, fading into the haze.

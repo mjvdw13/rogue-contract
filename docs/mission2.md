@@ -55,8 +55,12 @@ Different by design, from Mos Eisley and from Mission 3's canyon:
 - **Views:** the windbreak (3 m) closes in the yard, and drifts too steep
   to climb close in the pad, so no view outdoors is longer than about 60
   tiles; beyond them, only the sky and the backdrop. Under the ground,
-  views end at the next bend. Frame time stays at Mos Eisley's or below,
-  and the monsters plan their way over the whole map (no `navReach`).
+  views end at the next bend. Measured on the blockout (2026-11-05, a
+  busy machine): a view takes about 11.8 ms to draw against Mos Eisley's
+  20.6 (25 at worst against 52); planning the monsters' way takes about
+  2 ms (Mos Eisley under 1), as most of the map is two storeys. No
+  `navReach`: a monster in the tunnels heading straight for the player
+  would walk into the walls.
 
 ## The map
 
@@ -266,7 +270,8 @@ Heights in units (1 unit = 0.5 m). The pad is at 0.
 
 ## Areas
 
-Boxes are x0..x1, y0..y1 in tiles; circles are a centre and a radius.
+Boxes are x0..x1, y0..y1 in tiles; circles are a centre and a radius. As
+built in the third blockout (2026-11-05).
 
 | # | Area | Where | What's there |
 |---|------|-------|--------------|
@@ -278,7 +283,7 @@ Boxes are x0..x1, y0..y1 in tiles; circles are a centre and a radius.
 | 4c | **The workshop** | 72..86, 48..62 | East of the courtyard (an arch through 67..72, 54..58): the droid bench, a pit droid, tools, vaporator parts, a lamp on. The tunnel north (80..84, 31..48) to the generator shed's hatch. The tunnel south to the garage caved in (78..82, 62..64). |
 | 4d | **The storeroom** | 48..64, 72..80 | South of the courtyard (an arch through 54..58, 67..72): shelves of canisters and food tins, crates, a power unit. A tunnel east to the garage's shutter (64..72, 74..78, a light well) and one west (30..48, 74..78, a light well) to the rubble and the cellar's barred door (32..36, 78..79) at the top of six steps down (32..36, 79..84). |
 | 4e | **The long tunnel** | 26..30, 64..72 | South from the common room, older and rougher, the water pipe along its ceiling, a light well, one lamp out. Past the hidey-hole's door to the rubble (26..30, 72..74). |
-| 4f | **The hidey-hole** | 16..22, 62..68 | Behind a door in the plaster (22..26, 64..66): where the family hid Rusk, his bedroll, an empty ration pack, scratches counting days on the wall. The first secret, with a line ("A SCOUT'S BEDROLL. SOMEONE SLEPT HERE A LONG TIME."). |
+| 4f | **The hidey-hole** | 16..22, 64..70 | Behind a door in the plaster (22..26, 66..68): where the family hid Rusk, his bedroll, an empty ration pack, scratches counting days on the wall. The first secret, with a line ("A SCOUT'S BEDROLL. SOMEONE SLEPT HERE A LONG TIME."). |
 | 5 | **The yard** | 12..110, 12..96 | The farm's ground inside the windbreak, sand drifted against the wall's foot all round. On it: the entry dome, the three pits' rims (no parapets), the light wells' kerbs, the generator shed and the storehouse (both burning), the Imperials' staging point, two or three vaporators, cargo pods, a dead power droid. Troopers on the rims and behind the barricades. The storm is thickest here: sand pours over the windbreak in gusts. |
 | 5a | **The entry dome** | round, (56, 24), r 6.5 | A round building under a dome, its door west under a porch (45..50, 22..26), a lamp inside. A square room (52..60, 20..28) and a stair down its middle (54..58, 24..36), 12 steps south under its wall and the yard into the junction. |
 | 5b | **The generator shed** | 76..90, 14..26 | A blockhouse of corrugated tin over the farm's power unit, burning: flames out of its door and roof, a flickering light, smoke torn east. Its door on the west; a hatch in its floor and a stair down south (80..84, 19..31) to the workshop's tunnel. |
@@ -479,7 +484,7 @@ are in PLAN.md section 9.
    - **The third design** (this file, 2026-11-05): the farm walled in by
      its windbreak, Kyle dropped into the garden pit, one dash across
      the yard, the pad in a hollow of drifts; no view longer than about
-     60 tiles. Then **the blockout again**.
+     60 tiles. Then **the blockout again** (built 2026-11-05).
 3. **Evening:** the dusk sky, the suns, the haze, the light levels.
 4. **Blowing sand:** the engine pieces, then the particles on the bench,
    then in the level.

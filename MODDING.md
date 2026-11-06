@@ -868,9 +868,11 @@ by a plan of the whole map, worked out again each time the player crosses
 into a new tile. `navReach` (steps, the whole map by default) plans only
 that far out from the player: a monster further off heads straight for the
 player, as one with no way round does. Set it on a big open map, where the
-plan has tens of thousands of tiles to cover (on Mission 2's desert, 96
-steps cuts the time each plan takes by about four fifths); keep it longer
-than the longest way round anything a monster should find.
+plan has tens of thousands of tiles to cover (on a 288 x 256 open desert,
+an early blockout of Mission 2, 96 steps cut the time each plan took by
+about four fifths); keep it longer than the longest way round anything a
+monster should find. In a maze of tunnels it's no help: a monster beyond
+it walks straight into the walls.
 
 `weather` keeps `count` particles of one type (see Particles) in the air
 round the player, in a square `range` tiles each way (10), and only in
