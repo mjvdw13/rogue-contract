@@ -85,7 +85,7 @@ so they know who the hunter really is. The contract has gone rogue.
 | # | Mission | Kind | Drop-off | What happens | Pickup |
 |---|---------|------|----------|--------------|--------|
 | 1 | Mos Eisley: The Puck | Free roam, then run-and-gun | The Crow lands in Docking Bay 87 and leaves before customs arrives. | **Calm:** Kyle takes the contract and the fob from the broker in the cantina. Rusk has wiped his ID code, so the fob has nothing to track. A Jawa trader sold Rusk a part tagged with their own transponder, which gives the fob a signal. It leads across town, past the closed checkpoint, to a derelict docking bay where Rusk is hiding. **Loud:** Rusk pulls the Imperial tracer out of the fob, and the shooting starts. An officer's voice: "Kyle Katarn. Customs logged your ship this morning." A squad takes Rusk, and every trooper in town turns on Kyle. Before he's dragged off, Rusk shouts where he hid what he saw: the farm, the cellar. Kyle fights back across town to the bay. | Back in Docking Bay 87. JAN: "Customs won't be checking papers now." |
-| 2 | The Homestead | Run-and-gun | On the ridge at dusk, above a farm that's already burning, a sandstorm coming in. | The Empire is cleaning up everyone Rusk talked to. Kyle fights down through the vaporator field and into the sunken courtyard, and finds Rusk's helmet recordings of the test in the cellar. Then the prototype walks out of the blowing sand. It's far too tough to fight here: run. | Under fire. Jan is two minutes out, so Kyle holds the landing spot until the Crow sets down. |
+| 2 | The Homestead | Run-and-gun | Out in the desert at dusk, a farm already burning on the horizon, a sandstorm coming in. | The Empire is cleaning up everyone Rusk talked to. Kyle follows the farm's track across the sand, fights through the vaporator field and down into the tunnels under the farm, and finds Rusk's helmet recordings of the test in the cellar. Then the prototype walks out of the blowing sand. It's far too tough to fight here: run. | Under fire. Jan is two minutes out, so Kyle holds the landing spot until the Crow sets down. |
 | 3 | The Canyon Garrison | Run-and-gun | In the canyon's start bowl at night. | The map we've built, entered by the vent. Through the officer's barred window Kyle sees a general hurry out. He frees Rusk from a new detention block, takes the test records from the vault, and destroys the prototype in the generator chamber with the overload. | On the landing pad. The general's shuttle is gone. |
 | | Finale | Text | | The Crow gets away. The Alliance files the records as unconfirmed, and Jan brings the next job: Danuta. | |
 
@@ -136,8 +136,8 @@ models suit it.
    "Bay 87. Your ship left without clearance, hunter." They check the
    licence and let Kyle through.
 
-Missions 2 and 3 use the same pieces at their own spots (the ridge, the
-start bowl), shorter and without the customs scene.
+Missions 2 and 3 use the same pieces at their own spots (the Crow's rock,
+the start bowl), shorter and without the customs scene.
 
 **The pickup.** Walk onto the marked pickup spot, and the Crow comes down
 onto it. Control locks, JAN says a line, and the level ends once the Crow
@@ -244,31 +244,33 @@ The farm that hid Rusk, at the edge of the Jundland, at dusk (Mark,
 already under way when Kyle arrives. All combat. The level's full design,
 which grows this sketch, is `docs/mission2.md`.
 
-- **Size:** about 110 × 90 tiles (`docs/mission2.md`: 144 × 112).
+- **Size:** about 110 × 90 tiles (`docs/mission2.md`: 288 × 256, most
+  of it open sand, after Mark played the first blockout).
 - **Light:** a dusk sky, the suns low in the west and long shadows, sand
   blowing in gusts. The farm is lit by fires (flickering light around
   burning buildings) and by its doorways.
 
 ```
-            [7 ridge: Tuskens]
-                     |
-  [1 drop-off on the ridge] -> [2 vaporator field] -> [3 entry dome]
-                               |                       | stairs down
-                     open rim: look down               v
-                          [4 sunken courtyard, -6, sky]
-                      doors to [5 rooms] west, south, east
-                      [6 garage] -> long stairs up -> [8 pickup, south]
+  [7 Tuskens' perch]
+         |
+  [1 drop-off on the Crow's rock] -> the track, across open sand
+         -> [2 vaporator field] -> [3 entry dome]
+                                         | stairs down
+                     open rims: look down v
+     [garden pit] -- tunnels -- [4 main courtyard, -6, sky] -- tunnels
+                      [5 rooms and tunnels] west, south, east
+                      [6 garage] -> [garage pit] -> stairs up -> [8 pickup, south]
 ```
 
 | # | Area | Notes |
 |---|------|-------|
-| 1 | Drop-off | The Crow sets Kyle down on the ridge path above the burning farm and leaves. |
-| 2 | Vaporator field | Rows of moisture vaporators (tall 3D models) and low dunes (raised floors). Sandtroopers moving through. The prototype comes through here at the end. |
+| 1 | Drop-off | The Crow sets Kyle down on a rock out in the desert, the burning farm on the horizon, and leaves. A track marked by lamps leads to the farm. |
+| 2 | Vaporator field | A dozen moisture vaporators (tall 3D models), spread out over low dunes. Sandtroopers moving through. The prototype comes through here at the end. |
 | 3 | Entry dome | A small round building over an enclosed stairwell down to the courtyard. |
 | 4 | Sunken courtyard | A round pit open to the sky, about 20 across, 6 below the ground. Troopers on the rim shoot down into it, which the height grid does well. |
-| 5 | Rooms | Off the courtyard: a common room, storage, and a cellar with a dark cistern, where Rusk hid his helmet recordings. |
-| 6 | Garage | The family is holed up here. Clear the courtyard, and they escape in their speeder (off screen). A long stair leads up to the surface. |
-| 7 | Ridge | Tuskens watching. If Tuskens and troopers fight each other (see factions below), it's a three-way fight. |
+| 5 | Rooms | Round the courtyard and along the tunnels to two smaller pits: a common room, a workshop, storage, and a cellar with a dark cistern, where Rusk hid his helmet recordings. |
+| 6 | Garage | The family is holed up here. Once Kyle has the recordings, they escape in their speeder (off screen), out through the garage pit. A long stair leads up out of it to the surface. |
+| 7 | Tuskens' perch | Tuskens watching from the Crow's rock. If Tuskens and troopers fight each other (see factions below), it's a three-way fight. |
 | 8 | Pickup | Open ground south of the garage stair, with low rocks for cover. |
 
 **The ending:** picking up the recordings starts it. Heavy footsteps, then

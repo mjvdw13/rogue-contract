@@ -28,13 +28,13 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
-- **Mission 2's blockout** (`?map=m2`, 2026-11-05): the Homestead as
-  plain volumes at their final heights, played end to end with stand-in
-  messages (the sky and haze are stand-ins until the evening step). To
-  judge: the route (down the ridge, across the field, into the pit by the
-  dome's stair, the rooms, the cellar, out by the garage's trench), the
-  sizes and drops (the shelf and landing have no lip: stepping off is a
-  fall that hurts), and where the fights are.
+- **Mission 2's redesign** (`docs/mission2.md`, 2026-11-05), after Mark
+  played the first blockout: 288 x 256, open sand to dune crests at the
+  edges (no rock walls), a track with lamp-topped guide posts from a rock
+  out in the desert to the farm, about a dozen vaporators, and the farm
+  larger, with a main pit, a garden pit and a garage pit joined by
+  tunnels (two loops, a caved-in tunnel, the cellar at the far end). For
+  an OK on paper before the blockout is rebuilt.
 
 - **Finding the way** (`?map=m1`, 2026-11-03, after Mark's play test:
   maze-like, unclear who to talk to, the fob pointing down alleys). Four
@@ -1198,6 +1198,29 @@ snapshots, playable at `?map=m2`.
 
 - [x] Design: `docs/mission2.md` (the paper pass).
 - [x] The blockout: `m2` (144 x 112, sky 32), `?map=m2`.
+- [ ] **The redesign, after Mark's notes** (2026-11-05: far too many
+      vaporators; the way to the farm underwhelming, and walls in the
+      distance; a larger farm, with a main pit, one or two smaller ones
+      and tunnels joining them):
+  - [x] On paper: `docs/mission2.md` (the map, the way through, the
+        areas, the heights).
+  - [ ] The open sand: the map at 288 x 256, broad walkable dunes, dune
+        crests out of reach round the edges, no rock walls.
+  - [ ] The Crow's rock (the drop-off, the Tuskens' perch, its way
+        down), the roadblock and the Anvil.
+  - [ ] The track: packed sand from the west edge to the farm's gate,
+        stand-in guide posts with their lamps every 14 tiles or so.
+  - [ ] The field: about a dozen vaporators, 20 to 30 tiles apart; the
+        staging point and the pump house where the doc has them.
+  - [ ] The farm (148..246, 98..182): the entry dome, the generator
+        shed's hatch, the three pits, the junction, the rooms, the
+        tunnels and their two loops, the caved-in tunnel, the long
+        tunnel, the hidey-hole, the cellar, the garage's two shutters,
+        the garage pit's trench and the pickup.
+  - [ ] The life, the items and the story's triggers moved to match.
+  - [ ] Measured against `m1`: frame time on open sand, the flow
+        field's cost, validate and test time. If too slow: rays that end
+        in full haze, a flow field with a reach.
 - [ ] **Evening:**
   - [ ] `sky-dusk` (`derive.mjs`, from RESKY01): indigo overhead to rose
         to amber at the horizon, fading into the haze.
@@ -1206,7 +1229,7 @@ snapshots, playable at `?map=m2`.
         (in with the blockout).
   - [ ] Light levels: ground 176, deep shade about 104, interiors 96 to
         120, the courtyard 104, the cellar 64 to 80; the haze (amber,
-        `half: 48`), checked against the palette.
+        `half: 90` in a lull), checked against the palette.
   - [ ] A sky that wraps once round the horizon (a level's `skyWrap`:
         defs, validator, MODDING.md, a test), so the glow is in the west
         only; the two suns painted low on it.
@@ -1226,15 +1249,17 @@ snapshots, playable at `?map=m2`.
         (fine streaks on the wind), `sand-veil` (big faint sheets low
         across the view), `sand-snake` (ribbons over the ground); then in
         `m2`. Frame cost under 0.3 ms.
-  - [ ] Shelter in the courtyard, the trench and the buildings' lee: fewer,
-        or none (decide after looking).
+  - [ ] Shelter in the pits, the trench and the lee of the buildings and
+        rocks: fewer, or none (decide after looking).
   - [ ] Waiting on Mark: how thick, how often the gusts come, and whether
         troopers should see no farther than the player in one.
 - [ ] **Each area in detail,** in the order you meet them, snapshots
       before and after each:
-  - [ ] The shelf and the path: sandstone, boulders on the lips, the
-        landing's dead speeder bikes and crates, the Tuskens' windbreak
-        and fire pit, the crag's secret.
+  - [ ] The Crow's rock, the track, the roadblock and the Anvil:
+        wind-scoured sandstone, the Tuskens' windbreak and fire pit, the
+        perch's secret, the guide post and its knocked-down twin, the
+        roadblock's burning speeder bike, barricades and floodlight, the
+        Anvil's boulder climb and cleft.
   - [ ] The field: a farm vaporator model (taller than the town's) and a
         fallen one, dunes in soft outlines, the staging point (a lit
         floodlight, crates, barricades, a comm unit), the pump house.
@@ -1243,27 +1268,32 @@ snapshots, playable at `?map=m2`.
         dome's door, lamp and stairwell, the Imperials' barricades.
   - [ ] The courtyard and its rooms: round-topped arches, the overturned
         table, the cart, the common room's hearth and table, the
-        storeroom's shelves and the hidey-hole (secret, Rusk's bedroll),
-        the workshop's bench and pit droid.
-  - [ ] The cellar: the vaulted cistern, its dark pool, pipes, the lamp
-        on the floor, the case behind the loose stone.
-  - [ ] The garage, the trench and the pickup: the stripped speeder, the
-        hoist, drifts on the trench's steps, the beacon lamps round the
-        spot, low rocks.
-  - [ ] The backdrop and the edges: the ridge's rock climbing away
-        (`canyonBackdrop`) and a dune variant for the west and south.
+        storeroom's shelves, the workshop's bench and pit droid.
+  - [ ] The tunnels and the garden pit: the water pipe on the ceilings,
+        lamps at the junctions, the caved-in tunnel's rubble, the long
+        tunnel and the hidey-hole (secret, Rusk's bedroll), the grow beds
+        and grow lamps.
+  - [ ] The cellar: the vaulted cistern, its dark pool, the pipe, the
+        lamp on the floor, the case behind the loose stone.
+  - [ ] The garage, its pit, the trench and the pickup: the stripped
+        speeder, the hoist, drifts on the trench's steps, the beacon
+        lamps round the spot, low rocks.
+  - [ ] The open sand, the backdrop and the edges: the wrecked scout's
+        bike, the crests, the Jundland far off (`canyonBackdrop`) and a
+        dune variant for the west and south.
 - [ ] **Fire and smoke:** the generator shed and the storehouse burning
       (fire decorations with fire, ember and smoke emitters, flickering
-      lights), a vaporator burning in the field, the courtyard's cart;
+      lights), the roadblock's speeder bike, a vaporator burning in the
+      field, the courtyard's cart;
       the smoke torn east by the wind.
 - [ ] **Life:** the troopers by skill (`docs/mission2.md`'s table), the
-      probe droid, items and ammo, the hold-out's waves from the field
-      and the dunes.
+      probe droid, items and ammo, the hold-out's waves over the dunes
+      and from the farm.
 - [ ] **The story:** the recordings (the data tape, section 7) start the
       ending; footsteps and falling dust; the garage rolls open, the
       family's speeder heard leaving; the call and `wait` (section 6) for
       Jan's two minutes; the pickup as the exit. Stand-in words.
-- [ ] Waiting on Mark: the Tuskens' sheet (the crag) and the prototype's
+- [ ] Waiting on Mark: the Tuskens' sheet (the perch) and the prototype's
       (walking out of the sand at the end); the words.
 - [ ] **Tune and check:** light, the sand, frame time, the per-skill check;
       update `docs/mission2.md`.
