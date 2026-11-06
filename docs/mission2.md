@@ -55,12 +55,17 @@ Different by design:
 - The sky is at 32, over the rocks' tops and the crests.
 - The Jundland's mountains are the backdrop's, not walls: far off to the
   north and east, over the crests.
-- **Cost, measured on the blockout:** open sand lets the view run 200
-  tiles before anything stops it, and the monsters' flow field covers
-  about 60,000 walkable tiles (all of Mos Eisley is 32,000 tiles). If
-  either costs too much: end the view's rays where the haze is full (the
-  sky's horizon is the haze colour, so nothing shows past it), and plan
-  the flow field only so far round the player.
+- **Cost, measured on the blockout** (2026-11-05, on a busy machine, so
+  the ratios matter more than the numbers): planning the monsters' way
+  over all the open sand took about 8 ms each time Kyle crossed a tile
+  (all of Mos Eisley: under 0.5 ms), so the level plans only 96 steps out
+  (`navReach`: about 1.8 ms, 4.5 at worst, within the farm's tunnels from
+  anywhere in them). Drawing a view on open sand takes about a third longer
+  than in Mos Eisley's streets on average (16.8 ms against 12.2), up to 38
+  ms against 24 at worst: the rays run 200 tiles before anything stops
+  them, and flattening the dunes saves almost nothing. The fix, once the
+  dusk sky fades into the haze at the horizon (the evening step), is to end
+  the rays where the haze is all but full and leave the haze colour beyond.
 
 ## The map
 
@@ -133,13 +138,13 @@ under the ground:
 y     +--------------------------------------------------+
   98  |ooooooooooooooooooooooooooooooooooooooooooooooooo.|
  101  |ooooooooooooooooooooooooooooooooooooooooooooooooo.|
- 104  |ooooooooooooooooooooEEEEooooooooooooooooooooooooo.|
- 107  |oooooooooooooooooooEEEEEEoooooooooooooooooooooooo.|
- 110  |ooooooPPPPoooooooooEEEEEEoooooooooooooooooooooooo.|
+ 104  |ooooooooooooooooooooEEEEooooooooooeeooooooooooooo.|
+ 107  |oooooooooooooooooooEEEEEEoooooooooeeooooooooooooo.|
+ 110  |ooooooPPPPoooooooooEEeeEEoooooooooeeooooooooooooo.|
  113  |oooooPPPPPP-------ooEeeEooooooooooeeooooooooooooo.|
- 116  |oooooPPPPPP-------oooeeoooooooooooeeooooooooooooo.|
- 119  |ooooooPPPPoooooo--oooeeoooooooooooeeooooooooooooo.|
- 122  |ooooooo--ooooooo--oooeeoooooooooooeeooooooooooooo.|
+ 116  |oooooPPPPPP-------oooeeooooooooooo--ooooooooooooo.|
+ 119  |ooooooPPPPoooooo--oooeeooooooooooo--ooooooooooooo.|
+ 122  |ooooooo--ooooooo---------ooooooooo--ooooooooooooo.|
  125  |ooooooo--ooooooo---------ooooooooo--ooooooooooooo.|
  128  |ooooooo--ooooooo---------ooooooooo--ooooooooooooo.|
  131  |ooooooo--oooooooooCCCCCCCCoooooooo--ooooooooooooo.|
@@ -153,12 +158,12 @@ y     +--------------------------------------------------+
  155  |oorrroo--oooooooooooo--oooooooggggggoQQQQQQoooooo.|
  158  |ooooooo--ooooooooossssssssooooggggggQQQQQQQQooooo.|
  161  |ooooooo-----------ssssssss----ggggggQQQQQQQQooooo.|
- 164  |ooooooo--ooooooooossssssssooooggggggQQQQQQQQooooo.|
+ 164  |ooooooovvooooooooossssssssooooggggggQQQQQQQQooooo.|
  167  |ooooooovvoooooooooooooooooooooooooooooQQQQooooooo.|
- 170  |ooooooovvoooooooooooooooooooooooooooootttoooooooo.|
+ 170  |ooxxxxxxxxxxooooooooooooooooooooooooootttoooooooo.|
  173  |ooxxxxxxxxxxooooooooooooooooooooooooootttoooooooo.|
  176  |ooxxxxxxxxxxooooooooooooooooooooooooootttoooooooo.|
- 179  |ooxxxxxxxxxxooooooooooooooooooooooooootttoooooooo.|
+ 179  |ooooooooooooooooooooooooooooooooooooootttoooooooo.|
  182  |......................................ttt.........|
  185  |........................8888888888888888888888888.|
       +--------------------------------------------------+
@@ -267,7 +272,8 @@ Heights in units (1 unit = 0.5 m). The open sand is at 0.
 
 ## Areas
 
-Boxes are x0..x1, y0..y1 in tiles; circles are a centre and a radius.
+Boxes are x0..x1, y0..y1 in tiles; circles are a centre and a radius. As
+built in the second blockout (2026-11-05).
 
 | # | Area | Where | What's there |
 |---|------|-------|--------------|
@@ -280,19 +286,19 @@ Boxes are x0..x1, y0..y1 in tiles; circles are a centre and a radius.
 | i | **The Imperials' staging point** | 128..144, 102..116 | Where the raid came in, north of the track just short of the gate: a floodlight tower lit for the evening (a pool of light on the sand), supply crates, barricades at a slant, a comm unit on a crate. The commander. |
 | h | **The pump house** | round, (122, 170), r 4.5 | A small round building in the field (a dome on it, 9 across), the field's pump and tank: cover in the open, its door shot in. Its water pipe runs east under the yard wall to the cistern. |
 | 3 | **The farm's ground** | 148..246, 98..182 | A hardpan yard two steps up from the sand behind a knee-high yard wall, broken where the troopers came through; the gate on its west where the track comes in (148, 132..140). On it: the entry dome, the three pits' rims, the skylight domes over the common room and the workshop (small domes, 7 across, light from them on the rooms' floors), the generator shed and the storehouse (both burning), the beacon mast by the dome, two or three vaporators, cargo pods, a dead power droid, the Imperials' barricades and a second floodlight by the dome. Troopers on the rims shoot down into the pits. |
-| E | **The entry dome** | round, (192, 110), r 6.5 | The way down: a round building (13 across) under a dome, its door west toward the gate under a porch, a lamp inside. Inside, a square room (188..196, 106..114: angled walls take no ceiling, so a round room can't be roofed) and a stair down its middle (190..194, 112..124), 12 steps of 0.5 straight south under its wall and the yard, its ceiling stepping down with it, into the junction. |
-| G | **The generator shed** | 212..226, 100..112 | A blockhouse of corrugated tin over the farm's power unit, burning: flames out of its door and roof, a flickering light, smoke torn east. A hatch in its floor, behind the burning unit, and a stair down south (216..220, 112..124) to the workshop's tunnel: the back way in. |
-| B | **The storehouse** | 152..164, 158..168 | A small domed store, burning, its dome broken in (`dome-broken`), crates spilt out of its door. |
+| E | **The entry dome** | round, (192, 110), r 6.5 | The way down: a round building (13 across) under a dome, its door west toward the gate under a porch, a lamp inside. Inside, a square room (188..196, 106..114: angled walls take no ceiling, so a round room can't be roofed) and a stair down its middle (190..194, 110..122), 12 steps of 0.5 straight south under its wall and the yard, its ceiling stepping down with it, into the junction. |
+| G | **The generator shed** | 212..226, 100..112 | A blockhouse of corrugated tin over the farm's power unit, burning: flames out of its door and roof, a flickering light, smoke torn east. A hatch in its floor, behind the burning unit, and a stair down south (216..220, 105..117) to the workshop's tunnel: the back way in. |
+| B | **The storehouse** | 150..160, 158..166 | A small domed store, burning, its dome broken in (`dome-broken`), crates spilt out of its door. |
 | C | **The main courtyard** | round, (192, 142), r 12 | A round pit 24 across and 6 deep, open to the sky, its walls whitewashed plaster gone grey with soot, round-topped arches into the ways round it: the junction north, the common room west, the workshop east, the storeroom south. The suns are too low to reach in, so its floor is a dim pool (104) against the lit rim, lit by its doorways and a fire: an overturned table, a broken droid, a crate pile, a cart burning. Troopers in it and on the rim above. |
 | P | **The garden pit** | round, (164, 116), r 6 | A small pit, 12 across: the family's hydroponic garden, grow beds in rows under grow lamps (a cold blue-white light, unlike anything else on the map), a water tank. Arches east (the tunnel to the junction) and south (the tunnel to the common room). |
 | Q | **The garage pit** | round, (228, 162), r 8 | The speeder bay, 16 across, open to the sky: oil stains, a fuel tank, a hoist. The garage's shutter on its west side, down; the trench climbing south out of it. |
-| J | **The junction** | 180..198, 124..130 | Under the yard at the dome's stair's foot: an arch south into the courtyard, a tunnel west (170..184, 114..118, turning south at 180..184) to the garden pit. A lamp, a trooper's barricade. |
+| J | **The junction** | 180..198, 122..130 | Under the yard at the dome's stair's foot: an arch south into the courtyard, a tunnel west (170..184, 114..118, turning south at 180..184) to the garden pit. A lamp, a trooper's barricade. |
 | 5a | **The common room** | 160..176, 136..150 | West of the courtyard (an arch through 176..181, 140..144) under a low vault: the family's table knocked over, a hearth, a bench along the wall, a skylight overhead. A tunnel north to the garden pit (162..166, 122..136) and the long tunnel south. |
-| 5b | **The workshop** | 208..222, 134..148 | East of the courtyard (an arch through 203..208, 140..144): the farm's droid bench, a pit droid, tools, vaporator parts, a lamp on. A tunnel north to the generator shed's hatch (216..220, 124..134). The tunnel south to the garage (214..218, 148..154) is caved in: rubble and a broken support, the raid's work. |
+| 5b | **The workshop** | 208..222, 134..148 | East of the courtyard (an arch through 203..208, 140..144): the farm's droid bench, a pit droid, tools, vaporator parts, a lamp on. A tunnel north to the generator shed's hatch (216..220, 117..134). The tunnel south to the garage (214..218, 148..154) is caved in: rubble and a broken support, the raid's work. |
 | 5c | **The storeroom** | 184..200, 158..166 | South of the courtyard (an arch through 190..194, 153..158): shelves of canisters and food tins, crates, a power unit. A tunnel east to the garage's shutter (200..208, 160..164) and one west to the long tunnel (166..184, 160..164). |
-| 5d | **The long tunnel** | 162..166, 150..166 | South from the common room, older and rougher, the water pipe along its ceiling, one lamp out. Past the hidey-hole's secret door (158..162, 154..156) to the cellar's stair (162..166, 166..172). |
+| 5d | **The long tunnel** | 162..166, 150..164 | South from the common room, older and rougher, the water pipe along its ceiling, one lamp out. Past the hidey-hole's secret door (158..162, 154..156) to the cellar's stair (162..166, 164..170). |
 | 5e | **The hidey-hole** | 152..158, 152..158 | Where the family hid Rusk: his bedroll, an empty ration pack, scratches counting days on the wall. The second secret, with a line ("A SCOUT'S BEDROLL. SOMEONE SLEPT HERE A LONG TIME."). |
-| 5f | **The cellar** | 152..172, 172..182 | The objective. Six steps down into the cold: a vaulted cistern room, a dark pool along one side (the farm's water), the pipe coming down into it, one lamp knocked over and still lit on the floor. Quiet and dark (64 to 80): no enemies. Rusk's helmet recordings in a sealed case behind a loose stone: picking them up starts the ending. |
+| 5f | **The cellar** | 152..172, 170..180 | The objective. Six steps down into the cold: a vaulted cistern room, a dark pool along one side (the farm's water), the pipe coming down into it, one lamp knocked over and still lit on the floor. Quiet and dark (64 to 80): no enemies. Rusk's helmet recordings in a sealed case behind a loose stone: picking them up starts the ending. |
 | 6 | **The garage** | 208..220, 154..168 | Behind its two shutters (west on the storeroom's tunnel, east on the garage pit), down until the recordings are taken. Inside: oil, tools, a second speeder stripped for parts, the space where the family's speeder stood, its dust still in the air. A stock of ammo before the hold-out. |
 | 6a | **The trench** | 225..231, 170..184 | Out of the garage pit: a cut 6 wide climbing south, 12 steps of 0.5, walled in the farm's plaster, open to the sky, sand blown in drifts on its steps. |
 | 8 | **The pickup** | 196..246, 184..216; the spot 214..222, 196..204 | The family's landing pad on the sand south of the farm, the trench's head on its north, low rocks scattered for cover, the farm's beacon lamps round the spot. From it, looking north-west: the farm burning, the field, the Crow's rock black against the sunset. The hold-out comes at it over the dunes from the west and south, and from the farm. |
@@ -457,8 +463,8 @@ ammo in the garage before the hold-out.
 | `wait` in trigger lists | PLAN.md section 6 | Small |
 | The recordings: an objective item (a data tape) | PLAN.md section 7 | Small |
 | Evening suns, model shadow casters | `lib/town.js` (content) | Small |
-| Rays that end where the haze is full, only if open sand costs too much | `render/columns.js` | Small, measured |
-| A flow field planned only so far round the player, only if it costs | `world/nav.js` | Small, measured |
+| Rays that end where the haze is all but full (open sand draws a third slower than Mos Eisley) | `render/columns.js` | Small, measured |
+| A flow field planned only so far round the player (`navReach`, done) | `world/nav.js`, defs, validator | Small |
 | The guide post and the beacon mast | content models | Small |
 | A dune backdrop | `lib/backdrop.js` (content) | Small to medium |
 | Tuskens, the prototype | Mark's sheets | Mark |
@@ -483,7 +489,7 @@ are in PLAN.md section 9.
    - **The redesign** (this file, 2026-11-05) and **the blockout again**
      at 288 × 256: open sand to dune crests, the track and its guide
      posts, a dozen vaporators, the farm with three pits and the tunnels.
-     Frame time and validate time measured.
+     Built 2026-11-05; the flow field plans 96 steps out (`navReach`).
 3. **Evening:** the dusk sky, the suns, the haze, the light levels.
 4. **Blowing sand:** the engine pieces, then the particles on the bench,
    then in the level.

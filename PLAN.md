@@ -28,13 +28,15 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
-- **Mission 2's redesign** (`docs/mission2.md`, 2026-11-05), after Mark
-  played the first blockout: 288 x 256, open sand to dune crests at the
-  edges (no rock walls), a track with lamp-topped guide posts from a rock
-  out in the desert to the farm, about a dozen vaporators, and the farm
-  larger, with a main pit, a garden pit and a garage pit joined by
-  tunnels (two loops, a caved-in tunnel, the cellar at the far end). For
-  an OK on paper before the blockout is rebuilt.
+- **Mission 2's second blockout** (`?map=m2`, 2026-11-05), rebuilt after
+  Mark's notes on the first to `docs/mission2.md`'s redesign. To judge:
+  the walk in from the Crow's rock along the track (its guide posts are
+  stand-ins, forked poles with a small lamp), whether the desert feels big
+  enough, the dune crests at the edges, the vaporators' spacing, the
+  farm's three pits and its tunnels (two loops, the long tunnel to the
+  cellar), and where the fights are. The sky and haze are still stand-ins
+  (the night sky). Open sand draws about a third slower than Mos Eisley:
+  worth a word if it stutters.
 
 - **Finding the way** (`?map=m1`, 2026-11-03, after Mark's play test:
   maze-like, unclear who to talk to, the fob pointing down alleys). Four
@@ -1198,29 +1200,9 @@ snapshots, playable at `?map=m2`.
 
 - [x] Design: `docs/mission2.md` (the paper pass).
 - [x] The blockout: `m2` (144 x 112, sky 32), `?map=m2`.
-- [ ] **The redesign, after Mark's notes** (2026-11-05: far too many
-      vaporators; the way to the farm underwhelming, and walls in the
-      distance; a larger farm, with a main pit, one or two smaller ones
-      and tunnels joining them):
-  - [x] On paper: `docs/mission2.md` (the map, the way through, the
-        areas, the heights).
-  - [ ] The open sand: the map at 288 x 256, broad walkable dunes, dune
-        crests out of reach round the edges, no rock walls.
-  - [ ] The Crow's rock (the drop-off, the Tuskens' perch, its way
-        down), the roadblock and the Anvil.
-  - [ ] The track: packed sand from the west edge to the farm's gate,
-        stand-in guide posts with their lamps every 14 tiles or so.
-  - [ ] The field: about a dozen vaporators, 20 to 30 tiles apart; the
-        staging point and the pump house where the doc has them.
-  - [ ] The farm (148..246, 98..182): the entry dome, the generator
-        shed's hatch, the three pits, the junction, the rooms, the
-        tunnels and their two loops, the caved-in tunnel, the long
-        tunnel, the hidey-hole, the cellar, the garage's two shutters,
-        the garage pit's trench and the pickup.
-  - [ ] The life, the items and the story's triggers moved to match.
-  - [ ] Measured against `m1`: frame time on open sand, the flow
-        field's cost, validate and test time. If too slow: rays that end
-        in full haze, a flow field with a reach.
+- [x] The redesign after Mark's notes (2026-11-05): `docs/mission2.md`, and the
+      second blockout (288 x 256, open sand, the track, three pits and
+      tunnels; the flow field plans 96 steps out, `navReach`).
 - [ ] **Evening:**
   - [ ] `sky-dusk` (`derive.mjs`, from RESKY01): indigo overhead to rose
         to amber at the horizon, fading into the haze.
@@ -1235,6 +1217,11 @@ snapshots, playable at `?map=m2`.
         only; the two suns painted low on it.
   - [ ] The vaporators' long shadows: a thin caster per vaporator in the
         kit's `shadows()`.
+  - [ ] Rays that end where the haze is all but full, once the sky fades
+        into the haze at the horizon: open sand draws about a third slower
+        than Mos Eisley (16.8 ms against 12.2 on average, 38 against 24 at
+        worst, on a busy machine), as the rays run 200 tiles. Renders
+        byte-compared on the other maps, frame time measured.
 - [ ] **Blowing sand** (all cosmetic, its own RNG):
   - [ ] `weather` takes a list of types (defs, validator, MODDING.md, a
         test); one object still works.
