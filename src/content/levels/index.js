@@ -3,11 +3,12 @@
 import { defineEpisode } from '../../engine/defs.js';
 import strings from '../strings.js';
 import m1 from './m1.js';
+import m2 from './m2.js';
 import m3 from './m3.js';
 import sandbox from './sandbox.js';
 
 // The sandbox is a test map for the height engine (?map=sandbox), outside the episode.
-export const levels = [m1, m3, sandbox];
+export const levels = [m1, m2, m3, sandbox];
 
 export const episodes = [
   defineEpisode({

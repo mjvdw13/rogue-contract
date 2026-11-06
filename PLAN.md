@@ -28,11 +28,13 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
-- **Mission 2's flow** (`docs/mission2.md`, 2026-11-05): the paper pass
-  for the Homestead at evening, before the blockout. To judge: the map
-  (the ridge, the field, the farm, the pit and the rooms under the
-  ground, the trench, the pickup), the one-way route, the ending's
-  hold-out, and the evening light and blowing sand as planned.
+- **Mission 2's blockout** (`?map=m2`, 2026-11-05): the Homestead as
+  plain volumes at their final heights, played end to end with stand-in
+  messages (the sky and haze are stand-ins until the evening step). To
+  judge: the route (down the ridge, across the field, into the pit by the
+  dome's stair, the rooms, the cellar, out by the garage's trench), the
+  sizes and drops (the shelf and landing have no lip: stepping off is a
+  fall that hurts), and where the fights are.
 
 - **Finding the way** (`?map=m1`, 2026-11-03, after Mark's play test:
   maze-like, unclear who to talk to, the fob pointing down alleys). Four
@@ -1195,32 +1197,21 @@ flow mapped before any part is built. Each step is a commit with
 snapshots, playable at `?map=m2`.
 
 - [x] Design: `docs/mission2.md` (the paper pass).
-- [ ] Waiting on Mark: his OK on the flow (the map, the route, what holds
-      the player back, the ending) before the blockout.
-- [ ] **The blockout:** `m2` (144 x 112, sky 32) as plain volumes at their
-      final heights, the real ways between them, in `levels/index.js`.
-  - [ ] The ridge: the shelf (12), the Tuskens' crag (14), leg 1 down
-        east to the landing (6), leg 2 down west to the foot (0); rock
-        out of reach round it.
-  - [ ] The vaporator field and the dunes south of it: low dunes as raised
-        sand, stand-in vaporators in slanting rows, the staging point, the
-        pump house.
-  - [ ] The farm's ground (0.5) behind its broken yard wall: the entry dome
-        with its stair round the wall and the passage, the pit (-5.5) with
-        its parapet, the generator shed, the storehouse.
-  - [ ] Under the ground: the common room, the storeroom, the workshop,
-        the cellar (-8.5) and its pool, the garage; the trench up to the
-        pickup.
-  - [ ] Message triggers standing in for the story (Jan on the shelf, the
-        recordings, the garage opening, the call, the pickup as the exit).
-  - [ ] Validate on all five skills, the play test, snapshots from the
-        shelf, the field, the rim, the courtyard, the cellar and the
-        pickup; a map view.
+- [x] The blockout: `m2` (144 x 112, sky 32), `?map=m2`.
+- [ ] **Low angled walls stop things only below their top** (the rough
+      edge from section "Small fixes", needed now): the courtyard's rim is
+      a circle of angled walls with `wallTop` at the yard, and today they
+      stop bodies, shots and sight at any height, so the troopers on the
+      rim can't see or shoot into the pit and nobody can jump in. Bodies,
+      hitscan, projectiles and sight pass over a slant above its top; its
+      top drawn as a surface seen from above. Tests; renders before and
+      after byte-identical where nothing passes over a slant.
 - [ ] **Evening:**
   - [ ] `sky-dusk` (`derive.mjs`, from RESKY01): indigo overhead to rose
         to amber at the horizon, fading into the haze.
-  - [ ] The suns low in the west-south-west (`town.finish(EVENING)`: 196
-        and 204, 14 and 18 degrees up), so the shadows run 20 to 30 tiles.
+  - [x] The suns low in the west-south-west (`town.finish(EVENING)`: 196
+        and 204, 14 and 18 degrees up), so the shadows run 20 to 30 tiles
+        (in with the blockout).
   - [ ] Light levels: ground 176, deep shade about 104, interiors 96 to
         120, the courtyard 104, the cellar 64 to 80; the haze (amber,
         `half: 48`), checked against the palette.
@@ -1300,7 +1291,7 @@ snapshots, playable at `?map=m2`.
       round.
 - [ ] A low angled wall (`wallTop`) still stops bodies, shots and sight
       above its top, and its top isn't drawn as a surface (seen from above,
-      it shows wall). Fine out of reach; needed before walkable round roofs.
+      it shows wall). Now in section 9 (Mission 2's courtyard needs it).
 - [ ] The generated Jawa's robe has stray pixels that snap to a glow colour
       (fix the generator's colour).
 

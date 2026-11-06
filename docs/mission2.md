@@ -51,29 +51,29 @@ y    +------------------------------------------------+
    0 |RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR|
    4 |RRTTTTTRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR|
    8 |RRTTTTT11111111RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR|
-  12 |RRTTTTT11111111RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR|
-  16 |RRRRRRR11111111pppppppPPPPRRRRRRRRRRRRRRRRRRRRRR|
-  20 |RRRRRRR11111111pppppppPPPPRRRRRRRRRRRRRRRRRRRRRR|
-  24 |RRRRRRRRRRfffqqqqqqqqqPPPPRRRRRRRRRRRRRRRRRRRRRR|
-  28 |RRRRRRRRRRfffqqqqqqqqqPPPPRRRRRRRRRRRRRRRRRRRRRR|
-  32 |RRRRRRRRRRfffRRRRRRRRRRRRRoooooooooooooGGGGoRRRR|
-  36 |dd222222222222222222222222oooEEEoooooooGGGGoRRRR|
-  40 |dd222222222222222222222222oooEEEoooooooGGGGoRRRR|
-  44 |dd222222222222222222222222oooEEeeoooooooooooRRRR|
-  48 |dd222222222222222222222222oooooeeoooooooooooRRRR|
-  52 |dd22222222222222iiiii22222owwwwwoCCCCCokkkkoRRRR|
-  56 |dd22222222222222iiiii22222owwwwwCCCCCCCkkkkoRRRR|
-  60 |dd22222222222222iiiii22222owwwwwCCCCCCCkkxxxxRRR|
-  64 |dd222222222222222222222222owwwwwCCCCCCCooxxxxRRR|
-  68 |dd222222222222222222222222osssssoCCCCCoooxxxxRRR|
-  72 |dd222222hhh222222222222222osssssoggggggooxxxxRRR|
-  76 |dd222222hhh222222222222222oooooooggggggoBBBoRRRR|
-  80 |dd222222222222222222222222oooooooggggggoBBBoRRRR|
-  84 |dd222222222222222222222222oooooooottooooooooRRRR|
-  88 |dd222222222222222222222222oooooooottooooooooRRRR|
-  92 |dduuuuuuuuuuuuuuuuuuuuuuuuuuuuuuoottooooooooRRRR|
-  96 |DDuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu88888888888DRRRR|
- 100 |DDuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu888888**888DRRRR|
+  12 |RRTTTTT11111111RRRRRRPPPPRRRRRRRRRRRRRRRRRRRRRRR|
+  16 |RRRRRRR11111111ppppppPPPPRRRRRRRRRRRRRRRRRRRRRRR|
+  20 |RRRRRRR11111111ppppppPPPPRRRRRRRRRRRRRRRRRRRRRRR|
+  24 |RRRRRRRRRRfffffqqqqqqPPPPRRRRRRRRRRRRRRRRRRRRRRR|
+  28 |RRRRRRRRRRfffffqqqqqqPPPPRRRRRRRRRRRRRRRRRRRRRRR|
+  32 |RRRRRRRRRRfffffRRRRRRRRRRRRoooooooooooooooooRRRR|
+  36 |dd2222222222222222222222222oooooooEEEooGGGGoRRRR|
+  40 |dd2222222222222222222222222ooooooEEEEooGGGGoRRRR|
+  44 |dd2222222222222222222222222oooooooEEEoooooooRRRR|
+  48 |dd2222222222222222222222222ooooooooeooooooooRRRR|
+  52 |dd22222222222222iiiii222222oooooooCCooooooooRRRR|
+  56 |dd22222222222222iiiii222222owwwwCCCCCCokkkkoRRRR|
+  60 |dd22222222222222iiiii222222owwwwCCCCCCCkkkkoRRRR|
+  64 |dd2222222222222222222222222owwwwCCCCCCCkkkkoRRRR|
+  68 |dd2222222222222222222222222oooooCCCCCCooooooRRRR|
+  72 |dd222222hhh2222222222222222ossssooCCooooooooRRRR|
+  76 |dd222222hhh2222222222222222ossssogggggoxxxxxRRRR|
+  80 |dd2222222222222222222222222oooooogggggoxxxxxRRRR|
+  84 |dd2222222222222222222222222oooooogggggooooooRRRR|
+  88 |dd2222222222222222222222222ooooooottooooBBBoRRRR|
+  92 |dduuuuuuuuuuuuuuuuuuuuuuuuuuuuuuoottooooBBBoRRRR|
+  96 |DDuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu88tt8**88888RRRR|
+ 100 |DDuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu88888**88888RRRR|
  104 |DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDRRRR|
  108 |DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDRRRR|
      +------------------------------------------------+
@@ -106,15 +106,20 @@ the sunset, as the prototype walks out of the sand.
 
 **What holds the player back:**
 
-- The ridge: its path is the only way down from the shelf. Leg 1's south
-  side drops onto leg 2's rock (fenced by boulders where the drop would
-  be a shortcut that hurts); leg 2's last steps can be jumped off.
+- The ridge: its path is the way down from the shelf. Leg 1 is cut
+  through the rock, walled both sides. The shelf and the landing have no
+  lip (one just under eye height hid the farm from the shelf), so stepping
+  off is a fall of 6 to 12 that hurts, Dark Forces' way; leg 2 is open on
+  its south over a lower shelf of rock.
 - The farm's ground is two steps up from the field, behind a knee-high
   yard wall (`lowWall()`) broken in a few places, so the fight on the
   farm comes through its gaps.
 - Into the courtyard: the entry dome's stair is the way down and the only
-  way back up. Jumping in over the rim's parapet (a drop of 6, which hurts
-  a little: falls hurt from about 5.8) is allowed, Dark Forces' way.
+  way back up. No parapet round the rim: one 0.9 tall hid the pit from
+  the troopers behind it. Jumping in (a drop of 6, which hurts a little:
+  falls hurt from about 5.8) is allowed, Dark Forces' way, once low angled
+  walls stop bodies only below their top (today the rim's angled wall
+  stops bodies, shots and sight at any height: PLAN.md section 9).
 - The cellar: only from the workshop, down a stair behind it.
 - The garage: its shutter onto the courtyard is down, the family behind it,
   until Kyle has the recordings. Then it rolls up and the family's speeder
@@ -154,38 +159,37 @@ Heights in units (1 unit = 0.5 m). The field is at 0.
 | Leg 2 | 6 to 0 | West, 12 steps, then the ridge's foot |
 | The vaporator field | 0, dunes 0.25 to 1 | Dunes as raised sand in soft outlines (drift edges), steps under 0.8 so troopers follow |
 | The farm's ground | 0.5 | Two steps of 0.25 up from the field, its yard wall 0.9 over it |
-| The rim's parapet | 1.4 | A knee-high wall round the pit (0.9) |
-| The entry dome | 0.5, ceiling 5 | Its stair goes down round the wall, 12 steps of 0.5, to the passage |
+| The entry dome | 0.5, ceiling 4.5 | Its stair goes straight down south, 12 steps of 0.5, under its wall and the yard to the pit |
 | The courtyard and its rooms | -5.5 | Rooms' ceilings at -1.5 (2 m), under the farm's ground (slabs, their tops at 0.5) |
 | The garage | -5.5, ceiling -1 | Taller: the speeder came in and out |
 | The cellar | -8.5, ceiling -4.5 | Six steps of 0.5 down from the workshop; the cistern's pool 0.5 deeper |
-| The trench | -5.5 to 0.5 | 12 steps of 0.5 south, open to the sky, walled in the farm's plaster |
-| The pickup | 0 | Low rocks (boulders) for cover, the spot marked by the farm's beacon lamps |
+| The trench | -5.5 to 0.5 | 12 steps of 0.5 south (rows 88 to 98), open to the sky, walled in the farm's plaster |
+| The pickup | 0.5 | The farm's yard going on south: low rocks (boulders) for cover, the spot marked by the farm's beacon lamps |
 
 ## Areas
 
-Boxes are x0..x1, y0..y1 in tiles, roughly; the blockout settles them.
+Boxes are x0..x1, y0..y1 in tiles, as built in the blockout (2026-11-05).
 
 | # | Area | Box | What's there |
 |---|------|-----|--------------|
 | 1 | **The drop-off shelf** | 22..46, 8..24 | A flat shelf of rock on the ridge's south face, the Crow's landing spot (it leaves at once). The whole map shows below: the field's rows, the farm's domes, the smoke, the pit's dark ring, the dunes to the west with the suns low over them. Sandstone, wind-scoured, boulders along its lip. Quiet for a moment: no enemies on the shelf. |
 | 7 | **The Tuskens' crag** | 6..20, 6..18 | A side area up four rock steps from the shelf's west end: the Tuskens' lookout over the farm, a windbreak of hides on poles, a cold fire pit, a gaffi stick against a rock. Tuskens watching (with Mark's sheet; until then nobody). A crawl between boulders at its back is the first secret. |
-| 2a | **The ridge path** | leg 1 46..66, 16..24; the landing 66..78, 16..30; leg 2 40..66, 24..32 | Cut into the ridge's face: a ledge stepping down east, an overlook at the bend, and a second ledge stepping down west to the foot. The farm stays in view the whole way down, and the troopers in the field can shoot up at you. Two sandtroopers on the landing (a dead speeder bike or two of theirs, crates). |
-| 2 | **The vaporator field** | 6..78, 36..92 | The farm's rows of moisture vaporators, slanting (the rows run north-east to south-west, so the long shadows cross them), 4 to 5 tiles apart in a row, rows 8 apart. A taller farm vaporator than the town's (a new model, about 3 m). Low dunes drifted between the rows. Some vaporators knocked down and sparking, one on fire. Sandtroopers moving through, a probe droid. The sand is thickest here: on open ground a gust can hide a trooper ten tiles off. |
+| 2a | **The ridge path** | leg 1 46..64, 15..21; the landing 64..76, 14..32; leg 2 44..64, 24..31; the foot 30..48, 24..36 | Cut into the ridge's face: a cut through the rock stepping down east (8 steps), an overlook at the bend, and a ledge along the cliff stepping down west to the foot (16 steps). The farm stays in view the whole way down, and the troopers in the field can shoot up at you. Two sandtroopers on the landing (a dead speeder bike or two of theirs, crates). |
+| 2 | **The vaporator field** | 6..80, 36..92 | The farm's rows of moisture vaporators, slanting (the rows run north-east to south-west, so the long shadows cross them), 4 to 5 tiles apart in a row, rows 8 apart. A taller farm vaporator than the town's (a new model, about 3 m). Low dunes drifted between the rows. Some vaporators knocked down and sparking, one on fire. Sandtroopers moving through, a probe droid. The sand is thickest here: on open ground a gust can hide a trooper ten tiles off. |
 | 2b | **The Imperials' staging point** | 48..62, 52..64 | Where the raid came in: a floodlight tower lit for the evening (a pool of light on the sand), supply crates, barricades at a slant, a comm unit on a crate. The commander. |
 | 2c | **The pump house** | 24..32, 72..80 | A small round building in the field (a dome on it, 7 across), the field's pump and water tank: cover in the open, its door shot in. |
-| 3 | **The farm's ground** | 78..130, 30..92 | A hardpan yard two steps up from the field behind a knee-high yard wall, broken where the troopers came through. On it: the entry dome, the pit's parapet, the skylight domes over the rooms below (small domes, 7 across, light from them on the rooms' floors), the generator shed and the storehouse (both burning), a cargo pod, drums, a dead power droid, the family's beacon lamps (lit) by the trench's head. The Imperials' barricades and a second floodlight by the dome. Troopers on the rim shoot down into the courtyard. |
-| 3a | **The entry dome** | round, at (92, 42), r 5 | The way down: a round building (11 across) under a dome, its door facing the field, a lamp inside. Its middle is a round stairwell: the stair goes down round the wall (`wallStair()`), 12 steps of 0.5, to a passage at -5.5 that runs south under the ground (94..98, 46..52) into the courtyard's north arch. |
-| G | **The generator shed** | 118..128, 34..44 | A blockhouse of corrugated tin over the farm's power unit, burning: flames out of its door and roof (fire decorations with embers), a flickering light, smoke torn east. A crawlspace under its floor is the third secret. |
-| B | **The storehouse** | 120..130, 76..86 | A small domed store, burning, its dome broken in (`dome-broken`), crates spilt out of its door. Lights the trench's head and the pickup ground orange. |
-| 4 | **The sunken courtyard** | round, at (106, 62), r 10 | A round pit 20 across and 6 deep, open to the sky, its walls whitewashed plaster gone grey with soot, round-topped arches all round into the rooms. The suns are too low to reach in, so its floor is a dim pool (104) against the lit rim, lit by its doorways and a fire: an overturned table, a broken droid, a crate pile, a cart burning. Troopers in it and on the rim above. |
-| 5a | **The common room** | 82..96, 52..68 | West off the courtyard under a low vault: the family's table knocked over, a hearth, a bench along the wall, a skylight overhead. A door on to the storeroom. |
-| 5b | **The storeroom** | 80..96, 68..76 | Shelves of canisters and food tins, crates, a power unit. Behind a shelf, a secret door into the hidey-hole where the family hid Rusk: his bedroll, an empty ration pack, scratches counting days on the wall. The second secret, with a line ("A SCOUT'S BEDROLL. SOMEONE SLEPT HERE A LONG TIME."). |
-| 5c | **The workshop** | 116..128, 52..66 | East off the courtyard: the farm's droid bench, a pit droid, tools, vaporator parts, a lamp on. The stair to the cellar goes down behind its bench. |
-| 5d | **The cellar** | 122..134, 60..76 | The objective. Six steps down into the cold: a vaulted cistern room, a dark pool along one side (the farm's water), pipes up into the ceiling, one lamp knocked over and still lit on the floor. Quiet and dark (64 to 80): no enemies. Rusk's helmet recordings in a sealed case behind a loose stone: picking them up starts the ending. |
-| 6 | **The garage** | 98..116, 72..86 | South off the courtyard behind a roll-down shutter, down until the recordings are taken. Inside: oil, tools, a hoist, a second speeder stripped for parts, the space where the family's speeder stood, its dust still in the air. |
-| 6a | **The trench** | 102..108, 86..98 | The garage's way out: a cut 6 wide climbing south, 12 steps of 0.5, walled in the farm's plaster, open to the sky; sand blown in drifts on its steps. |
-| 8 | **The pickup** | 96..130, 96..106 | Open ground south of the farm, the trench's head on its north, low rocks scattered for cover, the farm's beacon lamps round a flat spot (the spot: 114..120, 100..104). From it, looking north-west: the farm burning, the field, the ridge black against the sunset. The hold-out comes at it from the field and over the dunes to the west, and from the farm. |
+| 3 | **The farm's ground** | 80..132, 34..92 | A hardpan yard two steps up from the field behind a knee-high yard wall, broken where the troopers came through. On it: the entry dome, the pit's parapet, the skylight domes over the rooms below (small domes, 7 across, light from them on the rooms' floors), the generator shed and the storehouse (both burning), a cargo pod, drums, a dead power droid, the family's beacon lamps (lit) by the trench's head. The Imperials' barricades and a second floodlight by the dome. Troopers on the rim shoot down into the courtyard. |
+| 3a | **The entry dome** | round, at (106, 42), r 6.5 | The way down, north of the pit: a round building (13 across) under a dome, its door west toward the field under a porch, a lamp inside. Inside, a square room (102..110, 38..46: angled walls take no ceiling, so a round room can't be roofed) and a stair down its middle (104..108), 12 steps of 0.5 straight south, under the dome's wall and the yard, its ceiling stepping down with it, into the courtyard's north side. |
+| G | **The generator shed** | 118..128, 36..44 | A blockhouse of corrugated tin over the farm's power unit, burning: flames out of its door and roof (fire decorations with embers), a flickering light, smoke torn east. A crawlspace under its floor is the third secret. |
+| B | **The storehouse** | 120..130, 88..96 | A small domed store, burning, its dome broken in (`dome-broken`), crates spilt out of its door. Lights the trench's head and the pickup ground orange. |
+| 4 | **The sunken courtyard** | round, at (106, 64), r 10 | A round pit 20 across and 6 deep, open to the sky, its walls whitewashed plaster gone grey with soot, round-topped arches all round into the rooms. The suns are too low to reach in, so its floor is a dim pool (104) against the lit rim, lit by its doorways and a fire: an overturned table, a broken droid, a crate pile, a cart burning. Troopers in it and on the rim above. |
+| 5a | **The common room** | 84..95, 58..70 | West off the courtyard under a low vault: the family's table knocked over, a hearth, a bench along the wall, a skylight overhead. A door on to the storeroom. |
+| 5b | **The storeroom** | 84..95, 72..80 | Shelves of canisters and food tins, crates, a power unit. Behind a shelf, a secret door into the hidey-hole (79..83, 73..78) where the family hid Rusk: his bedroll, an empty ration pack, scratches counting days on the wall. The second secret, with a line ("A SCOUT'S BEDROLL. SOMEONE SLEPT HERE A LONG TIME."). |
+| 5c | **The workshop** | 117..128, 58..70 | East off the courtyard: the farm's droid bench, a pit droid, tools, vaporator parts, a lamp on. The stair to the cellar goes down south from its south-east corner (123..127, 70..76). |
+| 5d | **The cellar** | 117..131, 76..86 | The objective. Six steps down into the cold: a vaulted cistern room, a dark pool along one side (the farm's water), pipes up into the ceiling, one lamp knocked over and still lit on the floor. Quiet and dark (64 to 80): no enemies. Rusk's helmet recordings in a sealed case behind a loose stone: picking them up starts the ending. |
+| 6 | **The garage** | 98..115, 77..88 | South off the courtyard behind a roll-down shutter, down until the recordings are taken. Inside: oil, tools, a hoist, a second speeder stripped for parts, the space where the family's speeder stood, its dust still in the air. |
+| 6a | **The trench** | 102..108, 88..99 | The garage's way out: a cut 6 wide climbing south, 12 steps of 0.5, walled in the farm's plaster, open to the sky; sand blown in drifts on its steps. |
+| 8 | **The pickup** | 96..132, 92..106 | Open ground south of the farm, the trench's head on its north, low rocks scattered for cover, the farm's beacon lamps round a flat spot (the spot: 110..116, 98..104). From it, looking north-west: the farm burning, the field, the ridge black against the sunset. The hold-out comes at it from the field and over the dunes to the west, and from the farm. |
 | 9 | **The dunes** | 6..96, 92..104 | Low dunes south of the field, walkable, rising into the Dune Sea out of reach. The way the reinforcements come at the end. |
 | 10 | **The edges** | | North and east, the Jundland's rock (the backdrop climbs away behind it). West and south, the dunes going on into the haze, the suns setting over them. |
 
@@ -346,8 +350,9 @@ Crow landing at the pickup; until then a message stands in for each.
 Each step is a commit Mark can try (`?map=m2`), with snapshots. The steps
 are in PLAN.md section 9.
 
-1. **This design** (the paper pass), for Mark's OK on the flow.
-2. **The blockout:** the whole map as plain volumes at their final
+1. **This design** (the paper pass), for Mark's OK on the flow (given
+   2026-11-05).
+2. **The blockout** (built 2026-11-05): the whole map as plain volumes at their final
    heights, the real ways between them, stand-ins for the domes and
    buildings, message triggers standing in for the story. Played end to
    end.
