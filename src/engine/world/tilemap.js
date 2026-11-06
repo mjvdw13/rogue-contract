@@ -389,7 +389,9 @@ export class TileMap {
   /**
    * Highest floor under a box of half-size r centred at (x, y), ignoring solid
    * tiles. In a tile with a slab, the floor of the storey a body reaching up
-   * to `reach` is in (see storeyAt): the slab's top by default.
+   * to `reach` is in (see storeyAt): the slab's top by default. Over the solid
+   * part of an angled wall that stops short of the ceiling (`wallTop`), its
+   * top, if the body reaches it (a circle of radius r touching that part).
    */
   floorAt(x, y, r = 0, reach = Infinity) {
     let best = -Infinity;
@@ -403,7 +405,11 @@ export class TileMap {
         const i = ty * this.w + tx;
         const f = this.flags[i];
         if (f & F_SOLID) continue;
-        const z = f & F_SLAB && this.slabTop[i] <= reach ? this.slabTop[i] : this.floorZ[i];
+        let z = f & F_SLAB && this.slabTop[i] <= reach ? this.slabTop[i] : this.floorZ[i];
+        if (f & F_SLANT) {
+          const sl = this.slants[this.slantIndex[i]];
+          if (sl.top <= reach && sl.top > z && (r > 0 ? sl.touchesCircle(x, y, r) : sl.solidAt(x, y))) z = sl.top;
+        }
         if (z > best) best = z;
       }
     }

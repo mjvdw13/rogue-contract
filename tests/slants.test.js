@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { buildLevel } from '../src/engine/world/level.js';
-import { castRay } from '../src/engine/world/physics.js';
+import { castRay, traceRay3D, lineOfSight3D, blockedByMap } from '../src/engine/world/physics.js';
 import { Slant, DIAGONALS } from '../src/engine/world/slants.js';
 import { makeWorld, mockInput, room, coarse, run, registry, headlessRenderer } from './helpers.js';
 
@@ -135,6 +135,76 @@ test('"wallTop" must lie between the floor and the ceiling, on an angled wall', 
   assert.ok(tile({ wall: 'imp-panel', diagonal: 'NE', wallTop: 9 }).some((e) => e.includes('wallTop')), 'above the ceiling');
   assert.ok(tile({ wall: 'imp-panel', diagonal: 'NE', wallTop: 0 }).some((e) => e.includes('wallTop')), 'at the floor');
   assert.ok(tile({ wallTop: 3 }).some((e) => e.includes('only for angled walls')), 'on open floor');
+});
+
+/**
+ * A pit's rim, as a round pit's is built: the west of the yard is a pit 4
+ * deep (floor -3), the east ground at 1, and between them a column of
+ * angled-wall tiles at x 7, solid on their east half, whose wall stops at
+ * the ground's height (`wallTop` 1). `rim` swaps those tiles for others.
+ */
+function rimLevel({ rim, things = [''] } = {}) {
+  const row = (m) => `#pppppp${m}gggggg#`;
+  return room(['#'.repeat(15), row('s'), row('s'), row('s'), row('s'), row('s'), '#'.repeat(15)], things, {
+    legend: {
+      p: { ...OPEN, floorZ: -3 },
+      g: { ...OPEN, floorZ: 1 },
+      s: rim ?? { ...OPEN, floorZ: -3, wall: 'imp-panel', line: [0.5, 1, 0.5, 0], wallTop: 1 },
+    },
+    sky: 'sky-night',
+  });
+}
+
+test('a shot passes over a low angled wall above its top, comes down on its top, and stops at its face below it', () => {
+  const m = buildLevel(registry, rimLevel()).map;
+  // West from the ground, level at 2: over the rim and the pit to the far wall.
+  const over = traceRay3D(m, 11.5, 3.5, 2, -1, 0, 0);
+  assert.ok(over.hit === 'wall' && Math.abs(over.dist - 10.5) < 1e-6, `reached the far wall (${over.hit} at ${over.dist})`);
+  // Coming down: over the ground's edge at x 8 (z 1.1), onto the wall's top at x 7.9.
+  const down = traceRay3D(m, 8.4, 3.5, 1.5, -1, 0, -1);
+  assert.ok(down.hit === 'floor' && Math.abs(down.dist - 0.5) < 1e-6, `landed on its top (${down.hit} at ${down.dist})`);
+  // East from down in the pit: its face, at x 7.5.
+  const face = traceRay3D(m, 3.5, 3.5, -1.75, 1, 0, 0);
+  assert.ok(face.hit === 'wall' && Math.abs(face.dist - 4) < 1e-6, `stopped at the face (${face.hit} at ${face.dist})`);
+});
+
+test("someone on a pit's rim sees down into it over the rim's low angled walls, but not through them from below", () => {
+  const m = buildLevel(registry, rimLevel()).map;
+  assert.ok(lineOfSight3D(m, 8.5, 3.5, 2.25, 3.5, 3.5, -2.5), "from the rim's edge to the pit floor");
+  assert.ok(!lineOfSight3D(m, 3.5, 3.5, -1.75, 11.5, 3.5, 2.25), 'from the pit up through the wall to the ground beyond');
+});
+
+test("a body at a low angled wall's top stands on it and walks off it into the pit; below its top the wall stops it", () => {
+  const m = buildLevel(registry, rimLevel()).map;
+  assert.ok(!blockedByMap(m, 8.2, 3.5, 0.5, 1), 'feet at its top: over it');
+  assert.ok(blockedByMap(m, 8.2, 3.5, 0.5, 0.5), 'feet below its top: against it');
+  assert.ok(blockedByMap(m, 8.2, 3.5, 0.5), 'no height given: every angled wall blocks, as before');
+  assert.equal(m.floorAt(8.4, 3.5, 0.5, 1.8), 1, 'over its solid half, its top is the floor');
+  assert.equal(m.floorAt(8.4, 3.5, 0.5, 0.8), 1, 'the ground beside it, when its top is out of reach');
+  assert.equal(m.floorAt(7.1, 3.5, 0.3, 1.8), -3, 'past its line, the pit');
+  // Walking west off the ground: over the rim and down into the pit.
+  const w = makeWorld(rimLevel({ things: ['', '', '', '           <'] }), { noMonsters: true });
+  const pt = w.player;
+  const input = mockInput();
+  input.hold('forward');
+  run(w, input, 1.5);
+  assert.ok(pt.x < 7.5 && Math.abs(pt.z + 3) < 1e-6, `fell into the pit (${pt.x.toFixed(2)}, z ${pt.z.toFixed(2)})`);
+  // And back east: the wall stops the body below its top.
+  pt.angle = 0;
+  run(w, input, 1.5);
+  assert.ok(pt.x <= 7.5 - pt.radius + 1e-3, `stopped at the wall (x ${pt.x.toFixed(3)})`);
+});
+
+test("seen from above, a low angled wall's top is drawn as ground, with no wall over it", () => {
+  // A wall nearly on the tile's west edge is all solid top: from the ground
+  // looking down across it, it draws as the ground would (no pit floor
+  // through it, no step up from the pit's floor at its far edge).
+  const cam = { x: 12.5, y: 3.5, angle: Math.PI, z: 4.25 };
+  const low = shot(rimLevel({ rim: { ...OPEN, floorZ: -3, wall: 'imp-panel', line: [0.02, 1, 0.02, 0], wallTop: 1 } }), cam);
+  const ground = shot(rimLevel({ rim: { ...OPEN, floorZ: 1 } }), cam);
+  let differ = 0;
+  for (let i = 0; i < low.length; i++) if (low[i] !== ground[i]) differ++;
+  assert.ok(differ < low.length * 0.005, `${differ} of ${low.length} pixels differ`);
 });
 
 /**

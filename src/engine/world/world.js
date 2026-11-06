@@ -300,13 +300,13 @@ export class World {
    * the nearest spot that's clear (searching outward a little at a time).
    */
   unstick(t) {
-    if (!blockedByMap(this.map, t.x, t.y, t.radius)) return;
+    if (!blockedByMap(this.map, t.x, t.y, t.radius, t.z)) return;
     for (let d = 0.05; d <= 1; d += 0.05) {
       for (let k = 0; k < 8; k++) {
         const a = (k / 8) * Math.PI * 2;
         const x = t.x + Math.cos(a) * d;
         const y = t.y + Math.sin(a) * d;
-        if (!blockedByMap(this.map, x, y, t.radius)) {
+        if (!blockedByMap(this.map, x, y, t.radius, t.z)) {
           t.x = x;
           t.y = y;
           this.grid.update(t);
@@ -374,7 +374,7 @@ export class World {
    */
   checkPosition(t, x, y, walk = false) {
     const map = this.map;
-    if (blockedByMap(map, x, y, t.radius)) return false;
+    if (blockedByMap(map, x, y, t.radius, t.z)) return false;
     if (t.kind !== 'projectile' && fenceBlocks(map, x, y, t.radius, t.z, t.z + t.height)) return false;
     const reach = this.reach(t);
     const floor = map.floorAt(x, y, t.radius, reach);

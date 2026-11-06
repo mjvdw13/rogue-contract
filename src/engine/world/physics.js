@@ -128,7 +128,10 @@ function doorPanel(door, x, y, dx, dy, mapX, mapY, enter, maxDist) {
  * distance. It stops at walls, door panels (a rising door's only above its
  * bottom edge), angled walls, the faces of raised floors and lowered ceilings,
  * and the floor or ceiling itself. Under a slab it keeps to its storey: the
- * slab's top is a floor, its underside a ceiling and its edges walls.
+ * slab's top is a floor, its underside a ceiling and its edges walls. An
+ * angled wall that stops short of the ceiling (`wallTop`) stops the ray only
+ * below its top, and over its solid part its top is a floor: a shot passes
+ * over a low rounded wall, or a pit's rim, as over a raised floor.
  * Distances are horizontal.
  *
  * `hit` is 'wall', 'floor', 'ceiling', or null if nothing was hit within
@@ -159,9 +162,29 @@ export function traceRay3D(map, x, y, z, dx, dy, slope, maxDist = 128) {
     const leave = Math.min(sdx, sdy, maxDist);
     // An angled wall or a door panel standing inside this tile.
     let block = Infinity;
+    // Where the ray comes down onto a low angled wall's top, over its solid part.
+    let onTop = Infinity;
     if (f & F_SLANT) {
-      const t = map.slants[map.slantIndex[idx]].ray(x, y, dx, dy);
-      if (t >= enter && t <= leave) block = t;
+      const sl = map.slants[map.slantIndex[idx]];
+      const t = sl.ray(x, y, dx, dy);
+      const cross = t >= enter && t <= leave;
+      if (sl.top === Infinity) {
+        if (cross) block = t;
+      } else {
+        // The stretch through the tile, in two parts where it crosses the
+        // line: on the solid side the ray must stay above the top (below it,
+        // it meets the face where it crossed in; coming down, the top).
+        const mid = cross ? t : leave;
+        for (let part = 0; part < 2; part++) {
+          const p0 = part ? mid : enter;
+          const p1 = part ? leave : mid;
+          if (p1 - p0 < 1e-9) continue;
+          const pm = (p0 + p1) / 2;
+          if (!sl.solidAt(x + dx * pm, y + dy * pm)) continue;
+          if (z + slope * p0 < sl.top - 1e-6) block = Math.min(block, p0);
+          else if (z + slope * p1 < sl.top) onTop = Math.min(onTop, (sl.top - z) / slope);
+        }
+      }
     } else if (f & F_DOOR) {
       const door = map.doors[map.doorIndex[idx]];
       if (door.style !== 'rise') {
@@ -174,7 +197,7 @@ export function traceRay3D(map, x, y, z, dx, dy, slope, maxDist = 128) {
       }
     }
     // Does the ray reach this storey's floor or ceiling before it leaves?
-    const end = Math.min(leave, block);
+    const end = Math.min(leave, block, onTop);
     const zEnd = z + slope * end;
     const slab = (f & F_SLAB) !== 0;
     const fz = slab && st ? slabTop[idx] : floorZ[idx];
@@ -182,6 +205,7 @@ export function traceRay3D(map, x, y, z, dx, dy, slope, maxDist = 128) {
     const sky = (f & F_SKY) !== 0 && (!slab || st === 1);
     if (zEnd < fz) return result(crossing(fz), 'floor');
     if (zEnd > cz) return result(crossing(cz), 'ceiling', sky);
+    if (onTop <= block && onTop < Infinity) return result(onTop, 'floor');
     if (block < Infinity) return result(block, 'wall');
     if (leave >= maxDist) return result(maxDist, null);
 
@@ -198,7 +222,11 @@ export function traceRay3D(map, x, y, z, dx, dy, slope, maxDist = 128) {
     const n = mapY * map.w + mapX;
     const nf = flags[n];
     if (nf & F_SOLID) return result(enter, 'wall');
-    if (nf & F_SLANT && map.slants[map.slantIndex[n]].solidAt(x + dx * enter, y + dy * enter)) return result(enter, 'wall');
+    if (nf & F_SLANT) {
+      // Into an angled wall's solid side: its back, unless the ray is over a low one's top.
+      const sl = map.slants[map.slantIndex[n]];
+      if (sl.solidAt(x + dx * enter, y + dy * enter) && z + slope * enter < sl.top) return result(enter, 'wall');
+    }
     // The face of a raised floor or a lowered ceiling (open sky between two
     // sky tiles), or a slab's edge; else on into the storey at that height.
     const ze = z + slope * enter;
@@ -233,9 +261,12 @@ export function lineOfSight(map, x0, y0, x1, y1) {
 /**
  * Does a circle of radius r at (x, y) overlap any blocking tile or the solid
  * side of an angled wall, or a box of half-size r the closed panel of a
- * rising door?
+ * rising door? A body whose feet are at `bottom` passes over an angled wall
+ * that stops short of the ceiling (`wallTop`) once it's at or above its top
+ * (it stands on it: TileMap.floorAt); without a `bottom`, every angled wall
+ * blocks.
  */
-export function blockedByMap(map, x, y, r) {
+export function blockedByMap(map, x, y, r, bottom = -Infinity) {
   const x0 = Math.floor(x - r);
   const x1 = Math.max(x0, Math.ceil(x + r) - 1); // (a box exactly touching an edge stays out)
   const y0 = Math.floor(y - r);
@@ -252,7 +283,10 @@ export function blockedByMap(map, x, y, r) {
         continue;
       }
       if (map.flags[ty * map.w + tx] & F_DOOR && map.panelBlocks(tx, ty, x, y, r)) return true;
-      if (map.flags[ty * map.w + tx] & F_SLANT && map.slants[map.slantIndex[ty * map.w + tx]].touchesCircle(x, y, r)) return true;
+      if (map.flags[ty * map.w + tx] & F_SLANT) {
+        const sl = map.slants[map.slantIndex[ty * map.w + tx]];
+        if (bottom < sl.top - 1e-6 && sl.touchesCircle(x, y, r)) return true;
+      }
     }
   }
   return false;

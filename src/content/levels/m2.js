@@ -306,11 +306,12 @@ list.push(
   at('sandtrooper', 14.5, 60.5, { angle: 30, skill: HARD }),
   at('med-kit', 56.5, 61.5),
   at('power-cell', 30.5, 82.5),
-  // The farm's ground: the rim, the dome's door, the shed.
-  at('sandtrooper', 99.5, 52.5, { angle: 180, z: FARM }),
-  at('sandtrooper', 114.5, 74.5, { angle: 135, z: FARM }),
+  // The farm's ground: on the rim's edge (shooting down into the pit), the
+  // dome's door, the shed.
+  at('sandtrooper', 100.6, 54.4, { angle: 180, z: FARM }),
+  at('sandtrooper', 112.9, 72.6, { angle: 135, z: FARM }),
   at('stormtrooper', 92.5, 42.5, { angle: 180, z: FARM }),
-  at('sandtrooper', 113.5, 53.5, { angle: 225, z: FARM, skill: NOT_EASIEST }),
+  at('sandtrooper', 112.4, 55, { angle: 225, z: FARM, skill: NOT_EASIEST }),
   at('sandtrooper', 115.5, 47.5, { angle: 180, z: FARM, skill: NORMAL_UP }),
   at('power-cell', 90.5, 50.5, { z: FARM }),
   // The stairwell.

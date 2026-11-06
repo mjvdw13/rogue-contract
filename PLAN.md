@@ -1198,14 +1198,6 @@ snapshots, playable at `?map=m2`.
 
 - [x] Design: `docs/mission2.md` (the paper pass).
 - [x] The blockout: `m2` (144 x 112, sky 32), `?map=m2`.
-- [ ] **Low angled walls stop things only below their top** (the rough
-      edge from section "Small fixes", needed now): the courtyard's rim is
-      a circle of angled walls with `wallTop` at the yard, and today they
-      stop bodies, shots and sight at any height, so the troopers on the
-      rim can't see or shoot into the pit and nobody can jump in. Bodies,
-      hitscan, projectiles and sight pass over a slant above its top; its
-      top drawn as a surface seen from above. Tests; renders before and
-      after byte-identical where nothing passes over a slant.
 - [ ] **Evening:**
   - [ ] `sky-dusk` (`derive.mjs`, from RESKY01): indigo overhead to rose
         to amber at the horizon, fading into the haze.
@@ -1289,9 +1281,6 @@ snapshots, playable at `?map=m2`.
       and walks on the spot.
 - [ ] The model builder restarts a cylinder's texture on each face; wrap it
       round.
-- [ ] A low angled wall (`wallTop`) still stops bodies, shots and sight
-      above its top, and its top isn't drawn as a surface (seen from above,
-      it shows wall). Now in section 9 (Mission 2's courtyard needs it).
 - [ ] The generated Jawa's robe has stray pixels that snap to a glow colour
       (fix the generator's colour).
 

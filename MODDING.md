@@ -1201,8 +1201,12 @@ other. Give the entry a `wall` texture plus either a 45° preset or a line:
   sky (and anything taller behind it) above. Without it, an angled wall
   under the sky stands as tall as the sky over the tile in front of it, and
   hides everything behind. It must lie between the tile's floor and ceiling.
-  Bodies, shots and sight still stop at the line at any height, and its top
-  isn't drawn as a surface, so keep it out of reach.
+  It stops bodies, shots and sight only below its top: over its solid part
+  the top is a floor, drawn in the tile's floor texture, that bodies stand
+  on and shots come down on, so a pit's rim built of them (the open side
+  the pit's floor, `wallTop` the ground round it) can be walked off, and
+  seen and shot down into, as a raised floor's edge can. A body whose feet
+  are below the top is stopped at the line.
 - `wallU`: where along its texture the wall starts, in tiles, at its second
   point (the texture runs right to left from there, seen from the open
   side). Without it each tile's wall starts its texture afresh, so a wide

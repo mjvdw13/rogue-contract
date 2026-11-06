@@ -6,9 +6,11 @@
  *
  * An angled wall stands up to the tile's ceiling, or stops short of it at
  * `wallTop`: under the sky, a rounded corner as tall as its building, with
- * the view going on over it. Its texture starts afresh in each tile unless
- * `wallU` says how far along it the tile's wall begins (a curve made of
- * chained tiles, the texture running on round it).
+ * the view going on over it. It stops bodies, shots and sight only below
+ * that top, and over its solid part the top is a floor (a pit's rim).
+ * Its texture starts afresh in each tile unless `wallU` says how far along
+ * it the tile's wall begins (a curve made of chained tiles, the texture
+ * running on round it).
  *
  * The four 45° presets name the corner that is solid:
  *   NE ◥   NW ◤   SE ◢   SW ◣

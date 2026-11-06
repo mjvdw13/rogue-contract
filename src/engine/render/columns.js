@@ -445,14 +445,15 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
     // (under a slab, the slab's underside is the ceiling; on it, its top the
     // floor). The light runs smoothly from where the ray enters to where it
     // leaves: l0 at t0, changing by dl per unit of distance.
-    const flats = (i, s, t0, t1) => {
+    // `over`: a floor at that height instead (a low angled wall's top, over its solid part).
+    const flats = (i, s, t0, t1, over) => {
       const slab = (flags[i] & F_SLAB) !== 0;
       const hazy = hazeOn && (flags[i] & F_SKY) !== 0;
       // (The light is sampled only once some rows need it.)
       let lit = false;
       let l0 = 0;
       let dl = 0;
-      const fz = slab && s ? slabTop[i] : floorZ[i];
+      const fz = over !== undefined ? over : slab && s ? slabTop[i] : floorZ[i];
       if (camZ > fz) {
         const k = (camZ - fz) * fy;
         let a = Math.ceil(horizon + k / t1 - 0.5);
@@ -599,13 +600,25 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
       // An angled wall in the current tile stops the ray where it crosses the line.
       // (Angled-wall tiles have no slab: their windows are all in storey 0.)
       // One that stops short of the ceiling (`wallTop`) stops it only up to
-      // its top, and the view goes on over it; a ray that came in through
-      // its solid side has drawn its back already (below), so carries on.
+      // its top, and the view goes on over it, and over its solid part its
+      // top is a floor; a ray that came in through its solid side has drawn
+      // its back already (below), so draws that top and carries on.
       if (flags[cur] & F_SLANT) {
         const sl = slants[slantIndex[cur]];
         const low = sl.top < ceilZ[cur];
         const t = sl.ray(px, py, rdx, rdy, along);
-        if (t >= tEnter - 1e-6 && t <= tExit + 1e-6 && !(low && sl.solidAt(px + rdx * tEnter, py + rdy * tEnter))) {
+        const crosses = t >= tEnter - 1e-6 && t <= tExit + 1e-6;
+        if (low && sl.solidAt(px + rdx * tEnter, py + rdy * tEnter)) {
+          const tTop = crosses && t > tEnter ? t : tExit;
+          for (let k = 0; k < nw; k++) {
+            clipTop = wTop[k];
+            clipBot = wBot[k];
+            flats(cur, 0, tEnter, tTop, sl.top);
+            wTop[k] = clipTop;
+            wBot[k] = clipBot;
+          }
+          tEnter = tTop;
+        } else if (crosses) {
           seen[cur] = 1;
           // Texture runs right-to-left from the second point (as seen from the
           // open side), from `wallU` on.
@@ -636,7 +649,15 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
             end = t;
             break;
           }
-          tEnter = t;
+          // Beyond the face, its top out to the tile's end.
+          for (let k = 0; k < nw; k++) {
+            clipTop = wTop[k];
+            clipBot = wBot[k];
+            flats(cur, 0, t, tExit, sl.top);
+            wTop[k] = clipTop;
+            wBot[k] = clipBot;
+          }
+          tEnter = tExit;
         }
       }
 
@@ -752,6 +773,13 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
       let solid = (f & F_SOLID) !== 0;
       let tex = wallTex[next];
       let u = wx;
+      // This tile's floor where the ray leaves it: a low angled wall's top
+      // over its solid part, so no step is drawn from the floor under it.
+      let fCur = floorZ[cur];
+      if (flags[cur] & F_SLANT) {
+        const sl = slants[slantIndex[cur]];
+        if (sl.top < ceilZ[cur] && sl.solidAt(px + rdx * tExit, py + rdy * tExit)) fCur = sl.top;
+      }
       // The top of a low angled wall entered from behind (-Infinity: none).
       let backTop = -Infinity;
 
@@ -825,7 +853,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
           clipTop = wTop[k];
           clipBot = wBot[k];
           const s = wSt[k];
-          const fz = s ? slabTop[cur] : floorZ[cur];
+          const fz = s ? slabTop[cur] : fCur;
           const cz = !s && curSlab ? slabBot[cur] : ceilZ[cur];
           const lv = faceLevel(s, tExit, contrast, out);
           face(tExit, rowOf(cz, tExit), rowOf(fz, tExit), cz, tex, u, lv, hz);
@@ -848,7 +876,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
         clipTop = wTop[k];
         clipBot = wBot[k];
         const s = wSt[k];
-        const fC = s ? slabTop[cur] : floorZ[cur];
+        const fC = s ? slabTop[cur] : fCur;
         const cC = !s && curSlab ? slabBot[cur] : ceilZ[cur];
         if (fN > fC) {
           const a = rowOf(fN, tExit);

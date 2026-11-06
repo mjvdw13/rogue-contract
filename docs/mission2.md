@@ -117,9 +117,9 @@ the sunset, as the prototype walks out of the sand.
 - Into the courtyard: the entry dome's stair is the way down and the only
   way back up. No parapet round the rim: one 0.9 tall hid the pit from
   the troopers behind it. Jumping in (a drop of 6, which hurts a little:
-  falls hurt from about 5.8) is allowed, Dark Forces' way, once low angled
-  walls stop bodies only below their top (today the rim's angled wall
-  stops bodies, shots and sight at any height: PLAN.md section 9).
+  falls hurt from about 5.8) is allowed, Dark Forces' way: the rim's low
+  angled walls stop bodies, shots and sight only below their top, so the
+  troopers on the rim see and shoot down into the pit.
 - The cellar: only from the workshop, down a stair behind it.
 - The garage: its shutter onto the courtyard is down, the family behind it,
   until Kyle has the recordings. Then it rolls up and the family's speeder
