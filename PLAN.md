@@ -28,15 +28,15 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
-- **Mission 2's second blockout** (`?map=m2`, 2026-11-05), rebuilt after
-  Mark's notes on the first to `docs/mission2.md`'s redesign. To judge:
-  the walk in from the Crow's rock along the track (its guide posts are
-  stand-ins, forked poles with a small lamp), whether the desert feels big
-  enough, the dune crests at the edges, the vaporators' spacing, the
-  farm's three pits and its tunnels (two loops, the long tunnel to the
-  cellar), and where the fights are. The sky and haze are still stand-ins
-  (the night sky). Open sand draws about a third slower than Mos Eisley:
-  worth a word if it stutters.
+- **Mission 2's third design** (`docs/mission2.md`, 2026-11-05), after
+  Mark's notes on the second blockout (the interior great, the exterior
+  bad): the farm walled in by its windbreak, Kyle dropped into the garden
+  pit, the tunnels kept and grown (the quarters, light wells, a secret
+  room under a light well), the cellar caved in and barred so the way to
+  it is one dash across the storm-swept yard and down through the burning
+  storehouse, and the hold-out on a landing pad in a hollow of drifts. No
+  view longer than about 60 tiles. For an OK on paper before the blockout
+  is rebuilt.
 
 - **Finding the way** (`?map=m1`, 2026-11-03, after Mark's play test:
   maze-like, unclear who to talk to, the fob pointing down alleys). Four
@@ -1203,6 +1203,20 @@ snapshots, playable at `?map=m2`.
 - [x] The redesign after Mark's notes (2026-11-05): `docs/mission2.md`, and the
       second blockout (288 x 256, open sand, the track, three pits and
       tunnels; the flow field plans 96 steps out, `navReach`).
+- [ ] **The third design, after Mark's notes on the second blockout**
+      (2026-11-05: the interior great, the passages with a glimpse of
+      sky; the exterior still bad, and pushing the engine):
+  - [x] On paper: `docs/mission2.md` (128 x 140, the walled farm).
+  - [ ] The blockout: the windbreak and its drifts; the yard (the entry
+        dome, the generator shed and its hatch, the storehouse and its
+        stair, the staging point, the light wells' kerbs); the tunnels
+        and rooms kept from the second blockout, moved, with the quarters,
+        the light wells, the well room, the two caved-in tunnels, the
+        barred door, the old cistern passage; the garage, its pit, the
+        trench's gate, the pad in its drifts with three cuts. Life, items
+        and triggers to match (the start in the garden pit, messages at
+        the rubble and the barred door, the barred door opening with the
+        garage). No `navReach`: the map is small.
 - [ ] **Evening:**
   - [ ] `sky-dusk` (`derive.mjs`, from RESKY01): indigo overhead to rose
         to amber at the horizon, fading into the haze.
@@ -1211,17 +1225,12 @@ snapshots, playable at `?map=m2`.
         (in with the blockout).
   - [ ] Light levels: ground 176, deep shade about 104, interiors 96 to
         120, the courtyard 104, the cellar 64 to 80; the haze (amber,
-        `half: 90` in a lull), checked against the palette.
+        `half: 48` in a lull), checked against the palette.
   - [ ] A sky that wraps once round the horizon (a level's `skyWrap`:
         defs, validator, MODDING.md, a test), so the glow is in the west
         only; the two suns painted low on it.
   - [ ] The vaporators' long shadows: a thin caster per vaporator in the
         kit's `shadows()`.
-  - [ ] Rays that end where the haze is all but full, once the sky fades
-        into the haze at the horizon: open sand draws about a third slower
-        than Mos Eisley (16.8 ms against 12.2 on average, 38 against 24 at
-        worst, on a busy machine), as the rays run 200 tiles. Renders
-        byte-compared on the other maps, frame time measured.
 - [ ] **Blowing sand** (all cosmetic, its own RNG):
   - [ ] `weather` takes a list of types (defs, validator, MODDING.md, a
         test); one object still works.
@@ -1242,45 +1251,42 @@ snapshots, playable at `?map=m2`.
         troopers should see no farther than the player in one.
 - [ ] **Each area in detail,** in the order you meet them, snapshots
       before and after each:
-  - [ ] The Crow's rock, the track, the roadblock and the Anvil:
-        wind-scoured sandstone, the Tuskens' windbreak and fire pit, the
-        perch's secret, the guide post and its knocked-down twin, the
-        roadblock's burning speeder bike, barricades and floodlight, the
-        Anvil's boulder climb and cleft.
-  - [ ] The field: a farm vaporator model (taller than the town's) and a
-        fallen one, dunes in soft outlines, the staging point (a lit
-        floodlight, crates, barricades, a comm unit), the pump house.
-  - [ ] The farm's ground and the entry dome: whitewash gone grey with
-        soot, the yard wall's gaps, skylight domes over the rooms, the
-        dome's door, lamp and stairwell, the Imperials' barricades.
+  - [ ] The garden pit: grow beds and grow lamps, the water tank, sand
+        streaming over its rim.
+  - [ ] The yard, the entry dome and the sheds: whitewash gone grey with
+        soot, skylight domes over the rooms, the light wells' kerbs, the
+        dome's door, lamp and stairwell, the staging point (a lit
+        floodlight, crates, barricades, a comm unit), a farm vaporator
+        model (taller than the town's).
   - [ ] The courtyard and its rooms: round-topped arches, the overturned
         table, the cart, the common room's hearth and table, the
         storeroom's shelves, the workshop's bench and pit droid.
-  - [ ] The tunnels and the garden pit: the water pipe on the ceilings,
-        lamps at the junctions, the caved-in tunnel's rubble, the long
-        tunnel and the hidey-hole (secret, Rusk's bedroll), the grow beds
-        and grow lamps.
-  - [ ] The cellar: the vaulted cistern, its dark pool, the pipe, the
-        lamp on the floor, the case behind the loose stone.
-  - [ ] The garage, its pit, the trench and the pickup: the stripped
-        speeder, the hoist, drifts on the trench's steps, the beacon
-        lamps round the spot, low rocks.
-  - [ ] The open sand, the backdrop and the edges: the wrecked scout's
-        bike, the crests, the Jundland far off (`canyonBackdrop`) and a
-        dune variant for the west and south.
+  - [ ] The tunnels and the quarters: the water pipe on the ceilings,
+        lamps at the junctions, the light wells, the caved-in tunnels'
+        rubble, the barred door, the long tunnel and the hidey-hole
+        (secret, Rusk's bedroll), the well room (secret).
+  - [ ] The storehouse, the old passage and the cellar: the fire, rough
+        sandstone and the passage's niche (secret), the vaulted cistern,
+        its dark pool, the pipe, the lamp on the floor, the case behind
+        the loose stone.
+  - [ ] The garage, its pit, the trench and the pad: the stripped
+        speeder, the hoist, drifts on the trench's steps, the windbreak's
+        gate, the beacon lamps round the spot, low rocks.
+  - [ ] The windbreak, its drifts and the backdrop: sand drifted against
+        the wall, the pad's drifts and cuts, the Jundland far off
+        (`canyonBackdrop`) and a dune variant for the west and south.
 - [ ] **Fire and smoke:** the generator shed and the storehouse burning
       (fire decorations with fire, ember and smoke emitters, flickering
-      lights), the roadblock's speeder bike, a vaporator burning in the
-      field, the courtyard's cart;
+      lights), the courtyard's cart;
       the smoke torn east by the wind.
 - [ ] **Life:** the troopers by skill (`docs/mission2.md`'s table), the
-      probe droid, items and ammo, the hold-out's waves over the dunes
-      and from the farm.
+      probe droid, items and ammo, the hold-out's waves through the pad's
+      three cuts.
 - [ ] **The story:** the recordings (the data tape, section 7) start the
       ending; footsteps and falling dust; the garage rolls open, the
       family's speeder heard leaving; the call and `wait` (section 6) for
       Jan's two minutes; the pickup as the exit. Stand-in words.
-- [ ] Waiting on Mark: the Tuskens' sheet (the perch) and the prototype's
+- [ ] Waiting on Mark: the Tuskens' sheet (on the pad's drifts) and the prototype's
       (walking out of the sand at the end); the words.
 - [ ] **Tune and check:** light, the sand, frame time, the per-skill check;
       update `docs/mission2.md`.
