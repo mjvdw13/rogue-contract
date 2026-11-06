@@ -628,6 +628,11 @@ export function defineSong(def) {
  * tiles each way (10), under the sky only: made `z` ([0.05, 2.5]) above the
  * floor with a random speed of up to `drift` ([0.3, 0.1]: across, up or
  * down), carried by `wind` ([x, y, z] units per second; still by default).
+ * `navReach` (steps; the whole map by default) is how far out from the
+ * player the monsters plan their way round walls and drops to them; further
+ * off, they head straight for the player. A big open map sets it, as
+ * planning costs a little for every tile within reach, each time the player
+ * crosses into a new tile.
  * `list` places things at exact spots: `{ type, x, y, angle?, z?, tag?,
  * skill?, drops?, ambush?, wander?, calm?, talk?, name? }`; a friendly's `wander` (tiles, 0
  * stands still) replaces its type's for that one. A monster's `calm` (true,
@@ -650,7 +655,7 @@ export function defineSong(def) {
  *   thingLegend?:object, list?:object[], triggers?:object[], music?:string, sky?:string,
  *   fog?:number, haze?:{color:number[], half?:number},
  *   weather?:{type:string, count:number, range?:number, z?:number[], drift?:number[], wind?:number[]},
- *   par?:number, next?:string, holster?:boolean,
+ *   par?:number, next?:string, holster?:boolean, navReach?:number,
  *   secretNext?:string, defaults?:object}} def
  */
 export function defineLevel(def) {

@@ -527,6 +527,7 @@ export function validateContent(reg) {
       if (level.haze.half !== undefined && !(level.haze.half > 0)) err(`${owner}: haze "half" (the distance in tiles at which it's halfway) must be above 0`);
     }
     if (level.weather) checkWeather(reg, level.weather, owner, err);
+    if (level.navReach !== undefined && !(typeof level.navReach === 'number' && level.navReach >= 1)) err(`${owner}: "navReach" (how many steps out the monsters plan their way to the player) must be a number, 1 or more`);
     if (typeof level.holster !== 'boolean') err(`${owner}: "holster" must be true or false`);
     else if (level.holster) {
       const actions = [...(level.triggers ?? []).flatMap((t) => [].concat(t.do ?? [])), ...[...map.uses.values()].flatMap((u) => u.actions)];

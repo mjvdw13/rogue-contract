@@ -171,7 +171,7 @@ export class World {
     /** Explosions made of particles, a flash and a sound (world/explosions.js), set off with explode(). */
     this.explosions = new Explosions(this);
     this.lights = new LightEffects(this.map, this.rng, this.lightmap);
-    this.nav = new FlowField(this.map);
+    this.nav = new FlowField(this.map, WALKER, level.navReach);
     /** Flow fields per kind of body (see navFor), the walker's being `nav`. */
     this.navFields = new Map([[navKey(WALKER), this.nav]]);
     this.navRefresh = 0;
@@ -492,7 +492,7 @@ export class World {
     const key = navKey(profile);
     let field = this.navFields.get(key);
     if (!field) {
-      field = new FlowField(this.map, profile);
+      field = new FlowField(this.map, profile, this.level.navReach);
       field.update(Math.floor(this.player.x), Math.floor(this.player.y), true, this.reach(this.player));
       this.navFields.set(key, field);
     }

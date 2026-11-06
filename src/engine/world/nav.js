@@ -25,10 +25,17 @@ export const WALKER = { step: 0.8, drop: 0.8, height: 1.7, flying: false };
  * `dist[i]` is still a tile's distance on maps without slabs.
  */
 export class FlowField {
-  /** @param {*} map @param {{step:number, drop:number, height:number, flying:boolean}} [profile] */
-  constructor(map, profile = WALKER) {
+  /**
+   * @param {*} map @param {{step:number, drop:number, height:number, flying:boolean}} [profile]
+   * @param {number} [limit] plan only this many steps out from the player
+   *   (a level's `navReach`): further tiles stay UNREACHABLE, so a body
+   *   there heads straight for the player, and each update costs only the
+   *   tiles within reach (a big open map has tens of thousands)
+   */
+  constructor(map, profile = WALKER, limit = Infinity) {
     this.map = map;
     this.profile = profile;
+    this.limit = limit;
     this.n = map.w * map.h;
     this.dist = new Int16Array(this.n * 2).fill(UNREACHABLE);
     this.queue = new Int32Array(this.n * 2);
@@ -113,12 +120,15 @@ export class FlowField {
     const w = map.w;
     const N = this.n;
     const flags = map.flags;
+    const limit = this.limit;
     while (head < tail) {
       const c = queue[head++];
       const ct = c >= N ? c - N : c;
       const cx = ct % w;
       const cy = (ct / w) | 0;
       const nd = dist[c] + 1;
+      // (Breadth first: every node after this one is as far or further.)
+      if (nd > limit) break;
       for (let k = 0; k < 4; k++) {
         const nx = cx + DIRS[k][0];
         const ny = cy + DIRS[k][1];

@@ -834,6 +834,7 @@ export default defineLevel({
   weather: { type: 'glint', count: 60 }, // particles in the air round you, outdoors
   hangings: [],              // ropes, cables and cloth (see Hangings)
   holster: false,            // true: weapons stay down until the town turns (see Calm)
+  navReach: 120,             // steps out the monsters plan their way to you (the whole map by default)
   tiles: [
     '###########',
     '#....#....#',
@@ -861,6 +862,15 @@ sky (seen from a sky tile) fade toward the haze colour with distance
 instead, halfway there at `half` tiles (40 by default): a night canyon
 fades into purple air rather than black. Pick a colour like the sky's near
 the horizon. Indoors, haze changes nothing.
+
+Monsters find their way to the player round walls, drops and locked doors
+by a plan of the whole map, worked out again each time the player crosses
+into a new tile. `navReach` (steps, the whole map by default) plans only
+that far out from the player: a monster further off heads straight for the
+player, as one with no way round does. Set it on a big open map, where the
+plan has tens of thousands of tiles to cover (on Mission 2's desert, 96
+steps cuts the time each plan takes by about four fifths); keep it longer
+than the longest way round anything a monster should find.
 
 `weather` keeps `count` particles of one type (see Particles) in the air
 round the player, in a square `range` tiles each way (10), and only in
