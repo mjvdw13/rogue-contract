@@ -16,8 +16,9 @@ import { valueNoise } from './lib/noise.js';
 // east caved in, so up through the generator shed into the work yard, where
 // the officer carries the red key to the gate; up the lane to the house's
 // great dome, down into its courtyard pit and through its rooms to the
-// cellar (the recordings); then out through the garage, its pit and the
-// trench onto the landing pad, where Jan won't land: through the wave of
+// cellar (the recordings); then out by Rusk's way, down through caves
+// under the pad and up into the garage pit, and up the trench onto the
+// landing pad, where Jan won't land: through the wave of
 // troopers and down the wash into the rocks, to the Crow on the flat.
 
 const W = 208;
@@ -179,13 +180,13 @@ const WASH = [[174, 128], [174, 152], [164, 160], [136, 161], [124, 168], [116, 
 /** Where the floor drops, by the distance down the wash: two steps of 0.5 each. */
 const DROPS = [14, 46, 70];
 const washFloor = (s) => -0.5 * DROPS.reduce((n, d) => n + (s >= d) + (s >= d + 2), 0);
-/** The nearest point on the wash's line to (x, y): how far off the line, and how far down the wash. */
-function alongWash(x, y) {
+/** The nearest point on a line of points to (x, y): how far off the line, and how far along it. */
+function along(line, x, y) {
   let best = { off: Infinity, s: 0 };
   let s0 = 0;
-  for (let i = 1; i < WASH.length; i++) {
-    const [ax, ay] = WASH[i - 1];
-    const [bx, by] = WASH[i];
+  for (let i = 1; i < line.length; i++) {
+    const [ax, ay] = line[i - 1];
+    const [bx, by] = line[i];
     const len = Math.hypot(bx - ax, by - ay);
     const t = Math.max(0, Math.min(1, ((x - ax) * (bx - ax) + (y - ay) * (by - ay)) / (len * len)));
     const off = Math.hypot(x - ax - t * (bx - ax), y - ay - t * (by - ay));
@@ -199,7 +200,7 @@ const FLAT = { cx: 110, cy: 187, rx: 26, ry: 16, z: washFloor(Infinity) };
 // Cut the wash and the flat into the rocks (and the wash's mouth through
 // the drifts south of the pad), with ragged edges.
 p.rect(64, 120, W - 1, H - 1, (x, y, c) => {
-  const { off, s } = alongWash(x + 0.5, y + 0.5);
+  const { off, s } = along(WASH, x + 0.5, y + 0.5);
   const inFlat = ((x + 0.5 - FLAT.cx) / FLAT.rx) ** 2 + ((y + 0.5 - FLAT.cy) / FLAT.ry) ** 2 < 0.85 + 0.3 * valueNoise(x, y, 5, 46);
   if (inFlat) return sand(FLAT.z, { tag: 'flat' });
   if (off >= 4 + 1.5 * valueNoise(x, y, 6, 45)) return c;
@@ -363,11 +364,9 @@ secret(139, 78, 144, 84);
 list.push(at('power-cell', 140.5, 79.5), at('med-kit', 140.5, 82.5));
 
 // ---------------------------------------------------------------- 9. the garage, its pit, the trench
-// Off the storeroom's east side, behind a roll-down shutter, and out by
-// another into the garage pit: both down until the recordings are taken.
-// Taller inside.
-dig(170, 63, 174, 67);
-shutter(173, 63, 174, 67);
+// Off the garage pit's north side, behind a roll-down shutter, down until
+// the recordings are taken (out of sight: the caves come up into the pit).
+// Its wall to the storeroom is blank. Taller inside.
 dig(174, 58, 186, 72, { ceilZ: PIT + 4.5, light: 104 });
 dig(178, 72, 182, 78, ARCH);
 shutter(178, 72, 182, 73);
@@ -381,6 +380,53 @@ town.block(175, 92, 177, 104, { h: FARM + 4, skirt: null });
 town.block(183, 92, 185, 104, { h: FARM + 4, skirt: null });
 town.arch(177, 104, 183, 106, { h: WALL, lintel: 4, floorZ: FARM, floor: 'flagstone', light: 136 });
 tag(177, 102, 183, 106, 'trench-head');
+
+// ---------------------------------------------------------------- 8a. the caves
+// Rusk's way out: a panel in the cellar's south wall, opened by taking the
+// recordings. Behind it his cut steps go down (12 of 0.5) into natural
+// caves under the drifts and the pad: a cavern 7 m across, a low passage
+// east under the pad, and a long climb north (8.5 up over 19 m) under the
+// east windbreak into the garage pit's east side. One way, no turnings.
+// Dark (56 to 72), lit by the troopers' lamps and the light through cracks.
+const CAVE = [[145.5, 88], [145.5, 100], [138, 110], [140, 122], [152, 131], [172, 135], [189, 128], [190, 110], [190, 92], [190, 84]];
+const CAVE_LEN = CAVE.slice(1).reduce((n, [x, y], i) => n + Math.hypot(x - CAVE[i][0], y - CAVE[i][1]), 0);
+const STEPS = 13; // Rusk's cut steps end here (distance along the caves)
+const CAVERN = [24, 52]; // the cavern, wide and tall
+const CLIMB = 96; // from here the floor climbs to the garage pit's floor
+const caveFloor = (s, x, y) => {
+  if (s < 1) return CELLAR;
+  if (s < STEPS) return CELLAR - 0.5 * Math.ceil(s - 1);
+  const rough = quarter(-15 + valueNoise(x, y, 5, 47) - 0.5);
+  if (s < CLIMB) return rough;
+  const t = Math.min(1, (s - CLIMB) / (CAVE_LEN - 2 - CLIMB));
+  return quarter(rough + t * (PIT - rough));
+};
+const caveWide = (s) => (s < STEPS ? 1.5 : s > CAVERN[0] && s < CAVERN[1] ? 2.5 + 4.5 * Math.sin((Math.PI * (s - CAVERN[0])) / (CAVERN[1] - CAVERN[0])) : 2.5);
+const garagePit = (x, y) => Math.hypot(x + 0.5 - 180, y + 0.5 - 84) < 7.5;
+p.rect(128, 76, 196, 142, (x, y, c) => {
+  if (garagePit(x, y) || c.slab) return c;
+  const { off, s } = along(CAVE, x + 0.5, y + 0.5);
+  if (off >= caveWide(s) + (s < STEPS ? 0 : 0.8 * valueNoise(x, y, 3, 48))) return c;
+  const f = caveFloor(s, x, y);
+  const tall = s > CAVERN[0] && s < CAVERN[1] ? 4 + 5 * Math.sin((Math.PI * (s - CAVERN[0])) / (CAVERN[1] - CAVERN[0])) : 0;
+  const top = topOf(c);
+  const ceil = Math.min(top - 1, f + (s < STEPS ? 4 : 4.25 + tall + valueNoise(x, y, 4, 49)));
+  return {
+    floor: 'desert-gravel', ceiling: 'sky', floorZ: f, ceilZ: SKY, light: c.light ?? SUN, side: 'sandstone',
+    slab: { bottom: quarter(ceil), top, floor: c.floor ?? 'desert-sand', ceiling: 'sandstone-dark', side: c.side ?? 'desert-sand', light: s < STEPS ? 64 : 72 },
+  };
+});
+// The panel at the steps' head, and the arch into the garage pit.
+p.rect(144, 88, 147, 89, (_, __, c) => ({ ...c, door: 'sandstone', style: 'rise', lock: 'remote', stayOpen: true, tag: 'bolthole' }));
+dig(186, 82, 189, 87, ARCH);
+tag(131, 106, 147, 124, 'tremor');
+lights.push(
+  { x: 145.5, y: 90, z: CELLAR + 2, radius: 4, light: 40 }, // the panel, lit from inside once it's open
+  { x: 137, y: 112, z: -13, radius: 5, light: 40 }, // a crack's light in the cavern
+  { x: 144, y: 121, z: -13.5, radius: 6, light: 56 }, // the troopers' lamp
+  { x: 176, y: 134, z: -13.5, radius: 5, light: 48 }, // a crack under the wash
+  { x: 190, y: 100, z: -9, radius: 5, light: 48 }, // the troopers' lamp on the climb
+);
 
 // ---------------------------------------------------------------- the light wells
 // Shafts of evening light down into the tunnels and rooms: the pump
@@ -469,6 +515,15 @@ list.push(
   at('med-kit', 139.5, 41.5, { skill: EASY }),
   at('power-cell', 184.5, 39.5),
   at('med-kit', 151.5, 68.5, { skill: [1, 2, 3] }),
+  // 8a. The caves: troopers who came down from the garage pit, searching
+  // with lamps: two in the cavern, one or two on the climb.
+  at('stormtrooper', 143.5, 120.5, { angle: 90 }),
+  at('stormtrooper', 138.5, 116.5, { angle: 90, skill: NOT_EASIEST }),
+  at('stormtrooper', 160.5, 132.5, { angle: 180, skill: HARD }),
+  at('stormtrooper', 190.5, 104.5, { angle: 270 }),
+  at('stormtrooper', 189.5, 96.5, { angle: 270, skill: NORMAL_UP }),
+  at('med-kit', 141.5, 108.5, { skill: EASY }),
+  at('power-cell', 180.5, 131.5),
   // 9. The garage: a stock of ammo before the wave.
   at('power-cell', 175.5, 59.5), at('power-cell', 176.5, 59.5), at('med-kit', 184.5, 70.5),
   at('energy-pack', 184.5, 59.5, { skill: EASY }),
@@ -533,6 +588,8 @@ export default defineLevel({
         { action: 'setFlag', flag: 'recordings' },
         { action: 'message', text: 'HEAVY FOOTSTEPS OVERHEAD.' },
         { action: 'message', text: 'JAN: KYLE, SOMETHING BIG JUST WALKED OUT OF THE STORM. GET OUT OF THERE.' },
+        { action: 'message', text: "A PANEL GRINDS OPEN IN THE SOUTH WALL. KYLE: RUSK'S WAY OUT." },
+        { action: 'openDoors', tag: 'bolthole' },
         { action: 'openDoors', tag: 'garage' },
       ],
     },
@@ -548,6 +605,7 @@ export default defineLevel({
         { action: 'spawn', thing: 'stormtrooper', tag: 'wave', fog: false },
       ],
     },
+    { on: 'enter', tag: 'tremor', if: 'recordings', do: [{ action: 'message', text: 'THE GROUND SHAKES. SAND POURS FROM THE CRACKS OVERHEAD.' }] },
     { on: 'enter', tag: 'flat', if: 'called', do: [{ action: 'message', text: "JAN: THERE YOU ARE. THEY'RE SHOOTING AT MY SHIP, HURRY!" }] },
     { on: 'enter', tag: 'pickup', if: 'called', do: [{ action: 'message', text: 'JAN: GET ABOARD!' }, { action: 'exit' }] },
   ],

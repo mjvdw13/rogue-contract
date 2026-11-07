@@ -28,8 +28,8 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
-- **Mission 2's fourth blockout, with the reservoir and the stretched
-  ending** (`?map=m2`, 2026-11-06), a walk west to east to the house
+- **Mission 2's fourth blockout, with the reservoir, the stretched
+  ending and the caves** (`?map=m2`, 2026-11-06), a walk west to east to the house
   (`docs/mission2.md`):
   the garden pit, the pump tunnels, down into the reservoir (a long dark
   hall under the sand, added after Mark's notes on the fourth: on the
@@ -38,13 +38,19 @@ These need Mark to try something, or to decide. Don't start them without him.
   the generator shed into the work yard facing the gate with the house's
   great dome over it, the officer's red key, the lane straight at the
   dome, its stair down into the courtyard pit and the rooms round it, the
-  cellar, out by the garage, its pit and the trench to the pad, where
+  cellar, then Rusk's way out (picked by Mark from three options to make
+  it longer): a panel opens as you take the recordings, his steps down
+  into caves under the pad, a cavern with troopers searching it, a low
+  passage east and a long climb up into the garage pit, then the trench
+  to the pad, where
   Jan won't land (after Mark's notes on the reservoir: he loves it; get
   through a wave of stormtroopers and find Jan): the wave of five, two of
   them up the wash, then down the wash into the rocks, under its arch,
-  to the Crow on the flat with troopers firing on it. The route is 636
-  steps (505 before the ending, 393 before the reservoir). To judge: the
-  ending (the wave's size, the wash's length, finding the Crow), whether
+  to the Crow on the flat with troopers firing on it. The route is 745
+  steps (631 before the caves, 505 before the ending, 393 before the
+  reservoir). To judge: the caves (their length, the dark, the fight in
+  the cavern, whether the panel reads as the way on), the ending (the
+  wave's size, the wash's length, finding the Crow), whether
   the level is now long enough, and what's still open: the reservoir's
   darkness, the dome as the destination, the key hunt, the lane (short,
   10 m), where the fights are. The sky and haze are still stand-ins (the

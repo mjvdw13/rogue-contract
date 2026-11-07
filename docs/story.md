@@ -260,7 +260,8 @@ which grows this sketch, is `docs/mission2.md`.
   [2 the work yard, in the storm] -> the officer's key -> the gate
          -> the lane -> [3 the house's great dome]'s stair
   [4 the courtyard, -6, sky] -> [5 its rooms] -> the cellar
-         [6 garage] -> [garage pit] -> the trench up
+         -> Rusk's way out: down through the caves under the pad
+         -> [garage pit, 6 the garage off it] -> the trench up
          -> [8 the landing pad, in the drifts; 7 Tuskens above]
          -> [9 the wash, down into the rocks] -> [10 the Crow, on the flat]
 ```
@@ -272,7 +273,7 @@ which grows this sketch, is `docs/mission2.md`.
 | 3 | The great dome | The house's entrance hall at the end of the lane, the tallest thing on the farm, over a stairwell down to the courtyard. |
 | 4 | Sunken courtyard | A round pit open to the sky, about 20 across, 6 below the ground. Troopers on the rim shoot down into it, which the height grid does well. |
 | 5 | Rooms | Round the courtyard: a common room, the family's quarters, the storeroom, and under it a cellar with a dark cistern, where Rusk hid his helmet recordings. |
-| 6 | Garage | The family is holed up here. Once Kyle has the recordings, they escape in their speeder (off screen), out through the garage pit. A long stair leads up out of it to the surface. |
+| 6 | Garage | The family is holed up here. Once Kyle has the recordings, they escape in their speeder (off screen), out through the garage pit. Kyle comes up into the pit from the caves, Rusk's way out of the cellar; a long stair leads up out of it to the surface. |
 | 7 | Drifts | Tuskens watching from the drifts above the landing pad. If Tuskens and troopers fight each other (see factions below), it's a three-way fight. |
 | 8 | The pad | The landing pad outside the windbreak, in a hollow of drifts, low rocks for cover. Jan won't land on it with troopers coming. |
 | 9 | The wash | A dry stream bed winding down into the rocks south of the farm, under a natural arch. |
