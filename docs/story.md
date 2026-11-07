@@ -246,14 +246,16 @@ which grows this sketch, is `docs/mission2.md`.
 
 - **Size:** about 110 × 90 tiles (`docs/mission2.md`: 208 × 142, the
   farm walled in by its windbreak, a walk west to east from the garden
-  pit to the house, after Mark played three blockouts).
+  pit to the house, after Mark played three blockouts; the reservoir
+  under the sand added after the fourth).
 - **Light:** a dusk sky, the suns low in the west and long shadows, sand
   blowing in gusts. The farm is lit by fires (flickering light around
   burning buildings) and by its doorways.
 
 ```
-  [1 drop-off: the garden pit] -> the pump tunnels -> the workshop pit
-         the way east caved in: up the generator shed's stair
+  [1 drop-off: the garden pit] -> the pump tunnels -> down through the
+         reservoir -> the workshop pit; the way east caved in: up the
+         generator shed's stair
   [2 the work yard, in the storm] -> the officer's key -> the gate
          -> the lane -> [3 the house's great dome]'s stair
   [4 the courtyard, -6, sky] -> [5 its rooms] -> the cellar

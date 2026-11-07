@@ -11,8 +11,9 @@ import { valueNoise } from './lib/noise.js';
 //
 // The farm is a walk from its working end in the west to the house in the
 // east, a chain of areas with one way on from each: dropped into the
-// garden pit, along the pump tunnels to the workshop pit; the way east
-// caved in, so up through the generator shed into the work yard, where
+// garden pit, along the pump tunnels, down through the farm's reservoir
+// (a long dark hall under the sand) and up to the workshop pit; the way
+// east caved in, so up through the generator shed into the work yard, where
 // the officer carries the red key to the gate; up the lane to the house's
 // great dome, down into its courtyard pit and through its rooms to the
 // cellar (the recordings); then out through the garage, its pit and the
@@ -30,6 +31,8 @@ const WALL = FARM + 6;
 const PIT = -5.5;
 const CEIL = -1.5;
 const CELLAR = -8.5;
+/** The reservoir's floor: 16 steps down from the pump room. */
+const RESERVOIR = PIT - 8;
 
 /** The suns at evening, low in the west-south-west, so the shadows run long to the east-north-east. */
 const EVENING = [
@@ -142,7 +145,7 @@ for (const box of GROUND) {
 /** Swept ground in front of a doorway or gate: no drift to climb. */
 const apron = (x0, y0, x1, y1) => p.rect(x0, y0, x1, y1, yard());
 
-// ---------------------------------------------------------------- 9. the landing pad
+// ---------------------------------------------------------------- 10. the landing pad
 // Outside the windbreak's south side, below the trench's gate: a hollow of
 // drifts too steep to climb (2 at once, then on up), cut in three places
 // where the wind has scoured gaps, each opening into a pocket out of sight
@@ -163,7 +166,7 @@ list.push(
   at('boulder-small', 154.5, 121.5, { angle: 310 }), at('boulder-large', 180.5, 129, { angle: 250 }),
 );
 
-// ---------------------------------------------------------------- 4. the work yard: the generator shed, the staging point, the gate
+// ---------------------------------------------------------------- 5. the work yard: the generator shed, the staging point, the gate
 // The generator shed: a tin blockhouse in the yard's north-west corner
 // (burning, with the detail), its door east; a hatch in its floor and a
 // stair down south to the workshop. Coming up it you step out facing east,
@@ -193,7 +196,7 @@ apron(126, 13, 131, 23);
 tag(118, 13, 124, 23, 'gate');
 lights.push({ x: 122, y: 18, z: FARM + 4, radius: 5, light: 48 });
 
-// ---------------------------------------------------------------- 6. the house: its great dome
+// ---------------------------------------------------------------- 7. the house: its great dome
 // A round building at the end of the lane, its door west under a porch,
 // tall (its wall 6.5 m, the dome on it 2.75 m more), so it shows over the
 // work yard's wall, over the gate: the destination. Inside, a square hall, and a stair
@@ -209,27 +212,25 @@ town.arch(152, 18, 155, 22, { h: DOME.h, lintel: 3, floorZ: FARM, floor: 'flagst
 apron(140, 16, 146, 24);
 lights.push({ x: 160, y: 16.5, z: FARM + 5, radius: 6, light: 48 });
 
-// ---------------------------------------------------------------- 1, 3, 6, 8. the four pits
+// ---------------------------------------------------------------- 1, 4, 7, 9. the four pits
 // Round pits 6 deep, open to the sky, their walls the farm's whitewash. No
 // parapets: one hides a pit from the troopers on its rim.
 const pit = (cx, cy, r, floor = 'street-sand') => town.circle(cx, cy, r, { inside: yard(PIT, { floor }), wall: { wall: 'adobe-pale', wallTop: FARM }, seam: 90 });
 pit(28, 46, 6, 'flagstone'); // 1. the garden pit, the drop-off
-pit(80, 52, 8); // 3. the workshop pit
-pit(160, 46, 12); // 6. the house's courtyard
-pit(180, 84, 7, 'flagstone'); // 8. the garage pit
+pit(80, 52, 8); // 4. the workshop pit
+pit(160, 46, 12); // 7. the house's courtyard
+pit(180, 84, 7, 'flagstone'); // 9. the garage pit
 lights.push({ x: 28, y: 46, z: PIT + 3.5, radius: 6, light: 64 }); // the grow lamps
 lights.push({ x: 82, y: 56, z: PIT + 1, radius: 5, light: 48 }); // a speeder burning
 lights.push({ x: 160, y: 50, z: PIT + 1, radius: 6, light: 56 }); // the cart burning
 
 // ---------------------------------------------------------------- 2. the pump tunnels
-// Under the garden court, east from the garden pit: the tunnel, the pump
-// room (the water pipe goes down into its pump), and on east under the
-// court's wall into the workshop pit. Tunnels 4 wide, ceilings at 2 m.
+// Under the garden court, east from the garden pit: the tunnel and the
+// pump room (the water pipe goes down into its pump), its one way on the
+// stair down to the reservoir. Tunnels 4 wide, ceilings at 2 m.
 dig(33, 44, 35, 48, ARCH);
 dig(35, 44, 50, 48);
 dig(46, 46, 58, 58, { light: 104 });
-dig(58, 50, 70, 54);
-dig(70, 50, 73, 54, ARCH);
 lights.push({ x: 52, y: 52, z: PIT + 3, radius: 6, light: 48 });
 // Secret 1: the hidey-hole off the tunnel's north side, where the family
 // hid Rusk, behind a door in the plaster.
@@ -239,18 +240,35 @@ p.rect(39, 43, 41, 44, (_, __, c) => ({ ...c, door: 'adobe-pale', style: 'rise',
 secret(35, 34, 44, 44);
 list.push(at('med-kit', 36.5, 35.5), at('thermal-detonator', 42.5, 38.5));
 
-// ---------------------------------------------------------------- 3. the workshop
+// ---------------------------------------------------------------- 3. the reservoir
+// The farm's water store, dug under the sand outside the windbreak's south
+// side: 16 steps down from the pump room, a hall 32 m long running east,
+// 4.5 m to its vault, a walkway along its north side and the shallow pool
+// beside it, a row of pillars in the pool, two shafts of evening light, the
+// Imperials' work lamps. At its east end, 16 steps up north under the wall
+// to the tunnel east of the workshop pit.
+p.rect(40, 66, 112, 92, sand(FARM)); // the sand over it, out of reach
+const vault = { ceilZ: RESERVOIR + 9, top: FARM, floor: 'flagstone', ceiling: 'sandstone-dark', side: 'sandstone', light: 80 };
+stairDown(50, 58, 54, 74, PIT, { side: 'sandstone' });
+under(44, 74, 108, 86, { ...vault, floorZ: RESERVOIR });
+under(44, 78, 108, 86, { ...vault, floorZ: RESERVOIR - 0.5, floor: 'water-murky', light: 72 });
+for (const x of [56, 66, 76, 86, 96]) p.rect(x, 80, x + 2, 82, { wall: 'sandstone' });
+stairDown(100, 58, 104, 74, PIT, { side: 'sandstone' });
+lights.push({ x: 70, y: 75.5, z: RESERVOIR + 1, radius: 7, light: 64 }, { x: 99, y: 75.5, z: RESERVOIR + 1, radius: 7, light: 64 });
+
+// ---------------------------------------------------------------- 4. the workshop
 // The droid workshop dug north of the workshop pit, the shed's stair coming
-// down into it. The tunnel east from the pit toward the house caved in
-// after ten tiles, in sight from the pit's west arch.
+// down into it. Up from the reservoir, the tunnel runs west into the pit;
+// east, toward the house, it caved in, in sight from the stair's head.
 dig(70, 26, 88, 40, { light: 120 });
 dig(78, 40, 82, 45, ARCH);
 stairDown(74, 14, 78, 26, 0);
 lights.push({ x: 84, y: 30, z: PIT + 3, radius: 6, light: 48 });
 dig(87, 50, 90, 54, ARCH);
-dig(90, 50, 100, 54, { light: 88 });
-tag(96, 50, 100, 54, 'rubble');
-list.push(at('boulder-small', 98.6, 51, { angle: 40 }), at('boulder-small', 99, 53.2, { angle: 160 }));
+dig(90, 50, 110, 54, { light: 88 });
+dig(100, 54, 104, 58, { light: 88 });
+tag(100, 50, 110, 54, 'rubble');
+list.push(at('boulder-small', 108.6, 51, { angle: 40 }), at('boulder-small', 109, 53.2, { angle: 160 }), at('boulder-small', 106.8, 52.4, { angle: 280 }));
 // Secret 2: the well room south of the caved-in tunnel, reached only down
 // its light well from the yard; a secret door out north into the tunnel.
 dig(90, 56, 98, 62, { light: 88 });
@@ -259,7 +277,7 @@ p.rect(93, 54, 95, 55, (_, __, c) => ({ ...c, door: 'adobe-pale', style: 'rise',
 secret(90, 55, 98, 62);
 list.push(at('shield-unit', 91.5, 60.5), at('energy-pack', 96.5, 60.5));
 
-// ---------------------------------------------------------------- 6. the house's rooms
+// ---------------------------------------------------------------- 7. the house's rooms
 // Round the courtyard pit, under the house's ground: the dome's stair from
 // the north, the common room west, the quarters east, the storeroom south,
 // and a tunnel from the common room round to the storeroom (a loop for the
@@ -278,7 +296,7 @@ lights.push({ x: 160, y: 65, z: PIT + 3, radius: 5, light: 32 });
 dig(140, 52, 144, 66, { light: 88 });
 dig(144, 62, 150, 66, { light: 88 });
 
-// ---------------------------------------------------------------- 7. the cellar
+// ---------------------------------------------------------------- 8. the cellar
 // Six steps down from the storeroom: cold and dark, the cistern's pool along
 // its south side, the lamp knocked over and still lit on the floor, the
 // recordings behind a loose stone at its east end.
@@ -294,7 +312,7 @@ under(143, 80, 144, 82, { ...niche, extra: { door: 'sandstone', style: 'rise', s
 secret(139, 78, 144, 84);
 list.push(at('power-cell', 140.5, 79.5), at('med-kit', 140.5, 82.5));
 
-// ---------------------------------------------------------------- 8. the garage, its pit, the trench
+// ---------------------------------------------------------------- 9. the garage, its pit, the trench
 // Off the storeroom's east side, behind a roll-down shutter, and out by
 // another into the garage pit: both down until the recordings are taken.
 // Taller inside.
@@ -316,9 +334,9 @@ tag(177, 102, 183, 106, 'trench-head');
 
 // ---------------------------------------------------------------- the light wells
 // Shafts of evening light down into the tunnels and rooms: the pump
-// tunnel, the pump room, the tunnel to the workshop pit, the workshop, the
-// house's loop tunnel and quarters, and the well room's (its only way in).
-for (const [x, y] of [[40, 45], [51, 51], [61, 51], [84, 30], [141, 57], [179, 41], [93, 58]]) well(x, y);
+// tunnel, the pump room, the reservoir's two, the workshop, the house's
+// loop tunnel and quarters, and the well room's (its only way in).
+for (const [x, y] of [[40, 45], [51, 51], [61, 83], [81, 83], [84, 30], [141, 57], [179, 41], [93, 58]]) well(x, y);
 
 // The farm's vaporators (stand-ins: the town's small one): a few in the
 // garden court, seen from the pit; in the yard (off the line from the
@@ -343,10 +361,17 @@ list.push(
   at('med-kit', 30.5, 42.5, { skill: EASY }),
   // 2. The pump tunnels.
   at('stormtrooper', 52.5, 54.5, { angle: 180 }),
-  at('stormtrooper', 66.5, 52, { angle: 180, skill: NOT_EASIEST }),
   at('stormtrooper', 56.5, 47.5, { angle: 180, skill: HARD }),
   at('power-cell', 47.5, 56.5),
-  // 3. The workshop pit, the rim above it, and the workshop.
+  // 3. The reservoir: troopers along the walkway and in the pool, in the
+  // light of their lamps.
+  at('stormtrooper', 72.5, 76.5, { angle: 180 }),
+  at('stormtrooper', 94.5, 76.5, { angle: 180 }),
+  at('stormtrooper', 84.5, 83.5, { angle: 180, skill: NOT_EASIEST }),
+  at('stormtrooper', 104.5, 76.5, { angle: 180, skill: HARD }),
+  at('med-kit', 46.5, 76.5, { skill: EASY }),
+  at('energy-pack', 106.5, 84.5),
+  // 4. The workshop pit, the rim above it, and the workshop.
   at('stormtrooper', 78.5, 49.5, { angle: 180 }),
   at('stormtrooper', 83.5, 56.5, { angle: 180 }),
   at('stormtrooper', 84.5, 47.5, { angle: 180, skill: NOT_EASIEST }),
@@ -357,7 +382,7 @@ list.push(
   at('stormtrooper', 76, 27.5, { angle: 270, skill: NORMAL_UP }),
   at('med-kit', 72.5, 37.5, { skill: [1, 2, 3] }),
   at('energy-pack', 86.5, 27.5),
-  // 4. The work yard: troopers, the probe droid, the officer with the key.
+  // 5. The work yard: troopers, the probe droid, the officer with the key.
   at('stormtrooper', 76, 15.5, { angle: 270, skill: NORMAL_UP }),
   at('officer', 108.5, 38.5, { angle: 180, z: FARM, drops: ['keycard-red'] }),
   at('sandtrooper', 102.5, 44.5, { angle: 180, z: FARM }),
@@ -368,12 +393,12 @@ list.push(
   at('sandtrooper', 92.5, 22.5, { angle: 180, z: FARM, skill: HARD }),
   at('sandtrooper', 100.5, 58.5, { angle: 90, z: FARM, skill: HARD }),
   at('power-cell', 106.5, 35.5, { z: FARM }),
-  // 5. The lane.
+  // 6. The lane.
   at('sandtrooper', 140.5, 15, { angle: 180, z: FARM }),
   at('sandtrooper', 142.5, 21.5, { angle: 180, z: FARM }),
   at('sandtrooper', 134.5, 14.5, { angle: 180, z: FARM, skill: NORMAL_UP }),
   at('med-kit', 127.5, 22.5, { z: FARM, skill: EASY }),
-  // 6. The house: its ground and the courtyard's rim, the dome's stair, the
+  // 7. The house: its ground and the courtyard's rim, the dome's stair, the
   // courtyard, the rooms.
   at('sandtrooper', 149.5, 30.5, { angle: 180, z: FARM }),
   at('sandtrooper', 176.5, 32.5, { angle: 180, z: FARM }),
@@ -394,7 +419,7 @@ list.push(
   at('med-kit', 139.5, 41.5, { skill: EASY }),
   at('power-cell', 184.5, 39.5),
   at('med-kit', 151.5, 68.5, { skill: [1, 2, 3] }),
-  // 8. The garage: a stock of ammo before the hold-out.
+  // 9. The garage: a stock of ammo before the hold-out.
   at('power-cell', 175.5, 59.5), at('power-cell', 176.5, 59.5), at('med-kit', 184.5, 70.5),
   at('energy-pack', 184.5, 59.5, { skill: EASY }),
   // The trench's gate.

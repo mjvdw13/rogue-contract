@@ -28,18 +28,21 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
-- **Mission 2's fourth blockout** (`?map=m2`, 2026-11-06), a walk west
-  to east to the house (`docs/mission2.md`, after Mark's notes on the
-  third: small, open-ended, hunting round one yard): the garden pit, the
-  pump tunnels, the workshop pit (the way east caved in, in sight), up
-  through the generator shed into the work yard facing the gate with the
-  house's great dome over it, the officer's red key, the lane straight at
-  the dome, its stair down into the courtyard pit and the rooms round it,
-  the cellar, out by the garage, its pit and the trench to the pad. To
-  judge: whether it now reads as progress, whether the dome works as the
-  destination (seen over the gate, 6.5 m tall), the key hunt in the yard,
-  the lane (short, 10 m), and where the fights are. The sky and haze are
-  still stand-ins (the night sky).
+- **Mission 2's fourth blockout, with the reservoir** (`?map=m2`,
+  2026-11-06), a walk west to east to the house (`docs/mission2.md`):
+  the garden pit, the pump tunnels, down into the reservoir (a long dark
+  hall under the sand, added after Mark's notes on the fourth: on the
+  right track, stretch it out with another underground segment), up
+  beside the workshop pit (the way east caved in, in sight), up through
+  the generator shed into the work yard facing the gate with the house's
+  great dome over it, the officer's red key, the lane straight at the
+  dome, its stair down into the courtyard pit and the rooms round it, the
+  cellar, out by the garage, its pit and the trench to the pad. The
+  route is 505 steps (393 before the reservoir). To judge: the reservoir
+  (32 m long, how dark, the fight down its length), whether the level is
+  now long enough, and what's still open from the fourth: the dome as
+  the destination, the key hunt, the lane (short, 10 m), where the
+  fights are. The sky and haze are still stand-ins (the night sky).
 
 - **Finding the way** (`?map=m1`, 2026-11-03, after Mark's play test:
   maze-like, unclear who to talk to, the fob pointing down alleys). Four
@@ -1212,6 +1215,11 @@ snapshots, playable at `?map=m2`.
 - [x] The fourth design after Mark's notes on the third blockout
       (2026-11-06): `docs/mission2.md`, and the fourth blockout (208 x
       142, a walk west to east to the house, one way on from each area).
+- [x] The reservoir after Mark's notes on the fourth blockout
+      (2026-11-06: on the right track; stretch it out with another
+      underground segment, not more complex ones): `docs/mission2.md`,
+      and in the blockout between the pump tunnels and the workshop pit
+      (the route 505 steps, from 393).
 - [ ] **Evening:**
   - [ ] `sky-dusk` (`derive.mjs`, from RESKY01): indigo overhead to rose
         to amber at the horizon, fading into the haze.
@@ -1251,6 +1259,9 @@ snapshots, playable at `?map=m2`.
         tunnels' ceilings (running east to the house's cistern: the way),
         the pump room's pump, the light wells, the hidey-hole (secret,
         Rusk's bedroll).
+  - [ ] The reservoir: its stairs, the pillars, the pipe along its north
+        wall, the Imperials' work lamps and cables, the shafts of evening
+        light on the water, drips, the pool's edge.
   - [ ] The workshop pit and the workshop: oil, droid parts, the
         burning speeder, the caved-in tunnel's rubble and broken
         support, the bench and pit droid, the shed's stairwell, the well

@@ -6,8 +6,8 @@ The Empire is already cleaning up when the Crow comes in low through a
 sandstorm: the farm is burning, troopers hold it, and Jan can't set down,
 so she drops Kyle into the farm's garden pit at its west end. Rusk's
 cellar is under the house at the east end. Kyle works east to it: along
-the pump tunnels to the workshop pit, up through the burning generator
-shed into the work yard, where an officer carries the key to the house's
+the pump tunnels, down through the farm's reservoir and up into the
+workshop pit, up through the burning generator shed into the work yard, where an officer carries the key to the house's
 gate, up the lane to the house's great dome, down into its courtyard pit
 and through its rooms to the cellar, where he finds Rusk's helmet
 recordings. Then out by the garage to hold the landing pad while
@@ -38,6 +38,16 @@ house, west to east:
 - **Walking east, away from the sunset:** the low suns behind you light
   the house's west face against the darkening east.
 
+**The reservoir** (2026-11-06). Mark played the fourth blockout: on the
+right track; stretch it out, the underground most, with another segment
+rather than more complex ones. So the pump room no longer opens straight
+into the workshop pit. Its one way on is a stair 16 steps down into the
+farm's reservoir, one long dark hall under the sand outside the
+windbreak, and 16 steps up at its far end to the tunnel beside the
+workshop pit. One more area in the chain, a kind of space the farm
+didn't have (one tall hall, water, pillars, a long sightline), and the
+route a quarter longer: 505 steps, from 393.
+
 The first design (a ridge and a vaporator field), the second (open
 desert, a track) and the third (the walled farm round one yard) are in
 this file's history.
@@ -60,9 +70,9 @@ Different by design, from Mos Eisley and from Mission 3's canyon:
 
 | | Mos Eisley | The Canyon Garrison (m3) | The Homestead |
 |---|---|---|---|
-| Ground | Streets between walls, flat | A canyon floor between rock walls | Four round pits open to the sky, tunnels and rooms under the ground between them; above, a walled yard, a lane and the house's ground |
+| Ground | Streets between walls, flat | A canyon floor between rock walls | Four round pits open to the sky, tunnels and rooms under the ground between them, the reservoir's long vault deeper still; above, a walled yard, a lane and the house's ground |
 | Walls | Plaster houses | Rock and Imperial metal | Whitewashed plaster gone grey with soot, round arches, the windbreak with sand drifted against it |
-| Route | Out and back through the same streets | Up the canyon and into the garrison | One way, west to east: down, along, up into the storm, across, down again, deeper, out by the trench |
+| Route | Out and back through the same streets | Up the canyon and into the garrison | One way, west to east: down, along, deeper, up into the storm, across, down again, deeper, out by the trench |
 | Light | Noon: high suns, short shadows, 200 to 224 | Night | Evening: suns 14° and 18° up, the pits in dim shade under a glowing sky, lamplight and fire below ground |
 | Air | Still: glints settling | Still | A sandstorm: sand streaming over the pits' rims and the windbreak in gusts, the haze swelling and clearing |
 
@@ -72,21 +82,27 @@ Different by design, from Mos Eisley and from Mission 3's canyon:
   L: a strip 176 × 52 along the north (the garden court, the work yard,
   the lane, the house), and the house's end running on south to 92
   deep (the back plot over the cellar, the garage pit). The landing pad
-  is south of that, 46 × 26 in its drifts.
+  is south of that, 46 × 26 in its drifts. The reservoir is dug under
+  the sand outside the windbreak's south side, 64 × 12.
 - `m2`, painted in code by the painter with the town kit, like `m1`.
 - The sky is at 32.
 - **The route:** the shortest way from the garden pit to the pickup
-  spot, by way of the officer, is 393 steps (the monsters' flow field,
-  tile to tile); the third blockout's was 292, before any hunting round.
-  All of it is forward.
+  spot, by way of the officer, is 505 steps (the monsters' flow field,
+  tile to tile): 151 to the workshop pit, 135 across the yard to the
+  gate, 61 to the courtyard, 46 to the recordings, 112 out to the
+  pickup. The fourth blockout's was 393 (59 to the workshop pit), the
+  third's 292, before any hunting round. All of it is forward.
 - **Views:** inner walls 3 m tall split the farm into compounds, so no
   view outdoors is longer than about 75 tiles (the shed's door to the
   dome, over the gate); beyond the windbreak, only the sky and the
-  backdrop. Under the ground, views end at the next bend.
+  backdrop. Under the ground, views end at the next bend, but for the
+  reservoir's hall, 64 tiles end to end.
 - **Measured** on the blockout (2026-11-06, `node` on this machine, the
   same bench run on Mos Eisley for comparison): a view draws in 8 to 22
   ms (Mos Eisley 12 to 65); a monster's plan takes 0.4 to 1.1 ms (Mos
   Eisley up to 2.7 here; the third blockout about 2). No `navReach`.
+  With the reservoir, plans take 0.3 to 0.6 ms, and a view in the
+  reservoir draws in 3 to 4 ms.
 
 ## The map
 
@@ -102,13 +118,13 @@ y     +----------------------------------------------------+
    30 |  #:::::::::::::#oooo@oooiiiioo#::::#oooooooooo#    |
    36 |  #:::::::::::::#ooooooooiiiioo#::::#oCCCCoo@@o#    |
    42 |  #:::PP::@:::::#ooKKoooooooooo#::::#CCCCCCo@@o#    |
-   48 |  #:::PP::::@@:@#oKKKKooooooooo#::::#CCCCCCoooo#    |
+   48 |  #:::PP::::@@::#oKKKKooooooooo#::::#CCCCCCoooo#    |
    54 |  #:::::::::::::#oKKKKo@ooooooo#:::@#ooCCoooooo#    |
    60 |  #################################:#oooooooooo#    |
    66 |                                  ##############    |
    72 |                                    #::::::::::#    |
-   78 |                                    #::::::QQQQ#    |
-   84 |                                    #::::::QQQQ#    |
+   78 |               @    @               #::::::QQQQ#    |
+   84 |               @    @               #::::::QQQQ#    |
    90 |                                    #:::::::tt:#dddd|
    96 |                                    #:::::::tt:#dddd|
   102 |                                  ##############d..d|
@@ -124,7 +140,7 @@ y     +----------------------------------------------------+
   P  the garden pit (the drop-off)    K  the workshop pit    C  the house's courtyard pit
   Q  the garage pit    S  the generator shed    i  the Imperials' staging point
   G  the farm's gate (the red lock)    D  the house's great dome and its porch
-  t  the trench, and its gate through the windbreak    @  a light well
+  t  the trench, and its gate through the windbreak    @  a light well (outside: the reservoir's)
   .  the landing pad, and the three cuts in the drifts round it
   d  drifts out of reach    **  the pickup spot
 ```
@@ -141,18 +157,19 @@ y     +----------------------------------------------------+
    30 |  #     hhh      kkkkk              # C-CC     #    |
    36 |  #   PPhhh      kkkkk            wwwCCCCCCqqqq#    |
    42 |  #  PPP----ppp   KKKK            ww-CCCCCCqqqq#    |
-   48 |  #  PPPP  ppp----KKKK--%         wwwCCCCCCqqqq#    |
-   54 |  #        pppp   KKKKrrr          -  CCCC gggg#    |
-   60 |  #################################--sssss-=ggg#    |
-   66 |                                    #ssssss=ggg#    |
-   72 |                                    #xvxxx  == #    |
-   78 |                                  nnxxxxxx QQQQ#    |
-   84 |                                    xxxxxx QQQQ#    |
+   48 |  #  PPPP  pppp   KKKK----%%      wwwCCCCCCqqqq#    |
+   54 |  #        pppp   KKKKrrr-         -  CCCC gggg#    |
+   60 |  ##########e############e#########--sssss-=ggg#    |
+   66 |            ee           e          #ssssss=ggg#    |
+   72 |           RRRRRRRRRRRRRRRR         #xvxxx  == #    |
+   78 |           RRRRRRRRRRRRRRRR       nnxxxxxx QQQQ#    |
+   84 |           RRRRRRRRRRRRRRRR         xxxxxx QQQQ#    |
    90 |                                    #       tt ddddd|
    96 |                                    #       tt ddddd|
   102 |                                  #############dd..d|
       +----------------------------------------------------+
-  -  a tunnel     e  a stair down (the shed's hatch; the dome's)
+  -  a tunnel     e  a stair (the shed's hatch; the dome's; the reservoir's two)
+  R  the reservoir (deeper, under the sand outside the windbreak)
   P  K  C  Q  the pits                p  the pump room     h  the hidey-hole (secret)
   k  the workshop    %  caved in (rubble)    r  the well room (secret)
   w  the common room    q  the quarters    s  the storeroom    v  the stair down to the cellar
@@ -162,51 +179,69 @@ y     +----------------------------------------------------+
 **The way through,** one area to the next:
 
 ```
- WEST, the suns setting                                       EAST, the night coming
+ WEST, the suns setting                                     EAST, the night coming
 
- 1 garden pit ──> 2 pump tunnels ──> 3 workshop pit ──stair up──> 4 work yard
-   drop-off         the pipe,          first fight,                 the storm, fire,
-   quiet, blue      light wells        troopers on the rim          the officer's red key
-                                       (way east caved in)                 │ the gate
-                                                                            v
- 9 the pad <── 8 garage pit, <── 7 the cellar <── 6 the house <── 5 the lane
-   hold out      the trench        the recordings;  the dome, its pit,   the dome
-   for the Crow                    dark, quiet      rooms round it       straight ahead
+ 1 garden pit ──> 2 pump tunnels ──down──> 3 reservoir ──up──> 4 workshop pit
+   drop-off         the pipe,                a long dark          first fight in
+   quiet, blue      light wells              hall: water,         the open; the way
+                                             pillars, lamps       east caved in
+                                                                        │ up the shed's stair
+                                                                        v
+ 6 the lane <────────────── the gate, the red key <────────────── 5 work yard
+   the dome straight ahead                                          the storm, fire,
+     │                                                              the officer's key
+     v
+ 7 the house ──> 8 the cellar ──> 9 garage pit, trench ──> 10 the pad
+   the dome, its    the recordings;  out into the storm       hold out
+   pit, its rooms   dark, quiet                               for the Crow
 ```
 
 1. **The garden pit** (the drop-off): quiet, cold blue grow lamps. Jan
    names the goal. One arch out, east.
-2. **The pump tunnels:** east under the garden court, the pump room off
-   them, the water pipe overhead running to the house's cistern (follow
-   the pipe), two light wells. Two or three troopers.
-3. **The workshop pit:** the first real fight, troopers on its floor and
-   on the rim above. Across it, through its east arch, the tunnel toward
-   the house caved in, in sight from where you come in. The one way on
-   is north, through the workshop to the generator shed's stair.
-4. **The work yard:** up the stair and out of the burning shed's door
+2. **The pump tunnels:** east under the garden court to the pump room,
+   the water pipe overhead (follow the pipe), two light wells. One or
+   two troopers. The pump room's one way on is the stair down beside
+   its pump.
+3. **The reservoir:** 16 steps down into the farm's water store under
+   the sand outside the windbreak: one hall 32 m long running east, 4.5
+   m to its vault, dark, a walkway along its north side and a shallow
+   pool beside it, a row of pillars in the pool, two shafts of evening
+   light, the Imperials' work lamps, the pipe along its wall. Troopers
+   down its length: a long fight from pillar to pillar. At its far end,
+   16 steps up.
+4. **The workshop pit:** up into the tunnel beside it. East, toward the
+   house, it caved in, the rubble right there; west, the pit, open to the
+   sky. The first fight in the open, troopers on its floor and on the
+   rim above. The one way on is north, through the workshop to the
+   generator shed's stair.
+5. **The work yard:** up the stair and out of the burning shed's door
    facing east: across the yard, the gate with its red lock, and over it
    the house's dome. The staging point's floodlight to the right; the
    officer there has the key. Look back down into the workshop pit.
-5. **The lane:** through the gate, a lane 6 m wide running east straight
+6. **The lane:** through the gate, a lane 6 m wide running east straight
    at the dome's porch, troopers behind barricades, the dome growing.
-6. **The house:** the dome's hall and its stair down into the courtyard
+7. **The house:** the dome's hall and its stair down into the courtyard
    pit (the big fight, troopers on the rim and below), the family's
    rooms round it: the common room, the quarters, the storeroom, a
    tunnel from the common room round to the storeroom. The storeroom's
    stair goes down.
-7. **The cellar:** under the house, dark, quiet, no one. The recordings.
+8. **The cellar:** under the house, dark, quiet, no one. The recordings.
    Footsteps overhead; the garage's shutters roll up.
-8. **The garage, its pit and the trench:** out of the storeroom through
+9. **The garage, its pit and the trench:** out of the storeroom through
    the garage, into its pit, up the trench in the storm.
-9. **The pad:** hold the spot until the Crow lands.
+10. **The pad:** hold the spot until the Crow lands.
 
 **What holds the player back** (each gate in sight of the way round it):
 
 - The garden pit and the workshop pit: 6 deep, their only ways out their
   arches. The garden court over the pump tunnels is out of reach.
-- The workshop pit's east arch: the tunnel caved in after ten tiles (the
-  raid's grenade), in sight across the pit from the west arch. The stair
-  north is the only way on.
+- The pump room: its one way on is the stair down to the reservoir.
+- The reservoir: under the sand outside the windbreak, out of reach
+  above; its two shafts of light too narrow to climb.
+- The tunnel at the head of the reservoir's stair: east, toward the
+  house, caved in a few tiles on (the raid's grenade), the rubble in
+  sight from the stair's head; west, the workshop pit. From the pit, the
+  stair north is the only way on.
 - The work yard: walls 3 m all round (sand drifted against their foot:
   you can walk up the drift but not onto the wall). The gate wants the
   red key, which the officer at the staging point carries on every skill.
@@ -234,9 +269,11 @@ y     +----------------------------------------------------+
   THIS IS AS CLOSE AS I GET." Kyle: "RUSK SAID THE CELLAR, UNDER THE
   HOUSE." Jan: "THE BIG DOME AT THE EAST END. FOLLOW THE WATER PIPE. CALL
   WHEN YOU HAVE IT."
-- The water pipe on the tunnels' ceilings runs east to the house's
-  cistern (in the detail step).
-- At the rubble, Kyle: "CAVED IN. UP AND OVER, THEN."
+- The water pipe on the tunnels' ceilings, down into the reservoir and
+  along its wall, then on east toward the house's cistern (in the detail
+  step).
+- At the head of the reservoir's stair, the rubble in sight, Kyle:
+  "CAVED IN. UP AND OVER, THEN."
 - Out of the shed's door: the gate dead ahead with the dome over it.
   Kyle: "THERE'S THE HOUSE." At the gate, without the key: "AN IMPERIAL
   LOCK ON THE FARM'S GATE. THE OFFICER WILL HAVE THE KEY." The staging
@@ -261,6 +298,7 @@ Heights in units (1 unit = 0.5 m). The pad is at 0.
 | The pits | -5.5 | 6 under the ground, open to the sky; no parapets |
 | The tunnels and rooms | -5.5, ceilings -1.5 (2 m) | Under the ground (slabs, their tops at 0.5); tunnels 4 wide |
 | The light wells | -5.5, open to the sky | 2 x 2, kerbed on the ground (0.9) |
+| The reservoir | -13.5, its vault -4.5 (4.5 m) | 16 steps down from the pump room, 16 up at its east end; its pool 0.5 deeper; under the sand outside the windbreak (its top 0.5) |
 | The garage | -5.5, ceiling -1 | |
 | The cellar | -8.5, ceiling -4.5 | Six steps down from the storeroom; the cistern's pool 0.5 deeper |
 | The trench | -5.5 to 0.5 | 12 steps up south out of the garage pit, then the gate through the windbreak |
@@ -269,31 +307,32 @@ Heights in units (1 unit = 0.5 m). The pad is at 0.
 ## Areas
 
 Boxes are x0..x1, y0..y1 in tiles; circles are a centre and a radius. As
-built in the fourth blockout (2026-11-06).
+built in the fourth blockout, with the reservoir (2026-11-06).
 
 | # | Area | Where | What's there |
 |---|------|-------|--------------|
 | 1 | **The garden pit** (the drop-off) | round, (28, 46), r 6 | A small pit, 12 across: the family's hydroponic garden, grow beds in rows under grow lamps (a cold blue-white light, unlike anything else on the map), a water tank. Sand streams over its rim. Jan drops Kyle in it and is gone. Quiet for a moment. One arch, east. Round it, the garden court (12..64, 12..64), out of reach: a few vaporators against the sky. |
-| 2 | **The pump tunnels** | 33..73, 44..54 | East from the garden pit (35..50, 44..48, a light well), through the pump room (46..58, 46..58: the farm's pump, the water pipe going down into it, a light well), and on east (58..70, 50..54, a light well) under the court's wall into the workshop pit. Older and rougher than the house's tunnels, the pipe along the ceiling. |
-| 3 | **The workshop pit** | round, (80, 52), r 8 | 16 across, open to the sky: oil, droid parts, a stripped speeder burning. Troopers on its floor and on the rim above. Arches west (from the tunnels), north (the workshop), and east: a tunnel (87..100, 50..54) caved in at its end, the rubble in sight from the west arch. |
-| 3a | **The workshop** | 70..88, 26..40 | North of the pit under the yard: the droid bench, a pit droid, tools, vaporator parts, a lamp on, a light well. The generator shed's stair comes down into its north side (74..78, 14..26). |
-| 4 | **The work yard** | 66..124, 12..64 | 29 × 26 m, walled, sand drifted against the walls. In it: the generator shed, the staging point, the workshop pit's rim, the well room's light well, two vaporators, cargo pods, a dead power droid. The storm is thickest here. |
-| 4a | **The generator shed** | 68..84, 12..24 | A tin blockhouse in the yard's north-west corner over the farm's power unit, burning: flames out of its roof, a flickering light, smoke torn east. The hatch and stair in its floor; its door east (83, 15..20), onto the yard, facing the gate. |
-| 4b | **The Imperials' staging point** | 102..118, 30..44 | In the middle of the yard, off the line from the shed to the gate: a floodlight tower lit for the evening, supply crates, barricades at a slant, a comm unit on a crate. The officer with the red key; the commander on skill 3 and up. |
-| 4c | **The gate** | 124..126, 15..21 | The farm's gate in the yard's east wall, straight across from the shed's door, 6 wide: the Imperials' red lock on it (a stand-in Imperial door), a lamp over it. |
-| 5 | **The lane** | 126..146, 12..24 | 20 long and 6 m wide between the windbreak and a wall, running east from the gate straight at the dome's porch. A vaporator either side, barricades, troopers behind them. The plot south of it (126..144, 26..64) is out of reach. |
-| 6 | **The house's ground** | 146..188, 12..70 | Walled in: the great dome, the courtyard pit's rim (no parapets), two light wells' kerbs, a vaporator. Troopers on the rim. |
-| 6a | **The great dome** | round, (160, 20), r 8 | The house's entrance hall and the tallest thing on the farm: a drum 6.5 m tall, an 11-wide dome on it. Its door west under a porch (146..152, 18..22), lit. A square hall (155..165, 15..25) and a stair down its middle (158..162, 20..32), 12 steps south under its wall and the ground into the courtyard pit's north arch. |
-| 6b | **The courtyard** | round, (160, 46), r 12 | A round pit 24 across and 6 deep, open to the sky, its walls whitewashed plaster gone grey with soot, round-topped arches all round: the dome's stair north, the common room west, the quarters east, the storeroom south. The suns are too low to reach in, so its floor is a dim pool against the lit rim, lit by its doorways and a cart burning; an overturned table, a broken droid, crates. The big fight: troopers in it and on the rim above. |
-| 6c | **The common room** | 138..146, 40..52 | West of the courtyard under a low vault: the family's table knocked over, a hearth, a bench. A tunnel south (140..144, 52..66, a light well) and east (144..150, 62..66) round to the storeroom: the loop. |
-| 6d | **The quarters** | 174..186, 38..54 | East of the courtyard: the family's sleeping alcoves, a chest turned out, a child's toy droid, a light well. |
-| 6e | **The storeroom** | 150..170, 61..70 | South of the courtyard: shelves of canisters and food tins, crates, a power unit. The stair down to the cellar at its south-west (152..156, 70..76); the garage's shutter off its east side (173, 63..67). |
-| 7 | **The cellar** | 144..166, 76..88 | The objective. A vaulted cistern room, a dark pool along its south side (the farm's water), the pipe coming down into it, one lamp knocked over and still lit on the floor. Quiet and dark (64 to 80): no enemies. Rusk's helmet recordings in a sealed case behind a loose stone at its east end (162..166, 77..81): picking them up starts the ending. |
-| 8 | **The garage** | 174..186, 58..72 | Behind its two shutters (west on the storeroom's tunnel, south on the garage pit's arch), down until the recordings are taken. Inside: oil, tools, a second speeder stripped for parts, the space where the family's speeder stood, its dust still in the air. A stock of ammo before the hold-out. |
-| 8a | **The garage pit** | round, (180, 84), r 7 | The speeder bay, 14 across, open to the sky, in the back plot (out of reach from above): oil stains, a fuel tank, a hoist. |
-| 8b | **The trench** | 177..183, 91..106 | Out of the garage pit: a cut 6 wide climbing south, 12 steps of 0.5, walled in the farm's plaster, open to the sky, drifts on its steps; then a gate through the windbreak (104..106) onto the pad. |
-| 9 | **The landing pad** | 150..196, 106..132; the spot 168..176, 116..124 | The family's landing pad outside the windbreak, in a hollow of drifts too steep to climb, cut in three places (west, south, east) where the wind has scoured gaps; the farm's beacon lamps round the spot, low rocks for cover. The storm at its worst. The hold-out comes through the cuts; at its end the prototype's shape walks out of the blowing sand. Tuskens on the drifts' crest above, watching (Mark's sheet; until then nobody). |
-| 10 | **The edges** | | The windbreak's top and the drifts' crests against the sky; beyond, only the backdrop: the Jundland's mountains to the north and east, the Dune Sea's dunes to the west and south, the suns setting over them. |
+| 2 | **The pump tunnels** | 33..58, 44..58 | East from the garden pit (35..50, 44..48, a light well) to the pump room (46..58, 46..58: the farm's pump, the water pipe going down into it, a light well), its one way on the stair down beside the pump (50..54, 58..74, 16 steps) to the reservoir. Older and rougher than the house's tunnels, the pipe along the ceiling. |
+| 3 | **The reservoir** | 44..108, 74..86 | The farm's water store, dug under the sand outside the windbreak's south side (out of reach above): one hall 32 × 6 m, 4.5 m to its vault (floor -13.5), dark (72 to 80), sandstone. A walkway along its north side (74..78), a shallow pool beside it (0.5 deeper), five pillars in a row in the pool, two shafts of evening light down into the water (61, 83 and 81, 83), the Imperials' work lamps, the pipe along its north wall. The stair from the pump room comes in at its west end; at its east end, 16 steps up north (100..104, 58..74) under the wall to the tunnel beside the workshop pit. |
+| 4 | **The workshop pit** | round, (80, 52), r 8 | 16 across, open to the sky: oil, droid parts, a stripped speeder burning. Troopers on its floor and on the rim above. You come in by its east arch, from the tunnel (87..110, 50..54) the reservoir's stair comes up into (100..104, 54..58): east, toward the house, the tunnel caved in (106..110), the rubble in sight from the stair's head. An arch north to the workshop. |
+| 4a | **The workshop** | 70..88, 26..40 | North of the pit under the yard: the droid bench, a pit droid, tools, vaporator parts, a lamp on, a light well. The generator shed's stair comes down into its north side (74..78, 14..26). |
+| 5 | **The work yard** | 66..124, 12..64 | 29 × 26 m, walled, sand drifted against the walls. In it: the generator shed, the staging point, the workshop pit's rim, the well room's light well, two vaporators, cargo pods, a dead power droid. The storm is thickest here. |
+| 5a | **The generator shed** | 68..84, 12..24 | A tin blockhouse in the yard's north-west corner over the farm's power unit, burning: flames out of its roof, a flickering light, smoke torn east. The hatch and stair in its floor; its door east (83, 15..20), onto the yard, facing the gate. |
+| 5b | **The Imperials' staging point** | 102..118, 30..44 | In the middle of the yard, off the line from the shed to the gate: a floodlight tower lit for the evening, supply crates, barricades at a slant, a comm unit on a crate. The officer with the red key; the commander on skill 3 and up. |
+| 5c | **The gate** | 124..126, 15..21 | The farm's gate in the yard's east wall, straight across from the shed's door, 6 wide: the Imperials' red lock on it (a stand-in Imperial door), a lamp over it. |
+| 6 | **The lane** | 126..146, 12..24 | 20 long and 6 m wide between the windbreak and a wall, running east from the gate straight at the dome's porch. A vaporator either side, barricades, troopers behind them. The plot south of it (126..144, 26..64) is out of reach. |
+| 7 | **The house's ground** | 146..188, 12..70 | Walled in: the great dome, the courtyard pit's rim (no parapets), two light wells' kerbs, a vaporator. Troopers on the rim. |
+| 7a | **The great dome** | round, (160, 20), r 8 | The house's entrance hall and the tallest thing on the farm: a drum 6.5 m tall, an 11-wide dome on it. Its door west under a porch (146..152, 18..22), lit. A square hall (155..165, 15..25) and a stair down its middle (158..162, 20..32), 12 steps south under its wall and the ground into the courtyard pit's north arch. |
+| 7b | **The courtyard** | round, (160, 46), r 12 | A round pit 24 across and 6 deep, open to the sky, its walls whitewashed plaster gone grey with soot, round-topped arches all round: the dome's stair north, the common room west, the quarters east, the storeroom south. The suns are too low to reach in, so its floor is a dim pool against the lit rim, lit by its doorways and a cart burning; an overturned table, a broken droid, crates. The big fight: troopers in it and on the rim above. |
+| 7c | **The common room** | 138..146, 40..52 | West of the courtyard under a low vault: the family's table knocked over, a hearth, a bench. A tunnel south (140..144, 52..66, a light well) and east (144..150, 62..66) round to the storeroom: the loop. |
+| 7d | **The quarters** | 174..186, 38..54 | East of the courtyard: the family's sleeping alcoves, a chest turned out, a child's toy droid, a light well. |
+| 7e | **The storeroom** | 150..170, 61..70 | South of the courtyard: shelves of canisters and food tins, crates, a power unit. The stair down to the cellar at its south-west (152..156, 70..76); the garage's shutter off its east side (173, 63..67). |
+| 8 | **The cellar** | 144..166, 76..88 | The objective. A vaulted cistern room, a dark pool along its south side (the house's own store), the pipe coming down into it, one lamp knocked over and still lit on the floor. Quiet and dark (64 to 80): no enemies. Rusk's helmet recordings in a sealed case behind a loose stone at its east end (162..166, 77..81): picking them up starts the ending. |
+| 9 | **The garage** | 174..186, 58..72 | Behind its two shutters (west on the storeroom's tunnel, south on the garage pit's arch), down until the recordings are taken. Inside: oil, tools, a second speeder stripped for parts, the space where the family's speeder stood, its dust still in the air. A stock of ammo before the hold-out. |
+| 9a | **The garage pit** | round, (180, 84), r 7 | The speeder bay, 14 across, open to the sky, in the back plot (out of reach from above): oil stains, a fuel tank, a hoist. |
+| 9b | **The trench** | 177..183, 91..106 | Out of the garage pit: a cut 6 wide climbing south, 12 steps of 0.5, walled in the farm's plaster, open to the sky, drifts on its steps; then a gate through the windbreak (104..106) onto the pad. |
+| 10 | **The landing pad** | 150..196, 106..132; the spot 168..176, 116..124 | The family's landing pad outside the windbreak, in a hollow of drifts too steep to climb, cut in three places (west, south, east) where the wind has scoured gaps; the farm's beacon lamps round the spot, low rocks for cover. The storm at its worst. The hold-out comes through the cuts; at its end the prototype's shape walks out of the blowing sand. Tuskens on the drifts' crest above, watching (Mark's sheet; until then nobody). |
+| 11 | **The edges** | | The windbreak's top and the drifts' crests against the sky; beyond, only the backdrop: the Jundland's mountains to the north and east, the Dune Sea's dunes to the west and south, the suns setting over them. |
 
 ### Secrets (3)
 
@@ -326,7 +365,8 @@ still noon.
   -40, both -68, so deep shade is about 104. Walls facing the suns are
   lit by the sunlit ground in front of them; walls facing east are in
   their own shadow. Interiors 96 to 120, with lamps. The courtyard's floor
-  104. The cellar 64 to 80. Fires 200 and over, flickering (`fx:
+  104. The reservoir 72 to 80, with the
+  Imperials' work lamps. The cellar 64 to 80. Fires 200 and over, flickering (`fx:
   'fire'`). The staging point's floodlight a pool of 64 over the sand;
   the light wells' shafts of evening light on the tunnels' floors; the
   garden pit's grow lamps a cold blue-white.
@@ -398,6 +438,7 @@ cosmetic: its own RNG, never `world.rng`.
 - **New:** a farm vaporator (taller), fires on roofs and in doorways
   (decorations with fire, ember and smoke emitters, as the fire drum
   has), the water pipe along the tunnels' ceilings, the farm's pump, the
+  reservoir's pillars and the Imperials' work lamps, the
   light wells' kerbs, grow beds and grow lamps, the family's table and
   hearth, the quarters' alcoves and a toy droid, shelves of tins, rubble
   and a broken support for the caved-in tunnel, the farm's gate with the
@@ -423,20 +464,22 @@ cosmetic: its own RNG, never `world.rng`.
 
 - **Ambient** (PLAN.md section 4's looping positional sounds, not built
   yet): the wind, rising and falling with the gusts (DF's WIND1), fire
-  crackling at the burning buildings, the cistern's drip.
+  crackling at the burning buildings, the drip and echo of the
+  reservoir and the cistern.
 - **Music:** combat from the start.
 - **One-shots:** the prototype's footsteps at the end, the family's
   speeder roaring away.
 
 ## Enemies and items by skill
 
-All combat. As placed in the blockout (19, 32 and 39 monsters on skills
+All combat. As placed in the blockout (21, 34 and 42 monsters on skills
 1, 3 and 5), to be tuned in the life step:
 
 | Area | Every skill | 2+ | 3+ | 4+ |
 |------|-------------|----|----|----|
 | The garden pit | none: a moment to look round | | | |
-| The pump tunnels | 1 | 1 more | | 1 more |
+| The pump tunnels | 1 | | | 1 more |
+| The reservoir | 2 on the walkway | 1 more in the pool | | 1 more by the far stair |
 | The workshop pit | 2 below, 2 on the rim above | 1 more below | | 1 more on the rim |
 | The workshop | 1 | | 1 more by the stair | |
 | The generator shed | | | 1 at the hatch | |
@@ -498,12 +541,16 @@ are in PLAN.md section 9.
    - **The fourth design** (this file, 2026-11-06): a walk west to east
      to the house, a chain of areas with one way on from each, the house
      named at the start and seen from the work yard on. Then **the
-     blockout again** (built 2026-11-06).
+     blockout again** (built 2026-11-06). Mark's notes the same day: on
+     the right track; stretch it out, the underground most, with another
+     segment, not more complex ones.
+   - **The reservoir** (2026-11-06): between the pump tunnels and the
+     workshop pit, in the design and the blockout.
 3. **Evening:** the dusk sky, the suns, the haze, the light levels.
 4. **Blowing sand:** the engine pieces, then the particles on the bench,
    then in the level.
 5. **Each area in detail,** in the order you meet them: the garden pit
-   and the pump tunnels; the workshop pit and the workshop; the work
+   and the pump tunnels; the reservoir; the workshop pit and the workshop; the work
    yard, the generator shed, the staging point and the gate; the lane and
    the great dome; the courtyard and the house's rooms; the cellar; the
    garage, its pit, the trench and the pad; the windbreak, the drifts and
