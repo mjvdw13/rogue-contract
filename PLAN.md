@@ -28,6 +28,15 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
+- **Mission 2's deeper pits** (`?map=m2`, 2026-11-07): every pit 6 m
+  deep (Mark: "try 6, then let me check it"), from 3, and everything under
+  them down by the same. The shed's stair runs on down the workshop's west
+  wall; the dome's comes out halfway down the courtyard's north wall and a
+  stair curves down the wall's inside; the trench runs on down the garage
+  pit's middle to the shutter. The route about 32 steps longer. To judge:
+  the depth, the three stairs, and the light wells (jumping down one now
+  costs about 36 health, from 7: the well room's secret is reached that
+  way).
 - **Mission 2's fourth blockout, with the reservoir, the stretched
   ending and the caves** (`?map=m2`, 2026-11-06), a walk west to east to the house
   (`docs/mission2.md`):
@@ -1243,12 +1252,19 @@ snapshots, playable at `?map=m2`.
       the garage pit (the route 745 steps, from 631).
 - [ ] **Mark's notes on the caves blockout** (2026-11-07: the flow is
       right):
-  - [ ] Deeper pits. They're 3 m now (the farm 0.5, the pits -5.5), too
-        shallow for a moisture farm. Deepen the garden, workshop and
-        garage pits and the courtyard, and everything under them (the
-        tunnels, the reservoir, the cellar, the caves) by the same, so
-        the stairs and ramps between them still work. Agree the depth
-        with Mark first (Lars' courtyard is about 6 to 8 m).
+  - [x] Deeper pits: 6 m (Mark, 2026-11-07), from 3. The pits at -11.5,
+        everything under them down by the same 6 (the tunnels' ceilings
+        -7.5, the reservoir -19.5, the cellar -14.5, the caves about -21).
+        The three stairs from the surface get 12 more steps each:
+    - [x] The shed's stair: along the shed's west wall, on down the
+          workshop's west wall.
+    - [x] The dome's stair: to a doorway halfway down the courtyard's
+          wall, then a stair curving down the wall's inside to the east
+          (the quarters' doorway moved south of it).
+    - [x] The trench: on down into the garage pit as a straight flight,
+          its foot at the garage's shutter.
+    - [x] Check: validate, snapshots of each stair and pit, the route
+          measured; `docs/mission2.md`'s heights.
   - [ ] Redesign the vaporators: a farm vaporator of its own (taller and
         stouter than the town's small one, its rings, fins and base
         unit), a model in `src/content/models/`, sketched for Mark before
