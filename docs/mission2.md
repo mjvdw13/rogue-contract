@@ -180,12 +180,14 @@ side. The arched door is in a **hood that projects forward** from the
 block, a rounded arch on two thick jambs. In front of it a **sunken
 stairwell** edged by a stone kerb: you go down from outside, before the
 door. Grimy and darker at the foot, the plaster cracked. A small panel
-by the door, crates and drums against the walls.
+by the door, crates and drums against the walls. Mark (2026-11-07): the
+great dome takes this, the way down starting outside in its stairwell
+rather than in a hall.
 
-**The garage** (on the flat): a low wide mound, almost flush with the
-ground, with a **ring of round windows** under its rim; at dusk the
-windows glow amber (a ring of lights round the horizon: a landmark from
-the pad). Inside, a round room: a **ring of round amber lamps** all the
+**The garage** (on the flat in the references): a low wide mound,
+almost flush with the ground, with a **ring of round windows** under its
+rim, glowing amber at dusk. Ours stays in its pit (Mark, 2026-11-07), so
+only its inside is borrowed: a round room, a **ring of round amber lamps** all the
 way round under the ceiling, a **round grating floor** in the middle
 inside a low kerb, a big console against the wall (dials, a round
 gauge, lit buttons, two small screens), wall lamps, rounded-square

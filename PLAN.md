@@ -1300,10 +1300,8 @@ snapshots, playable at `?map=m2`.
     - [ ] The garage round, not a box: a ring of round amber lamps
           under its ceiling, a round grating floor in a kerb, the
           console (dials, a gauge, two screens), wall lamps,
-          rounded-square openings. Seen from the pad, its roof a low
-          mound with a ring of lit windows (a question for Mark: the
-          garage on the surface by the pad, as in the references, or
-          kept in its pit).
+          rounded-square openings. It stays in its pit (Mark,
+          2026-11-07), opening on it; no mound on the surface.
     - [ ] The common room and storeroom as the kitchen: a smooth white
           vault, white counters along both sides with a red stripe,
           appliances in niches, oval niches in the plaster, a red rug.
@@ -1320,10 +1318,15 @@ snapshots, playable at `?map=m2`.
         over a doorway where a stair lands.
   - [ ] The courtyard's condenser panel (ribbed white, its gear disc,
         two fittings on the rim above): its landmark.
-  - [ ] The great dome as the entrance dome: on a block with low wings,
-        its door in a projecting hood, a sunken stairwell with a kerb in
-        front of it (a question for Mark: the way down starts outside,
-        not in a hall).
+  - [ ] The great dome as the entrance dome (Mark, 2026-11-07: yes, the
+        way down starts outside): on a block with low wings, its door in
+        a projecting hood at the foot of a sunken stairwell, kerbed,
+        cut down from the lane's end. The first flight (6) in the
+        stairwell, the door at its foot, the landing and second flight
+        (6) inside under the dome, then the doorway halfway down the
+        courtyard's wall and the curve as now. The hall goes; the porch
+        becomes the hood. Update `docs/mission2.md` (7a, Levels) when
+        built.
 - [ ] **Evening:**
   - [ ] `sky-dusk` (`derive.mjs`, from RESKY01): mauve overhead to rose
         to a pale warm amber at the horizon, fading into the haze (Mark's
