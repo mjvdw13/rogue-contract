@@ -28,16 +28,6 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
-- **Mission 2's new vaporators** (2026-11-07, sketch snapshots sent to
-  Mark; models in `models/vaporator.js`, not in the level yet): the
-  courtyard's cluster in the same parts as the yard's (a 3.4 m and a
-  2.25 m vaporator without masts, chiller bars round them, a squat unit,
-  domed caps), and for the yards the film's vaporator
-  (Mark's references): foot, pump, condenser with louvres and dials,
-  coolant section, brain discs, ribbed intake, banded column, cone, mast
-  and a turning humidity sensor, three chiller bars round it. To judge:
-  shapes, sizes, the worn white (it reads grey in the evening light).
-
 - **Mission 2's pits and shorter stairs** (`?map=m2`, 2026-11-07): after
   Mark's notes on the 6 m pits (the courtyard's curved stair good, the
   others too long), the courtyard stays 6 m and the garden, workshop and
@@ -1292,23 +1282,6 @@ snapshots, playable at `?map=m2`.
           gentler and longer.
     - [x] Check: validate, cell dumps of every stair, snapshots, the
           route; `docs/mission2.md`; Waiting on Mark.
-  - [ ] Redesign the vaporators from Mark's references
-        (`docs/mission2.md`, "The look"), models in
-        `src/content/models/`, sketched for Mark before they go in the
-        level:
-    - [x] The cluster for the courtyard: two or three stacked cylinders
-          (drums, collars, 2.5 to 4 m), rods round them, a squat unit,
-          domed caps at their feet (each cap its own small model).
-          `models/vaporator.js`: `vaporator-tall` (3.4 m), `-mid`
-          (2.25 m), `-squat`, `-cap`, rebuilt in the film vaporator's parts
-          (Mark, 2026-11-07).
-    - [x] The yard's vaporator, after the film's (Mark's references,
-          2026-11-07, replacing the lattice mast): `vaporator-farm`, 3.9 m
-          body, mast to 5.4 m, three chiller bars, and
-          `vaporator-sensor` turning on top.
-    - [ ] Mark's notes on the sketch (Waiting on Mark), then place them:
-          the cluster in the courtyard, the farm vaporators and caps on
-          the farm's ground in place of the town's small vaporator.
   - [ ] Underground and indoors not all sand: a garage proper and
         mechanical detail through the rooms, tunnels and caves (pipes,
         pumps, conduit, vents, hatches, metal floors where people work);

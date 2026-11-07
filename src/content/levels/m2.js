@@ -2,6 +2,7 @@ import { defineLevel } from '../../engine/defs.js';
 import { Painter } from './lib/painter.js';
 import { Town } from './lib/town.js';
 import { valueNoise } from './lib/noise.js';
+import { SENSOR_Z } from '../models/vaporator.js';
 
 // MISSION 2: THE HOMESTEAD. The layout, route and numbers are in
 // docs/mission2.md (area numbers below match its table). The blockout:
@@ -471,12 +472,28 @@ lights.push(
 // loop tunnel and quarters, and the well room's (its only way in).
 for (const [x, y] of [[40, 45], [51, 51], [61, 83], [81, 83], [84, 30], [141, 57], [179, 41], [93, 58]]) well(x, y);
 
-// The farm's vaporators (stand-ins: the town's small one): a few in the
-// garden court, seen from the pit; in the yard (off the line from the
-// shed's door to the gate); in the lane.
-for (const [x, y] of [[18.5, 30.5], [52.5, 30.5], [94.5, 30.5], [112.5, 58.5], [130.5, 22.5], [138.5, 13.5], [184.5, 64.5]]) {
-  list.push(at('vaporator', x, y, { z: FARM, angle: Math.round(valueNoise(x, y, 1, 7) * 360) }));
-}
+// The farm's vaporators (models/vaporator.js, after the film's): a few in
+// the garden court, seen from the pit; in the yard (off the line from the
+// shed's door to the gate); in the lane. Each has its humidity sensor
+// turning on its mast, and every other one a domed cap at its foot.
+[[18.5, 30.5], [52.5, 30.5], [94.5, 30.5], [112.5, 58.5], [130.5, 22.5], [138.5, 13.5], [184.5, 64.5]].forEach(([x, y], k) => {
+  const turn = Math.round(valueNoise(x, y, 1, 7) * 360);
+  list.push(at('vaporator-farm', x, y, { z: FARM, angle: turn }), at('vaporator-sensor', x, y, { z: FARM + SENSOR_Z, angle: (turn * 7) % 360 }));
+  if (k % 2 === 0) {
+    const a = ((turn + 70) * Math.PI) / 180;
+    list.push(at('vaporator-cap', x + Math.cos(a) * 1.9, y - Math.sin(a) * 1.9, { z: FARM }));
+  }
+});
+// The courtyard's cluster, in the middle of the floor in the burning
+// cart's light, clear of the curved stair, with room round it on every
+// side: a tall and a shorter
+// vaporator, the squat unit, domed caps at their feet (cover for the fight).
+list.push(
+  at('vaporator-tall', 161, 46.5, { z: COURT, angle: 200 }),
+  at('vaporator-mid', 164, 44.2, { z: COURT, angle: 240 }),
+  at('vaporator-squat', 158.2, 47.6, { z: COURT, angle: 160 }),
+);
+for (const [x, y] of [[159.6, 44.6], [162.6, 48.8], [165.6, 46.4], [156.6, 45.8]]) list.push(at('vaporator-cap', x, y, { z: COURT }));
 // The lane's barricades.
 list.push(at('barricade-worn', 137, 16.5, { angle: 100, z: FARM }), at('barricade-worn', 141, 21, { angle: 80, z: FARM }));
 

@@ -202,8 +202,9 @@ where the fittings stop, with oval niches in it. A rug in the living
 rooms (red, patterned). Rooms at different heights, joined by short
 stairs.
 
-**On the flat:** tall thin vaporators (a lattice mast with a vane on
-top), small squat units and domed caps scattered, a few crates.
+**On the flat:** tall thin vaporators (Mark, 2026-11-07: the film's, a
+mast with a humidity sensor on top), small squat units and domed caps
+scattered, a few crates.
 
 **The sky:** with the suns 5 to 15° up, the sky is rose to mauve all
 over, warmer and paler at the horizon, the two suns big pale discs, the
@@ -640,13 +641,14 @@ cosmetic: its own RNG, never `world.rng`.
 ## Props and models
 
 - **Have:** domes (and the broken dome), arches and hoods, lattice doors,
-  shutters, the street clutter, vaporators (the town's small one), the
-  fire drum, worn barricades and floodlight towers, boulders, the X-34,
+  shutters, the street clutter, the farm's vaporators
+  (`models/vaporator.js`, after the film's, Mark's references
+  2026-11-07: a 3.9 m one with a mast and a turning humidity sensor on the
+  ground, the courtyard's cluster of a 3.4 m and a 2.25 m one, a squat
+  unit and domed caps, all from the same parts), the fire drum, worn barricades and floodlight towers, boulders, the X-34,
   pit droids and power droids, the workbench and swoop hoist, terminals,
   a speeder bike, the Imperial red door (the gate's stand-in).
-- **New** (the look's details are in "The look", above): the courtyard's
-  vaporator cluster (stacked cylinders, rods, domed caps) and the tall
-  lattice vaporator for the ground, the condenser panel, the round
+- **New** (the look's details are in "The look", above): the condenser panel, the round
   doorway surrounds and their wavy whitewash, the garage's ring lamps,
   grating and console, the kitchen's white counters, fires on roofs and in doorways
   (decorations with fire, ember and smoke emitters, as the fire drum
