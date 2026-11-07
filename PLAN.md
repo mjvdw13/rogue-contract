@@ -28,8 +28,9 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
-- **Mission 2's fourth blockout, with the reservoir** (`?map=m2`,
-  2026-11-06), a walk west to east to the house (`docs/mission2.md`):
+- **Mission 2's fourth blockout, with the reservoir and the stretched
+  ending** (`?map=m2`, 2026-11-06), a walk west to east to the house
+  (`docs/mission2.md`):
   the garden pit, the pump tunnels, down into the reservoir (a long dark
   hall under the sand, added after Mark's notes on the fourth: on the
   right track, stretch it out with another underground segment), up
@@ -37,12 +38,17 @@ These need Mark to try something, or to decide. Don't start them without him.
   the generator shed into the work yard facing the gate with the house's
   great dome over it, the officer's red key, the lane straight at the
   dome, its stair down into the courtyard pit and the rooms round it, the
-  cellar, out by the garage, its pit and the trench to the pad. The
-  route is 505 steps (393 before the reservoir). To judge: the reservoir
-  (32 m long, how dark, the fight down its length), whether the level is
-  now long enough, and what's still open from the fourth: the dome as
-  the destination, the key hunt, the lane (short, 10 m), where the
-  fights are. The sky and haze are still stand-ins (the night sky).
+  cellar, out by the garage, its pit and the trench to the pad, where
+  Jan won't land (after Mark's notes on the reservoir: he loves it; get
+  through a wave of stormtroopers and find Jan): the wave of five, two of
+  them up the wash, then down the wash into the rocks, under its arch,
+  to the Crow on the flat with troopers firing on it. The route is 636
+  steps (505 before the ending, 393 before the reservoir). To judge: the
+  ending (the wave's size, the wash's length, finding the Crow), whether
+  the level is now long enough, and what's still open: the reservoir's
+  darkness, the dome as the destination, the key hunt, the lane (short,
+  10 m), where the fights are. The sky and haze are still stand-ins (the
+  night sky).
 
 - **Finding the way** (`?map=m1`, 2026-11-03, after Mark's play test:
   maze-like, unclear who to talk to, the fob pointing down alleys). Four
@@ -1220,6 +1226,12 @@ snapshots, playable at `?map=m2`.
       underground segment, not more complex ones): `docs/mission2.md`,
       and in the blockout between the pump tunnels and the workshop pit
       (the route 505 steps, from 393).
+- [x] The ending stretched after Mark's notes on the reservoir
+      (2026-11-06: don't end as you come out of the trench; get through a
+      wave of stormtroopers and find Jan): `docs/mission2.md`, and in the
+      blockout (the map 72 tiles taller): Jan won't land on the pad, the
+      wave of five, the wash winding down into the rocks under an arch,
+      the Crow on the flat at its foot (the route 636 steps, from 505).
 - [ ] **Evening:**
   - [ ] `sky-dusk` (`derive.mjs`, from RESKY01): indigo overhead to rose
         to amber at the horizon, fading into the haze.
@@ -1282,6 +1294,9 @@ snapshots, playable at `?map=m2`.
   - [ ] The garage, its pit, the trench and the pad: the stripped
         speeder, the hoist, drifts on the trench's steps, the windbreak's
         gate, the beacon lamps round the spot, low rocks.
+  - [ ] The wash and the flat: rock that reads as rock (the sandstone
+        texture looks laid in blocks), sand drifted against the walls'
+        feet, the arch, the dry bed's gravel, the Crow's landing lights.
   - [ ] The windbreak, its drifts and the backdrop: sand drifted against
         the wall, the pad's drifts and cuts, the Jundland far off
         (`canyonBackdrop`) and a dune variant for the west and south.
@@ -1290,12 +1305,12 @@ snapshots, playable at `?map=m2`.
       lights), the workshop pit's speeder and the courtyard's cart; the
       smoke torn east by the wind.
 - [ ] **Life:** the troopers by skill (`docs/mission2.md`'s table), the
-      probe droid, items and ammo, the hold-out's waves through the pad's
-      three cuts.
+      probe droid, items and ammo, the wave by skill (a `skill` on the
+      `spawn` action, or more troopers placed lying in wait).
 - [ ] **The story:** the recordings (the data tape, section 7) start the
       ending; footsteps and falling dust; the garage rolls open, the
-      family's speeder heard leaving; the call and `wait` (section 6) for
-      Jan's two minutes; the pickup as the exit. Stand-in words.
+      family's speeder heard leaving; the call; the Crow on the flat;
+      the pickup as the exit. Stand-in words.
 - [ ] Waiting on Mark: the Tuskens' sheet (on the pad's drifts) and the prototype's
       (walking out of the sand at the end); the words.
 - [ ] **Tune and check:** light, the sand, frame time, the per-skill check;

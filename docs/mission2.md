@@ -10,8 +10,10 @@ the pump tunnels, down through the farm's reservoir and up into the
 workshop pit, up through the burning generator shed into the work yard, where an officer carries the key to the house's
 gate, up the lane to the house's great dome, down into its courtyard pit
 and through its rooms to the cellar, where he finds Rusk's helmet
-recordings. Then out by the garage to hold the landing pad while
-something big walks out of the sand. All combat, from the first room.
+recordings. Then out by the garage onto the landing pad, where Jan
+won't land: through a wave of troopers and down a dry wash into the
+rocks to the Crow, while something big walks out of the sand. All
+combat, from the first room.
 
 Fourth design (2026-11-06). Mark played the third blockout: the walled
 farm's direction is right and the feel more correct, but the level felt
@@ -48,6 +50,18 @@ workshop pit. One more area in the chain, a kind of space the farm
 didn't have (one tall hall, water, pillars, a long sightline), and the
 route a quarter longer: 505 steps, from 393.
 
+**The ending stretched** (2026-11-06). Mark liked the reservoir and
+asked for more at the other end: the level ended as soon as you came out
+of the trench, the pickup spot ten tiles from its gate. Now Jan won't
+land on the pad with a squad coming over the drifts; she sets down
+where a dry wash comes out of the rocks south of the farm. Kyle gets
+through the wave on the pad (some of it coming up the wash at him), then
+follows the wash down into the rocks, under a natural arch and round a
+bend, to the flat at its foot, where the Crow is waiting with troopers
+firing on it. Two more areas in the chain and a new kind of ground (rock,
+a winding gorge, the lowest ground on the map); the route 636 steps,
+from 505.
+
 The first design (a ridge and a vaporator field), the second (open
 desert, a track) and the third (the walled farm round one yard) are in
 this file's history.
@@ -70,39 +84,45 @@ Different by design, from Mos Eisley and from Mission 3's canyon:
 
 | | Mos Eisley | The Canyon Garrison (m3) | The Homestead |
 |---|---|---|---|
-| Ground | Streets between walls, flat | A canyon floor between rock walls | Four round pits open to the sky, tunnels and rooms under the ground between them, the reservoir's long vault deeper still; above, a walled yard, a lane and the house's ground |
+| Ground | Streets between walls, flat | A canyon floor between rock walls | Four round pits open to the sky, tunnels and rooms under the ground between them, the reservoir's long vault deeper still; above, a walled yard, a lane and the house's ground; at the end, a dry wash winding down through the rocks |
 | Walls | Plaster houses | Rock and Imperial metal | Whitewashed plaster gone grey with soot, round arches, the windbreak with sand drifted against it |
-| Route | Out and back through the same streets | Up the canyon and into the garrison | One way, west to east: down, along, deeper, up into the storm, across, down again, deeper, out by the trench |
+| Route | Out and back through the same streets | Up the canyon and into the garrison | One way, west to east: down, along, deeper, up into the storm, across, down again, deeper, out by the trench, down the wash to the Crow |
 | Light | Noon: high suns, short shadows, 200 to 224 | Night | Evening: suns 14° and 18° up, the pits in dim shade under a glowing sky, lamplight and fire below ground |
 | Air | Still: glints settling | Still | A sandstorm: sand streaming over the pits' rims and the windbreak in gusts, the haze swelling and clearing |
 
 ## Grid and size
 
-- **208 × 142 tiles** (104 × 71 m). The farm inside its windbreak is an
+- **208 × 214 tiles** (104 × 107 m). The farm inside its windbreak is an
   L: a strip 176 × 52 along the north (the garden court, the work yard,
   the lane, the house), and the house's end running on south to 92
   deep (the back plot over the cellar, the garage pit). The landing pad
   is south of that, 46 × 26 in its drifts. The reservoir is dug under
-  the sand outside the windbreak's south side, 64 × 12.
+  the sand outside the windbreak's south side, 64 × 12. South of the
+  pad, the rocks: the wash winds 45 m down through them to the flat
+  where the Crow sets down, 26 × 16 m.
 - `m2`, painted in code by the painter with the town kit, like `m1`.
 - The sky is at 32.
 - **The route:** the shortest way from the garden pit to the pickup
-  spot, by way of the officer, is 505 steps (the monsters' flow field,
-  tile to tile): 151 to the workshop pit, 135 across the yard to the
-  gate, 61 to the courtyard, 46 to the recordings, 112 out to the
-  pickup. The fourth blockout's was 393 (59 to the workshop pit), the
-  third's 292, before any hunting round. All of it is forward.
+  under the Crow, by way of the officer, is 636 steps (the monsters'
+  flow field, tile to tile): 151 to the workshop pit, 135 across the
+  yard to the gate, 61 to the courtyard, 46 to the recordings, 89 out to
+  the pad, 154 down the wash to the Crow. Before the ending was
+  stretched it was 505 (the pickup on the pad); the fourth blockout's
+  393 (59 to the workshop pit), the third's 292, before any hunting
+  round. All of it is forward.
 - **Views:** inner walls 3 m tall split the farm into compounds, so no
   view outdoors is longer than about 75 tiles (the shed's door to the
   dome, over the gate); beyond the windbreak, only the sky and the
   backdrop. Under the ground, views end at the next bend, but for the
-  reservoir's hall, 64 tiles end to end.
+  reservoir's hall, 64 tiles end to end. In the wash, views end at its
+  bends (its long stretch about 35 tiles).
 - **Measured** on the blockout (2026-11-06, `node` on this machine, the
   same bench run on Mos Eisley for comparison): a view draws in 8 to 22
   ms (Mos Eisley 12 to 65); a monster's plan takes 0.4 to 1.1 ms (Mos
   Eisley up to 2.7 here; the third blockout about 2). No `navReach`.
   With the reservoir, plans take 0.3 to 0.6 ms, and a view in the
-  reservoir draws in 3 to 4 ms.
+  reservoir draws in 3 to 4 ms. On the pad, in the wash and on the
+  flat, a view draws in 6 to 17 ms, and plans take 0.5 to 0.9 ms.
 
 ## The map
 
@@ -129,10 +149,22 @@ y     +----------------------------------------------------+
    96 |                                    #:::::::tt:#dddd|
   102 |                                  ##############d..d|
   108 |                                d..dd..............d|
-  114 |                                d.........**.......d|
-  120 |                                d..dd.....**.....ddd|
+  114 |                                d..................d|
+  120 |                                d..dd............ddd|
   126 |                                ddddd............ddd|
-  132 |                                dddddddd....dddddddd|
+  132 |                                dddddddddd,,dddddddd|
+  138 |                                dddddddddd,,,ddddddd|
+  144 |                ^^^^^^^^^^^^^^^^^^^^^^^^^^nnn^^^^^^^|
+  150 |                ^^^^^^^^^^^^^^^^^^^^^^^^^,,,,^^^^^^^|
+  156 |                ^^^^^^^^^^^^^^^^,,,,,,,,,,,^^^^^^^^^|
+  162 |                ^^^^^^^^^^^^^^,,,,,^^^^^^^^^^^^^^^^^|
+  168 |                ^^^^^^^^^^^,,,,,^^^^^^^^^^^^^^^^^^^^|
+  174 |                ^^^^^^,,,,,,,,,,,^^^^^^^^^^^^^^^^^^^|
+  180 |                ^^^^^,,,,,,,,,,,,,^^^^^^^^^^^^^^^^^^|
+  186 |                ^^^^^,,,,MMM,,,,,^^^^^^^^^^^^^^^^^^^|
+  192 |                ^^^^^^,,,,,,,,,,,^^^^^^^^^^^^^^^^^^^|
+  198 |                ^^^^^^^^^,,,,,^^^^^^^^^^^^^^^^^^^^^^|
+  204 |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^|
       +----------------------------------------------------+
   #  the windbreak and the walls inside it, 3 m (sand drifted against their foot)
   o  ground you can walk: the work yard, the lane, the house's ground
@@ -141,8 +173,10 @@ y     +----------------------------------------------------+
   Q  the garage pit    S  the generator shed    i  the Imperials' staging point
   G  the farm's gate (the red lock)    D  the house's great dome and its porch
   t  the trench, and its gate through the windbreak    @  a light well (outside: the reservoir's)
-  .  the landing pad, and the three cuts in the drifts round it
-  d  drifts out of reach    **  the pickup spot
+  .  the landing pad, and the cuts west and east in the drifts round it
+  d  drifts out of reach    ^  the rocks, their tops out of reach
+  ,  the wash and the flat, below the pad    n  the rock arch over the wash
+  M  the Crow, set down on the flat (under it, the pickup)
 ```
 
 Under the ground, the same scale:
@@ -192,8 +226,13 @@ y     +----------------------------------------------------+
      │                                                              the officer's key
      v
  7 the house ──> 8 the cellar ──> 9 garage pit, trench ──> 10 the pad
-   the dome, its    the recordings;  out into the storm       hold out
-   pit, its rooms   dark, quiet                               for the Crow
+   the dome, its    the recordings;  out into the storm       Jan won't land;
+   pit, its rooms   dark, quiet                               the wave
+                                                                │ south
+                                                                v
+                                    12 the flat <──down── 11 the wash
+                                       the Crow,             into the rocks,
+                                       troopers on it        under the arch
 ```
 
 1. **The garden pit** (the drop-off): quiet, cold blue grow lamps. Jan
@@ -229,7 +268,16 @@ y     +----------------------------------------------------+
    Footsteps overhead; the garage's shutters roll up.
 9. **The garage, its pit and the trench:** out of the storeroom through
    the garage, into its pit, up the trench in the storm.
-10. **The pad:** hold the spot until the Crow lands.
+10. **The pad:** Kyle calls the Crow. Jan won't land with a squad
+    coming over the drifts; she'll set down where the dry wash comes out
+    of the rocks. The wave: troopers through the cuts west and east, and
+    up the wash.
+11. **The wash:** south out of the pad's hollow and down into the rocks,
+    under a natural arch, round a bend and west, down again: boulders for
+    cover, troopers lying in wait.
+12. **The flat:** the wash comes out onto a flat at the foot of the
+    rocks, the Crow hovering on it, troopers firing on it. Under the
+    Crow, the level ends.
 
 **What holds the player back** (each gate in sight of the way round it):
 
@@ -258,10 +306,11 @@ y     +----------------------------------------------------+
   out of reach, so the trench and the pad come only after the cellar.
 - The trench's walls stand 2 m over the back plot at its top, so the way
   out is only through the gate.
-- The pad: drifts too steep to climb all round, cut in three places
-  where the hold-out's troopers come in. It ends the level once the Crow
-  is down, Jan's two minutes after the call (the `wait` action, PLAN.md
-  section 6).
+- The pad: drifts too steep to climb all round, cut west and east into
+  pockets (where the wave comes from) and south into the wash, the one
+  way on.
+- The wash and the flat: walled by the rocks, their tops 3.5 m and more
+  over the pad, out of reach; one way down, no side turnings.
 
 **What points the way** (stand-in words):
 
@@ -283,7 +332,12 @@ y     +----------------------------------------------------+
   "KYLE, SOMETHING BIG JUST WALKED OUT OF THE STORM. GET OUT OF THERE."
   The garage's shutters roll up, the family's speeder roars away up the
   trench.
-- At the trench's gate, Kyle calls the Crow. Jan: "TWO MINUTES!"
+- At the trench's gate, Kyle calls the Crow. Jan: "NOT ON THAT PAD,
+  THERE'S A SQUAD COMING OVER THE DRIFTS." "I'LL SET DOWN WHERE THE DRY
+  WASH COMES OUT OF THE ROCKS, SOUTH OF YOU." The wash's mouth is ahead
+  across the pad, the rock arch over it in sight.
+- Out of the wash's last bend, the Crow on the flat. Jan: "THERE YOU
+  ARE. THEY'RE SHOOTING AT MY SHIP, HURRY!"
 
 ## Levels
 
@@ -303,11 +357,15 @@ Heights in units (1 unit = 0.5 m). The pad is at 0.
 | The cellar | -8.5, ceiling -4.5 | Six steps down from the storeroom; the cistern's pool 0.5 deeper |
 | The trench | -5.5 to 0.5 | 12 steps up south out of the garage pit, then the gate through the windbreak |
 | The pad | 0 | Its drifts rise 2 at once, then on up |
+| The rocks | 7 to 10.75 | Out of reach: the wash's walls, 4 to 7 m over its floor |
+| The wash | 0 to -3 | Three drops of two steps of 0.5; the arch 2.5 m over it, 1.5 m thick |
+| The flat | -3 | The lowest ground on the map |
 
 ## Areas
 
 Boxes are x0..x1, y0..y1 in tiles; circles are a centre and a radius. As
-built in the fourth blockout, with the reservoir (2026-11-06).
+built in the fourth blockout, with the reservoir and the stretched
+ending (2026-11-06).
 
 | # | Area | Where | What's there |
 |---|------|-------|--------------|
@@ -328,11 +386,13 @@ built in the fourth blockout, with the reservoir (2026-11-06).
 | 7d | **The quarters** | 174..186, 38..54 | East of the courtyard: the family's sleeping alcoves, a chest turned out, a child's toy droid, a light well. |
 | 7e | **The storeroom** | 150..170, 61..70 | South of the courtyard: shelves of canisters and food tins, crates, a power unit. The stair down to the cellar at its south-west (152..156, 70..76); the garage's shutter off its east side (173, 63..67). |
 | 8 | **The cellar** | 144..166, 76..88 | The objective. A vaulted cistern room, a dark pool along its south side (the house's own store), the pipe coming down into it, one lamp knocked over and still lit on the floor. Quiet and dark (64 to 80): no enemies. Rusk's helmet recordings in a sealed case behind a loose stone at its east end (162..166, 77..81): picking them up starts the ending. |
-| 9 | **The garage** | 174..186, 58..72 | Behind its two shutters (west on the storeroom's tunnel, south on the garage pit's arch), down until the recordings are taken. Inside: oil, tools, a second speeder stripped for parts, the space where the family's speeder stood, its dust still in the air. A stock of ammo before the hold-out. |
+| 9 | **The garage** | 174..186, 58..72 | Behind its two shutters (west on the storeroom's tunnel, south on the garage pit's arch), down until the recordings are taken. Inside: oil, tools, a second speeder stripped for parts, the space where the family's speeder stood, its dust still in the air. A stock of ammo before the wave. |
 | 9a | **The garage pit** | round, (180, 84), r 7 | The speeder bay, 14 across, open to the sky, in the back plot (out of reach from above): oil stains, a fuel tank, a hoist. |
 | 9b | **The trench** | 177..183, 91..106 | Out of the garage pit: a cut 6 wide climbing south, 12 steps of 0.5, walled in the farm's plaster, open to the sky, drifts on its steps; then a gate through the windbreak (104..106) onto the pad. |
-| 10 | **The landing pad** | 150..196, 106..132; the spot 168..176, 116..124 | The family's landing pad outside the windbreak, in a hollow of drifts too steep to climb, cut in three places (west, south, east) where the wind has scoured gaps; the farm's beacon lamps round the spot, low rocks for cover. The storm at its worst. The hold-out comes through the cuts; at its end the prototype's shape walks out of the blowing sand. Tuskens on the drifts' crest above, watching (Mark's sheet; until then nobody). |
-| 11 | **The edges** | | The windbreak's top and the drifts' crests against the sky; beyond, only the backdrop: the Jundland's mountains to the north and east, the Dune Sea's dunes to the west and south, the suns setting over them. |
+| 10 | **The landing pad** | 150..196, 106..132 | The family's landing pad outside the windbreak, in a hollow of drifts too steep to climb, cut west and east where the wind has scoured gaps (pockets beyond them, out of sight), and south into the wash; the farm's beacon lamps still lit round its spot (168..176, 116..124), low rocks for cover. The storm at its worst. Jan won't land on it. The wave comes through the cuts and up the wash; the prototype's shape walks out of the blowing sand behind (later). Tuskens on the drifts' crest above, watching (Mark's sheet; until then nobody). |
+| 11 | **The wash** | from (174, 128) down to (116, 178) | A dry stream bed winding down into the rocks at the Jundland's edge, 4 to 5.5 m wide, its rock walls 4 to 7 m: south 10 m out of the pad's hollow (two steps down, then under a natural arch of rock 1.5 m thick and 2.5 m up), round a bend, west 15 m along its long stretch (two more steps), then south-west (two more). Boulders for cover; troopers lying in wait down the long stretch (they don't come for the shooting on the pad). A med kit under the arch (skills 1 to 3), an energy pack at the bend. |
+| 12 | **The flat** | about 84..136, 171..203 | Where the wash comes out of the rocks: a flat of sand 26 × 16 m at their foot, the lowest ground on the map, rock all round. The Crow hovering on it, nose north-west, its landing lights on; troopers between the wash and the ship, firing on it; boulders. Under the Crow's middle (102..111, 186..195), the level ends. |
+| 13 | **The edges** | | The windbreak's top, the drifts' crests and the rocks' tops against the sky; beyond, only the backdrop: the Jundland's mountains to the north, east and south, the Dune Sea's dunes to the west, the suns setting over them. |
 
 ### Secrets (3)
 
@@ -472,8 +532,8 @@ cosmetic: its own RNG, never `world.rng`.
 
 ## Enemies and items by skill
 
-All combat. As placed in the blockout (21, 34 and 42 monsters on skills
-1, 3 and 5), to be tuned in the life step:
+All combat. As placed in the blockout (23, 38 and 48 monsters on skills
+1, 3 and 5, and the wave's 5 on top), to be tuned in the life step:
 
 | Area | Every skill | 2+ | 3+ | 4+ |
 |------|-------------|----|----|----|
@@ -491,10 +551,13 @@ All combat. As placed in the blockout (21, 34 and 42 monsters on skills
 | The house's rooms | 1 in the common room, 1 in the storeroom | 1 in the quarters | | 1 in the loop tunnel |
 | The cellar | none: quiet and dark | | | |
 | The trench's gate | | | 1 on the pad | |
-| The hold-out | 4 through the cuts (the plan: 6, 8 and 10 on the higher skills) | | | |
+| The wave, when Kyle calls | 5 stormtroopers: 2 through the west cut, 1 through the east, 2 up the wash (the plan: more on the higher skills) | | | |
+| The wash | | 1 lying in wait | | 1 more |
+| The flat | 2 between the wash and the Crow | | 1 more | 1 more |
 
 Med kits and ammo along the way, more on skills 1 and 2, a stock of
-ammo in the garage before the hold-out.
+ammo in the garage before the wave, a med kit and an energy pack in the
+wash.
 
 ## Engine and content pieces it needs
 
@@ -505,15 +568,16 @@ ammo in the garage before the hold-out.
 | The haze swelling with the gusts | world, `render/view.js` (rebuilds its table already) | Small |
 | The sky fading into the sand in a gust | `render/columns.js` (sky rows through a haze step) | Small, measured |
 | A sky that wraps once (`skyWrap`) | `render/columns.js`, defs | Small |
-| `wait` in trigger lists | PLAN.md section 6 | Small |
 | The recordings: an objective item (a data tape) | PLAN.md section 7 | Small |
 | Evening suns, model shadow casters | `lib/town.js` (content) | Small |
 | A dune backdrop | `lib/backdrop.js` (content) | Small to medium |
 | Tuskens, the prototype | Mark's sheets | Mark |
 
-Not needed: driving (the family leaves off screen), `remove`, escorts.
-`fly` and `cutscene` (section 6) come later for the drop-off and the
-Crow landing at the pickup; until then a message stands in for each.
+Not needed: driving (the family leaves off screen), `remove`, escorts,
+`wait` (Jan lands while Kyle fights down the wash). `fly` and `cutscene`
+(section 6) come later for the drop-off and the Crow taking off at the
+end; until then a message stands in for each, and the Crow is on the
+flat from the start.
 
 ## Build order
 
@@ -545,7 +609,12 @@ are in PLAN.md section 9.
      the right track; stretch it out, the underground most, with another
      segment, not more complex ones.
    - **The reservoir** (2026-11-06): between the pump tunnels and the
-     workshop pit, in the design and the blockout.
+     workshop pit, in the design and the blockout. Mark's notes: he loves
+     it; more, at the end: get through a wave of stormtroopers and find
+     Jan, instead of ending as you come out of the trench.
+   - **The ending stretched** (2026-11-06): Jan won't land on the pad;
+     the wave, the wash and the flat with the Crow, in the design and
+     the blockout.
 3. **Evening:** the dusk sky, the suns, the haze, the light levels.
 4. **Blowing sand:** the engine pieces, then the particles on the bench,
    then in the level.
@@ -553,11 +622,12 @@ are in PLAN.md section 9.
    and the pump tunnels; the reservoir; the workshop pit and the workshop; the work
    yard, the generator shed, the staging point and the gate; the lane and
    the great dome; the courtyard and the house's rooms; the cellar; the
-   garage, its pit, the trench and the pad; the windbreak, the drifts and
-   the backdrop.
+   garage, its pit, the trench and the pad; the wash and the flat; the
+   windbreak, the drifts, the rocks and the backdrop.
 6. **Fire and smoke:** the generator shed, the house's roof, the
    workshop pit's speeder and the courtyard's cart.
-7. **Life:** the troopers by skill, the hold-out's waves.
-8. **The story:** the recordings, the garage, `wait` and the pickup.
+7. **Life:** the troopers by skill, the wave by skill.
+8. **The story:** the recordings, the garage, the call, the Crow on the
+   flat and the pickup.
 9. **Tune:** light, the sand's thickness and gusts, frame time, the
    per-skill check.

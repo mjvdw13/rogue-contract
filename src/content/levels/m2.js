@@ -17,10 +17,11 @@ import { valueNoise } from './lib/noise.js';
 // the officer carries the red key to the gate; up the lane to the house's
 // great dome, down into its courtyard pit and through its rooms to the
 // cellar (the recordings); then out through the garage, its pit and the
-// trench to hold the landing pad.
+// trench onto the landing pad, where Jan won't land: through the wave of
+// troopers and down the wash into the rocks, to the Crow on the flat.
 
 const W = 208;
-const H = 142;
+const H = 214;
 const SKY = 32;
 /** Open ground in the evening suns, before their shadows. */
 const SUN = 176;
@@ -147,24 +148,73 @@ const apron = (x0, y0, x1, y1) => p.rect(x0, y0, x1, y1, yard());
 
 // ---------------------------------------------------------------- 10. the landing pad
 // Outside the windbreak's south side, below the trench's gate: a hollow of
-// drifts too steep to climb (2 at once, then on up), cut in three places
+// drifts too steep to climb (2 at once, then on up), cut west and east
 // where the wind has scoured gaps, each opening into a pocket out of sight
-// (where the hold-out comes from).
+// (where the wave comes from), and south into the wash. Jan won't land on
+// it with troopers coming; the farm's beacon lamps still lit round its spot.
 const PAD = [150, 106, 196, 132];
-p.rect(128, 92, W - 1, H - 1, (x, y, c) => (x < 190 && y < 106 ? c : sand(quarter(Math.min(6, 2 + 0.4 * boxDist(x, y, PAD) + 0.5 * valueNoise(x, y, 4, 42))))));
+p.rect(128, 92, W - 1, 142, (x, y, c) => (x < 190 && y < 106 ? c : sand(quarter(Math.min(6, 2 + 0.4 * boxDist(x, y, PAD) + 0.5 * valueNoise(x, y, 4, 42))))));
 p.rect(...PAD, sand(0));
 for (const box of [
   [142, 114, 150, 120], [134, 110, 142, 124], // the west cut and its pocket
-  [166, 132, 172, 136], [160, 134, 178, 138], // the south cut
   [196, 110, 202, 116], [198, 104, 204, 122], // the east cut
 ]) p.rect(...box, sand(0));
-tag(168, 116, 176, 124, 'pickup');
 for (const [x, y] of [[168, 116], [176, 116], [168, 124], [176, 124]]) lights.push({ x, y, z: 1, radius: 3, light: 32 });
 list.push(
   at('boulder-large', 158.5, 113, { angle: 30 }), at('boulder-small', 162.5, 126.5, { angle: 200 }),
   at('boulder-large', 186.5, 112, { angle: 140 }), at('boulder-small', 189, 125.2, { angle: 80 }),
   at('boulder-small', 154.5, 121.5, { angle: 310 }), at('boulder-large', 180.5, 129, { angle: 250 }),
 );
+
+// ---------------------------------------------------------------- 11. the wash
+// South of the pad the rocks begin, the Jundland's edge, their tops 3.5 to
+// 5 m up and out of reach. A dry stream bed winds down into them, 4 to 5.5 m
+// wide: south 10 m (two steps down, then under a natural arch of rock),
+// west 15 m (two more), then south-west (two more) onto the flat where the
+// Crow sets down. Its walls stand 4 to 6 m over it at first, 5 to 7 m by the end.
+const rockTop = (x, y) => quarter(7 + 3 * valueNoise(x, y, 10, 43) + 0.75 * valueNoise(x, y, 3, 44));
+p.rect(64, 142, W - 1, H - 1, (x, y) => ({ floor: 'desert-gravel', ceiling: 'sky', floorZ: rockTop(x, y), ceilZ: SKY, light: SUN, side: 'sandstone' }));
+/** The wash's line, from the pad down to the flat. */
+const WASH = [[174, 128], [174, 152], [164, 160], [136, 161], [124, 168], [116, 178]];
+/** Where the floor drops, by the distance down the wash: two steps of 0.5 each. */
+const DROPS = [14, 46, 70];
+const washFloor = (s) => -0.5 * DROPS.reduce((n, d) => n + (s >= d) + (s >= d + 2), 0);
+/** The nearest point on the wash's line to (x, y): how far off the line, and how far down the wash. */
+function alongWash(x, y) {
+  let best = { off: Infinity, s: 0 };
+  let s0 = 0;
+  for (let i = 1; i < WASH.length; i++) {
+    const [ax, ay] = WASH[i - 1];
+    const [bx, by] = WASH[i];
+    const len = Math.hypot(bx - ax, by - ay);
+    const t = Math.max(0, Math.min(1, ((x - ax) * (bx - ax) + (y - ay) * (by - ay)) / (len * len)));
+    const off = Math.hypot(x - ax - t * (bx - ax), y - ay - t * (by - ay));
+    if (off < best.off) best = { off, s: s0 + t * len };
+    s0 += len;
+  }
+  return best;
+}
+/** The flat at the wash's foot (12, below): an oval about 26 x 16 m. */
+const FLAT = { cx: 110, cy: 187, rx: 26, ry: 16, z: washFloor(Infinity) };
+// Cut the wash and the flat into the rocks (and the wash's mouth through
+// the drifts south of the pad), with ragged edges.
+p.rect(64, 120, W - 1, H - 1, (x, y, c) => {
+  const { off, s } = alongWash(x + 0.5, y + 0.5);
+  const inFlat = ((x + 0.5 - FLAT.cx) / FLAT.rx) ** 2 + ((y + 0.5 - FLAT.cy) / FLAT.ry) ** 2 < 0.85 + 0.3 * valueNoise(x, y, 5, 46);
+  if (inFlat) return sand(FLAT.z, { tag: 'flat' });
+  if (off >= 4 + 1.5 * valueNoise(x, y, 6, 45)) return c;
+  const floor = sand(washFloor(s), { side: 'sandstone' });
+  // The arch: a span of rock 1.5 m thick, 2.5 m over the floor.
+  if (s >= 18 && s < 21) return { ...floor, slab: { bottom: floor.floorZ + 5, top: rockTop(x, y), floor: 'desert-gravel', ceiling: 'sandstone', side: 'sandstone', light: 112 } };
+  return { ...floor, tag: s >= 82 ? 'flat' : c.tag };
+});
+// ---------------------------------------------------------------- 12. the flat
+// Where the wash comes out of the rocks: a flat of sand at their foot, the
+// lowest ground on the map. The Crow hovering on it, nose north-west, its
+// landing lights on; under its middle, the level ends.
+list.push(at('moldy-crow', 106, 190, { angle: 140 }));
+p.rect(102, 186, 111, 195, (_, __, c) => ({ ...c, tag: 'pickup' }));
+lights.push({ x: 106, y: 190, z: FLAT.z + 1, radius: 9, light: 72 });
 
 // ---------------------------------------------------------------- 5. the work yard: the generator shed, the staging point, the gate
 // The generator shed: a tin blockhouse in the yard's north-west corner
@@ -419,16 +469,32 @@ list.push(
   at('med-kit', 139.5, 41.5, { skill: EASY }),
   at('power-cell', 184.5, 39.5),
   at('med-kit', 151.5, 68.5, { skill: [1, 2, 3] }),
-  // 9. The garage: a stock of ammo before the hold-out.
+  // 9. The garage: a stock of ammo before the wave.
   at('power-cell', 175.5, 59.5), at('power-cell', 176.5, 59.5), at('med-kit', 184.5, 70.5),
   at('energy-pack', 184.5, 59.5, { skill: EASY }),
   // The trench's gate.
   at('sandtrooper', 180, 108.5, { angle: 90, skill: NORMAL_UP }),
+  // 11. The wash: rocks for cover; troopers lying in wait down its long
+  // stretch (they don't come for the shooting on the pad).
+  at('med-kit', 171.5, 150.5, { skill: [1, 2, 3] }),
+  at('energy-pack', 165.5, 154.5),
+  at('stormtrooper', 140.5, 158.5, { angle: 0, ambush: true, skill: NOT_EASIEST }),
+  at('stormtrooper', 133.5, 163.5, { angle: 30, ambush: true, skill: HARD }),
+  // 12. The flat: troopers between the wash and the Crow, firing on it.
+  at('stormtrooper', 114.5, 182.5, { angle: 60, ambush: true }),
+  at('stormtrooper', 100.5, 177.5, { angle: 45, ambush: true }),
+  at('stormtrooper', 121.5, 189.5, { angle: 90, ambush: true, skill: NORMAL_UP }),
+  at('stormtrooper', 94.5, 185.5, { angle: 30, ambush: true, skill: HARD }),
+);
+list.push(
+  at('boulder-large', 151, 157, { angle: 70 }), at('boulder-small', 159.5, 162.5, { angle: 190 }),
+  at('boulder-small', 138, 163, { angle: 20 }), at('boulder-large', 117.5, 186.5, { angle: 300 }),
+  at('boulder-small', 101, 181, { angle: 120 }), at('boulder-large', 125.5, 180, { angle: 210 }),
 );
 
-// Where the hold-out's troopers come from when Kyle calls the Crow: the
-// pockets beyond the pad's three cuts.
-for (const [x, y] of [[137, 115], [138, 121], [169, 136], [201, 107]]) p.set(x, y, { ...p.get(x, y), tag: 'wave' });
+// Where the wave comes from when Kyle calls the Crow: the pockets beyond
+// the pad's west and east cuts, and up the wash, round its bend.
+for (const [x, y] of [[137, 115], [138, 121], [200, 118], [156, 158], [148, 160]]) p.set(x, y, { ...p.get(x, y), tag: 'wave' });
 
 export default defineLevel({
   id: 'm2',
@@ -439,13 +505,13 @@ export default defineLevel({
   // Stand-ins until the evening step: the night sky and a dusty haze.
   haze: { color: [120, 84, 72], half: 48 },
   lights,
-  par: 540,
+  par: 600,
   // The story, in stand-ins until the pieces exist (docs/mission2.md): Jan
   // names the house; the rubble sends Kyle up; the house shows over the
   // yard's wall; the gate wants the officer's key; the recordings start the
-  // ending and open the garage; at the trench's gate Kyle calls the Crow and
-  // the troopers come; the pickup ends the level (Jan's two minutes, the
-  // `wait` action, still to come).
+  // ending and open the garage; at the trench's gate Kyle calls the Crow,
+  // Jan won't land on the pad and the wave comes; on the flat, Jan sees
+  // him; under the Crow, the level ends.
   triggers: [
     {
       on: 'start',
@@ -476,11 +542,13 @@ export default defineLevel({
       if: 'recordings',
       do: [
         { action: 'message', text: "KYLE: JAN, I'VE GOT IT. COME GET ME." },
-        { action: 'message', text: 'JAN: TWO MINUTES!' },
+        { action: 'message', text: "JAN: NOT ON THAT PAD, THERE'S A SQUAD COMING OVER THE DRIFTS." },
+        { action: 'message', text: "JAN: I'LL SET DOWN WHERE THE DRY WASH COMES OUT OF THE ROCKS, SOUTH OF YOU." },
         { action: 'setFlag', flag: 'called' },
-        { action: 'spawn', thing: 'sandtrooper', tag: 'wave', fog: false },
+        { action: 'spawn', thing: 'stormtrooper', tag: 'wave', fog: false },
       ],
     },
+    { on: 'enter', tag: 'flat', if: 'called', do: [{ action: 'message', text: "JAN: THERE YOU ARE. THEY'RE SHOOTING AT MY SHIP, HURRY!" }] },
     { on: 'enter', tag: 'pickup', if: 'called', do: [{ action: 'message', text: 'JAN: GET ABOARD!' }, { action: 'exit' }] },
   ],
   ...p.build(),

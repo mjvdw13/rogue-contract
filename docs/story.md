@@ -85,7 +85,7 @@ so they know who the hunter really is. The contract has gone rogue.
 | # | Mission | Kind | Drop-off | What happens | Pickup |
 |---|---------|------|----------|--------------|--------|
 | 1 | Mos Eisley: The Puck | Free roam, then run-and-gun | The Crow lands in Docking Bay 87 and leaves before customs arrives. | **Calm:** Kyle takes the contract and the fob from the broker in the cantina. Rusk has wiped his ID code, so the fob has nothing to track. A Jawa trader sold Rusk a part tagged with their own transponder, which gives the fob a signal. It leads across town, past the closed checkpoint, to a derelict docking bay where Rusk is hiding. **Loud:** Rusk pulls the Imperial tracer out of the fob, and the shooting starts. An officer's voice: "Kyle Katarn. Customs logged your ship this morning." A squad takes Rusk, and every trooper in town turns on Kyle. Before he's dragged off, Rusk shouts where he hid what he saw: the farm, the cellar. Kyle fights back across town to the bay. | Back in Docking Bay 87. JAN: "Customs won't be checking papers now." |
-| 2 | The Homestead | Run-and-gun | Dropped into a burning farm's garden pit at dusk, a sandstorm coming in. | The Empire is cleaning up everyone Rusk talked to. Kyle fights through the tunnels between the farm's pits, crosses its storm-swept yard, and finds Rusk's helmet recordings of the test in the cellar. Then the prototype walks out of the blowing sand. It's far too tough to fight here: run. | Under fire. Jan is two minutes out, so Kyle holds the landing spot until the Crow sets down. |
+| 2 | The Homestead | Run-and-gun | Dropped into a burning farm's garden pit at dusk, a sandstorm coming in. | The Empire is cleaning up everyone Rusk talked to. Kyle fights through the tunnels between the farm's pits, crosses its storm-swept yard, and finds Rusk's helmet recordings of the test in the cellar. Then the prototype walks out of the blowing sand. It's far too tough to fight here: run. | Under fire. Jan won't land on the pad, so Kyle fights through the wave and down a dry wash to where the Crow has set down. |
 | 3 | The Canyon Garrison | Run-and-gun | In the canyon's start bowl at night. | The map we've built, entered by the vent. Through the officer's barred window Kyle sees a general hurry out. He frees Rusk from a new detention block, takes the test records from the vault, and destroys the prototype in the generator chamber with the overload. | On the landing pad. The general's shuttle is gone. |
 | | Finale | Text | | The Crow gets away. The Alliance files the records as unconfirmed, and Jan brings the next job: Danuta. | |
 
@@ -141,9 +141,9 @@ pit, the start bowl), shorter and without the customs scene.
 
 **The pickup.** Walk onto the marked pickup spot, and the Crow comes down
 onto it. Control locks, JAN says a line, and the level ends once the Crow
-has landed. The Canyon Garrison already ends this way at its pad. Mission 2
-adds a wait: the spot only works once the Crow arrives, so you hold it
-under fire until Jan lands.
+has landed. The Canyon Garrison already ends this way at its pad. In
+Mission 2 the Crow is already down, away from the farm's pad: you fight
+your way to it.
 
 **Not doing:** walking down the ramp out of the hold. The grid can't keep a
 room inside a ship that then flies away, so Kyle starts at the foot of the
@@ -244,10 +244,11 @@ The farm that hid Rusk, at the edge of the Jundland, at dusk (Mark,
 already under way when Kyle arrives. All combat. The level's full design,
 which grows this sketch, is `docs/mission2.md`.
 
-- **Size:** about 110 × 90 tiles (`docs/mission2.md`: 208 × 142, the
+- **Size:** about 110 × 90 tiles (`docs/mission2.md`: 208 × 214, the
   farm walled in by its windbreak, a walk west to east from the garden
   pit to the house, after Mark played three blockouts; the reservoir
-  under the sand added after the fourth).
+  under the sand added after the fourth, and the ending stretched: the
+  wash down through the rocks to the Crow).
 - **Light:** a dusk sky, the suns low in the west and long shadows, sand
   blowing in gusts. The farm is lit by fires (flickering light around
   burning buildings) and by its doorways.
@@ -261,6 +262,7 @@ which grows this sketch, is `docs/mission2.md`.
   [4 the courtyard, -6, sky] -> [5 its rooms] -> the cellar
          [6 garage] -> [garage pit] -> the trench up
          -> [8 the landing pad, in the drifts; 7 Tuskens above]
+         -> [9 the wash, down into the rocks] -> [10 the Crow, on the flat]
 ```
 
 | # | Area | Notes |
@@ -272,12 +274,15 @@ which grows this sketch, is `docs/mission2.md`.
 | 5 | Rooms | Round the courtyard: a common room, the family's quarters, the storeroom, and under it a cellar with a dark cistern, where Rusk hid his helmet recordings. |
 | 6 | Garage | The family is holed up here. Once Kyle has the recordings, they escape in their speeder (off screen), out through the garage pit. A long stair leads up out of it to the surface. |
 | 7 | Drifts | Tuskens watching from the drifts above the landing pad. If Tuskens and troopers fight each other (see factions below), it's a three-way fight. |
-| 8 | Pickup | The landing pad outside the windbreak, in a hollow of drifts, low rocks for cover. |
+| 8 | The pad | The landing pad outside the windbreak, in a hollow of drifts, low rocks for cover. Jan won't land on it with troopers coming. |
+| 9 | The wash | A dry stream bed winding down into the rocks south of the farm, under a natural arch. |
+| 10 | Pickup | The flat where the wash comes out of the rocks: the Crow set down on it, troopers firing on it. |
 
 **The ending:** picking up the recordings starts it. Heavy footsteps, then
 the prototype's shape in the blowing sand beyond the pad. The objective
-says run. Kyle calls the Crow, and JAN: "Two minutes!" Hold the pickup spot
-until she lands.
+says run. Kyle calls the Crow, but Jan won't land on the pad with a squad
+coming over the drifts: she sets down where a dry wash comes out of the
+rocks. Kyle gets through the wave on the pad and down the wash to her.
 
 **Rooms under the ground:** with two storeys per tile (PLAN.md Phase 1c,
 done), the rooms round the courtyard can lie under walkable ground: their
@@ -323,7 +328,7 @@ triggers and actions.
 | **Conversations** | NPC lines that move on each time you use them, lines that depend on story flags, an `on: 'talk'` trigger, and a `setFlag` action plus `if` conditions on triggers. Enough for the broker, the Jawa and the informant. Jan and Kyle's radio lines are plain messages (`JAN: ...`). | NPC lines, triggers | Small to medium | M1 |
 | **Flying models** | A `fly` action moves a tagged model decoration along keyframes (position, height, facing, time), for the Crow landing and leaving and the shuttle leaving. It's only solid while it stands still. | Model decorations | Small | All |
 | **Scripted camera** | A `cutscene` action: for a few seconds, the view comes from a tagged spot looking at a target, the HUD and weapon are hidden, input is locked, and use or fire skips it. | `world.camera()` | Small to medium | All |
-| **Delays** | Actions that wait (`{ action: 'wait', seconds }`) inside a trigger's list, for drop-off timing and Jan's "two minutes". | Triggers | Small | All |
+| **Delays** | Actions that wait (`{ action: 'wait', seconds }`) inside a trigger's list, for drop-off timing. | Triggers | Small | All |
 | **Moving characters** | `remove` and `place` actions, for Rusk being taken, Mohc leaving and Rusk reaching the pad. | Actions | Small | M1, M3 |
 | **Damage from a trigger** | A `damage { tag, amount }` action, so the overload hurts the prototype. | Actions | Small | M3 |
 | **Objectives and briefings** | Already planned in Phase 2. The briefings are Jan and Kyle talking. | | Medium | All |
