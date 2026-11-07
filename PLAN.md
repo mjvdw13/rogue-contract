@@ -28,6 +28,15 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
+- **Mission 2's vaporators, in the level** (`?map=m2`, 2026-11-07,
+  `models/vaporator.js`): the film's vaporator in place of the seven
+  stand-ins on the farm's ground (sensor turning, a cap by every other),
+  and the courtyard's cluster in the middle of its floor, in the burning
+  cart's light (in the wall's shadow it was a black shape). To judge:
+  the looks in play and the cluster as cover. Offered, not asked for: a
+  cleaner, brighter white texture, as the worn white reads grey in the
+  evening light.
+
 - **Mission 2's pits and shorter stairs** (`?map=m2`, 2026-11-07): after
   Mark's notes on the 6 m pits (the courtyard's curved stair good, the
   others too long), the courtyard stays 6 m and the garden, workshop and
