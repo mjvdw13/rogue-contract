@@ -26,6 +26,7 @@ import { ENGINE, HOIST, BENCH, PIT_DROID } from './models/garage.js';
 import { BUNK, BUNKS } from './models/hostel.js';
 import { FIRE_DRUM } from './models/quarter.js';
 import { STALL, STABLE_POST, FEED } from './models/stable.js';
+import { VAPORATORS } from './models/vaporator.js';
 
 // Scenery. Solid ones block movement; ones with health can be shot (and
 // `explode`).
@@ -107,6 +108,11 @@ export default [
   ...PIPE_MODELS.map((id) => defineDecoration({ id, model: id, fixed: true })),
   // Things on Mos Eisley's streets: crates, drums, canisters, junk, rubble, scrap, a vaporator.
   ...Object.entries(CLUTTER).map(([id, c]) => defineDecoration({ id, model: id, solid: !!c.solid, radius: c.radius, height: c.height, fixed: true })),
+  // The Homestead's vaporators (models/vaporator.js): the courtyard's cluster,
+  // its caps, the lattice masts on the farm's ground and their vanes, turning
+  // slowly in the wind on top of them.
+  ...Object.entries(VAPORATORS).map(([id, v]) => defineDecoration({ id, model: id, solid: !!v.solid, radius: v.radius, height: v.height, fixed: true })),
+  defineDecoration({ id: 'vaporator-vane', model: 'vaporator-vane', spin: 0.3, fixed: true }),
   // An X-34 landspeeder parked on the street, hovering (models/speeder.js),
   // bobbing gently: it collides as its outline, as high as its windscreen.
   defineDecoration({ id: 'landspeeder', model: 'landspeeder', solid: true, height: 1.22, fixed: true, bob: { height: 0.02, period: 3.2 } }),

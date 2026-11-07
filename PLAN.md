@@ -28,6 +28,12 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
+- **Mission 2's new vaporators** (2026-11-07, sketch snapshots sent to
+  Mark; models in `models/vaporator.js`, not in the level yet): the
+  courtyard's cluster (a 3.8 m and a 2.6 m stacked column with rods, a
+  squat unit, domed caps) and the 5 m lattice mast with its vane. To
+  judge: shapes, sizes, the worn white (`dome-white`) and the collars.
+
 - **Mission 2's pits and shorter stairs** (`?map=m2`, 2026-11-07): after
   Mark's notes on the 6 m pits (the courtyard's curved stair good, the
   others too long), the courtyard stays 6 m and the garden, workshop and
@@ -1286,11 +1292,17 @@ snapshots, playable at `?map=m2`.
         (`docs/mission2.md`, "The look"), models in
         `src/content/models/`, sketched for Mark before they go in the
         level:
-    - [ ] The cluster for the courtyard: two or three stacked cylinders
+    - [x] The cluster for the courtyard: two or three stacked cylinders
           (drums, collars, 2.5 to 4 m), rods round them, a squat unit,
           domed caps at their feet (each cap its own small model).
-    - [ ] The tall lattice vaporator for the ground and the yards (a
-          thin mast, a vane on top).
+          `models/vaporator.js`: `vaporator-tall` (3.8 m), `-mid`,
+          `-squat`, `-cap`.
+    - [x] The tall lattice vaporator for the ground and the yards (a
+          thin mast, a vane on top): `vaporator-lattice` (5 m) and
+          `vaporator-vane`, turning slowly.
+    - [ ] Mark's notes on the sketch (Waiting on Mark), then place them:
+          the cluster in the courtyard, lattice masts and caps on the
+          farm's ground in place of the town's small vaporator.
   - [ ] Underground and indoors not all sand: a garage proper and
         mechanical detail through the rooms, tunnels and caves (pipes,
         pumps, conduit, vents, hatches, metal floors where people work);
