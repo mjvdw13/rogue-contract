@@ -1238,6 +1238,28 @@ snapshots, playable at `?map=m2`.
       blockout (the map 72 tiles taller): Jan won't land on the pad, the
       wave of five, the wash winding down into the rocks under an arch,
       the Crow on the flat at its foot (the route 636 steps, from 505).
+- [x] The caves after Mark asked for it longer (2026-11-06): Rusk's way
+      out of the cellar, down through caves under the pad and up into
+      the garage pit (the route 745 steps, from 631).
+- [ ] **Mark's notes on the caves blockout** (2026-11-07: the flow is
+      right):
+  - [ ] Deeper pits. They're 3 m now (the farm 0.5, the pits -5.5), too
+        shallow for a moisture farm. Deepen the garden, workshop and
+        garage pits and the courtyard, and everything under them (the
+        tunnels, the reservoir, the cellar, the caves) by the same, so
+        the stairs and ramps between them still work. Agree the depth
+        with Mark first (Lars' courtyard is about 6 to 8 m).
+  - [ ] Redesign the vaporators: a farm vaporator of its own (taller and
+        stouter than the town's small one, its rings, fins and base
+        unit), a model in `src/content/models/`, sketched for Mark before
+        it goes in the level. Replaces the work-yard line in "Each area
+        in detail".
+  - [ ] Underground and indoors not all sand: a garage proper (bays,
+        the hoist, the stripped speeder, tool racks) and mechanical
+        detail through the rooms, tunnels and caves (pipes, pumps,
+        conduit, vents, hatches, metal floors where people work); a
+        texture pass from the Dark Forces pack so the sandstone is for
+        bare rock only. Plan it area by area with Mark before building.
 - [ ] **Evening:**
   - [ ] `sky-dusk` (`derive.mjs`, from RESKY01): indigo overhead to rose
         to amber at the horizon, fading into the haze.
@@ -1287,8 +1309,7 @@ snapshots, playable at `?map=m2`.
   - [ ] The work yard: the generator shed (tin, its hatch), the staging
         point (a lit floodlight, crates, barricades, a comm unit), the
         farm's gate with the Imperials' red lock clamped on it (in place of
-        the stand-in Imperial door), the light wells' kerbs, a farm
-        vaporator model (taller than the town's).
+        the stand-in Imperial door), the light wells' kerbs.
   - [ ] The lane and the great dome: barricades, the dome's porch, door,
         lamp and hall, its stairwell.
   - [ ] The courtyard and the house's rooms: round-topped arches, the
