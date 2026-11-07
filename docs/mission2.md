@@ -127,6 +127,91 @@ Different by design, from Mos Eisley and from Mission 3's canyon:
 | Light | Noon: high suns, short shadows, 200 to 224 | Night | Evening: suns 14° and 18° up, the pits in dim shade under a glowing sky, lamplight and fire below ground |
 | Air | Still: glints settling | Still | A sandstorm: sand streaming over the pits' rims and the windbreak in gusts, the haze swelling and clearing |
 
+## The look (Mark's reference images, 2026-11-07)
+
+Fourteen pictures of a sunken moisture farm: the film set in the desert
+(a courtyard pit, an entrance dome on the flat, a garage mound), a
+cutaway drawing of a whole farm, film stills of a garage and a kitchen,
+and a game's take on the pit. They set the farm's vocabulary: borrow
+the parts, keep our own layout. What they show, by part:
+
+**The pits' walls: two tones, not one.**
+- Above, bare earth: warm tan to ochre, rough and slightly bulging, with
+  vertical runnels; rough scrub on the rim here and there. The rim is a
+  rounded lip of earth, no parapet (as built).
+- Below, a band of whitewashed plaster up to about the doorways' tops
+  (2.5 to 3.5 m in a 6 m pit), its top edge **wavy and uneven**, rising
+  in a bulge over each arch and dipping between them. Never a straight
+  line round the pit. Grimy and stained low down.
+- A red-ochre dado: a band of red-brown paint along the wall's foot
+  (about 0.5 m), and on the stairs' sides and treads.
+
+**Doorways.** Round-topped, set in a thick, rounded surround that bulges
+out of the wall like a lip (a hood of plaster, not a flat frame), deep
+reveals. Doors: dark plank doors in the arch, or an oval red-orange
+door. Some doorways are square under a flat slab lintel instead,
+especially low ones at the pit's floor. Small oval niches and blind
+windows in the plaster.
+
+**Stairs.** Straight flights along the pit's wall up to a doorway or a
+landing halfway up the wall, a solid plastered cheek on the open side
+(painted red-ochre), a landing in front of the door. A landing can be a
+**balcony**: a ledge along the wall over a doorway below, with a low
+plaster parapet, planters on it.
+
+**The courtyard's machinery.**
+- **A condenser panel:** a tall flat panel on the pit's wall, about 3 m
+  wide and as tall as the whitewash, white, ribbed in horizontal slats
+  with a big round gear-like disc on it, two small fittings (antennae or
+  vents) on the rim above it. The courtyard's landmark.
+- **Vaporator clusters** in the middle of the floor: two or three tall
+  stacked cylinders (drums of different widths, collars and joints,
+  2.5 to 4 m tall) with thin rods standing round them, and low
+  **domed caps** (silver hemispheres on short stalks, 0.4 to 0.6 m) at
+  their feet. A shorter squat unit beside them.
+- Under the cluster in the cutaway: a round water tank sunk in the
+  floor with a glass window, pipes out of its sides. Pipes run through
+  the rock between rooms.
+- Crates stacked by doorways, planters with greenery, a power droid.
+
+**The entrance dome** (on the flat over the pit): the dome sits on a
+low rectangular block, wider than the dome, with lower wings either
+side. The arched door is in a **hood that projects forward** from the
+block, a rounded arch on two thick jambs. In front of it a **sunken
+stairwell** edged by a stone kerb: you go down from outside, before the
+door. Grimy and darker at the foot, the plaster cracked. A small panel
+by the door, crates and drums against the walls.
+
+**The garage** (on the flat): a low wide mound, almost flush with the
+ground, with a **ring of round windows** under its rim; at dusk the
+windows glow amber (a ring of lights round the horizon: a landmark from
+the pad). Inside, a round room: a **ring of round amber lamps** all the
+way round under the ceiling, a **round grating floor** in the middle
+inside a low kerb, a big console against the wall (dials, a round
+gauge, lit buttons, two small screens), wall lamps, rounded-square
+openings with thick frames, cables and pipes on the walls, dark and
+oily. Bright through its openings against the dim inside.
+
+**The kitchen and rooms:** a smooth white vault, glossy white built-in
+counters along both sides with cupboards over them, a red or salmon
+stripe along the cupboards, appliances set in niches (boxes with small
+lit panels), rounded corners everywhere; the rough plaster wall shows
+where the fittings stop, with oval niches in it. A rug in the living
+rooms (red, patterned). Rooms at different heights, joined by short
+stairs.
+
+**On the flat:** tall thin vaporators (a lattice mast with a vane on
+top), small squat units and domed caps scattered, a few crates.
+
+**The sky:** with the suns 5 to 15° up, the sky is rose to mauve all
+over, warmer and paler at the horizon, the two suns big pale discs, the
+lower one more orange. Less indigo than the plan's sky.
+
+What we change on purpose: the farm is burning and searched, so
+everything above gets soot over the white, scorch over the doorways,
+broken crates and the Imperials' gear in among it. Not used: palm-frond
+shades and real-world plants (Star Wars, not a real village).
+
 ## Grid and size
 
 - **208 × 214 tiles** (104 × 107 m). The farm inside its windbreak is an
@@ -492,8 +577,9 @@ still noon.
   the light wells' shafts of evening light on the tunnels' floors; the
   garden pit's grow lamps a cold blue-white.
 - **Sky:** `sky-dusk`, a new sky from Robotics' cloudy RESKY01
-  (`derive.mjs`, as `sky-day` is): deep indigo overhead, violet and rose
-  lower, amber at the horizon fading into the haze. Mos Eisley's sky
+  (`derive.mjs`, as `sky-day` is): mauve overhead (a touch of indigo at
+  most, after Mark's references), rose lower, a warm pale amber at the
+  horizon fading into the haze. Mos Eisley's sky
   wraps twice round the horizon; this one wraps once (a small engine
   change, a level's `skyWrap`), so the glow is in the west only and the
   east is dark, with the two suns painted low over the dunes.
@@ -556,7 +642,11 @@ cosmetic: its own RNG, never `world.rng`.
   fire drum, worn barricades and floodlight towers, boulders, the X-34,
   pit droids and power droids, the workbench and swoop hoist, terminals,
   a speeder bike, the Imperial red door (the gate's stand-in).
-- **New:** a farm vaporator (taller), fires on roofs and in doorways
+- **New** (the look's details are in "The look", above): the courtyard's
+  vaporator cluster (stacked cylinders, rods, domed caps) and the tall
+  lattice vaporator for the ground, the condenser panel, the round
+  doorway surrounds and their wavy whitewash, the garage's ring lamps,
+  grating and console, the kitchen's white counters, fires on roofs and in doorways
   (decorations with fire, ember and smoke emitters, as the fire drum
   has), the water pipe along the tunnels' ceilings, the farm's pump, the
   reservoir's pillars and the Imperials' work lamps, the

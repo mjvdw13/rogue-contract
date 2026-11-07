@@ -1282,20 +1282,52 @@ snapshots, playable at `?map=m2`.
           gentler and longer.
     - [x] Check: validate, cell dumps of every stair, snapshots, the
           route; `docs/mission2.md`; Waiting on Mark.
-  - [ ] Redesign the vaporators: a farm vaporator of its own (taller and
-        stouter than the town's small one, its rings, fins and base
-        unit), a model in `src/content/models/`, sketched for Mark before
-        it goes in the level. Replaces the work-yard line in "Each area
-        in detail".
-  - [ ] Underground and indoors not all sand: a garage proper (bays,
-        the hoist, the stripped speeder, tool racks) and mechanical
-        detail through the rooms, tunnels and caves (pipes, pumps,
-        conduit, vents, hatches, metal floors where people work); a
-        texture pass from the Dark Forces pack so the sandstone is for
+  - [ ] Redesign the vaporators from Mark's references
+        (`docs/mission2.md`, "The look"), models in
+        `src/content/models/`, sketched for Mark before they go in the
+        level:
+    - [ ] The cluster for the courtyard: two or three stacked cylinders
+          (drums, collars, 2.5 to 4 m), rods round them, a squat unit,
+          domed caps at their feet (each cap its own small model).
+    - [ ] The tall lattice vaporator for the ground and the yards (a
+          thin mast, a vane on top).
+  - [ ] Underground and indoors not all sand: a garage proper and
+        mechanical detail through the rooms, tunnels and caves (pipes,
+        pumps, conduit, vents, hatches, metal floors where people work);
+        a texture pass from the Dark Forces pack so the sandstone is for
         bare rock only. Plan it area by area with Mark before building.
+        From the references:
+    - [ ] The garage round, not a box: a ring of round amber lamps
+          under its ceiling, a round grating floor in a kerb, the
+          console (dials, a gauge, two screens), wall lamps,
+          rounded-square openings. Seen from the pad, its roof a low
+          mound with a ring of lit windows (a question for Mark: the
+          garage on the surface by the pad, as in the references, or
+          kept in its pit).
+    - [ ] The common room and storeroom as the kitchen: a smooth white
+          vault, white counters along both sides with a red stripe,
+          appliances in niches, oval niches in the plaster, a red rug.
+- [ ] **The pits' walls and doorways** (from the references, before
+      "Each area in detail"; a kit in `lib/town.js` or a new
+      `lib/farm.js`, used by every pit):
+  - [ ] Two tones: bare earth above (tan to ochre, runnels), whitewash
+        below with a wavy top edge rising over each arch, a red-ochre
+        dado at the foot. Textures from the Dark Forces pack, recoloured;
+        the wavy edge likely a texture set per wall tile.
+  - [ ] Round-topped doorways in a thick bulging surround, plank doors
+        or an oval red door; low square doorways under slab lintels.
+  - [ ] The stairs' red-ochre cheeks, and a balcony with a low parapet
+        over a doorway where a stair lands.
+  - [ ] The courtyard's condenser panel (ribbed white, its gear disc,
+        two fittings on the rim above): its landmark.
+  - [ ] The great dome as the entrance dome: on a block with low wings,
+        its door in a projecting hood, a sunken stairwell with a kerb in
+        front of it (a question for Mark: the way down starts outside,
+        not in a hall).
 - [ ] **Evening:**
-  - [ ] `sky-dusk` (`derive.mjs`, from RESKY01): indigo overhead to rose
-        to amber at the horizon, fading into the haze.
+  - [ ] `sky-dusk` (`derive.mjs`, from RESKY01): mauve overhead to rose
+        to a pale warm amber at the horizon, fading into the haze (Mark's
+        references: rose and mauve all over, little indigo).
   - [x] The suns low in the west-south-west (`town.finish(EVENING)`: 196
         and 204, 14 and 18 degrees up), so the shadows run 20 to 30 tiles
         (in with the blockout).
