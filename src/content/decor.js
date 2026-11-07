@@ -109,10 +109,10 @@ export default [
   // Things on Mos Eisley's streets: crates, drums, canisters, junk, rubble, scrap, a vaporator.
   ...Object.entries(CLUTTER).map(([id, c]) => defineDecoration({ id, model: id, solid: !!c.solid, radius: c.radius, height: c.height, fixed: true })),
   // The Homestead's vaporators (models/vaporator.js): the courtyard's cluster,
-  // its caps, the lattice masts on the farm's ground and their vanes, turning
-  // slowly in the wind on top of them.
+  // its caps, the tall ones on the farm's ground and their humidity sensors,
+  // turning in the wind on top of their masts.
   ...Object.entries(VAPORATORS).map(([id, v]) => defineDecoration({ id, model: id, solid: !!v.solid, radius: v.radius, height: v.height, fixed: true })),
-  defineDecoration({ id: 'vaporator-vane', model: 'vaporator-vane', spin: 0.3, fixed: true }),
+  defineDecoration({ id: 'vaporator-sensor', model: 'vaporator-sensor', spin: 0.6, fixed: true }),
   // An X-34 landspeeder parked on the street, hovering (models/speeder.js),
   // bobbing gently: it collides as its outline, as high as its windscreen.
   defineDecoration({ id: 'landspeeder', model: 'landspeeder', solid: true, height: 1.22, fixed: true, bob: { height: 0.02, period: 3.2 } }),

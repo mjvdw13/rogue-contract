@@ -31,8 +31,11 @@ These need Mark to try something, or to decide. Don't start them without him.
 - **Mission 2's new vaporators** (2026-11-07, sketch snapshots sent to
   Mark; models in `models/vaporator.js`, not in the level yet): the
   courtyard's cluster (a 3.8 m and a 2.6 m stacked column with rods, a
-  squat unit, domed caps) and the 5 m lattice mast with its vane. To
-  judge: shapes, sizes, the worn white (`dome-white`) and the collars.
+  squat unit, domed caps), and for the yards the film's vaporator
+  (Mark's references): foot, pump, condenser with louvres and dials,
+  coolant section, brain discs, ribbed intake, banded column, cone, mast
+  and a turning humidity sensor, three chiller bars round it. To judge:
+  shapes, sizes, the worn white (it reads grey in the evening light).
 
 - **Mission 2's pits and shorter stairs** (`?map=m2`, 2026-11-07): after
   Mark's notes on the 6 m pits (the courtyard's curved stair good, the
@@ -1297,12 +1300,13 @@ snapshots, playable at `?map=m2`.
           domed caps at their feet (each cap its own small model).
           `models/vaporator.js`: `vaporator-tall` (3.8 m), `-mid`,
           `-squat`, `-cap`.
-    - [x] The tall lattice vaporator for the ground and the yards (a
-          thin mast, a vane on top): `vaporator-lattice` (5 m) and
-          `vaporator-vane`, turning slowly.
+    - [x] The yard's vaporator, after the film's (Mark's references,
+          2026-11-07, replacing the lattice mast): `vaporator-farm`, 3.9 m
+          body, mast to 5.4 m, three chiller bars, and
+          `vaporator-sensor` turning on top.
     - [ ] Mark's notes on the sketch (Waiting on Mark), then place them:
-          the cluster in the courtyard, lattice masts and caps on the
-          farm's ground in place of the town's small vaporator.
+          the cluster in the courtyard, the farm vaporators and caps on
+          the farm's ground in place of the town's small vaporator.
   - [ ] Underground and indoors not all sand: a garage proper and
         mechanical detail through the rooms, tunnels and caves (pipes,
         pumps, conduit, vents, hatches, metal floors where people work);
