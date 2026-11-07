@@ -28,15 +28,16 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
-- **Mission 2's deeper pits** (`?map=m2`, 2026-11-07): every pit 6 m
-  deep (Mark: "try 6, then let me check it"), from 3, and everything under
-  them down by the same. The shed's stair runs on down the workshop's west
-  wall; the dome's comes out halfway down the courtyard's north wall and a
-  stair curves down the wall's inside; the trench runs on down the garage
-  pit's middle to the shutter. The route about 32 steps longer. To judge:
-  the depth, the three stairs, and the light wells (jumping down one now
-  costs about 36 health, from 7: the well room's secret is reached that
-  way).
+- **Mission 2's pits and shorter stairs** (`?map=m2`, 2026-11-07): after
+  Mark's notes on the 6 m pits (the courtyard's curved stair good, the
+  others too long), the courtyard stays 6 m and the garden, workshop and
+  garage pits are 4 m. No flight over 8 steps, landings between: the
+  shed's 8 + 8, the dome's 6 + 6 then the curve, the reservoir's 7 + 5
+  each way. The pad, the wash and the flat 1.75 m lower, so the trench is
+  8 steps. The caves shallower, the climb out a gentle slope. To judge:
+  the depths, the stairs, and the light wells (about 17 health into the
+  small pits' tunnels, the well room's secret among them; 36 into the
+  house's).
 - **Mission 2's fourth blockout, with the reservoir, the stretched
   ending and the caves** (`?map=m2`, 2026-11-06), a walk west to east to the house
   (`docs/mission2.md`):
@@ -1265,6 +1266,22 @@ snapshots, playable at `?map=m2`.
           its foot at the garage's shutter.
     - [x] Check: validate, snapshots of each stair and pit, the route
           measured; `docs/mission2.md`'s heights.
+  - [x] Shorter stairs (Mark, 2026-11-07: the courtyard's curved stair is
+        good, the others too long). No flight over 8 steps, a landing
+        between flights:
+    - [x] Depth by size: the courtyard stays 6 m; the garden, workshop
+          and garage pits 4 m (-7.5), with their tunnels and rooms.
+    - [x] The shed's stair: 8, a landing, 8 (from 24 unbroken).
+    - [x] The reservoir 6 m under the farm (-13.5, from -19.5): each of
+          its stairs two short flights with a landing (from 16 unbroken).
+    - [x] The dome's stair: 6, a landing, 6, then the doorway and the curve.
+    - [x] The pad, the wash and the flat 1.75 m lower (outside the
+          windbreak, so nothing joins up): the trench 8 steps, from the pit's
+          south rim (from 24).
+    - [x] The caves: Rusk's steps 6 (from 12), the climb to the garage pit
+          gentler and longer.
+    - [x] Check: validate, cell dumps of every stair, snapshots, the
+          route; `docs/mission2.md`; Waiting on Mark.
   - [ ] Redesign the vaporators: a farm vaporator of its own (taller and
         stouter than the town's small one, its rings, fins and base
         unit), a model in `src/content/models/`, sketched for Mark before

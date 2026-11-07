@@ -30,14 +30,17 @@ const SUN = 176;
 // Heights, in units (1 unit = 0.5 m). The landing pad is at 0.
 const FARM = 0.5;
 const WALL = FARM + 6;
-/** The pits' floors and the rooms and tunnels round them: 6 m under the farm. */
-const PIT = -11.5;
-/** Halfway down: where the long stairs from the surface reach a pit's wall. */
-const MID = PIT + 6;
-const CEIL = PIT + 4;
-const CELLAR = PIT - 3;
-/** The reservoir's floor: 16 steps down from the pump room. */
-const RESERVOIR = PIT - 8;
+/** The small pits' floors (the garden, workshop and garage pits) and the tunnels and rooms off them: 4 m under the farm. */
+const PIT = -7.5;
+/** The house's courtyard, the big pit, and its rooms: 6 m under the farm. */
+const COURT = -11.5;
+/** Halfway down the courtyard: where the dome's stair reaches its wall. */
+const MID = COURT + 6;
+const CELLAR = COURT - 3;
+/** The reservoir's floor: 12 steps down from the pump room. */
+const RESERVOIR = PIT - 6;
+/** The pad, the drifts round it, the wash and the flat: lower than the farm, so the trench out is short. */
+const OUT = -3.5;
 
 /** The suns at evening, low in the west-south-west, so the shadows run long to the east-north-east. */
 const EVENING = [
@@ -69,7 +72,7 @@ const topOf = (c) => (c.slab ? c.slab.top : c.line && c.wallTop !== undefined ? 
  * the slab's top (a doorway through a pit's wall, whose tiles were its low
  * angled wall).
  */
-function under(x0, y0, x1, y1, { floorZ, ceilZ = CEIL, top, floor = 'flagstone', ceiling = 'planks', light = 112, side = 'adobe-pale', extra = {} }) {
+function under(x0, y0, x1, y1, { floorZ, ceilZ = (f) => f + 4, top, floor = 'flagstone', ceiling = 'planks', light = 112, side = 'adobe-pale', extra = {} }) {
   p.rect(x0, y0, x1, y1, (x, y, old) => {
     const f = typeof floorZ === 'function' ? floorZ(x, y) : floorZ;
     const t = top ?? topOf(old);
@@ -82,14 +85,22 @@ function under(x0, y0, x1, y1, { floorZ, ceilZ = CEIL, top, floor = 'flagstone',
     };
   });
 }
-/** A tunnel or room under the farm's ground, at the pits' floor. */
+/** A tunnel or room under the farm's ground, at a pit's floor (the small pits' unless `floorZ` says), 2 m tall. */
 const dig = (x0, y0, x1, y1, opts = {}) => under(x0, y0, x1, y1, { floorZ: PIT, ...opts });
-/** A doorway through a pit's round wall (its tiles were the wall's low angled tiles). */
-const ARCH = { ceilZ: PIT + 3.5, top: FARM };
-/** A stair dug down a box toward the south, a step of 0.5 a tile from `from` at row `y0`, its ceiling stepping down with it. */
-const stairDown = (x0, y0, x1, y1, from, opts = {}) =>
+/** A doorway through a pit's round wall at floor `z` (its tiles were the wall's low angled tiles). */
+const arch = (z = PIT) => ({ floorZ: z, ceilZ: z + 3.5, top: FARM });
+/**
+ * A stair dug down a box toward the south, a step of 0.5 a tile from `from`
+ * at row `start` (`y0` unless given), its ceiling stepping down with it. In
+ * flights of `flight` steps with a flat landing of `landing` tiles between
+ * them, down to `to` at the most.
+ */
+const stairDown = (x0, y0, x1, y1, from, { start = y0, flight = 8, landing = 2, to = -Infinity, ...opts } = {}) =>
   under(x0, y0, x1, y1, {
-    floorZ: (x, y) => from - 0.5 * (y - y0),
+    floorZ: (x, y) => {
+      const r = y - start, n = flight + landing;
+      return Math.max(to, from - 0.5 * (Math.floor(r / n) * flight + Math.min(r % n, flight - 1)));
+    },
     ceilZ: (f, old, t) => Math.min(old.slab ? old.slab.bottom : t - 0.25, f + 4.5),
     light: 96,
     ...opts,
@@ -98,7 +109,7 @@ const stairDown = (x0, y0, x1, y1, from, opts = {}) =>
 /**
  * A light well: a 2 x 2 shaft from the yard down into a tunnel or room, open
  * to the sky, with a kerb round its mouth on the yard (0.9, jumpable: a drop
- * of 12 into the tunnel, and it hurts). Too narrow to climb out of.
+ * of 8 or more, and it hurts). Too narrow to climb out of.
  */
 function well(x, y) {
   p.rect(x - 1, y - 1, x + 3, y + 3, (_, __, c) => (c.slab ? { ...c, slab: { ...c.slab, top: c.slab.top + 0.9 } } : { ...c, floorZ: c.floorZ + 0.9 }));
@@ -157,13 +168,13 @@ const apron = (x0, y0, x1, y1) => p.rect(x0, y0, x1, y1, yard());
 // (where the wave comes from), and south into the wash. Jan won't land on
 // it with troopers coming; the farm's beacon lamps still lit round its spot.
 const PAD = [150, 106, 196, 132];
-p.rect(128, 92, W - 1, 142, (x, y, c) => (x < 190 && y < 106 ? c : sand(quarter(Math.min(6, 2 + 0.4 * boxDist(x, y, PAD) + 0.5 * valueNoise(x, y, 4, 42))))));
-p.rect(...PAD, sand(0));
+p.rect(128, 92, W - 1, 142, (x, y, c) => (x < 190 && y < 106 ? c : sand(quarter(OUT + Math.min(6, 2 + 0.4 * boxDist(x, y, PAD) + 0.5 * valueNoise(x, y, 4, 42))))));
+p.rect(...PAD, sand(OUT));
 for (const box of [
   [142, 114, 150, 120], [134, 110, 142, 124], // the west cut and its pocket
   [196, 110, 202, 116], [198, 104, 204, 122], // the east cut
-]) p.rect(...box, sand(0));
-for (const [x, y] of [[168, 116], [176, 116], [168, 124], [176, 124]]) lights.push({ x, y, z: 1, radius: 3, light: 32 });
+]) p.rect(...box, sand(OUT));
+for (const [x, y] of [[168, 116], [176, 116], [168, 124], [176, 124]]) lights.push({ x, y, z: OUT + 1, radius: 3, light: 32 });
 list.push(
   at('boulder-large', 158.5, 113, { angle: 30 }), at('boulder-small', 162.5, 126.5, { angle: 200 }),
   at('boulder-large', 186.5, 112, { angle: 140 }), at('boulder-small', 189, 125.2, { angle: 80 }),
@@ -176,13 +187,13 @@ list.push(
 // wide: south 10 m (two steps down, then under a natural arch of rock),
 // west 15 m (two more), then south-west (two more) onto the flat where the
 // Crow sets down. Its walls stand 4 to 6 m over it at first, 5 to 7 m by the end.
-const rockTop = (x, y) => quarter(7 + 3 * valueNoise(x, y, 10, 43) + 0.75 * valueNoise(x, y, 3, 44));
+const rockTop = (x, y) => quarter(OUT + 7 + 3 * valueNoise(x, y, 10, 43) + 0.75 * valueNoise(x, y, 3, 44));
 p.rect(64, 142, W - 1, H - 1, (x, y) => ({ floor: 'desert-gravel', ceiling: 'sky', floorZ: rockTop(x, y), ceilZ: SKY, light: SUN, side: 'sandstone' }));
 /** The wash's line, from the pad down to the flat. */
 const WASH = [[174, 128], [174, 152], [164, 160], [136, 161], [124, 168], [116, 178]];
 /** Where the floor drops, by the distance down the wash: two steps of 0.5 each. */
 const DROPS = [14, 46, 70];
-const washFloor = (s) => -0.5 * DROPS.reduce((n, d) => n + (s >= d) + (s >= d + 2), 0);
+const washFloor = (s) => OUT - 0.5 * DROPS.reduce((n, d) => n + (s >= d) + (s >= d + 2), 0);
 /** The nearest point on a line of points to (x, y): how far off the line, and how far along it. */
 function along(line, x, y) {
   let best = { off: Infinity, s: 0 };
@@ -267,22 +278,23 @@ apron(140, 16, 146, 24);
 lights.push({ x: 160, y: 16.5, z: FARM + 5, radius: 6, light: 48 });
 
 // ---------------------------------------------------------------- 1, 4, 7, 9. the four pits
-// Round pits 12 deep (6 m), open to the sky, their walls the farm's whitewash. No
+// Round pits open to the sky, their walls the farm's whitewash: the three
+// small ones 8 deep (4 m), the house's courtyard, the big one, 12 (6 m). No
 // parapets: one hides a pit from the troopers on its rim.
-const pit = (cx, cy, r, floor = 'street-sand') => town.circle(cx, cy, r, { inside: yard(PIT, { floor }), wall: { wall: 'adobe-pale', wallTop: FARM }, seam: 90 });
+const pit = (cx, cy, r, floor = 'street-sand', z = PIT) => town.circle(cx, cy, r, { inside: yard(z, { floor }), wall: { wall: 'adobe-pale', wallTop: FARM }, seam: 90 });
 pit(28, 46, 6, 'flagstone'); // 1. the garden pit, the drop-off
 pit(80, 52, 8); // 4. the workshop pit
-pit(160, 46, 12); // 7. the house's courtyard
+pit(160, 46, 12, 'street-sand', COURT); // 7. the house's courtyard
 pit(180, 84, 7, 'flagstone'); // 9. the garage pit
 lights.push({ x: 28, y: 46, z: PIT + 3.5, radius: 6, light: 64 }); // the grow lamps
 lights.push({ x: 82, y: 56, z: PIT + 1, radius: 5, light: 48 }); // a speeder burning
-lights.push({ x: 160, y: 50, z: PIT + 1, radius: 6, light: 56 }); // the cart burning
+lights.push({ x: 160, y: 50, z: COURT + 1, radius: 6, light: 56 }); // the cart burning
 
 // ---------------------------------------------------------------- 2. the pump tunnels
 // Under the garden court, east from the garden pit: the tunnel and the
 // pump room (the water pipe goes down into its pump), its one way on the
 // stair down to the reservoir. Tunnels 4 wide, ceilings at 2 m.
-dig(33, 44, 35, 48, ARCH);
+dig(33, 44, 35, 48, arch());
 dig(35, 44, 50, 48);
 dig(46, 46, 58, 58, { light: 104 });
 lights.push({ x: 52, y: 52, z: PIT + 3, radius: 6, light: 48 });
@@ -296,18 +308,18 @@ list.push(at('med-kit', 36.5, 35.5), at('thermal-detonator', 42.5, 38.5));
 
 // ---------------------------------------------------------------- 3. the reservoir
 // The farm's water store, dug under the sand outside the windbreak's south
-// side: 16 steps down from the pump room, a hall 32 m long running east,
+// side: 12 steps down from the pump room, in two flights, a hall 32 m long running east,
 // 4.5 m to its vault, a walkway along its north side and the shallow pool
 // beside it, a row of pillars in the pool, two shafts of evening light, the
-// Imperials' work lamps. At its east end, 16 steps up north under the wall
+// Imperials' work lamps. At its east end, 12 steps up north under the wall
 // to the tunnel east of the workshop pit.
 p.rect(40, 66, 112, 92, sand(FARM)); // the sand over it, out of reach
 const vault = { ceilZ: RESERVOIR + 9, top: FARM, floor: 'flagstone', ceiling: 'sandstone-dark', side: 'sandstone', light: 80 };
-stairDown(50, 58, 54, 74, PIT, { side: 'sandstone' });
+stairDown(50, 58, 54, 74, PIT, { flight: 7, to: RESERVOIR, side: 'sandstone' });
 under(44, 74, 108, 86, { ...vault, floorZ: RESERVOIR });
 under(44, 78, 108, 86, { ...vault, floorZ: RESERVOIR - 0.5, floor: 'water-murky', light: 72 });
 for (const x of [56, 66, 76, 86, 96]) p.rect(x, 80, x + 2, 82, { wall: 'sandstone' });
-stairDown(100, 58, 104, 74, PIT, { side: 'sandstone' });
+stairDown(100, 58, 104, 74, PIT, { flight: 7, to: RESERVOIR, side: 'sandstone' });
 lights.push({ x: 70, y: 75.5, z: RESERVOIR + 1, radius: 7, light: 64 }, { x: 99, y: 75.5, z: RESERVOIR + 1, radius: 7, light: 64 });
 
 // ---------------------------------------------------------------- 4. the workshop
@@ -315,13 +327,13 @@ lights.push({ x: 70, y: 75.5, z: RESERVOIR + 1, radius: 7, light: 64 }, { x: 99,
 // down into it. Up from the reservoir, the tunnel runs west into the pit;
 // east, toward the house, it caved in, in sight from the stair's head.
 dig(70, 26, 88, 40, { light: 120 });
-dig(78, 40, 82, 45, ARCH);
-// The shed's stair: down its west wall under the yard, then on down the
-// workshop's west wall, open to the room.
+dig(78, 40, 82, 45, arch());
+// The shed's stair: down its west wall under the yard, eight steps, a
+// landing, then eight more on down the workshop's west wall, open to the room.
 stairDown(70, 14, 74, 26, 0);
-stairDown(70, 26, 74, 38, MID - 0.5, { ceilZ: (f) => f + 4.5, light: 120 });
+stairDown(70, 26, 74, 32, 0, { start: 14, ceilZ: (f) => Math.min(FARM - 0.5, f + 4.5), light: 120 });
 lights.push({ x: 84, y: 30, z: PIT + 3, radius: 6, light: 48 });
-dig(87, 50, 90, 54, ARCH);
+dig(87, 50, 90, 54, arch());
 dig(90, 50, 110, 54, { light: 88 });
 dig(100, 54, 104, 58, { light: 88 });
 tag(100, 50, 110, 54, 'rubble');
@@ -339,8 +351,8 @@ list.push(at('shield-unit', 91.5, 60.5), at('energy-pack', 96.5, 60.5));
 // the north, the common room west, the quarters east, the storeroom south,
 // and a tunnel from the common room round to the storeroom (a loop for the
 // fight).
-stairDown(158, 20, 162, 32, 0);
-dig(158, 32, 162, 35, { floorZ: MID, ceilZ: MID + 3.5, top: FARM });
+stairDown(158, 18, 162, 32, 0, { flight: 6 });
+dig(158, 32, 162, 35, arch(MID));
 // From the doorway, halfway down the courtyard's north wall, a stair 3 wide
 // down the wall's inside, east and round to the floor: a landing, then
 // twelve steps of 0.5 (counted along its inner edge, so no step is more).
@@ -349,32 +361,32 @@ dig(158, 32, 162, 35, { floorZ: MID, ceilZ: MID + 3.5, top: FARM });
   const inner = r - wide;
   const LANDING = 0.2; // radians either side of north
   p.rect(cx - r, cy - r, cx + r, cy + 3, (x, y, c) => {
-    if (c.floorZ !== PIT || c.line || c.wall || c.slab) return c;
+    if (c.floorZ !== COURT || c.line || c.wall || c.slab) return c;
     const d = Math.hypot(x + 0.5 - cx, y + 0.5 - cy);
     if (d < inner) return c;
     const turned = Math.atan2(y + 0.5 - cy, x + 0.5 - cx) + Math.PI / 2; // 0 at north, clockwise
     if (turned < -LANDING) return c;
     const f = MID - 0.5 * Math.max(0, Math.ceil((turned - LANDING) * inner));
-    return f > PIT ? { ...c, floorZ: f } : c;
+    return f > COURT ? { ...c, floorZ: f } : c;
   });
 }
-dig(138, 40, 146, 52, { light: 112 });
-dig(146, 44, 149, 48, ARCH);
-lights.push({ x: 142, y: 46, z: PIT + 3, radius: 6, light: 40 });
-dig(171, 49, 174, 53, ARCH);
-dig(174, 38, 186, 54, { light: 96 });
-lights.push({ x: 180, y: 46, z: PIT + 3, radius: 5, light: 32 });
-dig(158, 57, 162, 61, ARCH);
-dig(150, 61, 170, 70, { light: 96 });
-lights.push({ x: 160, y: 65, z: PIT + 3, radius: 5, light: 32 });
-dig(140, 52, 144, 66, { light: 88 });
-dig(144, 62, 150, 66, { light: 88 });
+dig(138, 40, 146, 52, { floorZ: COURT, light: 112 });
+dig(146, 44, 149, 48, arch(COURT));
+lights.push({ x: 142, y: 46, z: COURT + 3, radius: 6, light: 40 });
+dig(171, 49, 174, 53, arch(COURT));
+dig(174, 38, 186, 54, { floorZ: COURT, light: 96 });
+lights.push({ x: 180, y: 46, z: COURT + 3, radius: 5, light: 32 });
+dig(158, 57, 162, 61, arch(COURT));
+dig(150, 61, 170, 70, { floorZ: COURT, light: 96 });
+lights.push({ x: 160, y: 65, z: COURT + 3, radius: 5, light: 32 });
+dig(140, 52, 144, 66, { floorZ: COURT, light: 88 });
+dig(144, 62, 150, 66, { floorZ: COURT, light: 88 });
 
 // ---------------------------------------------------------------- 8. the cellar
 // Six steps down from the storeroom: cold and dark, the cistern's pool along
 // its south side, the lamp knocked over and still lit on the floor, the
 // recordings behind a loose stone at its east end.
-stairDown(152, 70, 156, 76, PIT - 0.5, { ceilZ: (f) => Math.min(CEIL, f + 4), light: 80 });
+stairDown(152, 70, 156, 76, COURT - 0.5, { ceilZ: (f) => Math.min(COURT + 4, f + 4), light: 80 });
 under(144, 76, 166, 88, { floorZ: CELLAR, ceilZ: CELLAR + 4, ceiling: 'sandstone-dark', light: 72 });
 under(146, 83, 158, 87, { floorZ: CELLAR - 0.5, ceilZ: CELLAR + 4, floor: 'water-murky', ceiling: 'sandstone-dark', light: 64 });
 lights.push({ x: 161.5, y: 79.5, z: CELLAR + 0.3, radius: 4, light: 40 });
@@ -391,35 +403,35 @@ list.push(at('power-cell', 140.5, 79.5), at('med-kit', 140.5, 82.5));
 // the recordings are taken (out of sight: the caves come up into the pit).
 // Its wall to the storeroom is blank. Taller inside.
 dig(174, 58, 186, 72, { ceilZ: PIT + 4.5, light: 104 });
-dig(178, 72, 182, 78, ARCH);
+dig(178, 72, 182, 78, arch());
 shutter(178, 72, 182, 73);
 lights.push({ x: 180, y: 64, z: PIT + 4, radius: 6, light: 40 });
-// The trench: a flight of twelve steps of 0.5 up south from the garage's
-// shutter, across the pit to its rim, then twelve more, open to the sky, walled in the farm's plaster (its walls stand 2 m over the back
-// plot at the top, so it stays out of reach); then the gate through the
-// windbreak onto the pad.
-p.rect(177, 79, 183, 104, (x, y) => yard(PIT + 0.5 * (y - 79), { floor: 'flagstone' }));
+// The trench: out of the pit's south side, eight steps of 0.5 up south,
+// then level to the gate through the windbreak onto the pad (lower than the
+// farm); open to the sky, walled in the farm's plaster (its walls stand 2 m
+// over the back plot, so it stays out of reach).
+p.rect(177, 91, 183, 104, (x, y) => yard(Math.min(OUT, PIT + 0.5 * (y - 91)), { floor: 'flagstone' }));
 town.block(175, 92, 177, 104, { h: FARM + 4, skirt: null });
 town.block(183, 92, 185, 104, { h: FARM + 4, skirt: null });
-town.arch(177, 104, 183, 106, { h: WALL, lintel: 4, floorZ: FARM, floor: 'flagstone', light: 136 });
+town.arch(177, 104, 183, 106, { h: WALL, lintel: 4, floorZ: OUT, floor: 'flagstone', light: 136 });
 tag(177, 102, 183, 106, 'trench-head');
 
 // ---------------------------------------------------------------- 8a. the caves
 // Rusk's way out: a panel in the cellar's south wall, opened by taking the
-// recordings. Behind it his cut steps go down (12 of 0.5) into natural
+// recordings. Behind it his cut steps go down (6 of 0.5) into natural
 // caves under the drifts and the pad: a cavern 7 m across, a low passage
-// east under the pad, and a long climb north (9.5 up over 19 m) under the
-// east windbreak into the garage pit's east side. One way, no turnings.
+// east under the pad, rising gently (a quarter step every tile or two),
+// and on up north under the east windbreak into the garage pit's east side. One way, no turnings.
 // Dark (56 to 72), lit by the troopers' lamps and the light through cracks.
 const CAVE = [[145.5, 88], [145.5, 100], [138, 110], [140, 122], [152, 131], [172, 135], [189, 128], [190, 110], [190, 92], [190, 84]];
 const CAVE_LEN = CAVE.slice(1).reduce((n, [x, y], i) => n + Math.hypot(x - CAVE[i][0], y - CAVE[i][1]), 0);
-const STEPS = 13; // Rusk's cut steps end here (distance along the caves)
+const STEPS = 7; // Rusk's cut steps end here (distance along the caves)
 const CAVERN = [24, 52]; // the cavern, wide and tall
-const CLIMB = 96; // from here the floor climbs to the garage pit's floor
+const CLIMB = 60; // from here the floor climbs to the garage pit's floor
 const caveFloor = (s, x, y) => {
   if (s < 1) return CELLAR;
   if (s < STEPS) return CELLAR - 0.5 * Math.ceil(s - 1);
-  const rough = quarter(CELLAR - 6.5 + valueNoise(x, y, 5, 47) - 0.5);
+  const rough = quarter(CELLAR - 3.5 + valueNoise(x, y, 5, 47) - 0.5);
   if (s < CLIMB) return rough;
   const t = Math.min(1, (s - CLIMB) / (CAVE_LEN - 2 - CLIMB));
   return quarter(rough + t * (PIT - rough));
@@ -441,14 +453,16 @@ p.rect(128, 76, 196, 142, (x, y, c) => {
 });
 // The panel at the steps' head, and the arch into the garage pit.
 p.rect(144, 88, 147, 89, (_, __, c) => ({ ...c, door: 'sandstone', style: 'rise', lock: 'remote', stayOpen: true, tag: 'bolthole' }));
-dig(186, 82, 189, 87, ARCH);
+dig(186, 82, 189, 87, arch());
 tag(131, 106, 147, 124, 'tremor');
 lights.push(
   { x: 145.5, y: 90, z: CELLAR + 2, radius: 4, light: 40 }, // the panel, lit from inside once it's open
-  { x: 137, y: 112, z: CELLAR - 4.5, radius: 5, light: 40 }, // a crack's light in the cavern
-  { x: 144, y: 121, z: CELLAR - 5, radius: 6, light: 56 }, // the troopers' lamp
-  { x: 176, y: 134, z: CELLAR - 5, radius: 5, light: 48 }, // a crack under the wash
-  { x: 190, y: 100, z: PIT - 3.5, radius: 5, light: 48 }, // the troopers' lamp on the climb
+  ...[
+    [137, 112, 3.5, 5, 40], // a crack's light in the cavern
+    [144, 121, 2, 6, 56], // the troopers' lamp
+    [176, 134, 2, 5, 48], // a crack under the wash
+    [190, 100, 2, 5, 48], // the troopers' lamp on the climb
+  ].map(([x, y, up, radius, light]) => ({ x, y, z: caveFloor(along(CAVE, x, y).s, x, y) + up, radius, light })),
 );
 
 // ---------------------------------------------------------------- the light wells
