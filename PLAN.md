@@ -30,8 +30,9 @@ These need Mark to try something, or to decide. Don't start them without him.
 
 - **Mission 2's new vaporators** (2026-11-07, sketch snapshots sent to
   Mark; models in `models/vaporator.js`, not in the level yet): the
-  courtyard's cluster (a 3.8 m and a 2.6 m stacked column with rods, a
-  squat unit, domed caps), and for the yards the film's vaporator
+  courtyard's cluster in the same parts as the yard's (a 3.4 m and a
+  2.25 m vaporator without masts, chiller bars round them, a squat unit,
+  domed caps), and for the yards the film's vaporator
   (Mark's references): foot, pump, condenser with louvres and dials,
   coolant section, brain discs, ribbed intake, banded column, cone, mast
   and a turning humidity sensor, three chiller bars round it. To judge:
@@ -1298,8 +1299,9 @@ snapshots, playable at `?map=m2`.
     - [x] The cluster for the courtyard: two or three stacked cylinders
           (drums, collars, 2.5 to 4 m), rods round them, a squat unit,
           domed caps at their feet (each cap its own small model).
-          `models/vaporator.js`: `vaporator-tall` (3.8 m), `-mid`,
-          `-squat`, `-cap`.
+          `models/vaporator.js`: `vaporator-tall` (3.4 m), `-mid`
+          (2.25 m), `-squat`, `-cap`, rebuilt in the film vaporator's parts
+          (Mark, 2026-11-07).
     - [x] The yard's vaporator, after the film's (Mark's references,
           2026-11-07, replacing the lattice mast): `vaporator-farm`, 3.9 m
           body, mast to 5.4 m, three chiller bars, and

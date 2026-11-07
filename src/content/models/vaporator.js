@@ -1,28 +1,20 @@
 import { ModelBuilder } from './lib/build.js';
 
 // The Homestead's moisture vaporators (levels/m2.js, docs/mission2.md, "The
-// look"): in the courtyard, a cluster of stacked drums with thin rods
-// standing round them, a squat unit and domed caps at their feet; on the
-// farm's ground, the film's tall vaporators, a sensor turning on a mast.
-// Worn white paint over grey metal, the farm's sand on them. The
-// origin is on the floor under each one's middle. Mos Eisley keeps its own
-// small vaporator (models/clutter.js).
+// look"), all in the film's parts (Mark's references, 2026-11-07). In the
+// courtyard, a cluster of two vaporators without masts, a squat unit and
+// domed caps at their feet; on the farm's ground, the tall ones, a sensor
+// turning on a mast. Worn white paint, the farm's sand on them. The origin
+// is on the floor under each one's middle, the front +y. Mos Eisley keeps
+// its own small vaporator (models/clutter.js).
 
 /** A ring of `n` points of radius `r` (x, y), turned by `turn` radians. */
 const ring = (n, r, turn = 0) => Array.from({ length: n }, (_, i) => [Math.cos(turn + (i / n) * Math.PI * 2) * r, Math.sin(turn + (i / n) * Math.PI * 2) * r]);
 
-const WHITE = { tex: 'dome-white' };
-const COLLAR = { tex: 'band-steel' };
-const GREY = { tex: 'metal-grey' };
-const DARK = { color: ['gray', 0.2] };
 const N = 10;
 const TURN = Math.PI / N;
-
-/** A drum: a plain side, open ends (a collar or a cap covers them). */
-const drum = (m, z, r, h, style = WHITE) => m.cylinder([0, 0, z], r, h, { segments: N, turn: TURN, ...style, top: false, bottom: false });
-
-/** A collar: a short dark band a little wider than the drums it joins, closed top and bottom. */
-const collar = (m, z, r, h = 0.22) => m.cylinder([0, 0, z], r, h, { segments: N, turn: TURN, ...COLLAR, top: DARK, bottom: DARK });
+const PAINT = { tex: 'ware-white' };
+const SHADE = { tex: 'dome-white' };
 
 /** A dome of radius `r` on `z`, in `steps` bands; its tip a point. */
 function dome(m, z, r, style, steps = 3, at = [0, 0]) {
@@ -58,82 +50,143 @@ function strut(m, a, b, w, style) {
   }
 }
 
-/** Rods standing round a column: `n` thin rods at radius `r`, `h` tall, braced to it at `braces` heights. */
-function rods(m, n, r, h, braces, turn = 0) {
-  for (const [x, y] of ring(n, r, turn)) {
-    strut(m, [x, y, 0], [x, y, h], 0.07, GREY);
-    m.cylinder([x, y, h], 0.06, 0.08, { segments: 6, color: ['gray', 0.3], bottom: false });
-    for (const [z, inner] of braces) strut(m, [x * (inner / r), y * (inner / r), z], [x, y, z], 0.05, DARK);
+/** A white drum with a lid (its bottom sits on the piece below, unless `under`). */
+const block = (m, z, r, h, style = PAINT, under = false) => m.cylinder([0, 0, z], r, h, { segments: 8, turn: Math.PI / 8, ...style, bottom: under && style });
+
+/** A stub `len` long sticking out sideways from the column, along `axis` ('x' or 'y'), `dir` 1 or -1, offset `at` across. */
+function stub(m, axis, dir, from, z, r, len, style = PAINT, at = 0) {
+  const base = axis === 'x' ? [dir > 0 ? from : -from - len, at, z] : [at, dir > 0 ? from : -from - len, z];
+  // (Its end against the column is hidden: the near end going +, the far end going -.)
+  m.cylinder(base, r, len, { segments: 6, axis, ...style, [dir > 0 ? 'bottom' : 'top']: false });
+}
+
+/** The flared foot a vaporator stands on, `h` tall, from radius `r0` to `r1`. */
+const foot = (m, r0, r1, h = 0.28) => m.loft(ring(N, r0, TURN), 0, ring(N, r1, TURN), h, { ...SHADE, bottom: false });
+
+/** Louvres on a box's front (its +y face at `y`), from `x0` to `x1` and `z0` to `z1`. */
+const louvres = (m, x0, x1, z0, z1, y) => m.box([x0, y + 0.001, z0], [x1, y + 0.01, z1], { tex: 'vent-slats', texScale: x1 - x0, top: false, bottom: false });
+
+/** Monitor dials on a front (+y) at `y`, at `x` and heights `zs`. */
+const dials = (m, x, zs, y) => zs.forEach((z) => stub(m, 'y', 1, y, z, 0.15, 0.1, { tex: 'vent-round', top: { tex: 'vent-round' } }, x));
+
+/** The air intake's ribs: `n` thin discs from `z`, alternately `r` and a little narrower. Returns the top. */
+function ribs(m, z, r, n) {
+  for (let k = 0; k < n; k++) block(m, z + k * 0.1, k % 2 ? r - 0.06 : r, 0.1, k % 2 ? SHADE : PAINT);
+  return z + n * 0.1;
+}
+
+/** A banded column from `z`: drums `[h, r]`, the thin bands between them a shade darker. Returns the top. */
+function column(m, z, parts) {
+  for (const [h, r] of parts) {
+    block(m, z, r, h, h < 0.15 ? SHADE : PAINT);
+    z += h;
+  }
+  return z;
+}
+
+/**
+ * Chiller bars standing round a vaporator: at radius `r` and `angles`
+ * (degrees), from its foot to `top`, a joint at `joint`, rounded tops, and
+ * arms in to the body (to radius `inner`) at each height in `arms`.
+ */
+function bars(m, r, angles, top, joint, arms, inner) {
+  for (const a of angles) {
+    const [x, y] = [Math.cos((a * Math.PI) / 180) * r, Math.sin((a * Math.PI) / 180) * r];
+    m.cylinder([x, y, 0.28], 0.11, top - 0.28, { segments: 6, ...PAINT, bottom: false, top: false });
+    m.cylinder([x, y, joint], 0.13, 0.12, { segments: 6, ...SHADE });
+    dome(m, top, 0.11, PAINT, 1, [x, y]);
+    for (const h of arms) strut(m, [(x * inner) / r, (y * inner) / r, h], [x, y, h], 0.14, PAINT);
   }
 }
 
-/** The cluster's tall vaporator, 4 m: three drums narrowing up, collars between, a domed top, four rods round it. */
+/**
+ * The courtyard cluster's tall vaporator, 3.4 m: the farm one's parts
+ * without its mast. The pump with louvres on its front, a wide drum with
+ * dials, a coupling and a pipe out of its side, the brain discs, the ribbed
+ * intake, a drum with a valve, a banded column and a domed top. Four
+ * chiller bars stand round it.
+ */
 function tall() {
   const m = new ModelBuilder('vaporator-tall');
-  collar(m, 0, 0.72, 0.35);
-  drum(m, 0.35, 0.58, 2.6);
-  collar(m, 2.95, 0.66, 0.25);
-  drum(m, 3.2, 0.44, 2.1);
-  collar(m, 5.3, 0.5, 0.2);
-  drum(m, 5.5, 0.3, 1.6, GREY);
-  collar(m, 7.1, 0.36, 0.15);
-  dome(m, 7.25, 0.3, WHITE);
-  // The rods: four, nearly its height, braced at the collars.
-  rods(m, 4, 0.95, 6.8, [[3.05, 0.66], [5.4, 0.5]], Math.PI / 4);
-  // A pipe out of its foot into the floor (the tank under it), and a valve box.
-  m.box([0.55, -0.18, 0], [0.85, 0.18, 0.7], { ...GREY, top: DARK });
+  foot(m, 0.95, 0.66);
+  block(m, 0.28, 0.62, 1.07);
+  m.box([-0.42, 0.4, 0.28], [0.42, 0.74, 1.25], { ...PAINT, bottom: false });
+  louvres(m, -0.32, 0.32, 0.4, 1.12, 0.74);
+  block(m, 1.35, 0.68, 0.12, SHADE, true);
+  block(m, 1.47, 0.6, 1.4);
+  m.box([0.45, -0.32, 1.65], [0.78, 0.32, 2.6], { ...PAINT, bottom: false });
+  stub(m, 'x', 1, 0.78, 1.95, 0.15, 0.1, { tex: 'vent-round', top: { tex: 'vent-round' } });
+  stub(m, 'x', 1, 0.78, 2.35, 0.15, 0.1, { tex: 'vent-round', top: { tex: 'vent-round' } });
+  stub(m, 'y', 1, 0.58, 2.2, 0.17, 0.12, SHADE);
+  stub(m, 'x', -1, 0.58, 2.1, 0.14, 0.45);
+  block(m, 2.87, 0.74, 0.22, PAINT, true);
+  block(m, 3.09, 0.7, 0.22);
+  let z = ribs(m, 3.31, 0.46, 4);
+  block(m, z, 0.44, 1.2);
+  stub(m, 'x', 1, 0.42, z + 0.5, 0.15, 0.22, SHADE);
+  z = column(m, z + 1.2, [[0.1, 0.47], [0.45, 0.34], [0.08, 0.3], [0.5, 0.33], [0.08, 0.29], [0.4, 0.31]]);
+  stub(m, 'y', 1, 0.3, z - 0.7, 0.07, 0.2);
+  dome(m, z, 0.31, PAINT, 2);
+  bars(m, 1.05, [45, 135, 225, 315], 6, 2.9, [0.32, 2.98], 0.6);
   return m.build();
 }
 
-/** The cluster's second vaporator, 2.75 m: two drums and a cap, three rods. */
+/**
+ * The cluster's second vaporator, 2.25 m: the pump with two dials and
+ * louvres, a drum with a coupling and a side pipe, a brain disc, ribs, a
+ * short banded column and a cone. Three chiller bars round it.
+ */
 function mid() {
   const m = new ModelBuilder('vaporator-mid');
-  collar(m, 0, 0.6, 0.3);
-  drum(m, 0.3, 0.48, 2.3);
-  collar(m, 2.6, 0.55, 0.22);
-  drum(m, 2.82, 0.32, 1.9);
-  collar(m, 4.72, 0.38, 0.15);
-  dome(m, 4.87, 0.32, WHITE);
-  rods(m, 3, 0.8, 4.9, [[2.7, 0.55]], Math.PI / 6);
+  foot(m, 0.8, 0.56);
+  block(m, 0.28, 0.52, 0.95);
+  m.box([-0.38, 0.32, 0.28], [0.3, 0.62, 1.15], { ...PAINT, bottom: false });
+  dials(m, -0.18, [0.55, 0.9], 0.62);
+  louvres(m, 0.02, 0.26, 0.4, 1.05, 0.62);
+  block(m, 1.23, 0.56, 0.1, SHADE, true);
+  block(m, 1.33, 0.5, 1.15);
+  stub(m, 'y', 1, 0.48, 1.9, 0.16, 0.12, SHADE);
+  stub(m, 'x', 1, 0.48, 1.8, 0.12, 0.4);
+  block(m, 2.48, 0.62, 0.22, PAINT, true);
+  let z = ribs(m, 2.7, 0.4, 3);
+  z = column(m, z, [[0.45, 0.32], [0.08, 0.28], [0.45, 0.31], [0.08, 0.27]]);
+  stub(m, 'x', -1, 0.3, z - 0.6, 0.13, 0.18, SHADE);
+  m.loft(ring(N, 0.29, TURN), z, ring(N, 0.17, TURN), z + 0.4, { ...PAINT, bottom: false, top: SHADE });
+  bars(m, 0.9, [90, 210, 330], 4.4, 2.2, [0.32, 2.58], 0.5);
   return m.build();
 }
 
-/** The squat unit, 1.2 m: a wide low drum with a domed lid and a vent on its side. */
+/**
+ * The squat unit, 1.1 m: the film's parts cut short. A wide drum with
+ * louvres and two dials on its front, a pipe out of its side, a brain disc
+ * for a lid and a dome on it.
+ */
 function squat() {
   const m = new ModelBuilder('vaporator-squat');
-  collar(m, 0, 0.82, 0.25);
-  drum(m, 0.25, 0.75, 1.3);
-  collar(m, 1.55, 0.8, 0.15);
-  dome(m, 1.7, 0.7, WHITE, 3);
-  // A vent on its side, standing a little proud.
-  m.box([0.74, -0.25, 0.5], [0.8, 0.25, 1.1], { tex: 'vent-slats', top: DARK, bottom: false });
+  foot(m, 1, 0.82, 0.22);
+  block(m, 0.22, 0.78, 1.1);
+  m.box([-0.5, 0.55, 0.3], [0.5, 0.88, 1.2], { ...PAINT, bottom: false });
+  louvres(m, -0.05, 0.42, 0.4, 1.1, 0.88);
+  dials(m, -0.28, [0.6, 0.95], 0.88);
+  stub(m, 'x', -1, 0.76, 0.7, 0.14, 0.35);
+  block(m, 1.32, 0.88, 0.18, PAINT, true);
+  dome(m, 1.5, 0.7, SHADE, 3);
   return m.build();
 }
 
 /** A domed cap, 0.5 m: a silver dome on a short stalk, a collar round its foot. */
 function cap() {
   const m = new ModelBuilder('vaporator-cap');
-  m.cylinder([0, 0, 0], 0.32, 0.1, { segments: N, turn: TURN, ...COLLAR, bottom: false });
-  m.cylinder([0, 0, 0.1], 0.1, 0.35, { segments: 6, ...GREY, top: false, bottom: false });
-  m.cylinder([0, 0, 0.45], 0.42, 0.06, { segments: N, turn: TURN, ...COLLAR, top: false });
-  dome(m, 0.51, 0.42, { color: ['steel', 0.7] }, 3);
+  m.cylinder([0, 0, 0], 0.32, 0.1, { segments: N, turn: TURN, ...SHADE, bottom: false });
+  m.cylinder([0, 0, 0.1], 0.1, 0.35, { segments: 6, ...PAINT, top: false, bottom: false });
+  m.cylinder([0, 0, 0.45], 0.42, 0.06, { segments: N, turn: TURN, ...PAINT, top: false });
+  dome(m, 0.51, 0.42, SHADE, 3);
   return m.build();
 }
 
 /** The farm vaporator's body, to the top of its telemetry cone, and its mast's top. */
 const BODY = 7.75;
 const MAST = 10.75;
-const PAINT = { tex: 'ware-white' };
-const SHADE = { tex: 'dome-white' };
-
-/** A white drum with a lid (its bottom sits on the piece below, unless `under`). */
-const block = (m, z, r, h, style = PAINT, under = false) => m.cylinder([0, 0, z], r, h, { segments: 8, turn: Math.PI / 8, ...style, bottom: under && style });
-/** A stub `len` long sticking out sideways from the column, along `axis` ('x' or 'y'), `dir` 1 or -1. */
-function stub(m, axis, dir, from, z, r, len, style = PAINT, at = 0) {
-  const base = axis === 'x' ? [dir > 0 ? from : -from - len, at, z] : [at, dir > 0 ? from : -from - len, z];
-  // (Its end against the column is hidden: the near end going +, the far end going -.)
-  m.cylinder(base, r, len, { segments: 6, axis, ...style, [dir > 0 ? 'bottom' : 'top']: false });
-}
 
 /**
  * A moisture vaporator for the farm's ground, after the film's (Mark's
@@ -143,8 +196,8 @@ function stub(m, axis, dir, from, z, r, len, style = PAINT, at = 0) {
  * the brain unit's wide discs, the ribbed air intake, a narrow column of
  * banded drums with valves and sensors on it, the telemetry cone and a
  * thin mast; three chiller bars stand round it, joined to it at its foot
- * and its middle. Its front is +y. The humidity sensor on the mast's top is
- * its own model, turning.
+ * and its middle. The humidity sensor on the mast's top is its own model,
+ * turning.
  */
 function farm() {
   const m = new ModelBuilder('vaporator-farm');
@@ -157,7 +210,7 @@ function farm() {
   // The condenser: a box, louvres on its front's right, two dials on its left.
   m.box([-0.7, -0.55, 1.5], [0.78, 0.65, 2.8], PAINT);
   m.box([0.05, 0.651, 1.6], [0.7, 0.66, 2.7], { tex: 'vent-slats', texScale: 0.65, top: false, bottom: false });
-  for (const z of [1.85, 2.3]) stub(m, 'y', 1, 0.65, z, 0.16, 0.12, { tex: 'vent-round', top: { tex: 'vent-round' } }, -0.4);
+  dials(m, -0.4, [1.85, 2.3], 0.65);
   block(m, 2.8, 0.55, 0.17, SHADE);
   // The coolant section: its coupling on the front, a pipe out of the left side.
   block(m, 2.97, 0.62, 0.83);
@@ -168,15 +221,10 @@ function farm() {
   block(m, 3.8, 0.66, 0.2, SHADE);
   block(m, 4, 0.74, 0.24, PAINT, true);
   block(m, 4.24, 0.7, 0.26);
-  // The air intake: ribbed.
-  for (let k = 0; k < 4; k++) block(m, 4.5 + k * 0.1, k % 2 ? 0.4 : 0.46, 0.1, k % 2 ? SHADE : PAINT);
-  // The column: drums with bands between, a pressure relief valve, sensors.
-  let z = 4.9;
-  // (Narrow bands between the drums mark the joins.)
-  for (const [h, r] of [[0.4, 0.34], [0.08, 0.3], [0.5, 0.33], [0.08, 0.29], [0.4, 0.33], [0.08, 0.29], [0.45, 0.31], [0.08, 0.27], [0.33, 0.3]]) {
-    block(m, z, r, h, r < 0.3 || h < 0.1 ? SHADE : PAINT);
-    z += h;
-  }
+  // The air intake, ribbed; the column, drums with narrow bands at the
+  // joins; a pressure relief valve and sensors on it.
+  let z = ribs(m, 4.5, 0.46, 4);
+  z = column(m, z, [[0.4, 0.34], [0.08, 0.3], [0.5, 0.33], [0.08, 0.29], [0.4, 0.33], [0.08, 0.29], [0.45, 0.31], [0.08, 0.27], [0.33, 0.3]]);
   stub(m, 'x', 1, 0.3, 5.1, 0.16, 0.25, SHADE);
   stub(m, 'y', 1, 0.3, 5.6, 0.12, 0.12, SHADE);
   stub(m, 'x', -1, 0.3, 6.1, 0.07, 0.25);
@@ -185,15 +233,7 @@ function farm() {
   m.loft(ring(N, 0.3, TURN), z, ring(N, 0.19, TURN), BODY, { ...PAINT, bottom: false, top: { ...SHADE } });
   stub(m, 'x', 1, 0.22, BODY - 0.3, 0.05, 0.25);
   m.cylinder([0, 0, BODY], 0.07, MAST - BODY, { segments: 6, ...PAINT, bottom: false });
-  // The chiller bars: three round it, a joint partway up, rounded tops,
-  // arms to the column at its foot and its middle ring.
-  for (const a of [115, 235, 355]) {
-    const [x, y] = [Math.cos((a * Math.PI) / 180) * 1.1, Math.sin((a * Math.PI) / 180) * 1.1];
-    m.cylinder([x, y, 0.3], 0.11, 4.6, { segments: 6, ...PAINT, bottom: false, top: false });
-    m.cylinder([x, y, 2.6], 0.13, 0.12, { segments: 6, ...SHADE });
-    dome(m, 4.9, 0.11, PAINT, 1, [x, y]);
-    for (const h of [0.3, 3.82]) strut(m, [x * 0.5, y * 0.5, h + 0.08], [x, y, h + 0.08], 0.14, PAINT);
-  }
+  bars(m, 1.1, [115, 235, 355], 4.9, 2.6, [0.38, 3.9], 0.55);
   return m.build();
 }
 
@@ -211,9 +251,9 @@ function sensor() {
 
 /** Each model's decoration size (for collision and the level checker). */
 export const VAPORATORS = {
-  'vaporator-tall': { model: tall, solid: true, radius: 1, height: 7.55 },
-  'vaporator-mid': { model: mid, solid: true, radius: 0.85, height: 5.2 },
-  'vaporator-squat': { model: squat, solid: true, radius: 0.85, height: 2.4 },
+  'vaporator-tall': { model: tall, solid: true, radius: 1.15, height: 6.85 },
+  'vaporator-mid': { model: mid, solid: true, radius: 1, height: 4.5 },
+  'vaporator-squat': { model: squat, solid: true, radius: 1, height: 2.2 },
   'vaporator-cap': { model: cap, radius: 0.42, height: 0.93 },
   'vaporator-farm': { model: farm, solid: true, radius: 1.2, height: BODY },
 };
