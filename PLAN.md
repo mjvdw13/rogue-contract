@@ -1334,19 +1334,19 @@ snapshots, playable at `?map=m2`.
         becomes the hood. Update `docs/mission2.md` (7a, Levels) when
         built.
 - [ ] **Evening:**
-  - [ ] `sky-dusk` (`derive.mjs`, from RESKY01): mauve overhead to rose
+  - [x] `sky-dusk` (`derive.mjs`, from RESKY01): mauve overhead to rose
         to a pale warm amber at the horizon, fading into the haze (Mark's
         references: rose and mauve all over, little indigo).
   - [x] The suns low in the west-south-west (`town.finish(EVENING)`: 196
         and 204, 14 and 18 degrees up), so the shadows run 20 to 30 tiles
         (in with the blockout).
-  - [ ] Light levels: ground 176, deep shade about 104, interiors 96 to
+  - [x] Light levels: ground 176, deep shade about 104, interiors 96 to
         120, the courtyard 104, the cellar 64 to 80; the haze (amber,
         `half: 48` in a lull), checked against the palette.
-  - [ ] A sky that wraps once round the horizon (a level's `skyWrap`:
+  - [x] A sky that wraps once round the horizon (a level's `skyWrap`:
         defs, validator, MODDING.md, a test), so the glow is in the west
         only; the two suns painted low on it.
-  - [ ] The vaporators' long shadows: a thin caster per vaporator in the
+  - [x] The vaporators' long shadows: a thin caster per vaporator in the
         kit's `shadows()`.
 - [ ] **Blowing sand** (all cosmetic, its own RNG):
   - [ ] `weather` takes a list of types (defs, validator, MODDING.md, a

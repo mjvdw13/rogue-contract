@@ -521,6 +521,7 @@ export function validateContent(reg) {
     for (const u of map.uses.values()) checkActions('a switch', u.actions);
     if (level.music && !reg.songs.has(level.music)) warn(`${owner}: unknown music "${level.music}"`);
     if (level.sky && !reg.textures.has(level.sky)) err(`${owner}: unknown sky texture "${level.sky}"`);
+    if (level.skyWrap !== undefined && !(Number.isInteger(level.skyWrap) && level.skyWrap >= 1)) err(`${owner}: skyWrap (how many times the sky goes round the horizon) must be a whole number, 1 or more`);
     if (level.haze) {
       const c = level.haze.color;
       if (!Array.isArray(c) || c.length !== 3 || !c.every((v) => typeof v === 'number' && v >= 0 && v <= 255)) err(`${owner}: haze needs a "color" of three numbers 0-255, like [40, 36, 64]`);

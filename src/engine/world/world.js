@@ -148,6 +148,8 @@ export class World {
     this.haze = level.haze ? { color: level.haze.color, half: level.haze.half ?? 40 } : null;
     /** Terrain past the edge of play, drawn where the sky shows (world/backdrop.js). */
     this.backdrop = level.backdrop ? new Backdrop(level.backdrop, (id) => (this.assets ? this.assets.textureSlot(id) : 0)) : null;
+    /** How many times the sky's texture goes round the horizon. */
+    this.skyWrap = level.skyWrap ?? 2;
     this.skyTexture = level.sky && this.assets ? this.assets.textures[this.assets.textureSlot(level.sky)] : null;
     /** Smooth light, interpolated between tile centres (the renderer reads `map.lightmap`). */
     this.lightmap = new LightMap(this.map, { occlusion: level.occlusion ?? 0 });

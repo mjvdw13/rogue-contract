@@ -531,6 +531,8 @@ pitWalls(p, 180, 84, 7, { floorZ: PIT, wash: 4.5, over: 1.5, seed: 54, blind: bl
 [[18.5, 30.5], [52.5, 30.5], [94.5, 30.5], [112.5, 58.5], [130.5, 22.5], [138.5, 13.5], [184.5, 64.5]].forEach(([x, y], k) => {
   const turn = Math.round(valueNoise(x, y, 1, 7) * 360);
   list.push(at('vaporator-farm', x, y, { z: FARM, angle: turn }), at('vaporator-sensor', x, y, { z: FARM + SENSOR_Z, angle: (turn * 7) % 360 }));
+  // Its long thin shadow across the yard in the low suns.
+  town.caster(x, y, 0.7, FARM, SENSOR_Z);
   if (k % 2 === 0) {
     const a = ((turn + 70) * Math.PI) / 180;
     list.push(at('vaporator-cap', x + Math.cos(a) * 1.9, y - Math.sin(a) * 1.9, { z: FARM }));
@@ -665,9 +667,11 @@ export default defineLevel({
   mapLabel: 'M2',
   name: 'THE HOMESTEAD',
   music: 'garrison',
-  sky: 'sky-night',
-  // Stand-ins until the evening step: the night sky and a dusty haze.
-  haze: { color: [120, 84, 72], half: 48 },
+  // Evening: the suns setting in the west-south-west, the sky going round
+  // once so the glow is there only, and a dusky amber haze.
+  sky: 'sky-dusk',
+  skyWrap: 1,
+  haze: { color: [176, 120, 88], half: 48 },
   lights,
   decals,
   par: 600,

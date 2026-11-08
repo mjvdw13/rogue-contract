@@ -169,16 +169,18 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
   const hazeTab = view.hazeTab;
   const bdBuf = view.bdBuf;
 
-  // Sky: horizontal texel per column from the view angle; the texture spans 180 degrees.
+  // Sky: horizontal texel per column from the view angle; the texture goes
+  // round the horizon `skyWrap` times (twice by default: it spans 180 degrees).
   let skyOffset = 0;
   // The sky is a texel per layout row: at scale 2, one per two rows.
   let skyShift = 0;
   if (sky) {
+    const wrap = view.skyWrap ?? 2;
     for (let x = 0; x < W; x++) {
       const camX = (2 * (x + 0.5)) / W - 1;
       let a = view.angle + Math.atan(camX * view.planeLen);
       a = ((a % TAU) + TAU) % TAU;
-      view.skyU[x] = Math.floor((a / TAU) * sky.w * 2) % sky.w;
+      view.skyU[x] = Math.floor((a / TAU) * sky.w * wrap) % sky.w;
     }
     skyShift = view.scale >> 1;
     skyOffset = sky.h - 6 - Math.round(horizon / view.scale);

@@ -831,6 +831,7 @@ export default defineLevel({
   par: 120,                  // seconds, shown on the tally screen
   fog: 0.05,                 // extra darkness with distance (the default)
   haze: { color: [32, 24, 64], half: 40 }, // outdoors, fade to this colour
+  skyWrap: 2,                // times the sky goes round the horizon (1: a sunset on one side)
   weather: { type: 'glint', count: 60 }, // particles in the air round you, outdoors
   hangings: [],              // ropes, cables and cloth (see Hangings)
   holster: false,            // true: weapons stay down until the town turns (see Calm)
@@ -862,6 +863,15 @@ sky (seen from a sky tile) fade toward the haze colour with distance
 instead, halfway there at `half` tiles (40 by default): a night canyon
 fades into purple air rather than black. Pick a colour like the sky's near
 the horizon. Indoors, haze changes nothing.
+
+The sky's texture goes round the horizon `skyWrap` times, twice by
+default (Dark Forces' skies span 180 degrees). With `skyWrap: 1` it goes
+round once, so it can be different all the way round: Mission 2's
+evening sky (`sky-dusk`) has its glow and the two suns in the
+west-south-west and dims toward the east. A sky that goes round once wants
+a texture twice as wide for the same detail. Its texel `u` looking along
+content angle `a` is `(360 - a) / 360` of its width (the engine's angles
+run clockwise).
 
 Monsters find their way to the player round walls, drops and locked doors
 by a plan of the whole map, worked out again each time the player crosses

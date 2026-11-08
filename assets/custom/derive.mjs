@@ -28,7 +28,13 @@
 // shadow under it). `edge: { rows, amp, seed }` makes the texels above a
 // wavy line round `rows` down from the top see-through (`amp` texels up and
 // down, repeating across the width), its lip darkened a little: a band
-// whose top edge isn't straight. With no `gradient` a texture keeps the source's own
+// whose top edge isn't straight. A sky that goes round the horizon once
+// (a level's `skyWrap: 1`) can have a sunset: `glow: { at, width, color,
+// amount, dim }` warms it toward `color` round `at` (a share of the width:
+// texel u is (360 - azimuth) / 360 of it, the engine's angles running
+// clockwise), `width` its spread, strongest toward the bottom, and darkens
+// the far side by up to `dim`; `suns: [{ at, row, rx, ry, color }]` paints
+// soft discs (`row` their middle, the horizon 6 rows above the bottom). With no `gradient` a texture keeps the source's own
 // colours (the bay's fuel pump panels).
 import fs from 'node:fs';
 import path from 'node:path';
@@ -251,6 +257,14 @@ export const TOWN = [
   // door gone rustier.
   { out: 'barricade-worn', df: 'IWSECB2', tile: [2, 1], gradient: [[30, 28, 26], [74, 70, 64], [116, 110, 100], [150, 142, 128], [176, 168, 150]], keep: 0.3, contrast: 0.9, rust: [{ color: [176, 146, 104], amount: 0.55, cell: 32, seed: 121 }, { color: [128, 64, 28], amount: 0.5, cell: 16, seed: 123, from: 0.6 }, { color: [18, 14, 10], amount: 0.5, cell: 16, seed: 125, from: 0.5 }] },
   { out: 'door-gate-rising', df: 'RDBIG4', gradient: [[22, 20, 18], [58, 54, 48], [98, 92, 82], [138, 130, 116]], keep: 0.2, contrast: 1, rust: WORN(16, 127, 0.8) },
+  // An evening for the homestead (m2.js, skyWrap 1): Robotics' cloudy sky
+  // in mauve overhead to rose, a pale warm amber at the horizon, glowing in
+  // the west-south-west where the two suns are setting (az 196 and 204, 14
+  // and 18 degrees up: the lower one more orange), the east dimmer. Four
+  // times wide, as it goes round once rather than twice.
+  { out: 'sky-dusk', df: 'RESKY01', gradient: [[64, 46, 78], [108, 72, 104], [152, 98, 120], [190, 128, 132], [214, 160, 146]], keep: 0.15, contrast: 0.8, tile: [4, 1], fade: { color: [220, 164, 122], from: 0.5 },
+    glow: { at: 0.444, width: 0.1, color: [244, 204, 146], amount: 0.75, dim: 0.12 },
+    suns: [{ at: 0.4556, row: 217, rx: 7, ry: 6, color: [252, 168, 96] }, { at: 0.4333, row: 207, rx: 7, ry: 6, color: [254, 238, 206] }] },
   // A hazy day: Robotics' pale cloudy sky, twice as wide, warming to dust at the horizon.
   { out: 'sky-day', df: 'RESKY01', gradient: [[74, 128, 182], [120, 166, 206], [168, 198, 222], [214, 226, 236]], keep: 0.3, contrast: 0.9, tile: [2, 1], fade: { color: [212, 200, 174], from: 0.55 } },
 ];
@@ -583,6 +597,44 @@ function edged(img, { rows, amp, seed }) {
   return img;
 }
 
+/** A sunset's glow round a point of the horizon, and the far side dimmed (see `glow` above). */
+function glowed(img, { at, width, color, amount, dim = 0 }) {
+  const { width: w, height: h, data: d } = img;
+  for (let x = 0; x < w; x++) {
+    let dx = Math.abs(x / w - at);
+    dx = Math.min(dx, 1 - dx);
+    const near = Math.exp(-((dx / width) ** 2));
+    const broad = Math.exp(-((dx / (width * 3)) ** 2));
+    for (let y = 0; y < h; y++) {
+      const low = (y / (h - 1)) ** 2;
+      const t = amount * near * (0.25 + 0.75 * low);
+      const k = 1 - dim * (1 - broad);
+      const i = (y * w + x) * 4;
+      for (let c = 0; c < 3; c++) d[i + c] = Math.round((d[i + c] + (color[c] - d[i + c]) * t) * k);
+    }
+  }
+  return img;
+}
+
+/** Soft discs: suns low over the horizon (see `suns` above), a faint halo round each. */
+function sunned(img, suns) {
+  const { width: w, data: d } = img;
+  for (const { at, row, rx, ry, color } of suns) {
+    const cx = at * w;
+    for (let y = Math.floor(row - ry * 3); y <= Math.ceil(row + ry * 3); y++) {
+      for (let x = Math.floor(cx - rx * 3); x <= Math.ceil(cx + rx * 3); x++) {
+        if (y < 0 || y >= img.height) continue;
+        const e = Math.hypot((x + 0.5 - cx) / rx, (y + 0.5 - row) / ry);
+        const t = e < 0.85 ? 1 : e < 1.05 ? 1 - (e - 0.85) / 0.2 * 0.6 : 0.4 * Math.exp(-(((e - 1.05) / 0.8) ** 2));
+        if (t <= 0.01) continue;
+        const i = (y * w + (((x % w) + w) % w)) * 4;
+        for (let c = 0; c < 3; c++) d[i + c] = Math.round(d[i + c] + (color[c] - d[i + c]) * t);
+      }
+    }
+  }
+  return img;
+}
+
 /** Bands painted down from the top row, one after another (see above). */
 function lipped(img, bands) {
   const d = img.data;
@@ -624,6 +676,8 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     if (spec.tile) img = tiled(img, spec.tile);
     if (spec.gradient) img = gradientMap(img, spec);
     if (spec.fade) img = faded(img, spec.fade);
+    if (spec.glow) img = glowed(img, spec.glow);
+    if (spec.suns) img = sunned(img, spec.suns);
     for (const r of [spec.rust ?? []].flat()) img = rusted(img, r);
     if (spec.lip) img = lipped(img, spec.lip);
     if (!spec.holes) for (let i = 3; i < img.data.length; i += 4) img.data[i] = 255;

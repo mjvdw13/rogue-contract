@@ -51,6 +51,7 @@ export class Renderer {
     if (view.W !== s.pw) view.resize(s.pw);
     view.setup(cam, scene.fog ?? 0.25, scene.haze ?? null);
     view.depthValid = false;
+    view.skyWrap = scene.skyWrap ?? 2;
     drawWorld(view, scene.map, textures, scene.skyTexture ?? null, s.px, s.pw, cms, scene.backdrop ?? null);
     view.depthValid = drawModels(view, scene.things, scene.map, textures, s.px, s.pw, cms, extras.skip);
     // Hangings: the cloths are models; the ropes write their depth, so what's behind them hides.

@@ -148,4 +148,5 @@ export default [
   ...TOWN_DECALS.map((id) => defineTexture({ id, src: `assets/custom/textures/${id}.png`, decal: true, fullbright: false })),
   defineTexture({ id: 'sky-night', src: 'assets/textures/sky-night.png', sky: true }),
   defineTexture({ id: 'sky-day', src: 'assets/custom/textures/sky-day.png', sky: true }),
+  defineTexture({ id: 'sky-dusk', src: 'assets/custom/textures/sky-dusk.png', sky: true }),
 ];
