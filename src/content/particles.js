@@ -212,6 +212,52 @@ export default [
     onFloor: 'die',
     cap: 40,
   }),
+  // Blowing sand (Mission 2's weather, docs/mission2.md "Blowing sand"),
+  // three layers on the wind. Fine grains streaking past at every height up
+  // to the head, lit by the light where they are.
+  defineParticle({
+    id: 'sand-grain',
+    colors: [{ ramp: 'sand', from: 11, to: 9 }],
+    life: [1, 2],
+    size: 0.02,
+    maxPx: 1,
+    streak: 0.08,
+    drag: 2,
+    wind: 1,
+    onFloor: 'die',
+    cap: 500,
+  }),
+  // Big faint sheets of it sweeping low across the view: what half hides
+  // what's behind them close up. Wider and longer-lived than a sand gust.
+  defineParticle({
+    id: 'sand-veil',
+    colors: [{ ramp: 'sand', from: 10, to: 9 }],
+    life: [2, 4],
+    size: 1.3,
+    maxPx: 32,
+    shape: 'disc',
+    blend: 'half',
+    fade: true,
+    alpha: 1,
+    fadeIn: 0.35,
+    drag: 1,
+    wind: 1,
+    onFloor: 'die',
+    cap: 40,
+  }),
+  // Sand running over the ground in ribbons, just above it, fast and pale.
+  defineParticle({
+    id: 'sand-snake',
+    colors: [{ ramp: 'sand', from: 11, to: 9 }],
+    life: [0.6, 1.2],
+    size: 0.03,
+    maxPx: 2,
+    streak: 0.15,
+    drag: 3,
+    wind: 1.3,
+    onFloor: 'die',
+    cap: 300,
+  }),
   // Explosions (src/content/explosions.js). The fireball: bright glowing
   // discs that swell and cool from white through yellow and orange to red.
   defineParticle({

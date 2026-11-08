@@ -671,7 +671,19 @@ export default defineLevel({
   // once so the glow is there only, and a dusky amber haze.
   sky: 'sky-dusk',
   skyWrap: 1,
-  haze: { color: [176, 120, 88], half: 48 },
+  // In a full gust the haze closes in to 7 m, and the sky's foot with it.
+  haze: { color: [176, 120, 88], half: 48, gust: 14 },
+  // Blowing sand on a west-south-west wind (1.5 m/s, gusting to 2.5 times
+  // that every 6 to 14 seconds): grains streaking past, faint sheets low
+  // across the view and ribbons over the ground, thicker in a gust. None
+  // made in the pits, the trench or the lee of a wall (more than 1.5 m
+  // standing over the floor within 3 m upwind), though what blows over a
+  // pit's mouth keeps going.
+  weather: [
+    { type: 'sand-grain', count: 360, calm: 0.35, range: 8, z: [0.1, 2.2], drift: [0.6, 0.2], shelter: 3, wind: [2.8, -1, 0], gusts: { every: [6, 14], hold: [2, 5], rise: 1.5, fall: 2, strength: 2.5 } },
+    { type: 'sand-veil', count: 30, calm: 0.2, range: 10, z: [0.2, 1.4], drift: [0.3, 0.05], shelter: 3 },
+    { type: 'sand-snake', count: 200, calm: 0.3, range: 8, z: [0.02, 0.12], drift: [0.4, 0], shelter: 3 },
+  ],
   lights,
   decals,
   par: 600,

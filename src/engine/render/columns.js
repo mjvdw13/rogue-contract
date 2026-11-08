@@ -4,9 +4,11 @@ import { HAZE_ROW, HAZE_STEPS } from '../gfx/palette.js';
 import { LightMap } from '../world/lightmap.js';
 import { layoutDecals } from '../world/decals.js';
 import { drawBackdropColumn } from './backdrop.js';
-import { TEXELS_PER_UNIT as TPU, TRANSPARENT, SHADE_STEP } from '../config.js';
+import { TEXELS_PER_UNIT as TPU, TRANSPARENT, SHADE_STEP, LIGHT_LEVELS } from '../config.js';
 
 const MAX_STEPS = 320;
+/** Per screen row, the sky's colormap (see drawWorld). */
+let skyCm = new Int32Array(0);
 const TAU = Math.PI * 2;
 /** Added to texture coordinates so they stay positive before masking. */
 const V_BIAS = 1 << 16;
@@ -184,6 +186,23 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
     }
     skyShift = view.scale >> 1;
     skyOffset = sky.h - 6 - Math.round(horizon / view.scale);
+  }
+  // Each row's colormap for the sky, or -1 to draw it as it is: all one
+  // (`fixed`: night vision), or in a gust (`skyHaze`, 0 to 1) the haze
+  // steps, the rows nearest the horizon fading most (over a quarter of the
+  // view's height above it).
+  if (skyCm.length < H) skyCm = new Int32Array(H);
+  {
+    const g = view.hazeOn ? view.skyHaze ?? 0 : 0;
+    const span = fy * 0.45;
+    for (let y = 0; y < H; y++) {
+      if (fixed >= 0) skyCm[y] = fixed * 256;
+      else if (g > 0) {
+        const up = horizon - (y + 0.5);
+        const k = Math.round(g * (HAZE_STEPS - 1) * Math.min(1, Math.max(0, 1 - up / span)));
+        skyCm[y] = k > 0 ? (HAZE_ROW + (k - 1) * LIGHT_LEVELS) * 256 : -1;
+      } else skyCm[y] = -1;
+    }
   }
 
   // 1 / (y + 0.5 - horizon) per row: floors and ceilings take their distance from it.
@@ -515,7 +534,8 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
               if (sy < 0) sy = 0;
               else if (sy >= sky.h) sy = sky.h - 1;
               const c = sky.cur[sy * sky.w + skyCol];
-              fb[o] = fixed >= 0 ? colormaps[fixed * 256 + c] : c;
+              const m = skyCm[y];
+              fb[o] = m >= 0 ? colormaps[m + c] : c;
             }
           } else {
             const slot = !s && slab ? slabUnderTex[i] : ceilTex[i];
@@ -583,7 +603,8 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
         if (sy < 0) sy = 0;
         else if (sy >= sky.h) sy = sky.h - 1;
         const c = sky.cur[sy * sky.w + skyCol];
-        fb[o] = fixed >= 0 ? colormaps[fixed * 256 + c] : c;
+        const m = skyCm[y];
+        fb[o] = m >= 0 ? colormaps[m + c] : c;
       }
     };
     const rowOf = (z, t) => Math.ceil(horizon + ((camZ - z) * fy) / t - 0.5);

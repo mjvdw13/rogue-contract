@@ -28,6 +28,22 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
+- **Mission 2's pits, dome, evening and blowing sand** (`?map=m2`,
+  2026-11-08): the pits' walls in two tones (earth above, whitewash with a
+  wavy edge rising over each doorway, a red-ochre dado), round-topped
+  doorways in thick hoods, blind plank doors round the walls, the
+  courtyard stair's red-ochre cheek and its balcony, the condenser panel
+  on the courtyard's south-east wall; the great dome on its block with
+  the sunken stairwell from the lane's end; the dusk sky (going round
+  once, the suns low in the west-south-west), the amber haze, the
+  vaporators' long shadows; blowing sand on a west-south-west wind,
+  gusting every 6 to 14 s (grains, faint veils, ribbons over the ground),
+  the haze closing to 7 m in a full gust, none down in the pits or in a
+  wall's lee. To judge: how thick the sand is and how often the gusts
+  come, the sky's colours (the palette turns some mauve to brown), the
+  whitewash in shade (it reads grey-green), whether troopers should see
+  no farther than the player in a gust. Not done: an oval red door.
+
 - **Mission 2's vaporators, in the level** (`?map=m2`, 2026-11-07,
   `models/vaporator.js`): the film's vaporator in place of the seven
   stand-ins on the farm's ground (sensor turning, a cap by every other),
@@ -1305,7 +1321,7 @@ snapshots, playable at `?map=m2`.
     - [ ] The common room and storeroom as the kitchen: a smooth white
           vault, white counters along both sides with a red stripe,
           appliances in niches, oval niches in the plaster, a red rug.
-- [ ] **The pits' walls and doorways** (from the references, before
+- [x] **The pits' walls and doorways** (from the references, before
       "Each area in detail"; a kit in `lib/town.js` or a new
       `lib/farm.js`, used by every pit):
   - [x] Two tones: bare earth above (tan to ochre, runnels), whitewash
@@ -1333,7 +1349,7 @@ snapshots, playable at `?map=m2`.
         courtyard's wall and the curve as now. The hall goes; the porch
         becomes the hood. Update `docs/mission2.md` (7a, Levels) when
         built.
-- [ ] **Evening:**
+- [x] **Evening:**
   - [x] `sky-dusk` (`derive.mjs`, from RESKY01): mauve overhead to rose
         to a pale warm amber at the horizon, fading into the haze (Mark's
         references: rose and mauve all over, little indigo).
@@ -1348,24 +1364,26 @@ snapshots, playable at `?map=m2`.
         only; the two suns painted low on it.
   - [x] The vaporators' long shadows: a thin caster per vaporator in the
         kit's `shadows()`.
-- [ ] **Blowing sand** (all cosmetic, its own RNG):
-  - [ ] `weather` takes a list of types (defs, validator, MODDING.md, a
+- [x] **Blowing sand** (all cosmetic, its own RNG):
+  - [x] `weather` takes a list of types (defs, validator, MODDING.md, a
         test); one object still works.
-  - [ ] Gusts: `weather.gusts: { every, hold, strength }`, a clock of its
+  - [x] Gusts: `weather.gusts: { every, hold, strength }`, a clock of its
         own driving the wind (and so every type with `wind`) and the
         number in the air; a test that a gust carries a particle farther.
-  - [ ] The haze swells in a gust (`haze.gust`, its half distance in a
+  - [x] The haze swells in a gust (`haze.gust`, its half distance in a
         full gust); a test that a far wall fades more in a gust.
-  - [ ] The sky's lower part fades into the haze in a gust (measured:
+  - [x] The sky's lower part fades into the haze in a gust (measured:
         the sky's rows are in the hot loop).
-  - [ ] The particles on the bench (`tools/particles.html`): `sand-grain`
+  - [x] The particles on the bench (`tools/particles.html`): `sand-grain`
         (fine streaks on the wind), `sand-veil` (big faint sheets low
         across the view), `sand-snake` (ribbons over the ground); then in
-        `m2`. Frame cost under 0.3 ms.
-  - [ ] Shelter in the pits, the trench and the lee of the buildings and
-        rocks: fewer, or none (decide after looking).
-  - [ ] Waiting on Mark: how thick, how often the gusts come, and whether
-        troopers should see no farther than the player in one.
+        `m2`. Frame cost under 0.3 ms (measured in the yard: about 0.35
+        ms in a full gust, nothing in a lull).
+  - [x] Shelter in the pits, the trench and the lee of the buildings and
+        rocks: fewer, or none (decide after looking): none made in a lee
+        (`shelter`), what blows over keeps going.
+  - [x] Waiting on Mark: how thick, how often the gusts come, and whether
+        troopers should see no farther than the player in one (above).
 - [ ] **Each area in detail,** in the order you meet them, snapshots
       before and after each:
   - [ ] The garden pit and the pump tunnels: grow beds and grow lamps,

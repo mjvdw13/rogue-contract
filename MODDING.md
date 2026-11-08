@@ -896,6 +896,40 @@ again somewhere in it. About a quarter of the square is in view at once, so
 more than the type's `cap` or the cap for its kind (1000 points, 150
 discs).
 
+`weather` can also be a list of these, one per particle type (a layer
+each), for weather made of several kinds at once. Mission 2's blowing
+sand:
+
+```js
+haze: { color: [176, 120, 88], half: 48, gust: 14 },
+weather: [
+  { type: 'sand-grain', count: 360, calm: 0.35, range: 8, shelter: 3, wind: [2.8, -1, 0],
+    gusts: { every: [6, 14], hold: [2, 5], rise: 1.5, fall: 2, strength: 2.5 } },
+  { type: 'sand-veil', count: 30, calm: 0.2, range: 10, z: [0.2, 1.4], shelter: 3 },
+  { type: 'sand-snake', count: 200, calm: 0.3, range: 8, z: [0.02, 0.12], shelter: 3 },
+],
+```
+
+- `wind` and `gusts` are the level's, given on one layer. With `gusts`
+  the wind comes and goes on a clock of its own: a lull of `every`
+  seconds (a range), then a gust rising over `rise` seconds, holding for
+  `hold` (a range) and dying over `fall`. In a full gust the wind is
+  `strength` times its own (so every type with `wind` flies faster), each
+  layer has its whole `count` in the air rather than its `calm` share (1
+  by default: no change), and the haze's half distance falls to its
+  `gust` (if it has one), the sky's lower part fading into it too. In
+  between, everything follows the gust's strength together. The extra
+  particles a gust made aren't taken away when it dies: they live out
+  their lives, and fewer are made again.
+- `shelter` (units): none of that layer is made where the wind is kept
+  off, in a tile with something upwind standing more than `shelter` over
+  its floor, near enough for its lee to reach (3 times as far as it
+  stands over the floor, 32 tiles at most). Raised floors and slabs make
+  a lee (a town's walls and roofs, a pit's rim); solid walls don't. What
+  blows over a sheltered tile at the height it was made keeps going, so
+  sand streams over a pit's mouth while its floor stays clear.
+- `node tools/snapshot.mjs m2 --custom --gust` shows a level in a full gust.
+
 ### Tiles
 
 The shared glyphs are in `src/content/levels/legend.js`, and each level can add

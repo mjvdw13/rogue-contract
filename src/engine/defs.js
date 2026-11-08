@@ -630,6 +630,9 @@ export function defineSong(def) {
  * tiles each way (10), under the sky only: made `z` ([0.05, 2.5]) above the
  * floor with a random speed of up to `drift` ([0.3, 0.1]: across, up or
  * down), carried by `wind` ([x, y, z] units per second; still by default).
+ * It can be a list of these, a layer per type, with `calm`, `shelter` and
+ * the level's `gusts` (MODDING.md, Levels); `haze.gust` is the haze's half
+ * distance in a full gust.
  * `navReach` (steps; the whole map by default) is how far out from the
  * player the monsters plan their way round walls and drops to them; further
  * off, they head straight for the player. A big open map sets it, as
@@ -655,8 +658,8 @@ export function defineSong(def) {
  * no attack (a tracker) still comes up.
  * @param {{id:string, name:string, tiles:string[], things?:string[], legend?:object,
  *   thingLegend?:object, list?:object[], triggers?:object[], music?:string, sky?:string,
- *   fog?:number, haze?:{color:number[], half?:number}, skyWrap?:number,
- *   weather?:{type:string, count:number, range?:number, z?:number[], drift?:number[], wind?:number[]},
+ *   fog?:number, haze?:{color:number[], half?:number, gust?:number}, skyWrap?:number,
+ *   weather?:object|object[],
  *   par?:number, next?:string, holster?:boolean, navReach?:number,
  *   secretNext?:string, defaults?:object}} def
  */

@@ -11,6 +11,7 @@
 //   node tools/snapshot.mjs sandbox --at 33.5,8.5,90 --top  on top of a slab (under it by default)
 //   node tools/snapshot.mjs m1 --custom --res 2           the 3D view at 2x (640x400)
 //   node tools/snapshot.mjs m1 --time 3                   after 3 s of play (emitters' particles in the air)
+//   node tools/snapshot.mjs m2 --custom --gust            the weather in a full gust (the haze closing in)
 //
 // The default output is tools/art/out/snapshots/<level>.png.
 import fs from 'node:fs';
@@ -52,7 +53,7 @@ export async function headless({ custom = false, scale = 1 } = {}) {
 }
 
 /** Render one frame of `levelId` from a camera. Returns RGBA pixels of the view. */
-export function snapshot(ctx, levelId, { at, pitch = 0, z, skill = 3, noMonsters = false, doors, top = false, time = 0 } = {}) {
+export function snapshot(ctx, levelId, { at, pitch = 0, z, skill = 3, noMonsters = false, doors, top = false, time = 0, gust = false } = {}) {
   const { registry, palette, assets, surface, renderer } = ctx;
   const level = registry.levels.get(levelId);
   if (!level) throw new Error(`Unknown level "${levelId}"`);
@@ -74,7 +75,11 @@ export function snapshot(ctx, levelId, { at, pitch = 0, z, skill = 3, noMonsters
     world.tick(1 / 60, still);
     [pt.x, pt.y, pt.z, pt.angle] = held;
   }
-  // The level's weather, round where the camera is.
+  // The level's weather, round where the camera is (in a full gust with `gust`).
+  if (gust && world.weather) {
+    world.weather.hold(1);
+    world.hazeGust();
+  }
   world.weather?.fill(pt.x, pt.y);
   const cam = { ...world.camera(), horizonOffset: pitch };
   if (z !== undefined) cam.z = (pt.z ?? 0) + z;
@@ -128,6 +133,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     noMonsters: args.includes('--nomonsters'),
     doors: opt('--doors') !== undefined ? Number(opt('--doors')) : undefined,
     top: args.includes('--top'),
+    gust: args.includes('--gust'),
     time: Number(opt('--time', 0)),
   });
   const out = path.resolve(opt('--out', path.join(root, 'tools/art/out/snapshots', `${levelId}.png`)));

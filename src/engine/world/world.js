@@ -146,6 +146,8 @@ export class World {
     this.fog = level.fog ?? 0.05;
     /** Outdoors, surfaces fade toward this colour with distance (halfway at `half` tiles) instead of darkening. */
     this.haze = level.haze ? { color: level.haze.color, half: level.haze.half ?? 40 } : null;
+    /** The haze's half distance in a lull, and in a full gust (`haze.gust`: it swells with the weather's gusts). */
+    this.hazeHalf = this.haze ? [this.haze.half, level.haze.gust ?? this.haze.half] : null;
     /** Terrain past the edge of play, drawn where the sky shows (world/backdrop.js). */
     this.backdrop = level.backdrop ? new Backdrop(level.backdrop, (id) => (this.assets ? this.assets.textureSlot(id) : 0)) : null;
     /** How many times the sky's texture goes round the horizon. */
@@ -168,7 +170,7 @@ export class World {
       const t = this.assets.textures[s];
       return t ? { slot: s, w: t.w, h: t.h } : null;
     };
-    this.hangings = new Hangings(this.map, [...this.registry.hangings.values()], level.hangings ?? [], this.registry.paletteDef?.ramps, level.weather?.wind, texture);
+    this.hangings = new Hangings(this.map, [...this.registry.hangings.values()], level.hangings ?? [], this.registry.paletteDef?.ramps, [].concat(level.weather ?? []).find((w) => w.wind)?.wind, texture);
     this.buildErrors.push(...this.hangings.errors);
     /** Explosions made of particles, a flash and a sound (world/explosions.js), set off with explode(). */
     this.explosions = new Explosions(this);
@@ -937,6 +939,13 @@ export class World {
 
   // ------------------------------------------------------------ simulation
 
+  /** The haze's half distance from the weather's gust (in half-tile steps: the view rebuilds its haze table when it changes). */
+  hazeGust() {
+    if (!this.weather || !this.hazeHalf) return;
+    const [calm, gust] = this.hazeHalf;
+    this.haze.half = Math.round((calm + (gust - calm) * this.weather.gust) * 2) / 2;
+  }
+
   tick(dt, input) {
     this.time += dt;
     this.stats.time += dt;
@@ -997,7 +1006,8 @@ export class World {
     }
     this.explosions.update(dt);
     this.particles.update(dt);
-    this.weather?.update(pt.x, pt.y);
+    this.weather?.update(pt.x, pt.y, dt);
+    this.hazeGust();
     this.hangings.update(dt, pt.x, pt.y);
     const dyn = this.dynamicLights();
     this.lightmap.setDynamic(dyn);

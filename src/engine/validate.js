@@ -526,8 +526,15 @@ export function validateContent(reg) {
       const c = level.haze.color;
       if (!Array.isArray(c) || c.length !== 3 || !c.every((v) => typeof v === 'number' && v >= 0 && v <= 255)) err(`${owner}: haze needs a "color" of three numbers 0-255, like [40, 36, 64]`);
       if (level.haze.half !== undefined && !(level.haze.half > 0)) err(`${owner}: haze "half" (the distance in tiles at which it's halfway) must be above 0`);
+      if (level.haze.gust !== undefined && !(level.haze.gust > 0)) err(`${owner}: haze "gust" (its half distance in a full gust of the weather) must be above 0`);
     }
-    if (level.weather) checkWeather(reg, level.weather, owner, err);
+    if (level.weather) {
+      const layers = [].concat(level.weather);
+      for (const w of layers) checkWeather(reg, w, owner, err);
+      for (const f of ['wind', 'gusts']) if (layers.filter((w) => w[f] !== undefined).length > 1) err(`${owner}: weather gives "${f}" on more than one layer (it's the level's, give it once)`);
+      const types = layers.map((w) => w.type);
+      if (new Set(types).size < types.length) err(`${owner}: weather has a particle type in more than one layer`);
+    }
     if (level.navReach !== undefined && !(typeof level.navReach === 'number' && level.navReach >= 1)) err(`${owner}: "navReach" (how many steps out the monsters plan their way to the player) must be a number, 1 or more`);
     if (typeof level.holster !== 'boolean') err(`${owner}: "holster" must be true or false`);
     else if (level.holster) {
@@ -561,6 +568,20 @@ function checkWeather(reg, w, owner, err) {
   if (w.z !== undefined && !(nums(w.z, 2, 0) && w.z[1] > w.z[0])) err(`${owner}: weather "z" must be [low, high] heights above the floor, like [0.05, 2.5]`);
   if (w.drift !== undefined && !nums(w.drift, 2, 0)) err(`${owner}: weather "drift" must be [across, up or down] speeds of 0 or more, like [0.3, 0.1]`);
   if (w.wind !== undefined && !nums(w.wind, 3, -Infinity)) err(`${owner}: weather "wind" must be [x, y, z] in units per second, like [3, 1, 0]`);
+  if (w.calm !== undefined && !(typeof w.calm === 'number' && w.calm >= 0 && w.calm <= 1)) err(`${owner}: weather "calm" (the share of its count in the air in a lull) must be 0 to 1`);
+  if (w.shelter !== undefined && !(typeof w.shelter === 'number' && w.shelter >= 0)) err(`${owner}: weather "shelter" (how much higher something upwind keeps it off a tile) must be a height, 0 or more`);
+  if (w.gusts !== undefined) {
+    const g = w.gusts;
+    const span = (v) => nums(v, 2, 0) && v[1] >= v[0];
+    if (!g || typeof g !== 'object') err(`${owner}: weather "gusts" must be { every, hold, rise, fall, strength }`);
+    else {
+      for (const k of Object.keys(g)) if (!['every', 'hold', 'rise', 'fall', 'strength'].includes(k)) err(`${owner}: weather "gusts" has unknown field "${k}" (it takes every, hold, rise, fall, strength)`);
+      if (g.every !== undefined && !(span(g.every) && g.every[0] > 0)) err(`${owner}: weather gusts "every" must be [shortest, longest] seconds between them, like [6, 14]`);
+      if (g.hold !== undefined && !span(g.hold)) err(`${owner}: weather gusts "hold" must be [shortest, longest] seconds a full gust lasts, like [2, 5]`);
+      for (const k of ['rise', 'fall']) if (g[k] !== undefined && !(typeof g[k] === 'number' && g[k] > 0)) err(`${owner}: weather gusts "${k}" must be seconds, above 0`);
+      if (g.strength !== undefined && !(typeof g.strength === 'number' && g.strength >= 1)) err(`${owner}: weather gusts "strength" (the wind in a full gust, times its own) must be 1 or more`);
+    }
+  }
   return undefined;
 }
 

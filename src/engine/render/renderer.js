@@ -52,6 +52,8 @@ export class Renderer {
     view.setup(cam, scene.fog ?? 0.25, scene.haze ?? null);
     view.depthValid = false;
     view.skyWrap = scene.skyWrap ?? 2;
+    // In a gust, with a haze that swells in them, the sky's lower part goes into the haze too.
+    view.skyHaze = scene.weather && scene.hazeHalf && scene.hazeHalf[1] !== scene.hazeHalf[0] ? scene.weather.gust : 0;
     drawWorld(view, scene.map, textures, scene.skyTexture ?? null, s.px, s.pw, cms, scene.backdrop ?? null);
     view.depthValid = drawModels(view, scene.things, scene.map, textures, s.px, s.pw, cms, extras.skip);
     // Hangings: the cloths are models; the ropes write their depth, so what's behind them hides.
