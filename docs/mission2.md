@@ -305,7 +305,7 @@ y     +----------------------------------------------------+
   :  ground out of reach: the garden court, the plots behind the lane and the house
   P  the garden pit (the drop-off)    K  the workshop pit    C  the house's courtyard pit
   Q  the garage pit    S  the generator shed    i  the Imperials' staging point
-  G  the farm's gate (the red lock)    D  the house's great dome and its porch
+  G  the farm's gate (the red lock)    D  the house's great dome and its stairwell
   t  the trench, and its gate through the windbreak    @  a light well (outside: the reservoir's)
   .  the landing pad, and the cuts west and east in the drifts round it
   d  drifts out of reach    ^  the rocks, their tops out of reach
@@ -392,7 +392,7 @@ y     +----------------------------------------------------+
    the house's dome. The staging point's floodlight to the right; the
    officer there has the key. Look back down into the workshop pit.
 6. **The lane:** through the gate, a lane 6 m wide running east straight
-   at the dome's porch, troopers behind barricades, the dome growing.
+   at the dome's stairwell, troopers behind barricades, the dome growing.
 7. **The house:** the dome's hall and its stair down into the courtyard
    pit (the big fight, troopers on the rim and below), the family's
    rooms round it: the common room, the quarters, the storeroom, a
@@ -437,7 +437,7 @@ y     +----------------------------------------------------+
   The validator's reach check confirms the lane can't be reached without
   it.
 - The lane: walled both sides; it opens only at its east end, onto the
-  house's ground at the dome's porch.
+  house's ground at the dome's stairwell.
 - The house's ground: walled in. Down by the dome's stair, or a jump
   into the courtyard pit or a light well (a drop of 12, which hurts:
   falls hurt from about 5.8).
@@ -472,7 +472,7 @@ y     +----------------------------------------------------+
   Kyle: "THERE'S THE HOUSE." At the gate, without the key: "AN IMPERIAL
   LOCK ON THE FARM'S GATE. THE OFFICER WILL HAVE THE KEY." The staging
   point's floodlight marks where he is.
-- In the lane, the dome straight ahead; its porch lit.
+- In the lane, the dome straight ahead; its stairwell and door lit.
 - Picking up the recordings: heavy footsteps overhead, dust falls, Jan:
   "KYLE, SOMETHING BIG JUST WALKED OUT OF THE STORM. GET OUT OF THERE."
   A panel in the cellar's south wall grinds open; Kyle: "RUSK'S WAY
@@ -495,7 +495,7 @@ Heights in units (1 unit = 0.5 m). The landing pad is at -3.5 (0 before the stai
 | The windbreak and the walls inside it | 6.5 | 3 m over the ground, out of reach; sand drifted against their foot rises to 2.5 |
 | The farm's ground (the yard, the lane, the house's) | 0.5 | |
 | The generator shed | 0.5, ceiling 4.5 | Its hatch and stair go down south, 8 steps of 0.5 under the yard, a landing, 8 more on down the workshop's west wall |
-| The house's great dome | 0.5, its hall's ceiling 6.5 | Its wall 13.5 (6.5 m), the dome on it 5.5 more; its stair goes down south, 6 steps, a landing, 6 more, to a doorway halfway down the courtyard's wall (-5.5); 12 more curve down the wall's inside to the floor |
+| The house's great dome | its stairwell's foot and hall -2.5, the hall's ceiling 5 | Its block 8.5 (4 m), the wings 5.5, the dome on it 5.5 more; the stairwell goes down east from the lane, 6 steps, to the door; inside, 6 more down south to -5.5, on to a doorway halfway down the courtyard's wall; 12 more curve down the wall's inside to the floor |
 | The pits | -7.5; the courtyard -11.5 | The garden, workshop and garage pits 8 (4 m) under the ground, the courtyard 12 (6 m); open to the sky; no parapets |
 | The tunnels and rooms | as their pit's floor, ceilings 4 over (2 m) | Under the ground (slabs, their tops at 0.5); tunnels 4 wide |
 | The light wells | as the room under them, open to the sky | 2 x 2, kerbed on the ground (0.9); jumping down one hurts (about 17 into the small pits' tunnels, 36 into the house's, 44 into the reservoir) |
@@ -526,9 +526,9 @@ ending (2026-11-06).
 | 5a | **The generator shed** | 68..84, 12..24 | A tin blockhouse in the yard's north-west corner over the farm's power unit, burning: flames out of its roof, a flickering light, smoke torn east. The hatch and stair in its floor; its door east (83, 15..20), onto the yard, facing the gate. |
 | 5b | **The Imperials' staging point** | 102..118, 30..44 | In the middle of the yard, off the line from the shed to the gate: a floodlight tower lit for the evening, supply crates, barricades at a slant, a comm unit on a crate. The officer with the red key; the commander on skill 3 and up. |
 | 5c | **The gate** | 124..126, 15..21 | The farm's gate in the yard's east wall, straight across from the shed's door, 6 wide: the Imperials' red lock on it (a stand-in Imperial door), a lamp over it. |
-| 6 | **The lane** | 126..146, 12..24 | 20 long and 6 m wide between the windbreak and a wall, running east from the gate straight at the dome's porch. A vaporator either side, barricades, troopers behind them. The plot south of it (126..144, 26..64) is out of reach. |
+| 6 | **The lane** | 126..146, 12..24 | 20 long and 6 m wide between the windbreak and a wall, running east from the gate straight at the dome's stairwell. A vaporator either side, barricades, troopers behind them. The plot south of it (126..144, 26..64) is out of reach. |
 | 7 | **The house's ground** | 146..188, 12..70 | Walled in: the great dome, the courtyard pit's rim (no parapets), two light wells' kerbs, a vaporator. Troopers on the rim. |
-| 7a | **The great dome** | round, (160, 20), r 8 | The house's entrance hall and the tallest thing on the farm: a drum 6.5 m tall, an 11-wide dome on it. Its door west under a porch (146..152, 18..22), lit. A square hall (155..165, 15..25) and a stair down its middle (158..162, 18..32), 6 steps, a landing and 6 more south under its wall and the ground to the courtyard pit's north arch, halfway down its wall. |
+| 7a | **The great dome** | 152..168, 14..26 | The entrance dome after the film's, the tallest thing on the farm: a block 4 m tall (wings 2.5 m north and south), an 11-wide dome on it. The way down starts outside: a sunken stairwell from the lane's end (143..152, 17..23, kerbed), 6 steps east to the door at its foot, round-topped in a hood. Inside, a hall (153..167, 15..25) at the stairwell's foot, and in its floor a stair (158..162, 22..32), 6 more south under the ground to the courtyard pit's north doorway, halfway down its wall. |
 | 7b | **The courtyard** | round, (160, 46), r 12 | A round pit 24 across and 6 m deep, open to the sky, its walls whitewashed plaster gone grey with soot, round-topped arches all round: the dome's stair north (its arch halfway up the wall, a stair 3 wide curving down the wall's inside to the east, 12 steps), the common room west, the quarters east, the storeroom south. The suns are too low to reach in, so its floor is a dim pool against the lit rim, lit by its doorways and a cart burning; an overturned table, a broken droid, crates. The big fight: troopers in it and on the rim above. |
 | 7c | **The common room** | 138..146, 40..52 | West of the courtyard under a low vault: the family's table knocked over, a hearth, a bench. A tunnel south (140..144, 52..66, a light well) and east (144..150, 62..66) round to the storeroom: the loop. |
 | 7d | **The quarters** | 174..186, 38..54 | East of the courtyard (its arch 171..174, 49..53, south of the wall stair's foot): the family's sleeping alcoves, a chest turned out, a child's toy droid, a light well. |

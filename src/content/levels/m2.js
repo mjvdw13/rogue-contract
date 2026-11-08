@@ -274,20 +274,32 @@ tag(118, 13, 124, 23, 'gate');
 lights.push({ x: 122, y: 18, z: FARM + 4, radius: 5, light: 48 });
 
 // ---------------------------------------------------------------- 7. the house: its great dome
-// A round building at the end of the lane, its door west under a porch,
-// tall (its wall 6.5 m, the dome on it 2.75 m more), so it shows over the
-// work yard's wall, over the gate: the destination. Inside, a square hall, and a stair
-// down its middle, south, under its wall and the ground into the
-// courtyard pit.
-const DOME = { cx: 160, cy: 20, r: 8, h: FARM + 13 };
-town.circle(DOME.cx, DOME.cy, DOME.r, { inside: town.roofCell({ h: DOME.h }), wall: { wall: 'adobe-pale', wallTop: DOME.h }, open: 'out' });
+// The entrance dome after the film's (Mark, 2026-11-07): a great dome on a
+// block wider than it, lower wings either side, at the end of the lane, so
+// it shows over the work yard's wall, over the gate: the destination. The
+// way down starts outside: a sunken stairwell cut down from the lane's end,
+// kerbed, six steps east to the door in its hood at the foot. Inside, under
+// the dome, a hall at the stairwell's foot; six more steps down south in its
+// floor, and on under the ground to the doorway halfway down the
+// courtyard's north wall.
+const DOME = { cx: 160, cy: 20, h: FARM + 8 };
+/** The stairwell's foot, the door and the hall: six steps under the farm. */
+const HALL = FARM - 3;
+town.block(152, 14, 168, 26, { h: DOME.h, skirt: null });
+town.block(154, 12, 166, 14, { h: FARM + 5, skirt: null }); // the north wing, against the windbreak
+town.block(154, 26, 166, 29, { h: FARM + 5, skirt: null }); // the south wing
 town.dome(DOME.cx, DOME.cy, DOME.h, 11);
-town.room(155, 15, 165, 25, { h: DOME.h, floorZ: FARM, ceilZ: FARM + 6, light: 112 });
-town.house(146, 18, 152, 22, { h: FARM + 4 });
-town.arch(146, 18, 152, 22, { h: FARM + 4, lintel: 3, floorZ: FARM, floor: 'flagstone', light: 128 });
-town.arch(152, 18, 155, 22, { h: DOME.h, lintel: 3, floorZ: FARM, floor: 'flagstone', light: 128 });
-apron(140, 16, 146, 24);
-lights.push({ x: 160, y: 16.5, z: FARM + 5, radius: 6, light: 48 });
+town.room(153, 15, 167, 25, { h: DOME.h, floorZ: HALL, ceilZ: FARM + 4.5, light: 112 });
+// The stairwell: from the lane's end east down six steps of 0.5 to its foot
+// before the door, open to the sky, a kerb along its sides.
+p.rect(143, 17, 152, 23, (x) => yard(Math.max(HALL, FARM - 0.5 * (x - 143)), { floor: 'flagstone' }));
+town.kerb(143, 16, 152, 17, { h: FARM + 0.375 });
+town.kerb(143, 23, 152, 24, { h: FARM + 0.375 });
+// The door's opening, round-topped, in a hood standing out of the block.
+town.arch(152, 18, 153, 22, { h: DOME.h, lintel: LINTEL, floorZ: HALL, floor: 'flagstone', light: 152, round: 'W' });
+town.hood(152, 20, 'W', { h: DOME.h, width: 4, floorZ: HALL });
+apron(138, 16, 143, 24);
+lights.push({ x: 157, y: 17, z: HALL + 3, radius: 6, light: 48 });
 
 // ---------------------------------------------------------------- 1, 4, 7, 9. the four pits
 // Round pits open to the sky, their walls the farm's whitewash: the three
@@ -363,7 +375,8 @@ list.push(at('shield-unit', 91.5, 60.5), at('energy-pack', 96.5, 60.5));
 // the north, the common room west, the quarters east, the storeroom south,
 // and a tunnel from the common room round to the storeroom (a loop for the
 // fight).
-stairDown(158, 18, 162, 32, 0, { flight: 6 });
+// (Under the hall's ceiling while it's in the hall; then stepping down with the flight.)
+stairDown(158, 22, 162, 32, HALL, { start: 21, flight: 7, to: MID, ceilZ: (f, old, t) => (old.slab ? old.slab.bottom : Math.min(t - 0.25, f + 4.5)) });
 doorway(158, 32, 162, 35, 'S', MID);
 // From the doorway, halfway down the courtyard's north wall, a stair 3 wide
 // down the wall's inside, east and round to the floor: a landing, then
@@ -534,9 +547,12 @@ list.push(
 );
 for (const [x, y] of [[159.6, 44.6], [162.6, 48.8], [165.6, 46.4], [156.6, 45.8]]) list.push(at('vaporator-cap', x, y, { z: COURT }));
 // The lane's barricades.
-list.push(at('barricade-worn', 137, 16.5, { angle: 100, z: FARM }), at('barricade-worn', 141, 21, { angle: 80, z: FARM }));
+list.push(at('barricade-worn', 137, 16.5, { angle: 100, z: FARM }), at('barricade-worn', 139.5, 13.5, { angle: 10, z: FARM }));
 
 town.finish(EVENING);
+// The dome's stairwell runs along the low suns, so its floor isn't as deep in
+// shade as the walls' make it (and the wall over the door takes its light).
+p.rect(143, 17, 152, 23, (_, __, c) => (c.light < 152 ? { ...c, light: 152 } : c));
 list.push(...town.things);
 
 // ---------------------------------------------------------------- life (by skill, docs/mission2.md)

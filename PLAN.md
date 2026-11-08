@@ -1324,7 +1324,7 @@ snapshots, playable at `?map=m2`.
   - [x] The courtyard's condenser panel (ribbed white, its gear disc,
         two fittings on the rim above): its landmark (`condenser-panel`,
         on the south-east wall; two domed caps on the rim as the vents).
-  - [ ] The great dome as the entrance dome (Mark, 2026-11-07: yes, the
+  - [x] The great dome as the entrance dome (Mark, 2026-11-07: yes, the
         way down starts outside): on a block with low wings, its door in
         a projecting hood at the foot of a sunken stairwell, kerbed,
         cut down from the lane's end. The first flight (6) in the
