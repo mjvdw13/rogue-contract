@@ -113,6 +113,8 @@ export default [
   // turning in the wind on top of their masts.
   ...Object.entries(VAPORATORS).map(([id, v]) => defineDecoration({ id, model: id, solid: !!v.solid, radius: v.radius, height: v.height, fixed: true })),
   defineDecoration({ id: 'vaporator-sensor', model: 'vaporator-sensor', spin: 0.6, fixed: true }),
+  // The courtyard's condenser panel on its wall (solid by its outline).
+  defineDecoration({ id: 'condenser-panel', model: 'condenser-panel', solid: true, fixed: true }),
   // An X-34 landspeeder parked on the street, hovering (models/speeder.js),
   // bobbing gently: it collides as its outline, as high as its windscreen.
   defineDecoration({ id: 'landspeeder', model: 'landspeeder', solid: true, height: 1.22, fixed: true, bob: { height: 0.02, period: 3.2 } }),

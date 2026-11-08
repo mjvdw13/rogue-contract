@@ -249,6 +249,42 @@ function sensor() {
   return m.build();
 }
 
+/**
+ * The courtyard's condenser panel, its landmark (Mark's references): a tall
+ * flat panel on the pit's wall, white, ribbed in level slats, framed, with
+ * a big gear-like disc on it. Built looking south, its back against the
+ * wall at y 0 (and reaching PANEL.sink back into it, so a curving wall
+ * leaves no gap), its middle at x 0, on the floor.
+ */
+export const PANEL = { w: 6, h: 5.5, d: 0.35, sink: 1, disc: 1.35 };
+function panel() {
+  const m = new ModelBuilder('condenser-panel');
+  const { w, h, d, sink, disc } = PANEL;
+  const a = w / 2;
+  const rim = 0.3;
+  const front = { tex: 'panel-ribs', flat: true };
+  // The frame round it (standing out a little further), and the ribbed plate inside it.
+  for (const [x0, x1, z0, z1] of [[-a, -a + rim, 0, h], [a - rim, a, 0, h], [-a + rim, a - rim, h - rim, h], [-a + rim, a - rim, 0, rim]]) {
+    m.box([x0, -sink, z0], [x1, d + 0.1, z1], { ...PAINT, bottom: false, side: (i) => (i === 0 ? false : i === 2 ? { ...PAINT, flat: true } : PAINT) });
+  }
+  m.face([[-a + rim, d, rim], [a - rim, d, rim], [a - rim, d, h - rim], [-a + rim, d, h - rim]], front, [0, 0, h / 2]);
+  // The disc: a drum standing out of the plate, its face the gear.
+  const n = 12; // (a face has at most 16 corners once clipped)
+  const cz = h * 0.55;
+  const pts = Array.from({ length: n }, (_, i) => {
+    const t = (i / n) * Math.PI * 2;
+    return [Math.cos(t) * disc, Math.sin(t) * disc];
+  });
+  const at = pts.map(([x, z]) => [x, d + 0.25, cz + z]);
+  for (let i = 0; i < n; i++) {
+    const j = (i + 1) % n;
+    m.face([[pts[i][0], d, cz + pts[i][1]], [pts[j][0], d, cz + pts[j][1]], [pts[j][0], d + 0.25, cz + pts[j][1]], [pts[i][0], d + 0.25, cz + pts[i][1]]], SHADE, [0, d + 0.12, cz]);
+  }
+  m.face(at, { tex: 'gear-disc', flat: true, uv: pts.map(([x, z]) => [0.5 + x / (2 * disc), 0.5 - z / (2 * disc)]) }, [0, 0, cz]);
+  m.line(-a, -sink, -a, d + 0.1).line(-a, d + 0.1, a, d + 0.1).line(a, d + 0.1, a, -sink);
+  return m.build();
+}
+
 /** Each model's decoration size (for collision and the level checker). */
 export const VAPORATORS = {
   'vaporator-tall': { model: tall, solid: true, radius: 1.15, height: 6.85 },
@@ -260,4 +296,4 @@ export const VAPORATORS = {
 /** How high the humidity sensor sits on the farm vaporator. */
 export const SENSOR_Z = MAST;
 
-export default [...Object.values(VAPORATORS).map((v) => v.model()), sensor()];
+export default [...Object.values(VAPORATORS).map((v) => v.model()), sensor(), panel()];

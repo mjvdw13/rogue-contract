@@ -85,6 +85,8 @@ const TOWN = [
   // The homestead's pits (lib/farm.js): bare earth, the whitewash's wavy top
   // edge (see-through above it) and the red-ochre dado.
   'pit-earth', 'pit-wash-edge', 'pit-dado',
+  // The courtyard's condenser panel (models/vaporator.js): its slats and gear disc.
+  'panel-ribs', 'gear-disc',
   // The drifts' edges, by which corners are drift (lib/town.js, drifts()).
   ...Array.from({ length: 14 }, (_, k) => `street-drift-${k + 1}`),
 ];

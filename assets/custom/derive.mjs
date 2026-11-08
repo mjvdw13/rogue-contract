@@ -91,6 +91,10 @@ export const TOWN = [
   { out: 'pit-earth', df: 'GWDIRTLT', gradient: [[70, 46, 26], [124, 88, 54], [168, 124, 80], [196, 154, 104], [218, 182, 132]], keep: 0, contrast: 0.75 },
   { out: 'pit-wash-edge', df: 'GWANO', crop: [0, 0, 128, 32], smooth: 1, gradient: WHITEWASH, keep: 0, contrast: 0.35, edge: { rows: 12, amp: 7, seed: 31 } },
   { out: 'pit-dado', df: 'GWANO', crop: [0, 0, 128, 32], smooth: 1, gradient: [[60, 24, 14], [102, 44, 26], [132, 62, 38], [150, 76, 48], [166, 92, 60]], keep: 0, contrast: 0.5, fade: { color: [54, 26, 16], from: 0.4 }, lip: [{ rows: 1, color: [196, 150, 112], amount: 0.35 }] },
+  // The courtyard's condenser panel (models/vaporator.js): Nar Shaddaa's
+  // slatted vent in worn white, and JabShip's ring of fins as its gear disc.
+  { out: 'panel-ribs', df: 'NPVENTS2', gradient: [[70, 68, 62], [130, 126, 116], [184, 180, 168], [214, 210, 198], [232, 228, 216]], keep: 0, contrast: 0.9, rust: WORN(16, 211, 0.35) },
+  { out: 'gear-disc', df: 'JPCIRCL2', gradient: [[40, 40, 40], [96, 94, 88], [150, 146, 136], [196, 192, 180], [224, 220, 208]], keep: 0, contrast: 1.2 },
   // Weathered plaster, darker and dirtier, for the old quarter.
   { out: 'adobe-old', df: 'ZPMARBY1', gradient: [[34, 24, 16], [86, 62, 42], [136, 104, 72], [178, 144, 104], [206, 178, 136]], keep: 0.1, contrast: 0.7 },
   // Sun-bleached wooden planks (doors, shutters, stalls): TestBase's streaked granite.

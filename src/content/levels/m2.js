@@ -3,7 +3,7 @@ import { Painter } from './lib/painter.js';
 import { Town } from './lib/town.js';
 import { valueNoise } from './lib/noise.js';
 import { pitWalls, pitDoorway, blindDoor } from './lib/farm.js';
-import { SENSOR_Z } from '../models/vaporator.js';
+import { SENSOR_Z, PANEL } from '../models/vaporator.js';
 
 // MISSION 2: THE HOMESTEAD. The layout, route and numbers are in
 // docs/mission2.md (area numbers below match its table). The blockout:
@@ -499,7 +499,16 @@ decals.push({ x: 160, y: 38, z: COURT + 2, face: 'S', tex: 'door-planks' }); // 
 const blind = (cx, cy, r, z, angles) => angles.map((a) => blindDoor(list, decals, cx, cy, r, a, { floorZ: z }));
 pitWalls(p, 28, 46, 6, { floorZ: PIT, wash: 4.5, over: 1.5, seed: 51, blind: blind(28, 46, 6, PIT, [160]) });
 pitWalls(p, 80, 52, 8, { floorZ: PIT, wash: 4.5, over: 1.5, seed: 52, blind: blind(80, 52, 8, PIT, [215]) });
-pitWalls(p, 160, 46, 12, { floorZ: COURT, wash: 6, over: 1.5, seed: 53, blind: blind(160, 46, 12, COURT, [135, 225, 315]) });
+pitWalls(p, 160, 46, 12, { floorZ: COURT, wash: 6, over: 1.5, seed: 53, blind: blind(160, 46, 12, COURT, [135, 225]) });
+// The courtyard's landmark: the condenser panel on its south-east wall, as
+// tall as the whitewash, two vents on the rim over it.
+{
+  const a = (315 * Math.PI) / 180;
+  const [ux, uy] = [Math.cos(a), -Math.sin(a)];
+  const chord = Math.sqrt(12 * 12 - (PANEL.w / 2) ** 2);
+  list.push({ type: 'condenser-panel', x: 160 + ux * chord, y: 46 + uy * chord, z: COURT, angle: 225 });
+  for (const s of [-1.6, 1.6]) list.push(at('vaporator-cap', 160 + ux * 13 - uy * s, 46 + uy * 13 + ux * s, { z: FARM }));
+}
 pitWalls(p, 180, 84, 7, { floorZ: PIT, wash: 4.5, over: 1.5, seed: 54, blind: blind(180, 84, 7, PIT, [200]) });
 
 // The farm's vaporators (models/vaporator.js, after the film's): a few in
