@@ -942,9 +942,16 @@ down); the first band that covers a height wins, and the wall's own texture
 fills the rest. A band's texture hangs from its top (from the face's top if
 it runs on up), so it lines up across walls of different heights. On an
 open tile or a doorway, `bands` change the faces of its raised floor and
-lowered ceiling (a gate's lintel) the same way, and on an angled wall its
+lowered ceiling (a gate's lintel) the same way, the edge of its slab (the
+wall over a doorway dug through a wall), and on an angled wall its
 face (Mos Eisley's rounded corners carry the skirt round). The map viewer
 shows a wall by its top band.
+
+A band's texture can have see-through texels: what's under them shows (the
+wall's own texture, or a band later in the list). The homestead's pits
+(`lib/farm.js`, `pitWalls()`) use one for the whitewash's wavy top edge
+over the bare earth: a tile-tall band, see-through above a wandering line,
+its height set per tile so the line rises over each doorway.
 
 ### Decals
 

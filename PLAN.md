@@ -1308,10 +1308,11 @@ snapshots, playable at `?map=m2`.
 - [ ] **The pits' walls and doorways** (from the references, before
       "Each area in detail"; a kit in `lib/town.js` or a new
       `lib/farm.js`, used by every pit):
-  - [ ] Two tones: bare earth above (tan to ochre, runnels), whitewash
+  - [x] Two tones: bare earth above (tan to ochre, runnels), whitewash
         below with a wavy top edge rising over each arch, a red-ochre
-        dado at the foot. Textures from the Dark Forces pack, recoloured;
-        the wavy edge likely a texture set per wall tile.
+        dado at the foot (`lib/farm.js`, `pitWalls()`: wall bands, the
+        edge a band with see-through texels, bands on the slab over a
+        doorway).
   - [ ] Round-topped doorways in a thick bulging surround, plank doors
         or an oval red door; low square doorways under slab lintels.
   - [ ] The stairs' red-ochre cheeks, and a balcony with a low parapet

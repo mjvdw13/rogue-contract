@@ -34,6 +34,8 @@ export class Texture {
       }
       this.frames.push({ px, cm });
     }
+    /** Whether it has see-through texels (a wall band drawn over another texture, its top edge cut). */
+    this.holes = this.frames[0].px.includes(255);
     this.cur = this.frames[0].px;
     this.curCM = this.frames[0].cm;
     this.shade = grime && raw && raw.width === fw && raw.height === this.h ? grimeShade(raw) : null;

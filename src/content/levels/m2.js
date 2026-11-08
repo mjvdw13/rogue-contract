@@ -2,6 +2,7 @@ import { defineLevel } from '../../engine/defs.js';
 import { Painter } from './lib/painter.js';
 import { Town } from './lib/town.js';
 import { valueNoise } from './lib/noise.js';
+import { pitWalls } from './lib/farm.js';
 import { SENSOR_Z } from '../models/vaporator.js';
 
 // MISSION 2: THE HOMESTEAD. The layout, route and numbers are in
@@ -471,6 +472,14 @@ lights.push(
 // tunnel, the pump room, the reservoir's two, the workshop, the house's
 // loop tunnel and quarters, and the well room's (its only way in).
 for (const [x, y] of [[40, 45], [51, 51], [61, 83], [81, 83], [84, 30], [141, 57], [179, 41], [93, 58]]) well(x, y);
+
+// The pits' walls in two tones (lib/farm.js): whitewash to about 2.25 m in
+// the small pits and 3 m in the courtyard, rising over each doorway, bare
+// earth above it, the red-ochre dado at the foot.
+pitWalls(p, 28, 46, 6, { floorZ: PIT, wash: 4.5, seed: 51 });
+pitWalls(p, 80, 52, 8, { floorZ: PIT, wash: 4.5, seed: 52 });
+pitWalls(p, 160, 46, 12, { floorZ: COURT, wash: 6, seed: 53 });
+pitWalls(p, 180, 84, 7, { floorZ: PIT, wash: 4.5, seed: 54 });
 
 // The farm's vaporators (models/vaporator.js, after the film's): a few in
 // the garden court, seen from the pit; in the yard (off the line from the

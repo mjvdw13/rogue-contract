@@ -70,3 +70,38 @@ test('an angled wall shows its tile\'s bands too', () => {
   assert.notDeepEqual(column(banded, r05 + 1, bottom - 1), column(plain, r05 + 1, bottom - 1), 'the trim below 0.5');
   assert.notDeepEqual(column(banded, row(4) + 1, r2 - 1), column(plain, row(4) + 1, r2 - 1), 'rock above 2');
 });
+
+test('a band\'s see-through texels show the wall under it', () => {
+  const cam = { x: 1.5, y: 2.5, angle: 0, z: 1 };
+  // A railing (mostly holes) as a band over the rock, from the floor to the ceiling.
+  const banded = shot(level({ wall: 'sandstone', bands: [{ from: 0, to: 4, tex: 'imp-railing' }] }), cam);
+  const rock = shot(level({ wall: 'sandstone' }), cam);
+  const { w } = renderer.surface;
+  const { fy, horizon } = renderer.view;
+  const row = (z) => Math.ceil(horizon + ((cam.z - z) * fy) / 7.5 - 0.5);
+  let same = 0;
+  let changed = 0;
+  for (let y = row(4) + 1; y < row(0) - 1; y++) for (let x = 0; x < w; x += 7) (banded[y * w + x] === rock[y * w + x] ? same++ : changed++);
+  assert.ok(same > 0, 'the rock shows through the railing\'s holes');
+  assert.ok(changed > 0, 'and the railing over it');
+});
+
+test('a doorway\'s wall over it (its slab\'s edge) shows the tile\'s bands', () => {
+  const cam = { x: 1.5, y: 2.5, angle: 0, z: 1 };
+  const tall = { ...ROOM, ceilZ: 6 };
+  const slab = { bottom: 2, top: 5, floor: 'imp-floor', ceiling: 'imp-ceiling', side: 'imp-panel', light: 160 };
+  // A slab across column 8: an opening under it, the wall over it 7 away.
+  const doorway = (bands) =>
+    room(['##########', '#.......S#', '#.......S#', '#.......S#', '##########'], ['', ' >'], {
+      legend: { '.': tall, '#': { wall: 'imp-panel' }, S: { ...tall, slab, ...(bands && { bands }) } },
+    });
+  const banded = shot(doorway([{ from: 3.5, tex: 'sandstone' }]), cam);
+  const plain = shot(doorway(), cam);
+  const { w } = renderer.surface;
+  const { fy, horizon } = renderer.view;
+  const x = w >> 1;
+  const row = (z) => Math.ceil(horizon + ((cam.z - z) * fy) / 7 - 0.5);
+  const column = (px, a, b) => Array.from({ length: b - a }, (_, k) => px[(a + k) * w + x]);
+  assert.deepEqual(column(banded, row(3.5) + 1, row(2) - 1), column(plain, row(3.5) + 1, row(2) - 1), 'the slab\'s own side under 3.5');
+  assert.notDeepEqual(column(banded, row(5) + 1, row(3.5) - 1), column(plain, row(5) + 1, row(3.5) - 1), 'the band above it');
+});

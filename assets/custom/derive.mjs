@@ -25,7 +25,10 @@
 // `turn: true` turns it a quarter (a pipe's picture for a pipe lying across the
 // other way). `lip: [{ rows, color, amount }, ...]` paints bands down from the top row,
 // each `rows` tall, `amount` of the way to `color` (a step's nosing and the
-// shadow under it). With no `gradient` a texture keeps the source's own
+// shadow under it). `edge: { rows, amp, seed }` makes the texels above a
+// wavy line round `rows` down from the top see-through (`amp` texels up and
+// down, repeating across the width), its lip darkened a little: a band
+// whose top edge isn't straight. With no `gradient` a texture keeps the source's own
 // colours (the bay's fuel pump panels).
 import fs from 'node:fs';
 import path from 'node:path';
@@ -82,6 +85,12 @@ export const TOWN = [
   // The dirty foot of every wall: sand kicked up and rain-less grime, darker
   // toward the ground. A band 1 tile high shows its top 32 rows.
   { out: 'adobe-skirt', df: 'GWANO', crop: [0, 0, 128, 32], gradient: [[56, 40, 24], [96, 72, 46], [128, 100, 68], [150, 122, 86], [170, 144, 106]], keep: 0, contrast: 0.6, fade: { color: [84, 62, 40], from: 0 } },
+  // The homestead's pits (lib/farm.js): bare earth above, warm tan to ochre
+  // with Gromas' vertical runnels; the whitewash's wavy top edge, a tile
+  // tall; and the red-ochre dado along the foot, darker toward the ground.
+  { out: 'pit-earth', df: 'GWDIRTLT', gradient: [[70, 46, 26], [124, 88, 54], [168, 124, 80], [196, 154, 104], [218, 182, 132]], keep: 0, contrast: 0.75 },
+  { out: 'pit-wash-edge', df: 'GWANO', crop: [0, 0, 128, 32], smooth: 1, gradient: WHITEWASH, keep: 0, contrast: 0.35, edge: { rows: 12, amp: 7, seed: 31 } },
+  { out: 'pit-dado', df: 'GWANO', crop: [0, 0, 128, 32], smooth: 1, gradient: [[60, 24, 14], [102, 44, 26], [132, 62, 38], [150, 76, 48], [166, 92, 60]], keep: 0, contrast: 0.5, fade: { color: [54, 26, 16], from: 0.4 }, lip: [{ rows: 1, color: [196, 150, 112], amount: 0.35 }] },
   // Weathered plaster, darker and dirtier, for the old quarter.
   { out: 'adobe-old', df: 'ZPMARBY1', gradient: [[34, 24, 16], [86, 62, 42], [136, 104, 72], [178, 144, 104], [206, 178, 136]], keep: 0.1, contrast: 0.7 },
   // Sun-bleached wooden planks (doors, shutters, stalls): TestBase's streaked granite.
@@ -555,6 +564,21 @@ function rusted(img, { color, amount, cell, seed, from = 0.5 }) {
   return img;
 }
 
+/** Clear the texels above a wavy line (see `edge` above), darkening its lip. */
+function edged(img, { rows, amp, seed }) {
+  const { width: w, data: d } = img;
+  for (let x = 0; x < w; x++) {
+    const n = periodicNoise(x, 0, 32, w, seed) * 0.7 + periodicNoise(x, 0, 8, w, seed + 1) * 0.3;
+    const line = rows + amp * (2 * n - 1);
+    for (let y = 0; y < img.height; y++) {
+      const i = (y * w + x) * 4;
+      if (y + 0.5 < line) d[i + 3] = 0;
+      else if (y + 0.5 < line + 2) for (let k = 0; k < 3; k++) d[i + k] = Math.round(d[i + k] * 0.82);
+    }
+  }
+  return img;
+}
+
 /** Bands painted down from the top row, one after another (see above). */
 function lipped(img, bands) {
   const d = img.data;
@@ -599,6 +623,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     for (const r of [spec.rust ?? []].flat()) img = rusted(img, r);
     if (spec.lip) img = lipped(img, spec.lip);
     if (!spec.holes) for (let i = 3; i < img.data.length; i += 4) img.data[i] = 255;
+    if (spec.edge) img = edged(img, spec.edge);
     made.set(spec.out, img);
     fs.writeFileSync(path.join(texDir, `${spec.out}.png`), encodePNG(img.width, img.height, img.data));
     console.log(`${spec.out}.png from ${spec.df} (${img.width}x${img.height})`);

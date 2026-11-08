@@ -290,6 +290,26 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
         for (let y = a; y < b; y++, o += fbW, v += stepV) fb[o] = colormaps[faceCm[y & 3] + col[colBase + ((v | 0) % th)]];
       }
     };
+    // A face with holes: like `face`, leaving what's under its see-through texels (a wall band with a ragged top).
+    const holeFace = (t, a, b, anchor, slot, u, lv, hz) => {
+      if (a < clipTop) a = clipTop;
+      if (b > clipBot) b = clipBot;
+      if (b <= a) return;
+      let o = a * fbW + x;
+      const tex = textures[slot];
+      const th = tex.h;
+      let tx = Math.floor(u * TPU) % tex.w;
+      if (tx < 0) tx += tex.w;
+      const col = tex.curCM;
+      const colBase = tx * th;
+      setFaceCm(lv, hz);
+      const stepV = (TPU * t) / fy;
+      let v = (anchor - camZ) * TPU + (a + 0.5 - horizon) * stepV + V_BIAS * th;
+      for (let y = a; y < b; y++, o += fbW, v += stepV) {
+        const c = col[colBase + ((v | 0) % th)];
+        if (c !== TRANSPARENT) fb[o] = colormaps[faceCm[y & 3] + c];
+      }
+    };
     // A fence face: like `face`, already clipped, with holes, writing the depth buffer.
     const fenceFace = (t, a, b, anchor, slot, u, lv, hz) => {
       const tex = textures[slot];
@@ -313,14 +333,15 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
      * Wall bands: over a face from height `faceBot` to `faceTop`, each band's
      * texture over its heights (last to first, so the first that covers a
      * height is on top). A band's texture hangs from its top, or from the
-     * face's top if it's open-ended.
+     * face's top if it's open-ended. Its see-through texels leave what's
+     * under them (the wall's own texture, or a band further down the list).
      */
     const bandFaces = (t, faceTop, faceBot, bands, u, lv, hz) => {
       for (let j = bands.length - 1; j >= 0; j--) {
         const band = bands[j];
         const top = band.to < faceTop ? band.to : faceTop;
         const bot = band.from > faceBot ? band.from : faceBot;
-        if (top > bot) face(t, rowOf(top, t), rowOf(bot, t), band.to < Infinity ? band.to : faceTop, band.tex, u, lv, hz);
+        if (top > bot) (textures[band.tex].holes ? holeFace : face)(t, rowOf(top, t), rowOf(bot, t), band.to < Infinity ? band.to : faceTop, band.tex, u, lv, hz);
       }
     };
     /**
@@ -908,6 +929,8 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
             seen[next] = 1;
             const lv = faceLevel(s, tExit, contrast, out);
             face(tExit, a, b, slabTop[next], slabSideTex[next], wx, lv, hz);
+            // (Bands too: the wall over a doorway changes with height as the wall beside it.)
+            if (nextBands) bandFaces(tExit, sTop, sBot, nextBands, wx, lv, hz);
             // (Decals on the edge too: a sign over a doorway, whose wall is its arch's slab.)
             if (decals) decalFaces(tExit, sTop, sBot, decals, edgePos, mirrored, lv, hz);
             // Above the edge stays open in this window, and below it in a new one.
