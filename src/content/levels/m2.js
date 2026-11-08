@@ -379,8 +379,13 @@ doorway(158, 32, 162, 35, 'S', MID);
     const turned = Math.atan2(y + 0.5 - cy, x + 0.5 - cx) + Math.PI / 2; // 0 at north, clockwise
     if (turned < -LANDING) return c;
     const f = MID - 0.5 * Math.max(0, Math.ceil((turned - LANDING) * inner));
-    return f > COURT ? { ...c, floorZ: f } : c;
+    if (f <= COURT) return c;
+    // The landing is a balcony over a blind door, whitewashed, a low
+    // parapet along its edge; the flight's open side a red-ochre cheek.
+    if (turned <= LANDING) return { ...c, floorZ: d < inner + 0.9 ? MID + 1 : MID, side: 'adobe-pale', bands: [{ to: COURT + 1, tex: 'pit-dado' }] };
+    return { ...c, floorZ: f, side: 'pit-dado' };
   });
+  list.push({ type: 'arch-hood-3-pale', x: cx, y: cy - inner + 0.01, z: COURT, angle: 0 });
 }
 dig(138, 40, 146, 52, { floorZ: COURT, light: 112 });
 doorway(146, 44, 149, 48, 'E', COURT);
@@ -490,6 +495,7 @@ for (const [x, y] of [[40, 45], [51, 51], [61, 83], [81, 83], [84, 30], [141, 57
 // (the farm's rooms we don't go into); the garage pit's two square.
 const decals = [];
 for (const [x0, y0, x1, y1, face, z] of DOORWAYS) pitDoorway(list, x0, y0, x1, y1, face, { floorZ: z, lintel: LINTEL });
+decals.push({ x: 160, y: 38, z: COURT + 2, face: 'S', tex: 'door-planks' }); // under the balcony
 const blind = (cx, cy, r, z, angles) => angles.map((a) => blindDoor(list, decals, cx, cy, r, a, { floorZ: z }));
 pitWalls(p, 28, 46, 6, { floorZ: PIT, wash: 4.5, over: 1.5, seed: 51, blind: blind(28, 46, 6, PIT, [160]) });
 pitWalls(p, 80, 52, 8, { floorZ: PIT, wash: 4.5, over: 1.5, seed: 52, blind: blind(80, 52, 8, PIT, [215]) });

@@ -1318,8 +1318,9 @@ snapshots, playable at `?map=m2`.
         (`pitDoorway()`, `blindDoor()`: seven round-topped, blind plank
         doors round each pit, the garage pit's two square; no oval door
         yet).
-  - [ ] The stairs' red-ochre cheeks, and a balcony with a low parapet
-        over a doorway where a stair lands.
+  - [x] The stairs' red-ochre cheeks, and a balcony with a low parapet
+        over a doorway where a stair lands (the courtyard's landing, over
+        a blind door).
   - [ ] The courtyard's condenser panel (ribbed white, its gear disc,
         two fittings on the rim above): its landmark.
   - [ ] The great dome as the entrance dome (Mark, 2026-11-07: yes, the
