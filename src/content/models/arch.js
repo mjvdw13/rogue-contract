@@ -20,6 +20,11 @@ import { PLASTERS } from './dome.js';
 // rather than in bands, one per segment.
 // Each comes in the five plasters (`arch-hood-3-pale`, as the domes).
 //
+// `arch-hood-<width><plaster>-deep`: the hood for a curved wall (the
+// homestead's pits, lib/farm.js): the same, but reaching HOOD.sink back
+// into the wall behind its face, so where the wall curves away behind its
+// legs and band there is no gap (the part inside the wall is hidden).
+//
 // `arch-round-<width><plaster>-grimy-<n>`: the same rounded arch, sooty, for
 // vaults indoors (the cantina's alcoves): grime lying a hair inside its
 // curve, a smoky stain along the crown fading down it (two bands over each
@@ -28,7 +33,7 @@ import { PLASTERS } from './dome.js';
 // Two of them, half a picture apart, to take turns along a vault so its
 // soot runs on unbroken from tile to tile.
 
-export const HOOD = { spring: 2.75, band: 0.45, depth: 0.45, widths: [3, 4] };
+export const HOOD = { spring: 2.75, band: 0.45, depth: 0.45, sink: 1, widths: [3, 4] };
 export const ROUND = { rise: 1.5, widths: [3, 4] };
 const STEPS = 8; // segments round a hood's half circle
 const CORNER = 6; // segments round each of a rounded opening's corners
@@ -42,7 +47,10 @@ const SOOT = { bands: [['grime-dust-1', 1 / 3, 0], ['grime-dust-2', 1 / 2, 0.25]
 
 export const ARCH_MODELS = [];
 for (const [suffix, tex] of Object.entries(PLASTERS)) {
-  for (const w of HOOD.widths) ARCH_MODELS.push({ id: `arch-hood-${w}${suffix}`, kind: 'hood', w, tex });
+  for (const w of HOOD.widths) {
+    ARCH_MODELS.push({ id: `arch-hood-${w}${suffix}`, kind: 'hood', w, tex });
+    ARCH_MODELS.push({ id: `arch-hood-${w}${suffix}-deep`, kind: 'hood', w, tex, sink: HOOD.sink });
+  }
   for (const w of ROUND.widths) {
     ARCH_MODELS.push({ id: `arch-round-${w}${suffix}`, kind: 'round', w, tex });
     for (let n = 0; n < SOOT.kinds; n++) ARCH_MODELS.push({ id: `arch-round-${w}${suffix}-grimy-${n + 1}`, kind: 'round', w, tex, grimy: n });
@@ -52,18 +60,19 @@ for (const [suffix, tex] of Object.entries(PLASTERS)) {
 /** The top of a hood of inner width `w` over its floor. */
 export const hoodTop = (w) => HOOD.spring + w / 2 + HOOD.band;
 
-function hood(id, w, tex) {
+function hood(id, w, tex, sink = 0) {
   const m = new ModelBuilder(id);
   const s = { tex };
   const front = { tex, flat: true }; // lit as the wall it stands on
   const a = w / 2;
   const { spring, band: b, depth: d } = HOOD;
+  const back = -sink;
   // The legs: their backs against the wall, their feet on the floor and
   // their tops under the arch are hidden.
   for (const sign of [1, -1]) {
     const [x0, x1] = sign > 0 ? [a, a + b] : [-a - b, -a];
-    m.box([x0, 0, 0], [x1, d, spring], { ...s, top: false, bottom: false, side: (i) => [false, s, front, s][i] });
-    m.line(x0, 0, x0, d).line(x0, d, x1, d).line(x1, d, x1, 0);
+    m.box([x0, back, 0], [x1, d, spring], { ...s, top: false, bottom: false, side: (i) => [false, s, front, s][i] });
+    m.line(x0, back, x0, d).line(x0, d, x1, d).line(x1, d, x1, back);
   }
   // The half circle: a block a segment, its outer face, front, soffit and
   // back (the joints between segments hidden). The back faces the wall, so
@@ -73,7 +82,7 @@ function hood(id, w, tex) {
     const [t0, t1] = [(k / STEPS) * Math.PI, ((k + 1) / STEPS) * Math.PI];
     const at = (r, t) => [Math.cos(t) * r, spring + Math.sin(t) * r];
     const outline = [at(a, t0), at(a + b, t0), at(a + b, t1), at(a, t1)];
-    m.prism(outline, 0, d, { ...s, axis: 'y', top: front, bottom: s, side: (i) => (i === 0 || i === 2 ? false : s) });
+    m.prism(outline, back, d, { ...s, axis: 'y', top: front, bottom: s, side: (i) => (i === 0 || i === 2 ? false : s) });
   }
   return m.build();
 }
@@ -123,4 +132,4 @@ function round(id, w, tex, grimy) {
   return m.build();
 }
 
-export default ARCH_MODELS.map((d) => (d.kind === 'hood' ? hood(d.id, d.w, d.tex) : round(d.id, d.w, d.tex, d.grimy)));
+export default ARCH_MODELS.map((d) => (d.kind === 'hood' ? hood(d.id, d.w, d.tex, d.sink) : round(d.id, d.w, d.tex, d.grimy)));

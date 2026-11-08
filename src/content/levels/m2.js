@@ -2,7 +2,7 @@ import { defineLevel } from '../../engine/defs.js';
 import { Painter } from './lib/painter.js';
 import { Town } from './lib/town.js';
 import { valueNoise } from './lib/noise.js';
-import { pitWalls } from './lib/farm.js';
+import { pitWalls, pitDoorway, blindDoor } from './lib/farm.js';
 import { SENSOR_Z } from '../models/vaporator.js';
 
 // MISSION 2: THE HOMESTEAD. The layout, route and numbers are in
@@ -91,6 +91,16 @@ function under(x0, y0, x1, y1, { floorZ, ceilZ = (f) => f + 4, top, floor = 'fla
 const dig = (x0, y0, x1, y1, opts = {}) => under(x0, y0, x1, y1, { floorZ: PIT, ...opts });
 /** A doorway through a pit's round wall at floor `z` (its tiles were the wall's low angled tiles). */
 const arch = (z = PIT) => ({ floorZ: z, ceilZ: z + 3.5, top: FARM });
+/** A round-topped doorway's lintel: high enough for its rounded corners (`pitDoorway()`). */
+const LINTEL = 4.25;
+/** A round-topped doorway through a pit's wall (rounded and hooded by `pitDoorway()` below). */
+const roundArch = (z = PIT) => ({ floorZ: z, ceilZ: z + LINTEL, top: FARM });
+/** The round-topped doorways: their boxes, the way they look, their floors. */
+const DOORWAYS = [];
+const doorway = (x0, y0, x1, y1, face, z = PIT) => {
+  dig(x0, y0, x1, y1, roundArch(z));
+  DOORWAYS.push([x0, y0, x1, y1, face, z]);
+};
 /**
  * A stair dug down a box toward the south, a step of 0.5 a tile from `from`
  * at row `start` (`y0` unless given), its ceiling stepping down with it. In
@@ -296,7 +306,7 @@ lights.push({ x: 160, y: 50, z: COURT + 1, radius: 6, light: 56 }); // the cart 
 // Under the garden court, east from the garden pit: the tunnel and the
 // pump room (the water pipe goes down into its pump), its one way on the
 // stair down to the reservoir. Tunnels 4 wide, ceilings at 2 m.
-dig(33, 44, 35, 48, arch());
+doorway(33, 44, 35, 48, 'W');
 dig(35, 44, 50, 48);
 dig(46, 46, 58, 58, { light: 104 });
 lights.push({ x: 52, y: 52, z: PIT + 3, radius: 6, light: 48 });
@@ -329,13 +339,13 @@ lights.push({ x: 70, y: 75.5, z: RESERVOIR + 1, radius: 7, light: 64 }, { x: 99,
 // down into it. Up from the reservoir, the tunnel runs west into the pit;
 // east, toward the house, it caved in, in sight from the stair's head.
 dig(70, 26, 88, 40, { light: 120 });
-dig(78, 40, 82, 45, arch());
+doorway(78, 40, 82, 45, 'S');
 // The shed's stair: down its west wall under the yard, eight steps, a
 // landing, then eight more on down the workshop's west wall, open to the room.
 stairDown(70, 14, 74, 26, 0);
 stairDown(70, 26, 74, 32, 0, { start: 14, ceilZ: (f) => Math.min(FARM - 0.5, f + 4.5), light: 120 });
 lights.push({ x: 84, y: 30, z: PIT + 3, radius: 6, light: 48 });
-dig(87, 50, 90, 54, arch());
+doorway(87, 50, 90, 54, 'W');
 dig(90, 50, 110, 54, { light: 88 });
 dig(100, 54, 104, 58, { light: 88 });
 tag(100, 50, 110, 54, 'rubble');
@@ -354,7 +364,7 @@ list.push(at('shield-unit', 91.5, 60.5), at('energy-pack', 96.5, 60.5));
 // and a tunnel from the common room round to the storeroom (a loop for the
 // fight).
 stairDown(158, 18, 162, 32, 0, { flight: 6 });
-dig(158, 32, 162, 35, arch(MID));
+doorway(158, 32, 162, 35, 'S', MID);
 // From the doorway, halfway down the courtyard's north wall, a stair 3 wide
 // down the wall's inside, east and round to the floor: a landing, then
 // twelve steps of 0.5 (counted along its inner edge, so no step is more).
@@ -373,12 +383,12 @@ dig(158, 32, 162, 35, arch(MID));
   });
 }
 dig(138, 40, 146, 52, { floorZ: COURT, light: 112 });
-dig(146, 44, 149, 48, arch(COURT));
+doorway(146, 44, 149, 48, 'E', COURT);
 lights.push({ x: 142, y: 46, z: COURT + 3, radius: 6, light: 40 });
-dig(171, 49, 174, 53, arch(COURT));
+doorway(171, 44, 174, 48, 'W', COURT);
 dig(174, 38, 186, 54, { floorZ: COURT, light: 96 });
 lights.push({ x: 180, y: 46, z: COURT + 3, radius: 5, light: 32 });
-dig(158, 57, 162, 61, arch(COURT));
+doorway(158, 57, 162, 61, 'N', COURT);
 dig(150, 61, 170, 70, { floorZ: COURT, light: 96 });
 lights.push({ x: 160, y: 65, z: COURT + 3, radius: 5, light: 32 });
 dig(140, 52, 144, 66, { floorZ: COURT, light: 88 });
@@ -476,10 +486,15 @@ for (const [x, y] of [[40, 45], [51, 51], [61, 83], [81, 83], [84, 30], [141, 57
 // The pits' walls in two tones (lib/farm.js): whitewash to about 2.25 m in
 // the small pits and 3 m in the courtyard, rising over each doorway, bare
 // earth above it, the red-ochre dado at the foot.
-pitWalls(p, 28, 46, 6, { floorZ: PIT, wash: 4.5, seed: 51 });
-pitWalls(p, 80, 52, 8, { floorZ: PIT, wash: 4.5, seed: 52 });
-pitWalls(p, 160, 46, 12, { floorZ: COURT, wash: 6, seed: 53 });
-pitWalls(p, 180, 84, 7, { floorZ: PIT, wash: 4.5, seed: 54 });
+// Round-topped doorways in thick hoods; blind plank doors round the walls
+// (the farm's rooms we don't go into); the garage pit's two square.
+const decals = [];
+for (const [x0, y0, x1, y1, face, z] of DOORWAYS) pitDoorway(list, x0, y0, x1, y1, face, { floorZ: z, lintel: LINTEL });
+const blind = (cx, cy, r, z, angles) => angles.map((a) => blindDoor(list, decals, cx, cy, r, a, { floorZ: z }));
+pitWalls(p, 28, 46, 6, { floorZ: PIT, wash: 4.5, over: 1.5, seed: 51, blind: blind(28, 46, 6, PIT, [160]) });
+pitWalls(p, 80, 52, 8, { floorZ: PIT, wash: 4.5, over: 1.5, seed: 52, blind: blind(80, 52, 8, PIT, [215]) });
+pitWalls(p, 160, 46, 12, { floorZ: COURT, wash: 6, over: 1.5, seed: 53, blind: blind(160, 46, 12, COURT, [135, 225, 315]) });
+pitWalls(p, 180, 84, 7, { floorZ: PIT, wash: 4.5, over: 1.5, seed: 54, blind: blind(180, 84, 7, PIT, [200]) });
 
 // The farm's vaporators (models/vaporator.js, after the film's): a few in
 // the garden court, seen from the pit; in the yard (off the line from the
@@ -623,6 +638,7 @@ export default defineLevel({
   // Stand-ins until the evening step: the night sky and a dusty haze.
   haze: { color: [120, 84, 72], half: 48 },
   lights,
+  decals,
   par: 600,
   // The story, in stand-ins until the pieces exist (docs/mission2.md): Jan
   // names the house; the rubble sends Kyle up; the house shows over the

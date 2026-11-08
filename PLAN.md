@@ -1313,8 +1313,11 @@ snapshots, playable at `?map=m2`.
         dado at the foot (`lib/farm.js`, `pitWalls()`: wall bands, the
         edge a band with see-through texels, bands on the slab over a
         doorway).
-  - [ ] Round-topped doorways in a thick bulging surround, plank doors
-        or an oval red door; low square doorways under slab lintels.
+  - [x] Round-topped doorways in a thick bulging surround, plank doors
+        or an oval red door; low square doorways under slab lintels
+        (`pitDoorway()`, `blindDoor()`: seven round-topped, blind plank
+        doors round each pit, the garage pit's two square; no oval door
+        yet).
   - [ ] The stairs' red-ochre cheeks, and a balcony with a low parapet
         over a doorway where a stair lands.
   - [ ] The courtyard's condenser panel (ribbed white, its gear disc,
