@@ -241,6 +241,16 @@ wall tanks and units, gauges, vents and fans on the working rooms' walls;
 round hatches in the pump room's and workshop's floors; the reservoir's
 walkway a grating.
 
+**The garage** (as built): round, 7 m across, tan plaster under a dark
+metal ceiling. The tiles are dug in steps round the circle; its wall is a
+model (`garage-ring`) that collides along its curve, with the dark band
+under the ceiling, two round amber lamps to each of its 34 panels, and a
+glowing globe on a bracket either side of the console. In the middle, a
+bronze grating sunk a quarter step inside a round red-ochre kerb (a
+model over the tiles' stepped edge). The console against the north wall:
+a big gauge, two lit screens, dials, lamps and lit buttons. A thick frame
+with rounded top corners round the opening onto the pit. Oil on the floor.
+
 ## Grid and size
 
 - **208 × 214 tiles** (104 × 107 m). The farm inside its windbreak is an

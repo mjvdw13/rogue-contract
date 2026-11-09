@@ -1325,7 +1325,7 @@ snapshots, playable at `?map=m2`.
           where people work (the pump room, the workshop, the reservoir's
           walkway); a pipe band along the reservoir's north wall.
           From the references:
-    - [ ] The garage round, not a box: a ring of round amber lamps
+    - [x] The garage round, not a box: a ring of round amber lamps
           under its ceiling, a round grating floor in a kerb, the
           console (dials, a gauge, two screens), wall lamps,
           rounded-square openings. It stays in its pit (Mark,

@@ -4,7 +4,7 @@ import { Town } from './lib/town.js';
 import { valueNoise } from './lib/noise.js';
 import { pitWalls, pitDoorway, blindDoor } from './lib/farm.js';
 import { SENSOR_Z, PANEL } from '../models/vaporator.js';
-import { PUMP } from '../models/farm.js';
+import { PUMP, GARAGE_RING } from '../models/farm.js';
 
 // MISSION 2: THE HOMESTEAD. The layout, route and numbers are in
 // docs/mission2.md (area numbers below match its table). The blockout:
@@ -494,11 +494,41 @@ list.push(at('power-cell', 140.5, 79.5), at('med-kit', 140.5, 82.5));
 // ---------------------------------------------------------------- 9. the garage, its pit, the trench
 // Off the garage pit's north side, behind a roll-down shutter, down until
 // the recordings are taken (out of sight: the caves come up into the pit).
-// Its wall to the storeroom is blank. Taller inside.
-dig(174, 58, 186, 72, { ceilZ: PIT + 4.5, light: 104 });
+// Round, after the film's (Mark's references): tan plaster under a dark
+// ceiling, a ring of round amber lamps all the way round under it, a
+// bronze grating in the middle sunk inside a red-ochre kerb, the console
+// against the north wall with a lamp either side, and a thick
+// rounded-square frame round the opening onto the pit. Dark and oily.
+// The tiles are dug in steps round the circle; its wall is a model
+// (models/farm.js, `garage-ring`) that collides along its curve.
+const GARAGE = { cx: 180, cy: 65, grate: 3.5, ceil: PIT + 4.5 };
+{
+  const { cx, cy, grate, ceil } = GARAGE;
+  const { r } = GARAGE_RING;
+  const box = [173, 58, 187, 72];
+  const ground = [];
+  p.rect(...box, (x, y, c) => (ground.push([x, y, c]), c));
+  dig(...box, { ceilZ: ceil, light: 80, floor: 'derelict-floor', lining: { wall: 'adobe', ceiling: 'hold-ceiling' } });
+  // Every tile the circle reaches into is dug; the floor a step up round
+  // the sunk grating, its edge the red-ochre kerb.
+  for (const [x, y, old] of ground) {
+    const near = Math.hypot(Math.max(x - cx, 0, cx - x - 1), Math.max(y - cy, 0, cy - y - 1));
+    const c = p.get(x, y);
+    if (near >= r) p.set(x, y, old);
+    else if (Math.hypot(x + 0.5 - cx, y + 0.5 - cy) < grate) p.set(x, y, { ...c, floor: 'grate-bronze' });
+    else p.set(x, y, { ...c, floorZ: PIT + 0.25, side: 'pit-dado' });
+  }
+  list.push({ type: 'garage-ring', x: cx, y: cy, z: PIT + 0.25, angle: 0 });
+  list.push({ type: 'garage-kerb', x: cx, y: cy, z: PIT, angle: 0 });
+  // The console on the chord across the north wall.
+  list.push({ type: 'garage-console', x: cx, y: cy - r + 0.45, z: PIT + 0.25, angle: 0 });
+  // The frame round the opening, on the circle's foot; oil on the floor.
+  list.push({ type: 'garage-frame-4', x: cx, y: 71.99, z: PIT, angle: 180 });
+  list.push(at('floor-spill-2', 177, 67.5, { z: PIT, angle: 20 }), at('floor-spill-1', 183, 63, { z: PIT + 0.25, angle: 110 }), at('floor-spill-1', 180.5, 70, { z: PIT + 0.25, angle: 200 }));
+  lights.push({ x: cx, y: cy, z: ceil - 0.5, radius: 8, light: 56 }, { x: cx, y: 60, z: PIT + 2, radius: 4, light: 40 });
+}
 dig(178, 72, 182, 78, arch());
 shutter(178, 72, 182, 73);
-lights.push({ x: 180, y: 64, z: PIT + 4, radius: 6, light: 40 });
 // The trench: out of the pit's south side, eight steps of 0.5 up south,
 // then level to the gate through the windbreak onto the pad (lower than the
 // farm); open to the sky, walled in the farm's plaster (its walls stand 2 m
@@ -773,8 +803,8 @@ list.push(
   at('med-kit', 141.5, 108.5, { skill: EASY }),
   at('power-cell', 180.5, 131.5),
   // 9. The garage: a stock of ammo before the wave.
-  at('power-cell', 175.5, 59.5), at('power-cell', 176.5, 59.5), at('med-kit', 184.5, 70.5),
-  at('energy-pack', 184.5, 59.5, { skill: EASY }),
+  at('power-cell', 176.2, 61.2, { z: PIT + 0.25 }), at('power-cell', 177, 60.6, { z: PIT + 0.25 }), at('med-kit', 183.5, 69, { z: PIT + 0.25 }),
+  at('energy-pack', 183.8, 61, { z: PIT + 0.25, skill: EASY }),
   // The trench's gate.
   at('sandtrooper', 180, 108.5, { angle: 90, skill: NORMAL_UP }),
   // 11. The wash: rocks for cover; troopers lying in wait down its long
