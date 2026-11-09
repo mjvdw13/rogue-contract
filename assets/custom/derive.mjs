@@ -97,6 +97,17 @@ export const TOWN = [
   { out: 'pit-earth', df: 'GWDIRTLT', gradient: [[70, 46, 26], [124, 88, 54], [168, 124, 80], [196, 154, 104], [218, 182, 132]], keep: 0, contrast: 0.75 },
   { out: 'pit-wash-edge', df: 'GWANO', crop: [0, 0, 128, 32], smooth: 1, gradient: WHITEWASH, keep: 0, contrast: 0.35, edge: { rows: 12, amp: 7, seed: 31 } },
   { out: 'pit-dado', df: 'GWANO', crop: [0, 0, 128, 32], smooth: 1, gradient: [[60, 24, 14], [102, 44, 26], [132, 62, 38], [150, 76, 48], [166, 92, 60]], keep: 0, contrast: 0.5, fade: { color: [54, 26, 16], from: 0.4 }, lip: [{ rows: 1, color: [196, 150, 112], amount: 0.35 }] },
+  // Under the homestead (m2): the house's smooth white plaster (its rooms'
+  // vaults, the kitchen's walls and counters), the dark damp duracrete of
+  // the reservoir's and the cistern's vaults, a bronze grating (the
+  // garage's round floor), a band of pipes along a wall (the bottom of a
+  // pipe-run wall, 2 tiles tall) and a red rug (Jedi Knight-ish
+  // squares from Jabba's ship, in deep reds).
+  { out: 'plaster-white', df: 'GWANO', crop: [0, 0, 128, 128], smooth: 2, gradient: [[120, 112, 92], [178, 170, 146], [208, 202, 178], [226, 222, 202], [240, 238, 224]], keep: 0, contrast: 0.25 },
+  { out: 'duracrete', df: 'GWANO', crop: [0, 0, 128, 128], smooth: 1, gradient: [[34, 30, 26], [70, 62, 52], [104, 94, 78], [130, 118, 98], [150, 138, 116]], keep: 0, contrast: 0.6, rust: [{ color: [22, 18, 14], amount: 0.5, cell: 32, seed: 211 }, { color: [90, 70, 46], amount: 0.25, cell: 16, seed: 213 }] },
+  { out: 'grate-bronze', df: 'ZPGRTE3X', gradient: [[14, 10, 6], [52, 36, 22], [98, 70, 42], [140, 104, 64], [176, 138, 90]], keep: 0, contrast: 1, rust: [{ color: [10, 8, 6], amount: 0.4, cell: 32, seed: 215 }] },
+  { out: 'pipe-band', df: 'IWAPIPE1', crop: [0, 64, 128, 64], gradient: [[16, 14, 12], [52, 46, 40], [96, 86, 74], [140, 128, 110], [190, 178, 156]], keep: 0.1, contrast: 1, rust: WORN(16, 217, 0.3) },
+  { out: 'rug-red', df: 'JPSQUAR1', gradient: [[34, 10, 10], [80, 20, 18], [122, 34, 28], [156, 62, 44], [186, 120, 80]], keep: 0, contrast: 1 },
   // The courtyard's condenser panel (models/vaporator.js): Nar Shaddaa's
   // slatted vent in worn white, and JabShip's ring of fins as its gear disc.
   { out: 'panel-ribs', df: 'NPVENTS2', gradient: [[70, 68, 62], [130, 126, 116], [184, 180, 168], [214, 210, 198], [232, 228, 216]], keep: 0, contrast: 0.9, rust: WORN(16, 211, 0.35) },

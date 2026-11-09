@@ -85,6 +85,9 @@ const TOWN = [
   // The homestead's pits (lib/farm.js): bare earth, the whitewash's wavy top
   // edge (see-through above it) and the red-ochre dado.
   'pit-earth', 'pit-wash-edge', 'pit-dado',
+  // Under the homestead (m2): the house's white plaster, the reservoir's and
+  // the cistern's duracrete, the garage's grating, a band of pipes and a rug.
+  'plaster-white', 'duracrete', 'grate-bronze', 'pipe-band', 'rug-red',
   // The courtyard's condenser panel (models/vaporator.js): its slats and gear disc.
   'panel-ribs', 'gear-disc',
   // The drifts' edges, by which corners are drift (lib/town.js, drifts()).

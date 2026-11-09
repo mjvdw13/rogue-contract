@@ -215,6 +215,20 @@ everything above gets soot over the white, scorch over the doorways,
 broken crates and the Imperials' gear in among it. Not used: palm-frond
 shades and real-world plants (Star Wars, not a real village).
 
+**Under the ground, as built** (2026-11-08). Each dug space names its
+lining, and `lineDug()` in `m2.js` puts it on the ground round it, up to
+the space's ceiling only, so nothing on the surface changes:
+- **The tunnels, the pump room, the workshop:** whitewash, with the pits'
+  red-ochre dado along the foot and a whitewashed vault. Riveted deck
+  plates (`yard-plate`) on the floors where people work.
+- **The house's rooms and the dome's stair:** smooth white plaster
+  (`plaster-white`), walls and vault, no dado.
+- **The reservoir:** cast duracrete walls (`derelict-wall`), a dark damp
+  vault (`duracrete`), an oily concrete floor (`derelict-floor`).
+- **The cellar (the cistern):** damp duracrete, walls and vault.
+- **The caves and the niche:** bare rock (`sandstone`), the only places
+  it's used underground.
+
 ## Grid and size
 
 - **208 × 214 tiles** (104 × 107 m). The farm inside its windbreak is an

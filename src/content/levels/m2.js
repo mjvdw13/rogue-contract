@@ -66,16 +66,34 @@ const yard = (z = FARM, extra = {}) => ({ floor: 'street-sand', ceiling: 'sky', 
 /** A tile's top: what you'd stand on there (a slab's top, a low angled wall's top, or its floor). */
 const topOf = (c) => (c.slab ? c.slab.top : c.line && c.wallTop !== undefined ? c.wallTop : c.floorZ ?? 0);
 
+// ---- Linings: what the dug rooms' walls and ceilings are (Mark's
+// references: whitewash in the tunnels with the pits' red-ochre dado along
+// the foot, smooth white plaster in the house, damp duracrete in the
+// reservoir and the cistern, bare rock only in the caves).
+/** The tunnels, the pump room, the workshop: whitewash, a red-ochre dado. */
+const WHITEWASH = { wall: 'adobe-pale', dado: 'pit-dado', ceiling: 'adobe-pale' };
+/** The house's rooms: smooth white plaster, walls and vault. */
+const HOUSE = { wall: 'plaster-white', ceiling: 'plaster-white' };
+/** The reservoir: duracrete walls with a line cast along them, a dark damp vault. */
+const RESERVOIR_WALLS = { wall: 'derelict-wall', ceiling: 'duracrete' };
+/** The cistern under the house, and the steps down to it. */
+const CISTERN = { wall: 'duracrete', ceiling: 'duracrete' };
+/** Bare rock: the caves, the niche behind the loose stone. */
+const ROCK = { wall: 'sandstone', ceiling: 'sandstone-dark' };
+/** Each dug tile's lining, by its index (the last dig over a tile wins). */
+const linings = new Map();
+
 /**
  * Space dug under the ground (or under a building) over the box: the lower
  * storey of a slab whose top is what was there (the yard, a drift, a
  * roof), so the surface stays as it was. `floorZ` and `ceilZ` may be
  * functions (of the tile, and of its floor), for a stair. `top` overrides
  * the slab's top (a doorway through a pit's wall, whose tiles were its low
- * angled wall).
+ * angled wall). `lining` is what its walls and ceiling are (`lineDug()`).
  */
-function under(x0, y0, x1, y1, { floorZ, ceilZ = (f) => f + 4, top, floor = 'flagstone', ceiling = 'planks', light = 112, side = 'adobe-pale', extra = {} }) {
+function under(x0, y0, x1, y1, { floorZ, ceilZ = (f) => f + 4, top, lining = WHITEWASH, floor = 'flagstone', ceiling = lining.ceiling, light = 112, side = lining.wall, extra = {} }) {
   p.rect(x0, y0, x1, y1, (x, y, old) => {
+    linings.set(y * W + x, lining);
     const f = typeof floorZ === 'function' ? floorZ(x, y) : floorZ;
     const t = top ?? topOf(old);
     const c = typeof ceilZ === 'function' ? ceilZ(f, old, t) : ceilZ;
@@ -135,6 +153,47 @@ const secret = (x0, y0, x1, y1) => p.rect(x0, y0, x1, y1, (_, __, c) => (c.wall 
 const boxDist = (x, y, [x0, y0, x1, y1]) => Math.hypot(Math.max(x0 - x, 0, x - (x1 - 1)), Math.max(y0 - y, 0, y - (y1 - 1)));
 /** A roll-down shutter over a box of dug tiles, up once the recordings are taken. */
 const shutter = (x0, y0, x1, y1) => p.rect(x0, y0, x1, y1, (_, __, c) => ({ ...c, door: 'shutter-rising', style: 'rise', lock: 'remote', stayOpen: true, tag: 'garage' }));
+
+/**
+ * Line the dug spaces (run once they're all dug): the tiles round each (the
+ * ground it's dug into) show its lining's wall on the faces it sees, with
+ * its dado along the foot, up to its ceiling and no higher, so the ground's
+ * own faces up on the surface (a drift's steps) keep theirs. A solid tile
+ * takes the wall. The slabs' edges seen from below (a lintel, a light
+ * well's shaft) take it too, but not where the surface steps down past one.
+ */
+function lineDug() {
+  const dug = (c) => c && c.slab && !c.line && c.floorZ < c.slab.bottom;
+  const near = (x, y) => [[x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]];
+  const faces = new Map();
+  for (const [k, lining] of linings) {
+    const x = k % W;
+    const y = (k - x) / W;
+    const c = p.get(x, y);
+    if (!dug(c)) continue;
+    const step = near(x, y).some(([nx, ny]) => {
+      const n = p.get(nx, ny);
+      return n && !dug(n) && !n.wall && topOf(n) >= c.slab.bottom && topOf(n) < c.slab.top;
+    });
+    if (!step) p.set(x, y, { ...c, slab: { ...c.slab, side: lining.wall } });
+    for (const [nx, ny] of near(x, y)) {
+      const n = p.get(nx, ny);
+      if (!n || dug(n) || n.line || n.door) continue;
+      const j = ny * W + nx;
+      const f = faces.get(j) ?? { lining, floor: Infinity, top: -Infinity };
+      if (c.slab.bottom > f.top) [f.lining, f.top] = [lining, c.slab.bottom];
+      f.floor = Math.min(f.floor, c.floorZ);
+      faces.set(j, f);
+    }
+  }
+  for (const [j, { lining, floor, top }] of faces) {
+    const x = j % W;
+    const n = p.get(x, (j - x) / W);
+    const dado = lining.dado ? [{ to: floor + 1, tex: lining.dado }] : [];
+    if (n.wall) p.set(x, (j - x) / W, { ...n, wall: lining.wall, ...(dado.length && { bands: dado }) });
+    else p.set(x, (j - x) / W, { ...n, bands: [...dado, { to: top, tex: lining.wall }, ...(n.bands ?? [])] });
+  }
+}
 
 // ---------------------------------------------------------------- the farm's ground and its walls
 // The farm's packed ground inside its windbreak (3 m), an L: a strip along
@@ -320,7 +379,7 @@ lights.push({ x: 160, y: 50, z: COURT + 1, radius: 6, light: 56 }); // the cart 
 // stair down to the reservoir. Tunnels 4 wide, ceilings at 2 m.
 doorway(33, 44, 35, 48, 'W');
 dig(35, 44, 50, 48);
-dig(46, 46, 58, 58, { light: 104 });
+dig(46, 46, 58, 58, { light: 104, floor: 'yard-plate' });
 lights.push({ x: 52, y: 52, z: PIT + 3, radius: 6, light: 48 });
 // Secret 1: the hidey-hole off the tunnel's north side, where the family
 // hid Rusk, behind a door in the plaster.
@@ -338,19 +397,19 @@ list.push(at('med-kit', 36.5, 35.5), at('thermal-detonator', 42.5, 38.5));
 // Imperials' work lamps. At its east end, 12 steps up north under the wall
 // to the tunnel east of the workshop pit.
 p.rect(40, 66, 112, 92, sand(FARM)); // the sand over it, out of reach
-const vault = { ceilZ: RESERVOIR + 9, top: FARM, floor: 'flagstone', ceiling: 'sandstone-dark', side: 'sandstone', light: 80 };
-stairDown(50, 58, 54, 74, PIT, { flight: 7, to: RESERVOIR, side: 'sandstone' });
+const vault = { ceilZ: RESERVOIR + 9, top: FARM, lining: RESERVOIR_WALLS, floor: 'derelict-floor', light: 80 };
+stairDown(50, 58, 54, 74, PIT, { flight: 7, to: RESERVOIR, lining: RESERVOIR_WALLS, floor: 'derelict-floor' });
 under(44, 74, 108, 86, { ...vault, floorZ: RESERVOIR });
 under(44, 78, 108, 86, { ...vault, floorZ: RESERVOIR - 0.5, floor: 'water-murky', light: 72 });
 for (const x of [56, 66, 76, 86, 96]) p.rect(x, 80, x + 2, 82, { wall: 'sandstone' });
-stairDown(100, 58, 104, 74, PIT, { flight: 7, to: RESERVOIR, side: 'sandstone' });
+stairDown(100, 58, 104, 74, PIT, { flight: 7, to: RESERVOIR, lining: RESERVOIR_WALLS, floor: 'derelict-floor' });
 lights.push({ x: 70, y: 75.5, z: RESERVOIR + 1, radius: 7, light: 64 }, { x: 99, y: 75.5, z: RESERVOIR + 1, radius: 7, light: 64 });
 
 // ---------------------------------------------------------------- 4. the workshop
 // The droid workshop dug north of the workshop pit, the shed's stair coming
 // down into it. Up from the reservoir, the tunnel runs west into the pit;
 // east, toward the house, it caved in, in sight from the stair's head.
-dig(70, 26, 88, 40, { light: 120 });
+dig(70, 26, 88, 40, { light: 120, floor: 'yard-plate' });
 doorway(78, 40, 82, 45, 'S');
 // The shed's stair: down its west wall under the yard, eight steps, a
 // landing, then eight more on down the workshop's west wall, open to the room.
@@ -376,7 +435,7 @@ list.push(at('shield-unit', 91.5, 60.5), at('energy-pack', 96.5, 60.5));
 // and a tunnel from the common room round to the storeroom (a loop for the
 // fight).
 // (Under the hall's ceiling while it's in the hall; then stepping down with the flight.)
-stairDown(158, 22, 162, 32, HALL, { start: 21, flight: 7, to: MID, ceilZ: (f, old, t) => (old.slab ? old.slab.bottom : Math.min(t - 0.25, f + 4.5)) });
+stairDown(158, 22, 162, 32, HALL, { start: 21, flight: 7, to: MID, lining: HOUSE, ceilZ: (f, old, t) => (old.slab ? old.slab.bottom : Math.min(t - 0.25, f + 4.5)) });
 doorway(158, 32, 162, 35, 'S', MID);
 // From the doorway, halfway down the courtyard's north wall, a stair 3 wide
 // down the wall's inside, east and round to the floor: a landing, then
@@ -400,14 +459,14 @@ doorway(158, 32, 162, 35, 'S', MID);
   });
   list.push({ type: 'arch-hood-3-pale', x: cx, y: cy - inner + 0.01, z: COURT, angle: 0 });
 }
-dig(138, 40, 146, 52, { floorZ: COURT, light: 112 });
+dig(138, 40, 146, 52, { floorZ: COURT, light: 112, lining: HOUSE });
 doorway(146, 44, 149, 48, 'E', COURT);
 lights.push({ x: 142, y: 46, z: COURT + 3, radius: 6, light: 40 });
 doorway(171, 44, 174, 48, 'W', COURT);
-dig(174, 38, 186, 54, { floorZ: COURT, light: 96 });
+dig(174, 38, 186, 54, { floorZ: COURT, light: 96, lining: HOUSE });
 lights.push({ x: 180, y: 46, z: COURT + 3, radius: 5, light: 32 });
 doorway(158, 57, 162, 61, 'N', COURT);
-dig(150, 61, 170, 70, { floorZ: COURT, light: 96 });
+dig(150, 61, 170, 70, { floorZ: COURT, light: 96, lining: HOUSE });
 lights.push({ x: 160, y: 65, z: COURT + 3, radius: 5, light: 32 });
 dig(140, 52, 144, 66, { floorZ: COURT, light: 88 });
 dig(144, 62, 150, 66, { floorZ: COURT, light: 88 });
@@ -416,13 +475,13 @@ dig(144, 62, 150, 66, { floorZ: COURT, light: 88 });
 // Six steps down from the storeroom: cold and dark, the cistern's pool along
 // its south side, the lamp knocked over and still lit on the floor, the
 // recordings behind a loose stone at its east end.
-stairDown(152, 70, 156, 76, COURT - 0.5, { ceilZ: (f) => Math.min(COURT + 4, f + 4), light: 80 });
-under(144, 76, 166, 88, { floorZ: CELLAR, ceilZ: CELLAR + 4, ceiling: 'sandstone-dark', light: 72 });
-under(146, 83, 158, 87, { floorZ: CELLAR - 0.5, ceilZ: CELLAR + 4, floor: 'water-murky', ceiling: 'sandstone-dark', light: 64 });
+stairDown(152, 70, 156, 76, COURT - 0.5, { ceilZ: (f) => Math.min(COURT + 4, f + 4), light: 80, lining: HOUSE });
+under(144, 76, 166, 88, { floorZ: CELLAR, ceilZ: CELLAR + 4, lining: CISTERN, light: 72 });
+under(146, 83, 158, 87, { floorZ: CELLAR - 0.5, ceilZ: CELLAR + 4, floor: 'water-murky', lining: CISTERN, light: 64 });
 lights.push({ x: 161.5, y: 79.5, z: CELLAR + 0.3, radius: 4, light: 40 });
 tag(162, 77, 166, 81, 'recordings');
 // Secret 3: a niche behind a loose panel in the cellar's west wall.
-const niche = { floorZ: CELLAR, ceilZ: CELLAR + 2.5, floor: 'sandstone', ceiling: 'sandstone-dark', side: 'sandstone', light: 64 };
+const niche = { floorZ: CELLAR, ceilZ: CELLAR + 2.5, floor: 'sandstone', lining: ROCK, light: 64 };
 under(139, 78, 143, 84, niche);
 under(143, 80, 144, 82, { ...niche, extra: { door: 'sandstone', style: 'rise', secret: true } });
 secret(139, 78, 144, 84);
@@ -476,6 +535,7 @@ p.rect(128, 76, 196, 142, (x, y, c) => {
   const tall = s > CAVERN[0] && s < CAVERN[1] ? 4 + 5 * Math.sin((Math.PI * (s - CAVERN[0])) / (CAVERN[1] - CAVERN[0])) : 0;
   const top = topOf(c);
   const ceil = Math.min(top - 1, f + (s < STEPS ? 4 : 4.25 + tall + valueNoise(x, y, 4, 49)));
+  linings.set(y * W + x, ROCK);
   return {
     floor: 'desert-gravel', ceiling: 'sky', floorZ: f, ceilZ: SKY, light: c.light ?? SUN, side: 'sandstone',
     slab: { bottom: quarter(ceil), top, floor: c.floor ?? 'desert-sand', ceiling: 'sandstone-dark', side: c.side ?? 'desert-sand', light: s < STEPS ? 64 : 72 },
@@ -500,6 +560,8 @@ lights.push(
 // tunnel, the pump room, the reservoir's two, the workshop, the house's
 // loop tunnel and quarters, and the well room's (its only way in).
 for (const [x, y] of [[40, 45], [51, 51], [61, 83], [81, 83], [84, 30], [141, 57], [179, 41], [93, 58]]) well(x, y);
+
+lineDug();
 
 // The pits' walls in two tones (lib/farm.js): whitewash to about 2.25 m in
 // the small pits and 3 m in the courtyard, rising over each doorway, bare

@@ -1311,8 +1311,20 @@ snapshots, playable at `?map=m2`.
         mechanical detail through the rooms, tunnels and caves (pipes,
         pumps, conduit, vents, hatches, metal floors where people work);
         a texture pass from the Dark Forces pack so the sandstone is for
-        bare rock only. Plan it area by area with Mark before building.
-        From the references:
+        bare rock only. Mark (2026-11-08): just do it, looking at the
+        references. A commit each, snapshots before and after:
+    - [x] Textures by area: every dug room's walls its own (now they are
+          the side of whatever ground is over them, so sand in the
+          reservoir and the caves), white plaster vaults for the house's
+          rooms and the tunnels (not planks), a red-ochre dado along the
+          tunnels as in the pits; duracrete in the reservoir and the
+          cistern; bare rock in the caves.
+    - [ ] Machinery: the water pipe along the tunnels' ceilings from the
+          garden pit to the house (Jan's "follow the water pipe"),
+          conduit, vents, wall units and tanks; metal deck and grating
+          where people work (the pump room, the workshop, the reservoir's
+          walkway); a pipe band along the reservoir's north wall.
+          From the references:
     - [ ] The garage round, not a box: a ring of round amber lamps
           under its ceiling, a round grating floor in a kerb, the
           console (dials, a gauge, two screens), wall lamps,
