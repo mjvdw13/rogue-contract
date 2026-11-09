@@ -106,6 +106,8 @@ const TOWN_DECALS = [
   // Bare brick where the plaster has fallen, and oil in the sand (the
   // clutter's `oil` models wear it).
   'brick-bare-1', 'brick-bare-2', 'oil',
+  // An oval niche in the homestead's white plaster (m2's rooms).
+  'niche-oval',
 ];
 
 // Mos Eisley's fences, derive.mjs: the derelict bay's rusty railing.

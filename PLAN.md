@@ -28,6 +28,18 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
+- **Mission 2 under the ground** (`?map=m2`, 2026-11-08, after the
+  references): the rooms lined by what they are (whitewash and the
+  red-ochre dado in the tunnels, white plaster in the house, duracrete in
+  the reservoir and cistern, rock only in the caves); the water pipe from
+  the garden court to the cave-in, the pump, conduit, tanks, vents,
+  hatches, deck plates and the reservoir's grating; the garage round (the
+  amber lamp ring, the sunk grating in its kerb, the console, the framed
+  opening); the storeroom as the kitchen (white counters, cupboards with
+  the red stripe, appliances) and the common room's red rug and oval
+  niches. To judge: whether the white reads white enough in the rooms'
+  light, the reservoir's walls (busy?), the size of the garage's kerb.
+
 - **Mission 2's pits, dome, evening and blowing sand** (`?map=m2`,
   2026-11-08): the pits' walls in two tones (earth above, whitewash with a
   wavy edge rising over each doorway, a red-ochre dado), round-topped
@@ -1276,63 +1288,6 @@ snapshots, playable at `?map=m2`.
 - [x] The caves after Mark asked for it longer (2026-11-06): Rusk's way
       out of the cellar, down through caves under the pad and up into
       the garage pit (the route 745 steps, from 631).
-- [ ] **Mark's notes on the caves blockout** (2026-11-07: the flow is
-      right):
-  - [x] Deeper pits: 6 m (Mark, 2026-11-07), from 3. The pits at -11.5,
-        everything under them down by the same 6 (the tunnels' ceilings
-        -7.5, the reservoir -19.5, the cellar -14.5, the caves about -21).
-        The three stairs from the surface get 12 more steps each:
-    - [x] The shed's stair: along the shed's west wall, on down the
-          workshop's west wall.
-    - [x] The dome's stair: to a doorway halfway down the courtyard's
-          wall, then a stair curving down the wall's inside to the east
-          (the quarters' doorway moved south of it).
-    - [x] The trench: on down into the garage pit as a straight flight,
-          its foot at the garage's shutter.
-    - [x] Check: validate, snapshots of each stair and pit, the route
-          measured; `docs/mission2.md`'s heights.
-  - [x] Shorter stairs (Mark, 2026-11-07: the courtyard's curved stair is
-        good, the others too long). No flight over 8 steps, a landing
-        between flights:
-    - [x] Depth by size: the courtyard stays 6 m; the garden, workshop
-          and garage pits 4 m (-7.5), with their tunnels and rooms.
-    - [x] The shed's stair: 8, a landing, 8 (from 24 unbroken).
-    - [x] The reservoir 6 m under the farm (-13.5, from -19.5): each of
-          its stairs two short flights with a landing (from 16 unbroken).
-    - [x] The dome's stair: 6, a landing, 6, then the doorway and the curve.
-    - [x] The pad, the wash and the flat 1.75 m lower (outside the
-          windbreak, so nothing joins up): the trench 8 steps, from the pit's
-          south rim (from 24).
-    - [x] The caves: Rusk's steps 6 (from 12), the climb to the garage pit
-          gentler and longer.
-    - [x] Check: validate, cell dumps of every stair, snapshots, the
-          route; `docs/mission2.md`; Waiting on Mark.
-  - [ ] Underground and indoors not all sand: a garage proper and
-        mechanical detail through the rooms, tunnels and caves (pipes,
-        pumps, conduit, vents, hatches, metal floors where people work);
-        a texture pass from the Dark Forces pack so the sandstone is for
-        bare rock only. Mark (2026-11-08): just do it, looking at the
-        references. A commit each, snapshots before and after:
-    - [x] Textures by area: every dug room's walls its own (now they are
-          the side of whatever ground is over them, so sand in the
-          reservoir and the caves), white plaster vaults for the house's
-          rooms and the tunnels (not planks), a red-ochre dado along the
-          tunnels as in the pits; duracrete in the reservoir and the
-          cistern; bare rock in the caves.
-    - [x] Machinery: the water pipe along the tunnels' ceilings from the
-          garden pit to the house (Jan's "follow the water pipe"),
-          conduit, vents, wall units and tanks; metal deck and grating
-          where people work (the pump room, the workshop, the reservoir's
-          walkway); a pipe band along the reservoir's north wall.
-          From the references:
-    - [x] The garage round, not a box: a ring of round amber lamps
-          under its ceiling, a round grating floor in a kerb, the
-          console (dials, a gauge, two screens), wall lamps,
-          rounded-square openings. It stays in its pit (Mark,
-          2026-11-07), opening on it; no mound on the surface.
-    - [ ] The common room and storeroom as the kitchen: a smooth white
-          vault, white counters along both sides with a red stripe,
-          appliances in niches, oval niches in the plaster, a red rug.
 - [x] **The pits' walls and doorways** (from the references, before
       "Each area in detail"; a kit in `lib/town.js` or a new
       `lib/farm.js`, used by every pit):
@@ -1399,13 +1354,12 @@ snapshots, playable at `?map=m2`.
 - [ ] **Each area in detail,** in the order you meet them, snapshots
       before and after each:
   - [ ] The garden pit and the pump tunnels: grow beds and grow lamps,
-        the water tank, sand streaming over its rim; the water pipe on the
-        tunnels' ceilings (running east to the house's cistern: the way),
-        the pump room's pump, the light wells, the hidey-hole (secret,
-        Rusk's bedroll).
-  - [ ] The reservoir: its stairs, the pillars, the pipe along its north
-        wall, the Imperials' work lamps and cables, the shafts of evening
-        light on the water, drips, the pool's edge.
+        the water tank (the pipe comes down out of the garden court beside
+        it), sand streaming over its rim, the light wells, the hidey-hole
+        (secret, Rusk's bedroll).
+  - [ ] The reservoir: its stairs, the pillars, the Imperials' work
+        lamps and cables, the shafts of evening light on the water, drips,
+        the pool's edge.
   - [ ] The workshop pit and the workshop: oil, droid parts, the
         burning speeder, the caved-in tunnel's rubble and broken
         support, the bench and pit droid, the shed's stairwell, the well

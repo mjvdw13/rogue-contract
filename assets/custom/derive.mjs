@@ -294,6 +294,9 @@ const REVEAL = { width: 3, color: [52, 38, 26] };
 const RUSTY_GREY = [[26, 20, 14], [70, 58, 46], [116, 108, 96], [156, 150, 138], [196, 190, 176]];
 const TEAL = [[4, 16, 18], [16, 58, 62], [44, 116, 118], [110, 190, 188]];
 export const DECALS = [
+  // An oval niche in the homestead's white plaster (Mark's references),
+  // a tall oval (0.8 by 1.75 tiles), darker inside toward its top.
+  { out: 'niche-oval', df: 'GWANO', crop: [0, 0, 64, 128], size: [26, 56], gradient: [[120, 112, 92], [178, 170, 146], [208, 202, 178], [226, 222, 202], [240, 238, 224]], keep: 0, contrast: 0.25, mask: 'oval', rim: { width: 2.5 } },
   // Doors after the film's (Mark's reference, 2026-10-17): a panel with a
   // lattice of braces (IDDOOR1), red-brown or grey, its corners rounded to
   // fit the tiled jamb round it (models/door-jamb.js), 2 tiles by 3.
@@ -499,6 +502,27 @@ function resized(img, [w, h]) {
 /** Cut a decal's shape out (see DECALS): transparent outside it, the rim darkened inside its edge. */
 function masked(img, { mask, r = 0, rim, seed = 1 }) {
   const { width: w, height: h, data: d } = img;
+  if (mask === 'oval') {
+    // A niche: an oval cut into the plaster, darker inside toward its top
+    // (the lip's shadow), its rim darkened by `rim`.
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const i = (y * w + x) * 4;
+        const u = ((x + 0.5) / w) * 2 - 1;
+        const v = ((y + 0.5) / h) * 2 - 1;
+        const q = u * u + v * v;
+        if (q >= 1) {
+          d[i + 3] = 0;
+          continue;
+        }
+        d[i + 3] = 255;
+        const e = (1 - Math.sqrt(q)) * Math.min(w, h) * 0.5;
+        const shade = 0.5 + 0.3 * ((v + 1) / 2) + (rim && e < rim.width ? -0.2 * (1 - e / rim.width) : 0);
+        for (let k = 0; k < 3; k++) d[i + k] = Math.round(d[i + k] * shade);
+      }
+    }
+    return img;
+  }
   if (mask === 'blob') {
     // A ragged blob: in where a noise beats the distance from the middle,
     // with holes where the noise dips (the cut edge darkened by `rim`).

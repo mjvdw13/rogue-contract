@@ -470,10 +470,27 @@ doorway(171, 44, 174, 48, 'W', COURT);
 dig(174, 38, 186, 54, { floorZ: COURT, light: 96, lining: HOUSE });
 lights.push({ x: 180, y: 46, z: COURT + 3, radius: 5, light: 32 });
 doorway(158, 57, 162, 61, 'N', COURT);
-dig(150, 61, 170, 70, { floorZ: COURT, light: 96, lining: HOUSE });
-lights.push({ x: 160, y: 65, z: COURT + 3, radius: 5, light: 32 });
+dig(150, 61, 170, 70, { floorZ: COURT, light: 104, lining: HOUSE });
+lights.push({ x: 160, y: 65, z: COURT + 3, radius: 7, light: 48 });
 dig(140, 52, 144, 66, { floorZ: COURT, light: 88 });
 dig(144, 62, 150, 66, { floorZ: COURT, light: 88 });
+
+// The storeroom is the kitchen, after the film's (Mark's references): white
+// built-in counters along both long walls with cupboards over them, a red
+// stripe along their fronts and lights under them, the appliances stacked
+// against the east end, and an oval niche in the plaster. The common room
+// has the red rug and oval niches round its walls.
+for (const [type, x, y, face] of [
+  ['kitchen-counter-6', 154.5, 61, 'S'], ['kitchen-counter-6', 166, 61, 'S'],
+  ['kitchen-counter-6', 159.5, 70, 'N'], ['kitchen-counter-7', 166.5, 70, 'N'],
+  ['kitchen-appliances', 170, 64.2, 'W'], ['kitchen-appliances', 170, 66.6, 'W'],
+]) town.fixture(type, x, y, face, { z: COURT });
+p.rect(140, 43, 145, 50, (_, __, c) => ({ ...c, floor: 'rug-red' }));
+decals.push(
+  ...[[42.5, 'E'], [49.5, 'E']].map(([y, face]) => ({ x: 138, y, z: COURT + 2.3, face, tex: 'niche-oval' })),
+  ...[141, 144].map((x) => ({ x, y: 40, z: COURT + 2.3, face: 'S', tex: 'niche-oval' })),
+  { x: 150, y: 68.5, z: COURT + 2.4, face: 'E', tex: 'niche-oval' },
+);
 
 // ---------------------------------------------------------------- 8. the cellar
 // Six steps down from the storeroom: cold and dark, the cistern's pool along

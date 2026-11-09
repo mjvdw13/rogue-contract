@@ -27,7 +27,7 @@ import { BUNK, BUNKS } from './models/hostel.js';
 import { FIRE_DRUM } from './models/quarter.js';
 import { STALL, STABLE_POST, FEED } from './models/stable.js';
 import { VAPORATORS } from './models/vaporator.js';
-import { FARM_MODELS, PUMP, CONSOLE as GARAGE_CONSOLE, GARAGE_RING } from './models/farm.js';
+import { FARM_MODELS, PUMP, CONSOLE as GARAGE_CONSOLE, GARAGE_RING, COUNTER, APPLIANCES } from './models/farm.js';
 
 // Scenery. Solid ones block movement; ones with health can be shot (and
 // `explode`).
@@ -114,6 +114,10 @@ export default [
   defineDecoration({ id: 'water-pump', model: 'water-pump', solid: true, height: PUMP.top, fixed: true }),
   // The garage's console, colliding as its desk, as high as its back panel.
   defineDecoration({ id: 'garage-console', model: 'garage-console', solid: true, height: GARAGE_CONSOLE.top, fixed: true }),
+  // The kitchen's counters and appliances, colliding as their outlines, the
+  // counters as high as their worktops (shots go over them).
+  ...COUNTER.lengths.map((l) => defineDecoration({ id: `kitchen-counter-${l}`, model: `kitchen-counter-${l}`, solid: true, height: COUNTER.top, fixed: true })),
+  defineDecoration({ id: 'kitchen-appliances', model: 'kitchen-appliances', solid: true, height: APPLIANCES.top, fixed: true }),
   // Things on Mos Eisley's streets: crates, drums, canisters, junk, rubble, scrap, a vaporator.
   ...Object.entries(CLUTTER).map(([id, c]) => defineDecoration({ id, model: id, solid: !!c.solid, radius: c.radius, height: c.height, fixed: true })),
   // The Homestead's vaporators (models/vaporator.js): the courtyard's cluster,

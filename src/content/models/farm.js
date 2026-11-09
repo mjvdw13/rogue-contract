@@ -247,6 +247,64 @@ function openingFrame(width, tall) {
   return m.build();
 }
 
+/** The kitchen's counters: their lengths, the worktop's height and depth. */
+export const COUNTER = { lengths: [2, 3, 4, 5, 6, 7], top: 0.95, depth: 0.68 };
+/** The kitchen's stack of appliances: its half width, depth and height. */
+export const APPLIANCES = { half: 0.38, depth: 0.6, top: 1.6 };
+
+const WHITE = { tex: 'plaster-white' };
+const SEAM = { color: [96, 92, 80] };
+/** The red stripe along the cupboards (the film's kitchen). */
+const STRIPE = { color: [176, 60, 46] };
+
+/**
+ * A run of the kitchen's built-in counter, after the film's (Mark's
+ * references): smooth white cupboards under a worktop with a rounded nose,
+ * a dark kick at the foot, and cupboards over it on the wall with a red
+ * stripe along their fronts and a light under them. `len` long, built
+ * looking +y with its back on y = 0.
+ */
+function counter(len) {
+  const m = new ModelBuilder(`kitchen-counter-${len}`);
+  const a = len / 2;
+  const { top, depth: d } = COUNTER;
+  const doors = (z0, z1, y) => {
+    for (let x = -a + 0.6; x < a - 0.3; x += 0.6) m.box([x - 0.012, y, z0], [x + 0.012, y + 0.01, z1], { ...SEAM, bottom: false });
+  };
+  m.box([-a, 0, 0], [a, d - 0.08, 0.12], { color: [40, 36, 30], bottom: false });
+  m.box([-a, 0, 0.12], [a, d - 0.06, top - 0.1], { ...WHITE, bottom: false });
+  doors(0.16, top - 0.14, d - 0.06);
+  m.box([-a, 0, top - 0.1], [a, d - 0.04, top], WHITE);
+  m.cylinder([-a, d - 0.05, top - 0.05], 0.05, len, { axis: 'x', segments: 6, ...WHITE });
+  // The cupboards over it, the stripe, the light under them.
+  m.box([-a, 0, 1.65], [a, 0.38, 2.4], WHITE);
+  doors(1.68, 2.37, 0.38);
+  m.box([-a, 0.38, 1.95], [a, 0.395, 2.05], { ...STRIPE, bottom: false });
+  m.box([-a + 0.1, 0.24, 1.635], [a - 0.1, 0.34, 1.65], { color: [255, 236, 190], glow: true, top: false });
+  m.outlineLines([[-a, 0], [a, 0], [a, d], [-a, d]]);
+  return m.build();
+}
+
+/**
+ * The kitchen's appliances, stacked in a niche (the film's): a low unit
+ * with a dark grille and two lamps, and on it a taller one with a dark
+ * window, a column of lit buttons and a red trim along its top. Built
+ * looking +y with its back on y = 0.
+ */
+function appliances() {
+  const m = new ModelBuilder('kitchen-appliances');
+  const { half: a, depth: d, top } = APPLIANCES;
+  m.box([-a, 0, 0], [a, d, 0.85], { ...WHITE, bottom: false });
+  m.box([-a + 0.08, d, 0.15], [a - 0.08, d + 0.01, 0.6], { color: [30, 28, 26], bottom: false });
+  for (const [x, color] of [[-0.2, [255, 60, 40]], [-0.08, [90, 255, 90]]]) m.box([x - 0.03, d, 0.7], [x + 0.03, d + 0.015, 0.76], { color, glow: true, bottom: false });
+  m.box([-a + 0.03, 0.05, 0.85], [a - 0.03, d - 0.05, top], WHITE);
+  m.box([-a + 0.12, d - 0.05, 1.02], [0.08, d - 0.04, 1.42], { color: [24, 30, 34], bottom: false });
+  [[255, 172, 70], [255, 60, 40], [90, 200, 255]].forEach((color, k) => m.box([0.17, d - 0.05, 1.12 + k * 0.1], [0.25, d - 0.035, 1.18 + k * 0.1], { color, glow: true, bottom: false }));
+  m.box([-a + 0.03, d - 0.05, top - 0.08], [a - 0.03, d - 0.035, top], { ...STRIPE, bottom: false });
+  m.outlineLines([[-a, 0], [a, 0], [a, d], [-a, d]]);
+  return m.build();
+}
+
 export const FARM_MODELS = [...PIPE_RUNS.map((l) => `water-pipe-${l}`), ...PIPE_RISES.map((h) => `water-pipe-up-${h}`), 'water-pipe-joint', 'floor-hatch', 'garage-ring', 'garage-kerb', 'garage-frame-4'];
 
-export default [...PIPE_RUNS.map(run), ...PIPE_RISES.map(rise), joint(), pump(), hatch(), garageRing(), garageKerb(), garageConsole(), openingFrame(4, 3.5)];
+export default [...PIPE_RUNS.map(run), ...PIPE_RISES.map(rise), joint(), pump(), hatch(), garageRing(), garageKerb(), garageConsole(), openingFrame(4, 3.5), ...COUNTER.lengths.map(counter), appliances()];

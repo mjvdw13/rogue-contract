@@ -251,6 +251,14 @@ model over the tiles' stepped edge). The console against the north wall:
 a big gauge, two lit screens, dials, lamps and lit buttons. A thick frame
 with rounded top corners round the opening onto the pit. Oil on the floor.
 
+**The kitchen and the common room** (as built): the storeroom is the
+kitchen. White built-in counters run along both long walls (a dark kick,
+cupboard doors, a worktop with a rounded nose), with cupboards over them
+carrying a red stripe and lights under them. Two stacks of appliances
+stand against the east end (dark windows, lit buttons, a red trim), and
+there's an oval niche in the west wall. The common room has the red rug
+and four tall oval niches round its walls (`niche-oval`, a decal).
+
 ## Grid and size
 
 - **208 × 214 tiles** (104 × 107 m). The farm inside its windbreak is an
