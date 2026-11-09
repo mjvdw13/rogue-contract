@@ -39,5 +39,6 @@ import hostel from './hostel.js';
 import quarter from './quarter.js';
 import stable from './stable.js';
 import vaporators from './vaporator.js';
+import farm from './farm.js';
 
-export default [terminal, reactorRing, coolantTank, shuttle, ...barricades, boulderLarge, boulderSmall, ...floodlightTowers, sensorMast, sensorDish, ...domes, doorJamb, ...doorLips, ...arches, ...buttresses, ...awnings, ...tin, ...pipes, ...clutter, landspeeder, ...bay, moldyCrow, ...market, ...cantina, ...hitching, ...pod, ...stains, ...sandcrawler, ...junkPiles, ...furnace, ...skiff, ...droids, ...racks, ...freighter, ...scaffolds, ...balcony, ...hold, ...garage, ...hostel, ...quarter, ...stable, ...vaporators];
+export default [terminal, reactorRing, coolantTank, shuttle, ...barricades, boulderLarge, boulderSmall, ...floodlightTowers, sensorMast, sensorDish, ...domes, doorJamb, ...doorLips, ...arches, ...buttresses, ...awnings, ...tin, ...pipes, ...clutter, landspeeder, ...bay, moldyCrow, ...market, ...cantina, ...hitching, ...pod, ...stains, ...sandcrawler, ...junkPiles, ...furnace, ...skiff, ...droids, ...racks, ...freighter, ...scaffolds, ...balcony, ...hold, ...garage, ...hostel, ...quarter, ...stable, ...vaporators, ...farm];

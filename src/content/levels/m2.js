@@ -4,6 +4,7 @@ import { Town } from './lib/town.js';
 import { valueNoise } from './lib/noise.js';
 import { pitWalls, pitDoorway, blindDoor } from './lib/farm.js';
 import { SENSOR_Z, PANEL } from '../models/vaporator.js';
+import { PUMP } from '../models/farm.js';
 
 // MISSION 2: THE HOMESTEAD. The layout, route and numbers are in
 // docs/mission2.md (area numbers below match its table). The blockout:
@@ -55,6 +56,7 @@ const town = new Town(p, { sky: SKY, light: SUN, wall: 'adobe-pale', floor: 'des
 const at = (type, x, y, extra = {}) => ({ type, x, y, ...extra });
 const list = [];
 const lights = [];
+const decals = [];
 const quarter = (z) => Math.round(z * 4) / 4;
 
 // ---- Cells
@@ -401,6 +403,8 @@ const vault = { ceilZ: RESERVOIR + 9, top: FARM, lining: RESERVOIR_WALLS, floor:
 stairDown(50, 58, 54, 74, PIT, { flight: 7, to: RESERVOIR, lining: RESERVOIR_WALLS, floor: 'derelict-floor' });
 under(44, 74, 108, 86, { ...vault, floorZ: RESERVOIR });
 under(44, 78, 108, 86, { ...vault, floorZ: RESERVOIR - 0.5, floor: 'water-murky', light: 72 });
+// The walkway a grating over the damp.
+p.rect(44, 74, 108, 78, (_, __, c) => (c.slab ? { ...c, floor: 'hold-floor' } : c));
 for (const x of [56, 66, 76, 86, 96]) p.rect(x, 80, x + 2, 82, { wall: 'sandstone' });
 stairDown(100, 58, 104, 74, PIT, { flight: 7, to: RESERVOIR, lining: RESERVOIR_WALLS, floor: 'derelict-floor' });
 lights.push({ x: 70, y: 75.5, z: RESERVOIR + 1, radius: 7, light: 64 }, { x: 99, y: 75.5, z: RESERVOIR + 1, radius: 7, light: 64 });
@@ -563,12 +567,83 @@ for (const [x, y] of [[40, 45], [51, 51], [61, 83], [81, 83], [84, 30], [141, 57
 
 lineDug();
 
+// ---------------------------------------------------------------- the machinery under the ground
+// After the cutaway in Mark's references: the farm's water pipe on its
+// brackets from where it comes down out of the garden court, along the pump
+// tunnel to the pump, along the reservoir's north wall over a band of
+// pipework, and on east along the tunnel past the workshop pit until the
+// cave-in (Jan: "follow the water pipe"). Conduit, tanks, units, gauges,
+// vents and hatches where people work.
+/**
+ * The water pipe (models/farm.js) along a path of points on its axis,
+ * [x, y, z, wall]: each leg straight along x, along y or upright, its
+ * brackets back to the wall on side `wall` (N, E, S or W) of the point it
+ * leaves from; a flanged joint at each turn, and where a leg over 16 long
+ * is joined. Legs come in quarter tiles.
+ */
+function waterPipe(path) {
+  const turn = { N: 0, W: 90, S: 180, E: 270 };
+  const put = (type, x, y, z, wall) => list.push({ type, x, y, z, angle: turn[wall] });
+  for (let i = 1; i < path.length; i++) {
+    const [ax, ay, az, wall] = path[i - 1];
+    const [bx, by, bz] = path[i];
+    const len = Math.abs(bx - ax) + Math.abs(by - ay) + Math.abs(bz - az);
+    const n = Math.ceil(len / 16);
+    const piece = len / n;
+    if ([ax !== bx, ay !== by, az !== bz].filter(Boolean).length !== 1 || piece * 4 !== Math.round(piece * 4)) throw new Error(`m2: the water pipe's leg from (${ax}, ${ay}, ${az}) to (${bx}, ${by}, ${bz}) must be straight and in quarter tiles`);
+    for (let k = 0; k < n; k++) {
+      if (az !== bz) put(`water-pipe-up-${piece}`, ax, ay, Math.min(az, bz) + k * piece, wall);
+      else put(`water-pipe-${piece}`, ax + ((bx - ax) * (k + 0.5)) / n, ay + ((by - ay) * (k + 0.5)) / n, az, wall);
+      if (k > 0) put('water-pipe-joint', ax + ((bx - ax) * k) / n, ay + ((by - ay) * k) / n, az + ((bz - az) * k) / n, wall);
+    }
+    if (i < path.length - 1) put('water-pipe-joint', bx, by, bz, path[i][3]);
+  }
+}
+/** Where the pipe hangs: half a tile under a tunnel's ceiling. */
+const HUNG = PIT + 3.5;
+// Down out of the garden court, along the pump tunnel's north wall, round
+// the step into the pump room, and down its wall into the pump.
+const PUMP_AT = [54, 46 + 0.25 + PUMP.back];
+waterPipe([[35.5, 44.25, PIT + 4, 'N'], [35.5, 44.25, HUNG, 'N'], [49.75, 44.25, HUNG, 'E'], [49.75, 46.25, HUNG, 'N'], [54, 46.25, HUNG, 'N'], [54, 46.25, PIT + PUMP.inlet]]);
+list.push({ type: 'water-pump', x: PUMP_AT[0], y: PUMP_AT[1], z: PIT, angle: 0 });
+// The reservoir: in through its west wall over the stairs' lintels, the
+// whole length of the north wall, and up the east end into the vault.
+const RES_PIPE = RESERVOIR + 5;
+waterPipe([[43.75, 74.25, RES_PIPE, 'N'], [107.75, 74.25, RES_PIPE, 'E'], [107.75, 74.25, RESERVOIR + 9]]);
+// Pipework along the foot of the north wall, under the pipe (not across
+// the stairs' openings).
+p.rect(44, 73, 108, 74, (_, __, c) => (c.slab ? c : { ...c, bands: [{ from: RESERVOIR, to: RESERVOIR + 2, tex: 'pipe-band' }, ...(c.bands ?? [])] }));
+// Out of the ceiling past the workshop pit's doorway, east along the tunnel
+// until it goes under the cave-in.
+waterPipe([[90.5, 50.25, PIT + 4, 'N'], [90.5, 50.25, HUNG, 'N'], [106.5, 50.25, HUNG]]);
+// Conduit, tanks, units and gauges on the walls; vents up by the ceilings;
+// hatches in the floors.
+const fittings = [
+  ['conduit-10', 40.5, 48, 'N', PIT + 2.75], // the pump tunnel
+  ['wall-tank', 58, 50.5, 'W', PIT + 1.6], ['wall-unit', 58, 54.5, 'W', PIT + 1.2], ['conduit-6', 55, 58, 'N', PIT + 2.75], // the pump room
+  ['wall-unit', 80, 26, 'S', PIT + 1.2], ['conduit-12', 81, 26, 'S', PIT + 3], ['wall-tank', 88, 33, 'W', PIT + 1.6], ['conduit-8', 80, 40, 'N', PIT + 3.1], // the workshop
+  ['conduit-8', 95, 54, 'N', PIT + 2.75], // the tunnel past the workshop pit
+  ['conduit-12', 140, 59, 'E', COURT + 2.75], // the house's loop tunnel
+];
+for (const [type, x, y, face, z] of fittings) town.fixture(type, x, y, face, { z });
+decals.push(
+  { x: 51.6, y: 46, z: PIT + 1.7, face: 'S', tex: 'wall-meter' }, // by the pump
+  { x: 46, y: 53, z: PIT + 3.2, face: 'E', tex: 'vent-grille' },
+  { x: 47, y: 48, z: PIT + 3.3, face: 'N', tex: 'vent-round', scale: 0.8 },
+  { x: 88, y: 29, z: PIT + 3.4, face: 'W', tex: 'vent-round' },
+  { x: 76, y: 26, z: PIT + 3.4, face: 'S', tex: 'wall-fan' },
+  { x: 86.5, y: 26, z: PIT + 1.6, face: 'S', tex: 'wall-meter' },
+  { x: 108, y: 82, z: RESERVOIR + 3, face: 'W', tex: 'vent-grille', scale: 1.5 },
+  { x: 44, y: 82, z: RESERVOIR + 3, face: 'E', tex: 'vent-grille', scale: 1.5 },
+  { x: 107, y: 54, z: PIT + 3.3, face: 'N', tex: 'vent-round', scale: 0.8 },
+);
+list.push(at('floor-hatch', 56.5, 56, { z: PIT }), at('floor-hatch', 76.5, 37.5, { z: PIT, angle: 30 }));
+
 // The pits' walls in two tones (lib/farm.js): whitewash to about 2.25 m in
 // the small pits and 3 m in the courtyard, rising over each doorway, bare
 // earth above it, the red-ochre dado at the foot.
 // Round-topped doorways in thick hoods; blind plank doors round the walls
 // (the farm's rooms we don't go into); the garage pit's two square.
-const decals = [];
 for (const [x0, y0, x1, y1, face, z] of DOORWAYS) pitDoorway(list, x0, y0, x1, y1, face, { floorZ: z, lintel: LINTEL });
 decals.push({ x: 160, y: 38, z: COURT + 2, face: 'S', tex: 'door-planks' }); // under the balcony
 const blind = (cx, cy, r, z, angles) => angles.map((a) => blindDoor(list, decals, cx, cy, r, a, { floorZ: z }));

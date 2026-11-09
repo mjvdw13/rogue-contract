@@ -27,6 +27,7 @@ import { BUNK, BUNKS } from './models/hostel.js';
 import { FIRE_DRUM } from './models/quarter.js';
 import { STALL, STABLE_POST, FEED } from './models/stable.js';
 import { VAPORATORS } from './models/vaporator.js';
+import { FARM_MODELS, PUMP } from './models/farm.js';
 
 // Scenery. Solid ones block movement; ones with health can be shot (and
 // `explode`).
@@ -106,6 +107,10 @@ export default [
   ...TIN_MODELS.map((id) => defineDecoration({ id, model: id, fixed: true })),
   // Pipes, conduits, a tank and a box unit on Mos Eisley's walls (against the wall, so not solid).
   ...PIPE_MODELS.map((id) => defineDecoration({ id, model: id, fixed: true })),
+  // Under the homestead (models/farm.js): the water pipe's pieces and a
+  // floor hatch, and the pump, colliding as its plinth, as high as its top.
+  ...FARM_MODELS.map((id) => defineDecoration({ id, model: id, fixed: true })),
+  defineDecoration({ id: 'water-pump', model: 'water-pump', solid: true, height: PUMP.top, fixed: true }),
   // Things on Mos Eisley's streets: crates, drums, canisters, junk, rubble, scrap, a vaporator.
   ...Object.entries(CLUTTER).map(([id, c]) => defineDecoration({ id, model: id, solid: !!c.solid, radius: c.radius, height: c.height, fixed: true })),
   // The Homestead's vaporators (models/vaporator.js): the courtyard's cluster,

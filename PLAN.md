@@ -1319,7 +1319,7 @@ snapshots, playable at `?map=m2`.
           rooms and the tunnels (not planks), a red-ochre dado along the
           tunnels as in the pits; duracrete in the reservoir and the
           cistern; bare rock in the caves.
-    - [ ] Machinery: the water pipe along the tunnels' ceilings from the
+    - [x] Machinery: the water pipe along the tunnels' ceilings from the
           garden pit to the house (Jan's "follow the water pipe"),
           conduit, vents, wall units and tanks; metal deck and grating
           where people work (the pump room, the workshop, the reservoir's

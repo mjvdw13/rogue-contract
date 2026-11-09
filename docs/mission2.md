@@ -229,6 +229,18 @@ the space's ceiling only, so nothing on the surface changes:
 - **The caves and the niche:** bare rock (`sandstone`), the only places
   it's used underground.
 
+The machinery (`models/farm.js`): the farm's water pipe, copper on iron
+brackets half a tile under the tunnels' ceilings, comes down out of the
+garden court, runs along the pump tunnel's north wall and down the pump
+room's wall into the pump (a grey housing, its motor, a gauge, the outlet
+down through a red-wheeled valve). In the reservoir it runs the whole
+north wall over the stairs' lintels, over a band of pipework along the
+wall's foot, and up the east end into the vault; past the workshop pit it
+runs east along the tunnel until it goes under the cave-in. Conduit,
+wall tanks and units, gauges, vents and fans on the working rooms' walls;
+round hatches in the pump room's and workshop's floors; the reservoir's
+walkway a grating.
+
 ## Grid and size
 
 - **208 × 214 tiles** (104 × 107 m). The farm inside its windbreak is an
