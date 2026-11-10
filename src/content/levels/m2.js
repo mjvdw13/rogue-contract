@@ -544,6 +544,47 @@ const GARAGE = { cx: 180, cy: 65, grate: 3.5, ceil: PIT + 4.5 };
   list.push(at('floor-spill-2', 177, 67.5, { z: PIT, angle: 20 }), at('floor-spill-1', 183, 63, { z: PIT + 0.25, angle: 110 }), at('floor-spill-1', 180.5, 70, { z: PIT + 0.25, angle: 200 }));
   lights.push({ x: cx, y: cy, z: ceil - 0.5, radius: 8, light: 56 }, { x: cx, y: 60, z: PIT + 2, radius: 4, light: 40 });
 }
+// The hangar off the garage's east side (the film's, where the skyhopper
+// stands through the second opening; Mark's notes, 2026-11-09): dug under
+// the drifts beyond the windbreak, 8 m across and 13 long, its floor 2 m
+// under the garage's and its roof at the ground, the roof's doors over the
+// skyhopper. A grate catwalk at the garage's floor runs along its west and
+// north walls behind a railing, and a stair goes down along the south
+// wall. It's under solid rock, not a slab, so the catwalk can be one.
+const HANGAR = { box: [190, 52, 207, 79], floor: PIT - 4, roof: 0, walk: PIT + 0.25 };
+{
+  const [x0, y0, x1, y1] = HANGAR.box;
+  const { floor, roof, walk } = HANGAR;
+  dig(187, 63, 190, 67, { floorZ: walk, ceilZ: walk + 3.5, floor: 'derelict-floor', lining: { wall: 'adobe', ceiling: 'hold-ceiling' }, light: 80 });
+  list.push({ type: 'garage-frame-4', x: 186.99, y: 65, z: walk, angle: 270 });
+  const room = { floor: 'derelict-floor', ceiling: 'hold-ceiling', floorZ: floor, ceilZ: roof, light: 124, side: 'hold-wall' };
+  p.rect(x0, y0, x1, y1, room);
+  p.rect(195, 58, 205, 72, { ...room, ceiling: 'door-bay-rising', ceilZ: roof + 0.5 });
+  // Its walls: dark plating up to the catwalk, tan panels over it.
+  const bands = [{ to: walk, tex: 'hold-wall' }, { to: roof + 0.5, tex: 'bay-wall' }];
+  for (let y = y0 - 1; y <= y1; y++) {
+    for (let x = x0 - 1; x <= x1; x++) {
+      const c = p.get(x, y);
+      if (!c || (x >= x0 && x < x1 && y >= y0 && y < y1)) continue;
+      p.set(x, y, c.wall ? { ...c, wall: 'bay-wall', bands: [bands[0]] } : { ...c, bands: [...bands, ...(c.bands ?? [])] });
+    }
+  }
+  const grate = { bottom: walk - 0.25, top: walk, floor: 'grate-bronze', ceiling: 'grate-bronze', side: 'metal-grey', light: 100 };
+  p.rect(x0, y0, x0 + 3, y1, (_, __, c) => ({ ...c, slab: grate }));
+  p.rect(x0 + 3, y0, x1, y0 + 3, (_, __, c) => ({ ...c, slab: grate }));
+  for (let k = 0; k < 8; k++) p.rect(x0 + 3 + k, y1 - 3, x0 + 4 + k, y1, (_, __, c) => ({ ...c, floorZ: walk - 0.5 * (k + 1), side: 'hold-wall' }));
+  const rail = { tex: 'rail-rust', height: 0.75 };
+  p.fence(x0 + 2, y0 + 3, x0 + 3, y1 - 3, 'E', rail);
+  p.fence(x0 + 3, y0 + 2, x1, y0 + 3, 'S', rail);
+  p.fence(x0 + 3, y1 - 3, x0 + 11, y1 - 2, 'N', rail);
+  list.push({ type: 'skyhopper', x: 200, y: 65, z: floor, angle: 180 });
+  list.push(at('floor-spill-2', 198.5, 70.5, { z: floor, angle: 70 }), at('floor-spill-1', 201.5, 61, { z: floor, angle: 150 }));
+  lights.push(
+    { x: 200, y: 61, z: floor + 6, radius: 8, light: 56 },
+    { x: 200, y: 70, z: floor + 6, radius: 8, light: 48 },
+    { x: 191.5, y: 65, z: walk + 2.5, radius: 4, light: 40 },
+  );
+}
 dig(178, 72, 182, 78, arch());
 shutter(178, 72, 182, 73);
 // The trench: out of the pit's south side, eight steps of 0.5 up south,
@@ -822,6 +863,7 @@ list.push(
   // 9. The garage: a stock of ammo before the wave.
   at('power-cell', 176.2, 61.2, { z: PIT + 0.25 }), at('power-cell', 177, 60.6, { z: PIT + 0.25 }), at('med-kit', 183.5, 69, { z: PIT + 0.25 }),
   at('energy-pack', 183.8, 61, { z: PIT + 0.25, skill: EASY }),
+  at('power-cell', 204.5, 77, { z: HANGAR.floor }), // down on the hangar's floor
   // The trench's gate.
   at('sandtrooper', 180, 108.5, { angle: 90, skill: NORMAL_UP }),
   // 11. The wash: rocks for cover; troopers lying in wait down its long

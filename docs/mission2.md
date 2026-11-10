@@ -251,6 +251,19 @@ model over the tiles' stepped edge). The console against the north wall:
 a big gauge, two lit screens, dials, lamps and lit buttons. A thick frame
 with rounded top corners round the opening onto the pit. Oil on the floor.
 
+**The hangar** (Mark's notes, 2026-11-09: the film's garage has the
+skyhopper in the next room): through a second framed opening in the
+garage's east side, under the windbreak, into a hangar dug under the
+drifts beyond it (190..206, 52..78), 8 m across and 13 long. Its floor is
+2 m under the garage's and its roof at the ground (5.75 m), the roof's
+doors over the middle. A grate catwalk at the garage's floor runs along
+its west and north walls behind a rusty railing, and a stair goes down
+along the south wall. On the floor, the family's skyhopper (`skyhopper`,
+`models/farm.js`): a dart of a fuselage, a bubble canopy, three broad
+wings at the back (a fin up, two angled down to stand on), worn grey with
+rose-red tips. Dark plating up to the catwalk, tan panels over it,
+brighter than the garage, so it shows bright through the opening.
+
 **The kitchen and the common room** (as built): the storeroom is the
 kitchen. White built-in counters run along both long walls (a dark kick,
 cupboard doors, a worktop with a rounded nose), with cupboards over them

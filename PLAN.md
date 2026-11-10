@@ -1351,6 +1351,17 @@ snapshots, playable at `?map=m2`.
         (`shelter`), what blows over keeps going.
   - [x] Waiting on Mark: how thick, how often the gusts come, and whether
         troopers should see no farther than the player in one (above).
+- [ ] **The garage's hangar and a cosier kitchen** (Mark's notes on the
+      underground pass, 2026-11-09, after the film stills):
+  - [x] The hangar off the garage's east side, under the drifts beyond
+        the windbreak: tall (the floor 2 m under the garage's, the roof
+        near the ground), a grate catwalk along its walls at the garage's
+        floor with a railing and a stair down, a skyhopper on the floor
+        (a new model, `models/farm.js`), work lamps; a second framed
+        opening in the garage's ring onto the catwalk.
+  - [ ] The kitchen narrower and lower: a galley about 3 m across with
+        the counters close either side and open shelves over them, a
+        low white vault, the appliances in niches at the end.
 - [ ] **Each area in detail,** in the order you meet them, snapshots
       before and after each:
   - [ ] The garden pit and the pump tunnels: grow beds and grow lamps,
