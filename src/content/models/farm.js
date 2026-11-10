@@ -312,103 +312,188 @@ function appliances() {
 }
 
 /**
- * The skyhopper (a T-16): its chord fore and aft (`half` either side of
- * the middle), the cockpit body's apex and base heights and half width,
- * where the lower airfoils' feet stand out, and the upper airfoil's top.
+ * The skyhopper (a T-16): its height. Everything else is in parts of it,
+ * measured off the schematics in Mark's references (2026-11-09).
  */
-export const SKYHOPPER = { half: 3.3, apex: 6.2, base: 3.9, wide: 1.4, foot: 3.6, top: 11 };
+export const SKYHOPPER = { height: 11 };
 
 /**
- * A flat plate (an airfoil) between four corners of its middle surface,
- * `t` either side along `n`; `edge` styles its rims.
+ * A flat plate (an airfoil) round the corners of its middle surface (a
+ * convex outline), `t` either side along `n`; `edge` styles its rims.
  */
 function plate(m, corners, n, t, style, edge = style) {
   const off = (p, k) => [p[0] + n[0] * t * k, p[1] + n[1] * t * k, p[2] + n[2] * t * k];
-  const mid = corners.reduce((a, p) => [a[0] + p[0] / 4, a[1] + p[1] / 4, a[2] + p[2] / 4], [0, 0, 0]);
+  const c = corners.length;
+  const mid = corners.reduce((a, p) => [a[0] + p[0] / c, a[1] + p[1] / c, a[2] + p[2] / c], [0, 0, 0]);
   for (const k of [-1, 1]) m.face(corners.map((p) => off(p, k)), style, mid);
-  for (let i = 0; i < 4; i++) {
-    const [a, b] = [corners[i], corners[(i + 1) % 4]];
+  for (let i = 0; i < c; i++) {
+    const [a, b] = [corners[i], corners[(i + 1) % c]];
     m.face([off(a, 1), off(b, 1), off(b, -1), off(a, -1)], edge, mid);
   }
 }
 
+/** A face laid `d` out over another (away from `inside`): markings, windows. */
+function overlay(m, points, style, inside, d = 0.015) {
+  const [a, b, c] = points;
+  const u = [b[0] - a[0], b[1] - a[1], b[2] - a[2]];
+  const v = [c[0] - a[0], c[1] - a[1], c[2] - a[2]];
+  let n = [u[1] * v[2] - u[2] * v[1], u[2] * v[0] - u[0] * v[2], u[0] * v[1] - u[1] * v[0]];
+  const l = Math.hypot(...n);
+  n = n.map((x) => x / l);
+  const mid = points.reduce((s, p) => [s[0] + p[0] / points.length, s[1] + p[1] / points.length, s[2] + p[2] / points.length], [0, 0, 0]);
+  if ((mid[0] - inside[0]) * n[0] + (mid[1] - inside[1]) * n[1] + (mid[2] - inside[2]) * n[2] < 0) n = n.map((x) => -x);
+  m.face(points.map((p) => [p[0] + n[0] * d, p[1] + n[1] * d, p[2] + n[2] * d]), style, inside);
+}
+
 /**
- * The family's skyhopper in its hangar (a T-16, after Mark's references,
- * 2026-11-09): taller than it is long. A cockpit body triangular from the
- * front, its windscreen and a band of small windows on its face; a tall
- * upper airfoil standing out of its ridge, its leading edge upright and
- * its trailing edge swept, two domes on it and a red mark at its tip; the
- * airspeed sensor along the ridge; two lower airfoils splayed down from
- * the body's foot to the floor like legs, on pads; the engine and the
- * repulsor gear slung under the body, a laser cannon under them. Light
- * grey riveted panels. Built looking +y (its nose), about 11 tall, 6.6 long and
- * 7.2 across its feet.
+ * The family's skyhopper in its hangar: a T-16, after the schematics, the
+ * model and the photo in Mark's references (2026-11-09). As wide on its
+ * feet as it's tall, and not half as long:
+ * - the cockpit body, triangular from the front: flat side panels, its
+ *   face raked forward from the ridge to its foot, the glass in its upper
+ *   half in a pale frame, a triangle of it on each side against the
+ *   panel, over a band of small windows;
+ * - the upper airfoil standing out of the ridge, half the height, its
+ *   trailing edge upright and overhanging the body's back, its leading
+ *   edge swept back to a tip half the root's chord; two domes on it, red
+ *   marks near the tip, actuators on the trailing edge;
+ * - the airspeed sensor along the ridge, past both ends;
+ * - under the body a deck, the machinery, two small cannons forward and
+ *   the heavy cannon slung on a strut; the ion engine on its back;
+ * - the two lower airfoils from the deck's edges under the body's back
+ *   half, down and out at 37 degrees to the floor, on pads.
+ * Light grey riveted panels. Built looking +y (its nose). Below, `f` runs
+ * forward from the upper airfoil's trailing edge and `k` up from the
+ * floor, both in parts of its height; `u` is across.
  */
 function skyhopper() {
   const m = new ModelBuilder('skyhopper');
-  const { half: L, apex: A, base: B, wide: W, foot: F, top: T } = SKYHOPPER;
+  const H = SKYHOPPER.height;
+  const P = (u, f, k) => [u * H, (f - 0.22) * H, k * H];
   const HULL = { tex: 'cone-panel' };
-  const EDGE = { color: ['gray', 0.45] };
+  const EDGE = { color: ['gray', 0.5] };
   const DARK = { color: ['gray', 0.14] };
   const GUTS = { tex: 'hold-guts', texScale: 0.5 };
-  const GLASS = { color: [38, 48, 56] };
+  const GLASS = { color: [34, 44, 52] };
+  const WHITE = { tex: 'plaster-white' };
+  const LIGHT = { color: [196, 196, 188] };
   const RED = { tex: 'speeder-red' };
-  // The cockpit body: a triangle from the front, its face raked back from
-  // the foot to the ridge.
-  const nose = L - 0.4;
-  const front = (z) => nose - ((z - B) / (A - B)) * 1.4;
-  m.face([[0, -L + 0.6, A], [W, -L + 0.6, B], [-W, -L + 0.6, B]], HULL, [0, 0, (A + B) / 2]);
-  for (const s of [-1, 1]) m.face([[0, -L + 0.6, A], [0, front(A), A], [s * W, nose, B], [s * W, -L + 0.6, B]], HULL, [0, 0, (A + B) / 2]);
-  m.face([[W, -L + 0.6, B], [W, nose, B], [-W, nose, B], [-W, -L + 0.6, B]], DARK, [0, 0, A]);
-  // Its face: the windscreen in the upper part, a white band of windows under it.
-  const faceAt = (k, z) => [k * W * (1 - (z - B) / (A - B)), front(z) + 0.02, z];
-  const zw = B + 0.45 * (A - B);
-  m.face([[0, front(A) + 0.02, A - 0.15], faceAt(1, zw), faceAt(-1, zw)], GLASS, [0, 0, (A + B) / 2]);
-  m.face([faceAt(1, zw), faceAt(1, B + 0.12), faceAt(-1, B + 0.12), faceAt(-1, zw)], { tex: 'plaster-white' }, [0, 0, (A + B) / 2]);
-  for (let k = -2; k <= 1; k++) {
-    const x = k * 0.32 + 0.03;
-    m.face([[x, front(zw - 0.35) + 0.04, zw - 0.15], [x + 0.26, front(zw - 0.35) + 0.04, zw - 0.15], [x + 0.26, front(zw - 0.35) + 0.04, zw - 0.45], [x, front(zw - 0.35) + 0.04, zw - 0.45]], GLASS, [0, 0, (A + B) / 2]);
-  }
-  // The upper airfoil: out of the ridge, its leading edge upright, its
-  // trailing edge swept up to a narrow tip; a red mark at the tip, a band
-  // over the root, two domes.
-  const up = (z) => -L + ((z - A) / (T - A)) * (L * 1.25);
-  plate(m, [[0, L - 0.2, A], [0, L - 0.2, T], [0, up(T), T], [0, -L, A]], [1, 0, 0], 0.08, HULL, EDGE);
+
+  // The body: a triangle from the front, its ridge at RIDGE and its foot
+  // at BASE, HALF wide either side there; from REAR forward, its side
+  // panels to PANEL, then the cockpit, its face raked from NOSE[0] at the
+  // ridge to NOSE[1] at the foot; the glass down to GLASS_K, the band of
+  // windows down to BAND.
+  const [RIDGE, BASE, HALF, REAR, PANEL, NOSE, GLASS_K, BAND] = [0.52, 0.29, 0.125, 0.04, 0.24, [0.326, 0.447], 0.39, 0.365];
+  const down = (k) => (RIDGE - k) / (RIDGE - BASE);
+  const front = (k) => NOSE[0] + down(k) * (NOSE[1] - NOSE[0]);
+  const S = (s, f, k) => P(s * HALF * down(k), f, k);
+  const F = (u, k) => P(u * HALF * down(k), front(k), k);
+  const inside = P(0, (REAR + NOSE[1]) / 2, (RIDGE + BASE) / 2);
+  m.face([P(0, REAR, RIDGE), P(HALF, REAR, BASE), P(-HALF, REAR, BASE)], HULL, inside);
+  m.face([P(HALF, REAR, BASE), P(HALF, NOSE[1], BASE), P(-HALF, NOSE[1], BASE), P(-HALF, REAR, BASE)], DARK, inside);
   for (const s of [-1, 1]) {
-    const x = s * 0.09;
-    m.face([[x, L - 0.2, T - 1.2], [x, L - 0.2, T - 0.6], [x, up(T - 0.6), T - 0.6], [x, up(T - 1.2), T - 1.2]], RED, [0, 0, T - 0.9]);
-    m.face([[x, L - 0.2, A + 0.7], [x, L - 0.2, A + 0.95], [x, up(A + 0.95), A + 0.95], [x, up(A + 0.7), A + 0.7]], { color: ['gray', 0.3] }, [0, 0, A + 0.8]);
-    for (const y of [1.4, 0.8]) m.cylinder([x, y, A + 2.6], 0.24, s * 0.12, { axis: 'x', segments: 8, color: ['gray', 0.62] });
+    m.face([S(s, REAR, RIDGE), S(s, PANEL, RIDGE), S(s, PANEL, BASE), S(s, REAR, BASE)], HULL, inside);
+    m.face([S(s, PANEL, RIDGE), S(s, front(RIDGE), RIDGE), S(s, front(GLASS_K), GLASS_K), S(s, PANEL, GLASS_K)], HULL, inside);
+    overlay(m, [S(s, PANEL + 0.004, RIDGE - 0.008), S(s, PANEL + 0.058, GLASS_K + 0.004), S(s, PANEL + 0.004, GLASS_K + 0.004)], GLASS, inside);
+    m.face([S(s, PANEL, GLASS_K), S(s, front(GLASS_K), GLASS_K), S(s, front(BAND), BAND), S(s, PANEL, BAND)], WHITE, inside);
+    m.face([S(s, PANEL, BAND), S(s, front(BAND), BAND), S(s, front(BASE), BASE), S(s, PANEL, BASE)], HULL, inside);
+    for (let i = 0; i < 3; i++) {
+      const f = PANEL + 0.012 + i * 0.045;
+      overlay(m, [S(s, f, GLASS_K - 0.004), S(s, f + 0.034, GLASS_K - 0.004), S(s, f + 0.034, BAND + 0.006), S(s, f, BAND + 0.006)], GLASS, inside);
+    }
+    // The logo in its square, and worn red marks along the top of the panel.
+    overlay(m, [S(s, 0.06, 0.505), S(s, 0.125, 0.505), S(s, 0.125, 0.44), S(s, 0.06, 0.44)], WHITE, inside);
+    overlay(m, [S(s, 0.072, 0.494), S(s, 0.113, 0.494), S(s, 0.113, 0.452), S(s, 0.072, 0.452)], RED, inside, 0.03);
+    overlay(m, [S(s, 0.135, 0.49), S(s, 0.235, 0.49), S(s, 0.235, 0.47), S(s, 0.135, 0.47)], RED, inside);
   }
-  // The airspeed sensor along the ridge, its tip out past the nose.
-  m.cylinder([0, -L - 0.2, A + 0.12], 0.13, 2 * L + 1.2, { axis: 'y', segments: 6, color: ['gray', 0.58] });
-  m.cylinder([0, L + 0.2, A + 0.12], 0.17, 0.5, { axis: 'y', segments: 6, ...RED });
-  // The lower airfoils: from the body's foot down and out to the floor,
-  // their trailing edges straight, narrowing toward the front; a pad
-  // under each foot.
+  m.face([F(0, RIDGE), F(1, GLASS_K), F(-1, GLASS_K)], GLASS, inside);
+  m.face([F(-1, GLASS_K), F(1, GLASS_K), F(1, BAND), F(-1, BAND)], WHITE, inside);
+  m.face([F(-1, BAND), F(1, BAND), F(1, BASE), F(-1, BASE)], HULL, inside);
+  for (let i = 0; i < 5; i++) {
+    const u = -0.86 + i * 0.35;
+    overlay(m, [F(u, GLASS_K - 0.004), F(u + 0.27, GLASS_K - 0.004), F(u + 0.27, BAND + 0.006), F(u, BAND + 0.006)], GLASS, inside);
+  }
+  // (The glass's frame: down its middle and along its sides.)
+  const bar = (w, k) => [w * H, (front(k) - 0.22) * H, k * H];
+  overlay(m, [bar(-0.005, RIDGE - 0.01), bar(0.005, RIDGE - 0.01), bar(0.005, GLASS_K), bar(-0.005, GLASS_K)], EDGE, inside);
+  for (const s of [-1, 1]) overlay(m, [F(0, RIDGE), F(s, GLASS_K), F(s * 0.82, GLASS_K), F(0, RIDGE - 0.03)], EDGE, inside);
+
+  // The upper airfoil, out of the ridge to the top: its trailing edge
+  // upright at f = 0, its leading edge swept from the cockpit's top back
+  // to the tip.
+  const T = 0.006 * H;
+  const lead = (k) => 0.16 + ((1 - k) / (1 - RIDGE)) * (NOSE[0] - 0.16);
+  plate(m, [P(0, 0, RIDGE), P(0, NOSE[0], RIDGE), P(0, lead(1), 1), P(0, 0, 1)], [1, 0, 0], T, HULL, EDGE);
   for (const s of [-1, 1]) {
-    const [dx, dz] = [s * (F - W), -B];
-    const l = Math.hypot(dx, dz);
-    const n = [-dz / l, 0, dx / l];
-    plate(m, [[s * W, -L, B], [s * W, L - 0.3, B], [s * F, 0.8, 0.15], [s * F, -L, 0.15]], n, 0.08, HULL, EDGE);
-    m.box([s * F - 0.35, -L - 0.1, 0], [s * F + 0.35, 1.1, 0.15], DARK);
+    const at = (f, k) => [s * (T + 0.01), (f - 0.22) * H, k * H];
+    const middle = [0, -0.07 * H, 0.9 * H];
+    m.face([at(0, 0.876), at(lead(0.876), 0.876), at(lead(0.934), 0.934), at(0, 0.934)], RED, middle);
+    const out = (h) => (s > 0 ? T : -T - h);
+    for (const f of [0.132, 0.178]) {
+      m.cylinder([out(0.008 * H), (f - 0.22) * H, 0.785 * H], 0.02 * H, 0.008 * H, { axis: 'x', segments: 10, ...LIGHT });
+      m.cylinder([out(0.013 * H), (f - 0.22) * H, 0.785 * H], 0.014 * H, 0.013 * H, { axis: 'x', segments: 10, color: [220, 220, 212] });
+    }
+    for (const [k0, k1] of [[0.56, 0.63], [0.65, 0.74]]) {
+      const x0 = out(0.012 * H);
+      m.box([x0, -0.21 * H, k0 * H], [x0 + 0.012 * H, -0.15 * H, k1 * H], { ...HULL, side: () => EDGE });
+    }
   }
-  // Slung under the body: the repulsor gear, the engine across it, a
-  // drum under that and the laser cannon pointing ahead.
-  m.box([-0.95, -2.2, B - 1], [0.95, 2, B], { ...HULL, side: (i) => (i === 2 || i === 0 ? GUTS : undefined) });
-  m.cylinder([-1.15, -0.4, B - 1.25], 0.62, 2.3, { axis: 'x', segments: 10, color: ['gray', 0.5], top: DARK, bottom: DARK });
-  m.cylinder([0, 0.3, B - 2.35], 0.42, 0.8, { segments: 8, ...GUTS, top: DARK, bottom: DARK });
-  m.cylinder([0, 0.6, B - 2.05], 0.09, 3.2, { axis: 'y', segments: 6, color: ['gray', 0.75] });
-  m.cylinder([0, 2.6, B - 2.05], 0.16, 0.25, { axis: 'y', segments: 8, ...DARK });
+  // The airspeed sensor along the ridge, past both ends.
+  const ZS = 0.533 * H;
+  m.cylinder([0, (-0.03 - 0.22) * H, ZS], 0.011 * H, 0.26 * H, { axis: 'y', segments: 6, ...LIGHT });
+  m.cylinder([0, (0.23 - 0.22) * H, ZS], 0.015 * H, 0.04 * H, { axis: 'y', segments: 6, ...EDGE });
+  m.cylinder([0, (0.27 - 0.22) * H, ZS], 0.006 * H, 0.12 * H, { axis: 'y', segments: 6, ...LIGHT });
+  m.cylinder([0, (-0.037 - 0.22) * H, ZS], 0.007 * H, 0.007 * H, { axis: 'y', segments: 6, ...DARK });
+
+  // Under the body: the deck the lower airfoils hang from, the machinery
+  // under it, two small cannons forward, the heavy cannon on its strut.
+  m.box(P(-0.135, 0.03, 0.268), P(0.135, 0.43, BASE), { ...HULL, side: () => EDGE });
+  m.box(P(-0.1, 0.1, 0.205), P(0.1, 0.44, 0.268), { ...DARK, side: () => GUTS, top: false });
+  m.box(P(-0.07, 0.44, 0.215), P(0.07, 0.445, 0.262), { ...DARK, side: () => GUTS, top: { tex: 'vent-grille' } });
+  for (const s of [-1, 1]) {
+    m.cylinder(P(s * 0.085, 0.4, 0.24), 0.016 * H, 0.06 * H, { axis: 'y', segments: 6, ...DARK });
+    m.cylinder(P(s * 0.085, 0.46, 0.24), 0.007 * H, 0.05 * H, { axis: 'y', segments: 6, ...LIGHT });
+  }
+  m.box(P(-0.015, 0.27, 0.17), P(0.015, 0.3, 0.2), DARK);
+  m.cylinder(P(0, 0.25, 0.125), 0.05 * H, 0.09 * H, { axis: 'y', segments: 8, ...EDGE, sides: GUTS });
+  m.cylinder(P(0, 0.34, 0.125), 0.011 * H, 0.3 * H, { axis: 'y', segments: 6, ...LIGHT });
+  m.cylinder(P(0, 0.47, 0.125), 0.021 * H, 0.008 * H, { axis: 'y', segments: 10, ...EDGE });
+  m.cylinder(P(0, 0.62, 0.125), 0.016 * H, 0.025 * H, { axis: 'y', segments: 6, ...DARK });
+  // The ion engine, a pale dome on the body's back.
+  m.cylinder(P(0, 0.022, 0.365), 0.036 * H, 0.018 * H, { axis: 'y', segments: 10, color: [214, 212, 204], top: false });
+
+  // The lower airfoils: from the deck's edges under the body's back half,
+  // down and out to the floor, the foot's leading corner cut; two hinge
+  // blocks on each, and a pad under its foot.
+  const [ROOT, FOOT] = [[0.135, 0.272], [0.48, 0.012]];
+  const [dx, dz] = [FOOT[0] - ROOT[0], ROOT[1] - FOOT[1]];
+  const len = Math.hypot(dx, dz);
+  for (const s of [-1, 1]) {
+    const n = [(s * dz) / len, 0, dx / len];
+    const on = (q, f) => P(s * (ROOT[0] + q * dx), f, ROOT[1] - q * dz);
+    plate(m, [on(0, 0.029), on(0, 0.24), on(0.86, 0.225), on(1, 0.18), on(1, 0.029)], n, 0.05, HULL, EDGE);
+    for (const t of [0.25, 0.42]) {
+      const lift = 0.05 + 0.006 * H;
+      const along = (q, f) => [s * (ROOT[0] + q * dx) * H + n[0] * lift, (f - 0.22) * H, (ROOT[1] - q * dz) * H + n[2] * lift];
+      plate(m, [along(t - 0.04, 0.06), along(t - 0.04, 0.1), along(t + 0.04, 0.1), along(t + 0.04, 0.06)], n, 0.006 * H, EDGE, DARK);
+    }
+    const x = s * FOOT[0] * H;
+    m.box([x - 0.3, (0.02 - 0.22) * H, 0], [x + 0.3, (0.235 - 0.22) * H, 0.12], DARK);
+  }
   // Its shadow on the floor.
-  m.face([[-F, L, 0.01], [F, L, 0.01], [F, -L, 0.01], [-F, -L, 0.01]], { tex: 'speeder-shadow', uv: [[0, 0], [1, 0], [1, 1], [0, 1]] }, [0, 0, -1]);
-  // Collision: each lower airfoil from its foot in to where it's head
-  // high (you can walk in under the body), and round the gear under it.
+  m.face([P(-0.2, 0.45, 0.001), P(0.2, 0.45, 0.001), P(0.2, 0, 0.001), P(-0.2, 0, 0.001)], { tex: 'speeder-shadow', uv: [[0, 0], [1, 0], [1, 1], [0, 1]] }, [0, 0, -1]);
+
+  // Collision: each lower airfoil from where it's head high out to its
+  // foot (you can walk in under the body), round the machinery under the
+  // body, and along the heavy cannon.
+  const head = ROOT[0] + ((ROOT[1] - 1.75 / H) / dz) * dx;
   for (const s of [-1, 1]) {
-    const inner = F - ((F - W) * 2) / B;
-    m.outlineLines([[s * inner, -L], [s * (F + 0.4), -L], [s * (F + 0.4), 1.1], [s * inner, 0.6]]);
+    const [a, b] = [s * head * H, s * (FOOT[0] * H + 0.3)];
+    m.outlineLines([[a, (0.029 - 0.22) * H], [b, (0.02 - 0.22) * H], [b, (0.235 - 0.22) * H], [a, (0.24 - 0.22) * H]]);
   }
-  m.outlineLines([[-1, -2.2], [1, -2.2], [1, 2], [-1, 2]]);
+  m.outlineLines([[-0.1 * H, (0.1 - 0.22) * H], [0.1 * H, (0.1 - 0.22) * H], [0.1 * H, (0.42 - 0.22) * H], [-0.1 * H, (0.42 - 0.22) * H]]);
+  m.line(0, (0.42 - 0.22) * H, 0, (0.645 - 0.22) * H);
   return m.build();
 }
 

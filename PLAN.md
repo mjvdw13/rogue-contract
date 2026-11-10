@@ -41,8 +41,8 @@ These need Mark to try something, or to decide. Don't start them without him.
   light, the reservoir's walls (busy?), the size of the garage's kerb.
   After Mark's notes (2026-11-09): the hangar off the garage (a catwalk
   over the skyhopper, the floor 2 m down), and the kitchen a narrow galley
-  with the storeroom beside it. The skyhopper redone as a T-16 after Mark's references
-  (2026-11-09). To judge: the skyhopper's look and size,
+  with the storeroom beside it. The skyhopper redone as a T-16, measured off the
+  schematics in Mark's references (2026-11-09). To judge: the skyhopper's look and size,
   the catwalk's railing, whether the galley is cosy enough.
 
 - **Mission 2's pits, dome, evening and blowing sand** (`?map=m2`,
