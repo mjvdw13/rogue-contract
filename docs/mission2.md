@@ -264,13 +264,18 @@ wings at the back (a fin up, two angled down to stand on), worn grey with
 rose-red tips. Dark plating up to the catwalk, tan panels over it,
 brighter than the garage, so it shows bright through the opening.
 
-**The kitchen and the common room** (as built): the storeroom is the
-kitchen. White built-in counters run along both long walls (a dark kick,
-cupboard doors, a worktop with a rounded nose), with cupboards over them
-carrying a red stripe and lights under them. Two stacks of appliances
-stand against the east end (dark windows, lit buttons, a red trim), and
-there's an oval niche in the west wall. The common room has the red rug
-and four tall oval niches round its walls (`niche-oval`, a decal).
+**The kitchen and the common room** (as built; made cosier after Mark's
+notes, 2026-11-09): the kitchen is a galley straight on from the
+courtyard's south doorway, 4 tiles across and 10 deep (158..162, 61..71),
+as in the film's still looking down it to the bright doorway. White
+built-in counters close along both walls (a dark kick, cupboard doors, a
+worktop with a rounded nose), with cupboards over them carrying a red
+stripe and lights under them; the vault low (3.25, stepping down to 2.75
+over the cupboards); two stacks of appliances against the far end (dark
+windows, lit buttons, a red trim). A doorway at the far end's west side
+into the storeroom (150..156, 61..70: crates, an oval niche in its west
+wall, the stair down to the cellar). The common room has the red rug and
+four tall oval niches round its walls (`niche-oval`, a decal).
 
 ## Grid and size
 
@@ -589,7 +594,7 @@ ending (2026-11-06).
 | 7b | **The courtyard** | round, (160, 46), r 12 | A round pit 24 across and 6 m deep, open to the sky, its walls whitewashed plaster gone grey with soot, round-topped arches all round: the dome's stair north (its arch halfway up the wall, a stair 3 wide curving down the wall's inside to the east, 12 steps), the common room west, the quarters east, the storeroom south. The suns are too low to reach in, so its floor is a dim pool against the lit rim, lit by its doorways and a cart burning; an overturned table, a broken droid, crates. The big fight: troopers in it and on the rim above. |
 | 7c | **The common room** | 138..146, 40..52 | West of the courtyard under a low vault: the family's table knocked over, a hearth, a bench. A tunnel south (140..144, 52..66, a light well) and east (144..150, 62..66) round to the storeroom: the loop. |
 | 7d | **The quarters** | 174..186, 38..54 | East of the courtyard (its arch 171..174, 49..53, south of the wall stair's foot): the family's sleeping alcoves, a chest turned out, a child's toy droid, a light well. |
-| 7e | **The storeroom** | 150..170, 61..70 | South of the courtyard: shelves of canisters and food tins, crates, a power unit. The stair down to the cellar at its south-west (152..156, 70..76); its east wall to the garage blank. |
+| 7e | **The kitchen and the storeroom** | 158..162, 61..71; 150..156, 61..70 | South of the courtyard: the kitchen a narrow galley, the storeroom west of it through a doorway at its far end, crates in it. The stair down to the cellar at the storeroom's south (152..156, 70..76). |
 | 8 | **The cellar** | 144..166, 76..88 | The objective. A vaulted cistern room, a dark pool along its south side (the house's own store), the pipe coming down into it, one lamp knocked over and still lit on the floor. Quiet and dark (64 to 80): no enemies. Rusk's helmet recordings in a sealed case behind a loose stone at its east end (162..166, 77..81): picking them up starts the ending and opens Rusk's panel in the south wall (144..147, 88). |
 | 8a | **The caves** | from (145, 88) down to (140, 122), east to (189, 128), north to (190, 84) | Rusk's way out. His cut steps, 3 wide, 12 down south; then natural rock: the cavern (about 131..148, 104..128), 7 m across at its widest and 6 m to its roof, troopers searching it by a lamp, light through a crack; a low passage east under the pad's south edge and the wash, 5 m wide; then the climb north under the east windbreak, troopers coming down it, into the garage pit's east arch (186..189, 82..87). Dark (64 to 72). |
 | 9 | **The garage** | 174..186, 58..72 | Behind its shutter on the garage pit's arch, down until the recordings are taken. Inside: oil, tools, a second speeder stripped for parts, the space where the family's speeder stood, its dust still in the air. A stock of ammo before the wave. |
