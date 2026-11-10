@@ -117,7 +117,7 @@ export default [
   // The kitchen's counters and appliances, colliding as their outlines, the
   // counters as high as their worktops (shots go over them).
   ...COUNTER.lengths.map((l) => defineDecoration({ id: `kitchen-counter-${l}`, model: `kitchen-counter-${l}`, solid: true, height: COUNTER.top, fixed: true })),
-  defineDecoration({ id: 'skyhopper', model: 'skyhopper', solid: true, height: SKYHOPPER.top * SKYHOPPER.scale, fixed: true }),
+  defineDecoration({ id: 'skyhopper', model: 'skyhopper', solid: true, height: SKYHOPPER.top, fixed: true }),
   defineDecoration({ id: 'kitchen-appliances', model: 'kitchen-appliances', solid: true, height: APPLIANCES.top, fixed: true }),
   // Things on Mos Eisley's streets: crates, drums, canisters, junk, rubble, scrap, a vaporator.
   ...Object.entries(CLUTTER).map(([id, c]) => defineDecoration({ id, model: id, solid: !!c.solid, radius: c.radius, height: c.height, fixed: true })),

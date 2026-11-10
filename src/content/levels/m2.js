@@ -559,7 +559,7 @@ const GARAGE = { cx: 180, cy: 65, grate: 3.5, ceil: PIT + 4.5 };
 // skyhopper. A grate catwalk at the garage's floor runs along its west and
 // north walls behind a railing, and a stair goes down along the south
 // wall. It's under solid rock, not a slab, so the catwalk can be one.
-const HANGAR = { box: [190, 52, 207, 79], floor: PIT - 4, roof: 0, walk: PIT + 0.25 };
+const HANGAR = { box: [190, 52, 207, 79], floor: PIT - 4, roof: 2, walk: PIT + 0.25 };
 {
   const [x0, y0, x1, y1] = HANGAR.box;
   const { floor, roof, walk } = HANGAR;
@@ -588,8 +588,8 @@ const HANGAR = { box: [190, 52, 207, 79], floor: PIT - 4, roof: 0, walk: PIT + 0
   list.push({ type: 'skyhopper', x: 200, y: 65, z: floor, angle: 180 });
   list.push(at('floor-spill-2', 198.5, 70.5, { z: floor, angle: 70 }), at('floor-spill-1', 201.5, 61, { z: floor, angle: 150 }));
   lights.push(
-    { x: 200, y: 61, z: floor + 6, radius: 8, light: 56 },
-    { x: 200, y: 70, z: floor + 6, radius: 8, light: 48 },
+    { x: 200, y: 61, z: floor + 8, radius: 9, light: 56 },
+    { x: 200, y: 70, z: floor + 8, radius: 9, light: 48 },
     { x: 191.5, y: 65, z: walk + 2.5, radius: 4, light: 40 },
   );
 }

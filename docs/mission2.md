@@ -255,14 +255,19 @@ with rounded top corners round the opening onto the pit. Oil on the floor.
 skyhopper in the next room): through a second framed opening in the
 garage's east side, under the windbreak, into a hangar dug under the
 drifts beyond it (190..206, 52..78), 8 m across and 13 long. Its floor is
-2 m under the garage's and its roof at the ground (5.75 m), the roof's
-doors over the middle. A grate catwalk at the garage's floor runs along
-its west and north walls behind a rusty railing, and a stair goes down
-along the south wall. On the floor, the family's skyhopper (`skyhopper`,
-`models/farm.js`): a dart of a fuselage, a bubble canopy, three broad
-wings at the back (a fin up, two angled down to stand on), worn grey with
-rose-red tips. Dark plating up to the catwalk, tan panels over it,
-brighter than the garage, so it shows bright through the opening.
+2 m under the garage's and its roof 1 m over the ground (6.75 m), the
+roof's doors over the middle. A grate catwalk at the garage's floor runs
+along its west and north walls behind a rusty railing, and a stair goes
+down along the south wall. On the floor, the family's skyhopper
+(`skyhopper`, `models/farm.js`, a T-16 after Mark's references,
+2026-11-09): taller than it's long (11 tall, 6.6 long), a cockpit body
+triangular from the front with its windscreen and a band of windows, a
+tall upper airfoil (leading edge upright, trailing edge swept, two domes,
+a red mark at its tip), the airspeed sensor along the ridge, two lower
+airfoils splayed down to the floor like legs, the engine and gear slung
+under the body with a laser cannon. Light grey riveted panels
+(`cone-panel`). You can walk in under its body. Dark plating up to the
+catwalk, tan panels over it, brighter than the garage, so it shows bright through the opening.
 
 **The kitchen and the common room** (as built; made cosier after Mark's
 notes, 2026-11-09): the kitchen is a galley straight on from the

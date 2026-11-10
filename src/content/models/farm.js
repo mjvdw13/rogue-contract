@@ -312,85 +312,103 @@ function appliances() {
 }
 
 /**
- * The skyhopper, as drawn: how far its nose reaches (+y), its tail (-y),
- * its fuselage's height and its fin's top; then built `scale` times that
- * (a big machine against you, like the film's).
+ * The skyhopper (a T-16): its chord fore and aft (`half` either side of
+ * the middle), the cockpit body's apex and base heights and half width,
+ * where the lower airfoils' feet stand out, and the upper airfoil's top.
  */
-export const SKYHOPPER = { nose: 5.4, tail: -4.6, axis: 1.65, top: 4.3, scale: 1.25 };
+export const SKYHOPPER = { half: 3.3, apex: 6.2, base: 3.9, wide: 1.4, foot: 3.6, top: 11 };
 
 /**
- * The family's skyhopper in its hangar (the film's, Mark's references): a
- * long dart of a fuselage tapering to a sharp nose, a bubble canopy over
- * the cockpit, an engine in its tail and three broad wings round the back,
- * a fin straight up and two angled down to the floor, standing on their
- * tips, a gun pod along each tip. Worn grey, rose-red on its tips and fin.
- * Built looking +y (its nose), about 12.5 long and 8.5 across the wings.
+ * A flat plate (an airfoil) between four corners of its middle surface,
+ * `t` either side along `n`; `edge` styles its rims.
+ */
+function plate(m, corners, n, t, style, edge = style) {
+  const off = (p, k) => [p[0] + n[0] * t * k, p[1] + n[1] * t * k, p[2] + n[2] * t * k];
+  const mid = corners.reduce((a, p) => [a[0] + p[0] / 4, a[1] + p[1] / 4, a[2] + p[2] / 4], [0, 0, 0]);
+  for (const k of [-1, 1]) m.face(corners.map((p) => off(p, k)), style, mid);
+  for (let i = 0; i < 4; i++) {
+    const [a, b] = [corners[i], corners[(i + 1) % 4]];
+    m.face([off(a, 1), off(b, 1), off(b, -1), off(a, -1)], edge, mid);
+  }
+}
+
+/**
+ * The family's skyhopper in its hangar (a T-16, after Mark's references,
+ * 2026-11-09): taller than it is long. A cockpit body triangular from the
+ * front, its windscreen and a band of small windows on its face; a tall
+ * upper airfoil standing out of its ridge, its leading edge upright and
+ * its trailing edge swept, two domes on it and a red mark at its tip; the
+ * airspeed sensor along the ridge; two lower airfoils splayed down from
+ * the body's foot to the floor like legs, on pads; the engine and the
+ * repulsor gear slung under the body, a laser cannon under them. Light
+ * grey riveted panels. Built looking +y (its nose), about 11 tall, 6.6 long and
+ * 7.2 across its feet.
  */
 function skyhopper() {
   const m = new ModelBuilder('skyhopper');
-  const { nose, tail, axis: Z } = SKYHOPPER;
-  const HULL = { tex: 'freighter-hull' };
+  const { half: L, apex: A, base: B, wide: W, foot: F, top: T } = SKYHOPPER;
+  const HULL = { tex: 'cone-panel' };
+  const EDGE = { color: ['gray', 0.45] };
+  const DARK = { color: ['gray', 0.14] };
+  const GUTS = { tex: 'hold-guts', texScale: 0.5 };
+  const GLASS = { color: [38, 48, 56] };
   const RED = { tex: 'speeder-red' };
-  const DARK = { color: ['gray', 0.16] };
-  const GLASS = { color: [46, 60, 70] };
-  // The fuselage: rings of eight, a little flatter than round.
-  const ring = (rx, rz, k = 1) => Array.from({ length: 8 }, (_, i) => {
-    const a = Math.PI / 8 + (i * Math.PI) / 4;
-    return [Math.cos(a) * rx * k, Z + Math.sin(a) * rz * k];
-  });
-  const stations = [[nose, 0.04, 0.04], [4.4, 0.3, 0.26], [3, 0.55, 0.48], [1.2, 0.72, 0.62], [-1.5, 0.78, 0.66], [-3.8, 0.68, 0.6]];
-  for (let i = 0; i < stations.length - 1; i++) {
-    const [y0, rx0, rz0] = stations[i];
-    const [y1, rx1, rz1] = stations[i + 1];
-    m.loft(ring(rx0, rz0), y0, ring(rx1, rz1), y1, { axis: 'y', ...HULL, bottom: false, top: i === stations.length - 2 ? DARK : false });
+  // The cockpit body: a triangle from the front, its face raked back from
+  // the foot to the ridge.
+  const nose = L - 0.4;
+  const front = (z) => nose - ((z - B) / (A - B)) * 1.4;
+  m.face([[0, -L + 0.6, A], [W, -L + 0.6, B], [-W, -L + 0.6, B]], HULL, [0, 0, (A + B) / 2]);
+  for (const s of [-1, 1]) m.face([[0, -L + 0.6, A], [0, front(A), A], [s * W, nose, B], [s * W, -L + 0.6, B]], HULL, [0, 0, (A + B) / 2]);
+  m.face([[W, -L + 0.6, B], [W, nose, B], [-W, nose, B], [-W, -L + 0.6, B]], DARK, [0, 0, A]);
+  // Its face: the windscreen in the upper part, a white band of windows under it.
+  const faceAt = (k, z) => [k * W * (1 - (z - B) / (A - B)), front(z) + 0.02, z];
+  const zw = B + 0.45 * (A - B);
+  m.face([[0, front(A) + 0.02, A - 0.15], faceAt(1, zw), faceAt(-1, zw)], GLASS, [0, 0, (A + B) / 2]);
+  m.face([faceAt(1, zw), faceAt(1, B + 0.12), faceAt(-1, B + 0.12), faceAt(-1, zw)], { tex: 'plaster-white' }, [0, 0, (A + B) / 2]);
+  for (let k = -2; k <= 1; k++) {
+    const x = k * 0.32 + 0.03;
+    m.face([[x, front(zw - 0.35) + 0.04, zw - 0.15], [x + 0.26, front(zw - 0.35) + 0.04, zw - 0.15], [x + 0.26, front(zw - 0.35) + 0.04, zw - 0.45], [x, front(zw - 0.35) + 0.04, zw - 0.45]], GLASS, [0, 0, (A + B) / 2]);
   }
-  // The engine in the tail, its nozzle dark with a dull glow deep in it.
-  m.loft(ring(0.6, 0.54), -3.8, ring(0.5, 0.46), tail, { axis: 'y', color: ['gray', 0.3], bottom: false, top: DARK });
-  m.face(ring(0.3, 0.28).map(([x, z]) => [x, tail - 0.01, z]), { color: [200, 96, 40], glow: true }, [0, tail + 1, Z]);
-  // The canopy: dark glass in a bubble over the cockpit.
-  const C = Z + 0.5;
-  m.loft([[-0.42, C], [0.42, C], [0.24, C + 0.16], [-0.24, C + 0.16]], -0.3, [[-0.48, C], [0.48, C], [0.3, C + 0.5], [-0.3, C + 0.5]], 0.8, { axis: 'y', ...GLASS, bottom: false, top: false });
-  m.loft([[-0.48, C], [0.48, C], [0.3, C + 0.5], [-0.3, C + 0.5]], 0.8, [[-0.36, C - 0.08], [0.36, C - 0.08], [0.08, C - 0.02], [-0.08, C - 0.02]], 2.5, { axis: 'y', ...GLASS, bottom: false });
-  m.box([-0.5, -0.32, C - 0.02], [0.5, -0.22, C + 0.2], DARK);
-  // The wings: broad, swept, thin; each out along `d` (across, up) from
-  // the fuselage, `span` long, its tip `tip` chord long at the back.
-  const wing = ([dx, dz], span, foot) => {
-    const t = 0.07;
-    const [nx, nz] = [-dz, dx];
-    const P = (y, s, side) => [dx * s + nx * t * side, y, Z + dz * s + nz * t * side];
-    const [rootLE, rootTE, tipLE, tipTE] = [-0.4, -3.9, -2.7, -4.2];
-    const r0 = 0.5;
-    const inside = [dx * span * 0.5, -2.8, Z + dz * span * 0.5];
-    for (const side of [-1, 1]) m.face([P(rootLE, r0, side), P(rootTE, r0, side), P(tipTE, span, side), P(tipLE, span, side)], HULL, inside);
-    m.face([P(rootLE, r0, 1), P(tipLE, span, 1), P(tipLE, span, -1), P(rootLE, r0, -1)], HULL, inside);
-    m.face([P(rootTE, r0, 1), P(tipTE, span, 1), P(tipTE, span, -1), P(rootTE, r0, -1)], DARK, inside);
-    // A rose-red band across the wing near its tip.
-    for (const side of [-1, 1]) {
-      const [a, b] = [span - 0.9, span - 0.5];
-      const lead = (s) => rootLE + ((tipLE - rootLE) * (s - r0)) / (span - r0);
-      const trail = (s) => rootTE + ((tipTE - rootTE) * (s - r0)) / (span - r0);
-      const Q = (y, s) => P(y, s, side * 1.15);
-      m.face([Q(lead(a), a), Q(trail(a), a), Q(trail(b), b), Q(lead(b), b)], RED, inside);
-    }
-    // The gun pod along its tip, and a pad under it where it stands.
-    const [px, pz] = [dx * span, Z + dz * span];
-    m.cylinder([px, tipTE, pz], 0.13, tipLE + 0.9 - tipTE, { axis: 'y', segments: 6, ...RED });
-    m.cylinder([px, tipLE + 0.9, pz], 0.05, 0.9, { axis: 'y', segments: 4, ...DARK });
-    if (foot) m.box([px - 0.2, tipTE + 0.1, 0], [px + 0.2, tipLE + 0.6, pz - 0.1], DARK);
-  };
-  const down = (25 * Math.PI) / 180;
-  const low = (Z - 0.12) / Math.sin(down);
-  wing([0, 1], SKYHOPPER.top - Z, false);
-  wing([Math.cos(down), -Math.sin(down)], low, true);
-  wing([-Math.cos(down), -Math.sin(down)], low, true);
+  // The upper airfoil: out of the ridge, its leading edge upright, its
+  // trailing edge swept up to a narrow tip; a red mark at the tip, a band
+  // over the root, two domes.
+  const up = (z) => -L + ((z - A) / (T - A)) * (L * 1.25);
+  plate(m, [[0, L - 0.2, A], [0, L - 0.2, T], [0, up(T), T], [0, -L, A]], [1, 0, 0], 0.08, HULL, EDGE);
+  for (const s of [-1, 1]) {
+    const x = s * 0.09;
+    m.face([[x, L - 0.2, T - 1.2], [x, L - 0.2, T - 0.6], [x, up(T - 0.6), T - 0.6], [x, up(T - 1.2), T - 1.2]], RED, [0, 0, T - 0.9]);
+    m.face([[x, L - 0.2, A + 0.7], [x, L - 0.2, A + 0.95], [x, up(A + 0.95), A + 0.95], [x, up(A + 0.7), A + 0.7]], { color: ['gray', 0.3] }, [0, 0, A + 0.8]);
+    for (const y of [1.4, 0.8]) m.cylinder([x, y, A + 2.6], 0.24, s * 0.12, { axis: 'x', segments: 8, color: ['gray', 0.62] });
+  }
+  // The airspeed sensor along the ridge, its tip out past the nose.
+  m.cylinder([0, -L - 0.2, A + 0.12], 0.13, 2 * L + 1.2, { axis: 'y', segments: 6, color: ['gray', 0.58] });
+  m.cylinder([0, L + 0.2, A + 0.12], 0.17, 0.5, { axis: 'y', segments: 6, ...RED });
+  // The lower airfoils: from the body's foot down and out to the floor,
+  // their trailing edges straight, narrowing toward the front; a pad
+  // under each foot.
+  for (const s of [-1, 1]) {
+    const [dx, dz] = [s * (F - W), -B];
+    const l = Math.hypot(dx, dz);
+    const n = [-dz / l, 0, dx / l];
+    plate(m, [[s * W, -L, B], [s * W, L - 0.3, B], [s * F, 0.8, 0.15], [s * F, -L, 0.15]], n, 0.08, HULL, EDGE);
+    m.box([s * F - 0.35, -L - 0.1, 0], [s * F + 0.35, 1.1, 0.15], DARK);
+  }
+  // Slung under the body: the repulsor gear, the engine across it, a
+  // drum under that and the laser cannon pointing ahead.
+  m.box([-0.95, -2.2, B - 1], [0.95, 2, B], { ...HULL, side: (i) => (i === 2 || i === 0 ? GUTS : undefined) });
+  m.cylinder([-1.15, -0.4, B - 1.25], 0.62, 2.3, { axis: 'x', segments: 10, color: ['gray', 0.5], top: DARK, bottom: DARK });
+  m.cylinder([0, 0.3, B - 2.35], 0.42, 0.8, { segments: 8, ...GUTS, top: DARK, bottom: DARK });
+  m.cylinder([0, 0.6, B - 2.05], 0.09, 3.2, { axis: 'y', segments: 6, color: ['gray', 0.75] });
+  m.cylinder([0, 2.6, B - 2.05], 0.16, 0.25, { axis: 'y', segments: 8, ...DARK });
   // Its shadow on the floor.
-  m.face([[-0.95, nose - 0.3, 0.01], [0.95, nose - 0.3, 0.01], [0.95, tail, 0.01], [-0.95, tail, 0.01]], { tex: 'speeder-shadow', uv: [[0, 0], [1, 0], [1, 1], [0, 1]] }, [0, 0, -1]);
-  // Collision round the fuselage and the lower wings.
-  const w = Math.cos(down) * low + 0.15;
-  m.outlineLines([[0, nose + 0.1], [0.8, 2.6], [0.8, -0.5], [w, -2.6], [w, -4.3], [-w, -4.3], [-w, -2.6], [-0.8, -0.5], [-0.8, 2.6]]);
-  const k = SKYHOPPER.scale;
-  m.vertices = m.vertices.map((v) => v.map((c) => +(c * k).toFixed(5)));
-  m.lines = m.lines.map((l) => l.map((c) => c * k));
+  m.face([[-F, L, 0.01], [F, L, 0.01], [F, -L, 0.01], [-F, -L, 0.01]], { tex: 'speeder-shadow', uv: [[0, 0], [1, 0], [1, 1], [0, 1]] }, [0, 0, -1]);
+  // Collision: each lower airfoil from its foot in to where it's head
+  // high (you can walk in under the body), and round the gear under it.
+  for (const s of [-1, 1]) {
+    const inner = F - ((F - W) * 2) / B;
+    m.outlineLines([[s * inner, -L], [s * (F + 0.4), -L], [s * (F + 0.4), 1.1], [s * inner, 0.6]]);
+  }
+  m.outlineLines([[-1, -2.2], [1, -2.2], [1, 2], [-1, 2]]);
   return m.build();
 }
 
