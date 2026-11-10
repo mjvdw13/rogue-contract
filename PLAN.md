@@ -1419,7 +1419,7 @@ Mission 3 is. Each step is a commit, playable at `?map=m4`.
       consoles, the desk, crates, door surround, the terminal, girders,
       work lamp), the mouse droid and the interrogation droid, the
       `station` song and sounds.
-- [ ] The blockout: every area at its final heights with the real ways
+- [x] The blockout: every area at its final heights with the real ways
       between them, the gates (the terminal, the red door, the chute, the
       beam), the exit under the Crow. Validates; the play test passes.
 - [ ] The view from the mouth: the trench as the backdrop, the field,

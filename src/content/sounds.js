@@ -215,5 +215,7 @@ export default [
   defineSound({ id: 'bossk-sight', synth: groan(110, 70, 0.7, 0.27, { lowpass: 1100, distortion: 0.6, vibrato: { rate: 22, depth: 3 } }), pitchVariance: 0.06 }),
   defineSound({ id: 'bossk-pain', synth: groan(150, 95, 0.3, 0.56, { lowpass: 1300, distortion: 0.6, vibrato: { rate: 26, depth: 3 } }), pitchVariance: 0.1 }),
   defineSound({ id: 'bossk-death', synth: groan(140, 45, 1.1, 0.4, { lowpass: 1000, distortion: 0.6, vibrato: { rate: 18, depth: 4 } }), pitchVariance: 0.06 }),
+  // The mouse droid's squeal: a quick rising chatter.
+  defineSound({ id: 'mouse-droid-squeal', synth: { wave: 'square', duty: 0.25, freq: 900, freqEnd: 2600, duration: 0.09, release: 0.04, volume: 0.22, repeat: { count: 4, interval: 0.07, decay: 0.9, pitch: 1.12 } }, pitchVariance: 0.08 }),
   defineSound({ id: 'droid-pain', synth: { wave: 'square', duty: 0.3, freq: 1600, freqEnd: 400, duration: 0.15, release: 0.08, volume: 0.3, ...crunch } }),
 ];
