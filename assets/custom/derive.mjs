@@ -250,6 +250,15 @@ export const TOWN = [
   // scorched and rusted through.
   { out: 'dome-white', df: 'IWGREYC2', scale: [32, 32], gradient: [[96, 94, 88], [150, 148, 140], [196, 194, 186], [224, 222, 214], [240, 238, 230]], keep: 0, contrast: 0.7, rust: WORN(16, 51, 0.9) },
   { out: 'dome-blue', df: 'IWGREYC2', scale: [32, 32], gradient: [[10, 22, 54], [28, 56, 112], [58, 100, 168], [96, 140, 196]], keep: 0, contrast: 0.7, rust: WORN(16, 53, 0.7) },
+  // The skyhopper (models/farm.js, after Mark's T-16 references): a pane
+  // of Talay's window, its soft highlight kept, as the cockpit's dark
+  // tinted glass; the landspeeder's mottled grey, darker than the hull,
+  // for the airfoils' rims, the glass's frame and the fittings; and the
+  // skin of Dark Forces' own TIE engine, near black and oily, for the
+  // machinery and guns under it. Its pale parts wear the dome's white.
+  { out: 'hopper-glass', df: 'TWILI10A', crop: [12, 47, 44, 76], scale: [32, 64], gradient: [[12, 16, 22], [22, 30, 38], [36, 48, 58], [58, 74, 86], [92, 110, 122]], keep: 0, contrast: 1 },
+  { out: 'hopper-metal', df: 'IWGREYC2', gradient: [[30, 30, 30], [68, 68, 66], [100, 100, 96], [126, 124, 118], [148, 146, 138]], keep: 0, contrast: 0.8, rust: WORN(16, 211, 0.4) },
+  { out: 'hopper-dark', df: 'ENGTEXTS', gradient: [[8, 8, 8], [22, 22, 22], [36, 36, 34], [52, 50, 48], [70, 68, 64]], keep: 0.1, contrast: 1 },
   // The blast doors across the main street (m1.js), the one Imperial thing
   // the town has, years in the suns: Nar Shaddaa's grimy X-braced door and
   // streaked plate in sand-scoured steel, rust and soot over them, and its

@@ -371,13 +371,14 @@ function skyhopper() {
   const H = SKYHOPPER.height;
   const P = (u, f, k) => [u * H, (f - 0.22) * H, k * H];
   const HULL = { tex: 'cone-panel' };
-  const EDGE = { color: ['gray', 0.5] };
-  const DARK = { color: ['gray', 0.14] };
+  const EDGE = { tex: 'hopper-metal' };
+  const DARK = { tex: 'hopper-dark' };
   const GUTS = { tex: 'hold-guts', texScale: 0.5 };
-  const GLASS = { color: [34, 44, 52] };
-  const WHITE = { tex: 'plaster-white' };
-  const LIGHT = { color: [196, 196, 188] };
+  const WHITE = { tex: 'dome-white' };
   const RED = { tex: 'speeder-red' };
+  // The glass: the whole pane on each window, so each catches the light.
+  const GLASS = (...uv) => ({ tex: 'hopper-glass', uv });
+  const PANE = GLASS([0, 0], [1, 0], [1, 1], [0, 1]);
 
   // The body: a triangle from the front, its ridge at RIDGE and its foot
   // at BASE, HALF wide either side there; from REAR forward, its side
@@ -395,24 +396,24 @@ function skyhopper() {
   for (const s of [-1, 1]) {
     m.face([S(s, REAR, RIDGE), S(s, PANEL, RIDGE), S(s, PANEL, BASE), S(s, REAR, BASE)], HULL, inside);
     m.face([S(s, PANEL, RIDGE), S(s, front(RIDGE), RIDGE), S(s, front(GLASS_K), GLASS_K), S(s, PANEL, GLASS_K)], HULL, inside);
-    overlay(m, [S(s, PANEL + 0.004, RIDGE - 0.008), S(s, PANEL + 0.058, GLASS_K + 0.004), S(s, PANEL + 0.004, GLASS_K + 0.004)], GLASS, inside);
+    overlay(m, [S(s, PANEL + 0.004, RIDGE - 0.008), S(s, PANEL + 0.058, GLASS_K + 0.004), S(s, PANEL + 0.004, GLASS_K + 0.004)], GLASS([0, 0], [1, 1], [0, 1]), inside);
     m.face([S(s, PANEL, GLASS_K), S(s, front(GLASS_K), GLASS_K), S(s, front(BAND), BAND), S(s, PANEL, BAND)], WHITE, inside);
     m.face([S(s, PANEL, BAND), S(s, front(BAND), BAND), S(s, front(BASE), BASE), S(s, PANEL, BASE)], HULL, inside);
     for (let i = 0; i < 3; i++) {
       const f = PANEL + 0.012 + i * 0.045;
-      overlay(m, [S(s, f, GLASS_K - 0.004), S(s, f + 0.034, GLASS_K - 0.004), S(s, f + 0.034, BAND + 0.006), S(s, f, BAND + 0.006)], GLASS, inside);
+      overlay(m, [S(s, f, GLASS_K - 0.004), S(s, f + 0.034, GLASS_K - 0.004), S(s, f + 0.034, BAND + 0.006), S(s, f, BAND + 0.006)], PANE, inside);
     }
     // The logo in its square, and worn red marks along the top of the panel.
     overlay(m, [S(s, 0.06, 0.505), S(s, 0.125, 0.505), S(s, 0.125, 0.44), S(s, 0.06, 0.44)], WHITE, inside);
     overlay(m, [S(s, 0.072, 0.494), S(s, 0.113, 0.494), S(s, 0.113, 0.452), S(s, 0.072, 0.452)], RED, inside, 0.03);
     overlay(m, [S(s, 0.135, 0.49), S(s, 0.235, 0.49), S(s, 0.235, 0.47), S(s, 0.135, 0.47)], RED, inside);
   }
-  m.face([F(0, RIDGE), F(1, GLASS_K), F(-1, GLASS_K)], GLASS, inside);
+  m.face([F(0, RIDGE), F(1, GLASS_K), F(-1, GLASS_K)], GLASS([0.5, 0], [1, 1], [0, 1]), inside);
   m.face([F(-1, GLASS_K), F(1, GLASS_K), F(1, BAND), F(-1, BAND)], WHITE, inside);
   m.face([F(-1, BAND), F(1, BAND), F(1, BASE), F(-1, BASE)], HULL, inside);
   for (let i = 0; i < 5; i++) {
     const u = -0.86 + i * 0.35;
-    overlay(m, [F(u, GLASS_K - 0.004), F(u + 0.27, GLASS_K - 0.004), F(u + 0.27, BAND + 0.006), F(u, BAND + 0.006)], GLASS, inside);
+    overlay(m, [F(u, GLASS_K - 0.004), F(u + 0.27, GLASS_K - 0.004), F(u + 0.27, BAND + 0.006), F(u, BAND + 0.006)], PANE, inside);
   }
   // (The glass's frame: down its middle and along its sides.)
   const bar = (w, k) => [w * H, (front(k) - 0.22) * H, k * H];
@@ -431,8 +432,8 @@ function skyhopper() {
     m.face([at(0, 0.876), at(lead(0.876), 0.876), at(lead(0.934), 0.934), at(0, 0.934)], RED, middle);
     const out = (h) => (s > 0 ? T : -T - h);
     for (const f of [0.132, 0.178]) {
-      m.cylinder([out(0.008 * H), (f - 0.22) * H, 0.785 * H], 0.02 * H, 0.008 * H, { axis: 'x', segments: 10, ...LIGHT });
-      m.cylinder([out(0.013 * H), (f - 0.22) * H, 0.785 * H], 0.014 * H, 0.013 * H, { axis: 'x', segments: 10, color: [220, 220, 212] });
+      m.cylinder([out(0.008 * H), (f - 0.22) * H, 0.785 * H], 0.02 * H, 0.008 * H, { axis: 'x', segments: 10, ...EDGE });
+      m.cylinder([out(0.013 * H), (f - 0.22) * H, 0.785 * H], 0.014 * H, 0.013 * H, { axis: 'x', segments: 10, ...WHITE });
     }
     for (const [k0, k1] of [[0.56, 0.63], [0.65, 0.74]]) {
       const x0 = out(0.012 * H);
@@ -441,9 +442,9 @@ function skyhopper() {
   }
   // The airspeed sensor along the ridge, past both ends.
   const ZS = 0.533 * H;
-  m.cylinder([0, (-0.03 - 0.22) * H, ZS], 0.011 * H, 0.26 * H, { axis: 'y', segments: 6, ...LIGHT });
+  m.cylinder([0, (-0.03 - 0.22) * H, ZS], 0.011 * H, 0.26 * H, { axis: 'y', segments: 6, ...WHITE });
   m.cylinder([0, (0.23 - 0.22) * H, ZS], 0.015 * H, 0.04 * H, { axis: 'y', segments: 6, ...EDGE });
-  m.cylinder([0, (0.27 - 0.22) * H, ZS], 0.006 * H, 0.12 * H, { axis: 'y', segments: 6, ...LIGHT });
+  m.cylinder([0, (0.27 - 0.22) * H, ZS], 0.006 * H, 0.12 * H, { axis: 'y', segments: 6, ...WHITE });
   m.cylinder([0, (-0.037 - 0.22) * H, ZS], 0.007 * H, 0.007 * H, { axis: 'y', segments: 6, ...DARK });
 
   // Under the body: the deck the lower airfoils hang from, the machinery
@@ -453,15 +454,15 @@ function skyhopper() {
   m.box(P(-0.07, 0.44, 0.215), P(0.07, 0.445, 0.262), { ...DARK, side: () => GUTS, top: { tex: 'vent-grille' } });
   for (const s of [-1, 1]) {
     m.cylinder(P(s * 0.085, 0.4, 0.24), 0.016 * H, 0.06 * H, { axis: 'y', segments: 6, ...DARK });
-    m.cylinder(P(s * 0.085, 0.46, 0.24), 0.007 * H, 0.05 * H, { axis: 'y', segments: 6, ...LIGHT });
+    m.cylinder(P(s * 0.085, 0.46, 0.24), 0.007 * H, 0.05 * H, { axis: 'y', segments: 6, ...WHITE });
   }
   m.box(P(-0.015, 0.27, 0.17), P(0.015, 0.3, 0.2), DARK);
   m.cylinder(P(0, 0.25, 0.125), 0.05 * H, 0.09 * H, { axis: 'y', segments: 8, ...EDGE, sides: GUTS });
-  m.cylinder(P(0, 0.34, 0.125), 0.011 * H, 0.3 * H, { axis: 'y', segments: 6, ...LIGHT });
+  m.cylinder(P(0, 0.34, 0.125), 0.011 * H, 0.3 * H, { axis: 'y', segments: 6, ...WHITE });
   m.cylinder(P(0, 0.47, 0.125), 0.021 * H, 0.008 * H, { axis: 'y', segments: 10, ...EDGE });
   m.cylinder(P(0, 0.62, 0.125), 0.016 * H, 0.025 * H, { axis: 'y', segments: 6, ...DARK });
-  // The ion engine, a pale dome on the body's back.
-  m.cylinder(P(0, 0.022, 0.365), 0.036 * H, 0.018 * H, { axis: 'y', segments: 10, color: [214, 212, 204], top: false });
+  // The ion engine, pale, on the body's back.
+  m.cylinder(P(0, 0.022, 0.365), 0.036 * H, 0.018 * H, { axis: 'y', segments: 10, ...WHITE, top: false });
 
   // The lower airfoils: from the deck's edges under the body's back half,
   // down and out to the floor, the foot's leading corner cut; two hinge

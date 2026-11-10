@@ -50,6 +50,8 @@ const TOWN = [
   'bay-pipe','line-front', 'valve-wheel', 'hose-orange',
   // A scrapped astromech's dome (models/clutter.js).
   'dome-white', 'dome-blue',
+  // The skyhopper's glass, its rims and fittings, and its undercarriage (models/farm.js).
+  'hopper-glass', 'hopper-metal', 'hopper-dark',
   // The cargo pod's hull.
   'pod-hull',
   // The junk yard's deck plates on the sand (models/clutter.js).
