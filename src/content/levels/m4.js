@@ -1,6 +1,5 @@
 import { defineLevel } from '../../engine/defs.js';
 import { Painter } from './lib/painter.js';
-import { valueNoise } from './lib/noise.js';
 
 // MISSION 4: THE BATTLE STATION. The layout, route and numbers are in
 // docs/mission4.md (area numbers below match its table). Painted in code on
@@ -85,13 +84,13 @@ const column = (x0, y0, x1, y1, lx, ly) => {
 };
 
 // ---------------------------------------------------------------- 1. the hangar
-// Docking Bay 326: 32 m by 24 m and 11 m high, its mouth in the trench's
-// east wall, 18 m wide and 7 m high, a magnetic field across it.
+// Docking Bay 326: 32 m by 24 m and 11 m high, its mouth in the station's
+// hull, 18 m wide and 7 m high, a magnetic field across it.
 const hangar = (extra = {}) => room(0, 22, { floor: T.hangarFloor, side: T.hangarWall, upper: T.hangarWall, light: 144, ...extra });
 p.rect(16, 56, 80, 104, hangar());
-// Open space over the trench: beyond the deck's edge the floor is far
-// below and the sky starts just above it, so nothing but sky shows out
-// there, and the backdrop (the trench) is drawn over it.
+// Open space: beyond the deck's edge the floor is far below and the sky
+// starts just above it, so nothing but stars shows out there (Mark,
+// 2026-11-10: just a starfield).
 const SPACE_Z = -90;
 const space = { floor: T.hull, ceiling: 'sky', floorZ: SPACE_Z, ceilZ: SPACE_Z + 0.5, light: 0, side: T.hull, scenery: true };
 p.rect(1, 48, 15, 148, space);
@@ -309,7 +308,7 @@ p.rect(78, 114, 82, 118, bare(8, 16));
 for (const [x, y] of [[100, 124], [88, 132], [84, 121]]) lamps.push({ x, y, radius: 7, light: 96 });
 p.rect(76, 114, 78, 118, door(8, { upper: T.girder }));
 // 9c. The open hull gallery: its outer wall isn't on yet, only a field
-// between you and the trench.
+// between you and the stars.
 p.rect(16, 114, 76, 140, bare(8, 20, { light: 112 }));
 p.rect(15, 116, 16, 138, bare(8, 18, { ceiling: 'sky', light: 152 }));
 p.fence(15, 116, 16, 138, 'W', { tex: T.field });
@@ -337,26 +336,6 @@ for (let y = 0; y < H; y++) {
   }
 }
 for (const [x, y, c] of lining) p.set(x, y, c);
-
-// ---------------------------------------------------------------- the trench
-// Outside, the station's equatorial trench runs north to south past the
-// mouth: 70 m across and deeper than the eye can follow, its far wall a
-// little lower than this one, so the stars stand over it.
-const B = { x: -224, y: -160, cell: 4, w: 64, h: 118 };
-const heights = new Float32Array((B.w + 1) * (B.h + 1));
-for (let j = 0; j <= B.h; j++) {
-  for (let i = 0; i <= B.w; i++) {
-    const x = B.x + i * B.cell;
-    const y = B.y + j * B.cell;
-    // Blocks of machinery and towers: noise in steps, so their tops are flat.
-    const blocks = Math.floor(valueNoise(x, y, 14, 5) * 5) * 6 + Math.floor(valueNoise(x, y, 5, 9) * 3) * 3;
-    let z;
-    if (x >= 8) z = SPACE_Z; // under the station itself: never seen
-    else if (x > -128) z = -80 + Math.floor(valueNoise(x, y, 9, 3) * 3) * 4; // the trench's floor
-    else z = 4 + blocks + Math.min(40, (-128 - x) * 0.5); // the far wall, and the hull climbing away behind it
-    heights[j * (B.w + 1) + i] = z;
-  }
-}
 
 // ---------------------------------------------------------------- things
 const at = (type, x, y, extra = {}) => ({ type, x, y, ...extra });
@@ -490,13 +469,10 @@ export default defineLevel({
   music: 'garrison',
   sky: T.sky,
   skyWrap: 1,
-  // Out over the trench, things fade to black a long way off.
-  haze: { color: [0, 0, 0], half: 700 },
   par: 600,
   ...p.build(),
   lights: lamps,
   decals,
-  backdrop: { ...B, heights, tex: T.hull, light: 200, moon: [0.8, 0, 0.6], far: 480 },
   things: [],
   list,
   triggers: [

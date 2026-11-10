@@ -31,7 +31,7 @@ These need Mark to try something, or to decide. Don't start them without him.
 - **Mission 4, the Battle Station** (`?map=m4`, 2026-11-10,
   `docs/mission4.md`): a first pass of the whole level, made in one
   session without you. The hangar with the Crow, three TIE fighters and a
-  shuttle, its mouth on the trench (the far wall, the stars, Tatooine);
+  shuttle, its mouth open on the stars;
   the control room behind the glass and its terminal; the pale ring
   corridor with light bars; the briefing room behind the blue door; the
   lift hub; detention block AA-19 (black and red, ten cells, Rusk in the
@@ -1440,10 +1440,10 @@ Mission 3 is. Each step is a commit, playable at `?map=m4`.
 - [x] The blockout: every area at its final heights with the real ways
       between them, the gates (the terminal, the red door, the chute, the
       beam), the exit under the Crow. Validates; the play test passes.
-- [x] The view from the mouth: the trench as the backdrop, `sky-space`.
-- [ ] The field across the mouth barely shows, and the trench's far wall
-      shimmers (its texture is far finer than a pixel out there: a
-      backdrop texture scale would fix it).
+- [x] Only stars outside the docking bay (Mark, 2026-11-10): no trench,
+      no planet. The backdrop goes; `sky-space` is a starfield.
+- [ ] A finishing pass over the whole level (Mark, 2026-11-10), area by
+      area with snapshots: what reads wrong, what's bare, what's missing.
 - [ ] Each area in detail, in the order you meet them, snapshots before
       and after: the hangar; the lobby and control room; the ring
       corridor and briefing room; the hub; detention; the compactor and

@@ -345,8 +345,8 @@ export const STATION = [
   // The switch: the pale wall, a lit panel in it (red, then green).
   { out: 'ds-switch', df: 'IPEXFLR2', smooth: 2, gradient: PALE_WALL, keep: 0, contrast: 0.25, rects: [[22, 22, 20, 20, [26, 29, 37]], [25, 25, 14, 6, RED], [25, 34, 6, 5, [64, 70, 86]], [33, 34, 6, 5, [64, 70, 86]]] },
   { out: 'ds-switch-on', df: 'IPEXFLR2', smooth: 2, gradient: PALE_WALL, keep: 0, contrast: 0.25, rects: [[22, 22, 20, 20, [26, 29, 37]], [25, 25, 14, 6, [70, 230, 60]], [25, 34, 6, 5, [64, 70, 86]], [33, 34, 6, 5, [64, 70, 86]]] },
-  // Space: stars, and Tatooine in the west (u 0.5 of a sky that goes round once).
-  { out: 'sky-space', paint: 'space', size: [1024, 256], stars: 900, seed: 7, planet: { at: 0.5, row: 150, r: 34, color: [236, 190, 130] } },
+  // Space: only stars (Mark, 2026-11-10).
+  { out: 'sky-space', paint: 'space', size: [1024, 256], stars: 1400, seed: 7 },
   // See-through: the field across the hangar's mouth, the control room's
   // window and a clean handrail.
   { out: 'ds-field', paint: 'field', size: [64, 64], color: [60, 220, 255], seed: 11 },
@@ -844,7 +844,8 @@ const PAINT = {
     const img = blank(w, h, [0, 0, 0, 255]);
     for (let n = 0; n < stars; n++) {
       const x = Math.floor(hash(n, 1, seed) * w);
-      const y = Math.floor(hash(n, 2, seed) * h);
+      // None on the last rows: below the horizon the sky repeats its last row.
+      const y = Math.floor(hash(n, 2, seed) * (h - 4));
       const b = hash(n, 3, seed);
       const v = b > 0.97 ? 255 : b > 0.8 ? 170 : 90;
       fillRect(img, x, y, 1, 1, [v, v, Math.min(255, v + 20)]);

@@ -37,9 +37,8 @@ and the finale, and gives the finale its reason.
   instead of a farm boy and nobody to tell him the odds.
 - **Fresh.** The station isn't finished. One sector on the way back is
   bare girders, missing deck plates and work lamps, its outer wall open to
-  the trench behind a field. Mouse droids underfoot, interrogation droids
-  in the cell block, and the view from the hangar's mouth across the
-  trench to its far wall, the planet over it.
+  space behind a field. Mouse droids underfoot, interrogation droids in
+  the cell block, and nothing but stars out of the hangar's mouth.
 
 Sample lines (stand-ins, like every level's):
 
@@ -82,7 +81,7 @@ loop back to the hangar:
 | 5 | The chute | The alarm shuts the lift; Rusk points at the hatch |
 | 6-7 | Out of the compactor, up the tunnels | One way on |
 | 8 | The terminal on the column | The bridge leads to it; the beam's glow |
-| 9 | The hangar | Jan's line; one way on; the trench to the left |
+| 9 | The hangar | Jan's line; one way on; the stars to the left |
 | 1 | The Crow | The exit works once the beam is off |
 
 ## Areas (x, y in tiles; heights in units)
@@ -91,7 +90,7 @@ The map is 208 x 152. Everything not painted is the station's structure.
 
 | # | Area | Box (x0..x1, y0..y1) | Floor / ceiling | Notes |
 |---|------|----------------------|-----------------|-------|
-| 1 | Docking Bay 326 | 16..80, 56..104 | 0 / 22 | 32 m by 24 m. The mouth (15, 62..98, 7 m high) in the trench's east wall, a field across it. The Crow in the middle, nose to the mouth; three TIE fighters in cradles along the north wall; a shuttle and cargo in the south-east. The control room's window high on the east wall. A gantry (a slab, top 8) along the south wall, a lift at its west end. The troop bay's door in the north wall. |
+| 1 | Docking Bay 326 | 16..80, 56..104 | 0 / 22 | 32 m by 24 m. The mouth (15, 62..98, 7 m high) in the station's hull, a field across it, only stars beyond (Mark, 2026-11-10: just a starfield). The Crow in the middle, nose to the mouth; three TIE fighters in cradles along the north wall; a shuttle and cargo in the south-east. The control room's window high on the east wall. A gantry (a slab, top 8) along the south wall, a lift at its west end. The troop bay's door in the north wall. |
 | 1a | Cargo lift and store | 64..70, 97..103; 62..72, 104..114 | lift 0 to -8; -8 / -3 | Secret 1. The lift is marked with hazard stripes. |
 | 1b | Troop bay | 30..50, 46..54 | 0 / 5 | Shut until the beam is off: the last fight's squad. |
 | 2 | Lobby | 82..100, 94..106 | 0 / 5 | From the hangar's east door. Lift (86..90, 90..94) up to 8. The ring door east (remote). |
@@ -108,7 +107,7 @@ The map is 208 x 152. Everything not painted is the station's structure.
 | 8 | Tractor beam shaft | 156..200, 100..144 | -60 / 30 | A ledge round it (slab, top 0), a bridge from the north ledge to the column (174..182, 118..126), a ledge 2 wide round the column. The terminal on the column's south face. Falling kills. |
 | 9a | Bare deck | 112..154, 112..136 | 0 / 8 | Missing plates (pits to -3), girders, work lamps, sparks. |
 | 9b | Panel yard | 78..112, 112..140 | 0 up to 8 / 16 | Stacks of wall panels, cable reels, stairs up to 8. |
-| 9c | Open hull gallery | 18..78, 112..144 | 8 / 20 | The outer wall is bare truss and a field: the trench beside you. North door onto the hangar's gantry. |
+| 9c | Open hull gallery | 18..78, 112..144 | 8 / 20 | The outer wall is bare truss and a field: the stars beside you. North door onto the hangar's gantry. |
 
 ## The kit (design language)
 
@@ -141,8 +140,7 @@ black decks, white light**, clean and new. Each area changes one thing.
   it at intervals, the column glowing.
 - **Unfinished sector:** `ds-girder` where the panels aren't on yet,
   bare decks (`ds-floor-grate`), work lamps in pools, the rest dark.
-- **Outside:** `sky-space` (stars, the planet in the west) and the
-  trench's far wall and floor as the backdrop (`ds-hull`).
+- **Outside:** `sky-space`, only stars. No backdrop.
 
 Models (`models/station.js`): `tie-fighter`, `tie-rack`, `lambda-shuttle`,
 `ds-console`, `ds-console-wall`, `ds-desk`, `ds-table`, `ds-chair`,
@@ -189,6 +187,6 @@ To be filled in from `m4.js` once the fights are placed (the table as in
   so the mouth's own column of deck is a sky tile with a low ceiling (the
   hangar's wall above it is its `upper`), and the tiles beyond are sky
   tiles 90 down whose sky starts just above their floor. Everything out
-  there is then sky, and the backdrop draws over it: the trench.
+  there is then sky.
 - **The last exit** is a trigger on the tiles under the Crow, `if` the
   beam is off (Mission 1 ends the same way).
