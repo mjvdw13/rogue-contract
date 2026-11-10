@@ -1406,6 +1406,36 @@ snapshots, playable at `?map=m2`.
 - [ ] **Tune and check:** light, the sand, frame time, the per-skill check;
       update `docs/mission2.md`.
 
+### 10. Mission 4: the Battle Station (Mark, 2026-11-10)
+
+A level on the first Death Star: a hangar, hallways and a detention
+block at least, fresh but familiar. The design (story proposal, flow,
+areas, the kit, light, secrets) is `docs/mission4.md`. Painted in code as
+Mission 3 is. Each step is a commit, playable at `?map=m4`.
+
+- [x] Design: `docs/mission4.md`.
+- [ ] The kit: textures (`ds-*`, `sky-space`, from the DF pack by
+      `derive.mjs`), models (`models/station.js`: TIE fighter, shuttle,
+      consoles, the desk, crates, door surround, the terminal, girders,
+      work lamp), the mouse droid and the interrogation droid, the
+      `station` song and sounds.
+- [ ] The blockout: every area at its final heights with the real ways
+      between them, the gates (the terminal, the red door, the chute, the
+      beam), the exit under the Crow. Validates; the play test passes.
+- [ ] The view from the mouth: the trench as the backdrop, the field,
+      `sky-space`.
+- [ ] Each area in detail, in the order you meet them, snapshots before
+      and after: the hangar; the lobby and control room; the ring
+      corridor and briefing room; the hub; detention; the compactor and
+      maintenance; the shaft; the unfinished sector.
+- [ ] Life: enemies and items by skill (the table in the doc), mouse
+      droids, the alarm, the troop bay's squad.
+- [ ] The story's stand-in words: Jan's lines, the terminal, Rusk, the
+      project file.
+- [ ] Tune and check: light, frame time, the per-skill check, the ammo
+      budget; update `docs/mission4.md`.
+- [ ] Waiting on Mark: where it sits in the story, and the look.
+
 ## Small fixes and known rough edges
 
 - [ ] A second `Registry` built from the same content pack finds no sprite
