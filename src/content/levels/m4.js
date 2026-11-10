@@ -9,43 +9,42 @@ import { valueNoise } from './lib/noise.js';
 const W = 208;
 const H = 152;
 
-// ---- The kit's textures (docs/mission4.md, "The kit"). Until the station's
-// own set (`ds-*`) is made, the Imperial base's stand in.
+// ---- The kit's textures (docs/mission4.md, "The kit"; assets/custom/derive.mjs, STATION).
 const T = {
-  wall: 'imp-panel',
-  wallLight: 'imp-lights',
-  wallDark: 'imp-panel-dark',
-  hangarWall: 'imp-panel-dark',
-  greeble: 'imp-vent',
-  detWall: 'imp-panel-dark',
-  compactorWall: 'imp-vent',
-  pipes: 'imp-vent',
-  girder: 'imp-stripe',
-  screen: 'imp-computer',
-  floor: 'imp-floor',
-  hangarFloor: 'imp-floor',
-  hazard: 'lift-floor',
-  grate: 'imp-grate',
-  detFloor: 'imp-floor',
-  detFloorLight: 'imp-ceiling-light',
+  wall: 'ds-wall',
+  wallLight: 'ds-wall-light',
+  wallDark: 'ds-wall-dark',
+  hangarWall: 'ds-hangar-wall',
+  greeble: 'ds-wall-greeble',
+  detWall: 'ds-det-wall',
+  compactorWall: 'ds-compactor-wall',
+  pipes: 'ds-wall-greeble',
+  girder: 'ds-girder',
+  screen: 'ds-screen',
+  floor: 'ds-floor',
+  hangarFloor: 'ds-floor-hangar',
+  hazard: 'ds-floor-line',
+  grate: 'ds-floor-grate',
+  detFloor: 'ds-floor',
+  detFloorLight: 'ds-det-floor-light',
   sludge: 'water-murky',
-  ceiling: 'imp-ceiling',
-  ceilingLight: 'imp-ceiling-light',
+  ceiling: 'ds-ceiling',
+  ceilingLight: 'ds-ceiling-light',
   liftFloor: 'lift-floor',
-  door: 'imp-gate',
+  door: 'ds-door',
   doorJamb: 'imp-gate-jamb',
-  doorNarrow: 'imp-door',
-  doorRed: 'imp-door-red',
-  doorBlue: 'imp-door-blue',
+  doorNarrow: 'ds-door-narrow',
+  doorRed: 'ds-door-red',
+  doorBlue: 'ds-door-blue',
   jamb: 'imp-jamb',
-  switchOff: 'imp-switch',
-  switchOn: 'imp-switch-on',
-  hull: 'imp-panel-dark',
-  field: 'imp-cage',
-  window: 'imp-bars',
-  railing: 'imp-railing',
+  switchOff: 'ds-switch',
+  switchOn: 'ds-switch-on',
+  hull: 'ds-hull',
+  field: 'ds-field',
+  window: 'ds-window',
+  railing: 'ds-railing',
   edge: 'imp-stripe',
-  sky: 'sky-night',
+  sky: 'sky-space',
 };
 
 const hull = { wall: T.wallDark };
@@ -260,7 +259,7 @@ p.rect(193, 92, 197, 100, tunnel(0, { light: 136 }));
 // A shaft with no bottom you can see: a ledge round it, a bridge from the
 // north ledge to the column, a ledge round the column, all slabs, so the
 // shaft runs on under them. The terminal is on the column's far side.
-const pit = room(-60, 30, { floor: T.grate, side: T.wallDark, upper: T.wallDark, light: 96 });
+const pit = room(-60, 30, { floor: T.grate, side: T.wallDark, upper: T.wallDark, light: 112 });
 const walk = { ...pit, light: 152, slab: { bottom: -0.5, top: 0, floor: T.grate, ceiling: T.grate, side: T.edge, light: 96 } };
 p.rect(156, 100, 200, 144, pit);
 p.rect(156, 100, 200, 104, walk);
@@ -318,6 +317,26 @@ for (const x of [28, 44, 60]) lamps.push({ x, y: 128, radius: 8, light: 96 });
 // North to the hangar's gantry.
 p.rect(44, 106, 48, 114, bare(8, 12));
 p.rect(44, 104, 48, 106, door(8, { upper: T.hangarWall }));
+
+// ---------------------------------------------------------------- the walls
+// Every room is dug out of the station's dark structure; the walls round
+// it take its own panelling (its `upper`: pale in the corridors, black in
+// detention, bare truss where the station isn't finished).
+const lining = [];
+for (let y = 0; y < H; y++) {
+  for (let x = 0; x < W; x++) {
+    if (p.get(x, y) !== hull) continue;
+    let tex = null;
+    for (let dy = -1; dy <= 1 && !tex; dy++) {
+      for (let dx = -1; dx <= 1 && !tex; dx++) {
+        const n = p.get(x + dx, y + dy);
+        if (n && !n.wall && !n.door && n.ceiling !== 'sky' && n.upper) tex = n.upper;
+      }
+    }
+    if (tex && tex !== T.wallDark) lining.push([x, y, { wall: tex }]);
+  }
+}
+for (const [x, y, c] of lining) p.set(x, y, c);
 
 // ---------------------------------------------------------------- the trench
 // Outside, the station's equatorial trench runs north to south past the

@@ -290,6 +290,86 @@ export const TOWN = [
 ];
 
 /**
+ * The battle station (m4, docs/mission4.md): pale cool grey walls, glossy
+ * black decks, white light. As TOWN: straight from the pack, no generated
+ * stand-in. `rects: [[x, y, w, h, colour]]` paints rectangles over the
+ * result (a light bar, a painted line, a marker lamp: palette glow
+ * colours, so they shine); `paint` draws one from nothing (PAINT below).
+ */
+const PALE = [[52, 54, 60], [100, 100, 99], [140, 139, 137], [182, 180, 176], [214, 212, 206]];
+// (The corridor wall's: a narrow range, so the plate is nearly plain.)
+const PALE_WALL = [[120, 120, 118], [140, 139, 137], [160, 159, 156], [182, 180, 176], [200, 198, 192]];
+const GUNMETAL = [[9, 10, 14], [26, 29, 37], [45, 49, 61], [64, 70, 86], [84, 91, 111]];
+const BLACK = [[4, 4, 6], [12, 13, 17], [22, 24, 30], [36, 38, 46], [58, 62, 74]];
+const TUBE = [214, 232, 255];
+const RED = [255, 40, 30];
+const DIM_RED = [150, 10, 10];
+export const STATION = [
+  // The corridor wall: the Executor's pale panelled plate.
+  { out: 'ds-wall', df: 'IPEXFLR2', smooth: 2, gradient: PALE_WALL, keep: 0, contrast: 0.25, rects: [[0, 0, 64, 1, [100, 100, 99]], [0, 1, 64, 1, [196, 194, 188]], [0, 0, 1, 64, [120, 120, 118]], [32, 0, 1, 64, [120, 120, 118]]] },
+  // The same with the film's light column: a white bar in a dark recess,
+  // floor to ceiling (the texture repeats up the wall).
+  { out: 'ds-wall-light', df: 'IPEXFLR2', smooth: 2, gradient: PALE_WALL, keep: 0, contrast: 0.25, rects: [[0, 0, 64, 1, [100, 100, 99]], [0, 1, 64, 1, [196, 194, 188]], [20, 0, 24, 64, [26, 29, 37]], [22, 0, 1, 64, [84, 91, 111]], [41, 0, 1, 64, [84, 91, 111]], [27, 0, 10, 64, TUBE], [27, 30, 10, 2, [108, 114, 134]]] },
+  // Dark gunmetal panels (the hangar high up, the shaft), and the hangar's.
+  { out: 'ds-wall-dark', df: 'IWADARK1', gradient: GUNMETAL, keep: 0, contrast: 1 },
+  { out: 'ds-hangar-wall', df: 'IWADARK3', gradient: [[14, 15, 20], [36, 39, 48], [58, 62, 74], [80, 86, 100], [108, 114, 130]], keep: 0, contrast: 1 },
+  // Machinery along the hangar's foot and in the maintenance tunnels.
+  { out: 'ds-wall-greeble', df: 'IWAPIPE6', gradient: [[8, 9, 12], [30, 32, 40], [60, 64, 76], [96, 102, 116], [150, 156, 170]], keep: 0.25, contrast: 1 },
+  // Bare structure where the panels aren't on yet: the X truss, in primer.
+  { out: 'ds-girder', df: 'IWBGFUL3', gradient: [[14, 10, 10], [50, 34, 30], [92, 60, 50], [130, 92, 76], [168, 130, 110]], keep: 0, contrast: 1 },
+  // Detention: black panels, slots of red light.
+  { out: 'ds-det-wall', df: 'IWADARK1', gradient: BLACK, keep: 0, contrast: 1.1, rects: [[8, 40, 20, 3, RED], [36, 40, 20, 3, RED], [8, 104, 20, 3, RED], [36, 104, 20, 3, RED], [8, 43, 20, 1, DIM_RED], [36, 43, 20, 1, DIM_RED], [8, 107, 20, 1, DIM_RED], [36, 107, 20, 1, DIM_RED]] },
+  // The compactor: the Detention Centre's stained wall, wetter and rustier.
+  { out: 'ds-compactor-wall', df: 'IWCMPCTR', gradient: [[10, 10, 8], [36, 34, 28], [66, 62, 52], [96, 90, 76], [124, 116, 98]], keep: 0.5, contrast: 1, rust: [{ color: [96, 50, 22], amount: 0.5, cell: 32, seed: 301 }, { color: [10, 14, 10], amount: 0.5, cell: 16, seed: 303 }] },
+  // A wall of displays (the control room, the briefing room).
+  { out: 'ds-screen', df: 'IWPANEL2' },
+  // Decks: glossy near-black plates; the hangar's, and its painted line.
+  { out: 'ds-floor', df: 'IPADARK3', gradient: BLACK, keep: 0, contrast: 1.2 },
+  { out: 'ds-floor-hangar', df: 'IPADARK4', gradient: BLACK, keep: 0, contrast: 1 },
+  { out: 'ds-floor-line', df: 'IPADARK4', gradient: BLACK, keep: 0, contrast: 1, rects: [[0, 26, 64, 12, [140, 139, 137]], [0, 26, 64, 1, [100, 100, 99]], [0, 37, 64, 1, [100, 100, 99]]] },
+  { out: 'ds-floor-grate', df: 'ZPGRTE3X', gradient: [[4, 4, 6], [20, 22, 28], [44, 48, 58], [72, 78, 92]], keep: 0, contrast: 1 },
+  // The cell block's lane: the Detention Centre's grid of red light.
+  { out: 'ds-det-floor-light', df: 'IPDTENRD' },
+  { out: 'ds-ceiling', df: 'IPDETSQR', gradient: GUNMETAL, keep: 0, contrast: 1 },
+  { out: 'ds-ceiling-light', df: 'IPALITE1' },
+  // The station's skin far off (the trench, as the backdrop): plain plate,
+  // a few lit windows.
+  { out: 'ds-hull', df: 'IPADARK3', tile: [2, 2], gradient: [[30, 32, 38], [54, 58, 68], [76, 82, 96], [96, 102, 118]], keep: 0, contrast: 0.5, rects: [[9, 20, 2, 1, [255, 250, 200]], [70, 51, 1, 1, TUBE], [41, 90, 2, 1, [255, 236, 120]], [110, 12, 1, 1, [255, 250, 200]], [97, 113, 1, 2, TUBE], [22, 70, 1, 1, [255, 255, 255]]] },
+  // Doors: the security base's twin-crest blast door (4 by 4), and the
+  // Detention Centre's hatch for side rooms and cells (2 by 2), with a
+  // key's colour for the locked ones.
+  { out: 'ds-door', df: 'IDSECB1' },
+  { out: 'ds-door-narrow', df: 'IDDET1' },
+  { out: 'ds-door-red', df: 'IDDET1', rects: [[26, 52, 12, 4, RED]] },
+  { out: 'ds-door-blue', df: 'IDDET1', rects: [[26, 52, 12, 4, [20, 150, 220]]] },
+  // The switch: the pale wall, a lit panel in it (red, then green).
+  { out: 'ds-switch', df: 'IPEXFLR2', smooth: 2, gradient: PALE_WALL, keep: 0, contrast: 0.25, rects: [[22, 22, 20, 20, [26, 29, 37]], [25, 25, 14, 6, RED], [25, 34, 6, 5, [64, 70, 86]], [33, 34, 6, 5, [64, 70, 86]]] },
+  { out: 'ds-switch-on', df: 'IPEXFLR2', smooth: 2, gradient: PALE_WALL, keep: 0, contrast: 0.25, rects: [[22, 22, 20, 20, [26, 29, 37]], [25, 25, 14, 6, [70, 230, 60]], [25, 34, 6, 5, [64, 70, 86]], [33, 34, 6, 5, [64, 70, 86]]] },
+  // Space: stars, and Tatooine in the west (u 0.5 of a sky that goes round once).
+  { out: 'sky-space', paint: 'space', size: [1024, 256], stars: 900, seed: 7, planet: { at: 0.5, row: 150, r: 34, color: [236, 190, 130] } },
+  // See-through: the field across the hangar's mouth, the control room's
+  // window and a clean handrail.
+  { out: 'ds-field', paint: 'field', size: [64, 64], color: [60, 220, 255], seed: 11 },
+  { out: 'ds-window', paint: 'window', size: [64, 128], pane: 32, frame: [26, 29, 37, 255], glint: [144, 150, 168, 255], seed: 13 },
+  { out: 'ds-railing', paint: 'railing', size: [64, 24], post: 32, color: [140, 139, 137, 255], dark: [64, 64, 64, 255] },
+  // Skins for the models (models/station.js): the TIE fighter's solar
+  // panel as Dark Forces drew it, its hull, machinery and window; crates;
+  // consoles; plain metals and lamps.
+  { out: 'tie-wing', df: 'TIEWNG' },
+  { out: 'tie-hull', df: 'IPGRDBLY', gradient: [[40, 46, 58], [84, 91, 111], [108, 114, 134], [144, 150, 168], [176, 184, 200]], keep: 0, contrast: 0.8 },
+  { out: 'tie-dark', df: 'ENGTEXTS', scale: [32, 32], gradient: [[6, 6, 8], [20, 21, 26], [36, 38, 46], [56, 60, 72]], keep: 0, contrast: 1 },
+  { out: 'tie-window', paint: 'tieWindow', size: [64, 64], glass: [20, 26, 38], frame: [144, 150, 168] },
+  { out: 'ds-crate', df: 'IPRMCRT9', gradient: [[12, 13, 16], [36, 38, 46], [64, 68, 80], [100, 104, 116], [160, 164, 174]], keep: 0, contrast: 1 },
+  { out: 'ds-crate-b', df: 'IPRMCRT9', gradient: PALE, keep: 0, contrast: 1 },
+  { out: 'ds-console-top', df: 'IWPANEL2', crop: [44, 0, 64, 64] },
+  { out: 'ds-console-side', df: 'IWADARK1', crop: [0, 0, 64, 32], gradient: GUNMETAL, keep: 0, contrast: 1 },
+  { out: 'ds-metal', df: 'IPGRDBLY', scale: [32, 32], gradient: PALE, keep: 0, contrast: 0.6 },
+  { out: 'ds-metal-dark', df: 'IPADARK3', scale: [32, 32], gradient: GUNMETAL, keep: 0, contrast: 0.8 },
+  { out: 'ds-lamp', paint: 'flat', size: [16, 16], color: TUBE },
+  { out: 'ds-lamp-red', paint: 'flat', size: [16, 16], color: RED },
+];
+
+/**
  * Mos Eisley's doors and windows: decals (see-through pictures on the
  * walls), cut from DF textures. `size: [w, h]` scales the source (after
  * `crop`) to that many texels (32 a tile); `mask` cuts its shape, `'arch'`
@@ -708,27 +788,147 @@ function packFiles() {
   return files;
 }
 
+/** A TOWN texture from its source image: the steps above, in their order. */
+function worked(img, spec) {
+  if (spec.crop) img = cropped(img, spec.crop);
+  if (spec.smooth) img = smoothed(img, spec.smooth);
+  if (spec.scale) img = resized(img, spec.scale);
+  if (spec.turn) img = turned(img);
+  if (spec.tile) img = tiled(img, spec.tile);
+  if (spec.gradient) img = gradientMap(img, spec);
+  if (spec.fade) img = faded(img, spec.fade);
+  if (spec.glow) img = glowed(img, spec.glow);
+  if (spec.suns) img = sunned(img, spec.suns);
+  for (const r of [spec.rust ?? []].flat()) img = rusted(img, r);
+  if (spec.lip) img = lipped(img, spec.lip);
+  if (!spec.holes) for (let i = 3; i < img.data.length; i += 4) img.data[i] = 255;
+  if (spec.edge) img = edged(img, spec.edge);
+  for (const [x, y, w, h, color] of spec.rects ?? []) fillRect(img, x, y, w, h, color);
+  return img;
+}
+
+/** Fill a rectangle with one colour (`[r, g, b]`, or with a fourth number, its alpha). */
+function fillRect(img, x0, y0, w, h, color) {
+  for (let y = Math.max(0, y0); y < Math.min(img.height, y0 + h); y++) {
+    for (let x = Math.max(0, x0); x < Math.min(img.width, x0 + w); x++) {
+      const i = (y * img.width + x) * 4;
+      img.data[i] = color[0];
+      img.data[i + 1] = color[1];
+      img.data[i + 2] = color[2];
+      img.data[i + 3] = color[3] ?? 255;
+    }
+  }
+}
+
+/** A small repeatable random number for a texel. */
+const hash = (x, y, seed) => {
+  let h = (x * 374761393 + y * 668265263 + seed * 362437) | 0;
+  h = Math.imul(h ^ (h >>> 13), 1274126177);
+  return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
+};
+const blank = (w, h, color = [0, 0, 0, 0]) => {
+  const img = { width: w, height: h, data: new Uint8Array(w * h * 4) };
+  fillRect(img, 0, 0, w, h, color);
+  return img;
+};
+
+/** The station's textures drawn from nothing (`paint` in a STATION entry). */
+const PAINT = {
+  /** One flat colour. */
+  flat: ({ size: [w, h], color }) => blank(w, h, [...color, 255]),
+  /**
+   * Space: black, stars of mixed brightness, and a planet (`planet: { at,
+   * row, r, color }`, `at` a share of the width), lit from one side.
+   */
+  space({ size: [w, h], stars, seed, planet }) {
+    const img = blank(w, h, [0, 0, 0, 255]);
+    for (let n = 0; n < stars; n++) {
+      const x = Math.floor(hash(n, 1, seed) * w);
+      const y = Math.floor(hash(n, 2, seed) * h);
+      const b = hash(n, 3, seed);
+      const v = b > 0.97 ? 255 : b > 0.8 ? 170 : 90;
+      fillRect(img, x, y, 1, 1, [v, v, Math.min(255, v + 20)]);
+    }
+    if (planet) {
+      const cx = planet.at * w;
+      for (let y = Math.floor(planet.row - planet.r); y <= planet.row + planet.r; y++) {
+        for (let x = Math.floor(cx - planet.r); x <= cx + planet.r; x++) {
+          const dx = (x + 0.5 - cx) / planet.r;
+          const dy = (y + 0.5 - planet.row) / planet.r;
+          const d2 = dx * dx + dy * dy;
+          if (d2 > 1) continue;
+          // A sphere lit from the upper left; bands of dune and rock across it.
+          const dz = Math.sqrt(1 - d2);
+          const lit = Math.max(0, -0.6 * dx - 0.45 * dy + 0.55 * dz);
+          const band = 0.85 + 0.15 * Math.sin(dy * 9 + Math.sin(dx * 4) * 1.5) + (hash(x >> 1, y >> 1, seed) - 0.5) * 0.12;
+          const k = Math.min(1, lit * 1.35) * band;
+          fillRect(img, x, y, 1, 1, planet.color.map((c) => Math.round(c * k)));
+        }
+      }
+    }
+    return img;
+  },
+  /** A magnetic field: see-through, a thin scatter of lit texels, denser along some rows. */
+  field({ size: [w, h], color, seed }) {
+    const img = blank(w, h);
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const line = y % 16 === 0;
+        if (hash(x, y, seed) < (line ? 0.5 : (x + y) % 2 ? 0 : 0.14)) fillRect(img, x, y, 1, 1, color);
+      }
+    }
+    return img;
+  },
+  /** A window: a dark frame round each pane, the glass see-through but for a few glints. */
+  window({ size: [w, h], pane, frame, glint, seed }) {
+    const img = blank(w, h);
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        if (x % pane < 2 || y < 2 || y >= h - 2) fillRect(img, x, y, 1, 1, frame);
+        else if (hash(x + y, (x - y) >> 2, seed) < 0.003) fillRect(img, x, y, 1, 1, glint);
+      }
+    }
+    return img;
+  },
+  /** A handrail: a rail along the top, a thin one under it, a post each `post` texels. */
+  railing({ size: [w, h], post, color, dark }) {
+    const img = blank(w, h);
+    fillRect(img, 0, 0, w, 3, color);
+    fillRect(img, 0, 3, w, 1, dark);
+    fillRect(img, 0, 12, w, 1, color);
+    for (let x = 0; x < w; x += post) fillRect(img, x, 0, 2, h, color);
+    return img;
+  },
+  /** The TIE fighter's window: dark glass in a ring, eight spokes to a hub. */
+  tieWindow({ size: [w, h], glass, frame }) {
+    const img = blank(w, h, [...frame, 255]);
+    const c = w / 2;
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const dx = x + 0.5 - c;
+        const dy = y + 0.5 - c;
+        const r = Math.hypot(dx, dy) / c;
+        const a = ((Math.atan2(dy, dx) / Math.PI) * 4 + 8.5) % 1;
+        if (r < 0.9 && r > 0.26 && Math.abs(a - 0.5) < 0.5 - 0.05 / r) fillRect(img, x, y, 1, 1, glass.map((v) => Math.round(v * (1.25 - r * 0.5))));
+      }
+    }
+    return img;
+  },
+};
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const pack = packFiles();
   const made = new Map();
   for (const spec of TOWN) {
-    let img = decodePNG(fs.readFileSync(pack.get(spec.df)));
-    if (spec.crop) img = cropped(img, spec.crop);
-    if (spec.smooth) img = smoothed(img, spec.smooth);
-    if (spec.scale) img = resized(img, spec.scale);
-    if (spec.turn) img = turned(img);
-    if (spec.tile) img = tiled(img, spec.tile);
-    if (spec.gradient) img = gradientMap(img, spec);
-    if (spec.fade) img = faded(img, spec.fade);
-    if (spec.glow) img = glowed(img, spec.glow);
-    if (spec.suns) img = sunned(img, spec.suns);
-    for (const r of [spec.rust ?? []].flat()) img = rusted(img, r);
-    if (spec.lip) img = lipped(img, spec.lip);
-    if (!spec.holes) for (let i = 3; i < img.data.length; i += 4) img.data[i] = 255;
-    if (spec.edge) img = edged(img, spec.edge);
+    const img = worked(decodePNG(fs.readFileSync(pack.get(spec.df))), spec);
     made.set(spec.out, img);
     fs.writeFileSync(path.join(texDir, `${spec.out}.png`), encodePNG(img.width, img.height, img.data));
     console.log(`${spec.out}.png from ${spec.df} (${img.width}x${img.height})`);
+  }
+  for (const spec of STATION) {
+    const img = spec.paint ? PAINT[spec.paint](spec) : worked(decodePNG(fs.readFileSync(pack.get(spec.df))), spec);
+    made.set(spec.out, img);
+    fs.writeFileSync(path.join(texDir, `${spec.out}.png`), encodePNG(img.width, img.height, img.data));
+    console.log(`${spec.out}.png (${img.width}x${img.height}, the station's)`);
   }
   for (let m = 1; m < 15; m++) {
     const img = driftEdge(made.get(DRIFT_EDGES.sand), made.get(DRIFT_EDGES.drift), m);

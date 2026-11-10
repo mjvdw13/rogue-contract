@@ -135,6 +135,21 @@ const SPEEDER = ['speeder-glass'];
 // assets/custom/crow.mjs and loaded from there directly. The engines glow.
 const CROW = ['crow-hull-side', 'crow-hull-top', 'crow-side', 'crow-belly', 'crow-rear', 'crow-nose', 'crow-ribs', 'crow-panel', 'crow-gun', 'crow-barrel', 'crow-wing', 'crow-fin', 'crow-grille', 'crow-ladder'];
 
+// The battle station (m4): derive.mjs, STATION. The ones with lamps and
+// screens glow; the rest never do.
+const STATION = [
+  'ds-wall', 'ds-wall-dark', 'ds-hangar-wall', 'ds-wall-greeble', 'ds-girder', 'ds-compactor-wall',
+  'ds-floor', 'ds-floor-hangar', 'ds-floor-line', 'ds-floor-grate', 'ds-ceiling',
+  'ds-door', 'ds-door-narrow',
+  // Skins for models/station.js.
+  'tie-wing', 'tie-hull', 'tie-dark', 'tie-window', 'ds-crate', 'ds-crate-b', 'ds-console-side', 'ds-metal', 'ds-metal-dark',
+];
+const STATION_GLOW = [
+  'ds-wall-light', 'ds-det-wall', 'ds-screen', 'ds-det-floor-light', 'ds-ceiling-light', 'ds-hull',
+  'ds-door-red', 'ds-door-blue', 'ds-switch', 'ds-switch-on', 'ds-console-top', 'ds-lamp', 'ds-lamp-red',
+];
+const STATION_FENCES = ['ds-field', 'ds-window', 'ds-railing'];
+
 const ANIMATED = {
   'imp-computer': { frames: 3, fps: 3 },
 };
@@ -153,6 +168,10 @@ export default [
   defineTexture({ id: 'crow-engine', src: 'assets/custom/textures/crow-engine.png' }),
   ...TOWN_FENCES.map((id) => defineTexture({ id, src: `assets/custom/textures/${id}.png`, fence: true, fullbright: false })),
   ...TOWN_DECALS.map((id) => defineTexture({ id, src: `assets/custom/textures/${id}.png`, decal: true, fullbright: false })),
+  ...STATION.map((id) => defineTexture({ id, src: `assets/custom/textures/${id}.png`, fullbright: false })),
+  ...STATION_GLOW.map((id) => defineTexture({ id, src: `assets/custom/textures/${id}.png` })),
+  ...STATION_FENCES.map((id) => defineTexture({ id, src: `assets/custom/textures/${id}.png`, fence: true })),
+  defineTexture({ id: 'sky-space', src: 'assets/custom/textures/sky-space.png', sky: true }),
   defineTexture({ id: 'sky-night', src: 'assets/textures/sky-night.png', sky: true }),
   defineTexture({ id: 'sky-day', src: 'assets/custom/textures/sky-day.png', sky: true }),
   defineTexture({ id: 'sky-dusk', src: 'assets/custom/textures/sky-dusk.png', sky: true }),
