@@ -683,7 +683,10 @@ cosmetic: its own RNG, never `world.rng`.
   wrapping box round the camera, now taking a list of types):
   - `sand-grain`: fine streaks of sand flying past on the wind, a few
     hundred within 8 tiles, at every height up to head height. In a gust
-    there are more, and they're faster and longer.
+    there are more, and they're faster and longer. All three layers are
+    faster than you run (15.6) even in a lull: about 25 units a second,
+    60 in a full gust (Mark, 2026-11-09: he could keep up with them), and
+    thinned by the dither as well as half-blended.
   - `sand-veil`: big faint sheets (`sand-gust`, tuned: half-blended
     discs) sweeping low across the view, a few dozen. These are what
     partly hide what's behind them close up.

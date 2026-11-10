@@ -213,18 +213,25 @@ export default [
     cap: 40,
   }),
   // Blowing sand (Mission 2's weather, docs/mission2.md "Blowing sand"),
-  // three layers on the wind. Fine grains streaking past at every height up
-  // to the head, lit by the light where they are.
+  // three layers on the wind, all faster than you run (15.6) even in a lull
+  // (Mark, 2026-11-09: he could keep up with them), and thinned by the
+  // dither. Fine grains streaking past at every height up to the head, lit
+  // by the light where they are: about 25 units a second in a lull, 60 in
+  // a full gust (the sheets 20 and 50, the ribbons 29 and 72).
   defineParticle({
     id: 'sand-grain',
     colors: [{ ramp: 'sand', from: 11, to: 9 }],
     life: [1, 2],
     size: 0.02,
     maxPx: 1,
-    streak: 0.04,
+    streak: 0.03,
     blend: 'half',
+    fade: true,
+    alpha: 0.75,
+    fadeIn: 0.15,
+    fadeOut: 0.3,
     drag: 6,
-    wind: 2.8,
+    wind: 8.5,
     onFloor: 'die',
     cap: 500,
   }),
@@ -239,24 +246,28 @@ export default [
     shape: 'disc',
     blend: 'half',
     fade: true,
-    alpha: 0.55,
+    alpha: 0.4,
     fadeIn: 0.35,
-    drag: 3,
-    wind: 2.2,
+    drag: 4,
+    wind: 7.5,
     onFloor: 'die',
     cap: 40,
   }),
-  // Sand running over the ground in ribbons, just above it, fast and pale.
+  // Sand running over the ground in ribbons, just above it, the fastest.
   defineParticle({
     id: 'sand-snake',
     colors: [{ ramp: 'sand', from: 11, to: 9 }],
     life: [0.6, 1.2],
     size: 0.03,
     maxPx: 2,
-    streak: 0.065,
+    streak: 0.045,
     blend: 'half',
+    fade: true,
+    alpha: 0.75,
+    fadeIn: 0.15,
+    fadeOut: 0.3,
     drag: 7,
-    wind: 3.4,
+    wind: 10,
     onFloor: 'die',
     cap: 300,
   }),
