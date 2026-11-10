@@ -370,8 +370,17 @@ const list = [
   at('player', 47.5, 84.5, { angle: 0 }),
   at('moldy-crow', 40, 80, { angle: 180 }),
   at('mouse-droid', 58.5, 76.5), at('mouse-droid', 30.5, 92.5),
-  at('supply-crate', 72.5, 94.5), at('supply-crate', 74, 95), at('supply-crate', 73, 96.4),
-  at('supply-crate', 60.5, 98), at('supply-crate', 76.5, 60.5), at('supply-crate', 78, 62),
+  // Three TIE fighters in their cradles along the north wall, a rack over
+  // each; a shuttle and cargo in the south-east; lamp bars under the roof.
+  ...[25, 55, 69].flatMap((x) => [at('tie-fighter', x, 63.5, { angle: 270 }), at('tie-rack', x, 63.5, { angle: 270, z: 12.3 })]),
+  at('lambda-shuttle', 62, 84, { angle: 180 }),
+  at('ds-container', 74, 92.5, { angle: 90 }), at('ds-container', 76.5, 88, { angle: 0 }),
+  at('ds-crate', 71, 95.5), at('ds-crate-tall', 72.8, 95.5), at('ds-crate', 60.5, 97),
+  at('ds-crate', 77, 60.5), at('ds-crate', 78.2, 62.4, { angle: 20 }), at('ds-crate-tall', 78.4, 58.2),
+  at('ds-crate', 18.5, 100), at('ds-crate-tall', 18.5, 58.5), at('ds-container', 22, 58.2, { angle: 0 }),
+  ...[28, 48, 68].flatMap((x) => [68, 92].map((y) => at('ds-ceiling-lamp-bar', x, y, { z: 22 }))),
+  // The trapezoid surrounds of the hangar's doors.
+  at('ds-doorframe', 79.85, 100, { angle: 180 }), at('ds-doorframe', 40, 56.15, { angle: 270 }),
   at('thermal-detonator', 75.5, 96.5),
   at('stormtrooper', 62.5, 62.5, { angle: 180, skill: NORMAL_UP }),
   // 1a. The store (secret).
@@ -388,8 +397,8 @@ const list = [
   at('officer', 90.5, 72.5, { angle: 270, drops: ['keycard-blue'] }),
   at('stormtrooper', 94.5, 82.5, { angle: 270 }),
   at('stormtrooper', 85.5, 68.5, { angle: 270, skill: NORMAL_UP }),
-  at('console', 84, 72), at('console', 84, 78), at('console', 84, 84),
-  at('terminal', 96.6, 70.5, { angle: 180 }), at('terminal', 96.6, 84.5, { angle: 180 }),
+  at('ds-console', 83.2, 71, { angle: 0 }), at('ds-console', 83.2, 77, { angle: 0 }), at('ds-console', 83.2, 83, { angle: 0 }),
+  at('ds-console-wall', 97.9, 68, { angle: 180 }), at('ds-console-wall', 97.9, 86, { angle: 180 }),
   at('med-kit', 95.5, 66.5), at('power-cell', 84.5, 88.5),
   // 3. The ring corridor.
   at('stormtrooper', 122.5, 100.5, { angle: 180 }),
@@ -398,23 +407,27 @@ const list = [
   at('stormtrooper', 152.5, 79, { angle: 180 }),
   at('stormtrooper', 138.5, 88, { angle: 225, skill: HARD }),
   at('mouse-droid', 112.5, 100.5), at('mouse-droid', 144.5, 81.5),
+  at('ds-doorframe', 102.15, 100, { angle: 0 }), at('ds-doorframe', 157.85, 80, { angle: 180 }),
   at('power-cell', 104.5, 102),
   // 3b. The briefing room.
   at('officer', 110.5, 84.5, { angle: 270 }), at('officer', 116.5, 86.5, { angle: 270, skill: NOT_EASIEST }),
   at('stormtrooper', 113.5, 81.5, { angle: 270, skill: NORMAL_UP }),
+  at('ds-table', 113, 87),
+  ...Array.from({ length: 8 }, (_, k) => at('ds-chair', 113 + 4.3 * Math.cos((k * Math.PI) / 4), 87 + 4.3 * Math.sin((k * Math.PI) / 4), { angle: 180 - k * 45 })),
   at('shield-unit', 119, 81), at('med-kit', 107, 92.5, { skill: [1, 2, 3] }),
   at('concussion-rifle', 113, 75), at('power-cell', 111, 74.5), at('power-cell', 115, 74.5),
   // 4. The hub.
   at('stormtrooper', 166.5, 76.5, { angle: 180 }), at('stormtrooper', 174.5, 84.5, { angle: 180 }),
   at('stormtrooper', 170.5, 73.5, { angle: 270, skill: NORMAL_UP }),
   at('probe-droid', 172, 80, { skill: HARD }),
+  at('ds-doorframe', 160.15, 80, { angle: 0 }), at('ds-doorframe', 170, 70.15, { angle: 270 }), at('ds-doorframe', 179.85, 80, { angle: 180 }),
   at('med-kit', 163.5, 86.5), at('energy-pack', 176.5, 73.5),
   // 5. Detention: the officer at the desk carries the red keycard.
   at('officer', 170.5, 50.5, { angle: 270, drops: ['keycard-red'] }),
   at('stormtrooper', 164.5, 56.5, { angle: 270 }), at('stormtrooper', 176.5, 56.5, { angle: 270 }),
   at('stormtrooper', 170.5, 46.5, { angle: 270, skill: NORMAL_UP }),
   at('interrogation-droid', 165, 48, { skill: NOT_EASIEST }),
-  at('console', 170, 54),
+  at('ds-desk', 170, 54, { angle: 90 }), at('ds-camera', 162, 46, { angle: 315, z: DET + 5 }), at('ds-camera', 178, 46, { angle: 225, z: DET + 5 }),
   at('med-kit', 162.5, 52.5), at('power-cell', 177.5, 49.5),
   at('interrogation-droid', 170, 26, { skill: NORMAL_UP }),
   at('stormtrooper', 170, 18, { angle: 270, skill: HARD }),
@@ -427,6 +440,9 @@ const list = [
   at('energy-pack', 181.5, 22), at('thermal-detonator', 181.5, 21), at('thermal-detonator', 181.5, 23),
   at('med-kit', 176.5, 28, { skill: EASY }),
   // 6. The compactor.
+  at('dianoga-eye', 194.5, 19.5, { angle: 100 }),
+  at('ds-crate', 190, 9, { angle: 30 }), at('ds-panel-stack', 198, 22, { angle: 70 }), at('ds-cable-reel', 191, 20),
+  at('ds-girder-beam', 196, 9, { angle: 40, z: -5.8 }), at('ds-panel-stack', 189, 14, { angle: 10 }),
   at('power-cell', 199.5, 8.5), at('med-kit', 189, 24.5),
   // 7. Maintenance and the pump room.
   at('stormtrooper', 197, 52.5, { angle: 90, skill: NOT_EASIEST }),
@@ -439,6 +455,7 @@ const list = [
   at('stormtrooper', 170.5, 142, { angle: 90, z: 0, skill: NOT_EASIEST }),
   at('stormtrooper', 186.5, 142, { angle: 90, z: 0, skill: HARD }),
   at('probe-droid', 166, 112, { z: 1, skill: NORMAL_UP }), at('probe-droid', 190, 134, { z: 1, skill: HARD }),
+  at('tractor-terminal', 180, 126.05, { angle: 270, z: 0 }), at('tractor-terminal', 176, 126.05, { angle: 270, z: 0 }),
   at('med-kit', 198, 102, { z: 0 }), at('power-cell', 183, 127, { z: 0 }),
   // 9. The unfinished sector.
   at('stormtrooper', 146.5, 116.5, { angle: 0 }), at('stormtrooper', 130.5, 132.5, { angle: 0 }),
@@ -447,7 +464,18 @@ const list = [
   at('power-cell', 124, 120), // down in the first gap
   at('stormtrooper', 100.5, 134.5, { angle: 0 }), at('stormtrooper', 80.5, 116, { angle: 0, skill: NOT_EASIEST }),
   at('officer', 90.5, 126.5, { angle: 0, skill: NORMAL_UP }),
-  at('supply-crate', 96, 128), at('supply-crate', 97.4, 129), at('supply-crate', 86, 136),
+  // Work lamps where the light is, girders up through the bare deck,
+  // panels and cable waiting to go on.
+  at('work-lamp', 148, 123, { angle: 200 }), at('work-lamp', 131, 115, { angle: 270 }), at('work-lamp', 130, 132.5, { angle: 90 }), at('work-lamp', 116, 124.5, { angle: 0 }),
+  at('work-lamp', 100, 125, { angle: 200 }), at('work-lamp', 88, 133, { angle: 45 }), at('work-lamp', 84, 122, { angle: 270 }),
+  ...[118, 130, 144].flatMap((x) => [114, 134].map((y) => at('ds-girder-post', x, y))),
+  ...[84, 96].flatMap((x) => [124, 136].map((y) => at('ds-girder-post', x, y))),
+  at('ds-panel-stack', 146, 132, { angle: 15 }), at('ds-panel-stack', 114, 133), at('ds-cable-reel', 150, 114.5), at('ds-cable-reel', 119, 121),
+  at('ds-panel-stack', 96, 128), at('ds-panel-stack', 98.6, 129, { angle: 80 }), at('ds-crate', 86, 136), at('ds-cable-reel', 104, 116),
+  at('ds-crate-tall', 92, 138), at('ds-container', 102, 136, { angle: 0 }),
+  ...[24, 36, 52, 64].flatMap((x) => [117, 137].map((y) => at('ds-girder-post', x, y))),
+  at('work-lamp', 28, 129, { angle: 180 }), at('work-lamp', 44, 127, { angle: 180 }), at('work-lamp', 60, 129, { angle: 180 }),
+  at('ds-panel-stack', 34, 122), at('ds-panel-stack', 56, 134, { angle: 60 }), at('ds-cable-reel', 21, 132), at('ds-crate', 68, 118),
   at('med-kit', 104.5, 138), at('energy-pack', 80, 138),
   at('stormtrooper', 62.5, 128.5, { angle: 0 }), at('stormtrooper', 40.5, 134.5, { angle: 0, skill: NOT_EASIEST }),
   at('stormtrooper', 24.5, 120.5, { angle: 0, skill: NORMAL_UP }),
