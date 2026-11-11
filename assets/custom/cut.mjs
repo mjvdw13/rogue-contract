@@ -149,8 +149,9 @@ const SHEETS = [
   ...[
     ['IENERGY', 'energy-cell'], ['IPOWER', 'power-cell'], ['IPLAZMA', 'plasma-cartridge'],
     ['ISHELL', 'mortar-shell'], ['ISHELLS', 'mortar-shells'],
-    // The weapons: the E-11 lying on its side (IST-GUNI), a trooper's drop.
-    ['IST-GUNI', 'rifle'],
+    // The weapons: the E-11 lying on its side (IST-GUNI), a trooper's drop;
+    // the repeater (IAUTOGUN).
+    ['IST-GUNI', 'rifle'], ['IAUTOGUN', 'repeater'],
   ].map(([cell, item]) => ({ cells: { folder: `Pickups/${cell}.cells`, list: ['000.PNG'] }, asset: `${item}-item`, out: `assets/sprites/items/${item}.png` })),
 ];
 
@@ -300,6 +301,16 @@ const WEAPONS = [
     padLeft: 0,
     padBottom: 12,
     frames: [[908, 1060, 27, 135], [1064, 1228, 13, 135]],
+  },
+  {
+    // repeater.js: 0 idle (autogun1, DF x 156), 1 and 2 the shot (autogun2
+    // and 3, x 163; 2 lit). On the sheet the lit one, with its lights
+    // yellow, is the middle one.
+    asset: 'repeater',
+    at: [0, 7, 7],
+    padLeft: 0,
+    padBottom: 12,
+    frames: [[247, 363, 184, 281], [490, 608, 186, 281], [368, 486, 186, 281]],
   },
 ];
 

@@ -1267,7 +1267,7 @@ conversations, then the fob.
         shells, mines, with their pickups. Key 0 selects slot 10.
   - [x] E-11 blaster rifle (3): quick red bolts, 2 energy a shot.
         Stormtroopers drop one.
-  - [ ] Imperial repeater (5): a stream of small bolts while fire is held.
+  - [x] Imperial repeater (5): a stream of small bolts while fire is held.
   - [ ] Jeron fusion cutter (6): slow green plasma, each shot from the
         next of four barrels, lit in turn (an engine field for it).
   - [ ] I.M. mines (7): set down in front of you, go off after 3 s (or

@@ -82,16 +82,16 @@ function explosion(size = 64, palette = FIRE, seed = 31, frames = 5) {
 /**
  * A blaster bolt: a short glowing streak with a white-hot core (frames 0-1),
  * then a spray of sparks where it hits (frames 2-4). `glow` is the colour
- * group ('red' or 'green'). 32x32.
+ * group ('red' or 'green'); `size` shrinks the streak (the repeater's). 32x32.
  */
-function blasterBolt(glow) {
+function blasterBolt(glow, size = 1) {
   const frames = [];
   for (let f = 0; f < 2; f++) {
     const c = new PixelCanvas(32, 32);
     for (let yy = 0; yy < 32; yy++) {
       for (let xx = 0; xx < 32; xx++) {
-        const dx = (xx + 0.5 - 16) / (5 + f);
-        const dy = (yy + 0.5 - 16) / 2.6;
+        const dx = (xx + 0.5 - 16) / ((5 + f) * size);
+        const dy = (yy + 0.5 - 16) / (2.6 * size);
         const d = Math.hypot(dx, dy);
         if (d > 1) continue;
         c.set(xx, yy, d < 0.35 ? [255, 255, 255] : d < 0.7 ? G(glow, 1) : G(glow, 0));
@@ -184,6 +184,7 @@ export default [
   { name: 'blood', out: F('blood'), draw: () => blood('blood') },
   { name: 'explosion', out: F('explosion'), draw: () => sheet(explosion(64, FIRE, 31, 5)) },
   { name: 'blaster-bolt', out: F('blaster-bolt'), draw: () => blasterBolt('red') },
+  { name: 'repeater-bolt', out: F('repeater-bolt'), draw: () => blasterBolt('amber', 0.6) },
   { name: 'ion-blast', out: F('ion-blast'), draw: ionBlast },
   { name: 'rocket', out: F('rocket'), draw: rocket },
 ];

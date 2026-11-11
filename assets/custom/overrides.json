@@ -218,5 +218,16 @@
     "src": "assets/custom/rifle.png",
     "frameWidth": 166,
     "frameHeight": 135
+  },
+  "assets/sprites/items/repeater.png": {
+    "src": "assets/custom/repeater-item.png",
+    "frameWidth": 56,
+    "frameHeight": 18,
+    "scale": 0.85
+  },
+  "assets/sprites/weapons/repeater.png": {
+    "src": "assets/custom/repeater.png",
+    "frameWidth": 126,
+    "frameHeight": 110
   }
 }

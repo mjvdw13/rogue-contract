@@ -31,6 +31,8 @@ assets/custom/*
 !assets/custom/mortar-shells-item.png
 !assets/custom/rifle-item.png
 !assets/custom/rifle.png
+!assets/custom/repeater.png
+!assets/custom/repeater-item.png
 !assets/custom/textures.mjs
 !assets/custom/textures/
 # The whole Dark Forces texture pack, sorted by what each texture shows.

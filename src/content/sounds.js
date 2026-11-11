@@ -36,6 +36,15 @@ export default [
     pitchVariance: 0.05,
   }),
   defineSound({ id: 'blaster-enemy', synth: enemyBlaster, pitchVariance: 0.08 }),
+  // The Imperial repeater: a short, hard chatter, one per shot.
+  defineSound({
+    id: 'repeater-fire',
+    synth: {
+      wave: 'square', freq: 700, freqEnd: 160, duration: 0.09, attack: 0.001, release: 0.07, lowpass: [5000, 900], volume: 0.4,
+      layers: [burst(0.04, [7000, 2000], 0.4)],
+    },
+    pitchVariance: 0.08,
+  }),
   // The E-11 rifle: a shorter, higher zap than the pistol's.
   defineSound({
     id: 'rifle-fire',

@@ -21,6 +21,17 @@ const BOLT = {
 export const projectiles = [
   defineProjectile({ id: 'blaster-bolt', ...BOLT, speed: 60, damage: [10, 20] }),
   defineProjectile({ id: 'trooper-bolt', ...BOLT, speed: 28, damage: [5, 12] }),
+  // The repeater's: smaller, amber and a little faster (Dark Forces' 270
+  // units a second to the pistol's 250).
+  defineProjectile({
+    id: 'repeater-bolt',
+    ...BOLT,
+    sheet: FX('repeater-bolt', 32, 32),
+    radius: 0.12,
+    light: { radius: 2, light: 40 },
+    speed: 65,
+    damage: [10, 20],
+  }),
   // A Jawa's ion blaster: a slow, weak, crackling cloud of blue electricity.
   defineProjectile({
     id: 'ion-bolt',

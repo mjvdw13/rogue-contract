@@ -237,6 +237,43 @@ function riflePickup() {
   return m.render({ ...RENDER, light: [-0.4, -0.8, 0.45] });
 }
 
+// ------------------------------------------------------------------ Imperial repeater
+
+/**
+ * The Imperial repeater: a squat boxy gun pointing up at the crosshair, a
+ * row of charge lights down its side that glow amber as it fires (`lit`),
+ * the gloved hand on the grip. 126x110 (Dark Forces' frame, cut.mjs).
+ */
+function repeaterFrame({ kick = 0, lit = false } = {}) {
+  const m = new Model(126, 110, { seed: 123 });
+  const metal = { ...MAT.metal, spec: 0.45, shine: 20, grain: 0.05 };
+  const k = kick;
+  m.slab([[34, 30 + k], [88, 24 + k], [96, 110], [40, 116]], 12, C('gray', 0.18), metal, { bevel: 4, thickness: 6 }); // the body
+  m.slab([[44, 18 + k], [78, 14 + k], [82, 30 + k], [46, 34 + k]], 18, C('gray', 0.1), metal, { bevel: 2, thickness: 3 }); // the muzzle block
+  for (const x of [54, 70]) m.sphere(x, 22 + k, 22, 3.4, C('gray', 0.02), MAT.metal); // the barrels' mouths
+  for (let j = 0; j < 6; j++) m.paint(42 + j * 1.2, 44 + j * 9 + k, 2.4, 2.4, lit ? G('amber', 1) : C('orange', 0.3), lit ? MAT.glow : undefined);
+  forearm(m, [130, 130, 6], [104, 88 + k, 18], 10);
+  fist(m, 96, 84 + k, 24, 11, 1);
+  const c = m.render(RENDER);
+  if (lit) flash(c, 62, 14 + k, 9, G('amber', 1), G('amber', 0), 5);
+  return c;
+}
+
+function repeaterSheet() {
+  return sheet([repeaterFrame(), repeaterFrame({ kick: 3 }), repeaterFrame({ kick: 2, lit: true })]);
+}
+
+/** The repeater lying on the floor, for a pickup. 64x24. */
+function repeaterPickup() {
+  const m = new Model(64, 24, { seed: 125 });
+  const metal = { ...MAT.metal, spec: 0.45, shine: 20, grain: 0.05 };
+  m.slab([[8, 8], [44, 8], [46, 18], [8, 18]], 5, C('gray', 0.18), metal, { bevel: 1.5, thickness: 3 });
+  m.slab([[2, 9], [10, 9], [10, 16], [2, 16]], 5, C('gray', 0.1), metal, { bevel: 1, thickness: 2 });
+  for (let j = 0; j < 5; j++) m.paint(16 + j * 5, 10, 1.2, 1.2, C('orange', 0.45));
+  m.slab([[40, 16], [48, 16], [52, 23], [44, 23]], 4, C('gray', 0.12), MAT.leather, { bevel: 1, thickness: 1.5 });
+  return m.render({ ...RENDER, light: [-0.4, -0.8, 0.45] });
+}
+
 // ------------------------------------------------------------------ tracking fob
 
 /**
@@ -290,4 +327,6 @@ export default [
   { name: 'pickup-concussion-rifle', out: 'assets/sprites/items/concussion-rifle.png', draw: concussionPickup, dither: 'fs' },
   { name: 'rifle', out: W('rifle'), draw: rifleSheet, dither: 'fs' },
   { name: 'pickup-rifle', out: 'assets/sprites/items/rifle.png', draw: riflePickup, dither: 'fs' },
+  { name: 'repeater', out: W('repeater'), draw: repeaterSheet, dither: 'fs' },
+  { name: 'pickup-repeater', out: 'assets/sprites/items/repeater.png', draw: repeaterPickup, dither: 'fs' },
 ];

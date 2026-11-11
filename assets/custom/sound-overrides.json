@@ -1,6 +1,7 @@
 {
   "blaster-fire": { "src": "assets/custom/sounds/weapons/PISTOL-1.mp3", "volume": 1.08 },
   "blaster-enemy": { "src": "assets/custom/sounds/weapons/RIFLE-1.mp3", "volume": 0.87 },
+  "repeater-fire": { "src": "assets/custom/sounds/weapons/REPEAT-1.mp3", "volume": 0.87 },
   "rifle-fire": { "src": "assets/custom/sounds/weapons/RIFLE-1.mp3", "volume": 0.87 },
   "droid-fire": { "src": "assets/custom/sounds/enemies/PROBFIR1.mp3", "volume": 1.16 },
   "bolt-hit": { "src": "assets/custom/sounds/impacts-explosions/EX-TINY1.mp3", "volume": 0.65 },

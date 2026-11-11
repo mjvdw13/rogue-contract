@@ -24,6 +24,17 @@ export default [
     message: 'Picked up a blaster rifle.',
     sound: 'weapon-pickup',
   }),
+  // The Imperial repeater, with 30 power cells (Dark Forces').
+  defineItem({
+    id: 'repeater',
+    name: 'Repeater Rifle',
+    glyph: '5',
+    sheet: { src: 'assets/sprites/items/repeater.png', frameWidth: 64, frameHeight: 24 },
+    radius: 0.7,
+    pickup: { weapon: 'repeater', ammo: { power: 30 } },
+    message: 'Picked up an Imperial repeater rifle.',
+    sound: 'weapon-pickup',
+  }),
   // The concussion rifle, as Bossk drops it.
   defineItem({
     id: 'concussion-rifle',
