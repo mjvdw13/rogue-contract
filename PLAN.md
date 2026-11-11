@@ -29,22 +29,21 @@ MODDING.md, if content authors need it). Keep this file short.
 These need Mark to try something, or to decide. Don't start them without him.
 
 - **Mission 4, the Battle Station** (`?map=m4`, 2026-11-10,
-  `docs/mission4.md`): a first pass of the whole level, made in one
-  session without you. The hangar with the Crow, three TIE fighters and a
-  shuttle, its mouth open on the stars;
-  the control room behind the glass and its terminal; the pale ring
-  corridor with light bars; the briefing room behind the blue door; the
-  lift hub; detention block AA-19 (black and red, ten cells, Rusk in the
-  last on the left); the waste chute, the compactor (something in the
-  water), maintenance; the tractor beam shaft and its terminal; the
-  unfinished sector and the gantry back over the hangar; out under the
-  Crow once the beam is off. To judge: the story (the doc's proposal:
-  where it sits, Rusk freed here or not), the flow and the sizes, the
-  look of each area, the new droids, the models (the TIE, the shuttle,
-  the table). Not looked at closely yet: the tractor terminals, the
-  door surrounds, the shuttle, the unfinished sector's dressing, frame
-  time, and how the fights play.
-
+  `docs/mission4.md`): the whole level, made in one session without you
+  and then gone over area by area. The hangar with the Crow, three TIE
+  fighters and a shuttle, its mouth open on the stars; the control room
+  behind the glass and its terminal; the pale ring corridor with light
+  bars; the briefing room behind the blue door; the lift hub; detention
+  block AA-19 (black and red, ten cells, Rusk in the last on the left);
+  the waste chute, the compactor (something in the water), maintenance;
+  the tractor beam shaft and its terminal; the unfinished sector and the
+  gantry back over the hangar; out under the Crow once the beam is off.
+  A test walks the route, so it can be finished; nobody has played the
+  fights. To judge: the story (the doc's proposal: where it sits, Rusk
+  freed here or not), the flow and the sizes, the look of each area, the
+  new droids, the models (the TIE, the shuttle, the table), the `station`
+  song and the alarm, and whether the alarm sealing the detention lift
+  is right.
 - **Mission 2 under the ground** (`?map=m2`, 2026-11-08, after the
   references): the rooms lined by what they are (whitewash and the
   red-ochre dado in the tunnels, white plaster in the house, duracrete in
@@ -1434,27 +1433,17 @@ Mission 3 is. Each step is a commit, playable at `?map=m4`.
 - [x] The kit: textures (`ds-*`, `sky-space`, from the DF pack by
       `derive.mjs`, STATION), models (`models/station.js`), the mouse
       droid and the interrogation droid.
-- [ ] The kit, still to make: the `station` song and the sounds (alarm
-      klaxon, the beam winding down, the turbolift, the compactor), sign
-      and crest decals, a skirting and trim band, 4-tall narrow doors.
-- [x] The blockout: every area at its final heights with the real ways
-      between them, the gates (the terminal, the red door, the chute, the
-      beam), the exit under the Crow. Validates; the play test passes.
-- [x] Only stars outside the docking bay (Mark, 2026-11-10): no trench,
-      no planet. The backdrop goes; `sky-space` is a starfield.
-- [ ] A finishing pass over the whole level (Mark, 2026-11-10), area by
-      area with snapshots: what reads wrong, what's bare, what's missing.
-- [ ] Each area in detail, in the order you meet them, snapshots before
-      and after: the hangar; the lobby and control room; the ring
-      corridor and briefing room; the hub; detention; the compactor and
-      maintenance; the shaft; the unfinished sector.
-- [ ] Life: enemies and items by skill (the table in the doc), mouse
-      droids, the alarm, the troop bay's squad.
-- [ ] The story's stand-in words: Jan's lines, the terminal, Rusk, the
-      project file.
-- [ ] Tune and check: light, frame time, the per-skill check, the ammo
-      budget; update `docs/mission4.md`.
-- [ ] Waiting on Mark: where it sits in the story, and the look.
+- [x] The blockout, the starfield outside (Mark, 2026-11-10: no trench,
+      no planet), and a finishing pass over every area with snapshots:
+      skirting and trim, light bars, signs, the hub's column, the alarm,
+      the `station` song, `alarm-klaxon` and `beam-down`.
+- [x] The route walked by a test (`tests/m4-route.test.js`); frame time
+      measured (`docs/mission4.md`, Checked).
+- [ ] Still to make, if Mark wants them: a turbolift sound, the
+      compactor's groan, the field's hum; 4-tall side doors; a sprite for
+      whoever Kyle sees in the briefing room.
+- [ ] Waiting on Mark: where it sits in the story, the look, the fights
+      (nobody has played it), the song.
 
 ## Small fixes and known rough edges
 

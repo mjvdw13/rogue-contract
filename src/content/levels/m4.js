@@ -209,6 +209,8 @@ for (const [x, y] of [[130, 96], [135, 91], [140, 86]]) {
 p.rect(104, 78, 122, 96, room(0, 6, { light: 136 }));
 p.chamfer(104, 78, 122, 96, 3, { wall: T.wall6 });
 p.pool(113, 87, 5, 200);
+// Coming up to the table you read what's on it.
+p.rect(108, 91, 118, 93, (x, y, old) => (old.wall ? old : { ...old, tag: 'file' }));
 p.rect(112, 96, 114, 97, narrow(0, { door: T.doorBlue, lock: 'blue' }));
 p.rect(108, 77, 118, 78, { wall: T.screen });
 p.rect(112, 77, 114, 78, { door: T.screen, secret: true, floor: T.floor, ceiling: T.ceiling, floorZ: 0, ceilZ: 6, light: 120 });
@@ -224,7 +226,8 @@ for (const [x, y] of [[170, 77.3], [170, 82.7], [167.3, 80], [172.7, 80]]) lamps
 // North: the detention lift, a door at each stop.
 p.rect(168, 68, 172, 70, door(0));
 p.rect(168, 64, 172, 68, lift([0, 12], 18));
-p.rect(168, 62, 172, 64, door(12));
+// (The top door is sealed by the alarm: the chute is the way out then.)
+p.rect(168, 62, 172, 64, door(12, { tag: 'det-lift' }));
 // East: the pump room's door, opened from the far side.
 p.rect(180, 78, 182, 82, door(0, { lock: 'remote', tag: 'hub-east', stayOpen: true }));
 p.rect(182, 78, 186, 82, hall({ upper: T.wallDark }));
@@ -521,8 +524,11 @@ export default defineLevel({
       { action: 'spawn', thing: 'stormtrooper', tag: 'alarm' },
       { action: 'sound', id: 'alarm-klaxon' },
       { action: 'setLight', tag: 'lane', light: 216, lightFx: 'glow', lightMin: 88 },
-      { action: 'message', text: 'ALARM: DETENTION BLOCK AA-19. THE WASTE HATCH IS OPEN.' },
+      { action: 'lockDoors', tag: 'det-lift' },
+      { action: 'closeDoors', tag: 'det-lift' },
+      { action: 'message', text: 'ALARM: DETENTION BLOCK AA-19. LIFT SEALED. THE WASTE HATCH IS OPEN.' },
     ] },
+    { on: 'enter', tag: 'file', do: [{ action: 'message', text: "ON THE TABLE: 'DARK TROOPER PROJECT, PHASE ONE. APPROVED. FIELD TRIALS TO FOLLOW THE TEST OF THIS STATION'S PRIMARY WEAPON.'" }] },
     { on: 'enter', tag: 'crow', unless: 'beam-off', once: false, do: [{ action: 'message', text: "JAN: NOT WHILE THAT BEAM'S ON US." }] },
     { on: 'enter', tag: 'crow', if: 'beam-off', do: [{ action: 'message', text: 'JAN: RUSK IS ABOARD. HOLD ON TO SOMETHING.' }, { action: 'exit' }] },
   ],
