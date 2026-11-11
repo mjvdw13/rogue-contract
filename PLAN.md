@@ -43,7 +43,11 @@ These need Mark to try something, or to decide. Don't start them without him.
   freed here or not), the flow and the sizes, the look of each area, the
   new droids, the models (the TIE, the shuttle, the table), the `station`
   song and the alarm, and whether the alarm sealing the detention lift
-  is right.
+  is right. Added 2026-11-11, to look at: sparks off the live cables
+  in the unfinished sector (how often, how bright the flashes), the
+  steam off the pipes in the tunnels, pump room and compactor (thin or
+  thick enough), the vents in the corridor walls, the flickering ceiling
+  panel on the slant.
 - **Mission 2 under the ground** (`?map=m2`, 2026-11-08, after the
   references): the rooms lined by what they are (whitewash and the
   red-ochre dado in the tunnels, white plaster in the house, duracrete in
@@ -1444,10 +1448,6 @@ Mission 3 is. Each step is a commit, playable at `?map=m4`.
       whoever Kyle sees in the briefing room.
 - [ ] Waiting on Mark: where it sits in the story, the look, the fights
       (nobody has played it), the song.
-- Life and detail (Mark, 2026-11-11: sparks, more detailed walls and
-  ceilings), a commit each:
-  - [ ] The clean decks (ring corridor, hub, lobby): vents and signs on
-        the long pale walls.
 
 ### 11. Frame time (Mark, 2026-11-10)
 

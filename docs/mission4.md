@@ -124,7 +124,8 @@ black decks, white light**, clean and new. Each area changes one thing.
   each, so light comes in bars. `ds-floor`, `ds-ceiling` with a lit
   panel (`ds-ceiling-light`) over each pair of columns. Corners are cut
   at 45 degrees; the long run to the hub goes at 45 degrees, so the
-  corridor is never one straight view.
+  corridor is never one straight view. Vents (`decal-vent`) low in
+  the long walls; the middle ceiling panel on the slant flickers.
 - **Doors:** 4 wide and 4 tall (`ds-door`, one picture), in walls 2
   thick, a trapezoid surround standing proud (`ds-doorframe`, a model).
   Side rooms and cells 2 wide (`ds-door-narrow`; `ds-door-red` and

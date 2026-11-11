@@ -90,6 +90,15 @@ const decals = [
   { x: 167, y: 70, z: 2.4, face: 'S', tex: 'decal-sign' },
   { x: 167.5, y: 44, z: 14.4, face: 'S', tex: 'decal-sign' },
   { x: 191.5, y: 100, z: 2.4, face: 'S', tex: 'decal-hazard' },
+  // Vents low in the long pale walls: the ring corridor's two straights,
+  // the lobby, the hub; a sign on the hub's south wall.
+  // (None at x 113 on the north side: the blue door is there.)
+  { x: 123, y: 97, z: 1.1, face: 'S', tex: 'decal-vent' },
+  ...[113, 123].map((x) => ({ x, y: 103, z: 1.1, face: 'N', tex: 'decal-vent' })),
+  ...[145, 152].flatMap((x) => [{ x, y: 77, z: 1.1, face: 'S', tex: 'decal-vent' }, { x, y: 83, z: 1.1, face: 'N', tex: 'decal-vent' }]),
+  { x: 92, y: 94, z: 1.1, face: 'S', tex: 'decal-vent' }, { x: 91, y: 106, z: 1.1, face: 'N', tex: 'decal-vent' },
+  { x: 167, y: 90, z: 1.1, face: 'N', tex: 'decal-vent' }, { x: 173, y: 90, z: 1.1, face: 'N', tex: 'decal-vent' },
+  { x: 170, y: 90, z: 2.4, face: 'N', tex: 'decal-sign' },
   // The compactor's walls, streaked and stained down to the sludge.
   ...[[190, 'grime-drip-1'], [194.5, 'grime-streaks-2'], [199, 'grime-drip-2']].flatMap(([x, tex]) => [
     { x, y: 4, z: 1, face: 'S', tex, scale: 2 }, { x: x - 1.5, y: 28, z: 1, face: 'N', tex, scale: 2, flip: true },
@@ -207,9 +216,10 @@ for (const x of [148, 154]) {
   column(x, 83, x + 2, 84, x + 1, 82.7);
   p.rect(x, 79, x + 2, 81, hall({ ceiling: T.ceilingLight, light: 208 }));
 }
-for (const [x, y] of [[130, 96], [135, 91], [140, 86]]) {
-  p.rect(x - 1, y - 1, x + 1, y + 1, hall({ ceiling: T.ceilingLight, light: 208 }));
-  lamps.push({ x, y, radius: 5, light: 48 });
+// (The middle panel on the slant has a fault: it flickers.)
+for (const [x, y, faulty] of [[130, 96], [135, 91, true], [140, 86]]) {
+  p.rect(x - 1, y - 1, x + 1, y + 1, hall({ ceiling: T.ceilingLight, light: 208, ...(faulty && { lightFx: 'flicker', lightMin: 136 }) }));
+  lamps.push({ x, y, radius: 5, light: 48, ...(faulty && { fx: 'flicker', min: 0 }) });
 }
 
 // 3b. The briefing room, behind the blue door. Secret 2 behind its screens.
