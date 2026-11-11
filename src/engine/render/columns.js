@@ -27,6 +27,13 @@ const fenceHz = new Float32Array(MAX_FENCES);
 // one after.
 const MAX_RUN = 256;
 const runEnd = new Float64Array(MAX_RUN);
+/**
+ * Numbers handed to drawWorld's bigger helpers, which are too big to be
+ * inlined: a fraction passed as an argument is boxed (16 bytes of garbage
+ * a time, at every tile of every ray), one left here isn't. For `flats`:
+ * [0] t0, [1] t1. For `flatSpan`: [0] t0, [2] kk, [3] l0, [4] dl.
+ */
+const REG = new Float64Array(8);
 const runTop = new Float64Array(MAX_RUN);
 
 /**
@@ -329,7 +336,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
       const band = bands[j];
       const top = band.to < faceTop ? band.to : faceTop;
       const bot = band.from > faceBot ? band.from : faceBot;
-      if (top > bot) (textures[band.tex].holes ? holeFace : face)(t, rowOf(top, t), rowOf(bot, t), band.to < Infinity ? band.to : faceTop, band.tex, u, lv, hz);
+      if (top > bot) (textures[band.tex].holes ? holeFace : face)(t, Math.ceil(horizon + ((camZ - top) * fy) / t - 0.5), Math.ceil(horizon + ((camZ - bot) * fy) / t - 0.5), band.to < Infinity ? band.to : faceTop, band.tex, u, lv, hz);
     }
   };
   /**
@@ -345,8 +352,8 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
       const top = d.z1 < faceTop ? d.z1 : faceTop;
       const bot = d.z0 > faceBot ? d.z0 : faceBot;
       if (top <= bot) continue;
-      let a = rowOf(top, t);
-      let b = rowOf(bot, t);
+      let a = Math.ceil(horizon + ((camZ - top) * fy) / t - 0.5);
+      let b = Math.ceil(horizon + ((camZ - bot) * fy) / t - 0.5);
       if (a < clipTop) a = clipTop;
       if (b > clipBot) b = clipBot;
       if (b <= a) continue;
@@ -407,13 +414,17 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
   const faceHaze = (t, out) => (out ? view.hazeF(t) : 0);
   /**
    * Rows [a, b) of this column's floor (kk > 0) or ceiling (kk < 0) in
-   * texture `tex`, kk being (camZ - the plane's height) * fy: a row's
+   * texture `tex` (kk, t0, l0 and dl in REG), kk being (camZ - the plane's height) * fy: a row's
    * distance is kk / (y + 0.5 - horizon). The light runs from l0 at t0,
    * changing by dl per unit of distance; outdoors in haze (`hazy`), the
    * level is without the fog, in its haze step's tables. Levels are as
    * View.levelF's, and dithered.
    */
-  const flatSpan = (a, b, kk, tex, hazy, t0, l0, dl) => {
+  const flatSpan = (a, b, tex, hazy) => {
+    const t0 = REG[0];
+    const kk = REG[2];
+    const l0 = REG[3];
+    const dl = REG[4];
     const tw = tex.w;
     const wm = tex.wMask;
     const hm = tex.hMask;
@@ -432,12 +443,15 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
     const c0 = (LIGHT_BLACK - l0 + t0 * dl) * 0.25 - extra;
     const c1 = (hazy ? 0 : fog) - dl * 0.25;
     const dk = DIMINISH / kk;
+    // (A number for sure, by the plus: an imported constant put straight
+    // into `br` makes the engine box `br` at every pixel, 16 bytes each.)
+    const maxBr = +MAX_BRIGHTEN;
     for (let y = a; y < b; y++, o += fbW) {
       const dist = kk * rowInv[y];
       const tx = ((px + rdx * dist) * TPU) & wm;
       const ty = ((py + rdy * dist) * TPU) & hm;
       let br = dk * (y + 0.5 - horizon);
-      if (br > MAX_BRIGHTEN) br = MAX_BRIGHTEN;
+      if (br > maxBr) br = maxBr;
       const d = thr[y & 3];
       let lv = (c0 + c1 * dist - br + d) | 0;
       if (lv < 0) lv = 0;
@@ -455,14 +469,16 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
   // floor). The light runs smoothly from where the ray enters to where it
   // leaves: l0 at t0, changing by dl per unit of distance.
   // `over`: a floor at that height instead (a low angled wall's top, over its solid part).
-  const flats = (i, s, t0, t1, over) => {
+  const flats = (i, s, over) => {
+    const t0 = REG[0];
+    const t1 = REG[1];
     const slab = (flags[i] & F_SLAB) !== 0;
     const hazy = hazeOn && (flags[i] & F_SKY) !== 0;
     // (The light is sampled only once some rows need it.)
     let lit = false;
     let l0 = 0;
     let dl = 0;
-    const fz = over !== undefined ? over : slab && s ? slabTop[i] : floorZ[i];
+    const fz = over !== undefined ? +over : slab && s ? slabTop[i] : floorZ[i];
     if (camZ > fz) {
       const k = (camZ - fz) * fy;
       let a = Math.ceil(horizon + k / t1 - 0.5);
@@ -477,7 +493,10 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
           lit = true;
           l0 = lm.sample(px + rdx * t0, py + rdy * t0, s);
           dl = t1 > t0 ? (lm.sample(px + rdx * t1, py + rdy * t1, s) - l0) / (t1 - t0) : 0;
-          flatSpan(a, b, k, textures[slot], hazy, t0, l0, dl);
+          REG[2] = k;
+          REG[3] = l0;
+          REG[4] = dl;
+          flatSpan(a, b, textures[slot], hazy);
         }
       }
       if (a < clipBot) clipBot = a < clipTop ? clipTop : a;
@@ -513,7 +532,10 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
               l0 = lm.sample(px + rdx * t0, py + rdy * t0, s);
               dl = t1 > t0 ? (lm.sample(px + rdx * t1, py + rdy * t1, s) - l0) / (t1 - t0) : 0;
             }
-            flatSpan(a, b, -k, textures[slot], hazy, t0, l0, dl);
+            REG[2] = -k;
+            REG[3] = l0;
+            REG[4] = dl;
+            flatSpan(a, b, textures[slot], hazy);
           }
         }
       }
@@ -574,7 +596,6 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
       fb[o] = m >= 0 ? colormaps[m + c] : c;
     }
   };
-  const rowOf = (z, t) => Math.ceil(horizon + ((camZ - z) * fy) / t - 0.5);
 
   for (x = 0; x < W; x++) {
     const camX = (2 * (x + 0.5)) / W - 1;
@@ -674,7 +695,9 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
           for (let k = 0; k < nw; k++) {
             clipTop = wTop[k];
             clipBot = wBot[k];
-            flats(cur, 0, tEnter, tTop, sl.top);
+            REG[0] = tEnter;
+            REG[1] = tTop;
+            flats(cur, 0, sl.top);
             wTop[k] = clipTop;
             wBot[k] = clipBot;
           }
@@ -686,14 +709,16 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
           const u = (1 - along[0]) * sl.len + sl.u;
           const lv = faceLevel(0, t, 0, out);
           const top = low ? sl.top : ceilZ[cur];
-          const a = rowOf(top, t);
+          const a = Math.ceil(horizon + ((camZ - top) * fy) / t - 0.5);
           const bands = bandIndex[cur] >= 0 ? bandSets[bandIndex[cur]] : null;
           const sDecals = hasDecals && slantDecals.size ? slantDecals.get(cur) : undefined;
           for (let k = 0; k < nw; k++) {
             clipTop = wTop[k];
             clipBot = wBot[k];
-            flats(cur, 0, tEnter, t);
-            face(t, a, rowOf(floorZ[cur], t), top, sl.tex, u, lv, faceHaze(t, out));
+            REG[0] = tEnter;
+            REG[1] = t;
+            flats(cur, 0);
+            face(t, a, Math.ceil(horizon + ((camZ - floorZ[cur]) * fy) / t - 0.5), top, sl.tex, u, lv, faceHaze(t, out));
             if (bands) bandFaces(t, top, floorZ[cur], bands, u, lv, faceHaze(t, out));
             if (sDecals) decalFaces(t, top, floorZ[cur], sDecals, u, false, lv, faceHaze(t, out));
             if (a < clipBot) clipBot = a < clipTop ? clipTop : a;
@@ -714,7 +739,9 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
           for (let k = 0; k < nw; k++) {
             clipTop = wTop[k];
             clipBot = wBot[k];
-            flats(cur, 0, t, tExit, sl.top);
+            REG[0] = t;
+            REG[1] = tExit;
+            flats(cur, 0, sl.top);
             wTop[k] = clipTop;
             wBot[k] = clipBot;
           }
@@ -745,14 +772,16 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
               const width = door.span1 - door.span0;
               const tw = door.tex >= 0 ? textures[door.tex].w / TPU : width;
               const u = (flip ? door.span1 - along : along - door.span0) - (width - tw) / 2;
-              const b = rowOf(bz, t);
+              const b = Math.ceil(horizon + ((camZ - bz) * fy) / t - 0.5);
               const lv = faceLevel(0, t, door.axis === 'x' ? 1 : -1, out);
               for (let k = 0; k < nw; k++) {
                 clipTop = wTop[k];
                 clipBot = wBot[k];
-                flats(cur, wSt[k], tEnter, t);
+                REG[0] = tEnter;
+                REG[1] = t;
+                flats(cur, wSt[k]);
                 if (!wSt[k]) {
-                  face(t, rowOf(top, t), b, bz + texHeight(door.tex), door.tex, u, lv, faceHaze(t, out));
+                  face(t, Math.ceil(horizon + ((camZ - top) * fy) / t - 0.5), b, bz + texHeight(door.tex), door.tex, u, lv, faceHaze(t, out));
                   if (b > clipTop) clipTop = b > clipBot ? clipBot : b;
                 }
                 wTop[k] = clipTop;
@@ -791,8 +820,10 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
               for (let k = 0; k < nw; k++) {
                 clipTop = wTop[k];
                 clipBot = wBot[k];
-                flats(cur, 0, tEnter, t);
-                face(t, rowOf(ceilZ[cur], t), rowOf(floorZ[cur], t), ceilZ[cur], door.tex, du + (door.axis === 'x' ? cy : cx), lv, faceHaze(t, out));
+                REG[0] = tEnter;
+                REG[1] = t;
+                flats(cur, 0);
+                face(t, Math.ceil(horizon + ((camZ - ceilZ[cur]) * fy) / t - 0.5), Math.ceil(horizon + ((camZ - floorZ[cur]) * fy) / t - 0.5), ceilZ[cur], door.tex, du + (door.axis === 'x' ? cy : cx), lv, faceHaze(t, out));
               }
               end = t;
               break;
@@ -804,7 +835,9 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
       for (let k = 0; k < nw; k++) {
         clipTop = wTop[k];
         clipBot = wBot[k];
-        flats(cur, wSt[k], tEnter, tExit);
+        REG[0] = tEnter;
+        REG[1] = tExit;
+        flats(cur, wSt[k]);
         wTop[k] = clipTop;
         wBot[k] = clipBot;
       }
@@ -821,7 +854,11 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
       const next = mapY * mw + mapX;
       const f = flags[next];
       const contrast = side === 0 ? 1 : -1;
-      const hz = faceHaze(tExit, out);
+      let hz = 0;
+      if (out) {
+        const hk = (tExit * HAZE_RES) | 0;
+        hz = hazeTab[hk < HAZE_LEN ? hk : HAZE_LEN - 1];
+      }
       // Position along the wall in world units (mirrored on two sides so
       // textures read left to right from every direction).
       const edgePos = side === 0 ? py + tExit * rdy : px + tExit * rdx;
@@ -851,8 +888,8 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
           const fe = fences[fk];
           const top = map.fenceTop(fe);
           const bottom = map.fenceBottom(fe);
-          const ra = rowOf(top, tExit);
-          const rb = rowOf(bottom, tExit);
+          const ra = Math.ceil(horizon + ((camZ - top) * fy) / tExit - 0.5);
+          const rb = Math.ceil(horizon + ((camZ - bottom) * fy) / tExit - 0.5);
           const lv = faceLevel(flags[cur] & F_SLAB && slabTop[cur] <= bottom + 0.5 ? 1 : 0, tExit, contrast, out);
           for (let k = 0; k < nw; k++) {
             let a = ra;
@@ -917,7 +954,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
           const fz = s ? slabTop[cur] : fCur;
           const cz = !s && curSlab ? slabBot[cur] : ceilZ[cur];
           const lv = faceLevel(s, tExit, contrast, out);
-          face(tExit, rowOf(cz, tExit), rowOf(fz, tExit), cz, tex, u, lv, hz);
+          face(tExit, Math.ceil(horizon + ((camZ - cz) * fy) / tExit - 0.5), Math.ceil(horizon + ((camZ - fz) * fy) / tExit - 0.5), cz, tex, u, lv, hz);
           if (bands) bandFaces(tExit, cz, fz, bands, u, lv, hz);
           if (decals) decalFaces(tExit, cz, fz, decals, edgePos, mirrored, lv, hz);
         }
@@ -940,21 +977,21 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
         const fC = s ? slabTop[cur] : fCur;
         const cC = !s && curSlab ? slabBot[cur] : ceilZ[cur];
         if (fN > fC) {
-          const a = rowOf(fN, tExit);
+          const a = Math.ceil(horizon + ((camZ - fN) * fy) / tExit - 0.5);
           seen[next] = 1;
           const lv = faceLevel(s, tExit, contrast, out);
-          face(tExit, a, rowOf(fC, tExit), fN, sideN, wx, lv, hz);
+          face(tExit, a, Math.ceil(horizon + ((camZ - fC) * fy) / tExit - 0.5), fN, sideN, wx, lv, hz);
           if (nextBands) bandFaces(tExit, fN, fC, nextBands, wx, lv, hz);
           if (decals) decalFaces(tExit, fN, fC, decals, edgePos, mirrored, lv, hz);
           if (a < clipBot) clipBot = a < clipTop ? clipTop : a;
         }
         if (cN < cC) {
-          const b = rowOf(cN, tExit);
-          if (flags[cur] & F_SKY && (s || !curSlab) && f & F_SKY) skyFill(rowOf(cC, tExit), b);
+          const b = Math.ceil(horizon + ((camZ - cN) * fy) / tExit - 0.5);
+          if (flags[cur] & F_SKY && (s || !curSlab) && f & F_SKY) skyFill(Math.ceil(horizon + ((camZ - cC) * fy) / tExit - 0.5), b);
           else {
             seen[next] = 1;
             const lv = faceLevel(s, tExit, contrast, out);
-            face(tExit, rowOf(cC, tExit), b, cN + texHeight(upperTex[next]), upperTex[next], wx, lv, hz);
+            face(tExit, Math.ceil(horizon + ((camZ - cC) * fy) / tExit - 0.5), b, cN + texHeight(upperTex[next]), upperTex[next], wx, lv, hz);
             if (nextBands) bandFaces(tExit, cC, cN, nextBands, wx, lv, hz);
             if (decals) decalFaces(tExit, cC, cN, decals, edgePos, mirrored, lv, hz);
           }
@@ -963,8 +1000,8 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
         if (nextSlab && clipTop < clipBot && slabBot[next] < cC && slabTop[next] > fC) {
           const sTop = slabTop[next] < cC ? slabTop[next] : cC;
           const sBot = slabBot[next] > fC ? slabBot[next] : fC;
-          const a = rowOf(sTop, tExit);
-          const b = rowOf(sBot, tExit);
+          const a = Math.ceil(horizon + ((camZ - sTop) * fy) / tExit - 0.5);
+          const b = Math.ceil(horizon + ((camZ - sBot) * fy) / tExit - 0.5);
           if (b > clipTop && a < clipBot) {
             seen[next] = 1;
             const lv = faceLevel(s, tExit, contrast, out);
@@ -1021,7 +1058,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
       if (camZ < skyline) {
         let lo = 0;
         for (let k = 0; k < nw; k++) if (wBot[k] > lo) lo = wBot[k];
-        let over = lo <= rowOf(skyline, tExit);
+        let over = lo <= Math.ceil(horizon + ((camZ - skyline) * fy) / tExit - 0.5);
         if (!over && blockTops) {
           // (Only once the open rows are above the eye: the blocks ahead
           // stand taller than it, or almost everywhere they do, and it
@@ -1038,7 +1075,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
           }
           if (nRun > 0) {
             while (jRun < nRun - 1 && runEnd[jRun] <= tExit) jRun++;
-            over = lo <= rowOf(runTop[jRun] + skyMargin, tExit);
+            over = lo <= Math.ceil(horizon + ((camZ - (runTop[jRun] + skyMargin)) * fy) / tExit - 0.5);
           }
         }
         if (over) {

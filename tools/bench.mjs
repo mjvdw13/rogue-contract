@@ -8,11 +8,16 @@
 //   node tools/bench.mjs m1 --views 80 --time 2
 //   node tools/bench.mjs m1 --base DIR        against another copy of src/engine (see below)
 //   node tools/bench.mjs m1 --worst 5         list the slowest views (for tools/snapshot.mjs --at)
+//   node tools/bench.mjs m1 --cold            a different view every frame (nothing in the cache)
 //
 // Per level: the average, 90th percentile and worst frame over the views
-// (each view's best of several frames), and the share of each stage.
+// (each view's best of several frames running), the share of each stage,
+// and the garbage a frame leaves (collecting it is what makes a frame
+// hitch now and then; in the renderer it is nearly all boxed numbers).
 //
-// Separate runs on one machine drift by up to 20%, so to judge a change,
+// Separate runs on one machine drift by up to 20%, and even in one process
+// the two renderers' ratio moves by 5% or so from run to run (the engine
+// doesn't compile them the same way twice), so run it a few times. To judge a change,
 // copy src/engine somewhere before making it and pass `--base` that copy:
 // both renderers then draw the same views in one process, in alternating
 // blocks, and the frames are compared byte for byte.
@@ -35,6 +40,7 @@ const playTime = Number(opt('--time', 1));
 const worst = Number(opt('--worst', 0));
 const wide = args.includes('--wide');
 const baseDir = opt('--base');
+const cold = args.includes('--cold');
 
 const ctx = await headless({ custom: true, scale: res });
 const { registry, assets, surface, palette } = ctx;
@@ -81,25 +87,49 @@ for (const id of levels.length ? levels : ['m1', 'm2', 'm3', 'm4']) {
   const best = renderers.map(() => new Float64Array(nViews).fill(Infinity));
   const stage = renderers.map(() => STAGES.map(() => new Float64Array(nViews).fill(Infinity)));
   const frames = renderers.map(() => []);
+  const garbage = renderers.map(() => 0);
+  const garbageN = renderers.map(() => 0);
   let differ = 0;
-  for (let rep = 0; rep < reps + 1; rep++) {
-    for (let k = 0; k < nViews; k++) {
-      for (let j = 0; j < renderers.length; j++) {
-        const r = renderers[j].r;
-        surface.clear(0);
-        const t0 = performance.now();
-        r.render(world, cams[k], { skip: pt });
-        const ms = performance.now() - t0;
-        // (The first pass warms the JIT up.)
-        if (rep === 0) {
-          if (renderers.length > 1) frames[j][k] = Uint8Array.from(surface.px);
-          continue;
+  // Each view is drawn several times running, as in play, where one frame
+  // is much like the last and the map and textures it needs are in the
+  // processor's cache (`--cold` draws a different view each time instead,
+  // which is up to twice as slow). The renderers take turns, in blocks.
+  const draw = (j, k, keep) => {
+    const r = renderers[j].r;
+    surface.clear(0);
+    const h0 = process.memoryUsage().heapUsed;
+    const t0 = performance.now();
+    r.render(world, cams[k], { skip: pt });
+    const ms = performance.now() - t0;
+    const heap = process.memoryUsage().heapUsed - h0;
+    if (!keep) return;
+    // (Less after than before: a collection ran in between.)
+    if (heap > 0) {
+      garbage[j] += heap;
+      garbageN[j]++;
+    }
+    if (ms < best[j][k]) best[j][k] = ms;
+    STAGES.forEach((s, q) => {
+      const v = r.ms?.[s] ?? 0;
+      if (v < stage[j][q][k]) stage[j][q][k] = v;
+    });
+  };
+  // (The first pass warms the JIT up, and keeps the frames to compare.)
+  for (let k = 0; k < nViews; k++) {
+    for (let j = 0; j < renderers.length; j++) {
+      draw(j, k, false);
+      if (renderers.length > 1) frames[j][k] = Uint8Array.from(surface.px);
+    }
+  }
+  if (cold) {
+    for (let rep = 0; rep < reps; rep++) for (let k = 0; k < nViews; k++) for (let j = 0; j < renderers.length; j++) draw(j, k, true);
+  } else {
+    for (let rep = 0; rep < 2; rep++) {
+      for (let k = 0; k < nViews; k++) {
+        for (let j = 0; j < renderers.length; j++) {
+          draw(j, k, false);
+          for (let q = 0; q < reps; q++) draw(j, k, true);
         }
-        if (ms < best[j][k]) best[j][k] = ms;
-        STAGES.forEach((s, q) => {
-          const v = r.ms?.[s] ?? 0;
-          if (v < stage[j][q][k]) stage[j][q][k] = v;
-        });
       }
     }
   }
@@ -113,7 +143,8 @@ for (const id of levels.length ? levels : ['m1', 'm2', 'm3', 'm4']) {
       const a = stage[j][q].reduce((x, y) => x + (y === Infinity ? 0 : y), 0) / nViews;
       return a >= 0.005 ? `${s} ${a.toFixed(2)}` : null;
     }).filter(Boolean);
-    console.log(`  ${name.padEnd(5)} avg ${fmt(avg)}  p90 ${fmt(pct(sorted, 0.9))}  worst ${fmt(sorted[nViews - 1])}   ${parts.join(', ')}`);
+    const kb = garbageN[j] ? Math.round(garbage[j] / garbageN[j] / 1024) : 0;
+    console.log(`  ${name.padEnd(5)} avg ${fmt(avg)}  p90 ${fmt(pct(sorted, 0.9))}  worst ${fmt(sorted[nViews - 1])}   ${parts.join(', ')}; ${kb} KB of garbage`);
   });
   if (renderers.length > 1) {
     const a = best[0].reduce((x, y) => x + y, 0);

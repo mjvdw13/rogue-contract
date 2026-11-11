@@ -168,7 +168,9 @@ export class View {
   levelF(light, dist) {
     const d = dist < 0.5 ? 0.5 : dist;
     let b = DIMINISH / d;
-    if (b > MAX_BRIGHTEN) b = MAX_BRIGHTEN;
+    // (24, not MAX_BRIGHTEN: an exported constant put straight into `b`
+    // makes the engine box `b` at every call, 16 bytes of garbage each.)
+    if (b > 24) b = 24;
     return (LIGHT_BLACK - light) / 4 - this.extraLight - b + d * this.fog;
   }
 }

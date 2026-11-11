@@ -1448,21 +1448,44 @@ Mission 3 is. Each step is a commit, playable at `?map=m4`.
 ### 11. Frame time (Mark, 2026-11-10)
 
 Smooth on every computer. Measured with `tools/bench.mjs` (headless, 40
-seeded views a level, the Dark Forces art): at 320x200 Mos Eisley
-averages 7.9 ms a frame and its worst views 15 to 19; the world pass
-(`drawWorld`) is 70 to 85% of it, models most of the rest. Of the world
-pass about a quarter is filling pixels and three quarters is the ray's
-work per tile crossed (10,000 tiles a frame in Mos Eisley, about 280 ns
-each), spread thinly over the whole loop: there's no one hot line.
+seeded views a level, the Dark Forces art, each view's best of several
+frames running): at 320x200 Mos Eisley averages 6.5 to 7 ms a frame, its
+90th percentile 13 and its worst views 15 to 18; m2, m3 and m4 average
+3 to 5.5, worst 7 to 15. The world pass (`drawWorld`) is 70 to 85% of a
+frame, models most of the rest. Of the world pass about a third is
+filling pixels and the rest is the ray's work per tile crossed (10,000
+tiles a frame in Mos Eisley), spread thinly over the whole loop: no one
+line is hot, the helpers are already inlined or cheap to call, and a
+cold cache costs only 7%. So changes that keep every pixel are worth
+5% here and there; a big gain needs one of the choices below.
 
 - [x] The bench, and the renderer's time by stage (`Renderer.ms`).
 - [x] `drawWorld`'s helpers made once a frame, not once a column.
-- [ ] The ray's work per tile, without changing a pixel: a short path
-      for a boundary where nothing changes, the last tile's rows and
-      light carried into the next.
-- [ ] Models: the light per pixel without a call and a division.
-- [ ] Waiting on Mark: which of the changes that show to try (the list
-      is in the session's notes to him).
+- [x] Garbage: 1.5 MB a frame down to 0.5 (the worst views 2.3 to 0.7).
+      A fraction clamped to an imported constant was boxed at every
+      floor and ceiling pixel; distances are handed to the big helpers
+      in an array (`REG`) instead of as arguments.
+- [ ] The rest of the garbage: `drawWorld`'s calls to `face`,
+      `decalFaces`, `faceLevel` and `walkBlocks` (0.5 MB a frame in the
+      worst views), the same way.
+- [ ] Waiting on Mark: which of these to build.
+  - Draw in threads: the screen's columns split over 3 or 4 workers.
+    Nothing looks different; the world pass 2.5 to 3.5 times faster on
+    any machine with 4 cores. The biggest job: the map's arrays shared
+    with the workers, doors, lights and decals mirrored to them, and a
+    service worker to give GitHub Pages the headers shared memory needs
+    (one thread as today where that fails).
+  - Low detail, by itself: when frames run late, draw every other
+    column and double it (Doom's low detail), back to full when there's
+    time. About 1.8 times faster while it's on; things look blockier
+    side to side. Could be a setting too. A day's work.
+  - The models' light per face span instead of per pixel, and their
+    textures stepped in runs of 8 pixels: models 1.3 to 1.5 times
+    faster (they are 15 to 30% of the worst frames); a level of light
+    can land a pixel off.
+  - The palette lookup in the shader, not in a loop (the frame goes to
+    the card as 1 byte a pixel): about 0.1 ms at 1x, 0.3 at 2x. Nothing
+    looks different. Small.
 
 ## Small fixes and known rough edges
 

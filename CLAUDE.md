@@ -41,7 +41,7 @@ src/content/     the game as data: monsters/, weapons/, items/, npcs/,
 assets/          generated art (from tools/art; don't hand-edit, it's regenerated)
 assets/custom/   Dark Forces rips, Mark's character sheets and their cutters,
                  overrides.json / sound-overrides.json (see its README.md)
-tools/           validate, snapshot (headless 3D render), mapview, smoke,
+tools/           validate, snapshot (headless 3D render), bench (frame time), mapview, smoke,
                  art/ (generators), lib/levelcheck.mjs (reachability),
                  particles.html (particle/explosion bench), soundboard.html
 tests/           node --test; helpers.js has makeWorld, room, run, mockInput,
@@ -113,6 +113,12 @@ only way to check visual work without a browser.
 - **Code style:** match the file. Small JSDoc on exported functions,
   comments that explain why. Hot paths (render, particles) use typed arrays
   and avoid allocation per frame.
+- **Hot paths and garbage:** a fraction passed to a function too big to
+  inline, or set from an imported or captured constant (`if (b > MAX) b =
+  MAX`), is boxed: 16 bytes of garbage each time, and a hitch when it's
+  collected. Write `+MAX` or keep such numbers in a typed array (`REG` in
+  `render/columns.js`). `node tools/bench.mjs` shows the garbage a frame
+  and the time by stage; with `--base` it compares two renderers.
 - **Determinism:** gameplay uses `world.rng`; cosmetic things (particles,
   explosions' looks) use their own RNG so tests stay deterministic.
 
