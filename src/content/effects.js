@@ -32,6 +32,20 @@ export const projectiles = [
     speed: 65,
     damage: [10, 20],
   }),
+  // The fusion cutter's plasma: a slow green ball (Dark Forces' 100 units a
+  // second to a bolt's 250), harder than a bolt (15 to 10), that flies on
+  // for 10 s.
+  defineProjectile({
+    id: 'fusion-plasma',
+    sheet: FX('fusion-plasma', 32, 32),
+    anims: { fly: { frames: [0, 1, 2, 3], fps: 12, loop: true }, explode: { frames: [4, 5, 6, 7, 8, 9, 10, 11, 12], fps: 20 } },
+    radius: 0.18,
+    light: { radius: 3, light: 64 },
+    speed: 24,
+    life: 10,
+    damage: [15, 30],
+    sounds: { explode: 'bolt-hit' },
+  }),
   // A Jawa's ion blaster: a slow, weak, crackling cloud of blue electricity.
   defineProjectile({
     id: 'ion-bolt',

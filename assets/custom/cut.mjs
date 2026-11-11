@@ -143,6 +143,14 @@ const SHEETS = [
   { cells: { folder: 'Pickups/IDETS.cells', list: ['000.PNG'] }, asset: 'detonator-belt', out: 'assets/sprites/items/detonator-belt.png' },
   // The concussion rifle lying on the floor (ICONCUS), Bossk's drop.
   { cells: { folder: 'Pickups/ICONCUS.cells', list: ['000.PNG'] }, asset: 'concussion-rifle-item', out: 'assets/sprites/items/concussion-rifle.png' },
+  // The fusion cutter's plasma: in flight (WEMISS) and its burst (EMISEXP),
+  // from the projectiles zip (unpack it into the folder, so it holds
+  // `Player Projectiles/`).
+  {
+    cells: { folder: 'Player Projectiles', list: [0, 1, 2, 3].map((k) => `WEMISS.cells/00${k}.PNG`).concat([0, 1, 2, 3, 4, 5, 6, 7, 8].map((k) => `EMISEXP.cells/00${k}.PNG`)), align: 'middle' },
+    asset: 'fusion-plasma',
+    out: 'assets/sprites/fx/fusion-plasma.png',
+  },
   // Ammo: an energy cell (IENERGY), a power cell (IPOWER), a plasma
   // cartridge (IPLAZMA), a mortar shell and a case of them (ISHELL, ISHELLS);
   // and the weapons lying on the floor.
@@ -150,8 +158,8 @@ const SHEETS = [
     ['IENERGY', 'energy-cell'], ['IPOWER', 'power-cell'], ['IPLAZMA', 'plasma-cartridge'],
     ['ISHELL', 'mortar-shell'], ['ISHELLS', 'mortar-shells'],
     // The weapons: the E-11 lying on its side (IST-GUNI), a trooper's drop;
-    // the repeater (IAUTOGUN).
-    ['IST-GUNI', 'rifle'], ['IAUTOGUN', 'repeater'],
+    // the repeater (IAUTOGUN), the fusion cutter (IFUSION).
+    ['IST-GUNI', 'rifle'], ['IAUTOGUN', 'repeater'], ['IFUSION', 'fusion-cutter'],
   ].map(([cell, item]) => ({ cells: { folder: `Pickups/${cell}.cells`, list: ['000.PNG'] }, asset: `${item}-item`, out: `assets/sprites/items/${item}.png` })),
 ];
 
@@ -311,6 +319,15 @@ const WEAPONS = [
     padLeft: 0,
     padBottom: 12,
     frames: [[247, 363, 184, 281], [490, 608, 186, 281], [368, 486, 186, 281]],
+  },
+  {
+    // fusion-cutter.js: 0 idle (fusion1, DF x 19), 1-4 a barrel lit after
+    // its shot (fusion2-5, x 23). (fusion6, all four lit, is its second fire.)
+    asset: 'fusion-cutter',
+    at: [0, 4, 4, 4, 4],
+    padLeft: 0,
+    padBottom: 12,
+    frames: [[617, 917, 198, 281], [933, 1229, 201, 281], [11, 307, 291, 371], [314, 610, 290, 370], [619, 915, 290, 370]],
   },
 ];
 

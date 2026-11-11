@@ -45,6 +45,15 @@ export default [
     },
     pitchVariance: 0.08,
   }),
+  // The Jeron fusion cutter: a rising electric whine with a crack.
+  defineSound({
+    id: 'fusion-fire',
+    synth: {
+      wave: 'saw', freq: 300, freqEnd: 1400, duration: 0.2, attack: 0.005, release: 0.15, lowpass: [3000, 6000], volume: 0.4,
+      layers: [burst(0.06, [6000, 1500], 0.35)],
+    },
+    pitchVariance: 0.05,
+  }),
   // The E-11 rifle: a shorter, higher zap than the pistol's.
   defineSound({
     id: 'rifle-fire',

@@ -324,6 +324,16 @@ export function validateContent(reg) {
     // A weapon with no attack (a tracker) needs no fire animation.
     if (w.fire && !w.anims.fire) err(`${owner}: needs a "fire" animation`);
     else if (w.fire && !w.anims.fire.events.includes('fire')) err(`${owner}: its "fire" animation needs a fireAt frame`);
+    if (w.cycle != null) {
+      if (!Array.isArray(w.cycle) || !w.cycle.length) err(`${owner}: cycle must be a list of fire animations, played one a shot in turn`);
+      else if (!w.fire) err(`${owner}: has no "fire" attack, so cycle does nothing`);
+      else {
+        for (const name of w.cycle) {
+          if (!w.anims[name]) err(`${owner}: cycle names an animation it doesn't have, "${name}"`);
+          else if (!w.anims[name].events.includes('fire')) err(`${owner}: its "${name}" animation (in cycle) needs a fireAt frame`);
+        }
+      }
+    }
     if (w.ammo && !reg.ammo.has(w.ammo)) err(`${owner}: unknown ammo "${w.ammo}"`);
     if (w.reraise !== undefined && typeof w.reraise !== 'boolean') err(`${owner}: reraise must be true or false`);
     if (w.charge) {

@@ -252,6 +252,10 @@ export function defineAmmo(def) {
  * the projectile it throws.
  * With no `fire` it has no attack: pressing fire does nothing, and it's never
  * picked when another weapon runs dry.
+ * `cycle: ['fire', 'fire2', ...]` plays those fire animations in turn, one a
+ * shot (each needs a fireAt frame), starting again from the first whenever
+ * the weapon comes up: barrels that fire one after another (Dark Forces'
+ * fusion cutter). Unset, every shot plays `fire`.
  * `track: { near, far, blink, facing, warm }` makes it a tracker (a
  * tracking fob) of the world's signal (the setSignal action): it blinks and
  * plays its `beep` sound every `blink` seconds, `blink[0]` at `near` tiles
@@ -270,7 +274,7 @@ export function defineAmmo(def) {
  *   track?:{near?:number, far?:number, blink?:[number,number], facing?:number|[number,number], warm?:number|[number,number]|null, route?:boolean},
  *   offset?:[number,number], flashLight?:number, light?:{radius:number, light:number},
  *   noise?:boolean, priority?:number,
- *   accurateFirstShot?:boolean, sounds?:Record<string,string>, bob?:number, reraise?:boolean,
+ *   accurateFirstShot?:boolean, sounds?:Record<string,string>, bob?:number, reraise?:boolean, cycle?:string[],
  *   charge?:{time?:number, min?:number, sink?:number, pull?:number}}} def
  */
 export function defineWeapon(def) {
@@ -291,6 +295,7 @@ export function defineWeapon(def) {
     sheet: normalizeSheet(def.sheet, `weapon:${def.id}`),
     anims: normalizeAnims(def.anims),
     fire: normalizeAttack(def.fire),
+    cycle: def.cycle ?? null,
     charge: def.charge ? { time: 1, min: 0.3, sink: 36, pull: 0.18, ...def.charge } : null,
     track: def.track ? { near: 4, far: 80, blink: [0.15, 1.5], facing: 15, warm: null, route: false, ...def.track } : null,
   };

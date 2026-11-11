@@ -229,5 +229,22 @@
     "src": "assets/custom/repeater.png",
     "frameWidth": 126,
     "frameHeight": 110
+  },
+  "assets/sprites/fx/fusion-plasma.png": {
+    "src": "assets/custom/fusion-plasma.png",
+    "frameWidth": 72,
+    "frameHeight": 76,
+    "scale": 0.85
+  },
+  "assets/sprites/items/fusion-cutter.png": {
+    "src": "assets/custom/fusion-cutter-item.png",
+    "frameWidth": 24,
+    "frameHeight": 20,
+    "scale": 0.85
+  },
+  "assets/sprites/weapons/fusion-cutter.png": {
+    "src": "assets/custom/fusion-cutter.png",
+    "frameWidth": 302,
+    "frameHeight": 96
   }
 }

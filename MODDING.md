@@ -362,6 +362,12 @@ unlocks them by their tag, shut or not: so it leads to a gate the story
 will open, and never round by one that stays shut. Never through a secret
 door. With no route at all, it points straight at the signal.
 
+`cycle: ['fire', 'fire2', 'fire3', 'fire4', 'fire3', 'fire2']` plays those
+fire animations in turn, one a shot, round and round (each needs its
+`fireAt`), starting again from the first when the weapon comes back up:
+barrels that fire one after another, each lit after its shot, like the
+fusion cutter's (`fusion-cutter.js`).
+
 `charge: { time: 1, min: 0.2, sink: 36, pull: 0.18 }` throws when fire is
 let go instead of when it's pressed. Pressing fire pulls the hand back,
 down `sink` pixels over `pull` seconds, and it stays there while fire is

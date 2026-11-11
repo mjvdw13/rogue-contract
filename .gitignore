@@ -33,6 +33,9 @@ assets/custom/*
 !assets/custom/rifle.png
 !assets/custom/repeater.png
 !assets/custom/repeater-item.png
+!assets/custom/fusion-cutter.png
+!assets/custom/fusion-cutter-item.png
+!assets/custom/fusion-plasma.png
 !assets/custom/textures.mjs
 !assets/custom/textures/
 # The whole Dark Forces texture pack, sorted by what each texture shows.

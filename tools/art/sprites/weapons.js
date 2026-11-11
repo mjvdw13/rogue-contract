@@ -274,6 +274,44 @@ function repeaterPickup() {
   return m.render({ ...RENDER, light: [-0.4, -0.8, 0.45] });
 }
 
+// ------------------------------------------------------------------ Jeron fusion cutter
+
+/**
+ * The Jeron fusion cutter: a wide dark gun held low across the bottom of
+ * the view, four fat barrels side by side along its top. `lit` is the
+ * barrel glowing green from its shot (1-4), or none. 302x96 (Dark Forces'
+ * frame, cut.mjs).
+ */
+function fusionFrame(lit = 0) {
+  const m = new Model(302, 96, { seed: 127 });
+  const metal = { ...MAT.metal, spec: 0.45, shine: 20, grain: 0.05 };
+  m.slab([[20, 70], [270, 56], [300, 96], [10, 100]], 8, C('gray', 0.14), metal, { bevel: 5, thickness: 8 }); // the body
+  for (let k = 0; k < 4; k++) {
+    const x = 92 + k * 46;
+    const y = 44 + k * 4;
+    m.capsule(x - 10, y + 16, 16, x + 14, y - 10, 18, 16, 14, C('gray', 0.2), metal);
+    m.paint(x + 4, y - 2, 6, 3, C('orange', 0.45)); // the copper band
+    if (lit === k + 1) m.capsule(x - 6, y + 10, 30, x + 10, y - 6, 30, 9, 8, G('green', 0.8), MAT.glow);
+  }
+  m.sphere(48, 76, 20, 14, C('gray', 0.1), metal);
+  forearm(m, [304, 110, 6], [266, 76, 18], 10);
+  fist(m, 258, 74, 24, 11, 1);
+  return m.render(RENDER);
+}
+
+function fusionSheet() {
+  return sheet([0, 1, 2, 3, 4].map(fusionFrame));
+}
+
+/** The fusion cutter lying on the floor, for a pickup. 32x24. */
+function fusionPickup() {
+  const m = new Model(32, 24, { seed: 129 });
+  const metal = { ...MAT.metal, spec: 0.45, shine: 20, grain: 0.05 };
+  m.slab([[4, 12], [28, 12], [28, 22], [4, 22]], 4, C('gray', 0.14), metal, { bevel: 1.5, thickness: 3 });
+  for (let k = 0; k < 4; k++) m.capsule(7 + k * 6, 14, 8, 7 + k * 6, 6, 8, 2.6, 2.6, C('gray', 0.22), metal);
+  return m.render({ ...RENDER, light: [-0.4, -0.8, 0.45] });
+}
+
 // ------------------------------------------------------------------ tracking fob
 
 /**
@@ -329,4 +367,6 @@ export default [
   { name: 'pickup-rifle', out: 'assets/sprites/items/rifle.png', draw: riflePickup, dither: 'fs' },
   { name: 'repeater', out: W('repeater'), draw: repeaterSheet, dither: 'fs' },
   { name: 'pickup-repeater', out: 'assets/sprites/items/repeater.png', draw: repeaterPickup, dither: 'fs' },
+  { name: 'fusion-cutter', out: W('fusion-cutter'), draw: fusionSheet, dither: 'fs' },
+  { name: 'pickup-fusion-cutter', out: 'assets/sprites/items/fusion-cutter.png', draw: fusionPickup, dither: 'fs' },
 ];

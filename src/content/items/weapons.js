@@ -35,6 +35,17 @@ export default [
     message: 'Picked up an Imperial repeater rifle.',
     sound: 'weapon-pickup',
   }),
+  // The Jeron fusion cutter, with 50 power cells.
+  defineItem({
+    id: 'fusion-cutter',
+    name: 'Fusion Cutter',
+    glyph: '6',
+    sheet: { src: 'assets/sprites/items/fusion-cutter.png', frameWidth: 32, frameHeight: 24 },
+    radius: 0.6,
+    pickup: { weapon: 'fusion-cutter', ammo: { power: 50 } },
+    message: 'Picked up a Jeron fusion cutter.',
+    sound: 'weapon-pickup',
+  }),
   // The concussion rifle, as Bossk drops it.
   defineItem({
     id: 'concussion-rifle',

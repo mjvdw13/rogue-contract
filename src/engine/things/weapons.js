@@ -19,7 +19,15 @@ export class WeaponState extends Animated {
     this.power = 1;
     /** (`track`) Seconds to the next blink. */
     this.blink = 0;
+    /** (`cycle`) Shots fired since it was raised: which fire animation is next. */
+    this.shot = 0;
   }
+}
+
+/** The fire animation for the next shot: `fire`, or with `cycle` the next of its list in turn. */
+function fireAnim(def, ws) {
+  if (!def.cycle) return 'fire';
+  return def.cycle[ws.shot++ % def.cycle.length];
 }
 
 export function hasAmmo(p, def) {
@@ -109,6 +117,7 @@ export function weaponThink(world, pt, input, dt) {
   let def = reg.weapons.get(p.weapon);
   if (ws.def !== def) {
     ws.def = def;
+    ws.shot = 0;
     ws.setAnim('idle');
   }
   if (!def) return;
@@ -124,6 +133,7 @@ export function weaponThink(world, pt, input, dt) {
         p.pendingWeapon = null;
         def = reg.weapons.get(p.weapon);
         ws.def = def;
+        ws.shot = 0;
         ws.setAnim('idle');
         ws.state = holstered(world, def) ? 'holster' : 'raise';
         if (ws.state === 'raise' && def?.sounds.raise) world.playSound(def.sounds.raise);
@@ -157,7 +167,7 @@ export function weaponThink(world, pt, input, dt) {
           ws.charge = 0;
         } else if (hasAmmo(p, def)) {
           ws.state = 'fire';
-          ws.setAnim('fire');
+          ws.setAnim(fireAnim(def, ws));
         } else {
           const best = bestWeapon(reg, p, def.id);
           if (best && best !== p.weapon) p.pendingWeapon = best;
@@ -180,7 +190,7 @@ export function weaponThink(world, pt, input, dt) {
       } else if (!input.isDown('fire')) {
         ws.power = min + (1 - min) * k;
         ws.state = 'fire';
-        ws.setAnim('fire');
+        ws.setAnim(fireAnim(def, ws));
       }
       break;
     }
@@ -195,7 +205,7 @@ export function weaponThink(world, pt, input, dt) {
         if (def.reraise) {
           ws.state = 'reload';
         } else if (input.isDown('fire') && hasAmmo(p, def) && !p.pendingWeapon) {
-          ws.setAnim('fire');
+          ws.setAnim(fireAnim(def, ws));
         } else {
           ws.state = 'ready';
           ws.setAnim('idle');
