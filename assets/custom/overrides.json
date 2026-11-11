@@ -207,5 +207,16 @@
     "frameWidth": 30,
     "frameHeight": 24,
     "scale": 0.85
+  },
+  "assets/sprites/items/rifle.png": {
+    "src": "assets/custom/rifle-item.png",
+    "frameWidth": 48,
+    "frameHeight": 17,
+    "scale": 0.85
+  },
+  "assets/sprites/weapons/rifle.png": {
+    "src": "assets/custom/rifle.png",
+    "frameWidth": 166,
+    "frameHeight": 135
   }
 }

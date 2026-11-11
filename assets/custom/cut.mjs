@@ -144,10 +144,13 @@ const SHEETS = [
   // The concussion rifle lying on the floor (ICONCUS), Bossk's drop.
   { cells: { folder: 'Pickups/ICONCUS.cells', list: ['000.PNG'] }, asset: 'concussion-rifle-item', out: 'assets/sprites/items/concussion-rifle.png' },
   // Ammo: an energy cell (IENERGY), a power cell (IPOWER), a plasma
-  // cartridge (IPLAZMA), a mortar shell and a case of them (ISHELL, ISHELLS).
+  // cartridge (IPLAZMA), a mortar shell and a case of them (ISHELL, ISHELLS);
+  // and the weapons lying on the floor.
   ...[
     ['IENERGY', 'energy-cell'], ['IPOWER', 'power-cell'], ['IPLAZMA', 'plasma-cartridge'],
     ['ISHELL', 'mortar-shell'], ['ISHELLS', 'mortar-shells'],
+    // The weapons: the E-11 lying on its side (IST-GUNI), a trooper's drop.
+    ['IST-GUNI', 'rifle'],
   ].map(([cell, item]) => ({ cells: { folder: `Pickups/${cell}.cells`, list: ['000.PNG'] }, asset: `${item}-item`, out: `assets/sprites/items/${item}.png` })),
 ];
 
@@ -285,6 +288,18 @@ const WEAPONS = [
     padLeft: 0,
     padBottom: 12,
     frames: [[36, 208, 627, 731], [214, 313, 625, 731], [321, 415, 628, 731]],
+  },
+  // The rest are placed the concussion rifle's way, each frame at Dark
+  // Forces' x position less the weapon's leftmost (`at`), so its definition's
+  // `offset` x is that leftmost - 160 + the frame width / 2. Every DF frame's
+  // bottom is on one line, so they stand on the frame's bottom.
+  {
+    // rifle.js: 0 idle (rifle1, DF x 113), 1 the shot (rifle2, x 112: lit, the flash).
+    asset: 'rifle',
+    at: [1, 0],
+    padLeft: 0,
+    padBottom: 12,
+    frames: [[908, 1060, 27, 135], [1064, 1228, 13, 135]],
   },
 ];
 

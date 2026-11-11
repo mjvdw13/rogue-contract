@@ -197,6 +197,46 @@ function concussionPickup() {
   return m.render({ ...RENDER, light: [-0.4, -0.8, 0.45] });
 }
 
+// ------------------------------------------------------------------ E-11 rifle
+
+/**
+ * The E-11 blaster rifle: a long barrel up and in at the crosshair from the
+ * bottom, a scope along its top, the magazine out to the left and the gloved
+ * hand on the grip. `fire` adds the red flash at the muzzle. 166x134 (Dark
+ * Forces' frame, cut.mjs).
+ */
+function rifleFrame({ kick = 0, fire = false } = {}) {
+  const m = new Model(166, 134, { seed: 119 });
+  const metal = { ...MAT.metal, spec: 0.45, shine: 20, grain: 0.05 };
+  const [x0, y0, x1, y1] = [120, 140 + kick, 92, 40 + kick];
+  m.capsule(x0, y0, 10, x1, y1, 14, 9, 6, C('gray', 0.16), metal); // the body
+  m.capsule(x1 + 2, y1 + 6, 15, x1 - 3, y1 - 12, 15, 3.6, 3.4, GUNMETAL, metal); // the barrel
+  m.capsule(x0 - 4, y0 - 26, 20, x1 + 10, y1 + 26, 20, 4, 4, C('gray', 0.1), metal); // the scope
+  m.sphere(x1 + 10, y1 + 26, 21, 3.2, C('steel', 0.5), MAT.glass);
+  m.slab([[70, 90 + kick], [104, 82 + kick], [106, 92 + kick], [72, 100 + kick]], 12, C('gray', 0.2), metal, { bevel: 1.5, thickness: 2 }); // the magazine
+  forearm(m, [150, 150, 6], [128, 108 + kick, 18], 10);
+  fist(m, 124, 104 + kick, 22, 11, 1);
+  const c = m.render(RENDER);
+  if (fire) flash(c, x1 - 4, y1 - 16, 10, G('red', 1), G('red', 0), 6);
+  return c;
+}
+
+function rifleSheet() {
+  return sheet([rifleFrame(), rifleFrame({ kick: 3, fire: true })]);
+}
+
+/** The rifle lying on the floor, for a pickup (and a trooper's drop). 64x24. */
+function riflePickup() {
+  const m = new Model(64, 24, { seed: 121 });
+  const metal = { ...MAT.metal, spec: 0.45, shine: 20, grain: 0.05 };
+  m.capsule(4, 13, 4, 30, 13, 4, 2, 2, GUNMETAL, metal);
+  m.capsule(24, 13, 4, 50, 13, 4, 4, 4, C('gray', 0.16), metal);
+  m.capsule(28, 8, 6, 44, 8, 6, 1.8, 1.8, C('gray', 0.1), metal);
+  m.slab([[30, 15], [36, 15], [34, 22], [28, 22]], 3, C('gray', 0.2), metal, { bevel: 1, thickness: 1.5 });
+  m.slab([[48, 11], [60, 13], [60, 18], [48, 17]], 3, C('gray', 0.12), metal, { bevel: 1, thickness: 1.5 });
+  return m.render({ ...RENDER, light: [-0.4, -0.8, 0.45] });
+}
+
 // ------------------------------------------------------------------ tracking fob
 
 /**
@@ -248,4 +288,6 @@ export default [
   { name: 'concussion-rifle', out: W('concussion-rifle'), draw: concussionSheet, dither: 'fs' },
   { name: 'fob', out: W('fob'), draw: fobSheet, dither: 'fs' },
   { name: 'pickup-concussion-rifle', out: 'assets/sprites/items/concussion-rifle.png', draw: concussionPickup, dither: 'fs' },
+  { name: 'rifle', out: W('rifle'), draw: rifleSheet, dither: 'fs' },
+  { name: 'pickup-rifle', out: 'assets/sprites/items/rifle.png', draw: riflePickup, dither: 'fs' },
 ];

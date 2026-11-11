@@ -1265,7 +1265,7 @@ conversations, then the fob.
   - [x] DF's ammo: power cells (repeater, fusion cutter, and the
         concussion rifle moves to them), plasma (assault cannon), mortar
         shells, mines, with their pickups. Key 0 selects slot 10.
-  - [ ] E-11 blaster rifle (3): quick red bolts, 2 energy a shot.
+  - [x] E-11 blaster rifle (3): quick red bolts, 2 energy a shot.
         Stormtroopers drop one.
   - [ ] Imperial repeater (5): a stream of small bolts while fire is held.
   - [ ] Jeron fusion cutter (6): slow green plasma, each shot from the

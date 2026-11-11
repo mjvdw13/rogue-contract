@@ -50,10 +50,11 @@ test('killing a monster counts the kill and drops its item', () => {
   w.damage(trooper, 1000, w.player, w.player);
   assert.ok(trooper.dead);
   assert.equal(w.stats.kills, 1);
-  // Troopers drop an energy cell most of the time: a few more make it certain enough.
+  // (Drops can be left to chance: a few more make it certain enough.)
   for (let k = 0; k < 6; k++) w.damage(w.spawn('stormtrooper', 5.5, 2.5), 1000, w.player, w.player);
   run(w, mockInput(), 0.5);
-  assert.ok(w.things.some((t) => t.def.id === 'energy-cell'), 'troopers drop energy cells');
+  const drop = trooper.def.drops[0].item;
+  assert.ok(w.things.some((t) => t.def.id === drop), `troopers drop their ${drop}`);
 });
 
 test('pickups respect their limits', () => {

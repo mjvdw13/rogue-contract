@@ -36,6 +36,15 @@ export default [
     pitchVariance: 0.05,
   }),
   defineSound({ id: 'blaster-enemy', synth: enemyBlaster, pitchVariance: 0.08 }),
+  // The E-11 rifle: a shorter, higher zap than the pistol's.
+  defineSound({
+    id: 'rifle-fire',
+    synth: {
+      wave: 'saw', freq: 1900, freqEnd: 260, duration: 0.16, attack: 0.002, release: 0.13, lowpass: [7000, 1100], volume: 0.5,
+      layers: [{ wave: 'square', freq: 1100, freqEnd: 180, duration: 0.12, release: 0.1, volume: 0.25 }, burst(0.05, [8000, 2500], 0.45)],
+    },
+    pitchVariance: 0.06,
+  }),
   // The probe droid's shot (sounds like the troopers' unless overridden).
   defineSound({ id: 'droid-fire', synth: enemyBlaster, pitchVariance: 0.08 }),
   // The Jawas' ion blaster: a buzzing electric zap, and a crackle where it hits.

@@ -29,6 +29,8 @@ assets/custom/*
 !assets/custom/plasma-cartridge-item.png
 !assets/custom/mortar-shell-item.png
 !assets/custom/mortar-shells-item.png
+!assets/custom/rifle-item.png
+!assets/custom/rifle.png
 !assets/custom/textures.mjs
 !assets/custom/textures/
 # The whole Dark Forces texture pack, sorted by what each texture shows.

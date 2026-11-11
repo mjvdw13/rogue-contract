@@ -12,6 +12,7 @@
 //   node tools/snapshot.mjs m1 --custom --res 2           the 3D view at 2x (640x400)
 //   node tools/snapshot.mjs m1 --time 3                   after 3 s of play (emitters' particles in the air)
 //   node tools/snapshot.mjs m2 --custom --gust            the weather in a full gust (the haze closing in)
+//   node tools/snapshot.mjs sandbox --weapon rifle:1      holding a weapon, on sheet frame 1 (default 0)
 //
 // The default output is tools/art/out/snapshots/<level>.png.
 import fs from 'node:fs';
@@ -53,7 +54,7 @@ export async function headless({ custom = false, scale = 1 } = {}) {
 }
 
 /** Render one frame of `levelId` from a camera. Returns RGBA pixels of the view. */
-export function snapshot(ctx, levelId, { at, pitch = 0, z, skill = 3, noMonsters = false, doors, top = false, time = 0, gust = false } = {}) {
+export function snapshot(ctx, levelId, { at, pitch = 0, z, skill = 3, noMonsters = false, doors, top = false, time = 0, gust = false, weapon } = {}) {
   const { registry, palette, assets, surface, renderer } = ctx;
   const level = registry.levels.get(levelId);
   if (!level) throw new Error(`Unknown level "${levelId}"`);
@@ -83,8 +84,23 @@ export function snapshot(ctx, levelId, { at, pitch = 0, z, skill = 3, noMonsters
   world.weather?.fill(pt.x, pt.y);
   const cam = { ...world.camera(), horizonOffset: pitch };
   if (z !== undefined) cam.z = (pt.z ?? 0) + z;
+  // Holding a weapon, raised, on one frame of its sheet: lit as the fire
+  // animation lights it there.
+  let psprites;
+  if (weapon) {
+    const def = registry.weapons.get(weapon.id);
+    if (!def) throw new Error(`Unknown weapon "${weapon.id}"`);
+    const ws = pt.player.weaponState;
+    pt.player.weapon = def.id;
+    Object.assign(ws, { def, state: 'ready', y: 0 });
+    ws.setAnim('idle');
+    ws.frame = weapon.frame;
+    const fire = def.anims.fire;
+    ws.fullbright = !!fire && fire.frames.some((f, k) => f === weapon.frame && fire.fullbright[k]);
+    psprites = world.psprites();
+  }
   surface.clear(0);
-  renderer.render(world, cam, { skip: pt });
+  renderer.render(world, cam, { skip: pt, psprites });
   const rgba = new Uint8Array(surface.pw * surface.ph * 4);
   const pal = palette.rgb;
   for (let i = 0; i < surface.pw * surface.ph; i++) {
@@ -120,7 +136,7 @@ export function upscale(img, scale, aspect = true) {
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const args = process.argv.slice(2);
   const opt = (name, def) => (args.includes(name) ? args[args.indexOf(name) + 1] : def);
-  const valued = new Set(['--at', '--pitch', '--z', '--out', '--scale', '--skill', '--doors', '--res', '--time']);
+  const valued = new Set(['--at', '--pitch', '--z', '--out', '--scale', '--skill', '--doors', '--res', '--time', '--weapon']);
   const levelId = args.find((a, i) => !a.startsWith('--') && !valued.has(args[i - 1])) ?? 'sandbox';
   const at = opt('--at') ? opt('--at').split(',').map(Number) : undefined;
   const res = Number(opt('--res', 1));
@@ -135,6 +151,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     top: args.includes('--top'),
     gust: args.includes('--gust'),
     time: Number(opt('--time', 0)),
+    weapon: opt('--weapon') ? { id: opt('--weapon').split(':')[0], frame: Number(opt('--weapon').split(':')[1] ?? 0) } : undefined,
   });
   const out = path.resolve(opt('--out', path.join(root, 'tools/art/out/snapshots', `${levelId}.png`)));
   fs.mkdirSync(path.dirname(out), { recursive: true });

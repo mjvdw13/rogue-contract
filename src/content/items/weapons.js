@@ -12,6 +12,18 @@ export default [
     message: 'Picked up a blaster pistol.',
     sound: 'weapon-pickup',
   }),
+  // The E-11 rifle, as stormtroopers drop it. A rifle when you have one
+  // already is its energy (Dark Forces' 15).
+  defineItem({
+    id: 'rifle',
+    name: 'Blaster Rifle',
+    glyph: '3',
+    sheet: { src: 'assets/sprites/items/rifle.png', frameWidth: 64, frameHeight: 24 },
+    radius: 0.7,
+    pickup: { weapon: 'rifle', ammo: { energy: 15 } },
+    message: 'Picked up a blaster rifle.',
+    sound: 'weapon-pickup',
+  }),
   // The concussion rifle, as Bossk drops it.
   defineItem({
     id: 'concussion-rifle',
