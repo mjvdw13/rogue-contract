@@ -1445,6 +1445,25 @@ Mission 3 is. Each step is a commit, playable at `?map=m4`.
 - [ ] Waiting on Mark: where it sits in the story, the look, the fights
       (nobody has played it), the song.
 
+### 11. Frame time (Mark, 2026-11-10)
+
+Smooth on every computer. Measured with `tools/bench.mjs` (headless, 40
+seeded views a level, the Dark Forces art): at 320x200 Mos Eisley
+averages 7.9 ms a frame and its worst views 15 to 19; the world pass
+(`drawWorld`) is 70 to 85% of it, models most of the rest. Of the world
+pass about a quarter is filling pixels and three quarters is the ray's
+work per tile crossed (10,000 tiles a frame in Mos Eisley, about 280 ns
+each), spread thinly over the whole loop: there's no one hot line.
+
+- [x] The bench, and the renderer's time by stage (`Renderer.ms`).
+- [x] `drawWorld`'s helpers made once a frame, not once a column.
+- [ ] The ray's work per tile, without changing a pixel: a short path
+      for a boundary where nothing changes, the last tile's rows and
+      light carried into the next.
+- [ ] Models: the light per pixel without a call and a division.
+- [ ] Waiting on Mark: which of the changes that show to try (the list
+      is in the session's notes to him).
+
 ## Small fixes and known rough edges
 
 - [ ] A second `Registry` built from the same content pack finds no sprite

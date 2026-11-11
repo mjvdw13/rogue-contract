@@ -226,11 +226,361 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
     }
   };
 
-  for (let x = 0; x < W; x++) {
+  // The column being drawn, and its state, shared with the helpers below.
+  // (They are made once a frame, not once a column: 15 closures a column
+  // was 1.6 MB of garbage a frame.)
+  let x = 0;
+  let rdx = 0;
+  let rdy = 0;
+  let skyCol = 0;
+  let skyLo = H;
+  let skyHi = 0;
+  let clipTop = 0;
+  let clipBot = H;
+  let nw = 0;
+  let nseg = 0;
+  let lastStart = 0;
+  let lastN = 0;
+  let segBase = 0;
+
+  const markSky = (a, b) => {
+    if (a < skyLo) skyLo = a;
+    if (b > skyHi) skyHi = b;
+    for (let o = a * fbW + x; a < b; a++, o += fbW) bdBuf[o] = 1;
+  };
+
+  // Fill rows [a, b) of this column with a textured vertical face at distance t.
+  // Textures are mapped in world units (TEXELS_PER_UNIT texels per unit), so
+  // they run on across tiles: `u` is the position along the wall in world
+  // units, and the texture's top row sits at height `anchor`.
+  const face = (t, a, b, anchor, slot, u, lv, hz) => {
+    if (a < clipTop) a = clipTop;
+    if (b > clipBot) b = clipBot;
+    if (b <= a) return;
+    let o = a * fbW + x;
+    if (slot < 0) {
+      for (let y = a; y < b; y++, o += fbW) fb[o] = 0;
+      return;
+    }
+    const tex = textures[slot];
+    const th = tex.h;
+    let tx = Math.floor(u * TPU) % tex.w;
+    if (tx < 0) tx += tex.w;
+    const col = tex.curCM;
+    const colBase = tx * th;
+    setFaceCm(lv, hz);
+    const stepV = (TPU * t) / fy;
+    let v = (anchor - camZ) * TPU + (a + 0.5 - horizon) * stepV + V_BIAS * th;
+    const hMask = tex.hMask;
+    if (hMask >= 0) {
+      for (let y = a; y < b; y++, o += fbW, v += stepV) fb[o] = colormaps[faceCm[y & 3] + col[colBase + ((v | 0) & hMask)]];
+    } else {
+      for (let y = a; y < b; y++, o += fbW, v += stepV) fb[o] = colormaps[faceCm[y & 3] + col[colBase + ((v | 0) % th)]];
+    }
+  };
+  // A face with holes: like `face`, leaving what's under its see-through texels (a wall band with a ragged top).
+  const holeFace = (t, a, b, anchor, slot, u, lv, hz) => {
+    if (a < clipTop) a = clipTop;
+    if (b > clipBot) b = clipBot;
+    if (b <= a) return;
+    let o = a * fbW + x;
+    const tex = textures[slot];
+    const th = tex.h;
+    let tx = Math.floor(u * TPU) % tex.w;
+    if (tx < 0) tx += tex.w;
+    const col = tex.curCM;
+    const colBase = tx * th;
+    setFaceCm(lv, hz);
+    const stepV = (TPU * t) / fy;
+    let v = (anchor - camZ) * TPU + (a + 0.5 - horizon) * stepV + V_BIAS * th;
+    for (let y = a; y < b; y++, o += fbW, v += stepV) {
+      const c = col[colBase + ((v | 0) % th)];
+      if (c !== TRANSPARENT) fb[o] = colormaps[faceCm[y & 3] + c];
+    }
+  };
+  // A fence face: like `face`, already clipped, with holes, writing the depth buffer.
+  const fenceFace = (t, a, b, anchor, slot, u, lv, hz) => {
+    const tex = textures[slot];
+    const th = tex.h;
+    let tx = Math.floor(u * TPU) % tex.w;
+    if (tx < 0) tx += tex.w;
+    const col = tex.curCM;
+    const colBase = tx * th;
+    setFaceCm(lv, hz);
+    const stepV = (TPU * t) / fy;
+    let v = (anchor - camZ) * TPU + (a + 0.5 - horizon) * stepV + V_BIAS * th;
+    let o = a * fbW + x;
+    for (let y = a; y < b; y++, o += fbW, v += stepV) {
+      const c = col[colBase + ((v | 0) % th)];
+      if (c === TRANSPARENT || t >= mdepth[o]) continue;
+      fb[o] = colormaps[faceCm[y & 3] + c];
+      mdepth[o] = t;
+    }
+  };
+  /**
+   * Wall bands: over a face from height `faceBot` to `faceTop`, each band's
+   * texture over its heights (last to first, so the first that covers a
+   * height is on top). A band's texture hangs from its top, or from the
+   * face's top if it's open-ended. Its see-through texels leave what's
+   * under them (the wall's own texture, or a band further down the list).
+   */
+  const bandFaces = (t, faceTop, faceBot, bands, u, lv, hz) => {
+    for (let j = bands.length - 1; j >= 0; j--) {
+      const band = bands[j];
+      const top = band.to < faceTop ? band.to : faceTop;
+      const bot = band.from > faceBot ? band.from : faceBot;
+      if (top > bot) (textures[band.tex].holes ? holeFace : face)(t, rowOf(top, t), rowOf(bot, t), band.to < Infinity ? band.to : faceTop, band.tex, u, lv, hz);
+    }
+  };
+  /**
+   * Decals on a face from height `faceBot` to `faceTop` the ray meets at
+   * distance t, at `pos` along the edge (mirrored when seen from the side that
+   * reads backward), in the face's light (or unlit if they glow). Grime
+   * (a texture with `shade`) darkens what's drawn there instead.
+   */
+  const decalFaces = (t, faceTop, faceBot, list, pos, mirrored, lv, hz) => {
+    for (let j = 0; j < list.length; j++) {
+      const d = list[j];
+      if (pos < d.a0 || pos >= d.a1) continue;
+      const top = d.z1 < faceTop ? d.z1 : faceTop;
+      const bot = d.z0 > faceBot ? d.z0 : faceBot;
+      if (top <= bot) continue;
+      let a = rowOf(top, t);
+      let b = rowOf(bot, t);
+      if (a < clipTop) a = clipTop;
+      if (b > clipBot) b = clipBot;
+      if (b <= a) continue;
+      const tex = textures[d.tex];
+      const th = tex.h;
+      let tx = (((mirrored !== d.flip ? d.a1 - pos : pos - d.a0) / (d.a1 - d.a0)) * tex.w) | 0;
+      if (tx >= tex.w) tx = tex.w - 1;
+      const colBase = tx * th;
+      const scale = th / (d.z1 - d.z0);
+      const stepV = (t / fy) * scale;
+      let v = (d.z1 - camZ + ((a + 0.5 - horizon) * t) / fy) * scale;
+      const shade = tex.shade;
+      if (shade) {
+        // Grime: darken what's there by the texel's levels, dithered,
+        // less in haze (the haze in the pixel isn't the wall's to darken).
+        const f = hz > 0 ? (1 - hz / (HAZE_STEPS - 1)) / SHADE_STEP : 1 / SHADE_STEP;
+        const k0 = tex.shadeSpan[tx * 2];
+        const k1 = tex.shadeSpan[tx * 2 + 1];
+        if (f <= 0 || k1 <= k0) continue;
+        // Only the rows over this texel column's grime (streaks are mostly bare).
+        let y0 = a;
+        if (v < k0) y0 = a + Math.ceil((k0 - v) / stepV);
+        const y1 = Math.min(b, a + Math.ceil((k1 - v) / stepV));
+        v += (y0 - a) * stepV;
+        for (let y = y0, o = y0 * fbW + x; y < y1; y++, o += fbW, v += stepV) {
+          let k = v | 0;
+          if (k >= th) k = th - 1;
+          else if (k < 0) k = 0;
+          const s = shade[colBase + k];
+          if (s === 0) continue;
+          let l = (s * f + thr[y & 3] + 0.5) | 0;
+          if (l <= 0) continue;
+          if (l > 31) l = 31;
+          fb[o] = colormaps[l * 256 + fb[o]];
+        }
+        continue;
+      }
+      const col = tex.curCM;
+      setFaceCm(d.glow ? 0 : lv, d.glow ? 0 : hz);
+      for (let y = a, o = a * fbW + x; y < b; y++, o += fbW, v += stepV) {
+        let k = v | 0;
+        if (k >= th) k = th - 1;
+        else if (k < 0) k = 0;
+        const c = col[colBase + k];
+        if (c !== TRANSPARENT) fb[o] = colormaps[faceCm[y & 3] + c];
+      }
+    }
+  };
+  /** A texture's height in world units (faces hung from their bottom edge use it). */
+  const texHeight = (slot) => (slot >= 0 ? textures[slot].h / TPU : 1);
+  /**
+   * The (fractional) colormap level of a face the ray meets at distance t,
+   * in storey s: the smooth light there, and the faces' fake contrast.
+   * Outdoors in haze (`out`), without the fog.
+   */
+  const faceLevel = (s, t, contrast, out) => (fixed >= 0 ? fixed : view.levelF(lm.sample(px + rdx * t, py + rdy * t, s), t) + contrast - (out ? t * fog : 0));
+  /** A face's haze step at distance t (0 indoors). */
+  const faceHaze = (t, out) => (out ? view.hazeF(t) : 0);
+  /**
+   * Rows [a, b) of this column's floor (kk > 0) or ceiling (kk < 0) in
+   * texture `tex`, kk being (camZ - the plane's height) * fy: a row's
+   * distance is kk / (y + 0.5 - horizon). The light runs from l0 at t0,
+   * changing by dl per unit of distance; outdoors in haze (`hazy`), the
+   * level is without the fog, in its haze step's tables. Levels are as
+   * View.levelF's, and dithered.
+   */
+  const flatSpan = (a, b, kk, tex, hazy, t0, l0, dl) => {
+    const tw = tex.w;
+    const wm = tex.wMask;
+    const hm = tex.hMask;
+    const pix = tex.cur;
+    let o = a * fbW + x;
+    if (fixed >= 0) {
+      const cm = fixed * 256;
+      for (let y = a; y < b; y++, o += fbW) {
+        const dist = kk * rowInv[y];
+        fb[o] = colormaps[cm + pix[(((py + rdy * dist) * TPU) & hm) * tw + (((px + rdx * dist) * TPU) & wm)]];
+      }
+      return;
+    }
+    // The level before the light diminishing is c0 + c1 * dist; the
+    // diminishing (DIMINISH / dist) is dk times the row's offset from the horizon.
+    const c0 = (LIGHT_BLACK - l0 + t0 * dl) * 0.25 - extra;
+    const c1 = (hazy ? 0 : fog) - dl * 0.25;
+    const dk = DIMINISH / kk;
+    for (let y = a; y < b; y++, o += fbW) {
+      const dist = kk * rowInv[y];
+      const tx = ((px + rdx * dist) * TPU) & wm;
+      const ty = ((py + rdy * dist) * TPU) & hm;
+      let br = dk * (y + 0.5 - horizon);
+      if (br > MAX_BRIGHTEN) br = MAX_BRIGHTEN;
+      const d = thr[y & 3];
+      let lv = (c0 + c1 * dist - br + d) | 0;
+      if (lv < 0) lv = 0;
+      else if (lv > 31) lv = 31;
+      if (hazy) {
+        const hk = (dist * HAZE_RES) | 0;
+        const h = (hazeTab[hk < HAZE_LEN ? hk : HAZE_LEN - 1] + d + 0.5) | 0;
+        if (h) lv += HAZE_ROW + (h - 1) * 32;
+      }
+      fb[o] = colormaps[lv * 256 + pix[ty * tw + tx]];
+    }
+  };
+  // Floor and ceiling of storey s of tile `i` between distances t0 and t1
+  // (under a slab, the slab's underside is the ceiling; on it, its top the
+  // floor). The light runs smoothly from where the ray enters to where it
+  // leaves: l0 at t0, changing by dl per unit of distance.
+  // `over`: a floor at that height instead (a low angled wall's top, over its solid part).
+  const flats = (i, s, t0, t1, over) => {
+    const slab = (flags[i] & F_SLAB) !== 0;
+    const hazy = hazeOn && (flags[i] & F_SKY) !== 0;
+    // (The light is sampled only once some rows need it.)
+    let lit = false;
+    let l0 = 0;
+    let dl = 0;
+    const fz = over !== undefined ? over : slab && s ? slabTop[i] : floorZ[i];
+    if (camZ > fz) {
+      const k = (camZ - fz) * fy;
+      let a = Math.ceil(horizon + k / t1 - 0.5);
+      let b = t0 > 0 ? Math.ceil(horizon + k / t0 - 0.5) : clipBot;
+      if (a < clipTop) a = clipTop;
+      if (b > clipBot) b = clipBot;
+      const slot = s ? slabTopTex[i] : floorTex[i];
+      if (b > a) {
+        if (slot < 0) {
+          for (let y = a, o = a * fbW + x; y < b; y++, o += fbW) fb[o] = 0;
+        } else {
+          lit = true;
+          l0 = lm.sample(px + rdx * t0, py + rdy * t0, s);
+          dl = t1 > t0 ? (lm.sample(px + rdx * t1, py + rdy * t1, s) - l0) / (t1 - t0) : 0;
+          flatSpan(a, b, k, textures[slot], hazy, t0, l0, dl);
+        }
+      }
+      if (a < clipBot) clipBot = a < clipTop ? clipTop : a;
+    }
+    const cz = !s && slab ? slabBot[i] : ceilZ[i];
+    if (cz > camZ) {
+      const k = (cz - camZ) * fy;
+      let a = t0 > 0 ? Math.ceil(horizon - k / t0 - 0.5) : clipTop;
+      let b = Math.ceil(horizon - k / t1 - 0.5);
+      if (a < clipTop) a = clipTop;
+      if (b > clipBot) b = clipBot;
+      if (b > a) {
+        if (flags[i] & F_SKY && (s || !slab)) {
+          if (backdrop) markSky(a, b);
+          for (let y = a, o = a * fbW + x; y < b; y++, o += fbW) {
+            if (!sky) {
+              fb[o] = 0;
+              continue;
+            }
+            let sy = (y >> skyShift) + skyOffset;
+            if (sy < 0) sy = 0;
+            else if (sy >= sky.h) sy = sky.h - 1;
+            const c = sky.cur[sy * sky.w + skyCol];
+            const m = skyCm[y];
+            fb[o] = m >= 0 ? colormaps[m + c] : c;
+          }
+        } else {
+          const slot = !s && slab ? slabUnderTex[i] : ceilTex[i];
+          if (slot < 0) {
+            for (let y = a, o = a * fbW + x; y < b; y++, o += fbW) fb[o] = 0;
+          } else {
+            if (!lit) {
+              l0 = lm.sample(px + rdx * t0, py + rdy * t0, s);
+              dl = t1 > t0 ? (lm.sample(px + rdx * t1, py + rdy * t1, s) - l0) / (t1 - t0) : 0;
+            }
+            flatSpan(a, b, -k, textures[slot], hazy, t0, l0, dl);
+          }
+        }
+      }
+      if (b > clipTop) clipTop = b > clipBot ? clipBot : b;
+    }
+  };
+  // Whether the open windows are the last batch recorded.
+  const sameAsLast = () => {
+    if (nw !== lastN) return false;
+    for (let k = 0; k < nw; k++) {
+      if (segTop[segBase + lastStart + k] !== wTop[k] || segBot[segBase + lastStart + k] !== wBot[k]) return false;
+    }
+    return true;
+  };
+  // Record the open windows at distance t, as one batch (if it fits). Not
+  // if they're the last batch again: things beyond are clipped the same by
+  // either, and over a town most boundaries change nothing, so the room
+  // lasts into the distance.
+  const record = (t) => {
+    if (nseg + nw > FILL || sameAsLast()) return;
+    lastStart = nseg;
+    lastN = nw;
+    for (let k = 0; k < nw; k++) {
+      segDist[segBase + nseg] = t;
+      segTop[segBase + nseg] = wTop[k];
+      segBot[segBase + nseg] = wBot[k];
+      segFirst[segBase + nseg] = k === 0 ? 1 : 0;
+      nseg++;
+    }
+  };
+  // Drop closed windows.
+  const compact = () => {
+    let n = 0;
+    for (let k = 0; k < nw; k++) {
+      if (wBot[k] <= wTop[k]) continue;
+      wTop[n] = wTop[k];
+      wBot[n] = wBot[k];
+      wSt[n] = wSt[k];
+      n++;
+    }
+    nw = n;
+  };
+  // The sky "wall" between two sky tiles of different heights.
+  const skyFill = (a, b) => {
+    if (a < clipTop) a = clipTop;
+    if (b > clipBot) b = clipBot;
+    if (backdrop && b > a) markSky(a, b);
+    for (let y = a, o = a * fbW + x; y < b; y++, o += fbW) {
+      if (!sky) {
+        fb[o] = 0;
+        continue;
+      }
+      let sy = (y >> skyShift) + skyOffset;
+      if (sy < 0) sy = 0;
+      else if (sy >= sky.h) sy = sky.h - 1;
+      const c = sky.cur[sy * sky.w + skyCol];
+      const m = skyCm[y];
+      fb[o] = m >= 0 ? colormaps[m + c] : c;
+    }
+  };
+  const rowOf = (z, t) => Math.ceil(horizon + ((camZ - z) * fy) / t - 0.5);
+
+  for (x = 0; x < W; x++) {
     const camX = (2 * (x + 0.5)) / W - 1;
     for (let k = 0; k < 4; k++) thr[k] = (BAYER[(x & 3) + k * 4] + 0.5) / 16 - 0.5;
-    const rdx = dirX + planeX * camX;
-    const rdy = dirY + planeY * camX;
+    rdx = dirX + planeX * camX;
+    rdy = dirY + planeY * camX;
     let mapX = Math.floor(px);
     let mapY = Math.floor(py);
     const ddx = rdx === 0 ? 1e30 : Math.abs(1 / rdx);
@@ -253,361 +603,28 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
       stepY = 1;
       sdy = (mapY + 1 - py) * ddy;
     }
-    const skyCol = sky ? view.skyU[x] : 0;
+    skyCol = sky ? view.skyU[x] : 0;
     // The blocks still ahead on the ray (none until it might stop), and the one it's in.
     let nRun = 0;
     let jRun = 0;
     // The rows that show sky (marked in bdBuf), for the backdrop.
-    let skyLo = H;
-    let skyHi = 0;
-    const markSky = (a, b) => {
-      if (a < skyLo) skyLo = a;
-      if (b > skyHi) skyHi = b;
-      for (let o = a * fbW + x; a < b; a++, o += fbW) bdBuf[o] = 1;
-    };
-
+    skyLo = H;
+    skyHi = 0;
     // The window being worked on (loaded from and stored back to wTop / wBot).
-    let clipTop = 0;
-    let clipBot = H;
-    let nw = 0;
-    let nseg = 0;
+    clipTop = 0;
+    clipBot = H;
+    nw = 0;
+    nseg = 0;
     // The last batch recorded: where it starts, and how many windows.
-    let lastStart = 0;
-    let lastN = 0;
-    const segBase = x * SEG;
+    lastStart = 0;
+    lastN = 0;
+    segBase = x * SEG;
     let cur = mapX >= 0 && mapY >= 0 && mapX < mw && mapY < mh ? mapY * mw + mapX : -1;
     let tEnter = 0;
     let end = 1e6;
     let nf = 0;
     /** The rising door whose panel this column has met (a panel on a tile edge is met from both tiles). */
     let panelDone = null;
-
-    // Fill rows [a, b) of this column with a textured vertical face at distance t.
-    // Textures are mapped in world units (TEXELS_PER_UNIT texels per unit), so
-    // they run on across tiles: `u` is the position along the wall in world
-    // units, and the texture's top row sits at height `anchor`.
-    const face = (t, a, b, anchor, slot, u, lv, hz) => {
-      if (a < clipTop) a = clipTop;
-      if (b > clipBot) b = clipBot;
-      if (b <= a) return;
-      let o = a * fbW + x;
-      if (slot < 0) {
-        for (let y = a; y < b; y++, o += fbW) fb[o] = 0;
-        return;
-      }
-      const tex = textures[slot];
-      const th = tex.h;
-      let tx = Math.floor(u * TPU) % tex.w;
-      if (tx < 0) tx += tex.w;
-      const col = tex.curCM;
-      const colBase = tx * th;
-      setFaceCm(lv, hz);
-      const stepV = (TPU * t) / fy;
-      let v = (anchor - camZ) * TPU + (a + 0.5 - horizon) * stepV + V_BIAS * th;
-      const hMask = tex.hMask;
-      if (hMask >= 0) {
-        for (let y = a; y < b; y++, o += fbW, v += stepV) fb[o] = colormaps[faceCm[y & 3] + col[colBase + ((v | 0) & hMask)]];
-      } else {
-        for (let y = a; y < b; y++, o += fbW, v += stepV) fb[o] = colormaps[faceCm[y & 3] + col[colBase + ((v | 0) % th)]];
-      }
-    };
-    // A face with holes: like `face`, leaving what's under its see-through texels (a wall band with a ragged top).
-    const holeFace = (t, a, b, anchor, slot, u, lv, hz) => {
-      if (a < clipTop) a = clipTop;
-      if (b > clipBot) b = clipBot;
-      if (b <= a) return;
-      let o = a * fbW + x;
-      const tex = textures[slot];
-      const th = tex.h;
-      let tx = Math.floor(u * TPU) % tex.w;
-      if (tx < 0) tx += tex.w;
-      const col = tex.curCM;
-      const colBase = tx * th;
-      setFaceCm(lv, hz);
-      const stepV = (TPU * t) / fy;
-      let v = (anchor - camZ) * TPU + (a + 0.5 - horizon) * stepV + V_BIAS * th;
-      for (let y = a; y < b; y++, o += fbW, v += stepV) {
-        const c = col[colBase + ((v | 0) % th)];
-        if (c !== TRANSPARENT) fb[o] = colormaps[faceCm[y & 3] + c];
-      }
-    };
-    // A fence face: like `face`, already clipped, with holes, writing the depth buffer.
-    const fenceFace = (t, a, b, anchor, slot, u, lv, hz) => {
-      const tex = textures[slot];
-      const th = tex.h;
-      let tx = Math.floor(u * TPU) % tex.w;
-      if (tx < 0) tx += tex.w;
-      const col = tex.curCM;
-      const colBase = tx * th;
-      setFaceCm(lv, hz);
-      const stepV = (TPU * t) / fy;
-      let v = (anchor - camZ) * TPU + (a + 0.5 - horizon) * stepV + V_BIAS * th;
-      let o = a * fbW + x;
-      for (let y = a; y < b; y++, o += fbW, v += stepV) {
-        const c = col[colBase + ((v | 0) % th)];
-        if (c === TRANSPARENT || t >= mdepth[o]) continue;
-        fb[o] = colormaps[faceCm[y & 3] + c];
-        mdepth[o] = t;
-      }
-    };
-    /**
-     * Wall bands: over a face from height `faceBot` to `faceTop`, each band's
-     * texture over its heights (last to first, so the first that covers a
-     * height is on top). A band's texture hangs from its top, or from the
-     * face's top if it's open-ended. Its see-through texels leave what's
-     * under them (the wall's own texture, or a band further down the list).
-     */
-    const bandFaces = (t, faceTop, faceBot, bands, u, lv, hz) => {
-      for (let j = bands.length - 1; j >= 0; j--) {
-        const band = bands[j];
-        const top = band.to < faceTop ? band.to : faceTop;
-        const bot = band.from > faceBot ? band.from : faceBot;
-        if (top > bot) (textures[band.tex].holes ? holeFace : face)(t, rowOf(top, t), rowOf(bot, t), band.to < Infinity ? band.to : faceTop, band.tex, u, lv, hz);
-      }
-    };
-    /**
-     * Decals on a face from height `faceBot` to `faceTop` the ray meets at
-     * distance t, at `pos` along the edge (mirrored when seen from the side that
-     * reads backward), in the face's light (or unlit if they glow). Grime
-     * (a texture with `shade`) darkens what's drawn there instead.
-     */
-    const decalFaces = (t, faceTop, faceBot, list, pos, mirrored, lv, hz) => {
-      for (let j = 0; j < list.length; j++) {
-        const d = list[j];
-        if (pos < d.a0 || pos >= d.a1) continue;
-        const top = d.z1 < faceTop ? d.z1 : faceTop;
-        const bot = d.z0 > faceBot ? d.z0 : faceBot;
-        if (top <= bot) continue;
-        let a = rowOf(top, t);
-        let b = rowOf(bot, t);
-        if (a < clipTop) a = clipTop;
-        if (b > clipBot) b = clipBot;
-        if (b <= a) continue;
-        const tex = textures[d.tex];
-        const th = tex.h;
-        let tx = (((mirrored !== d.flip ? d.a1 - pos : pos - d.a0) / (d.a1 - d.a0)) * tex.w) | 0;
-        if (tx >= tex.w) tx = tex.w - 1;
-        const colBase = tx * th;
-        const scale = th / (d.z1 - d.z0);
-        const stepV = (t / fy) * scale;
-        let v = (d.z1 - camZ + ((a + 0.5 - horizon) * t) / fy) * scale;
-        const shade = tex.shade;
-        if (shade) {
-          // Grime: darken what's there by the texel's levels, dithered,
-          // less in haze (the haze in the pixel isn't the wall's to darken).
-          const f = hz > 0 ? (1 - hz / (HAZE_STEPS - 1)) / SHADE_STEP : 1 / SHADE_STEP;
-          const k0 = tex.shadeSpan[tx * 2];
-          const k1 = tex.shadeSpan[tx * 2 + 1];
-          if (f <= 0 || k1 <= k0) continue;
-          // Only the rows over this texel column's grime (streaks are mostly bare).
-          let y0 = a;
-          if (v < k0) y0 = a + Math.ceil((k0 - v) / stepV);
-          const y1 = Math.min(b, a + Math.ceil((k1 - v) / stepV));
-          v += (y0 - a) * stepV;
-          for (let y = y0, o = y0 * fbW + x; y < y1; y++, o += fbW, v += stepV) {
-            let k = v | 0;
-            if (k >= th) k = th - 1;
-            else if (k < 0) k = 0;
-            const s = shade[colBase + k];
-            if (s === 0) continue;
-            let l = (s * f + thr[y & 3] + 0.5) | 0;
-            if (l <= 0) continue;
-            if (l > 31) l = 31;
-            fb[o] = colormaps[l * 256 + fb[o]];
-          }
-          continue;
-        }
-        const col = tex.curCM;
-        setFaceCm(d.glow ? 0 : lv, d.glow ? 0 : hz);
-        for (let y = a, o = a * fbW + x; y < b; y++, o += fbW, v += stepV) {
-          let k = v | 0;
-          if (k >= th) k = th - 1;
-          else if (k < 0) k = 0;
-          const c = col[colBase + k];
-          if (c !== TRANSPARENT) fb[o] = colormaps[faceCm[y & 3] + c];
-        }
-      }
-    };
-    /** A texture's height in world units (faces hung from their bottom edge use it). */
-    const texHeight = (slot) => (slot >= 0 ? textures[slot].h / TPU : 1);
-    /**
-     * The (fractional) colormap level of a face the ray meets at distance t,
-     * in storey s: the smooth light there, and the faces' fake contrast.
-     * Outdoors in haze (`out`), without the fog.
-     */
-    const faceLevel = (s, t, contrast, out) => (fixed >= 0 ? fixed : view.levelF(lm.sample(px + rdx * t, py + rdy * t, s), t) + contrast - (out ? t * fog : 0));
-    /** A face's haze step at distance t (0 indoors). */
-    const faceHaze = (t, out) => (out ? view.hazeF(t) : 0);
-    /**
-     * Rows [a, b) of this column's floor (kk > 0) or ceiling (kk < 0) in
-     * texture `tex`, kk being (camZ - the plane's height) * fy: a row's
-     * distance is kk / (y + 0.5 - horizon). The light runs from l0 at t0,
-     * changing by dl per unit of distance; outdoors in haze (`hazy`), the
-     * level is without the fog, in its haze step's tables. Levels are as
-     * View.levelF's, and dithered.
-     */
-    const flatSpan = (a, b, kk, tex, hazy, t0, l0, dl) => {
-      const tw = tex.w;
-      const wm = tex.wMask;
-      const hm = tex.hMask;
-      const pix = tex.cur;
-      let o = a * fbW + x;
-      if (fixed >= 0) {
-        const cm = fixed * 256;
-        for (let y = a; y < b; y++, o += fbW) {
-          const dist = kk * rowInv[y];
-          fb[o] = colormaps[cm + pix[(((py + rdy * dist) * TPU) & hm) * tw + (((px + rdx * dist) * TPU) & wm)]];
-        }
-        return;
-      }
-      // The level before the light diminishing is c0 + c1 * dist; the
-      // diminishing (DIMINISH / dist) is dk times the row's offset from the horizon.
-      const c0 = (LIGHT_BLACK - l0 + t0 * dl) * 0.25 - extra;
-      const c1 = (hazy ? 0 : fog) - dl * 0.25;
-      const dk = DIMINISH / kk;
-      for (let y = a; y < b; y++, o += fbW) {
-        const dist = kk * rowInv[y];
-        const tx = ((px + rdx * dist) * TPU) & wm;
-        const ty = ((py + rdy * dist) * TPU) & hm;
-        let br = dk * (y + 0.5 - horizon);
-        if (br > MAX_BRIGHTEN) br = MAX_BRIGHTEN;
-        const d = thr[y & 3];
-        let lv = (c0 + c1 * dist - br + d) | 0;
-        if (lv < 0) lv = 0;
-        else if (lv > 31) lv = 31;
-        if (hazy) {
-          const hk = (dist * HAZE_RES) | 0;
-          const h = (hazeTab[hk < HAZE_LEN ? hk : HAZE_LEN - 1] + d + 0.5) | 0;
-          if (h) lv += HAZE_ROW + (h - 1) * 32;
-        }
-        fb[o] = colormaps[lv * 256 + pix[ty * tw + tx]];
-      }
-    };
-    // Floor and ceiling of storey s of tile `i` between distances t0 and t1
-    // (under a slab, the slab's underside is the ceiling; on it, its top the
-    // floor). The light runs smoothly from where the ray enters to where it
-    // leaves: l0 at t0, changing by dl per unit of distance.
-    // `over`: a floor at that height instead (a low angled wall's top, over its solid part).
-    const flats = (i, s, t0, t1, over) => {
-      const slab = (flags[i] & F_SLAB) !== 0;
-      const hazy = hazeOn && (flags[i] & F_SKY) !== 0;
-      // (The light is sampled only once some rows need it.)
-      let lit = false;
-      let l0 = 0;
-      let dl = 0;
-      const fz = over !== undefined ? over : slab && s ? slabTop[i] : floorZ[i];
-      if (camZ > fz) {
-        const k = (camZ - fz) * fy;
-        let a = Math.ceil(horizon + k / t1 - 0.5);
-        let b = t0 > 0 ? Math.ceil(horizon + k / t0 - 0.5) : clipBot;
-        if (a < clipTop) a = clipTop;
-        if (b > clipBot) b = clipBot;
-        const slot = s ? slabTopTex[i] : floorTex[i];
-        if (b > a) {
-          if (slot < 0) {
-            for (let y = a, o = a * fbW + x; y < b; y++, o += fbW) fb[o] = 0;
-          } else {
-            lit = true;
-            l0 = lm.sample(px + rdx * t0, py + rdy * t0, s);
-            dl = t1 > t0 ? (lm.sample(px + rdx * t1, py + rdy * t1, s) - l0) / (t1 - t0) : 0;
-            flatSpan(a, b, k, textures[slot], hazy, t0, l0, dl);
-          }
-        }
-        if (a < clipBot) clipBot = a < clipTop ? clipTop : a;
-      }
-      const cz = !s && slab ? slabBot[i] : ceilZ[i];
-      if (cz > camZ) {
-        const k = (cz - camZ) * fy;
-        let a = t0 > 0 ? Math.ceil(horizon - k / t0 - 0.5) : clipTop;
-        let b = Math.ceil(horizon - k / t1 - 0.5);
-        if (a < clipTop) a = clipTop;
-        if (b > clipBot) b = clipBot;
-        if (b > a) {
-          if (flags[i] & F_SKY && (s || !slab)) {
-            if (backdrop) markSky(a, b);
-            for (let y = a, o = a * fbW + x; y < b; y++, o += fbW) {
-              if (!sky) {
-                fb[o] = 0;
-                continue;
-              }
-              let sy = (y >> skyShift) + skyOffset;
-              if (sy < 0) sy = 0;
-              else if (sy >= sky.h) sy = sky.h - 1;
-              const c = sky.cur[sy * sky.w + skyCol];
-              const m = skyCm[y];
-              fb[o] = m >= 0 ? colormaps[m + c] : c;
-            }
-          } else {
-            const slot = !s && slab ? slabUnderTex[i] : ceilTex[i];
-            if (slot < 0) {
-              for (let y = a, o = a * fbW + x; y < b; y++, o += fbW) fb[o] = 0;
-            } else {
-              if (!lit) {
-                l0 = lm.sample(px + rdx * t0, py + rdy * t0, s);
-                dl = t1 > t0 ? (lm.sample(px + rdx * t1, py + rdy * t1, s) - l0) / (t1 - t0) : 0;
-              }
-              flatSpan(a, b, -k, textures[slot], hazy, t0, l0, dl);
-            }
-          }
-        }
-        if (b > clipTop) clipTop = b > clipBot ? clipBot : b;
-      }
-    };
-    // Whether the open windows are the last batch recorded.
-    const sameAsLast = () => {
-      if (nw !== lastN) return false;
-      for (let k = 0; k < nw; k++) {
-        if (segTop[segBase + lastStart + k] !== wTop[k] || segBot[segBase + lastStart + k] !== wBot[k]) return false;
-      }
-      return true;
-    };
-    // Record the open windows at distance t, as one batch (if it fits). Not
-    // if they're the last batch again: things beyond are clipped the same by
-    // either, and over a town most boundaries change nothing, so the room
-    // lasts into the distance.
-    const record = (t) => {
-      if (nseg + nw > FILL || sameAsLast()) return;
-      lastStart = nseg;
-      lastN = nw;
-      for (let k = 0; k < nw; k++) {
-        segDist[segBase + nseg] = t;
-        segTop[segBase + nseg] = wTop[k];
-        segBot[segBase + nseg] = wBot[k];
-        segFirst[segBase + nseg] = k === 0 ? 1 : 0;
-        nseg++;
-      }
-    };
-    // Drop closed windows.
-    const compact = () => {
-      let n = 0;
-      for (let k = 0; k < nw; k++) {
-        if (wBot[k] <= wTop[k]) continue;
-        wTop[n] = wTop[k];
-        wBot[n] = wBot[k];
-        wSt[n] = wSt[k];
-        n++;
-      }
-      nw = n;
-    };
-    // The sky "wall" between two sky tiles of different heights.
-    const skyFill = (a, b) => {
-      if (a < clipTop) a = clipTop;
-      if (b > clipBot) b = clipBot;
-      if (backdrop && b > a) markSky(a, b);
-      for (let y = a, o = a * fbW + x; y < b; y++, o += fbW) {
-        if (!sky) {
-          fb[o] = 0;
-          continue;
-        }
-        let sy = (y >> skyShift) + skyOffset;
-        if (sy < 0) sy = 0;
-        else if (sy >= sky.h) sy = sky.h - 1;
-        const c = sky.cur[sy * sky.w + skyCol];
-        const m = skyCm[y];
-        fb[o] = m >= 0 ? colormaps[m + c] : c;
-      }
-    };
-    const rowOf = (z, t) => Math.ceil(horizon + ((camZ - z) * fy) / t - 0.5);
 
     if (cur < 0) {
       for (let y = 0, o = x; y < H; y++, o += fbW) fb[o] = 0;
