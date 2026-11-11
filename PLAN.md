@@ -1470,8 +1470,15 @@ cold cache costs only 7%. So changes that keep every pixel are worth
       worst views), the same way.
 - [ ] Waiting on Mark: which of these to build.
   - Draw in threads: the screen's columns split over 3 or 4 workers.
-    Nothing looks different; the world pass 2.5 to 3.5 times faster on
-    any machine with 4 cores. The biggest job: the map's arrays shared
+    Nothing looks different. Measured with a throwaway test in Node
+    (2026-11-11, this laptop: 4 cores, 8 threads, a 15 W chip; every
+    frame byte for byte the same as one thread's): the world pass 1.3
+    times faster on 2 threads, 1.6 on 3, 2.1 to 2.4 on 4 and 2.8 to 3.5
+    on 8, so Mos Eisley's worst frames go from 15 to 18 ms to about 8
+    or 9. Columns handed out 16 at a time from a shared counter beat a
+    fixed band each (the busy part of the view gets shared out), and
+    threads writing next to each other in the frame cost nothing that
+    shows. The biggest job: the map's arrays shared
     with the workers, doors, lights and decals mirrored to them, and a
     service worker to give GitHub Pages the headers shared memory needs
     (one thread as today where that fails).
