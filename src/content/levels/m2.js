@@ -5,6 +5,7 @@ import { valueNoise } from './lib/noise.js';
 import { pitWalls, pitDoorway, blindDoor } from './lib/farm.js';
 import { SENSOR_Z, PANEL } from '../models/vaporator.js';
 import { PUMP, GARAGE_RING } from '../models/farm.js';
+import { GARDEN_TANK } from '../models/garden.js';
 
 // MISSION 2: THE HOMESTEAD. The layout, route and numbers are in
 // docs/mission2.md (area numbers below match its table). The blockout:
@@ -371,7 +372,6 @@ pit(28, 46, 6, 'flagstone'); // 1. the garden pit, the drop-off
 pit(80, 52, 8); // 4. the workshop pit
 pit(160, 46, 12, 'street-sand', COURT); // 7. the house's courtyard
 pit(180, 84, 7, 'flagstone'); // 9. the garage pit
-lights.push({ x: 28, y: 46, z: PIT + 3.5, radius: 6, light: 64 }); // the grow lamps
 lights.push({ x: 82, y: 56, z: PIT + 1, radius: 5, light: 48 }); // a speeder burning
 lights.push({ x: 160, y: 50, z: COURT + 1, radius: 6, light: 56 }); // the cart burning
 
@@ -390,6 +390,7 @@ dig(39, 40, 41, 44, { light: 72, ceilZ: PIT + 2.5 });
 p.rect(39, 43, 41, 44, (_, __, c) => ({ ...c, door: 'adobe-pale', style: 'rise', secret: true }));
 secret(35, 34, 44, 44);
 list.push(at('med-kit', 36.5, 35.5), at('thermal-detonator', 42.5, 38.5));
+tag(35, 34, 44, 40, 'hidey');
 
 // ---------------------------------------------------------------- 3. the reservoir
 // The farm's water store, dug under the sand outside the windbreak's south
@@ -663,6 +664,60 @@ for (const [x, y] of [[40, 45], [51, 51], [61, 83], [81, 83], [84, 30], [141, 57
 
 lineDug();
 
+// ---------------------------------------------------------------- 1. the garden pit, dressed
+// The family's hydroponic garden: two raised beds in rows either side of
+// the way from where Jan drops you to the arch, under their grow lamps'
+// cold blue-white (nothing else on the map is that colour). The garden's
+// tank in the north-east, the farm's water pipe coming down the wall into
+// it from the court above. Sand pours over the west rim, the windward
+// one, onto a heap at the wall's foot.
+list.push(
+  at('grow-bed-5', 27.5, 41.8, { z: PIT }),
+  at('grow-bed-5', 27.5, 50.2, { z: PIT }),
+  at('garden-tank', 31.3, 42.6, { z: PIT }),
+  at('sand-heap', 22.6, 47.4, { z: PIT, angle: 90 }),
+  at('floor-dirt-1', 27.5, 44, { z: PIT, angle: 180 }), at('floor-dirt-2', 26.5, 48.6, { z: PIT }),
+  at('floor-scuff', 24.2, 46.2, { z: PIT, angle: 70 }),
+);
+lights.push(
+  { x: 27.5, y: 41.8, z: PIT + 2, radius: 4, light: 56 },
+  { x: 27.5, y: 50.2, z: PIT + 2, radius: 4, light: 56 },
+);
+waterPipe([[31.3, 42.6 - GARDEN_TANK.back, FARM + 0.5, 'N'], [31.3, 42.6 - GARDEN_TANK.back, PIT + GARDEN_TANK.inlet]]);
+
+// ---------------------------------------------------------------- 2. the pump tunnels, dressed
+// The hidey-hole's door is a panel in the plaster; the floor's scuffed in
+// front of it and the plaster grubby where hands pushed it. Inside, Rusk's
+// bedroll along the wall, the days he counted scratched over it, a crate
+// for a table with a canister of water, empty ration packs.
+list.push(
+  at('floor-scuff', 40, 44.6, { z: PIT }),
+  at('bedroll', 39.6, 34.75, { z: PIT }),
+  at('crate-grey-small', 43, 35, { z: PIT, angle: 10 }),
+  at('canister', 43.3, 36.3, { z: PIT }),
+  at('litter-small', 38.4, 36.6, { z: PIT, angle: 40 }),
+);
+decals.push(
+  { x: 41.4, y: 44, z: PIT + 0.9, face: 'S', tex: 'grime-smudge' },
+  { x: 39.6, y: 34, z: PIT + 1.1, face: 'S', tex: 'grime-tally' },
+);
+// The pump room: the pump's power unit beside its motor, spare filter
+// cartridges along the west wall, the maintenance bench on the south wall,
+// oil under the pump.
+list.push(
+  at('power-unit', 56.6, 47.3, { z: PIT }),
+  at('canister', 46.5, 52.4, { z: PIT }), at('canister-rust', 46.5, 53, { z: PIT }), at('canister', 46.55, 53.6, { z: PIT }), at('canister', 47.1, 52.7, { z: PIT }),
+  at('oil-small', 53.2, 48.6, { z: PIT, angle: 30 }),
+  at('scrap', 48.5, 57.2, { z: PIT, angle: 200 }),
+);
+town.fixture('workbench', 56, 58, 'N', { z: PIT });
+// Two filter tanks between the light well and the stair's head, each fed
+// from the ceiling (cover for the fight here).
+for (const x of [49, 50.6]) {
+  list.push(at('garden-tank', x, 55, { z: PIT }));
+  waterPipe([[x, 55 - GARDEN_TANK.back, PIT + GARDEN_TANK.inlet, 'N'], [x, 55 - GARDEN_TANK.back, PIT + 4]]);
+}
+
 // ---------------------------------------------------------------- the machinery under the ground
 // After the cutaway in Mark's references: the farm's water pipe on its
 // brackets from where it comes down out of the garden court, along the pump
@@ -797,8 +852,8 @@ const HARD = [4, 5];
 const EASY = [1, 2];
 list.push(
   // 1. The garden pit: a moment to look round.
-  at('player', 26.5, 47.5, { angle: 0 }),
-  at('med-kit', 30.5, 42.5, { skill: EASY }),
+  at('player', 24, 46, { angle: 0 }),
+  at('med-kit', 31, 49.5, { skill: EASY }),
   // 2. The pump tunnels.
   at('stormtrooper', 52.5, 54.5, { angle: 180 }),
   at('stormtrooper', 56.5, 47.5, { angle: 180, skill: HARD }),
@@ -936,6 +991,7 @@ export default defineLevel({
         { action: 'message', text: 'JAN: THE BIG DOME AT THE EAST END. FOLLOW THE WATER PIPE. CALL WHEN YOU HAVE IT.' },
       ],
     },
+    { on: 'enter', tag: 'hidey', do: [{ action: 'message', text: "A SCOUT'S BEDROLL. SOMEONE SLEPT HERE A LONG TIME." }] },
     { on: 'enter', tag: 'rubble', do: [{ action: 'message', text: 'KYLE: CAVED IN. UP AND OVER, THEN.' }] },
     { on: 'enter', tag: 'reveal', do: [{ action: 'message', text: "KYLE: THERE'S THE HOUSE." }] },
     { on: 'pickup', thing: 'keycard-red', do: [{ action: 'setFlag', flag: 'key' }] },

@@ -45,6 +45,23 @@ These need Mark to try something, or to decide. Don't start them without him.
   weapons or power, plasma, shells or mines yet: where should they go?
   Volumes of the new sounds were guessed (1.0, or the rifle's 0.87).
 
+- **Mission 2's garden pit and pump tunnels, dressed** (`?map=m2`,
+  2026-11-11, the first of "Each area in detail"): two grow beds either
+  side of the way to the arch, plants in rows under lamp frames whose
+  strips glow a cold blue-white; the garden's tank by the arch, the water
+  pipe coming down the wall into it; sand pouring over the west rim onto
+  a heap at the wall's foot (`sand-fall`, `sand-sheet`, a dust puff; not
+  seen moving yet: snapshots don't run emitters). You now start between
+  the beds' west ends (24, 46). The hidey-hole: scuffs on the tunnel
+  floor and a grubby patch by its panel, Rusk's bedroll, eleven groups of
+  days scratched over it (`grime-tally`), a crate, a canister, ration
+  wrappers, and the doc's line as you step in. The pump room: the pump's
+  power unit, spare filter cartridges on the west wall, a bench on the
+  south wall, oil, scrap, and two filter tanks fed from the ceiling
+  between the light well and the stair (cover). To judge: the plants'
+  green and the lamps' colour, how thick the pouring sand is, the tally,
+  and whether the start is a good first look.
+
 - **Mission 4, the Battle Station** (`?map=m4`, 2026-11-10,
   `docs/mission4.md`): the whole level, made in one session without you
   and then gone over area by area. The hangar with the Crow, three TIE
@@ -1397,10 +1414,6 @@ snapshots, playable at `?map=m2`.
         troopers should see no farther than the player in one (above).
 - [ ] **Each area in detail,** in the order you meet them, snapshots
       before and after each:
-  - [ ] The garden pit and the pump tunnels: grow beds and grow lamps,
-        the water tank (the pipe comes down out of the garden court beside
-        it), sand streaming over its rim, the light wells, the hidey-hole
-        (secret, Rusk's bedroll).
   - [ ] The reservoir: its stairs, the pillars, the Imperials' work
         lamps and cables, the shafts of evening light on the water, drips,
         the pool's edge.

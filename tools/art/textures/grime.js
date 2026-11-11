@@ -165,7 +165,52 @@ function scorch(name, { w, h, strength, rays }) {
   };
 }
 
+/**
+ * Days scratched into plaster: `groups` of four strokes and a fifth across
+ * them, in rows, the last group unfinished; each stroke a thin dark line
+ * that wobbles, a faint scuff round it.
+ */
+function tally(name, { w, h, groups }) {
+  return () => {
+    const r = rng(seedFrom(name));
+    const core = new Float32Array(w * h);
+    const line = (x0, y0, x1, y1, s) => {
+      const n = Math.ceil(Math.hypot(x1 - x0, y1 - y0) * 2);
+      for (let k = 0; k <= n; k++) {
+        const t = k / n;
+        const x = Math.round(x0 + (x1 - x0) * t + r.range(-0.3, 0.3));
+        const y = Math.round(y0 + (y1 - y0) * t);
+        if (x >= 0 && y >= 0 && x < w && y < h) core[y * w + x] = Math.max(core[y * w + x], s);
+      }
+    };
+    const perRow = Math.floor((w - 4) / 11);
+    for (let g = 0; g < groups; g++) {
+      const gx = 3 + (g % perRow) * 11 + r.range(-0.8, 0.8);
+      const gy = 3 + Math.floor(g / perRow) * 13 + r.range(-0.8, 0.8);
+      const strokes = g === groups - 1 ? 3 : 4;
+      for (let k = 0; k < strokes; k++) {
+        const x = gx + k * 2 + r.range(-0.4, 0.4);
+        line(x, gy + r.range(0, 1), x + r.range(-0.8, 0.8), gy + 9 + r.range(-1, 0.5), r.range(0.6, 0.8));
+      }
+      if (strokes === 4) line(gx - 1, gy + 7 + r.range(-1, 1), gx + 8, gy + 2 + r.range(-1, 1), 0.7);
+    }
+    return grime(w, h, (x, y) => {
+      let s = core[y * w + x];
+      for (let dy = -1; dy <= 1; dy++) {
+        for (let dx = -1; dx <= 1; dx++) {
+          const u = x + dx;
+          const v = y + dy;
+          if (u >= 0 && v >= 0 && u < w && v < h) s = Math.max(s, core[v * w + u] * 0.2);
+        }
+      }
+      return s;
+    });
+  };
+}
+
 export default [
+  // Days counted on the hidey-hole's wall (Mission 2): a tile and a half across.
+  { name: 'grime-tally', out: T('grime-tally'), raw: true, draw: tally('grime-tally', { w: 48, h: 44, groups: 11 }) },
   // Off a roofline, 2 tiles wide and 3 down.
   { name: 'grime-streaks-1', out: T('grime-streaks-1'), raw: true, draw: streaks('grime-streaks-1', { w: 64, h: 96, count: 9, band: 8, strength: 0.6 }) },
   { name: 'grime-streaks-2', out: T('grime-streaks-2'), raw: true, draw: streaks('grime-streaks-2', { w: 64, h: 96, count: 5, band: 5, strength: 0.7, maxLen: 0.7 }) },

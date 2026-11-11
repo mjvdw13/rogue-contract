@@ -29,6 +29,7 @@ import { FIRE_DRUM } from './models/quarter.js';
 import { STALL, STABLE_POST, FEED } from './models/stable.js';
 import { VAPORATORS } from './models/vaporator.js';
 import { FARM_MODELS, PUMP, CONSOLE as GARAGE_CONSOLE, GARAGE_RING, COUNTER, APPLIANCES, SKYHOPPER } from './models/farm.js';
+import { GROW_BED, GARDEN_TANK, SAND_HEAP } from './models/garden.js';
 
 // Scenery. Solid ones block movement; ones with health can be shot (and
 // `explode`).
@@ -165,6 +166,22 @@ export default [
   // counters as high as their worktops (shots go over them).
   ...COUNTER.lengths.map((l) => defineDecoration({ id: `kitchen-counter-${l}`, model: `kitchen-counter-${l}`, solid: true, height: COUNTER.top, fixed: true })),
   defineDecoration({ id: 'skyhopper', model: 'skyhopper', solid: true, height: SKYHOPPER.height, fixed: true }),
+  // The garden pit's (models/garden.js): grow beds under their lamps,
+  // colliding as their troughs (shots go over); the water tank; and a heap
+  // of sand at the wall's foot, sand pouring onto it from the rim 4 m up
+  // (SAND_HEAP.fall over its back edge) and a puff where it lands.
+  ...GROW_BED.lengths.map((l) => defineDecoration({ id: `grow-bed-${l}`, model: `grow-bed-${l}`, solid: true, height: GROW_BED.top, fixed: true })),
+  defineDecoration({ id: 'garden-tank', model: 'garden-tank', solid: true, height: GARDEN_TANK.top, fixed: true }),
+  defineDecoration({
+    id: 'sand-heap',
+    model: 'sand-heap',
+    fixed: true,
+    emit: [
+      { type: 'sand-fall', count: 3, every: [0.05, 0.12], at: [0, 0.15, SAND_HEAP.fall], radius: 0.5, dir: [0, 1, -0.2], spread: 0.25, speed: [0.3, 0.8] },
+      { type: 'sand-sheet', count: 1, every: [0.15, 0.35], at: [0, 0.15, SAND_HEAP.fall], radius: 0.4, dir: [0, 1, -0.2], spread: 0.2, speed: [0.2, 0.5] },
+      { type: 'dust-puff', count: 1, every: [0.8, 1.6], at: [0, 0.5, SAND_HEAP.h], radius: 0.4, dir: [0, 1, 0.5], spread: 0.6, speed: [0.2, 0.5] },
+    ],
+  }),
   defineDecoration({ id: 'kitchen-appliances', model: 'kitchen-appliances', solid: true, height: APPLIANCES.top, fixed: true }),
   // Things on Mos Eisley's streets: crates, drums, canisters, junk, rubble, scrap, a vaporator.
   ...Object.entries(CLUTTER).map(([id, c]) => defineDecoration({ id, model: id, solid: !!c.solid, radius: c.radius, height: c.height, fixed: true })),

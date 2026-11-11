@@ -271,6 +271,43 @@ export default [
     onFloor: 'die',
     cap: 300,
   }),
+  // Sand pouring over a pit's rim onto the heap at its foot (Mission 2's
+  // garden pit): grains streaking down, and thin falling sheets round them
+  // so the stream reads from across the pit.
+  defineParticle({
+    id: 'sand-fall',
+    colors: [{ ramp: 'sand', from: 11, to: 9 }],
+    life: [1.2, 1.8],
+    size: 0.02,
+    maxPx: 1,
+    streak: 0.04,
+    blend: 'half',
+    fade: true,
+    alpha: 0.85,
+    fadeIn: 0.1,
+    gravity: 9,
+    drag: 0.6,
+    wind: 0.15,
+    onFloor: 'die',
+    cap: 120,
+  }),
+  defineParticle({
+    id: 'sand-sheet',
+    colors: [{ ramp: 'sand', from: 10, to: 9 }],
+    life: [1.3, 1.9],
+    size: 0.18,
+    maxPx: 10,
+    shape: 'disc',
+    blend: 'half',
+    fade: true,
+    alpha: 0.5,
+    fadeIn: 0.15,
+    gravity: 8,
+    drag: 0.8,
+    wind: 0.15,
+    onFloor: 'die',
+    cap: 12,
+  }),
   // Explosions (src/content/explosions.js). The fireball: bright glowing
   // discs that swell and cool from white through yellow and orange to red.
   defineParticle({
