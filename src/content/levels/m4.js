@@ -518,8 +518,7 @@ const list = [
   at('stormtrooper', 185.5, 140.3, { angle: 90, skill: HARD }),
   at('probe-droid', 166, 112, { z: 1, skill: NORMAL_UP }), at('probe-droid', 190, 134, { z: 1, skill: HARD }),
   at('tractor-terminal', 176.5, 127.05, { angle: 270, z: 0 }), at('tractor-terminal', 179.5, 127.05, { angle: 270, z: 0 }),
-  // Lit rings round the column, down into the shaft and up out of sight;
-  // specks of energy drift up from each.
+  // Lit rings round the column, down into the shaft and up out of sight.
   ...[-26, -12, 3.2, 11, 20].map((z) => at('ds-beam-ring', SX, SY, { z })),
   at('med-kit', 191.5, 107.5), at('power-cell', 183.5, 125),
   // 9. The unfinished sector.
