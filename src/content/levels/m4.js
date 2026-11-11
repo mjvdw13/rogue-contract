@@ -253,9 +253,10 @@ for (let k = 0; k < 5; k++) {
 p.rect(179, 21, 180, 23, { door: T.detWall, secret: true, floor: T.detFloor, ceiling: T.ceiling, floorZ: DET - 0.5, ceilZ: DET + 1.5, light: 104 });
 p.rect(180, 20, 183, 24, det(DET - 0.5, DET + 2, { light: 104, secret: true }));
 // The chute: a hatch in the end wall, opened once Rusk has spoken, and a
-// steep square duct down to the compactor, 0.75 a step.
+// steep duct down to the compactor, 0.75 a step (4 high: under a lower
+// roof a body a tile wide catches its head on the next step's).
 p.rect(169, 10, 171, 12, narrow(DET - 1, { lock: 'remote', tag: 'chute', stayOpen: true, jamb: T.doorJamb, upper: T.detWall }));
-const duct = (z) => ({ floor: T.grate, ceiling: T.grate, floorZ: z, ceilZ: z + 2.5, light: 104, side: T.greeble, upper: T.greeble });
+const duct = (z) => ({ floor: T.grate, ceiling: T.grate, floorZ: z, ceilZ: z + 4, light: 104, side: T.greeble, upper: T.greeble });
 p.rect(169, 4, 171, 10, duct(DET - 1));
 p.stairs(171, 4, 186, 6, 'E', DET - 1.75, -0.75, duct);
 
@@ -273,7 +274,7 @@ p.stairs(195, 34, 199, 45, 'S', -5, 0.5, tunnel);
 p.rect(195, 45, 199, 64, tunnel(0));
 for (const y of [32, 48, 58]) p.pool(197, y + 0.5, 3, 176);
 p.rect(195, 64, 199, 66, door(0, { upper: T.pipes }));
-p.rect(186, 66, 204, 90, room(0, 6, { floor: T.grate, light: 128, upper: T.wallDark }));
+p.rect(186, 66, 204, 90, room(0, 6, { floor: T.grate, light: 144, upper: T.wallDark }));
 p.chamfer(186, 66, 204, 90, 3, { wall: T.wallDark });
 p.pool(195, 78, 6, 192);
 // Four pumps, floor to ceiling.
@@ -289,21 +290,22 @@ p.rect(193, 92, 197, 100, tunnel(0, { light: 136 }));
 
 // ---------------------------------------------------------------- 8. the tractor beam shaft
 // A shaft with no bottom you can see: a ledge round it, a bridge from the
-// north ledge to the column, a ledge round the column, all slabs, so the
+// north ledge to the column (2 m wide), a ledge round the column (1.5 m:
+// narrower and you walk off it turning the corner), all slabs, so the
 // shaft runs on under them. The terminal is on the column's far side.
-const pit = room(-60, 30, { floor: T.grate, side: T.wallDark, upper: T.wallDark, light: 112 });
+const pit = room(-150, 30, { floor: T.grate, side: T.wallDark, upper: T.wallDark, light: 112 });
 const walk = { ...pit, light: 152, slab: { bottom: -0.5, top: 0, floor: T.grate, ceiling: T.grate, side: T.edge, light: 96 } };
 p.rect(156, 100, 200, 144, pit);
 p.rect(156, 100, 200, 104, walk);
 p.rect(156, 140, 200, 144, walk);
 p.rect(156, 100, 160, 144, walk);
 p.rect(196, 100, 200, 144, walk);
-p.rect(172, 116, 184, 128, walk);
-p.rect(177, 104, 179, 116, walk);
+p.rect(171, 115, 185, 129, walk);
+p.rect(176, 104, 180, 115, walk);
 p.rect(174, 118, 182, 126, { wall: T.wallLight });
 // Railings round the outer ledge's inner edge, open at the bridge. None
 // on the bridge or round the column.
-p.fence(160, 103, 177, 104, 'S', railing).fence(179, 103, 196, 104, 'S', railing);
+p.fence(160, 103, 176, 104, 'S', railing).fence(180, 103, 196, 104, 'S', railing);
 p.fence(160, 140, 196, 141, 'N', railing);
 p.fence(159, 104, 160, 140, 'E', railing).fence(196, 104, 197, 140, 'W', railing);
 // The column's glow, pulsing until the beam is off.
@@ -326,13 +328,16 @@ p.rect(154, 120, 156, 124, door(0, { lock: 'remote', tag: 'out', stayOpen: true,
 
 // ---------------------------------------------------------------- 9. the unfinished sector
 const bare = (floorZ, ceilZ, extra = {}) => room(floorZ, ceilZ, { floor: T.grate, side: T.girder, upper: T.girder, light: 120, ...extra });
-// 9a. The bare deck: plates missing, so the way across zigzags (a step in
-// each gap to climb out by).
+// 9a. The bare deck: plates missing, so the way across zigzags (two steps
+// of 0.75 in each gap to walk out by: you can't walk up more than 0.8).
 p.rect(112, 112, 154, 136, bare(0, 8));
-p.rect(122, 112, 126, 128, bare(-3, 8, { light: 88 }));
-p.rect(122, 127, 126, 128, bare(-1.5, 8, { light: 88 }));
-p.rect(136, 120, 140, 136, bare(-3, 8, { light: 88 }));
-p.rect(136, 120, 140, 121, bare(-1.5, 8, { light: 88 }));
+const gap = (z) => bare(z, 8, { light: 88 });
+p.rect(122, 112, 126, 128, gap(-2.25));
+p.rect(122, 126, 126, 127, gap(-1.5));
+p.rect(122, 127, 126, 128, gap(-0.75));
+p.rect(136, 120, 140, 136, gap(-2.25));
+p.rect(136, 121, 140, 122, gap(-1.5));
+p.rect(136, 120, 140, 121, gap(-0.75));
 for (const [x, y] of [[148, 122], [131, 116], [130, 131], [116, 123]]) lamps.push({ x, y, radius: 9, light: 112 });
 p.rect(108, 120, 112, 126, bare(0, 6));
 // 9b. The panel yard, and stairs up its north wall to 4 m.
