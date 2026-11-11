@@ -81,6 +81,8 @@ export const GIRDER = { length: 6, width: 0.4 };
 export const PANEL_STACK = { half: [0.6, 1.1], top: 0.8 };
 export const REEL = { r: 0.6, top: 0.8 };
 export const WORK_LAMP = { r: 0.3, top: 2.2 };
+/** A pipe up a wall with a leaking joint: how far off the wall it stands, its height, where the steam comes out. */
+export const STEAM_PIPE = { off: 0.2, top: 4, leak: [0.34, 0, 1.45] };
 /** Cut cables hanging from a bare ceiling (the origin is on the ceiling): how low the live one's end hangs, where it sparks. */
 export const CABLES = { 'ds-cables': null, 'ds-cables-live': [0.3, 0.2, -2.6] };
 /** The shuttle: its top (the fin's). */
@@ -486,6 +488,24 @@ function cables(id) {
   return m.build();
 }
 
+// `ds-steam-pipe`: a pipe up a wall, turning into it at the top, with a
+// flanged joint that leaks steam (decor.js). The wall is behind it at
+// x = 0; it faces +x.
+function steamPipe() {
+  const m = new ModelBuilder('ds-steam-pipe');
+  const { off, top, leak } = STEAM_PIPE;
+  const pipe = { segments: 8, ...METAL, top: false, bottom: false };
+  m.cylinder([off, 0, 0], 0.11, top - 0.3, pipe);
+  // The elbow into the wall, and a thinner line beside it.
+  m.box([0, -0.11, top - 0.4], [off + 0.11, 0.11, top - 0.18], { ...METAL, bottom: false });
+  m.cylinder([0.1, 0.3, 0], 0.05, top - 0.9, { segments: 6, ...IRON, top: false, bottom: false });
+  // Flanges: at the deck, at the leaking joint and under the elbow.
+  for (const z of [0, leak[2] - 0.06, top - 0.6]) m.cylinder([off, 0, z], 0.17, 0.12, { segments: 8, ...IRON });
+  // Brackets back to the wall.
+  for (const z of [0.8, 2.6]) m.box([0, -0.2, z], [off, 0.4, z + 0.06], IRON);
+  return m.build();
+}
+
 function camera() {
   const m = new ModelBuilder('ds-camera');
   // A plate on the ceiling, a stem, and the camera's body tipped down.
@@ -610,6 +630,7 @@ export default [
   cableReel(),
   workLamp(),
   ...Object.keys(CABLES).map(cables),
+  steamPipe(),
   camera(),
   ceilingLampBar(),
   dianogaEye(),

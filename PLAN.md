@@ -1446,8 +1446,6 @@ Mission 3 is. Each step is a commit, playable at `?map=m4`.
       (nobody has played it), the song.
 - Life and detail (Mark, 2026-11-11: sparks, more detailed walls and
   ceilings), a commit each:
-  - [ ] The guts (maintenance, pump room, compactor): pipes leaking
-        steam, stains down the walls.
   - [ ] The clean decks (ring corridor, hub, lobby): vents and signs on
         the long pale walls.
 

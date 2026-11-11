@@ -17,7 +17,7 @@ import { BAY_WALL, DERELICT_WALL, BAY_HOSES } from './models/bay.js';
 import { SCAFFOLDS, scaffoldHeight } from './models/scaffold.js';
 import { BALCONY_FRAME } from './models/balcony.js';
 import { WIRES, CONSOLE } from './models/hold.js';
-import { CABLES as STATION_CABLES } from './models/station.js';
+import { CABLES as STATION_CABLES, STEAM_PIPE } from './models/station.js';
 import { TOWER_HEIGHT } from './models/market.js';
 import { BAR, TAPS, CORNER } from './models/cantina.js';
 import { POD } from './models/pod.js';
@@ -107,6 +107,16 @@ export default [
       { type: 'spark', count: 3, every: [0.2, 0.9], at: spark, radius: 0.05, dir: [0, 0, -1], spread: 0.8, speed: [0.5, 1.5] },
     ] }),
   })),
+  // A pipe up a wall, its joint leaking: a thin steady plume and a hiss now and then.
+  defineDecoration({
+    id: 'ds-steam-pipe',
+    model: 'ds-steam-pipe',
+    fixed: true,
+    emit: [
+      { type: 'steam', count: 2, every: [0.25, 0.6], at: STEAM_PIPE.leak, radius: 0.05, dir: [1, 0, 0.5], spread: 0.25, speed: [0.6, 1.4] },
+      { type: 'steam', count: 7, every: [4, 9], at: STEAM_PIPE.leak, radius: 0.08, dir: [1, 0, 0.3], spread: 0.35, speed: [1.5, 3] },
+    ],
+  }),
   defineDecoration({ id: 'ds-camera', model: 'ds-camera', fixed: true }),
   defineDecoration({ id: 'ds-ceiling-lamp-bar', model: 'ds-ceiling-lamp-bar', fixed: true }),
   // Something in the compactor's water, looking about.

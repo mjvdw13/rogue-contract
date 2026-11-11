@@ -90,6 +90,13 @@ const decals = [
   { x: 167, y: 70, z: 2.4, face: 'S', tex: 'decal-sign' },
   { x: 167.5, y: 44, z: 14.4, face: 'S', tex: 'decal-sign' },
   { x: 191.5, y: 100, z: 2.4, face: 'S', tex: 'decal-hazard' },
+  // The compactor's walls, streaked and stained down to the sludge.
+  ...[[190, 'grime-drip-1'], [194.5, 'grime-streaks-2'], [199, 'grime-drip-2']].flatMap(([x, tex]) => [
+    { x, y: 4, z: 1, face: 'S', tex, scale: 2 }, { x: x - 1.5, y: 28, z: 1, face: 'N', tex, scale: 2, flip: true },
+  ]),
+  ...[[8, 'grime-streaks-1'], [15, 'grime-blotch-1'], [23, 'grime-streaks-3']].flatMap(([y, tex]) => [
+    { x: 186, y, z: 1, face: 'E', tex, scale: 2 }, { x: 202, y: y + 2, z: 1, face: 'W', tex, scale: 2, flip: true },
+  ]),
 ];
 
 /**
@@ -477,6 +484,11 @@ const list = [
   at('stormtrooper', 189.5, 74.5, { angle: 90, ambush: true }), at('stormtrooper', 200.5, 82.5, { angle: 90, ambush: true }),
   at('probe-droid', 195, 80, { skill: NORMAL_UP }),
   at('coolant-tank', 189, 77), at('coolant-tank', 201, 82),
+  // Leaking pipes: in the compactor, up the tunnels, on three of the pumps.
+  at('ds-steam-pipe', 186.02, 20, { angle: 0 }), at('ds-steam-pipe', 201.98, 12, { angle: 180 }),
+  at('ds-steam-pipe', 195.02, 32, { angle: 0 }), at('ds-steam-pipe', 195.02, 50, { angle: 0 }), at('ds-steam-pipe', 198.98, 57, { angle: 180 }),
+  at('ds-steam-pipe', 191, 72.02, { angle: 270 }), at('ds-steam-pipe', 199, 83.98, { angle: 90 }), at('ds-steam-pipe', 197.98, 71, { angle: 180 }),
+  at('ds-steam-pipe', 193.02, 96, { angle: 0 }),
   at('energy-pack', 189.5, 80.5), at('med-kit', 201.5, 78),
   // 8. The shaft: troopers on the far ledges, probe droids over the drop.
   at('stormtrooper', 158, 110.5, { angle: 0, z: 0 }), at('stormtrooper', 198, 132.5, { angle: 180, z: 0 }),

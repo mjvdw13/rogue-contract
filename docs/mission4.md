@@ -141,7 +141,9 @@ black decks, white light**, clean and new. Each area changes one thing.
   on the station.
 - **Compactor and maintenance:** the station's guts: `ds-compactor-wall`,
   sludge (`water-murky`), pipes (`ds-wall-greeble`), `ds-floor-grate`.
-  Dim, a flickering lamp.
+  Dim, a flickering lamp. Pipes up the walls and the pumps leak steam
+  (`ds-steam-pipe`: a thin plume, a hiss every few seconds); the
+  compactor's walls are streaked with grime.
 - **The shaft:** `ds-wall-dark` falling out of sight, light columns down
   it at intervals, the column glowing.
 - **Unfinished sector:** `ds-girder` where the panels aren't on yet,
@@ -155,7 +157,7 @@ Models (`models/station.js`): `tie-fighter`, `tie-rack`, `lambda-shuttle`,
 `ds-console`, `ds-console-wall`, `ds-desk`, `ds-table`, `ds-chair`,
 `ds-crate`, `ds-crate-tall`, `ds-container`, `ds-doorframe`,
 `tractor-terminal`, `ds-girder-post`, `ds-girder-beam`, `ds-panel-stack`,
-`ds-cable-reel`, `work-lamp`, `ds-cables`, `ds-cables-live`, `ds-camera`, `ds-ceiling-lamp-bar`,
+`ds-cable-reel`, `work-lamp`, `ds-cables`, `ds-cables-live`, `ds-steam-pipe`, `ds-camera`, `ds-ceiling-lamp-bar`,
 `dianoga-eye`.
 
 Characters: stormtroopers, officers, probe droids; new: the
