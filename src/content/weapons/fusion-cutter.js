@@ -4,7 +4,8 @@ import { defineWeapon } from '../../engine/defs.js';
 // shot every quarter second, one power cell each. Its four barrels fire one
 // after another, across and back (`cycle`), each glowing after its shot: 1-4
 // the barrel lit, then 0 (DF's 20 and 14 ticks). DF drew it low across the
-// whole view (x 19).
+// whole view (x 19). Each shot leaves from the barrel that lights
+// (`barrels`): left to right, where they sit on screen.
 export default defineWeapon({
   id: 'fusion-cutter',
   name: 'FUSION CUTTER',
@@ -22,6 +23,7 @@ export default defineWeapon({
     fire4: { frames: [4, 0], durations: [0.14, 0.1], fireAt: 0, fullbright: [0] },
   },
   cycle: ['fire', 'fire2', 'fire3', 'fire4', 'fire3', 'fire2'],
+  barrels: { fire: -0.5, fire2: -0.22, fire3: 0, fire4: 0.3 },
   fire: { kind: 'projectile', projectile: 'fusion-plasma', spread: 0.017 }, // DF's ±1°
   sounds: { fire: 'fusion-fire' },
 });

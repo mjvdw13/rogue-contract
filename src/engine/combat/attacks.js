@@ -9,6 +9,7 @@ import { aimAttack, lockOn } from './aim.js';
  * `opts.aim` ({z, slope}): the height the attack starts from and how steeply
  * it climbs (see aim.js). A player's attack with `lockOn` (degrees) is turned
  * onto the nearest monster in that cone, Dark Forces' way (aim.js lockOn).
+ * A projectile also takes `opts.side`: tiles right of centre it starts from.
  */
 export const BUILTIN_ATTACKS = {
   hitscan(world, attacker, spec, angle, opts) {
@@ -39,7 +40,7 @@ export const BUILTIN_ATTACKS = {
     for (let i = 0; i < count; i++) {
       const a =
         count > 1 ? angle + (i - (count - 1) / 2) * (spec.spread ?? 0.1) : angle + world.rng.signed() * (spec.spread ?? 0);
-      world.spawnProjectile(spec.projectile, attacker, a, spec, opts.aim);
+      world.spawnProjectile(spec.projectile, attacker, a, spec, opts.aim, opts.side ?? 0);
     }
     return true;
   },

@@ -334,6 +334,16 @@ export function validateContent(reg) {
         }
       }
     }
+    if (w.barrels != null) {
+      if (typeof w.barrels !== 'object' || Array.isArray(w.barrels)) err(`${owner}: barrels must map fire animations to tiles right of centre, like { fire: -0.5, fire2: 0.3 }`);
+      else if (w.fire?.kind !== 'projectile') err(`${owner}: barrels only move where a projectile starts, and its attack isn't one`);
+      else {
+        for (const [name, x] of Object.entries(w.barrels)) {
+          if (!w.anims[name]?.events.includes('fire')) err(`${owner}: barrels names "${name}", which isn't a fire animation it has (with a fireAt frame)`);
+          if (!(typeof x === 'number' && Math.abs(x) <= 1)) err(`${owner}: barrel "${name}" must be a number of tiles from -1 to 1 (right of centre)`);
+        }
+      }
+    }
     if (w.ammo && !reg.ammo.has(w.ammo)) err(`${owner}: unknown ammo "${w.ammo}"`);
     if (w.reraise !== undefined && typeof w.reraise !== 'boolean') err(`${owner}: reraise must be true or false`);
     if (w.charge) {

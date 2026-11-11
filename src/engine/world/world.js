@@ -341,8 +341,8 @@ export class World {
     return this.explosions.explode(id, x, y, z, opts);
   }
 
-  spawnProjectile(id, owner, angle, spec, aim) {
-    return launchProjectile(this, id, owner, angle, spec, aim);
+  spawnProjectile(id, owner, angle, spec, aim, side = 0) {
+    return launchProjectile(this, id, owner, angle, spec, aim, side);
   }
 
   // ------------------------------------------------------------ movement

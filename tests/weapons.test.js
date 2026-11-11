@@ -60,6 +60,25 @@ test('a cycle starts again from its first barrel when the weapon comes back up',
   assert.equal(shots[0], def.cycle[0]);
 });
 
+test('each barrel shoots from itself: shots start across the gun, left to right and back', () => {
+  const { w, input } = holding('fusion-cutter');
+  const pt = w.player;
+  const right = [];
+  const spawn = w.spawnProjectile.bind(w);
+  w.spawnProjectile = (...args) => {
+    const shot = spawn(...args);
+    // How far right of the player's facing it starts (right as strafing goes).
+    if (shot) right.push((shot.x - pt.x) * -Math.sin(pt.angle) + (shot.y - pt.y) * Math.cos(pt.angle));
+    return shot;
+  };
+  input.hold('fire');
+  run(w, input, 2);
+  assert.ok(right.length >= 6, 'fired a round of shots');
+  // Across: left to right over the first four, then back.
+  for (let i = 1; i < 4; i++) assert.ok(right[i] > right[i - 1], `shot ${i + 1} right of shot ${i}`);
+  assert.ok(right[4] < right[3] && right[5] < right[4], 'and back');
+});
+
 /** Set down a mine, and let it come to rest. Returns it. */
 function setMine(w, input) {
   input.hold('fire');

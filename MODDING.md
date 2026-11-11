@@ -368,6 +368,11 @@ fire animations in turn, one a shot, round and round (each needs its
 barrels that fire one after another, each lit after its shot, like the
 fusion cutter's (`fusion-cutter.js`).
 
+`barrels: { fire: -0.5, fire2: -0.2, fire3: 0, fire4: 0.3 }` (projectile
+weapons) starts each shot from the barrel its fire animation lights: that
+many tiles right of centre (left if negative, -1 to 1), flying straight
+ahead. A fire animation it doesn't name shoots from the centre.
+
 `charge: { time: 1, min: 0.2, sink: 36, pull: 0.18 }` throws when fire is
 let go instead of when it's pressed. Pressing fire pulls the hand back,
 down `sink` pixels over `pull` seconds, and it stays there while fire is

@@ -286,15 +286,19 @@ export function projectileThink(world, p, dt) {
  * Spawn a projectile from `owner` toward `angle`, climbing along `aim`'s slope
  * (see aim.js). A spec or def `z` instead starts it that high above the
  * owner's feet. Lobbed (gravity) projectiles arc to land near the target.
+ * `side` starts it that many tiles to the right of centre (left if
+ * negative), flying parallel: one barrel of several (a weapon's `barrels`).
  */
-export function launchProjectile(world, id, owner, angle, spec = {}, aim = aimAttack(world, owner, angle)) {
+export function launchProjectile(world, id, owner, angle, spec = {}, aim = aimAttack(world, owner, angle), side = 0) {
   const def = world.registry.things.get(id);
   if (!def) {
     console.warn(`Unknown projectile "${id}"`);
     return null;
   }
   const off = (owner.radius ?? 0.5) + def.radius + 0.1;
-  const p = world.spawn(id, owner.x + Math.cos(angle) * off, owner.y + Math.sin(angle) * off, angle);
+  const ca = Math.cos(angle);
+  const sa = Math.sin(angle);
+  const p = world.spawn(id, owner.x + ca * off - sa * side, owner.y + sa * off + ca * side, angle);
   if (!p) return null;
   // (`power`: how hard a wound-up throw was let go, 0 to 1; see a weapon's `charge`.)
   const speed = def.speed * (owner.kind === 'monster' && world.skillInfo.fast ? 1.4 : 1) * (spec.power ?? 1);
