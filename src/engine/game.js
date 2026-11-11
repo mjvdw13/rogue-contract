@@ -153,7 +153,9 @@ export class Game {
     scene?.render(dt);
     if (this.menu.active) this.menu.draw(scene instanceof LevelScene);
     this.wipe.draw(s.px);
-    if (this.settings.showFps) {
+    // (Always, for now, while drawing in threads is being tried: back to
+    // `this.settings.showFps` once it's settled. See PLAN.md.)
+    {
       const f = this.font('small');
       const n = this.renderer.pool?.threads ?? 1;
       f?.draw(s, n > 1 ? `${this.loop.fps} FPS  ${n} THREADS` : `${this.loop.fps} FPS`, s.w - s.ox - 3, 3, { align: 'right', remap: this.palette.tint('gray', 'glow-green'), shadow: 0 });

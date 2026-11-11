@@ -1505,8 +1505,10 @@ cold cache costs only 7%. So changes that keep every pixel are worth
         640x400); the whole frame 1.5, 1.8 and 1.8, the 90th percentile
         from 16 or 17 ms to 10 or 11. The models are now the bigger
         part of the worst frames.
-  - [ ] Waiting on Mark: to try on the site. `?fps` shows the threads
-        drawing beside the frame rate (8 on this laptop); `?threads=0`
+  - [ ] Waiting on Mark: to try on the site. The frame rate and the
+        threads drawing show in the corner all the time for now (8
+        threads on this laptop): put it back behind the SHOW FPS
+        setting (`game.js`) once this is settled. `?threads=0`
         is the old way, for comparing. The first visit reloads itself
         once, before the loading screen. Worth trying on the slowest
         machine to hand, and in Firefox and Safari if there's one about.
