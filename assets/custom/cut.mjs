@@ -83,6 +83,30 @@ const SHEETS = [
     })(),
   },
   {
+    // The interrogation droid, in its sheet's order: hover 0-3 (two front
+    // poses, alternating), aim 4 (the eye lit dim green), fire 5 (bright
+    // green), pain 6 (the white flash of a hit), death 7-11 (sparks, the
+    // fireball, its cloud, the pieces flying apart, then one piece on the
+    // floor), the needle's stab 12, and the hover from the other views 13-16
+    // (front three-quarter, side, back three-quarter, back). Hovering frames
+    // hang from the top row's top; the pain frame from the same height.
+    file: 'MS-DOS - Star Wars_ Dark Forces - Enemies - Interrogation Droid.png',
+    asset: 'interrogation-droid',
+    frames: (() => {
+      const hover = row(0, 46);
+      const fall = row(49, 128);
+      return [
+        hover(0, 58), hover(544, 606), hover(0, 58), hover(544, 606),
+        hover(424, 482), hover(484, 542),
+        { box: [0, 58, 49, 128], base: 106 },
+        fall(61, 130), fall(132, 237), fall(249, 328), fall(330, 446),
+        { box: [486, 524, 98, 113], base: 111 },
+        hover(608, 665),
+        hover(60, 110), hover(112, 157), hover(159, 211), hover(213, 270),
+      ];
+    })(),
+  },
+  {
     // Bossk. No firing pose with a flash (Dark Forces has none for him), so
     // fire repeats the aiming pose.
     file: 'MS-DOS - Star Wars_ Dark Forces - Enemies - Trandoshan.png',

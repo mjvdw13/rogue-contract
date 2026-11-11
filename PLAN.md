@@ -1466,7 +1466,9 @@ Mission 3 is. Each step is a commit, playable at `?map=m4`.
       compactor's groan, the field's hum; 4-tall side doors; a sprite for
       whoever Kyle sees in the briefing room.
 - [ ] Waiting on Mark: where it sits in the story, the look, the fights
-      (nobody has played it), the song.
+      (nobody has played it), the song; the interrogation droid's Dark
+      Forces art (its size, the green eye as the shock's warning, the
+      needle's stab, one piece of wreck as the corpse).
 
 ### 11. Frame time (Mark, 2026-11-10)
 

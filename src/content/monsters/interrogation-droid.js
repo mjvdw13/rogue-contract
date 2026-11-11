@@ -4,9 +4,11 @@ import { defineMonster } from '../../engine/defs.js';
 // with a syringe held out. Smaller, quicker and far more fragile than the
 // probe droid, it has to come close: a weak shock across a few metres to
 // hurry the player along, and the needle once it's on them. It blows up
-// when destroyed, with a small blast. The sheet is generated
-// (tools/art/sprites/station.js), in the probe droid's order: hover 0-3,
-// needle drawn back 4, the stab 5, pain 6, death 7-11.
+// when destroyed, with a small blast. The sheet's order (the Dark Forces
+// sheet, cut by assets/custom/cut.mjs, and the generated stand-in in
+// tools/art/sprites/station.js): hover 0-3, aim 4, the shock 5, pain 6,
+// death 7-11, the needle's stab 12; the hover from the other views 13-16,
+// which only the Dark Forces sheet has.
 export default defineMonster({
   id: 'interrogation-droid',
   name: 'Interrogation Droid',
@@ -28,11 +30,11 @@ export default defineMonster({
   melee: { kind: 'melee', damage: [6, 14], range: 1.3, hitSound: 'punch-hit' },
   light: { radius: 2.5, light: 60 }, // the shock's flash, on the fullbright frames
   anims: {
-    idle: { frames: [0, 1, 2, 3], fps: 4, loop: true },
-    walk: { frames: [0, 1, 2, 3], fps: 8 },
+    idle: { frames: [0, 1, 2, 3], fps: 4, loop: true, views: { frontSide: [13, 13, 13, 13], side: [14, 14, 14, 14], backSide: [15, 15, 15, 15], back: [16, 16, 16, 16] } },
+    walk: { frames: [0, 1, 2, 3], fps: 8, views: { frontSide: [13, 13, 13, 13], side: [14, 14, 14, 14], backSide: [15, 15, 15, 15], back: [16, 16, 16, 16] } },
     attack: { frames: [4, 5, 4], durations: [0.25, 0.12, 0.2], fireAt: 1, fullbright: [1] },
     // The needle: a longer wind-up than the shock, so there's time to back off.
-    melee: { frames: [4, 5, 4], durations: [0.35, 0.15, 0.3], fireAt: 1 },
+    melee: { frames: [4, 12, 4], durations: [0.35, 0.15, 0.3], fireAt: 1 },
     pain: { frames: [6], durations: [0.15] },
     death: { frames: [7, 8, 9, 10, 11], fps: 8 },
   },

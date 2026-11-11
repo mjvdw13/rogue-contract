@@ -6,8 +6,8 @@
 //     (front 0-3, front three-quarter 4-7, side 8-11, back three-quarter
 //     12-15, back 16-19; the lamp is lit on the even frames), react 20,
 //     pain 21, death 22-25
-//   interrogation droid (48x44): hover 0-3, needle drawn back 4, the stab 5,
-//     pain 6, death 7-11
+//   interrogation droid (48x44): hover 0-3, needle drawn back 4, the shock 5,
+//     pain 6, death 7-11, the stab 12
 import { PixelCanvas } from '../lib/canvas.js';
 import { C, G } from '../lib/pal.js';
 import { Model, MAT } from '../lib/model.js';
@@ -269,6 +269,9 @@ function interrogatorSheet() {
   frames.push(interrogatorFrame({ eye: 1, bob: 1, reach: 1, shock: true }));
   frames.push(interrogatorFrame({ hurt: true, sway: 3, reach: 0.2 }));
   frames.push(...interrogatorDeath());
+  // The stab: the needle all the way out, no shock (12, after the death, so
+  // the Dark Forces sheet's order matches).
+  frames.push(interrogatorFrame({ eye: 1, bob: 1, reach: 1 }));
   return sheet(frames);
 }
 

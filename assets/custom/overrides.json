@@ -297,5 +297,11 @@
     "src": "assets/custom/assault-cannon.png",
     "frameWidth": 170,
     "frameHeight": 325
+  },
+  "assets/sprites/monsters/interrogation-droid.png": {
+    "src": "assets/custom/interrogation-droid.png",
+    "frameWidth": 118,
+    "frameHeight": 80,
+    "scale": 0.85
   }
 }
