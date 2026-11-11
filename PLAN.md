@@ -1493,12 +1493,23 @@ cold cache costs only 7%. So changes that keep every pixel are worth
         again on one thread. `tools/bench.mjs --threads N`. A test: a
         minute of play in every level, each frame drawn both ways, the
         same bytes.
-  - [ ] The browser: a service worker gives the pages the two headers
+  - [x] The browser: a service worker gives the pages the two headers
         shared memory needs (GitHub Pages can't set them); the first
         visit reloads once when it's in. The pool starts at boot with
         one worker a logical core less one (7 at most); `?threads=0`
         turns it off, and so does anything failing. Smoke test.
-  - [ ] Measured in Chromium, and under "Waiting on Mark" to try.
+  - [x] Measured in headless Chromium (Mos Eisley, 40 seeded views, each
+        drawn with and without the pool in the same page; the machine
+        was busy, so the ratios matter more than the times): the world
+        pass 1.8 times faster on 2 threads, 2.4 on 4, 2.8 on 8 (3.0 at
+        640x400); the whole frame 1.5, 1.8 and 1.8, the 90th percentile
+        from 16 or 17 ms to 10 or 11. The models are now the bigger
+        part of the worst frames.
+  - [ ] Waiting on Mark: to try on the site. `?fps` shows the threads
+        drawing beside the frame rate (8 on this laptop); `?threads=0`
+        is the old way, for comparing. The first visit reloads itself
+        once, before the loading screen. Worth trying on the slowest
+        machine to hand, and in Firefox and Safari if there's one about.
 - [ ] Waiting on Mark: which of these to build.
   - Low detail, by itself: when frames run late, draw every other
     column and double it (Doom's low detail), back to full when there's

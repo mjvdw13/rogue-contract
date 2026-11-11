@@ -68,7 +68,8 @@ Handy URL parameters:
 | `&wide=0` | The 4:3 frame instead of widescreen |
 | `&crt=off` / `subtle` / `full` | CRT effect (also in Options) |
 | `&gl=0` | Plain 2D canvas instead of WebGL |
-| `&fps` / `&mute` / `&seed=N` | Frame counter / no sound / fixed random seed |
+| `&fps` / `&mute` / `&seed=N` | Frame counter (and how many threads are drawing) / no sound / fixed random seed |
+| `&threads=N` | Draw the world on N threads (by default one for each logical core, 8 at most); `0` for one thread and no service worker |
 
 `tools/particles.html` is a bench for particles and explosion styles, and
 `tools/soundboard.html` plays every sound, synthesized and recorded.

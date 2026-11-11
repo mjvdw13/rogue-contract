@@ -239,6 +239,25 @@ for (const level of new Registry(content).levels.values()) {
   await p.close();
 }
 
+// 7. Threads: the service worker isolates the page (after the first visit's
+// reload), and worker threads draw some of the world; ?threads=0 leaves both out.
+{
+  const p = await page('index.html?map=m1&mute&nomonsters&threads=4');
+  await p.waitForFunction(() => window.game.scene.constructor.name === 'LevelScene', null, { timeout: 20000 }).catch(() => {});
+  await p.waitForTimeout(2500);
+  const on = await p.evaluate(() => ({ isolated: crossOriginIsolated, alive: !!window.game.renderer.pool?.alive, threads: window.game.renderer.pool?.threads, chunks: window.game.renderer.pool?.workerChunks }));
+  check(on.isolated, 'the service worker isolates the page');
+  check(on.alive && on.threads === 4, `?threads=4 draws on 4 threads (got ${on.threads})`);
+  check(on.chunks > 0, `the worker threads draw some of the world (${on.chunks} chunks of columns)`);
+  await shot(p, 'threads');
+  await p.close();
+  const q = await page('index.html?map=m1&mute&nomonsters&threads=0');
+  await q.waitForFunction(() => window.game.scene.constructor.name === 'LevelScene', null, { timeout: 20000 }).catch(() => {});
+  const off = await q.evaluate(() => ({ isolated: crossOriginIsolated, pool: !!window.game.renderer.pool }));
+  check(!off.isolated && !off.pool, '?threads=0 is one thread, and no service worker');
+  await q.close();
+}
+
 await browser.close();
 server.close();
 console.log(`\nScreenshots in ${path.relative(root, outDir)}/`);

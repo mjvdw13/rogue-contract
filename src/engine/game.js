@@ -21,6 +21,8 @@ import { TitleScene } from './scenes/title.js';
 import { LevelScene } from './scenes/level.js';
 import { IntermissionScene } from './scenes/intermission.js';
 import { FinaleScene } from './scenes/finale.js';
+import { browserPool } from './render/pool.js';
+import { CAN_SHARE } from './core/shared.js';
 
 /**
  * The game shell: owns the screen, input, audio, assets and the current
@@ -70,6 +72,11 @@ export class Game {
     this.rng = new Rng(params.has('seed') ? Number(params.get('seed')) : Date.now() & 0xffffffff);
     this.wipe = new MeltWipe(SCREEN_W, SCREEN_H, res);
     this.renderer = new Renderer(this.surface, this.assets, this.palette);
+    // The world is drawn on several threads where the page may share memory
+    // with them (render/pool.js; src/main.js sees to the "may"): a worker a
+    // logical core less one, or ?threads=N threads in all (0 or 1: none).
+    const threads = params.has('threads') ? Math.floor(Number(params.get('threads'))) || 0 : null;
+    if (CAN_SHARE && (threads === null || threads > 1)) this.renderer.pool = threads === null ? browserPool() : browserPool(Math.min(15, threads - 1));
     this.hud = new Hud(this);
     this.menu = new MenuSystem(this);
     this.scene = null;
@@ -148,7 +155,8 @@ export class Game {
     this.wipe.draw(s.px);
     if (this.settings.showFps) {
       const f = this.font('small');
-      f?.draw(s, `${this.loop.fps} FPS`, s.w - s.ox - 3, 3, { align: 'right', remap: this.palette.tint('gray', 'glow-green'), shadow: 0 });
+      const n = this.renderer.pool?.threads ?? 1;
+      f?.draw(s, n > 1 ? `${this.loop.fps} FPS  ${n} THREADS` : `${this.loop.fps} FPS`, s.w - s.ox - 3, 3, { align: 'right', remap: this.palette.tint('gray', 'glow-green'), shadow: 0 });
     }
     const pal = this.menu.active ? PAL_NORMAL : (scene?.paletteIndex?.() ?? PAL_NORMAL);
     this.presenter.present(s.px, this.palette.palettes[pal], this.time);

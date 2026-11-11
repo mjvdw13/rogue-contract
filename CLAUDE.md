@@ -88,7 +88,11 @@ only way to check visual work without a browser.
 4. **Renderer changes** that should look the same are checked by rendering
    a set of snapshots before and after and comparing bytes. `drawWorld` in
    `render/columns.js` is one long function on purpose (closures and calls
-   per column cost frame time); measure before restructuring it.
+   per column cost frame time); measure before restructuring it. It runs
+   on worker threads too (`render/pool.js`): whatever it reads must be in
+   shared memory (`shared()` in `core/shared.js`) or copied to the workers
+   (`mapCopy` in pool.js), and a column may not depend on another.
+   `tests/threads.test.js` compares the two ways byte for byte.
 5. **Before committing:** `npm test` and `npm run validate`. Run the smoke
    test when you touch boot, scenes, menus, the HUD, asset loading or
    `index.html`; otherwise CI catches it.
