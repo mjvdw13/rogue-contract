@@ -31,7 +31,7 @@ test('a weapon with a cycle fires its barrels one after another, and round again
   };
   input.hold('fire');
   const n = def.cycle.length + 2;
-  run(w, input, 3, () => shots.length < n);
+  run(w, input, 3);
   assert.deepEqual(shots.slice(0, n), [...def.cycle, def.cycle[0], def.cycle[1]]);
 });
 
@@ -98,4 +98,31 @@ test('left alone, a mine goes off when its fuse runs out', () => {
   assert.ok(!mine.removed && mine.state !== 'exploding', 'still lying there');
   run(w, input, mine.def.bounce.fuse);
   assert.ok(mine.state === 'exploding' || mine.removed, 'gone off');
+});
+
+test('a mortar round arcs up and comes down to burst on the floor, well out', () => {
+  const TALL = { '.': { floor: 'imp-floor', ceiling: 'imp-ceiling', light: 160, ceilZ: 10 } };
+  const long = room(['#'.repeat(32), ...Array(3).fill(`#${'.'.repeat(30)}#`), '#'.repeat(32)], ['', '', ' >'], { legend: TALL });
+  const w = makeWorld(long, { noMonsters: true });
+  const p = w.player.player;
+  p.weapons.add('mortar');
+  p.weapon = 'mortar';
+  p.ammo.shell = 3;
+  const input = mockInput();
+  run(w, input, 0.5);
+  input.hold('fire');
+  run(w, input, 0.05);
+  input.release('fire');
+  const round = w.things.find((t) => t.def.id === 'mortar-round');
+  assert.ok(round, 'fired');
+  const startZ = round.z;
+  let top = startZ;
+  run(w, input, 3, () => {
+    if (round.state !== 'exploding') top = Math.max(top, round.z);
+  });
+  assert.equal(round.state, 'exploding', 'burst');
+  assert.ok(top > startZ + 1, `went up (${(top - startZ).toFixed(1)} above the gun)`);
+  assert.ok(round.z < w.map.floorAt(round.x, round.y) + 0.5, 'on the floor');
+  const out = round.x - w.player.x;
+  assert.ok(out > 6, `well out (${out.toFixed(1)} tiles)`);
 });

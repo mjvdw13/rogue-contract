@@ -4,6 +4,7 @@
   "repeater-fire": { "src": "assets/custom/sounds/weapons/REPEAT-1.mp3", "volume": 0.87 },
   "fusion-fire": { "src": "assets/custom/sounds/weapons/FUSION1.mp3", "volume": 1 },
   "mine-arm": { "src": "assets/custom/sounds/weapons/CLAYMOR1.mp3", "volume": 1 },
+  "mortar-fire": { "src": "assets/custom/sounds/weapons/MORTAR4.mp3", "volume": 1 },
   "rifle-fire": { "src": "assets/custom/sounds/weapons/RIFLE-1.mp3", "volume": 0.87 },
   "droid-fire": { "src": "assets/custom/sounds/enemies/PROBFIR1.mp3", "volume": 1.16 },
   "bolt-hit": { "src": "assets/custom/sounds/impacts-explosions/EX-TINY1.mp3", "volume": 0.65 },

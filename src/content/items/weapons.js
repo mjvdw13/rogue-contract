@@ -66,6 +66,17 @@ export default [
     message: 'Picked up a pack of I.M. mines.',
     sound: 'item-ammo',
   }),
+  // The Packered mortar gun, with three shells.
+  defineItem({
+    id: 'mortar',
+    name: 'Mortar Gun',
+    glyph: '8',
+    sheet: { src: 'assets/sprites/items/mortar.png', frameWidth: 64, frameHeight: 24 },
+    radius: 0.7,
+    pickup: { weapon: 'mortar', ammo: { shell: 3 } },
+    message: 'Picked up a Packered mortar gun.',
+    sound: 'weapon-pickup',
+  }),
   // The concussion rifle, as Bossk drops it.
   defineItem({
     id: 'concussion-rifle',

@@ -88,6 +88,24 @@ export const projectiles = [
     explosion: 'large',
     sounds: { bounce: 'detonator-bounce', explode: 'detonator-explode' },
   }),
+  // A mortar shell: lobbed in an arc (about 12 tiles out on level ground,
+  // further looking up), turning over as it flies, it bursts on whatever it
+  // hits. No damage itself: its blast does it all (Dark Forces' 50 over 40
+  // units, a little under the detonator's 60 over 30), 115 over 5 tiles.
+  defineProjectile({
+    id: 'mortar-round',
+    sheet: FX('mortar-shell', 16, 16),
+    anims: { fly: { frames: [0, 1, 2, 3, 4, 5], fps: 12, loop: true } },
+    fullbright: false,
+    radius: 0.2,
+    speed: 14,
+    gravity: 28,
+    life: 6,
+    damage: 0,
+    splash: { radius: 5, damage: 115 },
+    explosion: 'large',
+    sounds: { explode: 'explode' },
+  }),
   // An I.M. mine, set down: dropped just in front of you, it lies where it
   // lands and goes off three seconds later (Dark Forces' fuse), or at once
   // when someone walks into it, as a `large` explosion. Dark Forces' mine

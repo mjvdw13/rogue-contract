@@ -151,6 +151,8 @@ const SHEETS = [
     asset: 'fusion-plasma',
     out: 'assets/sprites/fx/fusion-plasma.png',
   },
+  // A mortar shell in flight, turning over (WSHELL).
+  { cells: { folder: 'Player Projectiles/WSHELL.cells', list: [0, 1, 2, 3, 4, 5].map((k) => `00${k}.PNG`), align: 'middle' }, asset: 'mortar-shell-flying', out: 'assets/sprites/fx/mortar-shell.png' },
   // A mine set down (WLMINE, from the pickups zip).
   { cells: { folder: 'Pickups/WLMINE.cells', list: ['000.PNG'], align: 'middle' }, asset: 'mine-placed', out: 'assets/sprites/fx/mine.png' },
   // Ammo: an energy cell (IENERGY), a power cell (IPOWER), a plasma
@@ -161,8 +163,8 @@ const SHEETS = [
     ['ISHELL', 'mortar-shell'], ['ISHELLS', 'mortar-shells'],
     // The weapons: the E-11 lying on its side (IST-GUNI), a trooper's drop;
     // the repeater (IAUTOGUN), the fusion cutter (IFUSION), a mine and a
-    // pack of them (IMINE, IMINES).
-    ['IST-GUNI', 'rifle'], ['IAUTOGUN', 'repeater'], ['IFUSION', 'fusion-cutter'], ['IMINE', 'mine'], ['IMINES', 'mine-pack'],
+    // pack of them (IMINE, IMINES), the mortar gun (IMORTAR).
+    ['IST-GUNI', 'rifle'], ['IAUTOGUN', 'repeater'], ['IFUSION', 'fusion-cutter'], ['IMINE', 'mine'], ['IMINES', 'mine-pack'], ['IMORTAR', 'mortar'],
   ].map(([cell, item]) => ({ cells: { folder: `Pickups/${cell}.cells`, list: ['000.PNG'] }, asset: `${item}-item`, out: `assets/sprites/items/${item}.png` })),
 ];
 
@@ -340,6 +342,15 @@ const WEAPONS = [
     padLeft: 0,
     padBottom: 12,
     frames: [[36, 218, 527, 609], [235, 417, 527, 609]],
+  },
+  {
+    // mortar.js: 0 idle (mortar1, DF x 123), 1-3 the shot, its mouth
+    // glowing (mortar2-4, x 126, 127, 123).
+    asset: 'mortar',
+    at: [0, 3, 4, 0],
+    padLeft: 0,
+    padBottom: 12,
+    frames: [[15, 196, 388, 504], [206, 399, 386, 504], [406, 596, 388, 504], [603, 793, 384, 503]],
   },
 ];
 

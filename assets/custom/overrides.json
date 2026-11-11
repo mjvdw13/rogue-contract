@@ -269,5 +269,22 @@
     "src": "assets/custom/mines.png",
     "frameWidth": 184,
     "frameHeight": 95
+  },
+  "assets/sprites/fx/mortar-shell.png": {
+    "src": "assets/custom/mortar-shell-flying.png",
+    "frameWidth": 14,
+    "frameHeight": 17,
+    "scale": 0.85
+  },
+  "assets/sprites/items/mortar.png": {
+    "src": "assets/custom/mortar-item.png",
+    "frameWidth": 52,
+    "frameHeight": 15,
+    "scale": 0.85
+  },
+  "assets/sprites/weapons/mortar.png": {
+    "src": "assets/custom/mortar.png",
+    "frameWidth": 198,
+    "frameHeight": 132
   }
 }

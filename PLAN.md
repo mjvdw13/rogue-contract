@@ -1272,7 +1272,7 @@ conversations, then the fob.
         next of four barrels, lit in turn (an engine field for it).
   - [x] I.M. mines (7): set down in front of you, go off after 3 s (or
         when someone walks on one).
-  - [ ] Packered mortar gun (8, with the fob): a lobbed shell that bursts
+  - [x] Packered mortar gun (8, with the fob): a lobbed shell that bursts
         where it lands.
   - [ ] Assault cannon (0): heavy plasma bolts, 30 damage in DF.
 - [ ] Items still missing: batteries (for the headlamp), the objective item

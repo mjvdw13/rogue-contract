@@ -349,6 +349,55 @@ function mineStack() {
   return m.render({ ...RENDER, light: [-0.4, -0.8, 0.45] });
 }
 
+// ------------------------------------------------------------------ Packered mortar gun
+
+/**
+ * The Packered mortar gun: a fat round launcher held low in the middle,
+ * pointing up, its mouth glowing as it fires (`glow` 0-1). 198x132 (Dark
+ * Forces' frame, cut.mjs).
+ */
+function mortarFrame({ kick = 0, glow = 0 } = {}) {
+  const m = new Model(198, 132, { seed: 137 });
+  const metal = { ...MAT.metal, spec: 0.55, shine: 24, grain: 0.04 };
+  m.capsule(100, 150, 10, 96, 40 + kick, 16, 40, 30, C('gray', 0.32), metal); // the tube
+  m.ellipsoid(96, 36 + kick, 30, 28, 10, 8, C('gray', 0.12), metal); // its mouth
+  if (glow) m.ellipsoid(96, 36 + kick, 36, 22 * glow, 7 * glow, 4, G('amber', glow), MAT.glow);
+  for (const x of [62, 130]) m.capsule(x, 120, 14, x + (x < 96 ? 6 : -6), 70 + kick, 20, 8, 7, C('orange', 0.4), MAT.brass); // the side rails
+  forearm(m, [200, 150, 4], [160, 104 + kick, 16], 11);
+  fist(m, 152, 98 + kick, 24, 12, 1);
+  forearm(m, [-4, 150, 4], [36, 104 + kick, 16], 11);
+  fist(m, 44, 98 + kick, 24, 12, -1);
+  return m.render(RENDER);
+}
+
+function mortarSheet() {
+  return sheet([mortarFrame(), mortarFrame({ kick: 8, glow: 1 }), mortarFrame({ kick: 4, glow: 0.7 }), mortarFrame({ kick: 2, glow: 0.4 })]);
+}
+
+/** The mortar gun lying on the floor, for a pickup. 64x24. */
+function mortarPickup() {
+  const m = new Model(64, 24, { seed: 139 });
+  const metal = { ...MAT.metal, spec: 0.55, shine: 24, grain: 0.04 };
+  m.capsule(8, 13, 6, 46, 13, 6, 6, 6, C('gray', 0.32), metal);
+  m.ellipsoid(6, 13, 7, 3, 6, 6, C('gray', 0.1), metal);
+  m.slab([[44, 12], [60, 14], [60, 18], [44, 18]], 4, C('gray', 0.14), metal, { bevel: 1, thickness: 1.5 });
+  return m.render({ ...RENDER, light: [-0.4, -0.8, 0.45] });
+}
+
+/** A mortar shell tumbling through the air (6 frames, turning). 16x16. */
+function mortarShellFlying() {
+  return sheet(
+    [0, 1, 2, 3, 4, 5].map((k) => {
+      const m = new Model(16, 16, { seed: 141 });
+      const a = (k * Math.PI) / 3;
+      const [dx, dy] = [Math.cos(a) * 4, Math.sin(a) * 4];
+      m.capsule(8 - dx, 8 - dy, 4, 8 + dx, 8 + dy, 4, 2.6, 2.2, C('orange', 0.5), MAT.brass);
+      m.sphere(8 + dx * 1.2, 8 + dy * 1.2, 4, 2.2, C('gray', 0.45), MAT.metal);
+      return m.render({ ...RENDER, light: [-0.4, -0.8, 0.45] });
+    }),
+  );
+}
+
 // ------------------------------------------------------------------ tracking fob
 
 /**
@@ -409,5 +458,8 @@ export default [
   { name: 'mine-lying', out: 'assets/sprites/fx/mine.png', draw: mineLying, dither: 'fs' },
   { name: 'pickup-mine', out: 'assets/sprites/items/mine.png', draw: mineLying, dither: 'fs' },
   { name: 'pickup-mine-pack', out: 'assets/sprites/items/mine-pack.png', draw: mineStack, dither: 'fs' },
+  { name: 'mortar', out: W('mortar'), draw: mortarSheet, dither: 'fs' },
+  { name: 'pickup-mortar', out: 'assets/sprites/items/mortar.png', draw: mortarPickup, dither: 'fs' },
+  { name: 'mortar-shell-flying', out: 'assets/sprites/fx/mortar-shell.png', draw: mortarShellFlying, dither: 'fs' },
   { name: 'pickup-fusion-cutter', out: 'assets/sprites/items/fusion-cutter.png', draw: fusionPickup, dither: 'fs' },
 ];
