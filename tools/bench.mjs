@@ -9,6 +9,7 @@
 //   node tools/bench.mjs m1 --base DIR        against another copy of src/engine (see below)
 //   node tools/bench.mjs m1 --worst 5         list the slowest views (for tools/snapshot.mjs --at)
 //   node tools/bench.mjs m1 --cold            a different view every frame (nothing in the cache)
+//   node tools/bench.mjs m1 --threads 4       the world pass on 4 threads (render/pool.js), beside one
 //
 // Per level: the average, 90th percentile and worst frame over the views
 // (each view's best of several frames running), the share of each stage,
@@ -28,10 +29,12 @@ import { World } from '../src/engine/world/world.js';
 import { Rng } from '../src/engine/core/rng.js';
 import { analyseLevel } from './lib/levelcheck.mjs';
 import { SCREEN_W, screenWidth } from '../src/engine/config.js';
+import { Renderer } from '../src/engine/render/renderer.js';
+import { nodePool } from './lib/threads.mjs';
 
 const args = process.argv.slice(2);
 const opt = (name, def) => (args.includes(name) ? args[args.indexOf(name) + 1] : def);
-const valued = new Set(['--res', '--views', '--time', '--base', '--worst', '--reps']);
+const valued = new Set(['--res', '--views', '--time', '--base', '--worst', '--reps', '--threads']);
 const levels = args.filter((a, i) => !a.startsWith('--') && !valued.has(args[i - 1]));
 const res = Number(opt('--res', 1));
 const nViews = Number(opt('--views', 40));
@@ -41,6 +44,7 @@ const worst = Number(opt('--worst', 0));
 const wide = args.includes('--wide');
 const baseDir = opt('--base');
 const cold = args.includes('--cold');
+const threads = Number(opt('--threads', 1));
 
 const ctx = await headless({ custom: true, scale: res });
 const { registry, assets, surface, palette } = ctx;
@@ -49,6 +53,11 @@ const renderers = [{ name: 'now', r: ctx.renderer }];
 if (baseDir) {
   const mod = await import(pathToFileURL(path.resolve(baseDir, 'render/renderer.js')).href);
   renderers.unshift({ name: 'base', r: new mod.Renderer(surface, assets, palette) });
+}
+if (threads > 1) {
+  const r = new Renderer(surface, assets, palette);
+  r.pool = nodePool(threads - 1);
+  renderers.push({ name: `x${threads}`, r });
 }
 for (const { r } of renderers) r.prepare();
 
@@ -133,7 +142,8 @@ for (const id of levels.length ? levels : ['m1', 'm2', 'm3', 'm4']) {
       }
     }
   }
-  if (renderers.length > 1) for (let k = 0; k < nViews; k++) if (Buffer.compare(frames[0][k], frames[1][k]) !== 0) differ++;
+  const last = renderers.length - 1;
+  if (last > 0) for (let k = 0; k < nViews; k++) if (Buffer.compare(frames[0][k], frames[last][k]) !== 0) differ++;
 
   console.log(`${id}  ${surface.pw}x${surface.ph}, ${nViews} views, ms a frame`);
   renderers.forEach(({ name }, j) => {
@@ -148,8 +158,8 @@ for (const id of levels.length ? levels : ['m1', 'm2', 'm3', 'm4']) {
   });
   if (renderers.length > 1) {
     const a = best[0].reduce((x, y) => x + y, 0);
-    const b = best[1].reduce((x, y) => x + y, 0);
-    console.log(`  now is ${((1 - b / a) * 100).toFixed(1)}% faster; ${differ ? `${differ} of ${nViews} frames differ` : 'every frame the same'}`);
+    const b = best[last].reduce((x, y) => x + y, 0);
+    console.log(`  ${renderers[last].name} is ${((1 - b / a) * 100).toFixed(1)}% faster; ${differ ? `${differ} of ${nViews} frames differ` : 'every frame the same'}`);
   }
   if (worst) {
     const order = [...best[renderers.length - 1].keys()].sort((a, b) => best[renderers.length - 1][b] - best[renderers.length - 1][a]);

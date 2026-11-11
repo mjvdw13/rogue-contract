@@ -33,6 +33,7 @@ src/engine/      the engine; never mentions Star Wars or any content id
   combat/        aim (auto-aim, lockOn), attacks, damage (hitscan, splash)
   render/        columns.js (the world renderer, one hot function), sprites,
                  models, particles, backdrop, psprite (the weapon), view
+                 pool.js and worker.js (the world pass on worker threads)
   gfx/ audio/ input/ ui/ scenes/ core/
 src/content/     the game as data: monsters/, weapons/, items/, npcs/,
                  models/, levels/ (m3 is painted in code by levels/lib/painter.js;

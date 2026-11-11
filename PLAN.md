@@ -1483,7 +1483,7 @@ cold cache costs only 7%. So changes that keep every pixel are worth
         buffers, the map's arrays, the light map's cells, the textures
         and the colormaps are allocated shared where the page may
         (`crossOriginIsolated`, and in Node), plain arrays elsewhere.
-  - [ ] The pool (`render/pool.js`) and its worker (`render/worker.js`):
+  - [x] The pool (`render/pool.js`) and its worker (`render/worker.js`):
         the worker gets the textures once, a level's map when it
         changes (the arrays shared; doors, angled walls, fences, bands,
         decals and the backdrop copied, the doors' opening sent each

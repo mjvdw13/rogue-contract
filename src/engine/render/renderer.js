@@ -26,6 +26,11 @@ export class Renderer {
     this.particleMs = 0;
     /** Last frame's hangings drawing time (ms), likewise. */
     this.hangingMs = 0;
+    /**
+     * Worker threads to share the world pass with (render/pool.js), or null.
+     * @type {import('./pool.js').WorldPool|null}
+     */
+    this.pool = null;
     /** Last frame's time by stage (ms), for tools/bench.mjs. */
     this.ms = { world: 0, models: 0, hangings: 0, sprites: 0, particles: 0 };
   }
@@ -58,7 +63,10 @@ export class Renderer {
     view.skyHaze = scene.weather && scene.hazeHalf && scene.hazeHalf[1] !== scene.hazeHalf[0] ? scene.weather.gust : 0;
     const ms = this.ms;
     const tw = performance.now();
-    drawWorld(view, scene.map, textures, scene.skyTexture ?? null, s.px, s.pw, cms, scene.backdrop ?? null);
+    // On every thread, with a pool; on this one without, or if the pool fails.
+    if (!this.pool?.drawWorld(view, scene, cam, textures, s.px, cms)) {
+      drawWorld(view, scene.map, textures, scene.skyTexture ?? null, s.px, s.pw, cms, scene.backdrop ?? null);
+    }
     const tm = performance.now();
     view.depthValid = drawModels(view, scene.things, scene.map, textures, s.px, s.pw, cms, extras.skip);
     ms.world = tm - tw;
