@@ -88,6 +88,25 @@ export const projectiles = [
     explosion: 'large',
     sounds: { bounce: 'detonator-bounce', explode: 'detonator-explode' },
   }),
+  // An I.M. mine, set down: dropped just in front of you, it lies where it
+  // lands and goes off three seconds later (Dark Forces' fuse), or at once
+  // when someone walks into it, as a `large` explosion. Dark Forces' mine
+  // blast (90 over 45 units) is half again the detonator's (60 over 30), so
+  // it is here too.
+  defineProjectile({
+    id: 'mine-placed',
+    sheet: FX('mine', 24, 16),
+    anims: { fly: [0] },
+    fullbright: false,
+    radius: 0.2,
+    speed: 2,
+    gravity: 28,
+    damage: 0,
+    splash: { radius: 6, damage: 210 },
+    bounce: { restitution: 0.1, friction: 0.3, minSpeed: 1.5, roll: 8, fuse: 3, toss: 1, loft: 0 },
+    explosion: 'large',
+    sounds: { bounce: 'detonator-bounce', explode: 'detonator-explode' },
+  }),
   // The concussion rifle's shot (yours and Bossk's), as in Dark Forces: unseen
   // and fast, no damage itself. Where it lands, everything within the splash
   // takes the full damage and erupts in a `concussion` blast at its feet; off

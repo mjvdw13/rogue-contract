@@ -312,6 +312,43 @@ function fusionPickup() {
   return m.render({ ...RENDER, light: [-0.4, -0.8, 0.45] });
 }
 
+// ------------------------------------------------------------------ I.M. mines
+
+/** An I.M. mine: a flat steel disc, rust-red bands across it, a light in the middle. */
+function mineDisc(m, x, y, z, r, armed = false) {
+  m.ellipsoid(x, y, z, r, r * 0.45, r * 0.3, C('gray', 0.55), DET_METAL);
+  m.paintPoly([[x - r * 0.9, y - 2], [x + r * 0.9, y - 2], [x + r * 0.9, y + 1], [x - r * 0.9, y + 1]], C('rust', 0.45));
+  m.sphere(x, y - r * 0.1, z + r * 0.25, r * 0.12, armed ? G('red', 1) : C('gray', 0.2), armed ? MAT.glow : MAT.metal);
+}
+
+/** The gloved hand holding a mine out flat (0), its light red once armed (1). 184x95. */
+function mineFrame(armed = false) {
+  const m = new Model(184, 95, { seed: 131 });
+  mineDisc(m, 70, 58, 14, 46, armed);
+  forearm(m, [190, 110, 4], [150, 70, 16], 11);
+  m.ellipsoid(136, 60, 22, 16, 12, 8, GLOVE, MAT.leather); // the hand over its edge
+  for (let k = 0; k < 4; k++) m.capsule(132 - k * 3, 52 + k * 5, 26, 112 - k * 2, 54 + k * 6, 24, 3.4, 3, lighten(GLOVE, 0.05), MAT.leather);
+  return m.render(RENDER);
+}
+
+function mineSheet() {
+  return sheet([mineFrame(), mineFrame(true)]);
+}
+
+/** One mine lying on the floor (in play, and the pickup of one). 24x16. */
+function mineLying() {
+  const m = new Model(24, 16, { seed: 133 });
+  mineDisc(m, 12, 10, 3, 10, true);
+  return m.render({ ...RENDER, light: [-0.4, -0.8, 0.45] });
+}
+
+/** A stack of mines, for the pickup of five. 32x24. */
+function mineStack() {
+  const m = new Model(32, 24, { seed: 135 });
+  for (let k = 0; k < 4; k++) mineDisc(m, 16, 20 - k * 4, 3 + k * 3, 12);
+  return m.render({ ...RENDER, light: [-0.4, -0.8, 0.45] });
+}
+
 // ------------------------------------------------------------------ tracking fob
 
 /**
@@ -368,5 +405,9 @@ export default [
   { name: 'repeater', out: W('repeater'), draw: repeaterSheet, dither: 'fs' },
   { name: 'pickup-repeater', out: 'assets/sprites/items/repeater.png', draw: repeaterPickup, dither: 'fs' },
   { name: 'fusion-cutter', out: W('fusion-cutter'), draw: fusionSheet, dither: 'fs' },
+  { name: 'mines', out: W('mines'), draw: mineSheet, dither: 'fs' },
+  { name: 'mine-lying', out: 'assets/sprites/fx/mine.png', draw: mineLying, dither: 'fs' },
+  { name: 'pickup-mine', out: 'assets/sprites/items/mine.png', draw: mineLying, dither: 'fs' },
+  { name: 'pickup-mine-pack', out: 'assets/sprites/items/mine-pack.png', draw: mineStack, dither: 'fs' },
   { name: 'pickup-fusion-cutter', out: 'assets/sprites/items/fusion-cutter.png', draw: fusionPickup, dither: 'fs' },
 ];

@@ -46,6 +46,26 @@ export default [
     message: 'Picked up a Jeron fusion cutter.',
     sound: 'weapon-pickup',
   }),
+  // I.M. mines: one lying on the floor, and a pack of five.
+  defineItem({
+    id: 'mine',
+    name: 'I.M. Mine',
+    sheet: { src: 'assets/sprites/items/mine.png', frameWidth: 24, frameHeight: 16 },
+    radius: 0.5,
+    pickup: { weapon: 'mines', ammo: { mine: 1 } },
+    message: 'Picked up an I.M. mine.',
+    sound: 'item-ammo',
+  }),
+  defineItem({
+    id: 'mine-pack',
+    name: 'I.M. Mines',
+    glyph: '7',
+    sheet: { src: 'assets/sprites/items/mine-pack.png', frameWidth: 32, frameHeight: 24 },
+    radius: 0.6,
+    pickup: { weapon: 'mines', ammo: { mine: 5 } },
+    message: 'Picked up a pack of I.M. mines.',
+    sound: 'item-ammo',
+  }),
   // The concussion rifle, as Bossk drops it.
   defineItem({
     id: 'concussion-rifle',

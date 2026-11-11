@@ -59,3 +59,43 @@ test('a cycle starts again from its first barrel when the weapon comes back up',
   run(w, input, 0.1);
   assert.equal(shots[0], def.cycle[0]);
 });
+
+/** Set down a mine, and let it come to rest. Returns it. */
+function setMine(w, input) {
+  input.hold('fire');
+  run(w, input, 0.1);
+  input.release('fire');
+  run(w, input, 1);
+  return w.things.find((t) => t.def.id === 'mine-placed');
+}
+
+test('a mine is set down just in front of you and lies on the floor', () => {
+  const { w, p, input } = holding('mines');
+  const ammo = p.ammo.mine;
+  const mine = setMine(w, input);
+  assert.ok(mine, 'set down');
+  assert.equal(p.ammo.mine, ammo - 1);
+  assert.ok(mine.resting, 'lying still');
+  const ahead = mine.x - w.player.x;
+  assert.ok(ahead > 0.5 && ahead < 3, `just in front (${ahead.toFixed(2)} tiles)`);
+  assert.equal(p.weaponState.def.id, 'mines', 'the next one comes up');
+});
+
+test('a mine goes off when someone walks into it', () => {
+  const { w, input } = holding('mines');
+  const mine = setMine(w, input);
+  w.player.x -= 3; // well back
+  const trooper = w.spawn('stormtrooper', mine.x + 0.4, mine.y, Math.PI);
+  run(w, input, 0.1);
+  assert.ok(mine.state === 'exploding' || mine.removed, 'gone off');
+  assert.ok(trooper.dead || trooper.health < trooper.def.health, 'the trooper caught it');
+});
+
+test('left alone, a mine goes off when its fuse runs out', () => {
+  const { w, input } = holding('mines');
+  const mine = setMine(w, input);
+  w.player.x -= 5;
+  assert.ok(!mine.removed && mine.state !== 'exploding', 'still lying there');
+  run(w, input, mine.def.bounce.fuse);
+  assert.ok(mine.state === 'exploding' || mine.removed, 'gone off');
+});

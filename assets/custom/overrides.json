@@ -246,5 +246,28 @@
     "src": "assets/custom/fusion-cutter.png",
     "frameWidth": 302,
     "frameHeight": 96
+  },
+  "assets/sprites/fx/mine.png": {
+    "src": "assets/custom/mine-placed.png",
+    "frameWidth": 26,
+    "frameHeight": 11,
+    "scale": 0.85
+  },
+  "assets/sprites/items/mine.png": {
+    "src": "assets/custom/mine-item.png",
+    "frameWidth": 20,
+    "frameHeight": 20,
+    "scale": 0.85
+  },
+  "assets/sprites/items/mine-pack.png": {
+    "src": "assets/custom/mine-pack-item.png",
+    "frameWidth": 32,
+    "frameHeight": 25,
+    "scale": 0.85
+  },
+  "assets/sprites/weapons/mines.png": {
+    "src": "assets/custom/mines.png",
+    "frameWidth": 184,
+    "frameHeight": 95
   }
 }

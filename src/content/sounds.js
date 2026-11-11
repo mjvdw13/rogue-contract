@@ -54,6 +54,8 @@ export default [
     },
     pitchVariance: 0.05,
   }),
+  // An I.M. mine arming: a quick high double beep.
+  defineSound({ id: 'mine-arm', synth: { wave: 'square', freq: 1760, duration: 0.05, volume: 0.3, duty: 0.25, repeat: { count: 2, interval: 0.07, pitch: 1 } } }),
   // The E-11 rifle: a shorter, higher zap than the pistol's.
   defineSound({
     id: 'rifle-fire',

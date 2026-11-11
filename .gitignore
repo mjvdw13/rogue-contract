@@ -36,6 +36,10 @@ assets/custom/*
 !assets/custom/fusion-cutter.png
 !assets/custom/fusion-cutter-item.png
 !assets/custom/fusion-plasma.png
+!assets/custom/mines.png
+!assets/custom/mine-placed.png
+!assets/custom/mine-item.png
+!assets/custom/mine-pack-item.png
 !assets/custom/textures.mjs
 !assets/custom/textures/
 # The whole Dark Forces texture pack, sorted by what each texture shows.

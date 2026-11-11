@@ -151,6 +151,8 @@ const SHEETS = [
     asset: 'fusion-plasma',
     out: 'assets/sprites/fx/fusion-plasma.png',
   },
+  // A mine set down (WLMINE, from the pickups zip).
+  { cells: { folder: 'Pickups/WLMINE.cells', list: ['000.PNG'], align: 'middle' }, asset: 'mine-placed', out: 'assets/sprites/fx/mine.png' },
   // Ammo: an energy cell (IENERGY), a power cell (IPOWER), a plasma
   // cartridge (IPLAZMA), a mortar shell and a case of them (ISHELL, ISHELLS);
   // and the weapons lying on the floor.
@@ -158,8 +160,9 @@ const SHEETS = [
     ['IENERGY', 'energy-cell'], ['IPOWER', 'power-cell'], ['IPLAZMA', 'plasma-cartridge'],
     ['ISHELL', 'mortar-shell'], ['ISHELLS', 'mortar-shells'],
     // The weapons: the E-11 lying on its side (IST-GUNI), a trooper's drop;
-    // the repeater (IAUTOGUN), the fusion cutter (IFUSION).
-    ['IST-GUNI', 'rifle'], ['IAUTOGUN', 'repeater'], ['IFUSION', 'fusion-cutter'],
+    // the repeater (IAUTOGUN), the fusion cutter (IFUSION), a mine and a
+    // pack of them (IMINE, IMINES).
+    ['IST-GUNI', 'rifle'], ['IAUTOGUN', 'repeater'], ['IFUSION', 'fusion-cutter'], ['IMINE', 'mine'], ['IMINES', 'mine-pack'],
   ].map(([cell, item]) => ({ cells: { folder: `Pickups/${cell}.cells`, list: ['000.PNG'] }, asset: `${item}-item`, out: `assets/sprites/items/${item}.png` })),
 ];
 
@@ -328,6 +331,15 @@ const WEAPONS = [
     padLeft: 0,
     padBottom: 12,
     frames: [[617, 917, 198, 281], [933, 1229, 201, 281], [11, 307, 291, 371], [314, 610, 290, 370], [619, 915, 290, 370]],
+  },
+  {
+    // mines.js: 0 a mine in the hand (clay1, DF x 105), 1 armed, its light
+    // red (clay2, the same place).
+    asset: 'mines',
+    at: [0, 0],
+    padLeft: 0,
+    padBottom: 12,
+    frames: [[36, 218, 527, 609], [235, 417, 527, 609]],
   },
 ];
 
