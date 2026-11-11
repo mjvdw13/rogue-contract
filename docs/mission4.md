@@ -146,13 +146,16 @@ black decks, white light**, clean and new. Each area changes one thing.
   it at intervals, the column glowing.
 - **Unfinished sector:** `ds-girder` where the panels aren't on yet,
   bare decks (`ds-floor-grate`), work lamps in pools, the rest dark.
+  Cut cables hang from the ceilings (`ds-cables`); the live ones
+  (`ds-cables-live`) spit sparks, a flickering light at each. A beam
+  across the top of each girder post; one work lamp on the blink.
 - **Outside:** `sky-space`, only stars. No backdrop.
 
 Models (`models/station.js`): `tie-fighter`, `tie-rack`, `lambda-shuttle`,
 `ds-console`, `ds-console-wall`, `ds-desk`, `ds-table`, `ds-chair`,
 `ds-crate`, `ds-crate-tall`, `ds-container`, `ds-doorframe`,
 `tractor-terminal`, `ds-girder-post`, `ds-girder-beam`, `ds-panel-stack`,
-`ds-cable-reel`, `work-lamp`, `ds-camera`, `ds-ceiling-lamp-bar`,
+`ds-cable-reel`, `work-lamp`, `ds-cables`, `ds-cables-live`, `ds-camera`, `ds-ceiling-lamp-bar`,
 `dianoga-eye`.
 
 Characters: stormtroopers, officers, probe droids; new: the

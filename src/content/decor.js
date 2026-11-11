@@ -17,6 +17,7 @@ import { BAY_WALL, DERELICT_WALL, BAY_HOSES } from './models/bay.js';
 import { SCAFFOLDS, scaffoldHeight } from './models/scaffold.js';
 import { BALCONY_FRAME } from './models/balcony.js';
 import { WIRES, CONSOLE } from './models/hold.js';
+import { CABLES as STATION_CABLES } from './models/station.js';
 import { TOWER_HEIGHT } from './models/market.js';
 import { BAR, TAPS, CORNER } from './models/cantina.js';
 import { POD } from './models/pod.js';
@@ -95,6 +96,17 @@ export default [
   defineDecoration({ id: 'ds-panel-stack', model: 'ds-panel-stack', solid: true, radius: 1, height: 0.8 }),
   defineDecoration({ id: 'ds-cable-reel', model: 'ds-cable-reel', solid: true, radius: 0.6, height: 0.8 }),
   defineDecoration({ id: 'work-lamp', model: 'work-lamp', solid: true, radius: 0.3, height: 2.2 }),
+  // Cut cables out of the unfinished ceilings; the live one's end spits
+  // sparks, a spray now and then and a crackle between.
+  ...Object.entries(STATION_CABLES).map(([id, spark]) => defineDecoration({
+    id,
+    model: id,
+    fixed: true,
+    ...(spark && { emit: [
+      { type: 'spark', count: 14, every: [1.2, 4], at: spark, radius: 0.05, dir: [0, 0, -1], spread: 0.9, speed: [1, 3.5] },
+      { type: 'spark', count: 3, every: [0.2, 0.9], at: spark, radius: 0.05, dir: [0, 0, -1], spread: 0.8, speed: [0.5, 1.5] },
+    ] }),
+  })),
   defineDecoration({ id: 'ds-camera', model: 'ds-camera', fixed: true }),
   defineDecoration({ id: 'ds-ceiling-lamp-bar', model: 'ds-ceiling-lamp-bar', fixed: true }),
   // Something in the compactor's water, looking about.

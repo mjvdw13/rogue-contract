@@ -341,8 +341,15 @@ p.rect(122, 127, 126, 128, gap(-0.75));
 p.rect(136, 120, 140, 136, gap(-2.25));
 p.rect(136, 121, 140, 122, gap(-1.5));
 p.rect(136, 120, 140, 121, gap(-0.75));
-for (const [x, y] of [[148, 122], [131, 116], [130, 131], [116, 123]]) lamps.push({ x, y, radius: 9, light: 112 });
+for (const [x, y] of [[148, 122], [131, 116], [130, 131]]) lamps.push({ x, y, radius: 9, light: 112 });
+// The west work lamp is on the blink.
+lamps.push({ x: 116, y: 123, radius: 9, light: 112, fx: 'flicker', min: 32 });
 p.rect(108, 120, 112, 126, bare(0, 6));
+// Cut cables hang from the ceilings where the panels aren't on; the live
+// ones spit sparks and light the deck in flashes. [x, y, ceiling].
+const LIVE_CABLES = [[138, 127, 8], [120, 118, 8], [110, 124.5, 6], [45.2, 110, 12]];
+const DEAD_CABLES = [[146, 118, 8], [129, 123, 8], [116, 132, 8], [150, 130, 8], [80, 116.5, 16]];
+for (const [x, y] of LIVE_CABLES) lamps.push({ x, y, radius: 6, light: 72, fx: 'flicker', min: 0 });
 // 9b. The panel yard, and stairs up its north wall to 4 m.
 p.rect(78, 114, 108, 140, bare(0, 16));
 p.stairs(82, 114, 98, 118, 'W', 0.5, 0.5, (z) => bare(z, 16));
@@ -489,12 +496,15 @@ const list = [
   // panels and cable waiting to go on.
   at('work-lamp', 148, 123, { angle: 200 }), at('work-lamp', 131, 115, { angle: 270 }), at('work-lamp', 130, 132.5, { angle: 90 }), at('work-lamp', 116, 124.5, { angle: 0 }),
   at('work-lamp', 100, 125, { angle: 200 }), at('work-lamp', 88, 133, { angle: 45 }), at('work-lamp', 84, 122, { angle: 270 }),
-  ...[118, 130, 144].flatMap((x) => [114, 134].map((y) => at('ds-girder-post', x, y))),
-  ...[84, 96].flatMap((x) => [124, 136].map((y) => at('ds-girder-post', x, y))),
+  // (A beam across the top of each post.)
+  ...[118, 130, 144].flatMap((x) => [114, 134].flatMap((y) => [at('ds-girder-post', x, y), at('ds-girder-beam', x, y, { angle: 90, z: 6 })])),
+  ...[84, 96].flatMap((x) => [124, 136].flatMap((y) => [at('ds-girder-post', x, y), at('ds-girder-beam', x, y, { angle: 90, z: 6 })])),
+  ...LIVE_CABLES.map(([x, y, z], k) => at('ds-cables-live', x, y, { z, angle: 70 * k })),
+  ...DEAD_CABLES.map(([x, y, z], k) => at('ds-cables', x, y, { z, angle: 40 + 110 * k })),
   at('ds-panel-stack', 146, 132, { angle: 15 }), at('ds-panel-stack', 114, 133), at('ds-cable-reel', 150, 114.5), at('ds-cable-reel', 119, 121),
   at('ds-panel-stack', 96, 128), at('ds-panel-stack', 98.6, 129, { angle: 80 }), at('ds-crate', 86, 136), at('ds-cable-reel', 104, 116),
   at('ds-crate-tall', 92, 138), at('ds-container', 102, 136, { angle: 0 }),
-  ...[24, 36, 52, 64].flatMap((x) => [117, 137].map((y) => at('ds-girder-post', x, y))),
+  ...[24, 36, 52, 64].flatMap((x) => [117, 137].flatMap((y) => [at('ds-girder-post', x, y), at('ds-girder-beam', x, y, { angle: 90, z: 14 })])),
   at('work-lamp', 28, 129, { angle: 180 }), at('work-lamp', 44, 127, { angle: 180 }), at('work-lamp', 60, 129, { angle: 180 }),
   at('ds-panel-stack', 34, 122), at('ds-panel-stack', 56, 134, { angle: 60 }), at('ds-cable-reel', 21, 132), at('ds-crate', 68, 118),
   at('med-kit', 104.5, 138), at('energy-pack', 80, 138),

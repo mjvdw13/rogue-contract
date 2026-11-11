@@ -81,6 +81,8 @@ export const GIRDER = { length: 6, width: 0.4 };
 export const PANEL_STACK = { half: [0.6, 1.1], top: 0.8 };
 export const REEL = { r: 0.6, top: 0.8 };
 export const WORK_LAMP = { r: 0.3, top: 2.2 };
+/** Cut cables hanging from a bare ceiling (the origin is on the ceiling): how low the live one's end hangs, where it sparks. */
+export const CABLES = { 'ds-cables': null, 'ds-cables-live': [0.3, 0.2, -2.6] };
 /** The shuttle: its top (the fin's). */
 export const LAMBDA = { top: 14 };
 
@@ -456,6 +458,34 @@ function workLamp() {
   return m.build();
 }
 
+// `ds-cables`, `ds-cables-live`: a bundle of cables out of a ceiling whose
+// panels aren't on yet: loops sagging between two holes and cut ends
+// hanging. The origin is on the ceiling; the live one's longest end
+// spits sparks (decor.js).
+function cables(id) {
+  const m = new ModelBuilder(id);
+  const spark = CABLES[id];
+  const SHEATH = [{ tex: 'hose-orange' }, METAL, { tex: 'hold-pipes' }];
+  // A plate on the ceiling at each hole.
+  for (const [x, y] of [[-0.5, -0.2], [0.45, 0.15]]) m.box([x - 0.2, y - 0.2, -0.04], [x + 0.2, y + 0.2, 0], { ...IRON, top: false });
+  // Loops: [x0, y0, x1, y1, how low they sag].
+  const loops = [[-0.5, -0.25, 0.45, 0.1, 1.5], [-0.45, -0.1, 0.5, 0.2, 2.1], [-0.55, -0.2, 0.4, 0.25, 1.1]];
+  loops.forEach(([x0, y0, x1, y1, low], i) => {
+    const n = 6;
+    const pt = (u) => [x0 + (x1 - x0) * u, y0 + (y1 - y0) * u, -low * Math.sin(Math.PI * u)];
+    for (let j = 0; j < n; j++) strut(m, pt(j / n), pt((j + 1) / n), 0.04, SHEATH[i]);
+  });
+  // Cut ends, curling a little as they fall.
+  const ends = [[-0.45, -0.2, -1.8], [0.5, 0.05, -1.3], spark ?? [0.3, 0.2, -2.2]];
+  ends.forEach(([x, y, low], i) => {
+    const pts = [[x - 0.1, y, 0], [x - 0.05, y + 0.05, low / 2 + 0.3], [x + 0.05, y, low / 2 - 0.2], [x, y, low]];
+    for (let j = 0; j < pts.length - 1; j++) strut(m, pts[j], pts[j + 1], 0.04, SHEATH[(i + 1) % 3]);
+  });
+  // The live end's bare core, glowing.
+  if (spark) m.box([spark[0] - 0.03, spark[1] - 0.03, spark[2] - 0.06], [spark[0] + 0.03, spark[1] + 0.03, spark[2]], WHITE);
+  return m.build();
+}
+
 function camera() {
   const m = new ModelBuilder('ds-camera');
   // A plate on the ceiling, a stem, and the camera's body tipped down.
@@ -579,6 +609,7 @@ export default [
   panelStack(),
   cableReel(),
   workLamp(),
+  ...Object.keys(CABLES).map(cables),
   camera(),
   ceilingLampBar(),
   dianogaEye(),

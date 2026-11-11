@@ -1444,6 +1444,12 @@ Mission 3 is. Each step is a commit, playable at `?map=m4`.
       whoever Kyle sees in the briefing room.
 - [ ] Waiting on Mark: where it sits in the story, the look, the fights
       (nobody has played it), the song.
+- Life and detail (Mark, 2026-11-11: sparks, more detailed walls and
+  ceilings), a commit each:
+  - [ ] The guts (maintenance, pump room, compactor): pipes leaking
+        steam, stains down the walls.
+  - [ ] The clean decks (ring corridor, hub, lobby): vents and signs on
+        the long pale walls.
 
 ### 11. Frame time (Mark, 2026-11-10)
 
