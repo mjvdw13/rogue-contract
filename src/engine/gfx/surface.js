@@ -1,4 +1,5 @@
 import { TRANSPARENT } from '../config.js';
+import { shared } from '../core/shared.js';
 
 /**
  * An 8-bit palette-indexed drawing surface (the framebuffer and any scratch
@@ -17,7 +18,7 @@ export class Surface {
     this.pw = w;
     this.ph = h;
     this.scale = 1;
-    this.px = new Uint8Array(w * h);
+    this.px = shared(Uint8Array, w * h);
   }
 
   /** Reallocate at a new width and centre a layout of `layoutW` columns in it. */
@@ -25,7 +26,7 @@ export class Surface {
     this.w = w;
     this.pw = w;
     this.ox = (w - layoutW) >> 1;
-    this.px = new Uint8Array(w * this.h);
+    this.px = shared(Uint8Array, w * this.h);
   }
 
   /** Left edge of the whole surface, in layout coordinates. */
@@ -170,14 +171,14 @@ export class ScaledSurface extends Surface {
     this.scale = scale;
     this.pw = Math.round(w * scale);
     this.ph = Math.round(h * scale);
-    this.px = new Uint8Array(this.pw * this.ph);
+    this.px = shared(Uint8Array, this.pw * this.ph);
   }
 
   resize(w, layoutW = w) {
     this.w = w;
     this.pw = Math.round(w * this.scale);
     this.ox = (w - layoutW) >> 1;
-    this.px = new Uint8Array(this.pw * this.ph);
+    this.px = shared(Uint8Array, this.pw * this.ph);
   }
 
   pixel(x, y, c) {

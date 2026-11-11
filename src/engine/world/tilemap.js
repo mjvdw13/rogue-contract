@@ -1,3 +1,4 @@
+import { shared } from '../core/shared.js';
 // Tile flags.
 export const F_SOLID = 1;
 export const F_DOOR = 2;
@@ -104,16 +105,16 @@ export class TileMap {
     this.w = w;
     this.h = h;
     const n = w * h;
-    this.flags = new Uint16Array(n);
-    this.wallTex = new Int16Array(n).fill(-1);
-    this.floorTex = new Int16Array(n).fill(-1);
-    this.ceilTex = new Int16Array(n).fill(-1);
+    this.flags = shared(Uint16Array, n);
+    this.wallTex = shared(Int16Array, n).fill(-1);
+    this.floorTex = shared(Int16Array, n).fill(-1);
+    this.ceilTex = shared(Int16Array, n).fill(-1);
     /** Floor and ceiling heights in world units (1 = one tile = 64 texels). */
-    this.floorZ = new Float32Array(n);
-    this.ceilZ = new Float32Array(n).fill(2);
+    this.floorZ = shared(Float32Array, n);
+    this.ceilZ = shared(Float32Array, n).fill(2);
     /** Texture for the faces of a raised floor (its sides) and of a lowered ceiling (its underside edge). */
-    this.sideTex = new Int16Array(n).fill(-1);
-    this.upperTex = new Int16Array(n).fill(-1);
+    this.sideTex = shared(Int16Array, n).fill(-1);
+    this.upperTex = shared(Int16Array, n).fill(-1);
     this.baseLight = new Uint8Array(n);
     this.light = new Uint8Array(n);
     this.lightFx = new Uint8Array(n);
@@ -126,11 +127,11 @@ export class TileMap {
      * and edges, and how much lighter or darker the lower storey is than the
      * tile's light.
      */
-    this.slabBot = new Float32Array(n);
-    this.slabTop = new Float32Array(n);
-    this.slabTopTex = new Int16Array(n).fill(-1);
-    this.slabUnderTex = new Int16Array(n).fill(-1);
-    this.slabSideTex = new Int16Array(n).fill(-1);
+    this.slabBot = shared(Float32Array, n);
+    this.slabTop = shared(Float32Array, n);
+    this.slabTopTex = shared(Int16Array, n).fill(-1);
+    this.slabUnderTex = shared(Int16Array, n).fill(-1);
+    this.slabSideTex = shared(Int16Array, n).fill(-1);
     this.belowLight = new Int16Array(n);
     /**
      * Light added by placed light sources (see lightsources.js), one array
@@ -147,7 +148,7 @@ export class TileMap {
      * height has a band set (`bandSets[bandIndex[i]]`): `{ from, to, tex }`
      * spans, first match winning, its own texture elsewhere.
      */
-    this.bandIndex = new Int16Array(n).fill(-1);
+    this.bandIndex = shared(Int16Array, n).fill(-1);
     /** @type {{from:number, to:number, tex:number}[][]} */
     this.bandSets = [];
     /**
@@ -157,13 +158,13 @@ export class TileMap {
      */
     this.decals = [];
     this.edgeDecals = new Map();
-    this.decalEdge = new Uint8Array(n * 4);
+    this.decalEdge = shared(Uint8Array, n * 4);
     this.slantDecals = new Map();
     this.decalsDirty = false;
     this.damage = new Uint8Array(n);
-    this.doorIndex = new Int16Array(n).fill(-1);
+    this.doorIndex = shared(Int16Array, n).fill(-1);
     this.liftIndex = new Int16Array(n).fill(-1);
-    this.slantIndex = new Int16Array(n).fill(-1);
+    this.slantIndex = shared(Int16Array, n).fill(-1);
     /** @type {import('./slants.js').Slant[]} */
     this.slants = [];
     /** @type {import('./lifts.js').Lift[]} */
@@ -174,9 +175,9 @@ export class TileMap {
      * @type {{tex:number, height:number, tile:number}[]}
      */
     this.fences = [];
-    this.fenceAt = new Int16Array(n * 4).fill(-1);
+    this.fenceAt = shared(Int16Array, n * 4).fill(-1);
     this.tag = new Int16Array(n).fill(-1);
-    this.seen = new Uint8Array(n);
+    this.seen = shared(Uint8Array, n);
     /** @type {Door[]} */
     this.doors = [];
     /** tag name -> tile indices */
@@ -303,7 +304,7 @@ export class TileMap {
     const { w, h } = this;
     const bw = Math.ceil(w / SKY_BLOCK);
     const bh = Math.ceil(h / SKY_BLOCK);
-    const tops = new Float64Array(bw * bh).fill(-Infinity);
+    const tops = shared(Float64Array, bw * bh).fill(-Infinity);
     const put = (i, t) => {
       const b = Math.floor(Math.floor(i / w) / SKY_BLOCK) * bw + Math.floor((i % w) / SKY_BLOCK);
       if (t > tops[b]) tops[b] = t;

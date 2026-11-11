@@ -1479,7 +1479,7 @@ cold cache costs only 7%. So changes that keep every pixel are worth
   - [x] `drawWorld` draws a range of columns (`view.x0` to `x1`), and
         what it works out once a frame is kept for the frame's other
         ranges. Bytes the same, no slower.
-  - [ ] Shared memory (`core/shared.js`): the framebuffer, the view's
+  - [x] Shared memory (`core/shared.js`): the framebuffer, the view's
         buffers, the map's arrays, the light map's cells, the textures
         and the colormaps are allocated shared where the page may
         (`crossOriginIsolated`, and in Node), plain arrays elsewhere.

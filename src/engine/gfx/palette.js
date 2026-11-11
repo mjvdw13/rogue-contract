@@ -1,5 +1,6 @@
 import { LIGHT_LEVELS, TRANSPARENT } from '../config.js';
 import { clamp, lerp } from '../core/math.js';
+import { shared } from '../core/shared.js';
 
 // Palette variants used for full-screen flashes, Doom PLAYPAL style.
 export const PAL_NORMAL = 0;
@@ -167,7 +168,7 @@ export class Palette {
     const key = color.join(',');
     if (this._haze?.key === key) return this._haze.maps;
     const steps = HAZE_STEPS - 1;
-    const maps = new Uint8Array((HAZE_ROW + steps * LIGHT_LEVELS) * 256);
+    const maps = shared(Uint8Array, (HAZE_ROW + steps * LIGHT_LEVELS) * 256);
     maps.set(this.colormaps);
     const rgb = this.rgb;
     const [hr, hg, hb] = color;
@@ -202,7 +203,7 @@ export class Palette {
   }
 
   _buildColormaps() {
-    const maps = new Uint8Array((LIGHT_LEVELS + 1) * 256);
+    const maps = shared(Uint8Array, (LIGHT_LEVELS + 1) * 256);
     const rgb = this.rgb;
     for (let level = 0; level < LIGHT_LEVELS; level++) {
       const f = Math.pow(1 - level / LIGHT_LEVELS, 1.2);

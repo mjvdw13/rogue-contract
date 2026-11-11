@@ -1,5 +1,6 @@
 import { VIEW_W, VIEW_H, PIXEL_ASPECT, FOV_DEG, LIGHT_LEVELS } from '../config.js';
 import { HAZE_STEPS, HAZE_ROW } from '../gfx/palette.js';
+import { shared } from '../core/shared.js';
 
 /** The haze table's resolution: entries per tile of distance, and its length. */
 export const HAZE_RES = 8;
@@ -70,20 +71,20 @@ export class View {
     this.fx = (VIEW_W * this.scale) / 2 / Math.tan((FOV_DEG * Math.PI) / 360); // horizontal focal length (px)
     this.fy = this.fx / PIXEL_ASPECT; // vertical focal length (px), corrected for 4:3 display
     this.planeLen = this.W / 2 / this.fx;
-    this.zbuf = new Float32Array(this.W);
-    this.segDist = new Float32Array(this.W * this.SEG);
-    this.segTop = new Int16Array(this.W * this.SEG);
-    this.segBot = new Int16Array(this.W * this.SEG);
+    this.zbuf = shared(Float32Array, this.W);
+    this.segDist = shared(Float32Array, this.W * this.SEG);
+    this.segTop = shared(Int16Array, this.W * this.SEG);
+    this.segBot = shared(Int16Array, this.W * this.SEG);
     /** Set on the first window of each batch. */
-    this.segFirst = new Uint8Array(this.W * this.SEG);
-    this.segCount = new Uint8Array(this.W);
+    this.segFirst = shared(Uint8Array, this.W * this.SEG);
+    this.segCount = shared(Uint8Array, this.W);
     this.skyU = new Int32Array(this.W);
     /**
      * Per pixel, the depth of the nearest fence or model pixel (render/columns.js,
      * render/models.js), which sprites and models test against. Only cleared and
      * valid (`depthValid`) in frames where a fence or model drew.
      */
-    this.mdepth = new Float32Array(this.W * this.H);
+    this.mdepth = shared(Float32Array, this.W * this.H);
     this.depthValid = false;
     /** Marks the rows of a column that show sky, for the backdrop (render/backdrop.js); all 0 between columns. */
     this.bdBuf = new Uint8Array(this.W * this.H);

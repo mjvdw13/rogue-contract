@@ -1,5 +1,6 @@
 import { F_SOLID, F_SLAB, F_DOOR } from './tilemap.js';
 import { falloff } from './lightsources.js';
+import { shared } from '../core/shared.js';
 
 /**
  * Smooth light. A tile's light is a sample at its centre, and light anywhere
@@ -32,7 +33,7 @@ export class LightMap {
     this.cw = map.w + 1;
     this.ch = map.h + 1;
     const n = this.cw * this.ch;
-    this.cells = [new Float32Array(n * 4), new Float32Array(n * 4)];
+    this.cells = [shared(Float32Array, n * 4), shared(Float32Array, n * 4)];
     this.pending = [];
     this.stamp = new Uint32Array(n);
     this.gen = 0;

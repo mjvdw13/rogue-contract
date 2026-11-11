@@ -3,6 +3,7 @@ import { Sheet } from './gfx/sheet.js';
 import { BitmapFont } from './gfx/font.js';
 import { Model } from './gfx/model.js';
 import { LIGHT_LEVELS, SHADE_STEP } from './config.js';
+import { shared } from './core/shared.js';
 
 /**
  * A wall/flat/sky texture ready for the renderer. Animated textures cycle
@@ -23,8 +24,8 @@ export class Texture {
     this.hMask = (this.h & (this.h - 1)) === 0 ? this.h - 1 : -1;
     this.frames = [];
     for (let f = 0; f < Math.max(1, frames); f++) {
-      const px = new Uint8Array(fw * this.h);
-      const cm = new Uint8Array(fw * this.h);
+      const px = shared(Uint8Array, fw * this.h);
+      const cm = shared(Uint8Array, fw * this.h);
       for (let y = 0; y < this.h; y++) {
         for (let x = 0; x < fw; x++) {
           const c = image.pixels[y * image.width + f * fw + x];
@@ -59,7 +60,7 @@ export class Texture {
  * (gfx/palette.js). Transparent pixels darken nothing.
  */
 function grimeShade({ width: w, height: h, data }) {
-  const shade = new Uint8Array(w * h);
+  const shade = shared(Uint8Array, w * h);
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
       const o = (y * w + x) * 4;
@@ -73,7 +74,7 @@ function grimeShade({ width: w, height: h, data }) {
 
 /** Each column's first and end row of non-zero `shade` (0, 0 when it has none). */
 function shadeSpans(shade, w, h) {
-  const span = new Uint16Array(w * 2);
+  const span = shared(Uint16Array, w * 2);
   for (let x = 0; x < w; x++) {
     let first = -1;
     let end = 0;
