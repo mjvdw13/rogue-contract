@@ -70,7 +70,6 @@ export default [
   defineItem({
     id: 'mortar',
     name: 'Mortar Gun',
-    glyph: '8',
     sheet: { src: 'assets/sprites/items/mortar.png', frameWidth: 64, frameHeight: 24 },
     radius: 0.7,
     pickup: { weapon: 'mortar', ammo: { shell: 3 } },
