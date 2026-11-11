@@ -1,6 +1,6 @@
 import { defineWeapon } from '../../engine/defs.js';
 
-// Slot 1: bare (gloved) fists, for when the power cells run dry.
+// Slot 1: bare (gloved) fists, for when the energy cells run dry.
 export default defineWeapon({
   id: 'fists',
   name: 'FISTS',

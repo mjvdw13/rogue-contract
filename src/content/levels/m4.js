@@ -441,7 +441,7 @@ const list = [
   at('thermal-detonator', 75.5, 96.5),
   at('stormtrooper', 62.5, 62.5, { angle: 180, skill: NORMAL_UP }),
   // 1a. The store (secret).
-  at('shield-unit', 62, 109), at('power-cell', 70.5, 109.5), at('power-cell', 72, 108.5),
+  at('shield-unit', 62, 109), at('energy-cell', 70.5, 109.5), at('energy-cell', 72, 108.5),
   // 1b. The troop bay: the squad that comes out when the beam is off.
   at('stormtrooper', 34.5, 49.5, { angle: 270 }), at('stormtrooper', 38.5, 50.5, { angle: 270 }),
   at('stormtrooper', 42.5, 49.5, { angle: 270 }), at('stormtrooper', 46.5, 50.5, { angle: 270, skill: NOT_EASIEST }),
@@ -456,7 +456,7 @@ const list = [
   at('stormtrooper', 85.5, 68.5, { angle: 270, skill: NORMAL_UP }),
   at('ds-console', 83.2, 71, { angle: 0 }), at('ds-console', 83.2, 77, { angle: 0 }), at('ds-console', 83.2, 83, { angle: 0 }),
   at('ds-console-wall', 97.9, 68, { angle: 180 }), at('ds-console-wall', 97.9, 86, { angle: 180 }),
-  at('med-kit', 95.5, 66.5), at('power-cell', 84.5, 88.5),
+  at('med-kit', 95.5, 66.5), at('energy-cell', 84.5, 88.5),
   // 3. The ring corridor.
   at('stormtrooper', 122.5, 100.5, { angle: 180 }),
   at('stormtrooper', 134.5, 92.5, { angle: 225, skill: NOT_EASIEST }),
@@ -465,7 +465,7 @@ const list = [
   at('stormtrooper', 138.5, 88, { angle: 225, skill: HARD }),
   at('mouse-droid', 112.5, 100.5), at('mouse-droid', 144.5, 81.5),
   at('ds-doorframe', 102.15, 100, { angle: 0 }), at('ds-doorframe', 157.85, 80, { angle: 180 }),
-  at('power-cell', 104.5, 102),
+  at('energy-cell', 104.5, 102),
   // 3b. The briefing room.
   at('officer', 110.5, 84.5, { angle: 270 }), at('officer', 116.5, 86.5, { angle: 270, skill: NOT_EASIEST }),
   at('stormtrooper', 113.5, 81.5, { angle: 270, skill: NORMAL_UP }),
@@ -485,7 +485,7 @@ const list = [
   at('stormtrooper', 170.5, 46.5, { angle: 270, skill: NORMAL_UP }),
   at('interrogation-droid', 165, 48, { skill: NOT_EASIEST }),
   at('ds-desk', 170, 54, { angle: 90 }), at('ds-camera', 162, 46, { angle: 315, z: DET + 5 }), at('ds-camera', 178, 46, { angle: 225, z: DET + 5 }),
-  at('med-kit', 162.5, 52.5), at('power-cell', 177.5, 49.5),
+  at('med-kit', 162.5, 52.5), at('energy-cell', 177.5, 49.5),
   at('interrogation-droid', 170, 26, { skill: NORMAL_UP }),
   at('stormtrooper', 170, 18, { angle: 270, skill: HARD }),
   at('interrogation-droid', 176.5, 34, { ambush: true, skill: HARD }),
@@ -500,7 +500,7 @@ const list = [
   at('dianoga-eye', 194.5, 19.5, { angle: 100 }),
   at('ds-crate', 190, 9, { angle: 30 }), at('ds-panel-stack', 198, 22, { angle: 70 }), at('ds-cable-reel', 191, 20),
   at('ds-girder-beam', 196, 9, { angle: 40, z: -5.8 }), at('ds-panel-stack', 189, 14, { angle: 10 }),
-  at('power-cell', 199.5, 8.5), at('med-kit', 189, 24.5),
+  at('energy-cell', 199.5, 8.5), at('med-kit', 189, 24.5),
   // 7. Maintenance and the pump room.
   at('stormtrooper', 197, 52.5, { angle: 90, skill: NOT_EASIEST }),
   at('stormtrooper', 189.5, 74.5, { angle: 90, ambush: true }), at('stormtrooper', 200.5, 82.5, { angle: 90, ambush: true }),
@@ -520,12 +520,12 @@ const list = [
   at('tractor-terminal', 176.5, 127.05, { angle: 270, z: 0 }), at('tractor-terminal', 179.5, 127.05, { angle: 270, z: 0 }),
   // Lit rings round the column, down into the shaft and up out of sight.
   ...[-26, -12, 3.2, 11, 20].map((z) => at('ds-beam-ring', SX, SY, { z })),
-  at('med-kit', 191.5, 107.5), at('power-cell', 183.5, 125),
+  at('med-kit', 191.5, 107.5), at('energy-cell', 183.5, 125),
   // 9. The unfinished sector.
   at('stormtrooper', 146.5, 116.5, { angle: 0 }), at('stormtrooper', 130.5, 132.5, { angle: 0 }),
   at('stormtrooper', 116.5, 116.5, { angle: 0, skill: NOT_EASIEST }),
   at('probe-droid', 131, 122, { skill: NORMAL_UP }),
-  at('power-cell', 124, 120), // down in the first gap
+  at('energy-cell', 124, 120), // down in the first gap
   at('stormtrooper', 100.5, 134.5, { angle: 0 }), at('stormtrooper', 80.5, 116, { angle: 0, skill: NOT_EASIEST }),
   at('officer', 90.5, 126.5, { angle: 0, skill: NORMAL_UP }),
   // Work lamps where the light is, girders up through the bare deck,

@@ -31,7 +31,7 @@ export default defineMonster({
     death: { frames: [9, 10, 11, 12], fps: 7 },
   },
   sounds: { sight: 'jawa-sight', pain: 'jawa-pain', death: 'jawa-death' },
-  drops: [{ item: 'power-cell', chance: 0.5 }],
+  drops: [{ item: 'energy-cell', chance: 0.5 }],
   // Placed calm (Mos Eisley before the shooting): scurrying about, chattering in Jawaese.
   calm: { lines: ['Utinni!', "M'um m'aloo!", 'Eeh-chu-ta!', 'Kkkt! Utinni!'], speed: 1.5, stride: 0.9, wander: 5 },
 });

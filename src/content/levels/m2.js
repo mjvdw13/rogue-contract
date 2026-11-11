@@ -514,7 +514,7 @@ const niche = { floorZ: CELLAR, ceilZ: CELLAR + 2.5, floor: 'sandstone', lining:
 under(139, 78, 143, 84, niche);
 under(143, 80, 144, 82, { ...niche, extra: { door: 'sandstone', style: 'rise', secret: true } });
 secret(139, 78, 144, 84);
-list.push(at('power-cell', 140.5, 79.5), at('med-kit', 140.5, 82.5));
+list.push(at('energy-cell', 140.5, 79.5), at('med-kit', 140.5, 82.5));
 
 // ---------------------------------------------------------------- 9. the garage, its pit, the trench
 // Off the garage pit's north side, behind a roll-down shutter, down until
@@ -802,7 +802,7 @@ list.push(
   // 2. The pump tunnels.
   at('stormtrooper', 52.5, 54.5, { angle: 180 }),
   at('stormtrooper', 56.5, 47.5, { angle: 180, skill: HARD }),
-  at('power-cell', 47.5, 56.5),
+  at('energy-cell', 47.5, 56.5),
   // 3. The reservoir: troopers along the walkway and in the pool, in the
   // light of their lamps.
   at('stormtrooper', 72.5, 76.5, { angle: 180 }),
@@ -832,7 +832,7 @@ list.push(
   at('sandtrooper-commander', 112.5, 37.5, { angle: 180, z: FARM, skill: NORMAL_UP }),
   at('sandtrooper', 92.5, 22.5, { angle: 180, z: FARM, skill: HARD }),
   at('sandtrooper', 100.5, 58.5, { angle: 90, z: FARM, skill: HARD }),
-  at('power-cell', 106.5, 35.5, { z: FARM }),
+  at('energy-cell', 106.5, 35.5, { z: FARM }),
   // 6. The lane.
   at('sandtrooper', 140.5, 15, { angle: 180, z: FARM }),
   at('sandtrooper', 142.5, 21.5, { angle: 180, z: FARM }),
@@ -857,7 +857,7 @@ list.push(
   at('stormtrooper', 160.5, 66.5, { angle: 90 }),
   at('stormtrooper', 142, 60.5, { angle: 90, skill: HARD }),
   at('med-kit', 139.5, 41.5, { skill: EASY }),
-  at('power-cell', 184.5, 39.5),
+  at('energy-cell', 184.5, 39.5),
   at('med-kit', 151.5, 68.5, { skill: [1, 2, 3] }),
   // 8a. The caves: troopers who came down from the garage pit, searching
   // with lamps: two in the cavern, one or two on the climb.
@@ -867,11 +867,11 @@ list.push(
   at('stormtrooper', 190.5, 104.5, { angle: 270 }),
   at('stormtrooper', 189.5, 96.5, { angle: 270, skill: NORMAL_UP }),
   at('med-kit', 141.5, 108.5, { skill: EASY }),
-  at('power-cell', 180.5, 131.5),
+  at('energy-cell', 180.5, 131.5),
   // 9. The garage: a stock of ammo before the wave.
-  at('power-cell', 176.2, 61.2, { z: PIT + 0.25 }), at('power-cell', 177, 60.6, { z: PIT + 0.25 }), at('med-kit', 183.5, 69, { z: PIT + 0.25 }),
+  at('energy-cell', 176.2, 61.2, { z: PIT + 0.25 }), at('energy-cell', 177, 60.6, { z: PIT + 0.25 }), at('med-kit', 183.5, 69, { z: PIT + 0.25 }),
   at('energy-pack', 183.8, 61, { z: PIT + 0.25, skill: EASY }),
-  at('power-cell', 204.5, 77, { z: HANGAR.floor }), // down on the hangar's floor
+  at('energy-cell', 204.5, 77, { z: HANGAR.floor }), // down on the hangar's floor
   // The trench's gate.
   at('sandtrooper', 180, 108.5, { angle: 90, skill: NORMAL_UP }),
   // 11. The wash: rocks for cover; troopers lying in wait down its long

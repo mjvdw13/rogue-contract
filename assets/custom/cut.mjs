@@ -143,6 +143,12 @@ const SHEETS = [
   { cells: { folder: 'Pickups/IDETS.cells', list: ['000.PNG'] }, asset: 'detonator-belt', out: 'assets/sprites/items/detonator-belt.png' },
   // The concussion rifle lying on the floor (ICONCUS), Bossk's drop.
   { cells: { folder: 'Pickups/ICONCUS.cells', list: ['000.PNG'] }, asset: 'concussion-rifle-item', out: 'assets/sprites/items/concussion-rifle.png' },
+  // Ammo: an energy cell (IENERGY), a power cell (IPOWER), a plasma
+  // cartridge (IPLAZMA), a mortar shell and a case of them (ISHELL, ISHELLS).
+  ...[
+    ['IENERGY', 'energy-cell'], ['IPOWER', 'power-cell'], ['IPLAZMA', 'plasma-cartridge'],
+    ['ISHELL', 'mortar-shell'], ['ISHELLS', 'mortar-shells'],
+  ].map(([cell, item]) => ({ cells: { folder: `Pickups/${cell}.cells`, list: ['000.PNG'] }, asset: `${item}-item`, out: `assets/sprites/items/${item}.png` })),
 ];
 
 /**

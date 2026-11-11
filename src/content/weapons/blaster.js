@@ -1,7 +1,7 @@
 import { defineWeapon } from '../../engine/defs.js';
 
 // Slot 2: the mercenary's blaster pistol. It fires visible red bolts (fast
-// projectiles, not instant hits) and runs on energy from power cells.
+// projectiles, not instant hits) and runs on energy from energy cells.
 export default defineWeapon({
   id: 'blaster',
   name: 'BLASTER PISTOL',

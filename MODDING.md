@@ -98,7 +98,7 @@ export default defineMonster({
     death: { frames: [7, 8, 9, 10], fps: 8 },
   },
   sounds: { sight: 'trooper-sight', pain: 'trooper-pain', death: 'trooper-death' },
-  drops: ['power-cell', { item: 'med-kit', chance: 0.25 }],
+  drops: ['energy-cell', { item: 'med-kit', chance: 0.25 }],
 });
 ```
 
@@ -285,7 +285,7 @@ import { defineWeapon } from '../../engine/defs.js';
 export default defineWeapon({
   id: 'repeater',
   name: 'REPEATER',
-  slot: 3,                        // number key; several weapons can share a slot
+  slot: 3,                        // number key (slot 10 is key 0); several weapons can share a slot
   ammo: 'energy',                 // or null for melee
   ammoPerShot: 1,
   priority: 3,                    // auto-switch preference when picking up ammo
@@ -307,6 +307,9 @@ the same number of pixels. The HUD panels in the bottom corners draw over the
 weapon. The fire animation's length sets the rate of fire. `accurateFirstShot: true` makes a single shot perfectly
 accurate when you aren't holding the trigger. New ammo types go in
 `src/content/ammo.js` as `defineAmmo({ id, name, short, max, clip })`.
+The game has Dark Forces' own: `energy` (pistol, rifle), `power` (repeater,
+fusion cutter, concussion rifle), `plasma` (assault cannon), `shell`,
+`mine` and `detonator`.
 `lockOn: 5` in `fire` aims it Dark Forces' way: of the monsters (and
 friendlies that can be hurt) you can see, the nearest one within 5° either side of the crosshair (or under it, so
 one close up is hard to miss) gets the shot, turned and tilted onto it

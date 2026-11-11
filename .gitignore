@@ -24,6 +24,11 @@ assets/custom/*
 !assets/custom/detonator-belt.png
 !assets/custom/concussion-rifle.png
 !assets/custom/concussion-rifle-item.png
+!assets/custom/energy-cell-item.png
+!assets/custom/power-cell-item.png
+!assets/custom/plasma-cartridge-item.png
+!assets/custom/mortar-shell-item.png
+!assets/custom/mortar-shells-item.png
 !assets/custom/textures.mjs
 !assets/custom/textures/
 # The whole Dark Forces texture pack, sorted by what each texture shows.

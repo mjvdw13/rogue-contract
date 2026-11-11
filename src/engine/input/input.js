@@ -32,6 +32,7 @@ export const DEFAULT_BINDINGS = {
   weapon7: ['Digit7'],
   weapon8: ['Digit8'],
   weapon9: ['Digit9'], // the concussion rifle
+  weapon10: ['Digit0'], // the assault cannon (slot 10)
   zoomIn: ['Equal', 'NumpadAdd'],
   zoomOut: ['Minus', 'NumpadSubtract'],
   menu: ['Escape', 'Pad9'],

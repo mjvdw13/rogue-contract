@@ -102,7 +102,7 @@ export function weaponThink(world, pt, input, dt) {
     ws.y = Math.min(BOTTOM, ws.y + LOWER_SPEED * dt);
     return;
   }
-  for (let s = 1; s <= 9; s++) if (input.wasPressed(`weapon${s}`)) selectSlot(reg, p, s);
+  for (let s = 1; s <= 10; s++) if (input.wasPressed(`weapon${s}`)) selectSlot(reg, p, s);
   if (input.wasPressed('nextWeapon')) cycleWeapon(reg, p, 1);
   if (input.wasPressed('prevWeapon')) cycleWeapon(reg, p, -1);
 

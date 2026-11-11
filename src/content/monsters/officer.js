@@ -26,5 +26,5 @@ export default defineMonster({
     death: { frames: [7, 8, 9, 10, 11], fps: 8 },
   },
   sounds: { sight: 'trooper-sight', pain: 'trooper-pain', death: 'trooper-death' },
-  drops: [{ item: 'power-cell', chance: 0.4 }],
+  drops: [{ item: 'energy-cell', chance: 0.4 }],
 });

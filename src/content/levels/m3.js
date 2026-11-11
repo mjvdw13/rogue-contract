@@ -375,6 +375,7 @@ const list = [
   at('player', 14.5, 90.5, { angle: 90 }),
   at('detonator-belt', 17.5, 88.5), // thermal detonators, to try them out
   at('concussion-rifle', 19.5, 88.5), // and the concussion rifle (Bossk's)
+  at('power-cell', 19, 87.5), at('power-cell', 20, 87.5), // with power cells for it
   // The canyon: snipers on both ledges and the rock arch, two gate guards and
   // their commanders, a probe droid round the spire, and a band of Jawas
   // scavenging in the gorge.
@@ -408,13 +409,13 @@ const list = [
   at('jawa', 24, 76, { angle: 270 }), at('jawa', 30, 72, { angle: 225 }),
   at('jawa', 28, 62, { angle: 270, skill: NORMAL_UP }),
   at('jawa', 18.5, 66.5, { angle: 315, skill: HARD }),
-  at('power-cell', 24.5, 68.5),
+  at('energy-cell', 24.5, 68.5),
   at('med-kit', 29.5, 42.5, { skill: [1, 2, 3] }), // after the gate guards, by the vent
   at('thermal-detonator', 30.5, 42.5),
   at('energy-pack', 59.5, 45.5), // secret: ledge B
   at('shield-unit', 3.5, 82), // secret: the rock alcove
-  // The vent: a power cell where light falls through the grate.
-  at('power-cell', 33, 32.5),
+  // The vent: an energy cell where light falls through the grate.
+  at('energy-cell', 33, 32.5),
   // Maintenance: an ambush by the lift (two on the hard skills).
   at('stormtrooper', 36.5, 16.5, { angle: 270, ambush: true }),
   at('stormtrooper', 27.5, 20.5, { angle: 0, ambush: true, skill: HARD }),
@@ -423,7 +424,7 @@ const list = [
   at('terminal', 34, 14.6, { angle: 270 }), at('terminal', 35.4, 14.6, { angle: 270 }),
   at('energy-pack', 28.5, 24.5),
   at('thermal-detonator', 29.5, 24.5),
-  at('power-cell', 40.5, 24.5),
+  at('energy-cell', 40.5, 24.5),
   // The barracks: the officer carries the red keycard.
   at('stormtrooper', 68.5, 18, { angle: 180 }),
   at('stormtrooper', 74.5, 18, { angle: 180, skill: NORMAL_UP }), // by the red door
@@ -443,7 +444,7 @@ const list = [
   at('officer', 83.5, 22.5, { angle: 90, skill: HARD }),
   at('terminal', 85, 16.4, { angle: 90 }), at('terminal', 85, 17.6, { angle: 270 }),
   at('energy-pack', 85, 13.5),
-  at('power-cell', 80.5, 21.5), at('power-cell', 89.5, 21.5),
+  at('energy-cell', 80.5, 21.5), at('energy-cell', 89.5, 21.5),
   at('shield-unit', 96, 16), // secret: the niche
   // The generator: containment rings turning round the column above the
   // catwalk, and coolant tanks on the shaft floor. Things on the catwalks
@@ -460,7 +461,7 @@ const list = [
   at('fuel-barrel', 98.5, 44.5), at('fuel-barrel', 99.5, 46.5),
   at('med-kit', 97.5, 56.5),
   at('energy-pack', 73.5, 40.5, { z: 6 }),
-  at('power-cell', 73.5, 27.5), // in the dark under the north-west corner of the ring
+  at('energy-cell', 73.5, 27.5), // in the dark under the north-west corner of the ring
   // The gantry: a sandtrooper at the top of the stairs, and a med kit before
   // the last fight.
   at('sandtrooper', 117.2, 43, { angle: 180, skill: NORMAL_UP }),

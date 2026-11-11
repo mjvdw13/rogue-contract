@@ -1331,7 +1331,7 @@ const roofOver = (x0, y0, x1, y1, ceilZ, h) => p.rect(x0, y0, x1, y1, (_, __, c)
     at('crate-tan', 112.9, 97.7, { angle: 8 }), at('cantina-datapad', 112.9, 97.75, { z: F + 0.9, angle: 20 }),
     at('crate-tan', 116.35, 97.7, { angle: 92 }), at('crate-grey-small', 116.35, 97.7, { z: F + 0.9, angle: 15 }),
     at('barrel-rust', 116.4, 99.4), at('barrel-grey', 116.4, 100.2), at('canister-rust', 112.5, 101.9),
-    at('power-cell', 114.3, 98.3), at('power-cell', 114.9, 98.8), at('power-cell', 113.8, 100.6),
+    at('energy-cell', 114.3, 98.3), at('energy-cell', 114.9, 98.8), at('energy-cell', 113.8, 100.6),
     at('litter-small', 115, 101.2, { angle: 30 }),
     at('cantina-lamp', 114.5, 100, { z: HIDE - LAMP_CORD }),
   );
@@ -1732,7 +1732,7 @@ town.door(104, 33, 'S', { h: 7.5, tex: 'shutter', tall: 2.25, width: 2, jamb: fa
   list.push(
     at('rack-b', 103.5, 27.05, { angle: 0 }), at('crate-tan', 99.6, 28.6, { angle: 10 }), at('crate-grey-small', 99.6, 28.6, { z: 0.9, angle: 40 }),
     at('barrel-rust', 99.5, 34.5), at('canister-rust', 99.45, 33.6),
-    at('thermal-detonator', 103.5, 29.6), at('power-cell', 102.6, 30.8), at('power-cell', 99.8, 31),
+    at('thermal-detonator', 103.5, 29.6), at('energy-cell', 102.6, 30.8), at('energy-cell', 99.8, 31),
     at('cantina-lamp', 102.5, 29.5, { z: GUNS.ceilZ - LAMP_CORD }),
     // Outside, a crate stood half across the door, and the shop's sign's drums.
     at('crate-tan', 102.62, 34.8, { angle: 8 }), at('canister', 105.3, 33.6), at('barrel-grey', 105.45, 34.5),
@@ -1997,24 +1997,24 @@ list.push(
 // find a little more.
 list.push(
   // The second lane's south alley: a spacer's crate, two cells on it.
-  at('crate-tan', 130.5, 43.5, { angle: 3 }), at('power-cell', 131.6, 43.4), at('power-cell', 132.4, 43.1),
+  at('crate-tan', 130.5, 43.5, { angle: 3 }), at('energy-cell', 131.6, 43.4), at('energy-cell', 132.4, 43.1),
   // Its north alley: someone sleeps rough at its end, their med kit by them.
   at('bedroll', 131, 19.6, { angle: 90 }), at('med-kit', 131, 18.7), at('med-kit', 130.6, 20.6, { skill: [1, 2] }),
   // Off the thug's square: his men's spare cells by a crate.
-  at('crate-grey-small', 144.6, 46.4, { angle: 350 }), at('power-cell', 145.5, 46.3), at('power-cell', 145.4, 45.6, { skill: [1, 2] }),
+  at('crate-grey-small', 144.6, 46.4, { angle: 350 }), at('energy-cell', 145.5, 46.3), at('energy-cell', 145.4, 45.6, { skill: [1, 2] }),
   // The first lane's south alley, behind the garage: a pack off a speeder.
   at('cargo-pod', 104.5, 46.2, { angle: 90 }), at('energy-pack', 102.8, 46.3),
   // The gun shop's alley: its overflow, a cell left on a crate's lid.
-  at('crate-rust-long', 106.45, 26.8, { angle: 90 }), at('power-cell', 107.5, 26.6),
+  at('crate-rust-long', 106.45, 26.8, { angle: 90 }), at('energy-cell', 107.5, 26.6),
   // The north street's alley to the comm tower's foot: a med kit in a canister's shade.
   at('canister-rust', 180.6, 46.6), at('med-kit', 181.4, 46.8),
   // The wash's east bank: what the last flood left at the alley's end.
   at('crate-rust-long', 203.4, 70.35, { angle: 90 }), at('med-kit', 202.4, 69.7), at('energy-pack', 202.3, 70.5, { skill: [1, 2] }),
   // Beside the cantina's storehouse, off the back lane: its spare cells.
-  at('crate-grey-small', 121.6, 109.4, { angle: 8 }), at('power-cell', 122.5, 109.3), at('power-cell', 122.4, 108.6),
+  at('crate-grey-small', 121.6, 109.4, { angle: 8 }), at('energy-cell', 122.5, 109.3), at('energy-cell', 122.4, 108.6),
   // The west end's alleys, since the north back lane was walled off
   // (2026-11-05). The slot past A, by the town's wall: a crate left there, cells on it.
-  at('crate-grey-small', 2.8, 50.7, { angle: 10 }), at('power-cell', 3.4, 51.6), at('power-cell', 2.6, 51.9, { skill: [1, 2] }),
+  at('crate-grey-small', 2.8, 50.7, { angle: 10 }), at('energy-cell', 3.4, 51.6), at('energy-cell', 2.6, 51.9, { skill: [1, 2] }),
   // Between A and B: a pack off a speeder.
   at('cargo-pod', 15, 51.3, { angle: 90 }), at('energy-pack', 14.6, 53.2),
   // Past D's stair, at the storehouse's wall: its stores, a med kit by them.

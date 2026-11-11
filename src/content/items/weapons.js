@@ -19,7 +19,7 @@ export default [
     glyph: '9',
     sheet: { src: 'assets/sprites/items/concussion-rifle.png', frameWidth: 64, frameHeight: 24 },
     radius: 0.7,
-    pickup: { weapon: 'concussion-rifle', ammo: { energy: 30 } },
+    pickup: { weapon: 'concussion-rifle', ammo: { power: 30 } },
     message: 'Picked up a concussion rifle.',
     sound: 'weapon-pickup',
   }),

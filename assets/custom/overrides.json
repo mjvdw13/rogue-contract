@@ -177,5 +177,35 @@
     "src": "assets/custom/concussion-rifle.png",
     "frameWidth": 174,
     "frameHeight": 119
+  },
+  "assets/sprites/items/energy-cell.png": {
+    "src": "assets/custom/energy-cell-item.png",
+    "frameWidth": 14,
+    "frameHeight": 20,
+    "scale": 0.85
+  },
+  "assets/sprites/items/power-cell.png": {
+    "src": "assets/custom/power-cell-item.png",
+    "frameWidth": 16,
+    "frameHeight": 22,
+    "scale": 0.85
+  },
+  "assets/sprites/items/plasma-cartridge.png": {
+    "src": "assets/custom/plasma-cartridge-item.png",
+    "frameWidth": 20,
+    "frameHeight": 24,
+    "scale": 0.85
+  },
+  "assets/sprites/items/mortar-shell.png": {
+    "src": "assets/custom/mortar-shell-item.png",
+    "frameWidth": 10,
+    "frameHeight": 20,
+    "scale": 0.85
+  },
+  "assets/sprites/items/mortar-shells.png": {
+    "src": "assets/custom/mortar-shells-item.png",
+    "frameWidth": 30,
+    "frameHeight": 24,
+    "scale": 0.85
   }
 }

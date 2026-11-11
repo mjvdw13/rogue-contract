@@ -80,19 +80,19 @@ test('fired at a wall up close, it hurts you too', () => {
   assert.ok(w.player.player.health < health, `${health} to ${w.player.player.health}`);
 });
 
-test('the rifle fires one shot for four energy, and slowly', () => {
+test('the rifle fires one shot for four power, and slowly', () => {
   const w = world();
   const p = w.player.player;
   p.weapons.add('concussion-rifle');
   p.weapon = 'concussion-rifle';
-  p.ammo.energy = 20;
+  p.ammo.power = 20;
   const input = mockInput();
   run(w, input, 0.5); // raised
   input.hold('fire');
   run(w, input, 0.5);
-  assert.equal(p.ammo.energy, 16, 'one shot in the first half second');
+  assert.equal(p.ammo.power, 16, 'one shot in the first half second');
   run(w, input, 0.4);
-  assert.equal(p.ammo.energy, 12, 'the next after 0.8 s');
+  assert.equal(p.ammo.power, 12, 'the next after 0.8 s');
 });
 
 test('Bossk drops his rifle', () => {
@@ -120,7 +120,7 @@ function fireRifle(w, angle = 0) {
   const p = w.player.player;
   p.weapons.add('concussion-rifle');
   p.weapon = 'concussion-rifle';
-  p.ammo.energy = 20;
+  p.ammo.power = 20;
   w.player.angle = angle;
   const input = mockInput();
   run(w, input, 0.5);

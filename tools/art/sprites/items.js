@@ -1,4 +1,4 @@
-// Pickups: med kits, shield units, power cells and energy packs, and the
+// Pickups: med kits, shield units, energy cells and packs, and the
 // coloured keycards. Modelled like the other sprites, lying on the floor.
 import { mix, darken, lighten } from '../lib/canvas.js';
 import { C, G } from '../lib/pal.js';
@@ -34,8 +34,8 @@ function shieldUnit() {
   return sheet(frames);
 }
 
-/** A small power cell: a dark cylinder with copper contacts and a green charge light. 16x16. */
-function powerCell() {
+/** A small energy cell: a dark cylinder with copper contacts and a green charge light. 16x16. */
+function energyCell() {
   const m = new Model(16, 16, { seed: 221 });
   m.capsule(4, 11, 2, 12, 9, 2, 3.4, 3.4, C('gray', 0.3), MAT.metal);
   m.sphere(3.5, 11, 2, 2.2, C('orange', 0.55), MAT.brass);
@@ -44,7 +44,7 @@ function powerCell() {
   return m.render(RENDER);
 }
 
-/** An energy pack: a crate of power cells with a carry handle. 32x24. */
+/** An energy pack: a crate of energy cells with a carry handle. 32x24. */
 function energyPack() {
   const m = new Model(32, 24, { seed: 231 });
   m.slab(box(3, 9, 29, 22), 5, C('olive', 0.35), MAT.metal, { bevel: 1.5, thickness: 3 });
@@ -54,6 +54,45 @@ function energyPack() {
   }
   m.paintPoly(box(6, 15, 26, 17), C('yellow', 0.65));
   m.paint(26, 19, 1, 1, G('green', 0.9), MAT.glow);
+  return m.render(RENDER);
+}
+
+/** A power cell (Dark Forces' ammo for the heavier guns): an upright canister, red caps, a blue window. 16x24. */
+function powerCell() {
+  const m = new Model(16, 24, { seed: 225 });
+  m.capsule(8, 21, 3, 8, 6, 3, 4.6, 4.6, C('gray', 0.28), MAT.metal);
+  m.ellipsoid(8, 5, 3, 4.4, 1.6, 4, C('blood', 0.6), MAT.plastic);
+  m.ellipsoid(8, 21.5, 3, 4.8, 1.6, 4, C('blood', 0.5), MAT.plastic);
+  m.paint(6.5, 13, 1.4, 4.5, G('cyan', 0.8), MAT.glow);
+  return m.render(RENDER);
+}
+
+/** A plasma cartridge: a squat ribbed drum with a glowing core. 24x24. */
+function plasmaCartridge() {
+  const m = new Model(24, 24, { seed: 227 });
+  m.slab(box(3, 7, 21, 22), 5, C('gray', 0.22), MAT.metal, { bevel: 1.5, thickness: 3 });
+  for (let k = 0; k < 4; k++) m.capsule(6 + k * 4, 9, 9, 6 + k * 4, 20, 9, 1.5, 1.5, C('steel', 0.35), MAT.metal);
+  m.paintPoly(box(8, 4, 16, 7), G('amber', 0.8), MAT.glow);
+  return m.render(RENDER);
+}
+
+/** A mortar shell standing on its base: a brass case and a grey nose. 16x24. */
+function mortarShell(x, y, m) {
+  m.capsule(x, y, 3, x, y - 9, 3, 2.6, 2.6, C('orange', 0.5), MAT.brass);
+  m.ellipsoid(x, y - 11, 3, 2.6, 3, 2.6, C('gray', 0.45), MAT.metal);
+  m.paint(x, y - 14, 0.8, 0.8, C('blood', 0.6));
+}
+function oneShell() {
+  const m = new Model(16, 24, { seed: 229 });
+  mortarShell(8, 21, m);
+  return m.render(RENDER);
+}
+
+/** A case of five mortar shells: a low crate with the noses showing. 32x24. */
+function shellCase() {
+  const m = new Model(32, 24, { seed: 233 });
+  for (let k = 0; k < 5; k++) mortarShell(5 + k * 5.5, 18, m);
+  m.slab(box(2, 14, 30, 22), 6, C('olive', 0.35), MAT.metal, { bevel: 1, thickness: 3 });
   return m.render(RENDER);
 }
 
@@ -74,8 +113,12 @@ function keycard(ramp, glow) {
 export default [
   { name: 'med-kit', out: I('med-kit'), draw: medKit, dither: 'fs' },
   { name: 'shield-unit', out: I('shield-unit'), draw: shieldUnit, dither: 'fs' },
-  { name: 'power-cell', out: I('power-cell'), draw: powerCell, dither: 'fs' },
+  { name: 'energy-cell', out: I('energy-cell'), draw: energyCell, dither: 'fs' },
   { name: 'energy-pack', out: I('energy-pack'), draw: energyPack, dither: 'fs' },
+  { name: 'power-cell', out: I('power-cell'), draw: powerCell, dither: 'fs' },
+  { name: 'plasma-cartridge', out: I('plasma-cartridge'), draw: plasmaCartridge, dither: 'fs' },
+  { name: 'mortar-shell', out: I('mortar-shell'), draw: oneShell, dither: 'fs' },
+  { name: 'mortar-shells', out: I('mortar-shells'), draw: shellCase, dither: 'fs' },
   { name: 'keycard-red', out: I('keycard-red'), draw: keycard('blood', 'red') },
   { name: 'keycard-blue', out: I('keycard-blue'), draw: keycard('steel', 'cyan') },
   { name: 'keycard-yellow', out: I('keycard-yellow'), draw: keycard('yellow', 'amber') },

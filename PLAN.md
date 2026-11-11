@@ -1255,7 +1255,26 @@ conversations, then the fob.
 
 - [ ] Enemies still missing: a commando, and the mini-boss (a prototype
       assault droid, an early Dark Trooper test).
-- [ ] An E-11-style rifle.
+- [ ] **The rest of Dark Forces' weapons** (Mark, 2026-11-11), primary
+      fire only (we have no second fire). Numbers from The Force Engine's
+      `weapons.json`, `projectiles.json` and `effects.json`; art from the
+      ripped weapons sheet, projectiles zip and pickups zip; sounds from
+      `sounds/weapons`. Mark: Dark Forces' own ammo, the sandbox plus
+      troopers dropping rifles, DF's keys. Each weapon gets a stand-in
+      sheet, a pickup, its DF cut, a test and a place in the sandbox.
+  - [x] DF's ammo: power cells (repeater, fusion cutter, and the
+        concussion rifle moves to them), plasma (assault cannon), mortar
+        shells, mines, with their pickups. Key 0 selects slot 10.
+  - [ ] E-11 blaster rifle (3): quick red bolts, 2 energy a shot.
+        Stormtroopers drop one.
+  - [ ] Imperial repeater (5): a stream of small bolts while fire is held.
+  - [ ] Jeron fusion cutter (6): slow green plasma, each shot from the
+        next of four barrels, lit in turn (an engine field for it).
+  - [ ] I.M. mines (7): set down in front of you, go off after 3 s (or
+        when someone walks on one).
+  - [ ] Packered mortar gun (8, with the fob): a lobbed shell that bursts
+        where it lands.
+  - [ ] Assault cannon (0): heavy plasma bolts, 30 damage in DF.
 - [ ] Items still missing: batteries (for the headlamp), the objective item
       (a data tape).
 - [ ] The finale has its own picture (it reuses the title and intermission

@@ -2,14 +2,14 @@ import { defineWeapon } from '../../engine/defs.js';
 
 // Slot 9: the Stouker concussion rifle, Bossk's, as in Dark Forces. Its shot
 // flies unseen and fast; where it lands, everything near takes the same
-// damage and erupts in blue flame, you too if you're close. Four energy a
-// shot, slow to fire: 0 idle, 1 the shot (lit), 2 its after-glow, then back
-// to 0 (DF's timings). DF drew it right of the middle (x 130 of 320).
+// damage and erupts in blue flame, you too if you're close. Four power (DF's
+// power cells) a shot, slow to fire: 0 idle, 1 the shot (lit), 2 its
+// after-glow, then back to 0 (DF's timings). DF drew it right of the middle (x 130 of 320).
 export default defineWeapon({
   id: 'concussion-rifle',
   name: 'CONCUSSION RIFLE',
   slot: 9,
-  ammo: 'energy',
+  ammo: 'power',
   ammoPerShot: 4,
   priority: 3,
   light: { radius: 4, light: 64 }, // the vents' blue glow
