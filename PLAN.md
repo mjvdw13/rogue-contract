@@ -1468,20 +1468,38 @@ cold cache costs only 7%. So changes that keep every pixel are worth
 - [ ] The rest of the garbage: `drawWorld`'s calls to `face`,
       `decalFaces`, `faceLevel` and `walkBlocks` (0.5 MB a frame in the
       worst views), the same way.
+- [ ] Draw in threads (Mark, 2026-11-11): the world pass's columns
+      shared out among worker threads. Nothing looks different. A
+      throwaway test in Node (this laptop: 4 cores, 8 threads, a 15 W
+      chip; every frame byte for byte one thread's) made the pass 1.3
+      times faster on 2 threads, 1.6 on 3, 2.1 to 2.4 on 4 and 2.8 to
+      3.5 on 8: Mos Eisley's worst frames from 15 to 18 ms to 8 or 9.
+      Columns go out 16 at a time from a shared counter (the busy part
+      of the view gets shared out), and the main thread draws too.
+  - [x] `drawWorld` draws a range of columns (`view.x0` to `x1`), and
+        what it works out once a frame is kept for the frame's other
+        ranges. Bytes the same, no slower.
+  - [ ] Shared memory (`core/shared.js`): the framebuffer, the view's
+        buffers, the map's arrays, the light map's cells, the textures
+        and the colormaps are allocated shared where the page may
+        (`crossOriginIsolated`, and in Node), plain arrays elsewhere.
+  - [ ] The pool (`render/pool.js`) and its worker (`render/worker.js`):
+        the worker gets the textures once, a level's map when it
+        changes (the arrays shared; doors, angled walls, fences, bands,
+        decals and the backdrop copied, the doors' opening sent each
+        frame), and each frame the camera. A worker that wakes late
+        just finds no columns left; one that dies, or takes over a
+        quarter second, turns the pool off and the frame is drawn
+        again on one thread. `tools/bench.mjs --threads N`. A test: a
+        minute of play in every level, each frame drawn both ways, the
+        same bytes.
+  - [ ] The browser: a service worker gives the pages the two headers
+        shared memory needs (GitHub Pages can't set them); the first
+        visit reloads once when it's in. The pool starts at boot with
+        one worker a logical core less one (7 at most); `?threads=0`
+        turns it off, and so does anything failing. Smoke test.
+  - [ ] Measured in Chromium, and under "Waiting on Mark" to try.
 - [ ] Waiting on Mark: which of these to build.
-  - Draw in threads: the screen's columns split over 3 or 4 workers.
-    Nothing looks different. Measured with a throwaway test in Node
-    (2026-11-11, this laptop: 4 cores, 8 threads, a 15 W chip; every
-    frame byte for byte the same as one thread's): the world pass 1.3
-    times faster on 2 threads, 1.6 on 3, 2.1 to 2.4 on 4 and 2.8 to 3.5
-    on 8, so Mos Eisley's worst frames go from 15 to 18 ms to about 8
-    or 9. Columns handed out 16 at a time from a shared counter beat a
-    fixed band each (the busy part of the view gets shared out), and
-    threads writing next to each other in the frame cost nothing that
-    shows. The biggest job: the map's arrays shared
-    with the workers, doors, lights and decals mirrored to them, and a
-    service worker to give GitHub Pages the headers shared memory needs
-    (one thread as today where that fails).
   - Low detail, by itself: when frames run late, draw every other
     column and double it (Doom's low detail), back to full when there's
     time. About 1.8 times faster while it's on; things look blockier

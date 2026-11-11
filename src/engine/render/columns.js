@@ -94,6 +94,16 @@ const wBot = new Int16Array(MAX_WIN);
 const wSt = new Uint8Array(MAX_WIN);
 
 /**
+ * What a frame needs done to the map before any column is drawn: its new
+ * decals laid out, and its light map brought up to date.
+ */
+export function prepareWorld(map, textures) {
+  if (map.decalsDirty) layoutDecals(map, textures);
+  if (!map.lightmap) map.lightmap = new LightMap(map);
+  map.lightmap.update();
+}
+
+/**
  * Draw walls, floors, ceilings, sky and fences, one screen column at a time.
  *
  * Every tile has its own floor and ceiling height ("Doom on a grid"). Each
@@ -148,8 +158,12 @@ const wSt = new Uint8Array(MAX_WIN);
  * @param {number} fbW framebuffer width
  * @param {Uint8Array} colormaps
  * @param {import('../world/backdrop.js').Backdrop|null} [backdrop] terrain drawn where the sky shows
+ * @param {number} [x0] the columns to draw, x0 up to x1 (all of them by
+ *   default): a column depends on no other, so threads can each draw some
+ *   (render/pool.js)
+ * @param {number} [x1]
  */
-export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop = null) {
+export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop = null, x0 = 0, x1 = view.W) {
   const { W, H, x: px, y: py, dirX, dirY, planeX, planeY, fy, camZ, horizon, zbuf, fog } = view;
   const { segDist, segTop, segBot, segFirst, segCount } = view;
   const SEG = view.SEG;
@@ -164,7 +178,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
   // Nothing in the level stands higher (TileMap.computeSkyline), nor in each block of it than its blockTops.
   const skyline = map.skyline;
   const { blockTops, blockW, blockH, skyMargin } = map;
-  if (map.decalsDirty) layoutDecals(map, textures);
+  prepareWorld(map, textures);
   const { edgeDecals, decalEdge, slantDecals } = map;
   const hasDecals = map.decals.length > 0;
   const hasFences = fences.length > 0;
@@ -172,8 +186,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
   const along = [0];
   const fixed = view.fixedColormap;
   const extra = view.extraLight;
-  const lm = map.lightmap ?? (map.lightmap = new LightMap(map));
-  lm.update();
+  const lm = map.lightmap;
   const hazeOn = view.hazeOn;
   const hazeTab = view.hazeTab;
   const bdBuf = view.bdBuf;
@@ -185,7 +198,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
   let skyShift = 0;
   if (sky) {
     const wrap = view.skyWrap ?? 2;
-    for (let x = 0; x < W; x++) {
+    for (let x = x0; x < x1; x++) {
       const camX = (2 * (x + 0.5)) / W - 1;
       let a = view.angle + Math.atan(camX * view.planeLen);
       a = ((a % TAU) + TAU) % TAU;
@@ -597,7 +610,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
     }
   };
 
-  for (x = 0; x < W; x++) {
+  for (x = x0; x < x1; x++) {
     const camX = (2 * (x + 0.5)) / W - 1;
     for (let k = 0; k < 4; k++) thr[k] = (BAYER[(x & 3) + k * 4] + 0.5) / 16 - 0.5;
     rdx = dirX + planeX * camX;
