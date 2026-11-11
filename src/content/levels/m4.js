@@ -11,9 +11,12 @@ const H = 152;
 // ---- The kit's textures (docs/mission4.md, "The kit"; assets/custom/derive.mjs, STATION).
 const T = {
   wall: 'ds-wall',
+  wall6: 'ds-wall-6',
+  wall8: 'ds-wall-8',
   wallLight: 'ds-wall-light',
   wallDark: 'ds-wall-dark',
   hangarWall: 'ds-hangar-wall',
+  hangarLight: 'ds-hangar-light',
   greeble: 'ds-wall-greeble',
   detWall: 'ds-det-wall',
   compactorWall: 'ds-compactor-wall',
@@ -49,9 +52,14 @@ const T = {
 const hull = { wall: T.wallDark };
 const railing = { tex: T.railing, height: 0.75 };
 
+/**
+ * The pale wall for a room `h` high. Walls hang from the ceiling, so the
+ * ones with a trim and a skirting are one picture for each height.
+ */
+const pale = (h) => (h === 6 ? T.wall6 : h === 8 ? T.wall8 : T.wall);
 /** A room: deck, ceiling, its floor and ceiling heights. */
 const room = (floorZ, ceilZ, extra = {}) => ({
-  floor: T.floor, ceiling: T.ceiling, floorZ, ceilZ, light: 160, side: T.wallDark, upper: T.wall, ...extra,
+  floor: T.floor, ceiling: T.ceiling, floorZ, ceilZ, light: 160, side: T.wallDark, upper: pale(ceilZ - floorZ), ...extra,
 });
 /** A blast door, 4 wide and 4 tall, in a wall 2 thick. */
 const door = (floorZ, extra = {}) => ({
@@ -72,7 +80,17 @@ const lift = (stops, ceilZ, extra = {}, spec = {}) => ({
 const p = new Painter(W, H, hull);
 /** Light sources, added area by area. */
 const lamps = [];
-const decals = [];
+const decals = [
+  // The crest high on the hangar's east wall, over the control room's window.
+  { x: 80, y: 77, z: 17, face: 'W', tex: 'decal-crest', scale: 3 },
+  // Signs by the doors: the lobby's, the briefing room's, the detention
+  // lift's, the cell block's; hazard stripes by the shaft's.
+  { x: 80, y: 96.5, z: 2.4, face: 'W', tex: 'decal-sign' },
+  { x: 110.5, y: 97, z: 2.4, face: 'S', tex: 'decal-sign' },
+  { x: 167, y: 70, z: 2.4, face: 'S', tex: 'decal-sign' },
+  { x: 167.5, y: 44, z: 14.4, face: 'S', tex: 'decal-sign' },
+  { x: 191.5, y: 100, z: 2.4, face: 'S', tex: 'decal-hazard' },
+];
 
 /**
  * A light column: a lit panel in the wall over (x0, y0)-(x1, y1) and its
@@ -101,6 +119,13 @@ p.fence(15, 62, 16, 98, 'W', { tex: T.field });
 // Hazard stripes along the mouth, and a pool of light under each lamp bar.
 p.rect(16, 62, 18, 98, hangar({ floor: T.hazard, light: 168 }));
 for (const x of [28, 48, 68]) for (const y of [68, 92]) p.pool(x, y, 9, 200);
+// Painted guide lines in from the mouth, either side of the pad.
+for (const y of [72, 86]) p.rect(18, y, 34, y + 2, (x, ty, old) => ({ ...old, floor: T.hazard }));
+// Light bars up the walls.
+for (const [x, y] of [[20, 55], [34, 55], [46, 55], [60, 55], [74, 55], [30, 104], [54, 104], [62, 104], [74, 104], [80, 61], [80, 91], [80, 95], [15, 59], [15, 101]]) {
+  p.rect(x, y, x + 1, y + 1, { wall: T.hangarLight });
+  lamps.push({ x: x === 15 ? 16.5 : x === 80 ? 79.5 : x + 0.5, y: y === 55 ? 56.5 : y === 104 ? 103.5 : y + 0.5, z: 3, radius: 6, light: 40 });
+}
 // The tiles under the Crow: the way out, once the beam is off.
 p.rect(36, 77, 44, 83, (x, y, old) => ({ ...old, tag: 'crow' }));
 
@@ -118,20 +143,23 @@ p.rect(64, 104, 70, 106, store);
 p.rect(60, 106, 74, 112, store);
 
 // 1b. The troop bay behind the north wall: shut until the beam is off.
-p.rect(30, 46, 50, 54, room(0, 5, { light: 136 }));
+p.rect(30, 46, 50, 54, room(0, 6, { light: 136 }));
 p.rect(38, 54, 42, 56, door(0, { lock: 'remote', tag: 'troops', stayOpen: true, upper: T.hangarWall }));
 
 // ---------------------------------------------------------------- 2. lobby and control room
 p.rect(80, 98, 82, 102, door(0, { upper: T.hangarWall }));
-p.rect(82, 94, 100, 106, room(0, 5, { light: 168 }));
-p.chamfer(82, 94, 100, 106, 2, { wall: T.wall }, ['SW', 'SE', 'NE']);
-p.rect(86, 90, 90, 94, lift([0, 8], 13));
+p.rect(82, 94, 100, 106, room(0, 6, { light: 168 }));
+p.chamfer(82, 94, 100, 106, 2, { wall: T.wall6 }, ['SW', 'SE', 'NE']);
+column(86, 106, 88, 107, 87, 105.7);
+column(94, 106, 96, 107, 95, 105.7);
+column(94, 93, 96, 94, 95, 94.3);
+p.rect(86, 90, 90, 94, lift([0, 8], 14));
 // The control room, 4 m over the deck, its window on the hangar.
-p.rect(82, 64, 98, 90, room(8, 13, { light: 152 }));
-p.chamfer(82, 64, 98, 90, 2, { wall: T.wallDark }, ['NE', 'SE']);
+p.rect(82, 64, 98, 90, room(8, 14, { light: 152 }));
+p.chamfer(82, 64, 98, 90, 2, { wall: T.wall6 }, ['NE', 'SE']);
 p.rect(80, 66, 82, 88, room(9, 12, { light: 152, side: T.hangarWall, upper: T.hangarWall }));
 p.fence(80, 66, 81, 88, 'W', { tex: T.window });
-p.rect(84, 64, 96, 65, room(8, 13, { light: 176, lightFx: 'glow', lightMin: 136 }));
+p.rect(84, 64, 96, 65, room(8, 14, { light: 176, lightFx: 'glow', lightMin: 136 }));
 p.rect(84, 63, 96, 64, { wall: T.screen });
 // The terminal: it opens the ring door.
 p.rect(98, 76, 99, 78, {
@@ -154,8 +182,8 @@ for (let y = 60; y < 112; y++) {
     const d = x - y;
     if (d < 24 || d > 68 || !p.get(x, y).wall) continue;
     if (s >= 222 && s < 230) p.set(x, y, hall());
-    else if (s === 221) p.set(x, y, { ...hall(), wall: T.wall, diagonal: 'NW' });
-    else if (s === 230) p.set(x, y, { ...hall(), wall: T.wall, diagonal: 'SE' });
+    else if (s === 221) p.set(x, y, { ...hall(), wall: T.wall6, diagonal: 'NW' });
+    else if (s === 230) p.set(x, y, { ...hall(), wall: T.wall6, diagonal: 'SE' });
   }
 }
 p.rect(102, 97, 126, 103, hall());
@@ -179,7 +207,7 @@ for (const [x, y] of [[130, 96], [135, 91], [140, 86]]) {
 
 // 3b. The briefing room, behind the blue door. Secret 2 behind its screens.
 p.rect(104, 78, 122, 96, room(0, 6, { light: 136 }));
-p.chamfer(104, 78, 122, 96, 3, { wall: T.wallDark });
+p.chamfer(104, 78, 122, 96, 3, { wall: T.wall6 });
 p.pool(113, 87, 5, 200);
 p.rect(112, 96, 114, 97, narrow(0, { door: T.doorBlue, lock: 'blue' }));
 p.rect(108, 77, 118, 78, { wall: T.screen });
@@ -188,15 +216,18 @@ p.rect(110, 73, 116, 77, room(0, 4, { light: 120, secret: true }));
 
 // ---------------------------------------------------------------- 4. the lift hub
 p.rect(160, 70, 180, 90, room(0, 8, { light: 168 }));
-p.chamfer(160, 70, 180, 90, 6, { wall: T.wall });
-p.pool(170, 80, 6, 216);
+p.chamfer(160, 70, 180, 90, 6, { wall: T.wall8 });
+p.pool(170, 80, 7, 216);
+// A light column in the middle, so no door looks straight at another.
+p.rect(168, 78, 172, 82, { wall: T.wallLight });
+for (const [x, y] of [[170, 77.3], [170, 82.7], [167.3, 80], [172.7, 80]]) lamps.push({ x, y, z: 3, radius: 6, light: 48 });
 // North: the detention lift, a door at each stop.
 p.rect(168, 68, 172, 70, door(0));
 p.rect(168, 64, 172, 68, lift([0, 12], 18));
 p.rect(168, 62, 172, 64, door(12));
 // East: the pump room's door, opened from the far side.
 p.rect(180, 78, 182, 82, door(0, { lock: 'remote', tag: 'hub-east', stayOpen: true }));
-p.rect(182, 78, 186, 82, hall({ ceilZ: 5 }));
+p.rect(182, 78, 186, 82, hall({ upper: T.wallDark }));
 
 // ---------------------------------------------------------------- 5. detention block AA-19
 const DET = 12;
@@ -210,7 +241,7 @@ for (const x of [166, 174]) p.rect(x, 58, x + 1, 59, (tx, ty, old) => ({ ...old,
 // its floor a grid of red light, five cells a side.
 p.rect(169, 43, 171, 44, narrow(DET, { door: T.doorRed, lock: 'red', upper: T.detWall }));
 p.rect(167, 12, 173, 43, det(DET - 0.5, DET + 4));
-p.rect(169, 12, 171, 42, det(DET - 1, DET + 4, { floor: T.detFloorLight, light: 168 }));
+p.rect(169, 12, 171, 42, det(DET - 1, DET + 4, { floor: T.detFloorLight, light: 168, tag: 'lane' }));
 for (let k = 0; k < 5; k++) {
   const y = 14 + 6 * k;
   for (const [x0, x1, dx] of [[161, 166, 166], [174, 179, 173]]) {
@@ -229,9 +260,9 @@ p.rect(169, 4, 171, 10, duct(DET - 1));
 p.stairs(171, 4, 186, 6, 'E', DET - 1.75, -0.75, duct);
 
 // ---------------------------------------------------------------- 6. the trash compactor
-const compactor = (extra = {}) => room(-6, 4, { floor: T.sludge, side: T.compactorWall, upper: T.compactorWall, light: 112, ...extra });
+const compactor = (extra = {}) => room(-6, 4, { floor: T.sludge, side: T.compactorWall, upper: T.compactorWall, light: 136, ...extra });
 p.rect(186, 4, 202, 28, compactor());
-p.rect(192, 12, 196, 16, compactor({ light: 160, lightFx: 'flicker', lightMin: 96 }));
+p.rect(191, 11, 197, 17, compactor({ light: 192, lightFx: 'flicker', lightMin: 112 }));
 // The pressure hatch, a step up out of the sludge.
 p.rect(196, 28, 198, 30, narrow(-5.5, { jamb: T.doorJamb, upper: T.compactorWall }));
 
@@ -242,16 +273,18 @@ p.stairs(195, 34, 199, 45, 'S', -5, 0.5, tunnel);
 p.rect(195, 45, 199, 64, tunnel(0));
 for (const y of [32, 48, 58]) p.pool(197, y + 0.5, 3, 176);
 p.rect(195, 64, 199, 66, door(0, { upper: T.pipes }));
-p.rect(186, 66, 204, 90, room(0, 6, { floor: T.grate, light: 128 }));
+p.rect(186, 66, 204, 90, room(0, 6, { floor: T.grate, light: 128, upper: T.wallDark }));
 p.chamfer(186, 66, 204, 90, 3, { wall: T.wallDark });
 p.pool(195, 78, 6, 192);
+// Four pumps, floor to ceiling.
+for (const x of [190, 198]) for (const y of [70, 84]) p.rect(x, y, x + 2, y + 2, { wall: T.pipes });
 // The switch that opens the hub's east door: the way back.
 p.rect(204, 77, 205, 79, {
   wall: T.switchOff,
   switchTo: T.switchOn,
   use: [{ action: 'openDoors', tag: 'hub-east' }, { action: 'message', text: 'LIFT HUB ACCESS UNSEALED.' }],
 });
-p.rect(193, 90, 197, 92, door(0));
+p.rect(193, 90, 197, 92, door(0, { upper: T.wallDark }));
 p.rect(193, 92, 197, 100, tunnel(0, { light: 136 }));
 
 // ---------------------------------------------------------------- 8. the tractor beam shaft
@@ -282,6 +315,7 @@ p.rect(177, 125, 179, 126, {
   switchTo: T.switchOn,
   use: [
     { action: 'setFlag', flag: 'beam-off' },
+    { action: 'sound', id: 'beam-down' },
     { action: 'setLight', tag: 'beam-lamps', light: 16, lightFx: 'none' },
     { action: 'openDoors', tag: 'out' },
     { action: 'openDoors', tag: 'troops' },
@@ -291,7 +325,7 @@ p.rect(177, 125, 179, 126, {
 p.rect(154, 120, 156, 124, door(0, { lock: 'remote', tag: 'out', stayOpen: true, upper: T.wallDark }));
 
 // ---------------------------------------------------------------- 9. the unfinished sector
-const bare = (floorZ, ceilZ, extra = {}) => room(floorZ, ceilZ, { floor: T.grate, side: T.girder, upper: T.girder, light: 104, ...extra });
+const bare = (floorZ, ceilZ, extra = {}) => room(floorZ, ceilZ, { floor: T.grate, side: T.girder, upper: T.girder, light: 120, ...extra });
 // 9a. The bare deck: plates missing, so the way across zigzags (a step in
 // each gap to climb out by).
 p.rect(112, 112, 154, 136, bare(0, 8));
@@ -299,20 +333,20 @@ p.rect(122, 112, 126, 128, bare(-3, 8, { light: 88 }));
 p.rect(122, 127, 126, 128, bare(-1.5, 8, { light: 88 }));
 p.rect(136, 120, 140, 136, bare(-3, 8, { light: 88 }));
 p.rect(136, 120, 140, 121, bare(-1.5, 8, { light: 88 }));
-for (const [x, y] of [[148, 122], [131, 116], [130, 131], [116, 123]]) lamps.push({ x, y, radius: 7, light: 96 });
+for (const [x, y] of [[148, 122], [131, 116], [130, 131], [116, 123]]) lamps.push({ x, y, radius: 9, light: 112 });
 p.rect(108, 120, 112, 126, bare(0, 6));
 // 9b. The panel yard, and stairs up its north wall to 4 m.
 p.rect(78, 114, 108, 140, bare(0, 16));
 p.stairs(82, 114, 98, 118, 'W', 0.5, 0.5, (z) => bare(z, 16));
 p.rect(78, 114, 82, 118, bare(8, 16));
-for (const [x, y] of [[100, 124], [88, 132], [84, 121]]) lamps.push({ x, y, radius: 7, light: 96 });
+for (const [x, y] of [[100, 124], [88, 132], [84, 121]]) lamps.push({ x, y, radius: 9, light: 112 });
 p.rect(76, 114, 78, 118, door(8, { upper: T.girder }));
 // 9c. The open hull gallery: its outer wall isn't on yet, only a field
 // between you and the stars.
 p.rect(16, 114, 76, 140, bare(8, 20, { light: 112 }));
 p.rect(15, 116, 16, 138, bare(8, 18, { ceiling: 'sky', light: 152 }));
 p.fence(15, 116, 16, 138, 'W', { tex: T.field });
-for (const x of [28, 44, 60]) lamps.push({ x, y: 128, radius: 8, light: 96 });
+for (const x of [28, 44, 60]) lamps.push({ x, y: 128, radius: 10, light: 112 });
 // North to the hangar's gantry.
 p.rect(44, 106, 48, 114, bare(8, 12));
 p.rect(44, 104, 48, 106, door(8, { upper: T.hangarWall }));
@@ -398,7 +432,7 @@ const list = [
   // 4. The hub.
   at('stormtrooper', 166.5, 76.5, { angle: 180 }), at('stormtrooper', 174.5, 84.5, { angle: 180 }),
   at('stormtrooper', 170.5, 73.5, { angle: 270, skill: NORMAL_UP }),
-  at('probe-droid', 172, 80, { skill: HARD }),
+  at('probe-droid', 175.5, 80, { skill: HARD }),
   at('ds-doorframe', 160.15, 80, { angle: 0 }), at('ds-doorframe', 170, 70.15, { angle: 270 }), at('ds-doorframe', 179.85, 80, { angle: 180 }),
   at('med-kit', 163.5, 86.5), at('energy-pack', 176.5, 73.5),
   // 5. Detention: the officer at the desk carries the red keycard.
@@ -425,9 +459,9 @@ const list = [
   at('power-cell', 199.5, 8.5), at('med-kit', 189, 24.5),
   // 7. Maintenance and the pump room.
   at('stormtrooper', 197, 52.5, { angle: 90, skill: NOT_EASIEST }),
-  at('stormtrooper', 190.5, 72.5, { angle: 90, ambush: true }), at('stormtrooper', 200.5, 84.5, { angle: 90, ambush: true }),
+  at('stormtrooper', 189.5, 74.5, { angle: 90, ambush: true }), at('stormtrooper', 200.5, 82.5, { angle: 90, ambush: true }),
   at('probe-droid', 195, 80, { skill: NORMAL_UP }),
-  at('coolant-tank', 190, 86), at('coolant-tank', 200, 70),
+  at('coolant-tank', 189, 77), at('coolant-tank', 201, 82),
   at('energy-pack', 189.5, 80.5), at('med-kit', 201.5, 78),
   // 8. The shaft: troopers on the far ledges, probe droids over the drop.
   at('stormtrooper', 158, 110.5, { angle: 0, z: 0 }), at('stormtrooper', 198, 132.5, { angle: 180, z: 0 }),
@@ -466,7 +500,7 @@ export default defineLevel({
   id: 'm4',
   mapLabel: 'M4',
   name: 'THE BATTLE STATION',
-  music: 'garrison',
+  music: 'station',
   sky: T.sky,
   skyWrap: 1,
   par: 600,
@@ -480,6 +514,8 @@ export default defineLevel({
     { on: 'talk', tag: 'rusk', if: 'rusk-free', do: [
       { action: 'openDoors', tag: 'chute' },
       { action: 'spawn', thing: 'stormtrooper', tag: 'alarm' },
+      { action: 'sound', id: 'alarm-klaxon' },
+      { action: 'setLight', tag: 'lane', light: 216, lightFx: 'glow', lightMin: 88 },
       { action: 'message', text: 'ALARM: DETENTION BLOCK AA-19. THE WASTE HATCH IS OPEN.' },
     ] },
     { on: 'enter', tag: 'crow', unless: 'beam-off', once: false, do: [{ action: 'message', text: "JAN: NOT WHILE THAT BEAM'S ON US." }] },

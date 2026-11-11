@@ -2,5 +2,6 @@
 import title from './title.js';
 import garrison from './garrison.js';
 import intermission from './intermission.js';
+import station from './station.js';
 
-export default [title, garrison, intermission];
+export default [title, garrison, intermission, station];

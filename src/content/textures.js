@@ -138,14 +138,14 @@ const CROW = ['crow-hull-side', 'crow-hull-top', 'crow-side', 'crow-belly', 'cro
 // The battle station (m4): derive.mjs, STATION. The ones with lamps and
 // screens glow; the rest never do.
 const STATION = [
-  'ds-wall', 'ds-wall-dark', 'ds-hangar-wall', 'ds-wall-greeble', 'ds-girder', 'ds-compactor-wall',
+  'ds-wall', 'ds-wall-6', 'ds-wall-8', 'ds-wall-dark', 'ds-hangar-wall', 'ds-wall-greeble', 'ds-girder', 'ds-compactor-wall',
   'ds-floor', 'ds-floor-hangar', 'ds-floor-line', 'ds-floor-grate', 'ds-ceiling',
   'ds-door', 'ds-door-narrow',
   // Skins for models/station.js.
   'tie-wing', 'tie-hull', 'tie-dark', 'tie-window', 'ds-crate', 'ds-crate-b', 'ds-console-side', 'ds-metal', 'ds-metal-dark',
 ];
 const STATION_GLOW = [
-  'ds-wall-light', 'ds-det-wall', 'ds-screen', 'ds-det-floor-light', 'ds-ceiling-light', 'ds-hull',
+  'ds-wall-light', 'ds-hangar-light', 'ds-det-wall', 'ds-screen', 'ds-det-floor-light', 'ds-ceiling-light', 'ds-hull',
   'ds-door-red', 'ds-door-blue', 'ds-switch', 'ds-switch-on', 'ds-console-top', 'ds-lamp', 'ds-lamp-red',
 ];
 const STATION_FENCES = ['ds-field', 'ds-window', 'ds-railing'];

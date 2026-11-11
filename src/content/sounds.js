@@ -217,5 +217,15 @@ export default [
   defineSound({ id: 'bossk-death', synth: groan(140, 45, 1.1, 0.4, { lowpass: 1000, distortion: 0.6, vibrato: { rate: 18, depth: 4 } }), pitchVariance: 0.06 }),
   // The mouse droid's squeal: a quick rising chatter.
   defineSound({ id: 'mouse-droid-squeal', synth: { wave: 'square', duty: 0.25, freq: 900, freqEnd: 2600, duration: 0.09, release: 0.04, volume: 0.22, repeat: { count: 4, interval: 0.07, decay: 0.9, pitch: 1.12 } }, pitchVariance: 0.08 }),
+  // The station (m4): the cell block's alarm, two notes over and over, and
+  // the tractor beam winding down.
+  defineSound({ id: 'alarm-klaxon', synth: { wave: 'square', duty: 0.4, freq: 620, freqEnd: 470, duration: 0.42, attack: 0.01, release: 0.08, lowpass: 2200, volume: 0.3, repeat: { count: 6, interval: 0.5, decay: 0.92 } } }),
+  defineSound({
+    id: 'beam-down',
+    synth: {
+      wave: 'saw', freq: 220, freqEnd: 28, duration: 2.4, attack: 0.02, release: 1.2, lowpass: [1800, 200], volume: 0.5, vibrato: { rate: 9, depth: 0.8 },
+      layers: [{ wave: 'sine', freq: 110, freqEnd: 30, duration: 2.4, release: 1.4, volume: 0.5 }, { wave: 'noise', duration: 1.6, attack: 0.05, release: 1.4, lowpass: [3000, 300], volume: 0.15 }],
+    },
+  }),
   defineSound({ id: 'droid-pain', synth: { wave: 'square', duty: 0.3, freq: 1600, freqEnd: 400, duration: 0.15, release: 0.08, volume: 0.3, ...crunch } }),
 ];

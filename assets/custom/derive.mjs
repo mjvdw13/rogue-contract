@@ -304,15 +304,33 @@ const BLACK = [[4, 4, 6], [12, 13, 17], [22, 24, 30], [36, 38, 46], [58, 62, 74]
 const TUBE = [214, 232, 255];
 const RED = [255, 40, 30];
 const DIM_RED = [150, 10, 10];
+// The pale wall floor to ceiling, for a room `rows` texels high (192: 6
+// units; 256: 8): a dark trim under the ceiling, a seam every 2 units and
+// a black skirting at the floor. Walls hang from the ceiling, so the rows
+// under the skirting are never seen in a room that high.
+const PALE_SEAMS = [[0, 0, 1, 256, [120, 120, 118]], [32, 0, 1, 256, [120, 120, 118]], ...[64, 128, 192].flatMap((y) => [[0, y, 64, 1, [100, 100, 99]], [0, y + 1, 64, 1, [196, 194, 188]]])];
+const paleWall = (rows) => [
+  ...PALE_SEAMS,
+  [0, 0, 64, 10, [26, 29, 37]], [0, 10, 64, 1, [84, 91, 111]], [0, 11, 64, 1, [100, 100, 99]],
+  [0, rows - 17, 64, 1, [100, 100, 99]], [0, rows - 16, 64, 1, [64, 70, 86]], [0, rows - 15, 64, 15, [12, 13, 17]],
+];
+// A switch's panel in it, its middle 1.3 units over the floor of a room 6 high.
+const switchPanel = (lamp) => [[22, 140, 20, 20, [26, 29, 37]], [25, 143, 14, 6, lamp], [25, 152, 6, 5, [64, 70, 86]], [33, 152, 6, 5, [64, 70, 86]]];
+const PALE_TALL = { df: 'IPEXFLR2', smooth: 2, tile: [1, 4], gradient: PALE_WALL, keep: 0, contrast: 0.25 };
 export const STATION = [
   // The corridor wall: the Executor's pale panelled plate.
   { out: 'ds-wall', df: 'IPEXFLR2', smooth: 2, gradient: PALE_WALL, keep: 0, contrast: 0.25, rects: [[0, 0, 64, 1, [100, 100, 99]], [0, 1, 64, 1, [196, 194, 188]], [0, 0, 1, 64, [120, 120, 118]], [32, 0, 1, 64, [120, 120, 118]]] },
   // The same with the film's light column: a white bar in a dark recess,
   // floor to ceiling (the texture repeats up the wall).
   { out: 'ds-wall-light', df: 'IPEXFLR2', smooth: 2, gradient: PALE_WALL, keep: 0, contrast: 0.25, rects: [[0, 0, 64, 1, [100, 100, 99]], [0, 1, 64, 1, [196, 194, 188]], [20, 0, 24, 64, [26, 29, 37]], [22, 0, 1, 64, [84, 91, 111]], [41, 0, 1, 64, [84, 91, 111]], [27, 0, 10, 64, TUBE], [27, 30, 10, 2, [108, 114, 134]]] },
+  // The corridor wall whole, for rooms 6 and 8 high: trim, seams, skirting.
+  { out: 'ds-wall-6', ...PALE_TALL, rects: paleWall(192) },
+  { out: 'ds-wall-8', ...PALE_TALL, rects: paleWall(256) },
   // Dark gunmetal panels (the hangar high up, the shaft), and the hangar's.
   { out: 'ds-wall-dark', df: 'IWADARK1', gradient: GUNMETAL, keep: 0, contrast: 1 },
   { out: 'ds-hangar-wall', df: 'IWADARK3', gradient: [[14, 15, 20], [36, 39, 48], [58, 62, 74], [80, 86, 100], [108, 114, 130]], keep: 0, contrast: 1 },
+  // The hangar's wall with a light bar up it.
+  { out: 'ds-hangar-light', df: 'IWADARK3', gradient: [[14, 15, 20], [36, 39, 48], [58, 62, 74], [80, 86, 100], [108, 114, 130]], keep: 0, contrast: 1, rects: [[22, 0, 20, 128, [12, 13, 17]], [23, 0, 1, 128, [84, 91, 111]], [40, 0, 1, 128, [84, 91, 111]], [28, 0, 8, 128, TUBE], [28, 62, 8, 2, [108, 114, 134]], [28, 126, 8, 2, [108, 114, 134]]] },
   // Machinery along the hangar's foot and in the maintenance tunnels.
   { out: 'ds-wall-greeble', df: 'IWAPIPE6', gradient: [[8, 9, 12], [30, 32, 40], [60, 64, 76], [96, 102, 116], [150, 156, 170]], keep: 0.25, contrast: 1 },
   // Bare structure where the panels aren't on yet: the X truss, in primer.
@@ -342,9 +360,11 @@ export const STATION = [
   { out: 'ds-door-narrow', df: 'IDDET1' },
   { out: 'ds-door-red', df: 'IDDET1', rects: [[26, 52, 12, 4, RED]] },
   { out: 'ds-door-blue', df: 'IDDET1', rects: [[26, 52, 12, 4, [20, 150, 220]]] },
-  // The switch: the pale wall, a lit panel in it (red, then green).
-  { out: 'ds-switch', df: 'IPEXFLR2', smooth: 2, gradient: PALE_WALL, keep: 0, contrast: 0.25, rects: [[22, 22, 20, 20, [26, 29, 37]], [25, 25, 14, 6, RED], [25, 34, 6, 5, [64, 70, 86]], [33, 34, 6, 5, [64, 70, 86]]] },
-  { out: 'ds-switch-on', df: 'IPEXFLR2', smooth: 2, gradient: PALE_WALL, keep: 0, contrast: 0.25, rects: [[22, 22, 20, 20, [26, 29, 37]], [25, 25, 14, 6, [70, 230, 60]], [25, 34, 6, 5, [64, 70, 86]], [33, 34, 6, 5, [64, 70, 86]]] },
+  // The switch: the pale wall of a room 6 high, a lit panel in it (red,
+  // then green). One picture floor to ceiling, so the panel isn't repeated
+  // up the wall.
+  { out: 'ds-switch', ...PALE_TALL, rects: [...paleWall(192), ...switchPanel(RED)] },
+  { out: 'ds-switch-on', ...PALE_TALL, rects: [...paleWall(192), ...switchPanel([70, 230, 60])] },
   // Space: only stars (Mark, 2026-11-10).
   { out: 'sky-space', paint: 'space', size: [1024, 256], stars: 1400, seed: 7 },
   // See-through: the field across the hangar's mouth, the control room's
