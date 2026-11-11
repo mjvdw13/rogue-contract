@@ -178,6 +178,20 @@ export default [
     onFloor: 'die',
     cap: 150,
   }),
+  // Specks of energy drifting up round a beam's column: cyan, fading in and out.
+  defineParticle({
+    id: 'energy-mote',
+    colors: [['glow-cyan', 0], ['glow-cyan', 2], ['glow-cyan', 3], ['glow-cyan', 2], ['glow-cyan', 0]],
+    life: [2.5, 5],
+    size: 0.03,
+    maxPx: 2,
+    fullbright: true,
+    blend: 'add',
+    gravity: -0.35,
+    drag: 0.5,
+    onFloor: 'die',
+    cap: 300,
+  }),
   // Cold mist lying on a floor: wide, faint, slow, fading in and out.
   defineParticle({
     id: 'mist',

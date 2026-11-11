@@ -1,5 +1,6 @@
 import { defineLevel } from '../../engine/defs.js';
 import { Painter } from './lib/painter.js';
+import { Town } from './lib/town.js';
 
 // MISSION 4: THE BATTLE STATION. The layout, route and numbers are in
 // docs/mission4.md (area numbers below match its table). Painted in code on
@@ -78,6 +79,8 @@ const lift = (stops, ceilZ, extra = {}, spec = {}) => ({
 });
 
 const p = new Painter(W, H, hull);
+/** The town kit, for its circles (the shaft). */
+const kit = new Town(p, { skirt: null });
 /** Light sources, added area by area. */
 const lamps = [];
 const decals = [
@@ -89,7 +92,7 @@ const decals = [
   { x: 110.5, y: 97, z: 2.4, face: 'S', tex: 'decal-sign' },
   { x: 167, y: 70, z: 2.4, face: 'S', tex: 'decal-sign' },
   { x: 167.5, y: 44, z: 14.4, face: 'S', tex: 'decal-sign' },
-  { x: 191.5, y: 100, z: 2.4, face: 'S', tex: 'decal-hazard' },
+  { x: 193, y: 103, z: 2.4, face: 'E', tex: 'decal-hazard' },
   // Vents low in the long pale walls: the ring corridor's two straights,
   // the lobby, the hub; a sign on the hub's south wall.
   // (None at x 113 on the north side: the blue door is there.)
@@ -306,33 +309,42 @@ p.rect(204, 77, 205, 79, {
   use: [{ action: 'openDoors', tag: 'hub-east' }, { action: 'message', text: 'LIFT HUB ACCESS UNSEALED.' }],
 });
 p.rect(193, 90, 197, 92, door(0, { upper: T.wallDark }));
-p.rect(193, 92, 197, 100, tunnel(0, { light: 136 }));
+p.rect(193, 92, 197, 112, tunnel(0, { light: 136 }));
 
 // ---------------------------------------------------------------- 8. the tractor beam shaft
-// A shaft with no bottom you can see: a ledge round it, a bridge from the
-// north ledge to the column (2 m wide), a ledge round the column (1.5 m:
-// narrower and you walk off it turning the corner), all slabs, so the
-// shaft runs on under them. The terminal is on the column's far side.
+// A round shaft with no bottom you can see, 22 across its radius. A ledge
+// 4 wide round its wall and one 3.5 wide round the column in its middle
+// are the tops of solid rings (angled walls with a `wallTop`), so their
+// rims are smooth circles and nothing fences them. A bridge (a slab, 2 m
+// wide) from the north ledge to the column. The terminal is in a block
+// on the column's far side.
+const [SX, SY] = [178, 122];
+const SHAFT = { r: 22, ledge: 18, island: 7.5, column: 4 };
 const pit = room(-150, 30, { floor: T.grate, side: T.wallDark, upper: T.wallDark, light: 112 });
+const ledge = { ...pit, floorZ: 0, light: 152 };
 const walk = { ...pit, light: 152, slab: { bottom: -0.5, top: 0, floor: T.grate, ceiling: T.grate, side: T.edge, light: 96 } };
-p.rect(156, 100, 200, 144, pit);
-p.rect(156, 100, 200, 104, walk);
-p.rect(156, 140, 200, 144, walk);
-p.rect(156, 100, 160, 144, walk);
-p.rect(196, 100, 200, 144, walk);
-p.rect(171, 115, 185, 129, walk);
-p.rect(176, 104, 180, 115, walk);
-p.rect(174, 118, 182, 126, { wall: T.wallLight });
-// Railings round the outer ledge's inner edge, open at the bridge. None
-// on the bridge or round the column.
-p.fence(160, 103, 176, 104, 'S', railing).fence(180, 103, 196, 104, 'S', railing);
-p.fence(160, 140, 196, 141, 'N', railing);
-p.fence(159, 104, 160, 140, 'E', railing).fence(196, 104, 197, 140, 'W', railing);
+kit.circle(SX, SY, SHAFT.r, { inside: ledge, wall: { wall: T.wallDark }, seam: 90 });
+// The ways in: the tunnel's mouth in the north-east, the west door.
+for (let y = 100; y < 112; y++) for (let x = 193; x < 197; x++) if (p.get(x, y).line) p.set(x, y, tunnel(0, { light: 136 }));
+p.rect(156, 120, 157, 124, ledge);
+// Light columns round the wall, a lamp at each.
+for (let k = 0; k < 8; k++) {
+  const a = ((k + 0.5) * Math.PI) / 4;
+  const [x, y] = [Math.floor(SX + Math.cos(a) * (SHAFT.r - 0.3)), Math.floor(SY + Math.sin(a) * (SHAFT.r - 0.3))];
+  if (p.get(x, y).line) p.set(x, y, { ...p.get(x, y), wall: T.wallLight });
+  lamps.push({ x: SX + Math.cos(a) * (SHAFT.r - 2), y: SY + Math.sin(a) * (SHAFT.r - 2), z: 3, radius: 7, light: 56 });
+}
+kit.circle(SX, SY, SHAFT.ledge, { inside: pit, wall: { wall: T.wallDark, wallTop: 0 } });
+kit.circle(SX, SY, SHAFT.island, { inside: ledge, wall: { wall: T.wallDark, wallTop: 0 }, open: 'out' });
+kit.circle(SX, SY, SHAFT.column, { inside: { wall: T.wallLight }, wall: { wall: T.wallLight }, open: 'out' });
+p.rect(176, 103, 180, 116, walk);
 // The column's glow, pulsing until the beam is off.
-for (const [x, y] of [[178, 117], [178, 127], [173, 122], [183, 122]]) {
+for (const [x, y] of [[178, 116], [178, 128.5], [172, 122], [184, 122]]) {
   lamps.push({ x, y, z: 2, radius: 9, light: 88, fx: 'glow', min: 24, tag: 'beam-lamps' });
 }
-p.rect(177, 125, 179, 126, {
+// The terminal's block, proud of the column's south side.
+p.rect(176, 125, 180, 127, { wall: T.wallDark });
+p.rect(177, 126, 179, 127, {
   wall: T.switchOff,
   switchTo: T.switchOn,
   use: [
@@ -500,13 +512,16 @@ const list = [
   at('ds-steam-pipe', 191, 72.02, { angle: 270 }), at('ds-steam-pipe', 199, 83.98, { angle: 90 }), at('ds-steam-pipe', 197.98, 71, { angle: 180 }),
   at('ds-steam-pipe', 193.02, 96, { angle: 0 }),
   at('energy-pack', 189.5, 80.5), at('med-kit', 201.5, 78),
-  // 8. The shaft: troopers on the far ledges, probe droids over the drop.
-  at('stormtrooper', 158, 110.5, { angle: 0, z: 0 }), at('stormtrooper', 198, 132.5, { angle: 180, z: 0 }),
-  at('stormtrooper', 170.5, 142, { angle: 90, z: 0, skill: NOT_EASIEST }),
-  at('stormtrooper', 186.5, 142, { angle: 90, z: 0, skill: HARD }),
+  // 8. The shaft: troopers round the ledge, probe droids over the drop.
+  at('stormtrooper', 161, 112, { angle: 0 }), at('stormtrooper', 195.5, 131, { angle: 180 }),
+  at('stormtrooper', 171, 140.5, { angle: 90, skill: NOT_EASIEST }),
+  at('stormtrooper', 185.5, 140.3, { angle: 90, skill: HARD }),
   at('probe-droid', 166, 112, { z: 1, skill: NORMAL_UP }), at('probe-droid', 190, 134, { z: 1, skill: HARD }),
-  at('tractor-terminal', 180, 126.05, { angle: 270, z: 0 }), at('tractor-terminal', 176, 126.05, { angle: 270, z: 0 }),
-  at('med-kit', 198, 102, { z: 0 }), at('power-cell', 183, 127, { z: 0 }),
+  at('tractor-terminal', 176.5, 127.05, { angle: 270, z: 0 }), at('tractor-terminal', 179.5, 127.05, { angle: 270, z: 0 }),
+  // Lit rings round the column, down into the shaft and up out of sight;
+  // specks of energy drift up from each.
+  ...[-26, -12, 3.2, 11, 20].map((z) => at('ds-beam-ring', SX, SY, { z })),
+  at('med-kit', 191.5, 107.5), at('power-cell', 183.5, 125),
   // 9. The unfinished sector.
   at('stormtrooper', 146.5, 116.5, { angle: 0 }), at('stormtrooper', 130.5, 132.5, { angle: 0 }),
   at('stormtrooper', 116.5, 116.5, { angle: 0, skill: NOT_EASIEST }),

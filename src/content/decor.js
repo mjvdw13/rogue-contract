@@ -117,6 +117,17 @@ export default [
       { type: 'steam', count: 7, every: [4, 9], at: STEAM_PIPE.leak, radius: 0.08, dir: [1, 0, 0.3], spread: 0.35, speed: [1.5, 3] },
     ],
   }),
+  // A lit ring round the tractor beam's column: specks of energy drift
+  // up from all round it.
+  defineDecoration({
+    id: 'ds-beam-ring',
+    model: 'ds-beam-ring',
+    fixed: true,
+    emit: Array.from({ length: 8 }, (_, k) => ({
+      type: 'energy-mote', count: 1, every: [0.15, 0.5],
+      at: [Math.cos((k * Math.PI) / 4) * 6, Math.sin((k * Math.PI) / 4) * 6, 0], radius: 2.2, dir: [0, 0, 1], spread: 1, speed: [0.05, 0.4],
+    })),
+  }),
   defineDecoration({ id: 'ds-camera', model: 'ds-camera', fixed: true }),
   defineDecoration({ id: 'ds-ceiling-lamp-bar', model: 'ds-ceiling-lamp-bar', fixed: true }),
   // Something in the compactor's water, looking about.

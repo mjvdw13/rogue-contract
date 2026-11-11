@@ -81,6 +81,8 @@ export const GIRDER = { length: 6, width: 0.4 };
 export const PANEL_STACK = { half: [0.6, 1.1], top: 0.8 };
 export const REEL = { r: 0.6, top: 0.8 };
 export const WORK_LAMP = { r: 0.3, top: 2.2 };
+/** A glowing ring round the tractor beam's column: its radius, its height, how many sides. */
+export const BEAM_RING = { r: 4.3, h: 0.5, sides: 16 };
 /** A pipe up a wall with a leaking joint: how far off the wall it stands, its height, where the steam comes out. */
 export const STEAM_PIPE = { off: 0.2, top: 4, leak: [0.34, 0, 1.45] };
 /** Cut cables hanging from a bare ceiling (the origin is on the ceiling): how low the live one's end hangs, where it sparks. */
@@ -506,6 +508,23 @@ function steamPipe() {
   return m.build();
 }
 
+// `ds-beam-ring`: a lit band round the beam's column between two dark
+// collars. The origin is the column's middle, at the band's foot.
+function beamRing() {
+  const m = new ModelBuilder('ds-beam-ring');
+  const { r, h, sides: n } = BEAM_RING;
+  const at = (k, rr, z) => [Math.cos((k * 2 * Math.PI) / n) * rr, Math.sin((k * 2 * Math.PI) / n) * rr, z];
+  const band = (rr, z0, z1, style) => {
+    for (let k = 0; k < n; k++) m.face([at(k, rr, z1), at(k + 1, rr, z1), at(k + 1, rr, z0), at(k, rr, z0)], style, [0, 0, (z0 + z1) / 2]);
+  };
+  band(r, 0, h, WHITE);
+  for (const z of [-0.2, h]) {
+    band(r + 0.12, z, z + 0.2, IRON);
+    for (const zz of [z, z + 0.2]) for (let k = 0; k < n; k++) m.face([at(k, r - 0.3, zz), at(k + 1, r - 0.3, zz), at(k + 1, r + 0.12, zz), at(k, r + 0.12, zz)], { ...IRON, twoSided: true });
+  }
+  return m.build();
+}
+
 function camera() {
   const m = new ModelBuilder('ds-camera');
   // A plate on the ceiling, a stem, and the camera's body tipped down.
@@ -631,6 +650,7 @@ export default [
   workLamp(),
   ...Object.keys(CABLES).map(cables),
   steamPipe(),
+  beamRing(),
   camera(),
   ceilingLampBar(),
   dianogaEye(),

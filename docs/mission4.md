@@ -105,7 +105,7 @@ As built (`m4.js`).
 | 6 | Trash compactor | 186..202, 4..28 | -6 / 4 | Sludge, heaps of junk, something with one eye. A pressure hatch south. |
 | 7 | Maintenance | 195..199, 30..64; 193..197, 92..100 | -5.5 up to 0 / +4 | Pipes, grate floors, dim. |
 | 7 | Pump room | 186..204, 66..90 | 0 / 6 | Dark walls, four pumps floor to ceiling. An ambush. A switch in the east wall opens the hub's east door (the way back). |
-| 8 | Tractor beam shaft | 156..200, 100..144 | -150 / 30 | A ledge 4 wide round it (slab, top 0, railed), a bridge 4 wide from the north ledge to the column (174..182, 118..126), a ledge 3 wide round the column, no rails on either. The terminal on the column's south face. Falling kills. |
+| 8 | Tractor beam shaft | a circle, centre 178, 122, radius 22 | -150 / 30 | Round. A ledge 4 wide round its wall and one 3.5 wide round the column (radius 4) are the tops of solid rings, their rims smooth circles, no rails. A bridge 4 wide (a slab) from the north ledge to the column. The tunnel from the pump room comes in at the north-east, the door out is west. The terminal in a block on the column's south side. Eight light columns round the wall; five lit rings on the column (`ds-beam-ring`), cyan specks (`energy-mote`) rising from each. Falling kills. |
 | 9a | Bare deck | 112..154, 112..136 | 0 / 8 | Two gaps where the plates aren't on (2.25 deep, two steps out of each), girders, work lamps. |
 | 9b | Panel yard | 78..108, 114..140 | 0 up to 8 / 16 | Stacks of wall panels, cable reels, stairs up its north wall to 8. |
 | 9c | Open hull gallery | 16..76, 114..140 | 8 / 20 | The outer wall is bare truss and a field: the stars beside you. North door onto the hangar's gantry. |
@@ -145,8 +145,9 @@ black decks, white light**, clean and new. Each area changes one thing.
   Dim, a flickering lamp. Pipes up the walls and the pumps leak steam
   (`ds-steam-pipe`: a thin plume, a hiss every few seconds); the
   compactor's walls are streaked with grime.
-- **The shaft:** `ds-wall-dark` falling out of sight, light columns down
-  it at intervals, the column glowing.
+- **The shaft:** round (the town kit's `circle()`), `ds-wall-dark`
+  falling out of sight, eight light columns round it, the column glowing
+  with lit rings and specks of energy drifting up round it.
 - **Unfinished sector:** `ds-girder` where the panels aren't on yet,
   bare decks (`ds-floor-grate`), work lamps in pools, the rest dark.
   Cut cables hang from the ceilings (`ds-cables`); the live ones
@@ -158,7 +159,7 @@ Models (`models/station.js`): `tie-fighter`, `tie-rack`, `lambda-shuttle`,
 `ds-console`, `ds-console-wall`, `ds-desk`, `ds-table`, `ds-chair`,
 `ds-crate`, `ds-crate-tall`, `ds-container`, `ds-doorframe`,
 `tractor-terminal`, `ds-girder-post`, `ds-girder-beam`, `ds-panel-stack`,
-`ds-cable-reel`, `work-lamp`, `ds-cables`, `ds-cables-live`, `ds-steam-pipe`, `ds-camera`, `ds-ceiling-lamp-bar`,
+`ds-cable-reel`, `work-lamp`, `ds-cables`, `ds-cables-live`, `ds-steam-pipe`, `ds-beam-ring`, `ds-camera`, `ds-ceiling-lamp-bar`,
 `dianoga-eye`.
 
 Characters: stormtroopers, officers, probe droids; new: the

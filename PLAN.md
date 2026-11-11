@@ -47,7 +47,12 @@ These need Mark to try something, or to decide. Don't start them without him.
   in the unfinished sector (how often, how bright the flashes), the
   steam off the pipes in the tunnels, pump room and compactor (thin or
   thick enough), the vents in the corridor walls, the flickering ceiling
-  panel on the slant.
+  panel on the slant. The tractor beam shaft, now round (2026-11-11): a
+  round wall with eight light columns, a round column with lit rings,
+  the ledges' rims smooth circles with no railings (is that too easy to
+  fall off?), cyan specks rising round the column. They keep rising once
+  the beam is off: no action can stop an emitter yet; say if they should
+  stop.
 - **Mission 2 under the ground** (`?map=m2`, 2026-11-08, after the
   references): the rooms lined by what they are (whitewash and the
   red-ochre dado in the tunnels, white plaster in the house, duracrete in
