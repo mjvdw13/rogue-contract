@@ -101,21 +101,22 @@ export const projectiles = [
     explosion: 'large',
     sounds: { bounce: 'detonator-bounce', explode: 'detonator-explode' },
   }),
-  // A mortar shell: lobbed in an arc (about 12 tiles out on level ground,
-  // further looking up), turning over as it flies, it bursts on whatever it
-  // hits. No damage itself: its blast does it all (Dark Forces' 50 over 40
-  // units, a little under the detonator's 60 over 30), 115 over 5 tiles.
+  // A mortar shell: lobbed in a low arc (about 14 tiles out on level ground,
+  // further looking up; it tops out about 1.3 tiles over the muzzle),
+  // turning over as it flies, it bursts on whatever it hits. No damage
+  // itself: its blast does it all, 160 over 7 tiles (Mark's call, up from
+  // Dark Forces' 50 over 40 units, a little under the detonator's 60 over 30).
   defineProjectile({
     id: 'mortar-round',
     sheet: FX('mortar-shell', 16, 16),
     anims: { fly: { frames: [0, 1, 2, 3, 4, 5], fps: 12, loop: true } },
     fullbright: false,
     radius: 0.2,
-    speed: 14,
+    speed: 20,
     gravity: 28,
     life: 6,
     damage: 0,
-    splash: { radius: 5, damage: 115 },
+    splash: { radius: 7, damage: 160 },
     explosion: 'large',
     sounds: { explode: 'explode' },
   }),
