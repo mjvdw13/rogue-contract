@@ -163,8 +163,9 @@ const SHEETS = [
     ['ISHELL', 'mortar-shell'], ['ISHELLS', 'mortar-shells'],
     // The weapons: the E-11 lying on its side (IST-GUNI), a trooper's drop;
     // the repeater (IAUTOGUN), the fusion cutter (IFUSION), a mine and a
-    // pack of them (IMINE, IMINES), the mortar gun (IMORTAR).
-    ['IST-GUNI', 'rifle'], ['IAUTOGUN', 'repeater'], ['IFUSION', 'fusion-cutter'], ['IMINE', 'mine'], ['IMINES', 'mine-pack'], ['IMORTAR', 'mortar'],
+    // pack of them (IMINE, IMINES), the mortar gun (IMORTAR), the assault
+    // cannon (ICANNON).
+    ['IST-GUNI', 'rifle'], ['IAUTOGUN', 'repeater'], ['IFUSION', 'fusion-cutter'], ['IMINE', 'mine'], ['IMINES', 'mine-pack'], ['IMORTAR', 'mortar'], ['ICANNON', 'assault-cannon'],
   ].map(([cell, item]) => ({ cells: { folder: `Pickups/${cell}.cells`, list: ['000.PNG'] }, asset: `${item}-item`, out: `assets/sprites/items/${item}.png` })),
 ];
 
@@ -351,6 +352,17 @@ const WEAPONS = [
     padLeft: 0,
     padBottom: 12,
     frames: [[15, 196, 388, 504], [206, 399, 386, 504], [406, 596, 388, 504], [603, 793, 384, 503]],
+  },
+  {
+    // assault-cannon.js: 0 idle (assault1, DF x 206), 1 the shot, its edge
+    // lit blue (assault2, x 208). Both reach above the view and past its
+    // right edge, as in DF. (assault3 and 4, the middle pair on the sheet,
+    // are its missiles, the second fire.)
+    asset: 'assault-cannon',
+    at: [0, 2],
+    padLeft: 0,
+    padBottom: 12,
+    frames: [[847, 1015, 377, 689], [1028, 1194, 378, 688]],
   },
 ];
 

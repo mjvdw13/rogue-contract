@@ -1274,7 +1274,7 @@ conversations, then the fob.
         when someone walks on one).
   - [x] Packered mortar gun (8, with the fob): a lobbed shell that bursts
         where it lands.
-  - [ ] Assault cannon (0): heavy plasma bolts, 30 damage in DF.
+  - [x] Assault cannon (0): heavy plasma bolts, 30 damage in DF.
 - [ ] Items still missing: batteries (for the headlamp), the objective item
       (a data tape).
 - [ ] The finale has its own picture (it reuses the title and intermission

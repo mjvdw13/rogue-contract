@@ -43,6 +43,8 @@ assets/custom/*
 !assets/custom/mortar.png
 !assets/custom/mortar-item.png
 !assets/custom/mortar-shell-flying.png
+!assets/custom/assault-cannon.png
+!assets/custom/assault-cannon-item.png
 !assets/custom/textures.mjs
 !assets/custom/textures/
 # The whole Dark Forces texture pack, sorted by what each texture shows.

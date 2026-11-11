@@ -398,6 +398,43 @@ function mortarShellFlying() {
   );
 }
 
+// ------------------------------------------------------------------ assault cannon
+
+/**
+ * The assault cannon: a huge curved housing rising from the bottom right up
+ * out of the top of the view, its dark inner face toward you, the hand at
+ * its foot. `glow` lights its edge blue as it fires. 170x325 (Dark Forces'
+ * frame, cut.mjs).
+ */
+function cannonFrame({ kick = 0, glow = 0 } = {}) {
+  const m = new Model(170, 325, { seed: 143 });
+  const metal = { ...MAT.metal, spec: 0.55, shine: 22, grain: 0.04 };
+  for (let k = 0; k < 8; k++) {
+    const t = k / 7;
+    const [x, y] = [150 - 110 * t * t, 330 - 340 * t + kick];
+    m.sphere(x, y, 12, 34 - t * 10, C('gray', 0.18), metal);
+    m.sphere(x - 10, y + 6, 30, 22 - t * 8, C('rust', 0.25), MAT.metal); // the inner face
+  }
+  if (glow) for (let k = 0; k < 6; k++) m.paint(40 + k * 14, 40 + k * 40 + kick, 4, 8, G('cyan', glow), MAT.glow);
+  forearm(m, [190, 330, 4], [120, 290 + kick, 30], 12);
+  fist(m, 112, 284 + kick, 40, 13, 1);
+  return m.render(RENDER);
+}
+
+function cannonSheet() {
+  return sheet([cannonFrame(), cannonFrame({ kick: 6, glow: 1 })]);
+}
+
+/** The assault cannon lying on the floor, for a pickup. 64x24. */
+function cannonPickup() {
+  const m = new Model(64, 24, { seed: 145 });
+  const metal = { ...MAT.metal, spec: 0.55, shine: 22, grain: 0.04 };
+  m.capsule(6, 14, 5, 40, 14, 5, 5, 6, C('gray', 0.18), metal);
+  m.slab([[34, 8], [62, 12], [62, 20], [34, 20]], 4, C('gray', 0.14), metal, { bevel: 2, thickness: 2 });
+  m.paint(20, 10, 6, 1.2, C('rust', 0.3));
+  return m.render({ ...RENDER, light: [-0.4, -0.8, 0.45] });
+}
+
 // ------------------------------------------------------------------ tracking fob
 
 /**
@@ -461,5 +498,7 @@ export default [
   { name: 'mortar', out: W('mortar'), draw: mortarSheet, dither: 'fs' },
   { name: 'pickup-mortar', out: 'assets/sprites/items/mortar.png', draw: mortarPickup, dither: 'fs' },
   { name: 'mortar-shell-flying', out: 'assets/sprites/fx/mortar-shell.png', draw: mortarShellFlying, dither: 'fs' },
+  { name: 'assault-cannon', out: W('assault-cannon'), draw: cannonSheet, dither: 'fs' },
+  { name: 'pickup-assault-cannon', out: 'assets/sprites/items/assault-cannon.png', draw: cannonPickup, dither: 'fs' },
   { name: 'pickup-fusion-cutter', out: 'assets/sprites/items/fusion-cutter.png', draw: fusionPickup, dither: 'fs' },
 ];

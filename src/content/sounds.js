@@ -58,6 +58,15 @@ export default [
   defineSound({ id: 'mine-arm', synth: { wave: 'square', freq: 1760, duration: 0.05, volume: 0.3, duty: 0.25, repeat: { count: 2, interval: 0.07, pitch: 1 } } }),
   // The Packered mortar gun: a deep hollow thump.
   defineSound({ id: 'mortar-fire', synth: { ...thump(140, 50, 0.3, 0.6), layers: [burst(0.08, [2500, 600], 0.35)] }, pitchVariance: 0.06 }),
+  // The assault cannon: a heavy, falling electric blast.
+  defineSound({
+    id: 'cannon-fire',
+    synth: {
+      wave: 'saw', freq: 900, freqEnd: 70, duration: 0.3, attack: 0.003, release: 0.25, lowpass: [4000, 500], volume: 0.55,
+      layers: [thump(160, 60, 0.2, 0.5), burst(0.08, [6000, 1200], 0.4)],
+    },
+    pitchVariance: 0.05,
+  }),
   // The E-11 rifle: a shorter, higher zap than the pistol's.
   defineSound({
     id: 'rifle-fire',

@@ -169,16 +169,17 @@ function ionBlast() {
  * then a burst of fire and smoke where it hits (frames 3-5). 32x32.
  */
 /**
- * Green plasma (the fusion cutter's): a flickering green-white ball (frames
- * 0-3, looped), then a burst of green sparks fading out (frames 4-12, as
- * many as Dark Forces' EMISEXP). 32x32.
+ * Plasma: a flickering white-hot ball (frames 0-3, looped), then a burst of
+ * sparks fading out (frames 4-12, as many as Dark Forces' EMISEXP). Green
+ * for the fusion cutter, cyan and bigger (`size`) for the assault cannon.
+ * 32x32.
  */
-function plasma() {
-  const HOT = [[255, 255, 255], G('green', 1), G('green', 0.5), G('green', 0)];
+function plasma(glow = 'green', size = 1) {
+  const HOT = [[255, 255, 255], G(glow, 1), G(glow, 0.5), G(glow, 0)];
   const frames = [];
   for (let f = 0; f < 4; f++) {
     const c = new PixelCanvas(32, 32);
-    fireBlob(c, 16, 16, 3.4 + (f % 2) * 0.8, 170 + f, HOT, { holes: 0.1 });
+    fireBlob(c, 16, 16, (3.4 + (f % 2) * 0.8) * size, 170 + f, HOT, { holes: 0.1 });
     frames.push(c);
   }
   for (let f = 0; f < 9; f++) {
@@ -188,7 +189,7 @@ function plasma() {
     for (let k = 0; k < 12 - f; k++) {
       const a = r.range(0, Math.PI * 2);
       const d = 3 + f * 1.4 + r.range(0, 3);
-      c.set(16 + Math.cos(a) * d, 16 + Math.sin(a) * d, f < 5 ? G('green', 1) : G('green', 0));
+      c.set(16 + Math.cos(a) * d, 16 + Math.sin(a) * d, f < 5 ? G(glow, 1) : G(glow, 0));
     }
     frames.push(c);
   }
@@ -214,7 +215,8 @@ export default [
   { name: 'repeater-bolt', out: F('repeater-bolt'), draw: () => blasterBolt('amber', 0.6) },
   { name: 'ion-blast', out: F('ion-blast'), draw: ionBlast },
   { name: 'rocket', out: F('rocket'), draw: rocket },
-  { name: 'fusion-plasma', out: F('fusion-plasma'), draw: plasma },
+  { name: 'fusion-plasma', out: F('fusion-plasma'), draw: () => plasma('green') },
+  { name: 'cannon-plasma', out: F('cannon-plasma'), draw: () => plasma('cyan', 1.4) },
 ];
 
 export { fireBlob, smoke, FIRE };

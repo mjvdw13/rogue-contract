@@ -46,6 +46,19 @@ export const projectiles = [
     damage: [15, 30],
     sounds: { explode: 'bolt-hit' },
   }),
+  // The assault cannon's plasma: a big blue ball, as slow as the fusion
+  // cutter's and twice as hard (Dark Forces' 30). DF's own (wplasma) isn't
+  // in the ripped projectiles, so this stand-in is what players see.
+  defineProjectile({
+    id: 'cannon-plasma',
+    sheet: FX('cannon-plasma', 32, 32),
+    anims: { fly: { frames: [0, 1, 2, 3], fps: 12, loop: true }, explode: { frames: [4, 5, 6, 7, 8, 9, 10, 11, 12], fps: 20 } },
+    radius: 0.24,
+    light: { radius: 4, light: 80 },
+    speed: 24,
+    damage: [30, 60],
+    sounds: { explode: 'bolt-hit' },
+  }),
   // A Jawa's ion blaster: a slow, weak, crackling cloud of blue electricity.
   defineProjectile({
     id: 'ion-bolt',

@@ -59,7 +59,6 @@ export default [
   defineItem({
     id: 'mine-pack',
     name: 'I.M. Mines',
-    glyph: '7',
     sheet: { src: 'assets/sprites/items/mine-pack.png', frameWidth: 32, frameHeight: 24 },
     radius: 0.6,
     pickup: { weapon: 'mines', ammo: { mine: 5 } },
@@ -74,6 +73,16 @@ export default [
     radius: 0.7,
     pickup: { weapon: 'mortar', ammo: { shell: 3 } },
     message: 'Picked up a Packered mortar gun.',
+    sound: 'weapon-pickup',
+  }),
+  // The assault cannon, with 30 plasma.
+  defineItem({
+    id: 'assault-cannon',
+    name: 'Assault Cannon',
+    sheet: { src: 'assets/sprites/items/assault-cannon.png', frameWidth: 64, frameHeight: 24 },
+    radius: 0.8,
+    pickup: { weapon: 'assault-cannon', ammo: { plasma: 30 } },
+    message: 'Picked up an assault cannon.',
     sound: 'weapon-pickup',
   }),
   // The concussion rifle, as Bossk drops it.

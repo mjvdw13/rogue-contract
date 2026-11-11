@@ -6,8 +6,9 @@ import repeater from './repeater.js';
 import fusionCutter from './fusion-cutter.js';
 import mines from './mines.js';
 import mortar from './mortar.js';
+import assaultCannon from './assault-cannon.js';
 import thermalDetonator from './thermal-detonator.js';
 import concussionRifle from './concussion-rifle.js';
 import fob from './fob.js';
 
-export default [fists, blaster, rifle, thermalDetonator, repeater, fusionCutter, mines, mortar, concussionRifle, fob];
+export default [fists, blaster, rifle, thermalDetonator, repeater, fusionCutter, mines, mortar, concussionRifle, assaultCannon, fob];

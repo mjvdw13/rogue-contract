@@ -126,3 +126,14 @@ test('a mortar round arcs up and comes down to burst on the floor, well out', ()
   const out = round.x - w.player.x;
   assert.ok(out > 6, `well out (${out.toFixed(1)} tiles)`);
 });
+
+test('key 0 picks the weapon in slot 10', () => {
+  const { w, p, input } = holding('blaster');
+  const ten = [...w.registry.weapons.values()].find((d) => d.slot === 10);
+  assert.ok(ten, 'something in slot 10');
+  p.weapons.add(ten.id);
+  if (ten.ammo) p.ammo[ten.ammo] = 50;
+  input.tap('weapon10');
+  run(w, input, 1);
+  assert.equal(p.weapon, ten.id);
+});

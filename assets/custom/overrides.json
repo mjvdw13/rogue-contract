@@ -286,5 +286,16 @@
     "src": "assets/custom/mortar.png",
     "frameWidth": 198,
     "frameHeight": 132
+  },
+  "assets/sprites/items/assault-cannon.png": {
+    "src": "assets/custom/assault-cannon-item.png",
+    "frameWidth": 76,
+    "frameHeight": 22,
+    "scale": 0.85
+  },
+  "assets/sprites/weapons/assault-cannon.png": {
+    "src": "assets/custom/assault-cannon.png",
+    "frameWidth": 170,
+    "frameHeight": 325
   }
 }
