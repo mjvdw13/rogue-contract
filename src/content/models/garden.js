@@ -1,7 +1,7 @@
 import { ModelBuilder } from './lib/build.js';
 import { WATER_PIPE } from './farm.js';
 
-// The Homestead's garden pit (levels/m2.js, docs/mission2.md area 1).
+// The Homestead's garden (levels/m2.js, docs/mission2.md area 1).
 //
 // `grow-bed-<len>`: a raised hydroponic bed, `len` long along x and
 // GROW_BED.w across, its trough of rusty plate full of dark growing medium
@@ -15,14 +15,9 @@ import { WATER_PIPE } from './farm.js';
 // the floor. Its inlet rises from the dome and turns back (-y) to
 // GARDEN_TANK.back behind its axis at GARDEN_TANK.inlet, where the farm's
 // water pipe comes down the pit's wall into it. Built looking +y.
-//
-// `sand-heap`: sand blown over a pit's rim, piled against the wall's foot:
-// a low mound, its back on y = 0 against the wall, highest there. Not solid.
-// Its decoration pours sand onto it from the rim (decor.js).
+
 export const GROW_BED = { lengths: [4, 5], w: 1.1, top: 0.72, lamp: 2.3 };
 export const GARDEN_TANK = { r: 0.65, top: 2.7, inlet: 3, back: 0.9 };
-/** The heap's radius and height, and how far over it the sand pours from (a small pit's rim). */
-export const SAND_HEAP = { r: 1.4, h: 0.7, fall: 7.8 };
 
 const PLATE = { tex: 'yard-plate-rust' };
 const IRON = { color: ['gray', 0.22] };
@@ -104,17 +99,6 @@ function ring(r, n) {
   return Array.from({ length: n }, (_, i) => [Math.cos((i / n) * Math.PI * 2) * r, Math.sin((i / n) * Math.PI * 2) * r]);
 }
 
-function sandHeap() {
-  const m = new ModelBuilder('sand-heap');
-  const { r, h } = SAND_HEAP;
-  // A half disc on the floor, rising to a smaller one against the wall.
-  const half = (rad, n = 8) => Array.from({ length: n + 1 }, (_, i) => [Math.cos((i / n) * Math.PI) * rad, Math.sin((i / n) * Math.PI) * rad]);
-  const sand = { tex: 'desert-sand' };
-  m.loft(half(r), 0, half(r * 0.55), h * 0.6, { ...sand, bottom: false, top: false });
-  m.loft(half(r * 0.55), h * 0.6, half(r * 0.2), h, { ...sand, bottom: false });
-  return m.build();
-}
+export const GARDEN_MODELS = [...GROW_BED.lengths.map((l) => `grow-bed-${l}`), 'garden-tank'];
 
-export const GARDEN_MODELS = [...GROW_BED.lengths.map((l) => `grow-bed-${l}`), 'garden-tank', 'sand-heap'];
-
-export default [...GROW_BED.lengths.map(growBed), gardenTank(), sandHeap()];
+export default [...GROW_BED.lengths.map(growBed), gardenTank()];

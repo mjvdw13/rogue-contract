@@ -46,22 +46,20 @@ These need Mark to try something, or to decide. Don't start them without him.
   Volumes of the new sounds were guessed (1.0, or the rifle's 0.87).
 
 - **Mission 2's garden pit and pump tunnels, dressed** (`?map=m2`,
-  2026-11-11, the first of "Each area in detail"): two grow beds either
-  side of the way to the arch, plants in rows under lamp frames whose
-  strips glow a cold blue-white; the garden's tank by the arch, the water
-  pipe coming down the wall into it; sand pouring over the west rim onto
-  a heap at the wall's foot (`sand-fall`, `sand-sheet`, a dust puff;
-  thickened after Mark couldn't see it: a solid streaking stream and
-  dithered sheets, from across the pit a column rim to heap; only in the
-  garden pit, on its west side, behind you at the start). You now start between
-  the beds' west ends (24, 46). The hidey-hole: scuffs on the tunnel
+  2026-11-11, the first of "Each area in detail"): the garden indoors
+  (Mark: no pour, the hydroponics inside), a grow room 8 m by 4 m through
+  a new round-topped doorway in the garden pit's south side, four beds in
+  two rows down either side of the way in, plants under lamp frames whose
+  strips glow a cold blue-white, lit only by them. The garden's tank stays
+  in the pit by the east arch, the water pipe coming down the wall into
+  it. You start at (24, 46), facing the arch. The hidey-hole: scuffs on the tunnel
   floor and a grubby patch by its panel, Rusk's bedroll, eleven groups of
   days scratched over it (`grime-tally`), a crate, a canister, ration
   wrappers, and the doc's line as you step in. The pump room: the pump's
   power unit, spare filter cartridges on the west wall, a bench on the
   south wall, oil, scrap, and two filter tanks fed from the ceiling
   between the light well and the stair (cover). To judge: the plants'
-  green and the lamps' colour, how thick the pouring sand is, the tally,
+  green and the lamps' colour, the grow room's size and darkness, the tally,
   and whether the start is a good first look.
 
 - **Mission 2's reservoir, dressed** (`?map=m2`, 2026-11-11): the five

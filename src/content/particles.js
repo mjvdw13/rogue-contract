@@ -271,9 +271,8 @@ export default [
     onFloor: 'die',
     cap: 300,
   }),
-  // Sand pouring over a pit's rim onto the heap at its foot (Mission 2's
-  // garden pit): grains streaking down, and thin falling sheets round them
-  // so the stream reads from across the pit.
+  // Sand trickling through the grates at the reservoir's light wells
+  // (Mission 2): grains streaking down.
   defineParticle({
     id: 'sand-fall',
     colors: [{ ramp: 'sand', from: 11, to: 10 }],
@@ -286,22 +285,6 @@ export default [
     wind: 0.15,
     onFloor: 'die',
     cap: 240,
-  }),
-  defineParticle({
-    id: 'sand-sheet',
-    colors: [{ ramp: 'sand', from: 11, to: 10 }],
-    life: [1.3, 1.9],
-    size: 0.3,
-    maxPx: 16,
-    shape: 'disc',
-    blend: 'dither',
-    alpha: 0.7,
-    fadeIn: 0.1,
-    gravity: 8,
-    drag: 0.8,
-    wind: 0.15,
-    onFloor: 'die',
-    cap: 40,
   }),
   // Water dripping from a leaking pipe joint (Mission 2's reservoir).
   defineParticle({

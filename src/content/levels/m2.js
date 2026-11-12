@@ -380,6 +380,10 @@ lights.push({ x: 160, y: 50, z: COURT + 1, radius: 6, light: 56 }); // the cart 
 // pump room (the water pipe goes down into its pump), its one way on the
 // stair down to the reservoir. Tunnels 4 wide, ceilings at 2 m.
 doorway(33, 44, 35, 48, 'W');
+// The grow room, off the garden pit's south side under the court: 8 m by
+// 4 m, lit only by its grow lamps.
+doorway(26, 51, 30, 53, 'N');
+dig(20, 53, 36, 61, { light: 72 });
 dig(35, 44, 50, 48);
 dig(46, 46, 58, 58, { light: 104, floor: 'yard-plate' });
 lights.push({ x: 52, y: 52, z: PIT + 3, radius: 6, light: 48 });
@@ -671,24 +675,21 @@ for (const [x, y] of [[40, 45], [51, 51], [61, 83], [81, 83], [84, 30], [141, 57
 lineDug();
 
 // ---------------------------------------------------------------- 1. the garden pit, dressed
-// The family's hydroponic garden: two raised beds in rows either side of
-// the way from where Jan drops you to the arch, under their grow lamps'
-// cold blue-white (nothing else on the map is that colour). The garden's
-// tank in the north-east, the farm's water pipe coming down the wall into
-// it from the court above. Sand pours over the west rim, the windward
-// one, onto a heap at the wall's foot.
+// The garden's tank in the pit's north-east, the farm's water pipe coming
+// down the wall into it from the court above. Through the south doorway,
+// the family's hydroponic garden (Mark, 2026-11-11: indoors): four raised
+// beds in two rows under their grow lamps' cold blue-white (nothing else
+// on the map is that colour), the way in straight down the middle.
 list.push(
-  at('grow-bed-5', 27.5, 41.8, { z: PIT }),
-  at('grow-bed-5', 27.5, 50.2, { z: PIT }),
   at('garden-tank', 31.3, 42.6, { z: PIT }),
-  at('sand-heap', 22.6, 47.4, { z: PIT, angle: 90 }),
   at('floor-dirt-1', 27.5, 44, { z: PIT, angle: 180 }), at('floor-dirt-2', 26.5, 48.6, { z: PIT }),
   at('floor-scuff', 24.2, 46.2, { z: PIT, angle: 70 }),
 );
-lights.push(
-  { x: 27.5, y: 41.8, z: PIT + 2, radius: 4, light: 56 },
-  { x: 27.5, y: 50.2, z: PIT + 2, radius: 4, light: 56 },
-);
+for (const [x, y] of [[23.5, 55.5], [32.5, 55.5], [23.5, 59], [32.5, 59]]) {
+  list.push(at('grow-bed-5', x, y, { z: PIT }));
+  lights.push({ x, y, z: PIT + 2, radius: 3.5, light: 48 });
+}
+list.push(at('floor-dirt-1', 28, 57.2, { z: PIT, angle: 90 }), at('floor-scuff', 27.6, 54.4, { z: PIT }));
 waterPipe([[31.3, 42.6 - GARDEN_TANK.back, FARM + 0.5, 'N'], [31.3, 42.6 - GARDEN_TANK.back, PIT + GARDEN_TANK.inlet]]);
 
 // ---------------------------------------------------------------- 2. the pump tunnels, dressed
