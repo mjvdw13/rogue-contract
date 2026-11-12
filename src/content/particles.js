@@ -295,7 +295,6 @@ export default [
     maxPx: 16,
     shape: 'disc',
     blend: 'dither',
-    fade: true,
     alpha: 0.7,
     fadeIn: 0.1,
     gravity: 8,
