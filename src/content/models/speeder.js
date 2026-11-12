@@ -14,10 +14,19 @@ import { ModelBuilder } from './lib/build.js';
 // down on four timber cribs, its right-hand side engine pulled (the one on
 // the trestles in the yard behind, models/garage.js), the pylon's cut
 // wires hanging.
+//
+// `burnt` is one stripped and burnt out (the Homestead's workshop pit,
+// levels/m2.js): both side engines gone, the paint burnt off to rust and
+// soot, the windscreen gone, the dashboard dead.
 
-const PAINT = { tex: 'speeder-paint' };
-const RED = { tex: 'speeder-red' };
-const METAL = { tex: 'speeder-metal' };
+/** The paint, and burnt off to rusty, sooty metal. */
+const SKINS = {
+  paint: { PAINT: { tex: 'speeder-paint' }, RED: { tex: 'speeder-red' }, METAL: { tex: 'speeder-metal' } },
+  burnt: { PAINT: { tex: 'yard-plate-rust' }, RED: { tex: 'drum-rust' }, METAL: { tex: 'yard-plate-rust' } },
+};
+let PAINT, RED, METAL;
+const skin = (name) => ({ PAINT, RED, METAL } = SKINS[name]);
+skin('paint');
 const DARK = { color: ['gray', 0.16] };
 const SEAT = { color: ['gray', 0.22] };
 const WIRE = { color: [34, 30, 28] };
@@ -76,9 +85,10 @@ export function engine(m, x, y, z, len = 0.99) {
   m.cylinder([x - 0.68, y, z], r + 0.008, 0.08, { segments: 8, axis: 'x', turn: Math.PI / 8, ...RED, top: false, bottom: false });
   m.loft(ring(1), x - len + 0.14, ring(0.66), x - len, { axis: 'x', ...METAL, bottom: false, top: DARK });
 }
-/** A landspeeder model `id`; `blocks`: set down on blocks, an engine pulled. */
-export function buildSpeeder(id, { blocks = false } = {}) {
+/** A landspeeder model `id`; `blocks`: set down on blocks, an engine pulled; `burnt`: stripped and burnt out. */
+export function buildSpeeder(id, { blocks = false, burnt = false } = {}) {
   const m = new ModelBuilder(id);
+  skin(burnt ? 'burnt' : 'paint');
 
   // The nose: round in plan (a half circle of radius W), blunter in profile.
   const NOSE = 1.4;
@@ -119,7 +129,7 @@ export function buildSpeeder(id, { blocks = false } = {}) {
   // In the cockpit: the dashboard's console with its lights, the driver's
   // yoke on the left (north, at angle 0), and two seats.
   m.box([0.46, -0.42, ZF], [COCKPIT[0], 0.42, ZT - 0.05], { color: ['gray', 0.28], bottom: false });
-  for (const [y, c] of [[-0.3, [70, 230, 60]], [-0.22, [255, 40, 30]], [0.1, [255, 176, 0]], [0.18, [70, 230, 60]]]) {
+  for (const [y, c] of burnt ? [] : [[-0.3, [70, 230, 60]], [-0.22, [255, 40, 30]], [0.1, [255, 176, 0]], [0.18, [70, 230, 60]]]) {
     m.box([0.55, y - 0.025, ZT - 0.05], [0.6, y + 0.025, ZT - 0.035], { color: c, glow: true, bottom: false });
   }
   m.box([0.3, -0.24, ZT - 0.12], [0.46, -0.2, ZT - 0.08], DARK);
@@ -139,17 +149,18 @@ export function buildSpeeder(id, { blocks = false } = {}) {
   const base = [-G, -0.18, 0.18, G];
   const top = [-0.4, -0.15, 0.15, 0.4];
   const topX = [-0.02, 0.06, 0.06, -0.02];
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < (burnt ? 0 : 3); i++) {
     m.face([[COCKPIT[0], base[i], ZT], [COCKPIT[0], base[i + 1], ZT], [topX[i + 1], top[i + 1], ZG], [topX[i], top[i], ZG]], GLASS);
   }
-  for (const s of [-1, 1]) {
+  for (const s of burnt ? [] : [-1, 1]) {
     m.face([[COCKPIT[0], s * G, ZT], [SEATS - 0.05, s * G, ZT], [SEATS - 0.05, s * 0.44, ZT + 0.2], [-0.02, s * 0.4, ZG]], GLASS);
   }
 
   for (const s of [-1, 1]) {
-    if (blocks && s > 0) {
+    if ((blocks && s > 0) || burnt) {
       // (The pulled engine's cut wires, hanging from the pylon's end.)
-      for (const [x, len] of [[-0.62, 0.34], [-0.75, 0.22], [-0.88, 0.41]]) m.box([x - 0.012, 0.95, 0.72 - len], [x + 0.012, 0.975, 0.72], WIRE);
+      const [y0, y1] = s > 0 ? [0.95, 0.975] : [-0.975, -0.95];
+      for (const [x, len] of [[-0.62, 0.34], [-0.75, 0.22], [-0.88, 0.41]]) m.box([x - 0.012, y0, 0.72 - len], [x + 0.012, y1, 0.72], WIRE);
     } else {
       engine(m, -0.2, s * 1.07, 0.72);
     }
@@ -184,8 +195,10 @@ export function buildSpeeder(id, { blocks = false } = {}) {
 
   // Collision: round the hull and the side engines (the centre one is
   // overhead); on blocks, the pulled engine's side only to its pylon.
-  const port = blocks ? 0.95 : 1.27;
-  m.outlineLines([[2.08, -0.35], [2.08, 0.35], [1.6, 0.68], [-0.2, port], [-1.2, port], [-1.3, 0.4], [-1.3, -0.4], [-1.2, -1.27], [-0.2, -1.27], [1.6, -0.68]]);
+  const port = blocks || burnt ? 0.95 : 1.27;
+  const star = burnt ? 0.95 : 1.27;
+  m.outlineLines([[2.08, -0.35], [2.08, 0.35], [1.6, 0.68], [-0.2, port], [-1.2, port], [-1.3, 0.4], [-1.3, -0.4], [-1.2, -star], [-0.2, -star], [1.6, -0.68]]);
+  skin('paint');
   return m.build();
 }
 

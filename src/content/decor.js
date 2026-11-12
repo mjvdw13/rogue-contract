@@ -31,6 +31,7 @@ import { VAPORATORS } from './models/vaporator.js';
 import { FARM_MODELS, PUMP, CONSOLE as GARAGE_CONSOLE, GARAGE_RING, COUNTER, APPLIANCES, SKYHOPPER } from './models/farm.js';
 import { GROW_BED, GARDEN_TANK } from './models/garden.js';
 import { RES_PILLAR, FLOOR_CABLES } from './models/reservoir.js';
+import { CAVE_IN } from './models/workshop.js';
 
 // Scenery. Solid ones block movement; ones with health can be shot (and
 // `explode`).
@@ -191,6 +192,31 @@ export default [
     model: 'water-pipe-joint',
     fixed: true,
     emit: [{ type: 'drip', count: 1, every: [0.4, 1.1], at: [0, 0.05, -0.22], radius: 0.05, dir: [0, 0, -1], spread: 0.05, speed: [0, 0.1] }],
+  }),
+  // The workshop pit's (models/workshop.js): the family's speeder, stripped
+  // and burnt, still burning in its cockpit and under its hull (small
+  // flames, embers, a dark smoke); the tunnel's cave-in, sand trickling
+  // from the hole in the ceiling over it.
+  defineDecoration({
+    id: 'speeder-wreck',
+    model: 'speeder-wreck',
+    solid: true,
+    height: 1.22,
+    fixed: true,
+    emit: [
+      { type: 'flame', count: 1, every: [0.06, 0.14], at: [-0.25, 0, 0.75], radius: 0.35, dir: [0, 0, 1], spread: 0.3, speed: [0.2, 0.6] },
+      { type: 'flame', count: 1, every: [0.15, 0.35], at: [-0.95, 0, 0.9], radius: 0.2, dir: [0, 0, 1], spread: 0.3, speed: [0.2, 0.5] },
+      { type: 'ember', count: 1, every: [0.15, 0.4], at: [-0.4, 0, 1], radius: 0.4, dir: [0, 0, 1], spread: 0.5, speed: [0.5, 1.2] },
+      { type: 'smoulder', count: 1, every: [0.35, 0.6], at: [-0.4, 0, 1.4], radius: 0.3, dir: [0.1, 0, 1], spread: 0.3, speed: [0.3, 0.5] },
+    ],
+  }),
+  defineDecoration({
+    id: 'cave-in',
+    model: 'cave-in',
+    solid: true,
+    height: CAVE_IN.h,
+    fixed: true,
+    emit: [{ type: 'sand-fall', count: 1, every: [0.2, 0.6], at: [-0.6, 0, CAVE_IN.h - 0.1], radius: 0.5, dir: [0, 0, -1], spread: 0.2, speed: [0.1, 0.3] }],
   }),
   defineDecoration({ id: 'kitchen-appliances', model: 'kitchen-appliances', solid: true, height: APPLIANCES.top, fixed: true }),
   // Things on Mos Eisley's streets: crates, drums, canisters, junk, rubble, scrap, a vaporator.

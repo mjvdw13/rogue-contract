@@ -6,6 +6,7 @@ import { pitWalls, pitDoorway, blindDoor } from './lib/farm.js';
 import { SENSOR_Z, PANEL } from '../models/vaporator.js';
 import { PUMP, GARAGE_RING } from '../models/farm.js';
 import { GARDEN_TANK } from '../models/garden.js';
+import { LAMP_CORD } from '../models/cantina.js';
 
 // MISSION 2: THE HOMESTEAD. The layout, route and numbers are in
 // docs/mission2.md (area numbers below match its table). The blockout:
@@ -372,7 +373,7 @@ pit(28, 46, 6, 'flagstone'); // 1. the garden pit, the drop-off
 pit(80, 52, 8); // 4. the workshop pit
 pit(160, 46, 12, 'street-sand', COURT); // 7. the house's courtyard
 pit(180, 84, 7, 'flagstone'); // 9. the garage pit
-lights.push({ x: 82, y: 56, z: PIT + 1, radius: 5, light: 48 }); // a speeder burning
+lights.push({ x: 79.5, y: 57, z: PIT + 1.2, radius: 5, light: 48, fx: 'fire' }); // the speeder burning
 lights.push({ x: 160, y: 50, z: COURT + 1, radius: 6, light: 56 }); // the cart burning
 
 // ---------------------------------------------------------------- 2. the pump tunnels
@@ -430,12 +431,11 @@ doorway(78, 40, 82, 45, 'S');
 // landing, then eight more on down the workshop's west wall, open to the room.
 stairDown(70, 14, 74, 26, 0);
 stairDown(70, 26, 74, 32, 0, { start: 14, ceilZ: (f) => Math.min(FARM - 0.5, f + 4.5), light: 120 });
-lights.push({ x: 84, y: 30, z: PIT + 3, radius: 6, light: 48 });
 doorway(87, 50, 90, 54, 'W');
 dig(90, 50, 110, 54, { light: 88 });
 dig(100, 54, 104, 58, { light: 88 });
 tag(100, 50, 110, 54, 'rubble');
-list.push(at('boulder-small', 108.6, 51, { angle: 40 }), at('boulder-small', 109, 53.2, { angle: 160 }), at('boulder-small', 106.8, 52.4, { angle: 280 }));
+list.push(at('cave-in', 108, 52, { z: PIT, angle: 0 }), at('boulder-small', 104.7, 50.9, { angle: 40 }), at('boulder-small', 104.3, 53.1, { angle: 280 }));
 // Secret 2: the well room south of the caved-in tunnel, reached only down
 // its light well from the yard; a secret door out north into the tunnel.
 dig(90, 56, 98, 62, { light: 88 });
@@ -746,6 +746,66 @@ list.push(
 for (let x = 48; x <= 104; x += 4) decals.push({ x, y: 86, z: RESERVOIR, face: 'N', tex: x % 8 ? 'grime-dust-1' : 'grime-dust-2' });
 for (const [x, face] of [[44, 'E'], [108, 'W']]) decals.push({ x, y: 82, z: RESERVOIR, face, tex: 'grime-dust-1' });
 
+// ---------------------------------------------------------------- 4. the workshop pit and the workshop, dressed
+// The pit: the family's speeder, stripped for parts and on blocks, burnt in
+// the raid and still burning, oil soaked into the sand round it; droid parts
+// and scrap against the wall, drums by the west wall, a plate or two laid
+// to the doorways. (`rim(a)` stands a thing by the wall at `a` degrees
+// round from the middle, its back to the wall: a model at angle 0 has its
+// back to the north.)
+const rim = (type, a, r = 7.2, extra = {}) => {
+  const t = (a * Math.PI) / 180;
+  return at(type, 80 + Math.cos(t) * r, 52 - Math.sin(t) * r, { z: PIT, angle: (a + 270) % 360, ...extra });
+};
+list.push(
+  at('speeder-wreck', 79.5, 57, { z: PIT, angle: 160 }),
+  at('oil', 79.8, 57.4, { z: PIT, angle: 20 }), at('oil-small', 83.6, 50.2, { z: PIT, angle: 110 }), at('oil-small', 75.6, 48.4, { z: PIT, angle: 300 }),
+  at('deck-plate', 80, 45.6, { z: PIT, angle: 3 }), at('deck-plate-rust', 85.6, 52, { z: PIT, angle: 88 }),
+  rim('scrap', 140), rim('junk-heap', 118, 6.6), rim('droid-dome', 105, 6.4, { angle: 30 }),
+  rim('barrel-rust', 168, 7.3), rim('barrel-grey', 176, 7.3), rim('canister-rust', 184, 7.4),
+  rim('power-droid-rust', 300, 6.6, { angle: 140 }),
+  rim('crate-tan', 330, 7), rim('crate-grey-small', 338, 7.4),
+  at('litter-small', 76.5, 53.8, { z: PIT, angle: 70 }),
+);
+// Soot up the pit's wall behind the speeder.
+for (const [a, tex] of [[255, 'grime-scorch-1'], [278, 'grime-scorch-2']]) {
+  const t = (a * Math.PI) / 180;
+  decals.push({ x: Math.round((80 + Math.cos(t) * 7.95) * 1000) / 1000, y: Math.round((52 - Math.sin(t) * 7.95) * 1000) / 1000, z: PIT + 2, face: 'angled', tex });
+}
+// The workshop: the droid bench on the north wall under its lamp, a pit
+// droid at an astromech that's half taken apart (its dome on the floor), a
+// vaporator's lower stage in for repair by the east wall with its cap off,
+// a rack of parts by the doorway, scrap, oil and litter.
+list.push(
+  at('workbench', 83.5, 26.01, { z: PIT, angle: 0 }),
+  at('cantina-lamp', 83.5, 27.6, { z: PIT + 4 - LAMP_CORD }),
+  at('astromech-rust', 82.2, 28.5, { z: PIT, angle: 20 }),
+  at('pit-droid', 83.6, 28.9, { z: PIT, angle: 165 }),
+  at('droid-dome', 80.9, 28.4, { z: PIT, angle: 200 }),
+  at('oil-small', 82.6, 29.3, { z: PIT, angle: 50 }),
+  at('vaporator-squat', 86.6, 37.6, { z: PIT }),
+  at('vaporator-cap', 84.4, 38.9, { z: PIT }),
+  at('rack-b', 75.6, 39.95, { z: PIT, angle: 180 }),
+  at('scrap', 77.6, 26.01, { z: PIT, angle: 0 }),
+  at('crate-grey-small', 74.7, 39.3, { z: PIT, angle: 15 }), at('canister', 87.4, 30.2, { z: PIT }),
+  at('oil', 85.4, 34.6, { z: PIT, angle: 140 }), at('litter-small', 79.4, 34.2, { z: PIT, angle: 250 }),
+);
+lights.push({ x: 83.5, y: 27.8, z: PIT + 3, radius: 6, light: 48 });
+// The shed's stair: soot down its walls from the fire above, a crate
+// dropped on the landing.
+decals.push(
+  { x: 70, y: 16.5, z: -0.6, face: 'E', tex: 'grime-scorch-1' },
+  { x: 74, y: 15.5, z: -0.2, face: 'W', tex: 'grime-scorch-2' },
+  { x: 74, y: 19, z: -2.2, face: 'W', tex: 'grime-streaks-2' },
+);
+list.push(at('crate-grey-small', 73.2, 22.8, { z: -3.5, angle: 30 }));
+// The tunnel to the cave-in: cracks out from it along the walls.
+decals.push(
+  { x: 103, y: 50, z: PIT + 2.2, face: 'S', tex: 'grime-crack-1' },
+  { x: 105, y: 54, z: PIT + 1.6, face: 'N', tex: 'grime-crack-2' },
+  { x: 99, y: 54, z: PIT + 2.6, face: 'N', tex: 'grime-crack-1' },
+);
+
 // ---------------------------------------------------------------- the machinery under the ground
 // After the cutaway in Mark's references: the farm's water pipe on its
 // brackets from where it comes down out of the garden court, along the pump
@@ -796,7 +856,7 @@ list.find((t) => t.type === 'water-pipe-joint' && t.x === 75.75 && t.y === 74.25
 p.rect(44, 73, 108, 74, (_, __, c) => (c.slab ? c : { ...c, bands: [{ from: RESERVOIR, to: RESERVOIR + 2, tex: 'pipe-band' }, ...(c.bands ?? [])] }));
 // Out of the ceiling past the workshop pit's doorway, east along the tunnel
 // until it goes under the cave-in.
-waterPipe([[90.5, 50.25, PIT + 4, 'N'], [90.5, 50.25, HUNG, 'N'], [106.5, 50.25, HUNG]]);
+waterPipe([[90.5, 50.25, PIT + 4, 'N'], [90.5, 50.25, HUNG, 'N'], [108, 50.25, HUNG]]);
 // Conduit, tanks, units and gauges on the walls; vents up by the ceilings;
 // hatches in the floors.
 const fittings = [

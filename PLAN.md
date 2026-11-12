@@ -75,6 +75,25 @@ These need Mark to try something, or to decide. Don't start them without him.
   colour (they read dark red-brown in the haze), whether the lamps want a
   visible beam, and whether the darkness is right now.
 
+- **Mission 2's workshop pit and workshop, dressed** (`?map=m2`,
+  2026-11-11; up the reservoir's east stair): the cave-in is a slope of
+  earth and rock to the ceiling now, slabs of the vault's plaster on it,
+  the steel prop snapped at its foot and its top thrown up the slope, a
+  beam hanging out of the hole, sand trickling down, cracks along the
+  tunnel's walls; the water pipe runs into it. In the pit, the family's
+  X-34 stripped, on blocks and burnt (a new `flame` particle, embers and
+  dark smoke, a flickering light), oil round it, scrap, a junk heap, a
+  droid dome, drums, crates and a dead power droid round the wall, two
+  scorch marks behind the speeder. In the workshop, the droid bench and
+  its tool board on the north wall under a hanging lamp, a pit droid at
+  an astromech half taken apart (its dome on the floor), a vaporator's
+  lower stage in for repair with its cap off, a rack of parts, scrap. The
+  shed's stair: soot down its walls, a crate on the landing. To judge:
+  the flames (size, how many), whether the burnt hull reads as burnt (it's
+  rusty grey plate), the scorch marks (they read as round blast marks, not
+  soot), and whether the workshop wants more in it (it's 9 m by 7 m).
+  The well room (the secret) is as it was.
+
 - **Mission 4, the Battle Station** (`?map=m4`, 2026-11-10,
   `docs/mission4.md`): the whole level, made in one session without you
   and then gone over area by area. The hangar with the Crow, three TIE
@@ -1427,10 +1446,6 @@ snapshots, playable at `?map=m2`.
         troopers should see no farther than the player in one (above).
 - [ ] **Each area in detail,** in the order you meet them, snapshots
       before and after each:
-  - [ ] The workshop pit and the workshop: oil, droid parts, the
-        burning speeder, the caved-in tunnel's rubble and broken
-        support, the bench and pit droid, the shed's stairwell, the well
-        room (secret).
   - [ ] The work yard: the generator shed (tin, its hatch), the staging
         point (a lit floodlight, crates, barricades, a comm unit), the
         farm's gate with the Imperials' red lock clamped on it (in place of

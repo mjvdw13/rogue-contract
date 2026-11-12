@@ -298,6 +298,26 @@ export default [
     onFloor: 'die',
     cap: 30,
   }),
+  // Small flames licking up off something burning (Mission 2's speeder in
+  // the workshop pit): little glowing discs that rise, swell a little and
+  // cool from yellow to red.
+  defineParticle({
+    id: 'flame',
+    colors: [{ ramp: 'glow-yellow', from: 5, to: 0 }, { ramp: 'glow-red', from: 2, to: 0 }],
+    life: [0.3, 0.6],
+    size: 0.12,
+    grow: 1.6,
+    maxPx: 12,
+    shape: 'disc',
+    blend: 'add',
+    fade: true,
+    fadeOut: 0.5,
+    fullbright: true,
+    gravity: -2.5,
+    drag: 3,
+    onFloor: 'die',
+    cap: 60,
+  }),
   // Explosions (src/content/explosions.js). The fireball: bright glowing
   // discs that swell and cool from white through yellow and orange to red.
   defineParticle({
