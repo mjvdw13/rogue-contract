@@ -32,6 +32,7 @@ import { FARM_MODELS, PUMP, CONSOLE as GARAGE_CONSOLE, GARAGE_RING, COUNTER, APP
 import { GROW_BED, GARDEN_TANK } from './models/garden.js';
 import { RES_PILLAR, FLOOR_CABLES } from './models/reservoir.js';
 import { CAVE_IN } from './models/workshop.js';
+import { GENERATOR } from './models/yard.js';
 
 // Scenery. Solid ones block movement; ones with health can be shot (and
 // `explode`).
@@ -218,6 +219,12 @@ export default [
     fixed: true,
     emit: [{ type: 'sand-fall', count: 1, every: [0.2, 0.6], at: [-0.6, 0, CAVE_IN.h - 0.1], radius: 0.5, dir: [0, 0, -1], spread: 0.2, speed: [0.1, 0.3] }],
   }),
+  // The work yard's (models/yard.js): the farm's generator in the shed
+  // (colliding as its skid), the Imperials' lock on the gate's jamb, the
+  // staging point's comm unit on its crate.
+  defineDecoration({ id: 'farm-generator', model: 'farm-generator', solid: true, height: GENERATOR.skid + 2 * GENERATOR.r, fixed: true }),
+  defineDecoration({ id: 'imp-lock', model: 'imp-lock', fixed: true }),
+  defineDecoration({ id: 'comm-unit', model: 'comm-unit', fixed: true }),
   defineDecoration({ id: 'kitchen-appliances', model: 'kitchen-appliances', solid: true, height: APPLIANCES.top, fixed: true }),
   // Things on Mos Eisley's streets: crates, drums, canisters, junk, rubble, scrap, a vaporator.
   ...Object.entries(CLUTTER).map(([id, c]) => defineDecoration({ id, model: id, solid: !!c.solid, radius: c.radius, height: c.height, fixed: true })),

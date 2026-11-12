@@ -7,6 +7,7 @@ import { SENSOR_Z, PANEL } from '../models/vaporator.js';
 import { PUMP, GARAGE_RING } from '../models/farm.js';
 import { GARDEN_TANK } from '../models/garden.js';
 import { LAMP_CORD } from '../models/cantina.js';
+import { IMP_LOCK } from '../models/yard.js';
 
 // MISSION 2: THE HOMESTEAD. The layout, route and numbers are in
 // docs/mission2.md (area numbers below match its table). The blockout:
@@ -146,7 +147,8 @@ const stairDown = (x0, y0, x1, y1, from, { start = y0, flight = 8, landing = 2, 
  * of 8 or more, and it hurts). Too narrow to climb out of.
  */
 function well(x, y) {
-  p.rect(x - 1, y - 1, x + 3, y + 3, (_, __, c) => (c.slab ? { ...c, slab: { ...c.slab, top: c.slab.top + 0.9 } } : { ...c, floorZ: c.floorZ + 0.9 }));
+  // (The kerb: whitewashed, a flagstone coping.)
+  p.rect(x - 1, y - 1, x + 3, y + 3, (_, __, c) => (c.slab ? { ...c, slab: { ...c.slab, top: c.slab.top + 0.9, floor: 'flagstone', side: 'adobe-pale' } } : { ...c, floorZ: c.floorZ + 0.9, floor: 'flagstone', side: 'adobe-pale' }));
   p.rect(x, y, x + 2, y + 2, (_, __, c) => ({ floor: c.floor, ceiling: 'sky', floorZ: c.floorZ, ceilZ: SKY, light: 136, side: 'adobe-pale' }));
 }
 
@@ -330,7 +332,9 @@ lights.push({ x: 109, y: 37, z: 3.5, radius: 8, light: 64 });
 // The farm's gate onto the lane, in the yard's east wall straight across
 // from the shed's door: the Imperials' red lock on it, a lamp over it.
 town.arch(124, 15, 126, 21, { h: WALL, lintel: 4, floorZ: FARM, floor: 'flagstone', light: 136 });
-p.rect(125, 15, 126, 21, (_, __, c) => ({ ...c, door: 'imp-door-red', style: 'rise', lock: 'red' }));
+p.rect(125, 15, 126, 21, (_, __, c) => ({ ...c, door: 'door-gate-rising', style: 'rise', lock: 'red' }));
+// The Imperials' red lock clamped to the jamb beside it, on the yard's side.
+list.push(at('imp-lock', 123.99, 22.5, { z: FARM + IMP_LOCK.z, angle: 270 }));
 apron(119, 13, 124, 23);
 apron(126, 13, 131, 23);
 tag(118, 13, 124, 23, 'gate');
@@ -804,6 +808,39 @@ decals.push(
   { x: 103, y: 50, z: PIT + 2.2, face: 'S', tex: 'grime-crack-1' },
   { x: 105, y: 54, z: PIT + 1.6, face: 'N', tex: 'grime-crack-2' },
   { x: 99, y: 54, z: PIT + 2.6, face: 'N', tex: 'grime-crack-1' },
+);
+
+// ---------------------------------------------------------------- 5. the work yard, dressed
+// The generator shed: the farm's generator on its skid, its stack out
+// through the roof; a rusty railing along the stair's open side, the way
+// down at its north end; fuel drums, the fuse box and conduit. Outside, its
+// tin patched and streaked, soot over the door.
+list.push(
+  at('farm-generator', 78.5, 17.2, { z: FARM, angle: 0 }),
+  at('barrel-rust', 81.9, 13.6, { z: FARM }), at('barrel-grey', 82.6, 14.2, { z: FARM }), at('canister-rust', 75.2, 22.4, { z: FARM }),
+  at('oil-small', 79.6, 19.2, { z: FARM, angle: 60 }), at('crate-grey-small', 76.2, 13.5, { z: FARM, angle: 8 }),
+);
+p.fence(74, 16, 75, 23, 'W', { tex: 'rail-rust', height: 0.75 });
+town.fixture('wall-unit', 79, 23, 'N', { z: FARM + 1.2 });
+town.fixture('conduit-6', 78, 23, 'N', { z: FARM + 3 });
+decals.push(
+  { x: 84, y: 17.5, z: FARM + 3.4, face: 'E', tex: 'grime-scorch-1' },
+  { x: 84, y: 22.2, z: FARM + 2.6, face: 'E', tex: 'patch-rust' },
+  { x: 84, y: 13.4, z: FARM + 1.6, face: 'E', tex: 'patch-plate' },
+  { x: 73, y: 24, z: FARM + 2.2, face: 'S', tex: 'patch-tin' },
+  { x: 79.5, y: 24, z: FARM + 3.3, face: 'S', tex: 'grime-streaks-1' },
+  { x: 81, y: 24, z: FARM + 1.4, face: 'S', tex: 'vent-slats' },
+);
+// The staging point: the comm unit on a crate, the floodlight cabled to
+// the power unit, a cargo pod and spare crates. About the yard: cargo pods
+// along the walls, a dead power droid by the shed.
+list.push(
+  at('comm-unit', 104.6, 37.6, { z: FARM + 1.2, angle: 200 }),
+  ...[[112, 32.5, 0], [114, 32.5, 0]].map(([x, y, a]) => at('floor-cable-4', x, y, { z: FARM, angle: a })),
+  at('cargo-pod', 116.8, 40.6, { z: FARM, angle: 75 }),
+  at('crate-grey-small', 106.4, 41.6, { z: FARM, angle: 25 }),
+  at('cargo-pod', 90.5, 13.8, { angle: 2 }), at('cargo-pod', 68.4, 40, { angle: 92 }),
+  at('power-droid-rust', 86.2, 24.8, { z: FARM, angle: 120 }),
 );
 
 // ---------------------------------------------------------------- the machinery under the ground
