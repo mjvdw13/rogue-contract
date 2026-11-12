@@ -94,6 +94,23 @@ These need Mark to try something, or to decide. Don't start them without him.
   soot), and whether the workshop wants more in it (it's 9 m by 7 m).
   The well room (the secret) is as it was.
 
+- **Mission 2's work yard, dressed** (`?map=m2`, 2026-11-11; up the
+  shed's stair from the workshop): in the generator shed, the farm's
+  generator (a new model: a drum on a skid with cooling rings, gauges at
+  its east end, one lamp dead, its stack up into the roof), a rusty
+  railing along the stair's open side so the way down is at its north
+  end, fuel drums, the fuse box and conduit; outside, the tin patched and
+  streaked, soot over the door. The gate is the farm's own X-braced gate
+  now, with the Imperials' red lock (a dark box, a red stripe and lamp,
+  its cable to the gate) clamped on the wall beside it: it stays when the
+  gate rises. At the staging point, a comm unit on a crate, the
+  floodlight cabled to its power unit, a cargo pod; more pods along the
+  yard's walls and a dead power droid by the shed. The light wells' kerbs
+  are whitewashed with a flagstone coping. To judge: whether the lock
+  reads as clamped on (it's on the wall, not the gate), the generator's
+  size, and whether the yard wants more. The shed isn't burning yet:
+  that's in "Fire and smoke".
+
 - **Mission 4, the Battle Station** (`?map=m4`, 2026-11-10,
   `docs/mission4.md`): the whole level, made in one session without you
   and then gone over area by area. The hangar with the Crow, three TIE
@@ -1446,10 +1463,6 @@ snapshots, playable at `?map=m2`.
         troopers should see no farther than the player in one (above).
 - [ ] **Each area in detail,** in the order you meet them, snapshots
       before and after each:
-  - [ ] The work yard: the generator shed (tin, its hatch), the staging
-        point (a lit floodlight, crates, barricades, a comm unit), the
-        farm's gate with the Imperials' red lock clamped on it (in place of
-        the stand-in Imperial door), the light wells' kerbs.
   - [ ] The lane and the great dome: barricades, the dome's porch, door,
         lamp and hall, its stairwell.
   - [ ] The courtyard and the house's rooms: round-topped arches, the
