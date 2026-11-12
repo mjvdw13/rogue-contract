@@ -332,8 +332,11 @@ lights.push({ x: 109, y: 37, z: 3.5, radius: 8, light: 64 });
 // The farm's gate onto the lane, in the yard's east wall straight across
 // from the shed's door: the Imperials' red lock on it, a lamp over it.
 town.arch(124, 15, 126, 21, { h: WALL, lintel: 4, floorZ: FARM, floor: 'flagstone', light: 136 });
-p.rect(125, 15, 126, 21, (_, __, c) => ({ ...c, door: 'door-gate-rising', style: 'rise', lock: 'red' }));
-// The Imperials' red lock clamped to the jamb beside it, on the yard's side.
+// It opens from the Imperials' red lock clamped to the wall beside it on
+// the yard's side (Mark, 2026-11-11: the panel, not the gate): use the
+// lock with the officer's key and the gate rises and stays up.
+p.rect(125, 15, 126, 21, (_, __, c) => ({ ...c, door: 'door-gate-rising', style: 'rise', lock: 'remote', stayOpen: true, tag: 'farm-gate' }));
+tag(124, 22, 125, 23, 'gate-lock');
 list.push(at('imp-lock', 123.99, 22.5, { z: FARM + IMP_LOCK.z, angle: 270 }));
 apron(119, 13, 124, 23);
 apron(126, 13, 131, 23);
@@ -1163,6 +1166,8 @@ export default defineLevel({
     { on: 'enter', tag: 'reveal', do: [{ action: 'message', text: "KYLE: THERE'S THE HOUSE." }] },
     { on: 'pickup', thing: 'keycard-red', do: [{ action: 'setFlag', flag: 'key' }] },
     { on: 'enter', tag: 'gate', unless: 'key', do: [{ action: 'message', text: "AN IMPERIAL LOCK ON THE FARM'S GATE. THE OFFICER WILL HAVE THE KEY." }] },
+    { on: 'use', tag: 'gate-lock', unless: 'key', once: false, do: [{ action: 'message', text: "THE LOCK WANTS AN IMPERIAL KEYCARD. THE OFFICER WILL HAVE IT." }] },
+    { on: 'use', tag: 'gate-lock', if: 'key', do: [{ action: 'message', text: "THE LOCK TAKES THE OFFICER'S CARD. THE GATE GRINDS UP." }, { action: 'openDoors', tag: 'farm-gate' }] },
     {
       on: 'enter',
       tag: 'recordings',

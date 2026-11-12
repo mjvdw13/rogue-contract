@@ -102,12 +102,14 @@ These need Mark to try something, or to decide. Don't start them without him.
   end, fuel drums, the fuse box and conduit; outside, the tin patched and
   streaked, soot over the door. The gate is the farm's own X-braced gate
   now, with the Imperials' red lock (a dark box, a red stripe and lamp,
-  its cable to the gate) clamped on the wall beside it: it stays when the
-  gate rises. At the staging point, a comm unit on a crate, the
+  its cable to the gate) clamped on the wall beside it. After Mark's note
+  (2026-11-11) the gate opens from the lock, not the gate itself: use the
+  lock with the officer's key and the gate rises and stays up (without
+  the key the lock says it wants it; the gate just sounds locked). At the staging point, a comm unit on a crate, the
   floodlight cabled to its power unit, a cargo pod; more pods along the
   yard's walls and a dead power droid by the shed. The light wells' kerbs
   are whitewashed with a flagstone coping. To judge: whether the lock
-  reads as clamped on (it's on the wall, not the gate), the generator's
+  reads as clamped on (it's on the wall, not the gate), its two lines, the generator's
   size, and whether the yard wants more. The shed isn't burning yet:
   that's in "Fire and smoke".
 
