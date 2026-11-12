@@ -50,8 +50,10 @@ These need Mark to try something, or to decide. Don't start them without him.
   side of the way to the arch, plants in rows under lamp frames whose
   strips glow a cold blue-white; the garden's tank by the arch, the water
   pipe coming down the wall into it; sand pouring over the west rim onto
-  a heap at the wall's foot (`sand-fall`, `sand-sheet`, a dust puff; not
-  seen moving yet: snapshots don't run emitters). You now start between
+  a heap at the wall's foot (`sand-fall`, `sand-sheet`, a dust puff;
+  thickened after Mark couldn't see it: a solid streaking stream and
+  dithered sheets, from across the pit a column rim to heap; only in the
+  garden pit, on its west side, behind you at the start). You now start between
   the beds' west ends (24, 46). The hidey-hole: scuffs on the tunnel
   floor and a grubby patch by its panel, Rusk's bedroll, eleven groups of
   days scratched over it (`grime-tally`), a crate, a canister, ration
@@ -67,7 +69,7 @@ These need Mark to try something, or to decide. Don't start them without him.
   rusty band where the water once stood, a flared capital under the
   vault), a damp line along the walls' foot, the walkway's lip in rusty
   steel. Iron grates across the light wells' feet, sand trickling through
-  into the shafts and dust catching the light (emitters: not seen moving).
+  into the shafts and dust catching the light.
   The Imperials' two work lamps on tripods (Mission 4's), aimed into the
   pool, cabled along the walkway to a power unit at the west end; crates
   and a cable reel by the east stair. The water pipe's middle joint leaks,

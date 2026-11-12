@@ -178,8 +178,8 @@ export default [
     model: 'sand-heap',
     fixed: true,
     emit: [
-      { type: 'sand-fall', count: 3, every: [0.05, 0.12], at: [0, 0.15, SAND_HEAP.fall], radius: 0.5, dir: [0, 1, -0.2], spread: 0.25, speed: [0.3, 0.8] },
-      { type: 'sand-sheet', count: 1, every: [0.15, 0.35], at: [0, 0.15, SAND_HEAP.fall], radius: 0.4, dir: [0, 1, -0.2], spread: 0.2, speed: [0.2, 0.5] },
+      { type: 'sand-fall', count: 5, every: [0.03, 0.06], at: [0, 0.15, SAND_HEAP.fall], radius: 0.3, dir: [0, 1, -0.2], spread: 0.25, speed: [0.3, 0.8] },
+      { type: 'sand-sheet', count: 1, every: [0.04, 0.08], at: [0, 0.15, SAND_HEAP.fall], radius: 0.25, dir: [0, 1, -0.2], spread: 0.2, speed: [0.2, 0.5] },
       { type: 'dust-puff', count: 1, every: [0.8, 1.6], at: [0, 0.5, SAND_HEAP.h], radius: 0.4, dir: [0, 1, 0.5], spread: 0.6, speed: [0.2, 0.5] },
     ],
   }),
