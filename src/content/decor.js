@@ -225,6 +225,10 @@ export default [
   defineDecoration({ id: 'farm-generator', model: 'farm-generator', solid: true, height: GENERATOR.skid + 2 * GENERATOR.r, fixed: true }),
   defineDecoration({ id: 'imp-lock', model: 'imp-lock', fixed: true }),
   defineDecoration({ id: 'comm-unit', model: 'comm-unit', fixed: true }),
+  // The great dome's porch and hall: its lamps, one shot out, and its door lying where it fell.
+  defineDecoration({ id: 'wall-globe', model: 'wall-globe', fixed: true }),
+  defineDecoration({ id: 'wall-globe-dead', model: 'wall-globe-dead', fixed: true }),
+  defineDecoration({ id: 'door-fallen', model: 'door-fallen', fixed: true }),
   defineDecoration({ id: 'kitchen-appliances', model: 'kitchen-appliances', solid: true, height: APPLIANCES.top, fixed: true }),
   // Things on Mos Eisley's streets: crates, drums, canisters, junk, rubble, scrap, a vaporator.
   ...Object.entries(CLUTTER).map(([id, c]) => defineDecoration({ id, model: id, solid: !!c.solid, radius: c.radius, height: c.height, fixed: true })),

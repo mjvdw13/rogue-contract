@@ -843,7 +843,47 @@ list.push(
   at('power-droid-rust', 86.2, 24.8, { z: FARM, angle: 120 }),
 );
 
-// ---------------------------------------------------------------- the machinery under the ground
+// ---------------------------------------------------------------- 6, 7a. the lane and the great dome, dressed
+// The lane: the Imperials' barricades across it, crates behind them,
+// blaster scorches along both walls where the farmhands held them off, a
+// cargo pod shoved aside, litter.
+list.push(
+  at('barricade-worn', 141.2, 21.4, { angle: 170, z: FARM }),
+  at('supply-crate', 138.6, 18.6, { z: FARM }), at('crate-grey-small', 139.8, 17.6, { z: FARM, angle: 30 }),
+  at('cargo-pod', 131, 13.4, { angle: 4 }),
+  at('litter-small', 134.6, 19, { z: FARM, angle: 120 }), at('litter-small', 142.2, 15.6, { z: FARM, angle: 15 }),
+  at('floor-scuff', 140.4, 20.2, { z: FARM, angle: 80 }),
+);
+for (const [x, y, z, face, tex] of [
+  [133.5, 12, FARM + 2.1, 'S', 'grime-scorch-1'], [141, 12, FARM + 1.5, 'S', 'grime-scorch-2'], [129, 12, FARM + 2.6, 'S', 'grime-scorch-2'],
+  [136, 24, FARM + 1.8, 'N', 'grime-scorch-1'], [142.5, 24, FARM + 2.4, 'N', 'grime-scorch-2'],
+]) decals.push({ x, y, z, face, tex });
+// The porch: a lamp either side of the hood, the south one shot out; the
+// door blown in, soot round the opening, sand blown down the steps.
+list.push(
+  at('wall-globe', 151.99, 17.4, { z: HALL + 2.9, angle: 270 }),
+  at('wall-globe-dead', 151.99, 22.6, { z: HALL + 2.9, angle: 270 }),
+  at('floor-dirt-1', 146.5, 20, { angle: 90 }), at('floor-dirt-2', 149.8, 21.2, { z: HALL }),
+  at('rubble', 150.6, 18.4, { z: HALL, angle: 40 }),
+);
+lights.push({ x: 151.4, y: 17.4, z: HALL + 2.8, radius: 3, light: 40 });
+decals.push(
+  { x: 152, y: 17.3, z: HALL + 3.4, face: 'W', tex: 'grime-scorch-2' },
+  { x: 152, y: 22.7, z: HALL + 2.9, face: 'W', tex: 'grime-scorch-1' },
+);
+// The hall under the dome: the door where it fell, a lamp hung under the
+// dome, the family's astromech shut down in a corner, crates and a
+// canister knocked about, boot scuffs and sand from the doorway.
+list.push(
+  at('door-fallen', 155.4, 19.8, { z: HALL, angle: 76 }),
+  at('cantina-lamp', 160, 19.5, { z: FARM + 4.5 - LAMP_CORD }),
+  at('astromech-blue', 166, 16.2, { z: HALL, angle: 225 }),
+  at('crate-tan', 165.6, 23.8, { z: HALL, angle: 18 }), at('crate-grey-small', 164.2, 24.2, { z: HALL, angle: 60 }),
+  at('canister', 154, 24.3, { z: HALL }), at('litter-small', 163, 19, { z: HALL, angle: 300 }),
+  at('floor-scuff', 157.6, 21, { z: HALL, angle: 20 }), at('floor-scuff', 161.4, 17.6, { z: HALL, angle: 110 }),
+  at('floor-dirt-1', 154.2, 20.4, { z: HALL, angle: 90 }),
+);
+
 // After the cutaway in Mark's references: the farm's water pipe on its
 // brackets from where it comes down out of the garden court, along the pump
 // tunnel to the pump, along the reservoir's north wall over a band of

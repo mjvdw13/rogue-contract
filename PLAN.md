@@ -111,6 +111,17 @@ These need Mark to try something, or to decide. Don't start them without him.
   size, and whether the yard wants more. The shed isn't burning yet:
   that's in "Fire and smoke".
 
+- **Mission 2's lane and great dome, dressed** (`?map=m2`, 2026-11-11;
+  through the gate): a third barricade across the lane with crates behind
+  it, blaster scorches along both walls, a cargo pod shoved aside, litter.
+  At the porch, an amber lamp either side of the hood (the south one shot
+  out), soot by the opening, sand and rubble down the steps; the house's
+  door blown in and lying on the hall's floor. In the hall, a lamp hung
+  under the dome, the family's astromech shut down in a corner, crates
+  and a canister knocked about, boot scuffs. To judge: the fallen door
+  (the door's picture on planks), whether the hall wants more (furniture
+  for an entrance hall), and the lamps.
+
 - **Mission 4, the Battle Station** (`?map=m4`, 2026-11-10,
   `docs/mission4.md`): the whole level, made in one session without you
   and then gone over area by area. The hangar with the Crow, three TIE
@@ -1463,8 +1474,6 @@ snapshots, playable at `?map=m2`.
         troopers should see no farther than the player in one (above).
 - [ ] **Each area in detail,** in the order you meet them, snapshots
       before and after each:
-  - [ ] The lane and the great dome: barricades, the dome's porch, door,
-        lamp and hall, its stairwell.
   - [ ] The courtyard and the house's rooms: round-topped arches, the
         overturned table, the cart, the common room's hearth and table,
         the quarters' alcoves and toy droid, the storeroom's shelves.

@@ -17,6 +17,17 @@ import { ModelBuilder } from './lib/build.js';
 // `comm-unit`: the staging point's field comm unit, set on a crate: a
 // plated case with a lit screen and buttons, a whip antenna and a small
 // dish. Not solid (the crate under it is).
+//
+// The lane and the great dome's (area 7a):
+//
+// `wall-globe`, `wall-globe-dead`: a lamp on the wall by the house's door,
+// a bracket and an amber globe (the dead one shot out, dark). Its back to
+// the wall at y = 0, out along +y; place it at the globe's height.
+//
+// `door-fallen`: the house's plank door, blown in off its runners, lying
+// flat on the floor: DOOR_FALLEN.w across x, DOOR_FALLEN.l along y (its
+// round top at +y), DOOR_FALLEN.t thick. Not solid.
+export const DOOR_FALLEN = { w: 3, l: 4, t: 0.12 };
 export const GENERATOR = { half: 1.8, r: 0.75, skid: 0.25, stack: 4 };
 export const IMP_LOCK = { z: 1, half: 0.45, h: 1.2, deep: 0.32, cable: 1.4 };
 export const COMM_UNIT = { half: 0.4, depth: 0.32, h: 0.38 };
@@ -91,4 +102,22 @@ function commUnit() {
   return m.build();
 }
 
-export default [generator(), impLock(), commUnit()];
+function wallGlobe(id, lit) {
+  const m = new ModelBuilder(id);
+  const amber = { color: lit ? [150, 96, 40] : [64, 48, 34] };
+  m.box([-0.04, 0, -0.06], [0.04, 0.3, 0.02], DARK);
+  m.cylinder([0, 0.36, -0.18], 0.15, 0.3, { segments: 8, ...amber, top: lit ? { color: [255, 210, 140], glow: true } : { color: [60, 44, 30] }, bottom: amber });
+  return m.build();
+}
+
+function doorFallen() {
+  const m = new ModelBuilder('door-fallen');
+  const { w, l, t } = DOOR_FALLEN;
+  // The planks, edge on; its face up, the door's picture over it (its
+  // round top's corners see-through).
+  m.box([-w / 2 + 0.08, -l / 2, 0], [w / 2 - 0.08, l / 2 - 0.5, t - 0.01], { tex: 'planks', top: false });
+  m.face([[-w / 2, -l / 2, t], [w / 2, -l / 2, t], [w / 2, l / 2, t], [-w / 2, l / 2, t]], { tex: 'door-planks', uv: [[0, 1], [1, 1], [1, 0], [0, 0]] }, [0, 0, 0]);
+  return m.build();
+}
+
+export default [generator(), impLock(), commUnit(), wallGlobe('wall-globe', true), wallGlobe('wall-globe-dead', false), doorFallen()];
