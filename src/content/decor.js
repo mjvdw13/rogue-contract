@@ -30,6 +30,7 @@ import { STALL, STABLE_POST, FEED } from './models/stable.js';
 import { VAPORATORS } from './models/vaporator.js';
 import { FARM_MODELS, PUMP, CONSOLE as GARAGE_CONSOLE, GARAGE_RING, COUNTER, APPLIANCES, SKYHOPPER } from './models/farm.js';
 import { GROW_BED, GARDEN_TANK, SAND_HEAP } from './models/garden.js';
+import { RES_PILLAR, FLOOR_CABLES } from './models/reservoir.js';
 
 // Scenery. Solid ones block movement; ones with health can be shot (and
 // `explode`).
@@ -181,6 +182,27 @@ export default [
       { type: 'sand-sheet', count: 1, every: [0.15, 0.35], at: [0, 0.15, SAND_HEAP.fall], radius: 0.4, dir: [0, 1, -0.2], spread: 0.2, speed: [0.2, 0.5] },
       { type: 'dust-puff', count: 1, every: [0.8, 1.6], at: [0, 0.5, SAND_HEAP.h], radius: 0.4, dir: [0, 1, 0.5], spread: 0.6, speed: [0.2, 0.5] },
     ],
+  }),
+  // The reservoir's (models/reservoir.js): its round pillars; the grates at
+  // the light wells' feet, sand trickling through and dust catching the
+  // light under them; the Imperials' cables on the floor; and a joint of the
+  // water pipe that leaks, dripping onto the walkway.
+  defineDecoration({ id: 'res-pillar', model: 'res-pillar', solid: true, radius: RES_PILLAR.r + 0.1, height: RES_PILLAR.h, fixed: true }),
+  defineDecoration({
+    id: 'well-grate',
+    model: 'well-grate',
+    fixed: true,
+    emit: [
+      { type: 'sand-fall', count: 1, every: [0.15, 0.5], at: [0, 0, -0.1], radius: 0.8, dir: [0, 0, -1], spread: 0.2, speed: [0.1, 0.4] },
+      { type: 'glint', count: 1, every: [0.1, 0.25], at: [0, 0, -4], radius: 0.9, dir: [0, 0, -1], spread: 1, speed: [0, 0.1] },
+    ],
+  }),
+  ...FLOOR_CABLES.map((l) => defineDecoration({ id: `floor-cable-${l}`, model: `floor-cable-${l}`, fixed: true })),
+  defineDecoration({
+    id: 'water-pipe-joint-leak',
+    model: 'water-pipe-joint',
+    fixed: true,
+    emit: [{ type: 'drip', count: 1, every: [0.4, 1.1], at: [0, 0.05, -0.22], radius: 0.05, dir: [0, 0, -1], spread: 0.05, speed: [0, 0.1] }],
   }),
   defineDecoration({ id: 'kitchen-appliances', model: 'kitchen-appliances', solid: true, height: APPLIANCES.top, fixed: true }),
   // Things on Mos Eisley's streets: crates, drums, canisters, junk, rubble, scrap, a vaporator.

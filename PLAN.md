@@ -62,6 +62,19 @@ These need Mark to try something, or to decide. Don't start them without him.
   green and the lamps' colour, how thick the pouring sand is, the tally,
   and whether the start is a good first look.
 
+- **Mission 2's reservoir, dressed** (`?map=m2`, 2026-11-11): the five
+  pillars round now (duracrete models standing in the pool, a plinth, a
+  rusty band where the water once stood, a flared capital under the
+  vault), a damp line along the walls' foot, the walkway's lip in rusty
+  steel. Iron grates across the light wells' feet, sand trickling through
+  into the shafts and dust catching the light (emitters: not seen moving).
+  The Imperials' two work lamps on tripods (Mission 4's), aimed into the
+  pool, cabled along the walkway to a power unit at the west end; crates
+  and a cable reel by the east stair. The water pipe's middle joint leaks,
+  dripping onto the walkway (`drip`). To judge: the pillars' size and
+  colour (they read dark red-brown in the haze), whether the lamps want a
+  visible beam, and whether the darkness is right now.
+
 - **Mission 4, the Battle Station** (`?map=m4`, 2026-11-10,
   `docs/mission4.md`): the whole level, made in one session without you
   and then gone over area by area. The hangar with the Crow, three TIE
@@ -1414,9 +1427,6 @@ snapshots, playable at `?map=m2`.
         troopers should see no farther than the player in one (above).
 - [ ] **Each area in detail,** in the order you meet them, snapshots
       before and after each:
-  - [ ] The reservoir: its stairs, the pillars, the Imperials' work
-        lamps and cables, the shafts of evening light on the water, drips,
-        the pool's edge.
   - [ ] The workshop pit and the workshop: oil, droid parts, the
         burning speeder, the caved-in tunnel's rubble and broken
         support, the bench and pit droid, the shed's stairwell, the well

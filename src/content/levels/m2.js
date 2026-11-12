@@ -405,10 +405,16 @@ stairDown(50, 58, 54, 74, PIT, { flight: 7, to: RESERVOIR, lining: RESERVOIR_WAL
 under(44, 74, 108, 86, { ...vault, floorZ: RESERVOIR });
 under(44, 78, 108, 86, { ...vault, floorZ: RESERVOIR - 0.5, floor: 'water-murky', light: 72 });
 // The walkway a grating over the damp.
-p.rect(44, 74, 108, 78, (_, __, c) => (c.slab ? { ...c, floor: 'hold-floor' } : c));
-for (const x of [56, 66, 76, 86, 96]) p.rect(x, 80, x + 2, 82, { wall: 'sandstone' });
+// Its lip over the pool is steel.
+p.rect(44, 74, 108, 78, (_, __, c) => (c.slab ? { ...c, floor: 'hold-floor', side: 'metal-rust' } : c));
 stairDown(100, 58, 104, 74, PIT, { flight: 7, to: RESERVOIR, lining: RESERVOIR_WALLS, floor: 'derelict-floor' });
 lights.push({ x: 70, y: 75.5, z: RESERVOIR + 1, radius: 7, light: 64 }, { x: 99, y: 75.5, z: RESERVOIR + 1, radius: 7, light: 64 });
+// Where the work lamps' beams fall on the water, and the evening light
+// down the two wells.
+lights.push(
+  { x: 74, y: 81, z: RESERVOIR, radius: 4, light: 40 }, { x: 95, y: 81, z: RESERVOIR, radius: 4, light: 40 },
+  { x: 62, y: 84, z: RESERVOIR, radius: 3, light: 56 }, { x: 82, y: 84, z: RESERVOIR, radius: 3, light: 56 },
+);
 
 // ---------------------------------------------------------------- 4. the workshop
 // The droid workshop dug north of the workshop pit, the shed's stair coming
@@ -718,6 +724,27 @@ for (const x of [49, 50.6]) {
   waterPipe([[x, 55 - GARDEN_TANK.back, PIT + GARDEN_TANK.inlet, 'N'], [x, 55 - GARDEN_TANK.back, PIT + 4]]);
 }
 
+// ---------------------------------------------------------------- 3. the reservoir, dressed
+// Five round duracrete pillars in the pool, a rusty band where the water
+// once stood and a damp line along the walls' foot. Grates across the light
+// wells' feet, sand trickling through them into the shafts of light. The
+// Imperials have brought in two work lamps on tripods, cabled along the
+// walkway to a power unit at the west end, and left crates and a reel of
+// cable by the east stair. The water pipe's middle joint leaks.
+for (const x of [57, 67, 77, 87, 97]) list.push(at('res-pillar', x, 81, { z: RESERVOIR - 0.5 }));
+for (const [x, y] of [[62, 84], [82, 84]]) list.push(at('well-grate', x, y, { z: RESERVOIR + 8.95 }));
+list.push(
+  at('power-unit', 45, 75, { z: RESERVOIR }),
+  at('work-lamp', 70, 75, { z: RESERVOIR, angle: 300 }),
+  at('work-lamp', 99, 75, { z: RESERVOIR, angle: 235 }),
+  ...[50, 58, 66, 74, 82, 90].map((x) => at('floor-cable-8', x, 74.6, { z: RESERVOIR })),
+  at('floor-cable-4', 96, 74.6, { z: RESERVOIR }),
+  at('ds-cable-reel', 102.2, 75.2, { z: RESERVOIR }),
+  at('supply-crate', 106.6, 75.1, { z: RESERVOIR }), at('supply-crate', 106.9, 76.6, { z: RESERVOIR }),
+);
+for (let x = 48; x <= 104; x += 4) decals.push({ x, y: 86, z: RESERVOIR, face: 'N', tex: x % 8 ? 'grime-dust-1' : 'grime-dust-2' });
+for (const [x, face] of [[44, 'E'], [108, 'W']]) decals.push({ x, y: 82, z: RESERVOIR, face, tex: 'grime-dust-1' });
+
 // ---------------------------------------------------------------- the machinery under the ground
 // After the cutaway in Mark's references: the farm's water pipe on its
 // brackets from where it comes down out of the garden court, along the pump
@@ -761,6 +788,8 @@ list.push({ type: 'water-pump', x: PUMP_AT[0], y: PUMP_AT[1], z: PIT, angle: 0 }
 // whole length of the north wall, and up the east end into the vault.
 const RES_PIPE = RESERVOIR + 5;
 waterPipe([[43.75, 74.25, RES_PIPE, 'N'], [107.75, 74.25, RES_PIPE, 'E'], [107.75, 74.25, RESERVOIR + 9]]);
+// Its middle joint leaks.
+list.find((t) => t.type === 'water-pipe-joint' && t.x === 75.75 && t.y === 74.25).type = 'water-pipe-joint-leak';
 // Pipework along the foot of the north wall, under the pipe (not across
 // the stairs' openings).
 p.rect(44, 73, 108, 74, (_, __, c) => (c.slab ? c : { ...c, bands: [{ from: RESERVOIR, to: RESERVOIR + 2, tex: 'pipe-band' }, ...(c.bands ?? [])] }));

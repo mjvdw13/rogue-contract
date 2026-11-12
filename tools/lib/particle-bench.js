@@ -30,6 +30,7 @@ export const BENCH_KINDS = {
   'sand-snake': { label: 'Sand snakes (streak, lit, low and fast)', vel: (r) => [r(3, 5), r(-1.8, -0.8), 0], z: [0.02, 0.12], wind: [2.8, -1, 0] },
   'sand-fall': { label: 'Sand falling (streak, lit, pouring down)', vel: (r) => [r(-0.2, 0.2), r(0.3, 0.8), 0], z: [3.5, 4] },
   'sand-sheet': { label: 'Sand sheets (disc, lit, half, pouring down)', vel: (r) => [r(-0.2, 0.2), r(0.2, 0.5), 0], z: [3.5, 4] },
+  drip: { label: 'Drips (streak, lit, falling)', vel: () => [0, 0, 0], z: [3.5, 4] },
   fire: { label: 'Fire (disc, glowing, add, swelling)', vel: (r) => [r(-0.5, 0.5), r(-0.5, 0.5), r(0, 1)], z: [0.3, 1.5] },
   fireball: { label: 'Fireball (big disc, glowing, add, swelling)', vel: (r) => [r(-0.5, 0.5), r(-0.5, 0.5), r(0, 1)], z: [0.5, 2] },
   'blast-flash': { label: 'Blast flash (big disc, glowing, add, a blink)', vel: () => [0, 0, 0], z: [0.5, 2] },

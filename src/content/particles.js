@@ -308,6 +308,18 @@ export default [
     onFloor: 'die',
     cap: 12,
   }),
+  // Water dripping from a leaking pipe joint (Mission 2's reservoir).
+  defineParticle({
+    id: 'drip',
+    colors: [{ ramp: 'steel', from: 26, to: 23 }],
+    life: [1, 1.5],
+    size: 0.02,
+    maxPx: 1,
+    streak: 0.04,
+    gravity: 9.8,
+    onFloor: 'die',
+    cap: 30,
+  }),
   // Explosions (src/content/explosions.js). The fireball: bright glowing
   // discs that swell and cool from white through yellow and orange to red.
   defineParticle({
