@@ -341,15 +341,16 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
    * Wall bands: over a face from height `faceBot` to `faceTop`, each band's
    * texture over its heights (last to first, so the first that covers a
    * height is on top). A band's texture hangs from its top, or from the
-   * face's top if it's open-ended. Its see-through texels leave what's
-   * under them (the wall's own texture, or a band further down the list).
+   * face's top if it's open-ended (with `grid`, from the world grid above
+   * it, as step sides are). Its see-through texels leave what's under them
+   * (the wall's own texture, or a band further down the list).
    */
-  const bandFaces = (t, faceTop, faceBot, bands, u, lv, hz) => {
+  const bandFaces = (t, faceTop, faceBot, bands, u, lv, hz, grid) => {
     for (let j = bands.length - 1; j >= 0; j--) {
       const band = bands[j];
       const top = band.to < faceTop ? band.to : faceTop;
       const bot = band.from > faceBot ? band.from : faceBot;
-      if (top > bot) (textures[band.tex].holes ? holeFace : face)(t, Math.ceil(horizon + ((camZ - top) * fy) / t - 0.5), Math.ceil(horizon + ((camZ - bot) * fy) / t - 0.5), band.to < Infinity ? band.to : faceTop, band.tex, u, lv, hz);
+      if (top > bot) (textures[band.tex].holes ? holeFace : face)(t, Math.ceil(horizon + ((camZ - top) * fy) / t - 0.5), Math.ceil(horizon + ((camZ - bot) * fy) / t - 0.5), band.to < Infinity ? band.to : grid ? gridTop(faceTop, band.tex) : faceTop, band.tex, u, lv, hz);
     }
   };
   /**
@@ -417,6 +418,15 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
   };
   /** A texture's height in world units (faces hung from their bottom edge use it). */
   const texHeight = (slot) => (slot >= 0 ? textures[slot].h / TPU : 1);
+  /**
+   * The lowest multiple of a texture's height at or above z: an anchor on a
+   * grid fixed in the world, so faces of different heights hung from it (the
+   * sides of a stair's steps) show the same row at the same height.
+   */
+  const gridTop = (z, slot) => {
+    const h = texHeight(slot);
+    return Math.ceil(z / h - 1e-6) * h;
+  };
   /**
    * The (fractional) colormap level of a face the ray meets at distance t,
    * in storey s: the smooth light there, and the faces' fake contrast.
@@ -968,7 +978,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
           const cz = !s && curSlab ? slabBot[cur] : ceilZ[cur];
           const lv = faceLevel(s, tExit, contrast, out);
           face(tExit, Math.ceil(horizon + ((camZ - cz) * fy) / tExit - 0.5), Math.ceil(horizon + ((camZ - fz) * fy) / tExit - 0.5), cz, tex, u, lv, hz);
-          if (bands) bandFaces(tExit, cz, fz, bands, u, lv, hz);
+          if (bands) bandFaces(tExit, cz, fz, bands, u, lv, hz, 0);
           if (decals) decalFaces(tExit, cz, fz, decals, edgePos, mirrored, lv, hz);
         }
         end = tExit;
@@ -993,8 +1003,10 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
           const a = Math.ceil(horizon + ((camZ - fN) * fy) / tExit - 0.5);
           seen[next] = 1;
           const lv = faceLevel(s, tExit, contrast, out);
-          face(tExit, a, Math.ceil(horizon + ((camZ - fC) * fy) / tExit - 0.5), fN, sideN, wx, lv, hz);
-          if (nextBands) bandFaces(tExit, fN, fC, nextBands, wx, lv, hz);
+          // Hung from the world grid, not the step's top, so a stair's open
+          // side reads as one wall instead of a sawtooth.
+          face(tExit, a, Math.ceil(horizon + ((camZ - fC) * fy) / tExit - 0.5), gridTop(fN, sideN), sideN, wx, lv, hz);
+          if (nextBands) bandFaces(tExit, fN, fC, nextBands, wx, lv, hz, 1);
           if (decals) decalFaces(tExit, fN, fC, decals, edgePos, mirrored, lv, hz);
           if (a < clipBot) clipBot = a < clipTop ? clipTop : a;
         }
@@ -1005,7 +1017,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
             seen[next] = 1;
             const lv = faceLevel(s, tExit, contrast, out);
             face(tExit, Math.ceil(horizon + ((camZ - cC) * fy) / tExit - 0.5), b, cN + texHeight(upperTex[next]), upperTex[next], wx, lv, hz);
-            if (nextBands) bandFaces(tExit, cC, cN, nextBands, wx, lv, hz);
+            if (nextBands) bandFaces(tExit, cC, cN, nextBands, wx, lv, hz, 0);
             if (decals) decalFaces(tExit, cC, cN, decals, edgePos, mirrored, lv, hz);
           }
           if (b > clipTop) clipTop = b > clipBot ? clipBot : b;
@@ -1020,7 +1032,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
             const lv = faceLevel(s, tExit, contrast, out);
             face(tExit, a, b, slabTop[next], slabSideTex[next], wx, lv, hz);
             // (Bands too: the wall over a doorway changes with height as the wall beside it.)
-            if (nextBands) bandFaces(tExit, sTop, sBot, nextBands, wx, lv, hz);
+            if (nextBands) bandFaces(tExit, sTop, sBot, nextBands, wx, lv, hz, 0);
             // (Decals on the edge too: a sign over a doorway, whose wall is its arch's slab.)
             if (decals) decalFaces(tExit, sTop, sBot, decals, edgePos, mirrored, lv, hz);
             // Above the edge stays open in this window, and below it in a new one.
