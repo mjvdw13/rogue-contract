@@ -926,7 +926,7 @@ no streets behind the houses.
       cantina's door, the broker; the broker gives the contract, the pass
       and Rusk's signal in one talk. The junk yard, the alleys and the
       informant are left out (their gates stay shut).
-- [ ] The streets: yard walls close the south back lane either side of the
+- [x] The streets: yard walls close the south back lane either side of the
       bay door, so the only way up is the square.
 - [x] The way home: Kyle draws his blaster at the switch and keeps the
       fob, which points at the back lane, the cantina's back door, its

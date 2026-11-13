@@ -185,6 +185,19 @@ town.window(53, 83.5, 'W', { z: 3, tex: 'window-louvre' });
 town.buttress(53, 85.2, 'W', { h: 5, wall: 'adobe-ochre' });
 // A stall on the square in front of G, under a tarp that billows.
 town.tarp(46, 80, 50, 84, { z: 2.75, face: 'W', rise: 0.5, cloth: 'red' });
+// The south back lane shut too (Mark, 2026-11-13: no streets behind the
+// houses). Yard walls 2.5 tall, as on the north lane, either side of the bay
+// door, so its lane leads only north, up the square to the main street: one
+// across the foot of the south row (the alley between E and F a dead end
+// now), one west of the door, one east of it from the round house, and one
+// across the square's south side from the round house to G. The customs
+// house and the lane behind the round house are out of play; the alley
+// between G and Q still runs down to the landspeeder, a dead end.
+town.block(2, 91, 21, 92, { h: 2.5, wall: 'adobe-pale', skirt: 'dirt' });
+town.block(27, 92, 28, 100, { h: 2.5, wall: 'adobe-grey', skirt: 'dirt' });
+town.block(38, 90, 39, 100, { h: 2.5, wall: 'adobe-rose', skirt: 'plinth' });
+town.block(44, 88, 55, 89, { h: 2.5, wall: 'adobe-ochre', skirt: 'dirt' }).block(43, 89, 45, 90, { h: 2.5, wall: 'adobe-ochre', skirt: 'dirt' });
+town.block(52, 89, 53, 100, { h: 2.5, wall: 'adobe-pale', skirt: 'dirt' });
 
 // ---------------------------------------------------------------- 2. the main street (east) and the market
 // East of the first stretch the street widens into the market (y 58..82,
