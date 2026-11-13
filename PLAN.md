@@ -137,16 +137,13 @@ These need Mark to try something, or to decide. Don't start them without him.
   A test walks the route, so it can be finished; nobody has played the
   fights. To judge: the story (the doc's proposal: where it sits, Rusk
   freed here or not), the flow and the sizes, the look of each area, the
-  new droids, the models (the TIE, the shuttle, the table), the `station`
+  mouse droid, the models (the TIE, the shuttle, the table), the `station`
   song and the alarm, and whether the alarm sealing the detention lift
   is right. Added 2026-11-11, to look at: sparks off the live cables
   in the unfinished sector (how often, how bright the flashes), the
   steam off the pipes in the tunnels, pump room and compactor (thin or
   thick enough), the vents in the corridor walls, the flickering ceiling
-  panel on the slant. The tractor beam shaft, now round (2026-11-11): a
-  round wall with eight light columns, a round column with lit rings,
-  the ledges' rims smooth circles with no railings (is that too easy to
-  fall off?).
+  panel on the slant.
 - **Mission 2 under the ground** (`?map=m2`, 2026-11-08, after the
   references): the rooms lined by what they are (whitewash and the
   red-ochre dado in the tunnels, white plaster in the house, duracrete in
@@ -1538,9 +1535,7 @@ Mission 3 is. Each step is a commit, playable at `?map=m4`.
       compactor's groan, the field's hum; 4-tall side doors; a sprite for
       whoever Kyle sees in the briefing room.
 - [ ] Waiting on Mark: where it sits in the story, the look, the fights
-      (nobody has played it), the song; the interrogation droid's Dark
-      Forces art (its size, the green eye as the shock's warning, the
-      needle's stab, one piece of wreck as the corpse).
+      (nobody has played it), the song.
 
 ### 11. Frame time (Mark, 2026-11-10)
 
