@@ -145,6 +145,7 @@ export default [
   // The control room's plotting table and the ship turning over it; a cell's bunk.
   defineDecoration({ id: 'ds-holo-table', model: 'ds-holo-table', solid: true, radius: HOLO.r, height: HOLO.top }),
   defineDecoration({ id: 'ds-holo-ship', model: 'ds-holo-ship', fixed: true, spin: 0.5, bob: { height: 0.04, period: 3 } }),
+  defineDecoration({ id: 'ds-holo-station', model: 'ds-holo-station', fixed: true, spin: 0.25 }),
   defineDecoration({ id: 'ds-door-panel', model: 'ds-door-panel', fixed: true }),
   defineDecoration({ id: 'ds-panel-hoisted', model: 'ds-panel-hoisted', fixed: true }),
   defineDecoration({ id: 'ds-bunk', model: 'ds-bunk', fixed: true, height: CELL_BUNK.top }),

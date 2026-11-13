@@ -22,6 +22,12 @@ import { ModelBuilder } from './lib/build.js';
 // HOLO.over): the captured freighter, a ship drawn in lines of blue
 // light, turning slowly (decor.js spins it).
 //
+// `ds-holo-station`: what the briefing room's table shows: a sphere drawn
+// in lines of blue light, HOLO_STATION.r across its radius, its rings of
+// latitude and meridians, a dish in its northern half, and the half of it
+// that isn't built yet left open (only the meridians there). Placed with
+// its middle at its `z`; decor.js turns it.
+//
 // `ds-door-panel`: the control beside a door: a slim box on the wall (the
 // origin on the wall's face), a lit readout and three buttons.
 //
@@ -40,6 +46,8 @@ export const WELD = [0.95, 0, SERVICE.deck + 0.4];
 export const CART = { top: 1 };
 /** The plotting table's radius and top, and the hologram's height over the floor. */
 export const HOLO = { r: 0.95, top: 1, over: 1.35 };
+/** The station hologram's radius. */
+export const HOLO_STATION = { r: 0.75 };
 /** The hoisted panel's half length and height, and its lifting eyes (y, z). */
 export const PANEL = { half: 1, tall: 2, eye: [0.85, 2.1] };
 /** A bunk's depth out of the wall, length and top. */
@@ -56,6 +64,22 @@ const HOLO_BLUE = { color: [96, 176, 255], glow: true, twoSided: true };
 
 /** A square of half-width h round (cx, cy). */
 const sq = (cx, cy, h) => [[cx - h, cy - h], [cx + h, cy - h], [cx + h, cy + h], [cx - h, cy + h]];
+/**
+ * A line of light from a to b: two crossed ribbons `h` either side of it,
+ * two-sided (two faces, where a strut would take four).
+ */
+function ribbon(m, a, b, h, style) {
+  const d = [b[0] - a[0], b[1] - a[1], b[2] - a[2]];
+  const cross = (u, v) => [u[1] * v[2] - u[2] * v[1], u[2] * v[0] - u[0] * v[2], u[0] * v[1] - u[1] * v[0]];
+  const unit = (v) => {
+    const l = Math.hypot(...v) || 1;
+    return v.map((x) => (x / l) * h);
+  };
+  const p = unit(Math.abs(d[2]) > Math.hypot(d[0], d[1]) ? cross(d, [1, 0, 0]) : cross(d, [0, 0, 1]));
+  const q = unit(cross(d, p));
+  const mid = a.map((v, i) => (v + b[i]) / 2);
+  for (const o of [p, q]) m.face([a.map((v, i) => v + o[i]), b.map((v, i) => v + o[i]), b.map((v, i) => v - o[i]), a.map((v, i) => v - o[i])], style, mid.map((v, i) => v + (o === p ? q : p)[i]));
+}
 /** A strut of half-width h from a to b, square in plan. */
 const strut = (m, [ax, ay, az], [bx, by, bz], h, style) => m.loft(sq(ax, ay, h), az, sq(bx, by, h), bz, { ...style, top: false, bottom: false });
 
@@ -161,6 +185,41 @@ function holoShip() {
   return m.build();
 }
 
+function holoStation() {
+  const m = new ModelBuilder('ds-holo-station');
+  const R = HOLO_STATION.r;
+  const line = (a, b) => ribbon(m, a, b, 0.01, HOLO_BLUE);
+  const at = (lat, lon) => [R * Math.cos(lat) * Math.cos(lon), R * Math.cos(lat) * Math.sin(lon), R * Math.sin(lat)];
+  const N = 16;
+  // Meridians all round; the rings of latitude only on the built half
+  // (and the equator's trench all round).
+  for (let k = 0; k < 8; k++) {
+    const lon = (k * Math.PI) / 4;
+    for (let j = 0; j < 8; j++) line(at(-Math.PI / 2 + (j * Math.PI) / 8, lon), at(-Math.PI / 2 + ((j + 1) * Math.PI) / 8, lon));
+  }
+  for (const lat of [-0.9, -0.5, 0, 0.5, 0.9]) {
+    const half = lat !== 0;
+    for (let k = 0; k < N; k++) {
+      if (half && k >= N / 2 + 2) continue;
+      line(at(lat, (k * 2 * Math.PI) / N), at(lat, ((k + 1) * 2 * Math.PI) / N));
+    }
+  }
+  // The dish: a small ring set into the northern half, on the built side.
+  const dl = 0.55;
+  const dlon = Math.PI / 4;
+  const c = at(dl, dlon);
+  const n = c.map((v) => v / R);
+  const u = [-Math.sin(dlon), Math.cos(dlon), 0];
+  const w = [n[1] * u[2] - n[2] * u[1], n[2] * u[0] - n[0] * u[2], n[0] * u[1] - n[1] * u[0]];
+  const ring = [];
+  for (let k = 0; k < 8; k++) {
+    const a = (k * Math.PI) / 4;
+    ring.push([0, 1, 2].map((i) => c[i] + (u[i] * Math.cos(a) + w[i] * Math.sin(a)) * 0.2));
+  }
+  ring.forEach((p, k) => line(p, ring[(k + 1) % 8]));
+  return m.build();
+}
+
 function doorPanel() {
   const m = new ModelBuilder('ds-door-panel');
   m.box([0, -0.22, 1.0], [0.08, 0.22, 1.75], { ...DARK, bottom: false });
@@ -189,4 +248,4 @@ function bunk() {
   return m.build();
 }
 
-export default [serviceStand(), fuelSocket(), beacon(), toolCart(), holoTable(), holoShip(), doorPanel(), panelHoisted(), bunk()];
+export default [serviceStand(), fuelSocket(), beacon(), toolCart(), holoTable(), holoShip(), holoStation(), doorPanel(), panelHoisted(), bunk()];

@@ -493,6 +493,8 @@ const list = [
   at('officer', 110.5, 84.5, { angle: 270 }), at('officer', 116.5, 86.5, { angle: 270, skill: NOT_EASIEST }),
   at('stormtrooper', 113.5, 81.5, { angle: 270, skill: NORMAL_UP }),
   at('ds-table', 113, 87),
+  // Over it, the project: a sphere in blue light, half of it not built yet.
+  at('ds-holo-station', 113, 87, { z: 2.15 }),
   ...Array.from({ length: 8 }, (_, k) => at('ds-chair', 113 + 4.3 * Math.cos((k * Math.PI) / 4), 87 + 4.3 * Math.sin((k * Math.PI) / 4), { angle: 180 - k * 45 })),
   at('shield-unit', 119, 81), at('med-kit', 107, 92.5, { skill: [1, 2, 3] }),
   at('concussion-rifle', 113, 75), at('power-cell', 111, 74.5), at('power-cell', 115, 74.5),
