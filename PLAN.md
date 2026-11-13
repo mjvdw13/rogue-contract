@@ -143,7 +143,12 @@ These need Mark to try something, or to decide. Don't start them without him.
   in the unfinished sector (how often, how bright the flashes), the
   steam off the pipes in the tunnels, pump room and compactor (thin or
   thick enough), the vents in the corridor walls, the flickering ceiling
-  panel on the slant.
+  panel on the slant. The shuttle, rebuilt from Mark's references
+  (2026-11-12): 17 long and 19 tall (about 0.43 of canon, to fit under
+  the bay's roof), the drive across its stern, the long cockpit wedge,
+  the swept fin, the wings folded up leaning out 8 degrees, the ramp;
+  moved east to 66.5, 82.5 to fit. To judge: the size against the TIEs
+  and the Crow, the wings' lean, how pale it reads in the bay's light.
 - **Mission 2 under the ground** (`?map=m2`, 2026-11-08, after the
   references): the rooms lined by what they are (whitewash and the
   red-ochre dado in the tunnels, white plaster in the house, duracrete in

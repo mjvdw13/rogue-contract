@@ -430,7 +430,7 @@ const list = [
   // Three TIE fighters in their cradles along the north wall, a rack over
   // each; a shuttle and cargo in the south-east; lamp bars under the roof.
   ...[25, 55, 69].flatMap((x) => [at('tie-fighter', x, 63.5, { angle: 270 }), at('tie-rack', x, 63.5, { angle: 270, z: 12.3 })]),
-  at('lambda-shuttle', 62, 84, { angle: 180 }),
+  at('lambda-shuttle', 66.5, 82.5, { angle: 180 }),
   at('ds-container', 74, 92.5, { angle: 90 }), at('ds-container', 76.5, 88, { angle: 0 }),
   at('ds-crate', 71, 95.5), at('ds-crate-tall', 72.8, 95.5), at('ds-crate', 60.5, 97),
   at('ds-crate', 77, 60.5), at('ds-crate', 78.2, 62.4, { angle: 20 }), at('ds-crate-tall', 78.4, 58.2),

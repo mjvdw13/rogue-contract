@@ -84,7 +84,7 @@ export default [
   // The battle station (m4): models/station.js.
   defineDecoration({ id: 'tie-fighter', model: 'tie-fighter', solid: true, fixed: true, height: 10.3 }),
   defineDecoration({ id: 'tie-rack', model: 'tie-rack', fixed: true }),
-  defineDecoration({ id: 'lambda-shuttle', model: 'lambda-shuttle', solid: true, fixed: true, height: 14 }),
+  defineDecoration({ id: 'lambda-shuttle', model: 'lambda-shuttle', solid: true, fixed: true, height: 19.1 }),
   defineDecoration({ id: 'ds-console', model: 'ds-console', solid: true, fixed: true, radius: 0.9, height: 1.1 }),
   defineDecoration({ id: 'ds-console-wall', model: 'ds-console-wall', solid: true, fixed: true, radius: 0.9, height: 2.2 }),
   defineDecoration({ id: 'ds-desk', model: 'ds-desk', solid: true, fixed: true, height: 1.1 }),

@@ -54,9 +54,11 @@ import { ModelBuilder } from './lib/build.js';
 // `dianoga-eye`: the thing in the trash compactor: an eye on a stalk, up
 // out of the water, looking toward +x.
 //
-// `lambda-shuttle`: a Lambda-class shuttle landed on its gear, its wings
-// folded up, the tall fin on its back, a ramp down under its chin. It
-// collides as its body's outline.
+// `lambda-shuttle`: a Lambda-class shuttle landed on its gear, at about
+// 0.43 of canon (17 long, LAMBDA.top tall): the wide body with the drive
+// across its stern, the long wedge of the cockpit out front, the swept fin
+// on its back and the two wings folded up beside it, the ramp down under
+// the cockpit. It collides as its body's outline.
 
 /** The TIE: its wings' planes (either side of the middle), its ball's centre height and radius, its top. */
 export const TIE = { wing: 5, z: 5.3, ball: 1.8, top: 10.3 };
@@ -88,7 +90,7 @@ export const STEAM_PIPE = { off: 0.2, top: 4, leak: [0.34, 0, 1.45] };
 /** Cut cables hanging from a bare ceiling (the origin is on the ceiling): how low the live one's end hangs, where it sparks. */
 export const CABLES = { 'ds-cables': null, 'ds-cables-live': [0.3, 0.2, -2.6] };
 /** The shuttle: its top (the fin's). */
-export const LAMBDA = { top: 14 };
+export const LAMBDA = { top: 19.1 };
 
 const HULL = { tex: 'tie-hull' };
 const DARK = { tex: 'tie-dark' };
@@ -576,57 +578,82 @@ function dianogaEye() {
 function lambdaShuttle() {
   const m = new ModelBuilder('lambda-shuttle');
   const GLASS = { color: [14, 18, 28] };
-  /** The belly's height off the deck, on its gear. */
-  const G = 1.1;
-  const up = (pts) => pts.map(([y, z]) => [y, z + G]);
-  // The body's cross-section (y, z over the belly): edge 0 the belly, 3 the roof.
-  const BODY_ = up([[-1.7, 0], [1.7, 0], [2.5, 1.4], [2, 3.6], [-2, 3.6], [-2.5, 1.4]]);
-  const NECK = up([[-0.9, 0.5], [0.9, 0.5], [1.3, 1.4], [1, 2.7], [-1, 2.7], [-1.3, 1.4]]);
-  const NOSE = up([[-0.6, 0.5], [0.6, 0.5], [0.8, 0.9], [0.6, 1.3], [-0.6, 1.3], [-0.8, 0.9]]);
-  const belly = (i) => (i === 0 ? IRON : undefined);
-  // The body, its back the engines' plate; the neck narrowing forward; the
-  // cockpit, its roof raked down to the nose.
-  m.prism(BODY_, -6, 1, { axis: 'x', ...WALL, top: false, bottom: DARK, side: belly });
-  m.loft(BODY_, 1, NECK, 3.6, { axis: 'x', ...WALL, top: false, bottom: false, side: belly });
-  m.loft(NECK, 3.6, NOSE, 6, { axis: 'x', ...WALL, bottom: false, top: METAL, side: belly });
-  // The windows: a band across the raked roof and one down each side of it.
-  const rake = (t, y, lift = 0.02) => [3.6 + 2.4 * t, y * (1 - 0.4 * t), G + 2.7 - 1.4 * t + lift];
-  m.face([rake(0.12, -0.9), rake(0.12, 0.9), rake(0.8, 0.9), rake(0.8, -0.9)], GLASS, [4.5, 0, G + 1]);
-  for (const s of [-1, 1]) {
-    const side = (t, k) => [3.6 + 2.4 * t, s * (1 + 0.3 * k - (0.4 + 0.2 * k) * t + 0.02), G + 2.7 - 1.3 * k - (1.4 - 0.9 * k) * t];
-    m.face([side(0.12, 0.1), side(0.8, 0.1), side(0.8, 0.7), side(0.12, 0.7)], GLASS, [4.5, 0, G + 1.5]);
-  }
-  // The engines: two pale bars of light across the back.
-  for (const z of [G + 1.3, G + 2.3]) m.face([[-6.02, -1.6, z + 0.5], [-6.02, 1.6, z + 0.5], [-6.02, 1.6, z], [-6.02, -1.6, z]], { color: [214, 232, 255], glow: true }, [0, 0, z]);
+  const GLOW = { color: [214, 232, 255], glow: true };
+  // The wings' and fin's plate, its panels big enough to read across the bay.
+  const SKIN = { ...WALL, texScale: 2 };
+  /** The dark strip down a plate's trailing edge, a to b, `d` in toward c to d, on both faces. */
+  const stripe = (a, b, c, d, n, t) => {
+    for (const k of [-1, 1]) m.face([a, b, c, d].map((p) => [p[0] + n[0] * k * (t + 0.02), p[1] + n[1] * k * (t + 0.02), p[2] + n[2] * k * (t + 0.02)]), DARK, middle([a, b, c, d]).map((v, j) => v - n[j] * k));
+  };
+  // Taken from the Cygnus and Topps drawings at 0.035 tiles a drawing
+  // pixel: 17 long, the fin's top 19.1 over the deck, the folded wings'
+  // 15.6. The nose is +x, the stern at -8.5.
+  /** The belly's height off the deck, on its gear; the lower hull's top; the roof. */
+  const [G, MID, ROOF] = [1.6, 3.6, 5.6];
 
-  // The fin on its back, swept to a narrower top.
-  const ROOF = G + 3.6;
-  plate(m, [[-5.8, 0, ROOF], [0.4, 0, ROOF], [-2.4, 0, LAMBDA.top], [-5.2, 0, LAMBDA.top]], [0, 1, 0], 0.14, WALL, METAL);
-  // Each wing folded up from its hinge along the body's shoulder, leaning
-  // out a little; the hinge's housing, a cannon at its front.
-  const [dy, dz] = [1.3, 9.1];
-  const len = Math.hypot(dy, dz);
+  // The lower hull, wide; the upper hull on it, narrower, the fin on that.
+  m.prism([[-2.6, G], [2.6, G], [3.2, G + 0.6], [3.2, MID], [-3.2, MID], [-3.2, G + 0.6]], -8, 1.5, { axis: 'x', ...WALL, bottom: METAL, side: (i) => (i === 0 ? IRON : undefined) });
+  m.prism([[-2.6, MID], [2.6, MID], [2.2, 5], [1.6, ROOF], [-1.6, ROOF], [-2.2, 5]], -7.8, 1.5, { axis: 'x', ...WALL, bottom: false });
+  // The main drive: two oval pods across the stern, glowing behind.
+  const oval = (cy, cz, a, b) => Array.from({ length: 10 }, (_, i) => {
+    const t = (i / 10) * Math.PI * 2;
+    return [cy + Math.cos(t) * a, cz + Math.sin(t) * b];
+  });
+  for (const s of [-1, 1]) m.prism(oval(s * 1.55, 2.65, 1.45, 1), -8.7, -4.5, { axis: 'x', ...METAL, bottom: GLOW });
+
+  // The cockpit: a long wedge out of the body's front, low at the nose, its
+  // upper sides the windows, an intake grille across its blunt tip.
+  const BACK = [[-1.1, 2], [1.1, 2], [1.6, 3.6], [1.3, 5.3], [-1.3, 5.3], [-1.6, 3.6]];
+  const TIP = [[-0.8, 1.5], [0.8, 1.5], [1.2, 2], [1.1, 2.5], [-1.1, 2.5], [-1.2, 2]];
+  const [CB, CF] = [1.5, 8.5];
+  m.loft(BACK, CB, TIP, CF, { axis: 'x', ...WALL, bottom: false, top: IRON, side: (i) => (i === 0 ? IRON : i === 3 ? METAL : undefined) });
+  // A point on the cockpit's skin: t from its back to its tip, along edge
+  // i of the section by u, stood off it a little.
+  const skin = (t, i, u) => {
+    const at = (k) => [BACK[k][0] + (TIP[k][0] - BACK[k][0]) * t, BACK[k][1] + (TIP[k][1] - BACK[k][1]) * t];
+    const [a, b] = [at(i), at((i + 1) % 6)];
+    const [y, z] = [a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u];
+    const zc = 3.6 - 1.6 * t;
+    const l = Math.hypot(y, z - zc);
+    return [CB + (CF - CB) * t, y + (y / l) * 0.03, z + ((z - zc) / l) * 0.03];
+  };
+  const pane = (i, [t0, t1], [u0, u1]) => m.face([skin(t0, i, u0), skin(t1, i, u0), skin(t1, i, u1), skin(t0, i, u1)], GLASS, [CB + (CF - CB) * (t0 + t1) / 2, 0, 3]);
+  pane(3, [0.06, 0.34], [0.06, 0.94]);
+  for (const i of [2, 4]) pane(i, [0.06, 0.4], [0.12, 0.88]);
+
+  // The fin: a plate on the roof, swept back to a narrow top, its foot
+  // reaching forward over the cockpit; a fairing along its root.
+  plate(m, [[-7.8, 0, ROOF], [1.3, 0, ROOF], [3.6, 0, 7.7], [-2.7, 0, LAMBDA.top], [-7.6, 0, LAMBDA.top]], [0, 1, 0], 0.22, SKIN, IRON);
+  stripe([-7.8, 0, ROOF + 0.5], [-7.6, 0, LAMBDA.top], [-7.2, 0, LAMBDA.top], [-7.4, 0, ROOF + 0.5], [0, 1, 0], 0.22);
+  m.box([-7.2, -0.5, ROOF], [0.6, 0.5, ROOF + 0.5], METAL);
+
+  // Each wing folded up from a round housing on the hull's side, leaning
+  // out 8 degrees, the same swept shape as the fin; twin cannons out of
+  // the housing's front.
+  const [HY, HZ, R] = [4.1, 3.2, 0.85];
+  const [dy, dz] = [Math.sin((8 * Math.PI) / 180), Math.cos((8 * Math.PI) / 180)];
   for (const s of [-1, 1]) {
-    const W = (x, t) => [x, s * (2.75 + dy * t), G + 1.7 + dz * t];
-    plate(m, [W(-5.5, 0), W(0.5, 0), W(-1.9, 1), W(-5, 1)], [0, (s * dz) / len, -dy / len], 0.11, WALL, METAL);
-    m.box([-5.7, s > 0 ? 2.25 : -3.15, G + 1], [0.7, s > 0 ? 3.15 : -2.25, G + 2.2], METAL);
-    m.box([0.7, s * 2.7 - 0.12, G + 1.45], [2, s * 2.7 + 0.12, G + 1.69], { ...DARK, bottom: false });
+    m.cylinder([-7.6, s * HY, HZ], R, 8, { axis: 'x', segments: 10, ...METAL });
+    const W = (x, w) => [x, s * (HY + dy * w), HZ + R * 0.7 + dz * w];
+    plate(m, [W(-7.4, 0), W(0.4, 0), W(1.6, 1.6), W(-2.2, 12.3), W(-7, 12.3)], [0, s * dz, -dy], 0.18, SKIN, IRON);
+    stripe(W(-7.4, 0), W(-7, 12.3), W(-6.6, 12.3), W(-7, 0), [0, s * dz, -dy], 0.18);
+    for (const o of [-0.22, 0.22]) m.box([0.4, s * HY + o - 0.07, HZ - 0.07], [2.2, s * HY + o + 0.07, HZ + 0.07], { ...DARK, bottom: false });
   }
 
-  // Its gear: two legs under the body's back and one under the neck, on
-  // pads; the ramp down from under the cockpit.
-  for (const [x, y] of [[-4.2, -1.3], [-4.2, 1.3], [0.4, 0]]) {
-    m.box([x - 0.16, y - 0.16, 0.1], [x + 0.16, y + 0.16, G], { ...IRON, top: false, bottom: false });
-    m.box([x - 0.5, y - 0.4, 0], [x + 0.5, y + 0.4, 0.1], { ...METAL, bottom: false });
+  // Its gear: two broad legs under the engines and one under the body's
+  // front, on pads; the ramp down from under the cockpit to the deck.
+  for (const [x, y] of [[-6.2, -2.4], [-6.2, 2.4], [-0.6, 0]]) {
+    m.box([x - 0.35, y - 0.3, 0.15], [x + 0.35, y + 0.3, G], { ...IRON, top: false, bottom: false });
+    m.box([x - 0.7, y - 0.55, 0], [x + 0.7, y + 0.55, 0.15], { ...METAL, bottom: false });
   }
-  const [rx, rz] = [2.6, G + 0.5];
+  const [rx, rz] = [4.6, G - 0.05];
   const rl = Math.hypot(rx, rz);
-  plate(m, [[3.2, -0.7, G + 0.5], [3.2, 0.7, G + 0.5], [3.2 + rx, 0.7, 0.04], [3.2 + rx, -0.7, 0.04]], [rz / rl, 0, rx / rl], 0.04, IRON);
+  plate(m, [[1.5, -0.8, G - 0.05], [1.5, 0.8, G - 0.05], [1.5 + rx, 0.8, 0.04], [1.5 + rx, -0.8, 0.04]], [rz / rl, 0, rx / rl], 0.05, IRON);
   // Its shadow on the deck.
-  m.face([[6.3, -3.6, 0.01], [6.3, 3.6, 0.01], [-6.5, 3.6, 0.01], [-6.5, -3.6, 0.01]], SHADOW, [0, 0, -1]);
+  m.face([[8.8, -5.4, 0.01], [8.8, 5.4, 0.01], [-9, 5.4, 0.01], [-9, -5.4, 0.01]], SHADOW, [0, 0, -1]);
 
-  // Collision: the body's outline, housings to nose.
-  m.outlineLines([[-6, -3.15], [1, -3.15], [3.6, -1.4], [6, -0.8], [6, 0.8], [3.6, 1.4], [1, 3.15], [-6, 3.15]]);
+  // Collision: the body and housings, narrowing along the cockpit.
+  m.outlineLines([[-8.7, -5], [0.4, -5], [1.5, -1.6], [8.5, -1.2], [8.5, 1.2], [1.5, 1.6], [0.4, 5], [-8.7, 5]]);
   return m.build();
 }
 
