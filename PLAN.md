@@ -54,6 +54,7 @@ Mark (2026-11-13): add more life and detail to `m4`, one area at a time.
 - [x] The station's PA: three announcements on the way, with a chime.
 - [x] A second prisoner, a pilot the beam caught, with three lines.
 - [x] Detention control's lights pulse with the alarm too.
+- [x] The turbolifts' own sound.
 - [x] The unfinished sector: a post being welded on the bare deck, a panel
   hoisted toward the gallery's truss.
 

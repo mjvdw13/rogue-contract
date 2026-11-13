@@ -43,5 +43,7 @@
   "pump-hum": { "src": "assets/custom/sounds/ambience/MACHINE2.mp3", "volume": 0.5 },
   "beam-hum": { "src": "assets/custom/sounds/ambience/ELECTRIC.mp3", "volume": 0.6 },
   "dianoga-gurgle": { "src": "assets/custom/sounds/enemies/CREATUR1.mp3", "volume": 0.7 },
-  "field-hum": { "src": "assets/custom/sounds/ambience/RUMBLE1.mp3", "volume": 0.4 }
+  "field-hum": { "src": "assets/custom/sounds/ambience/RUMBLE1.mp3", "volume": 0.4 },
+  "turbolift-start": { "src": "assets/custom/sounds/doors-lifts-switches/ELEV3-1.mp3", "volume": 1 },
+  "turbolift-stop": { "src": "assets/custom/sounds/doors-lifts-switches/ELEV3-3.mp3", "volume": 0.8 }
 }

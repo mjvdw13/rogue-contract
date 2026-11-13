@@ -177,7 +177,9 @@ p.chamfer(82, 94, 100, 106, 2, { wall: T.wall6 }, ['SW', 'SE', 'NE']);
 column(86, 106, 88, 107, 87, 105.7);
 column(94, 106, 96, 107, 95, 105.7);
 column(94, 93, 96, 94, 95, 94.3);
-p.rect(86, 90, 90, 94, lift([0, 8], 14));
+// (The two turbolifts, here and the detention block's, have their own sound.)
+const TURBO = { sounds: { start: 'turbolift-start', stop: 'turbolift-stop' } };
+p.rect(86, 90, 90, 94, lift([0, 8], 14, {}, TURBO));
 // The control room, 4 m over the deck, its window on the hangar.
 p.rect(82, 64, 98, 90, room(8, 14, { light: 152 }));
 p.chamfer(82, 64, 98, 90, 2, { wall: T.wall6 }, ['NE', 'SE']);
@@ -250,7 +252,7 @@ p.rect(168, 78, 172, 82, { wall: T.wallLight });
 for (const [x, y] of [[170, 77.3], [170, 82.7], [167.3, 80], [172.7, 80]]) lamps.push({ x, y, z: 3, radius: 6, light: 48 });
 // North: the detention lift, a door at each stop.
 p.rect(168, 68, 172, 70, door(0));
-p.rect(168, 64, 172, 68, lift([0, 12], 18));
+p.rect(168, 64, 172, 68, lift([0, 12], 18, {}, TURBO));
 // (The top door is sealed by the alarm: the chute is the way out then.)
 p.rect(168, 62, 172, 64, door(12, { tag: 'det-lift' }));
 // East: the pump room's door, opened from the far side.

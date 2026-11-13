@@ -183,7 +183,8 @@ jet, the welder's arc buzzes (`weld-arc`, DF's WELD-1 on the site), and a
 tank in the pump room hums (`pump-hum`, DF's MACHINE2). The two rings by
 the walks carry the beam's power (`ds-beam-ring-live`): cyan arcs
 (`beam-arc`) crackle off them and the coupling hums (`beam-hum`, DF's
-ELECTRIC) until the terminal sets `beam-off`. Not made: a turbolift's own sound, the
+ELECTRIC) until the terminal sets `beam-off`. The two turbolifts whine and chime (`turbolift-start`, `turbolift-stop`,
+DF's ELEV3). Not made: the
 compactor's groan, the field's hum.
 
 ## Light

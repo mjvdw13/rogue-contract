@@ -199,6 +199,16 @@ export default [
     id: 'lift-start',
     synth: { wave: 'saw', freq: 40, freqEnd: 70, duration: 0.9, attack: 0.08, release: 0.3, lowpass: 500, volume: 0.4, vibrato: { rate: 18, depth: 0.6 }, layers: [{ ...thump(70, 40, 0.15, 0.6) }, { wave: 'noise', duration: 0.9, lowpass: 900, volume: 0.15, release: 0.3 }] },
   }),
+  // A turbolift (Mission 4's): a rising electric whine as it goes, a soft
+  // chime as it stops (DF's ELEV3 on the site).
+  defineSound({
+    id: 'turbolift-start',
+    synth: { wave: 'saw', freq: 90, freqEnd: 260, duration: 1.1, attack: 0.15, release: 0.4, lowpass: 1400, volume: 0.3, vibrato: { rate: 12, depth: 0.3 }, layers: [{ wave: 'noise', duration: 1.1, attack: 0.2, release: 0.4, lowpass: 1200, volume: 0.1 }] },
+  }),
+  defineSound({
+    id: 'turbolift-stop',
+    synth: { wave: 'sine', freq: 660, duration: 0.3, attack: 0.01, release: 0.25, volume: 0.25, layers: [{ ...thump(70, 40, 0.2, 0.5) }] },
+  }),
   defineSound({
     id: 'lift-stop',
     synth: { ...thump(80, 35, 0.25, 0.9), layers: [burst(0.08, [1800, 300], 0.45), { ...click(500, 0.4), delay: 0.05 }] },
