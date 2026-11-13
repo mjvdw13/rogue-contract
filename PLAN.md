@@ -24,40 +24,6 @@ MODDING.md, if content authors need it). Keep this file short.
 | Title and repo | **Rogue Contract**. Public repo `mjvdw13/rogue-contract`, served by GitHub Pages from `main`. "Star Wars" and "Dark Forces" stay out of the title. |
 | Art, sound and rights | A non-commercial fan game. Mark's decisions (2026-10-12, 2026-10-15): ripped Dark Forces art and sound effects are committed in `assets/custom/` and used on the hosted site, through `overrides.json` and `sound-overrides.json`, with generated art and synth sounds as the fallback (and what tests and the smoke test use). Characters Mark makes with AI image tools are committed as our own art. Music stays original: no note-for-note John Williams. |
 
-## Mission 4: more life and detail
-
-Mark (2026-11-13): add more life and detail to `m4`, one area at a time.
-
-- [x] Troopers walk beats (a new `beat` placement field): a pair marching
-  the ring corridor, one round the hub's column, one on the shaft's ledge,
-  on the bare deck, the gallery and the hangar deck (skill 3+).
-- [x] The hangar's deck crew at work: a TIE under repair, fuel lines, a
-  power droid, beacons at the mouth.
-- [x] The control room and detention: a plotting table with the Crow turning
-  over it in blue light, a bunk in each cell.
-- [x] The machinery heard: emitters' bursts may play a sound (crackle,
-  hiss, the weld's arc, the pump room's hum).
-- [x] The corridors: door control panels, a security post in the lobby, the
-  officer on the last straight walking it.
-- [x] The tractor beam's coupling crackles and hums until it's off (emitter
-  bursts take `if`/`unless` story flags).
-- [x] The tractor beam's coupling crackles and hums until it's off (emitter
-  bursts take `if`/`unless` story flags).
-- [x] The briefing room: the half-built station turning over the table in
-  blue light.
-- [x] The compactor: bubbles come up round the eye, and now and then it
-  gurgles (DF's CREATUR1 on the site).
-- [x] The troop bay's lockers and benches; the fields across the hangar's
-  mouth and the gallery hum (DF's RUMBLE1), beacons at the gallery's.
-- [x] Detention control's cell monitors; pipes along the maintenance
-  tunnel's ceiling and a live cable come loose there.
-- [x] The station's PA: three announcements on the way, with a chime.
-- [x] A second prisoner, a pilot the beam caught, with three lines.
-- [x] Detention control's lights pulse with the alarm too.
-- [x] The turbolifts' own sound.
-- [x] The unfinished sector: a post being welded on the bare deck, a panel
-  hoisted toward the gallery's truss.
-
 ## Waiting on Mark
 
 These need Mark to try something, or to decide. Don't start them without him.
@@ -157,6 +123,33 @@ These need Mark to try something, or to decide. Don't start them without him.
   and a canister knocked about, boot scuffs. To judge: the fallen door
   (the door's picture on planks), whether the hall wants more (furniture
   for an entrance hall), and the lamps.
+
+- **Mission 4, more life and detail** (`?map=m4`, 2026-11-13, after
+  "add more life and detail to m4"): troopers walk beats until they see
+  you (a new `beat` placement field): a pair marching the ring corridor
+  in step, one round the hub's column, one on the shaft's west ledge, the
+  officer on the corridor's last straight, and others on the bare deck,
+  the gallery and (skill 3+) the hangar deck. The hangar's crew at work:
+  fuel hoses from the north wall to the two west TIEs, the east one's
+  cockpit welded from a service stand (sparks, flicker, a power droid, a
+  tool cart), red beacons blinking at the mouth. The control room's
+  plotting table with the Crow turning over it in blue light; the
+  briefing room's table with the half-built station turning over it.
+  Door panels, the lobby's security post, bunks in the cells, cell
+  monitors in detention control (which now pulses with the alarm), a
+  second prisoner (a pilot, three lines), the troop bay's lockers and
+  benches, pipes and a loose live cable in the maintenance tunnel, a post
+  welded on the bare deck, a panel hoisted in the gallery. Heard: emitter
+  bursts may play sounds, so cables crackle, pipes hiss, the welder buzzes
+  (DF's WELD-1), the pump room hums (MACHINE2), the fields hum (RUMBLE1),
+  the beam's coupling hums (ELECTRIC) and arcs until it's off (emitters
+  wait on story flags), the compactor's eye bubbles and gurgles (CREATUR1),
+  the turbolifts whine (ELEV3), and the PA speaks three times. To judge:
+  whether the patrols make the fights better or worse (they see you
+  sooner), the holograms' blue and size, the volumes of the new sounds
+  (all guessed, none heard), how often the PA speaks, and whether any
+  area wants more or less. Stains on the hangar deck were tried and
+  don't show on its dark texture.
 
 - **Mission 4, the Battle Station** (`?map=m4`, 2026-11-10,
   `docs/mission4.md`): the whole level, made in one session without you
