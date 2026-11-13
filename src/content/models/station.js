@@ -57,7 +57,7 @@ import { ModelBuilder } from './lib/build.js';
 // `lambda-shuttle`: a Lambda-class shuttle landed on its gear, at about
 // 0.43 of canon (17 long, LAMBDA.top tall): the wide body with the drive
 // across its stern, the long wedge of the cockpit out front, the swept fin
-// on its back and the two wings folded up beside it, the ramp down under
+// on its back and the two wings folded up beside it (bent at a knee), the ramp down under
 // the cockpit. It collides as its body's outline.
 
 /** The TIE: its wings' planes (either side of the middle), its ball's centre height and radius, its top. */
@@ -627,16 +627,25 @@ function lambdaShuttle() {
   stripe([-7.8, 0, ROOF + 0.5], [-7.6, 0, LAMBDA.top], [-7.2, 0, LAMBDA.top], [-7.4, 0, ROOF + 0.5], [0, 1, 0], 0.22);
   m.box([-7.2, -0.5, ROOF], [0.6, 0.5, ROOF + 0.5], METAL);
 
-  // Each wing folded up from a round housing on the hull's side, leaning
-  // out 8 degrees, the same swept shape as the fin; twin cannons out of
-  // the housing's front.
+  // Each wing folded up from a round housing on the hull's side, bent as
+  // the head-on drawings have it: a knee 1.5 long out and up at 45
+  // degrees, then the panel, the same swept shape as the fin, standing
+  // nearly upright and leaning 3 degrees in toward the fin. Twin cannons
+  // out of the housing's front.
   const [HY, HZ, R] = [4.1, 3.2, 0.85];
-  const [dy, dz] = [Math.sin((8 * Math.PI) / 180), Math.cos((8 * Math.PI) / 180)];
+  const KNEE = 1.5;
+  const rad = (d) => (d * Math.PI) / 180;
+  const [ky, kz] = [Math.cos(rad(45)), Math.sin(rad(45))];
+  const [py, pz] = [-Math.sin(rad(3)), Math.cos(rad(3))];
   for (const s of [-1, 1]) {
     m.cylinder([-7.6, s * HY, HZ], R, 8, { axis: 'x', segments: 10, ...METAL });
-    const W = (x, w) => [x, s * (HY + dy * w), HZ + R * 0.7 + dz * w];
-    plate(m, [W(-7.4, 0), W(0.4, 0), W(1.6, 1.6), W(-2.2, 12.3), W(-7, 12.3)], [0, s * dz, -dy], 0.18, SKIN, IRON);
-    stripe(W(-7.4, 0), W(-7, 12.3), W(-6.6, 12.3), W(-7, 0), [0, s * dz, -dy], 0.18);
+    const [by, bz] = [HY + ky * KNEE, HZ + R * 0.7 + kz * KNEE];
+    const K = (x, w) => [x, s * (HY + ky * w), HZ + R * 0.7 + kz * w];
+    const W = (x, w) => [x, s * (by + py * w), bz + pz * w];
+    plate(m, [K(-7.4, 0), K(0.4, 0), K(0.4, KNEE), K(-7.4, KNEE)], [0, s * kz, -ky], 0.18, METAL, IRON);
+    const n = [0, s * pz, -py];
+    plate(m, [W(-7.4, 0), W(0.4, 0), W(1.6, 1.6), W(-2.2, 11), W(-7, 11)], n, 0.18, SKIN, IRON);
+    stripe(W(-7.4, 0), W(-7, 11), W(-6.6, 11), W(-7, 0), n, 0.18);
     for (const o of [-0.22, 0.22]) m.box([0.4, s * HY + o - 0.07, HZ - 0.07], [2.2, s * HY + o + 0.07, HZ + 0.07], { ...DARK, bottom: false });
   }
 
