@@ -22,6 +22,9 @@ import { ModelBuilder } from './lib/build.js';
 // HOLO.over): the captured freighter, a ship drawn in lines of blue
 // light, turning slowly (decor.js spins it).
 //
+// `ds-door-panel`: the control beside a door: a slim box on the wall (the
+// origin on the wall's face), a lit readout and three buttons.
+//
 // `ds-bunk`: a cell's bunk, a slab hinged out of the back wall on two
 // chains (the origin on the wall's face, +x out of it).
 
@@ -152,6 +155,16 @@ function holoShip() {
   return m.build();
 }
 
+function doorPanel() {
+  const m = new ModelBuilder('ds-door-panel');
+  m.box([0, -0.22, 1.0], [0.08, 0.22, 1.75], { ...DARK, bottom: false });
+  m.face([[0.081, -0.16, 1.68], [0.081, 0.16, 1.68], [0.081, 0.16, 1.48], [0.081, -0.16, 1.48]], { tex: 'ds-screen', uv: [[0, 0], [0.5, 0], [0.5, 0.33], [0, 0.33]], glow: true }, [0, 0, 1.5]);
+  m.box([0.08, -0.15, 1.18], [0.11, -0.05, 1.28], RED);
+  m.box([0.08, 0.05, 1.18], [0.11, 0.15, 1.28], AMBER);
+  m.box([0.08, -0.05, 1.32], [0.11, 0.05, 1.4], METAL);
+  return m.build();
+}
+
 function bunk() {
   const m = new ModelBuilder('ds-bunk');
   const { depth: d, length: l, top } = BUNK;
@@ -162,4 +175,4 @@ function bunk() {
   return m.build();
 }
 
-export default [serviceStand(), fuelSocket(), beacon(), toolCart(), holoTable(), holoShip(), bunk()];
+export default [serviceStand(), fuelSocket(), beacon(), toolCart(), holoTable(), holoShip(), doorPanel(), bunk()];

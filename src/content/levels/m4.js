@@ -471,12 +471,17 @@ const list = [
   // The plotting table: the deck officer watching the ship they took.
   at('ds-holo-table', 91, 78), at('ds-holo-ship', 91, 78, { z: 8 + 1.35 }),
   at('med-kit', 95.5, 66.5), at('energy-cell', 84.5, 88.5),
+  // The lobby's security post, watching the door in from the hangar; the
+  // doors' control panels.
+  at('ds-console', 97.6, 96.6, { angle: 180 }),
+  at('ds-door-panel', 82.02, 97, { angle: 0 }), at('ds-door-panel', 99.98, 103, { angle: 180 }),
+  at('ds-door-panel', 115.2, 97.02, { angle: 270 }), at('ds-door-panel', 172.6, 44.02, { angle: 270, z: DET }),
   // 3. The ring corridor: a pair marching the first straight in step.
   ...[[98.5], [101.5, NOT_EASIEST]].map(([y, skill]) => at('stormtrooper', 122.5, y, {
     angle: 180, ...(skill && { skill }), beat: { patrol: [[106.5, y], [124.5, y]], idleTime: [3, 3] },
   })),
   at('stormtrooper', 134.5, 92.5, { angle: 225, skill: NOT_EASIEST }),
-  at('officer', 148.5, 80.5, { angle: 180, skill: NORMAL_UP }),
+  at('officer', 148.5, 80.5, { angle: 180, skill: NORMAL_UP, beat: { patrol: [[143.5, 80.5], [156.5, 80.5]], idleTime: [3, 6] } }),
   at('stormtrooper', 152.5, 79, { angle: 180 }),
   at('stormtrooper', 138.5, 88, { angle: 225, skill: HARD }),
   at('mouse-droid', 112.5, 100.5), at('mouse-droid', 144.5, 81.5),

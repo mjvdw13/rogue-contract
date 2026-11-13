@@ -37,7 +37,8 @@ Mark (2026-11-13): add more life and detail to `m4`, one area at a time.
   over it in blue light, a bunk in each cell.
 - [x] The machinery heard: emitters' bursts may play a sound (crackle,
   hiss, the weld's arc, the pump room's hum).
-- [ ] The corridors and hub: wall details, a second mouse droid route.
+- [x] The corridors: door control panels, a security post in the lobby, the
+  officer on the last straight walking it.
 - [ ] The guts (compactor, maintenance, pumps) and the unfinished sector.
 
 ## Waiting on Mark
