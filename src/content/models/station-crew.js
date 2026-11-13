@@ -16,6 +16,14 @@ import { ModelBuilder } from './lib/build.js';
 //
 // `ds-tool-cart`: a tech's cart: a chest of drawers on casters, a tray on
 // top with a few tools, a handle at the back (-x).
+//
+// `ds-holo-table`: the control room's round plotting table, its top a
+// projector ring; `ds-holo-ship` is what it shows over it (placed at
+// HOLO.over): the captured freighter, a ship drawn in lines of blue
+// light, turning slowly (decor.js spins it).
+//
+// `ds-bunk`: a cell's bunk, a slab hinged out of the back wall on two
+// chains (the origin on the wall's face, +x out of it).
 
 /** The service stand's deck height and its half sizes. */
 export const SERVICE = { deck: 3.4, half: [0.8, 0.7] };
@@ -23,6 +31,10 @@ export const SERVICE = { deck: 3.4, half: [0.8, 0.7] };
 export const WELD = [0.95, 0, SERVICE.deck + 0.4];
 /** The tool cart's top. */
 export const CART = { top: 1 };
+/** The plotting table's radius and top, and the hologram's height over the floor. */
+export const HOLO = { r: 0.95, top: 1, over: 1.35 };
+/** A bunk's depth out of the wall, length and top. */
+export const BUNK = { depth: 0.9, length: 2.4, top: 0.95 };
 
 const METAL = { tex: 'ds-metal' };
 const IRON = { tex: 'ds-metal-dark' };
@@ -31,6 +43,7 @@ const STRIPE = { tex: 'imp-stripe' };
 const GRATE = { tex: 'ds-floor-grate' };
 const RED = { tex: 'ds-lamp-red', glow: true };
 const AMBER = { tex: 'ds-lamp', glow: true };
+const HOLO_BLUE = { color: [96, 176, 255], glow: true, twoSided: true };
 
 /** A square of half-width h round (cx, cy). */
 const sq = (cx, cy, h) => [[cx - h, cy - h], [cx + h, cy - h], [cx + h, cy + h], [cx - h, cy + h]];
@@ -108,4 +121,45 @@ function toolCart() {
   return m.build();
 }
 
-export default [serviceStand(), fuelSocket(), beacon(), toolCart()];
+function holoTable() {
+  const m = new ModelBuilder('ds-holo-table');
+  const { r, top } = HOLO;
+  // A flared foot, the column, the top's dark rim and the projector's lit ring.
+  m.cylinder([0, 0, 0], r * 0.7, 0.15, { segments: 12, ...IRON, bottom: false });
+  m.cylinder([0, 0, 0.15], r * 0.4, top - 0.3, { segments: 12, ...DARK, top: false, bottom: false });
+  m.cylinder([0, 0, top - 0.15], r, 0.15, { segments: 12, ...IRON });
+  m.cylinder([0, 0, top], r * 0.75, 0.01, { segments: 12, ...HOLO_BLUE, twoSided: false, bottom: false });
+  m.cylinder([0, 0, top + 0.01], r * 0.55, 0.01, { segments: 12, ...METAL, bottom: false });
+  return m.build();
+}
+
+function holoShip() {
+  const m = new ModelBuilder('ds-holo-ship');
+  // A long flat hull, the cockpit forward, two engines aft: its edges in
+  // thin lines of light, so the table shows through.
+  const line = (a, b) => strut(m, a, b, 0.012, HOLO_BLUE);
+  const deck = [[0.7, 0], [0.35, -0.22], [-0.45, -0.3], [-0.6, -0.15], [-0.6, 0.15], [-0.45, 0.3], [0.35, 0.22]];
+  for (const z of [0, 0.12]) deck.forEach((p, i) => line([...p, z], [...deck[(i + 1) % deck.length], z]));
+  for (const p of deck) line([...p, 0], [...p, 0.12]);
+  // The cockpit's bubble and the engines' rings.
+  line([0.35, -0.08, 0.12], [0.5, 0, 0.22]);
+  line([0.35, 0.08, 0.12], [0.5, 0, 0.22]);
+  line([0.5, 0, 0.22], [0.7, 0, 0.12]);
+  for (const s of [-1, 1]) {
+    line([-0.6, s * 0.18, 0.06], [-0.75, s * 0.18, 0.06]);
+    line([-0.75, s * 0.1, 0.06], [-0.75, s * 0.26, 0.06]);
+  }
+  return m.build();
+}
+
+function bunk() {
+  const m = new ModelBuilder('ds-bunk');
+  const { depth: d, length: l, top } = BUNK;
+  m.box([0, -l / 2, top - 0.12], [d, l / 2, top], { ...IRON, top: DARK });
+  // A thin pad on it, and the chains up to the wall.
+  m.box([0.08, -l / 2 + 0.1, top], [d - 0.08, l / 2 - 0.1, top + 0.06], { tex: 'ds-console-side' });
+  for (const s of [-1, 1]) strut(m, [d - 0.04, s * (l / 2 - 0.06), top], [0, s * (l / 2 - 0.06), top + 0.9], 0.012, METAL);
+  return m.build();
+}
+
+export default [serviceStand(), fuelSocket(), beacon(), toolCart(), holoTable(), holoShip(), bunk()];

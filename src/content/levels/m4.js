@@ -468,6 +468,8 @@ const list = [
   at('stormtrooper', 85.5, 68.5, { angle: 270, skill: NORMAL_UP }),
   at('ds-console', 83.2, 71, { angle: 0 }), at('ds-console', 83.2, 77, { angle: 0 }), at('ds-console', 83.2, 83, { angle: 0 }),
   at('ds-console-wall', 97.9, 68, { angle: 180 }), at('ds-console-wall', 97.9, 86, { angle: 180 }),
+  // The plotting table: the deck officer watching the ship they took.
+  at('ds-holo-table', 91, 78), at('ds-holo-ship', 91, 78, { z: 8 + 1.35 }),
   at('med-kit', 95.5, 66.5), at('energy-cell', 84.5, 88.5),
   // 3. The ring corridor: a pair marching the first straight in step.
   ...[[98.5], [101.5, NOT_EASIEST]].map(([y, skill]) => at('stormtrooper', 122.5, y, {
@@ -510,6 +512,11 @@ const list = [
     talk: [{ lines: ['KATARN? YOU CAME UP HERE FOR ME?', "THEY'LL HAVE THE LIFT BY NOW. THE WASTE HATCH, END OF THE ROW. GO. I'LL KEEP BEHIND YOU."], set: 'rusk-free' }],
   }),
   at('prisoner', 176.5, 40, { angle: 180 }),
+  // A bunk in each cell (not over the loose panel in the second on the east).
+  ...[0, 1, 2, 3, 4].flatMap((k) => [
+    at('ds-bunk', 161.02, 16 + 6 * k, { angle: 0 }),
+    ...(k === 1 ? [] : [at('ds-bunk', 178.98, 16 + 6 * k, { angle: 180 })]),
+  ]),
   at('energy-pack', 181.5, 22), at('thermal-detonator', 181.5, 21), at('thermal-detonator', 181.5, 23),
   at('med-kit', 176.5, 28, { skill: EASY }),
   // 6. The compactor.

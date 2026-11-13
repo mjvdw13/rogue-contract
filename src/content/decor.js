@@ -18,7 +18,7 @@ import { SCAFFOLDS, scaffoldHeight } from './models/scaffold.js';
 import { BALCONY_FRAME } from './models/balcony.js';
 import { WIRES, CONSOLE } from './models/hold.js';
 import { CABLES as STATION_CABLES, STEAM_PIPE } from './models/station.js';
-import { SERVICE, WELD, CART } from './models/station-crew.js';
+import { SERVICE, WELD, CART, HOLO, BUNK as CELL_BUNK } from './models/station-crew.js';
 import { TOWER_HEIGHT } from './models/market.js';
 import { BAR, TAPS, CORNER } from './models/cantina.js';
 import { POD } from './models/pod.js';
@@ -140,6 +140,10 @@ export default [
   defineDecoration({ id: 'ds-fuel-socket', model: 'ds-fuel-socket', fixed: true }),
   defineDecoration({ id: 'ds-beacon', model: 'ds-beacon', fixed: true }),
   defineDecoration({ id: 'ds-tool-cart', model: 'ds-tool-cart', solid: true, radius: 0.5, height: CART.top }),
+  // The control room's plotting table and the ship turning over it; a cell's bunk.
+  defineDecoration({ id: 'ds-holo-table', model: 'ds-holo-table', solid: true, radius: HOLO.r, height: HOLO.top }),
+  defineDecoration({ id: 'ds-holo-ship', model: 'ds-holo-ship', fixed: true, spin: 0.5, bob: { height: 0.04, period: 3 } }),
+  defineDecoration({ id: 'ds-bunk', model: 'ds-bunk', fixed: true, height: CELL_BUNK.top }),
   // A lit ring round the tractor beam's column.
   defineDecoration({ id: 'ds-beam-ring', model: 'ds-beam-ring', fixed: true }),
   defineDecoration({ id: 'ds-camera', model: 'ds-camera', fixed: true }),

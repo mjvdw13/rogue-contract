@@ -33,7 +33,8 @@ Mark (2026-11-13): add more life and detail to `m4`, one area at a time.
   on the bare deck, the gallery and the hangar deck (skill 3+).
 - [x] The hangar's deck crew at work: a TIE under repair, fuel lines, a
   power droid, beacons at the mouth.
-- [ ] The control room and detention: consoles that blink, the screens.
+- [x] The control room and detention: a plotting table with the Crow turning
+  over it in blue light, a bunk in each cell.
 - [ ] The corridors and hub: wall details, a second mouse droid route.
 - [ ] The guts (compactor, maintenance, pumps) and the unfinished sector.
 
