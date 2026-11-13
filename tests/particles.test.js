@@ -442,6 +442,21 @@ test('an emit burst with a sound and no particle type is only the sound', () => 
   assert.equal(w.particles.n, 0);
 });
 
+test('an emit burst with unless stops once the story flag is set', () => {
+  const reg = emitting([{ type: 'test-dot', count: 1, every: 0.2, unless: 'off' }]);
+  const w = makeWorld(room(OPEN, ['', ' >'], { legend: { '.': ROOM } }), { noMonsters: true, registry: reg });
+  w.spawn('droid-dome', 6.5, 3.5);
+  let bursts = 0;
+  const burst = w.particles.burst.bind(w.particles);
+  w.particles.burst = (...args) => (bursts++, burst(...args));
+  for (let k = 0; k < 60; k++) w.tick(DT, mockInput());
+  const before = bursts;
+  assert.ok(before >= 4, `${before} bursts while the flag is unset`);
+  w.flags.add('off');
+  for (let k = 0; k < 60; k++) w.tick(DT, mockInput());
+  assert.equal(bursts, before, 'none once it is set');
+});
+
 test('a decoration emits nothing while the player is far off', () => {
   const reg = emitting([{ type: 'test-dot', count: 3, every: 0.1 }]);
   const wide = OPEN.map((row) => row[0] + row.slice(1, -1).padEnd(46, row[1]) + row.at(-1));

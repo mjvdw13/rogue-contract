@@ -173,7 +173,10 @@ call, bells). Sounds `alarm-klaxon` (Rusk's alarm), `beam-down` (the
 terminal), `mouse-droid-squeal`. The machinery is heard (2026-11-13): the live cables crackle
 (`spark-crackle`) with each spray, the pipes hiss (`steam-hiss`) with each
 jet, the welder's arc buzzes (`weld-arc`, DF's WELD-1 on the site), and a
-tank in the pump room hums (`pump-hum`, DF's MACHINE2). Not made: a turbolift's own sound, the
+tank in the pump room hums (`pump-hum`, DF's MACHINE2). The two rings by
+the walks carry the beam's power (`ds-beam-ring-live`): cyan arcs
+(`beam-arc`) crackle off them and the coupling hums (`beam-hum`, DF's
+ELECTRIC) until the terminal sets `beam-off`. Not made: a turbolift's own sound, the
 compactor's groan, the field's hum.
 
 ## Light

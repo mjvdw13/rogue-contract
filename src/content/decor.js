@@ -17,7 +17,7 @@ import { BAY_WALL, DERELICT_WALL, BAY_HOSES } from './models/bay.js';
 import { SCAFFOLDS, scaffoldHeight } from './models/scaffold.js';
 import { BALCONY_FRAME } from './models/balcony.js';
 import { WIRES, CONSOLE } from './models/hold.js';
-import { CABLES as STATION_CABLES, STEAM_PIPE } from './models/station.js';
+import { CABLES as STATION_CABLES, STEAM_PIPE, BEAM_RING } from './models/station.js';
 import { SERVICE, WELD, CART, HOLO, BUNK as CELL_BUNK } from './models/station-crew.js';
 import { TOWER_HEIGHT } from './models/market.js';
 import { BAR, TAPS, CORNER } from './models/cantina.js';
@@ -150,6 +150,21 @@ export default [
   defineDecoration({ id: 'ds-bunk', model: 'ds-bunk', fixed: true, height: CELL_BUNK.top }),
   // A lit ring round the tractor beam's column.
   defineDecoration({ id: 'ds-beam-ring', model: 'ds-beam-ring', fixed: true }),
+  // One carrying the beam's power: crackling round its rim, the coupling
+  // humming, until the beam is switched off (Mission 4's `beam-off`).
+  defineDecoration({
+    id: 'ds-beam-ring-live',
+    model: 'ds-beam-ring',
+    fixed: true,
+    emit: [
+      ...[0, 1, 2, 3, 4, 5].map((k) => {
+        const a = (k * Math.PI) / 3;
+        const [c, s] = [Math.cos(a), Math.sin(a)];
+        return { type: 'beam-arc', count: 6, every: [0.4, 1.6], at: [c * (BEAM_RING.r + 1), s * (BEAM_RING.r + 1), BEAM_RING.h / 2], radius: 0.15, dir: [c, s, 0], spread: 1, speed: [1, 3], unless: 'beam-off' };
+      }),
+      { every: 3.4, sound: 'beam-hum', unless: 'beam-off' },
+    ],
+  }),
   defineDecoration({ id: 'ds-camera', model: 'ds-camera', fixed: true }),
   defineDecoration({ id: 'ds-ceiling-lamp-bar', model: 'ds-ceiling-lamp-bar', fixed: true }),
   // Something in the compactor's water, looking about.

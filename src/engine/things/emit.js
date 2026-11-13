@@ -1,6 +1,7 @@
 // A decoration's `emit`: bursts of particles it gives off while it stands
 // (embers off a fire, steam off a vent). Cosmetic, so it uses the
 // particles' own RNG and the game plays out the same.
+import { flagsAllow } from '../world/triggers.js';
 
 /** How near the player (tiles, each way) emitters run: beyond it their particles would be specks. */
 export const EMIT_RANGE = 32;
@@ -13,8 +14,9 @@ const between = (rng, v) => (Array.isArray(v) ? v[0] + (v[1] - v[0]) * rng.next(
  * at a random point in the first wait), from `at` in the thing's own frame
  * (as its model is built: x ahead at angle 0, y to its right, z up),
  * turned and scaled with it; a `dir` turns with it too. A burst with a
- * `sound` plays it from the thing each time. Not once it's dead, nor while
- * the player is more than EMIT_RANGE away.
+ * `sound` plays it from the thing each time. A burst with `if` or `unless`
+ * (story flags) goes off only while the flags allow. Not once it's dead,
+ * nor while the player is more than EMIT_RANGE away.
  */
 export function emitThink(world, t, dt) {
   const list = t.def.emit;
@@ -31,6 +33,7 @@ export function emitThink(world, t, dt) {
     if ((t.emitWait[i] -= dt) > 0) continue;
     const e = list[i];
     t.emitWait[i] = between(rng, e.every);
+    if ((e.if !== undefined || e.unless !== undefined) && !flagsAllow(world.flags, e)) continue;
     const [ax, ay, az] = e.at ?? [0, 0, 0];
     const dir = e.dir && [e.dir[0] * c - e.dir[1] * s, e.dir[0] * s + e.dir[1] * c, e.dir[2]];
     if (e.type) ps.burst(e.type, t.x + (ax * c - ay * s) * k, t.y + (ax * s + ay * c) * k, t.z + (t.bobZ ?? 0) + az * k, { ...e, dir });

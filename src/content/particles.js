@@ -133,6 +133,21 @@ export default [
     onFloor: 'die',
     cap: 200,
   }),
+  // The tractor beam's coupling arcing: bigger, longer cyan sparks that
+  // float off the ring (decor.js, ds-beam-ring-live).
+  defineParticle({
+    id: 'beam-arc',
+    colors: [{ ramp: 'glow-cyan', from: 3, to: 0 }],
+    life: [0.25, 0.6],
+    size: 0.04,
+    maxPx: 4,
+    streak: 0.06,
+    fullbright: true,
+    blend: 'add',
+    gravity: 0,
+    drag: 3,
+    cap: 200,
+  }),
   // Grit knocked off rock and dirt (in the canyon, instead of shrapnel).
   defineParticle({
     id: 'rock-chip',

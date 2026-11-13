@@ -645,6 +645,10 @@ steam), not on a trickle every tenth of a second. A burst with a `sound`
 and no `type` is only the sound: a machine's hum, `every` as long as the
 sound, so it runs on without a gap.
 
+`if` and `unless` on a burst (story flags, as on triggers) hold it back
+while the flags don't allow it: the tractor beam's coupling crackles
+`unless: 'beam-off'`, and falls quiet once the switch sets the flag.
+
 They're cosmetic (the particles' own RNG) and only run while the player
 is within 32 tiles (`EMIT_RANGE` in `things/emit.js`), and not once the
 decoration is dead.

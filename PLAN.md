@@ -39,6 +39,10 @@ Mark (2026-11-13): add more life and detail to `m4`, one area at a time.
   hiss, the weld's arc, the pump room's hum).
 - [x] The corridors: door control panels, a security post in the lobby, the
   officer on the last straight walking it.
+- [x] The tractor beam's coupling crackles and hums until it's off (emitter
+  bursts take `if`/`unless` story flags).
+- [x] The tractor beam's coupling crackles and hums until it's off (emitter
+  bursts take `if`/`unless` story flags).
 - [x] The unfinished sector: a post being welded on the bare deck, a panel
   hoisted toward the gallery's truss.
 

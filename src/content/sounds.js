@@ -169,6 +169,12 @@ export default [
     id: 'pump-hum',
     synth: { wave: 'saw', freq: 55, duration: 3.9, attack: 0.3, sustain: 1, release: 0.3, lowpass: 300, volume: 0.25, vibrato: { rate: 2, depth: 0.15 }, layers: [{ wave: 'noise', duration: 3.9, attack: 0.3, release: 0.3, lowpass: 400, volume: 0.08 }] },
   }),
+  // The tractor beam's coupling: an electric drone (3.4 s, DF's ELECTRIC on
+  // the site), repeated by its ring's emitter until the beam is off.
+  defineSound({
+    id: 'beam-hum',
+    synth: { wave: 'saw', freq: 98, duration: 3.4, attack: 0.25, sustain: 1, release: 0.25, lowpass: 900, volume: 0.22, vibrato: { rate: 30, depth: 0.25 }, layers: [{ wave: 'square', freq: 49, duration: 3.4, attack: 0.25, release: 0.25, lowpass: 400, volume: 0.12 }] },
+  }),
   defineSound({
     id: 'door-open',
     synth: { ...hiss(0.32, 0.55), layers: [{ wave: 'saw', freq: 70, freqEnd: 130, duration: 0.28, attack: 0.01, release: 0.12, lowpass: 700, volume: 0.35, vibrato: { rate: 30, depth: 0.5 } }] },
