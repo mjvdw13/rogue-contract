@@ -13,6 +13,8 @@ export const clothTextures = ['cloth-rag', 'cloth-pale'].map((id) =>
 export default [
   // A power cable strung between houses: dark, heavy, barely moves.
   defineHanging({ id: 'cable', shape: 'rope', color: ['gray', 0.12], width: 0.05, breeze: 0.25, drag: 1 }),
+  // A fuel hose: thick and stiff, hardly stirring in a hangar's air.
+  defineHanging({ id: 'hose', shape: 'rope', color: ['gray', 0.08], width: 0.1, breeze: 0.05, drag: 0.5 }),
   // A rope: lighter, swings more.
   defineHanging({ id: 'rope', shape: 'rope', color: ['sand', 0.45], width: 0.035, breeze: 0.6 }),
   // A rust-red rag, its hem torn to tatters.

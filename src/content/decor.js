@@ -18,6 +18,7 @@ import { SCAFFOLDS, scaffoldHeight } from './models/scaffold.js';
 import { BALCONY_FRAME } from './models/balcony.js';
 import { WIRES, CONSOLE } from './models/hold.js';
 import { CABLES as STATION_CABLES, STEAM_PIPE } from './models/station.js';
+import { SERVICE, WELD, CART } from './models/station-crew.js';
 import { TOWER_HEIGHT } from './models/market.js';
 import { BAR, TAPS, CORNER } from './models/cantina.js';
 import { POD } from './models/pod.js';
@@ -121,6 +122,24 @@ export default [
       { type: 'steam', count: 7, every: [4, 9], at: STEAM_PIPE.leak, radius: 0.08, dir: [1, 0, 0.3], spread: 0.35, speed: [1.5, 3] },
     ],
   }),
+  // The crews' gear (models/station-crew.js): a service stand at a TIE (the
+  // welding one spits sparks at the cockpit's frame, a spray now and then
+  // and a trickle between), fuel points, the mouth's beacons, a tool cart.
+  defineDecoration({ id: 'ds-service-stand', model: 'ds-service-stand', solid: true, fixed: true, height: SERVICE.deck + 1 }),
+  defineDecoration({
+    id: 'ds-service-stand-welding',
+    model: 'ds-service-stand',
+    solid: true,
+    fixed: true,
+    height: SERVICE.deck + 1,
+    emit: [
+      { type: 'spark', count: 3, every: [0.05, 0.15], at: WELD, radius: 0.05, dir: [-0.3, 0, -1], spread: 0.9, speed: [0.5, 2.5] },
+      { type: 'spark', count: 16, every: [1.5, 4], at: WELD, radius: 0.08, dir: [-0.4, 0, -0.6], spread: 1.1, speed: [1.5, 4] },
+    ],
+  }),
+  defineDecoration({ id: 'ds-fuel-socket', model: 'ds-fuel-socket', fixed: true }),
+  defineDecoration({ id: 'ds-beacon', model: 'ds-beacon', fixed: true }),
+  defineDecoration({ id: 'ds-tool-cart', model: 'ds-tool-cart', solid: true, radius: 0.5, height: CART.top }),
   // A lit ring round the tractor beam's column.
   defineDecoration({ id: 'ds-beam-ring', model: 'ds-beam-ring', fixed: true }),
   defineDecoration({ id: 'ds-camera', model: 'ds-camera', fixed: true }),

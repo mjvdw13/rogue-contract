@@ -145,6 +145,10 @@ for (const [x, y] of [[20, 55], [34, 55], [46, 55], [60, 55], [74, 55], [30, 104
   p.rect(x, y, x + 1, y + 1, { wall: T.hangarLight });
   lamps.push({ x: x === 15 ? 16.5 : x === 80 ? 79.5 : x + 0.5, y: y === 55 ? 56.5 : y === 104 ? 103.5 : y + 0.5, z: 3, radius: 6, light: 40 });
 }
+// Red beacons either side of the mouth, blinking together.
+for (const y of [61, 99]) lamps.push({ x: 16.7, y, z: 9.5, radius: 5, light: 64, fx: 'blink', min: 0, sync: 'mouth' });
+// The east TIE's cockpit frame being welded: the arc's flicker.
+lamps.push({ x: 69, y: 65.4, z: 3.8, radius: 5, light: 96, fx: 'flicker', min: 0 });
 // The tiles under the Crow: the way out, once the beam is off.
 p.rect(36, 77, 44, 83, (x, y, old) => ({ ...old, tag: 'crow' }));
 
@@ -439,6 +443,13 @@ const list = [
   // The trapezoid surrounds of the hangar's doors.
   at('ds-doorframe', 79.85, 100, { angle: 180 }), at('ds-doorframe', 40, 56.15, { angle: 270 }),
   at('thermal-detonator', 75.5, 96.5),
+  // The deck crew's work: the two west TIEs fuelling from points in the
+  // wall, the east one's cockpit frame being welded from a service stand,
+  // a power droid feeding the torch, a tool cart; beacons at the mouth.
+  at('ds-fuel-socket', 27.5, 56.02, { angle: 270 }), at('ds-fuel-socket', 57.5, 56.02, { angle: 270 }),
+  at('ds-service-stand-welding', 69, 66.3, { angle: 90 }),
+  at('power-droid', 71.6, 67.4, { angle: 150 }), at('ds-tool-cart', 66.4, 67.6, { angle: 20 }),
+  at('ds-beacon', 16.02, 61, { angle: 0, z: 10 }), at('ds-beacon', 16.02, 99, { angle: 0, z: 10 }),
   // A trooper walking the deck between the fighters and the shuttle.
   at('stormtrooper', 62.5, 70.5, { angle: 180, skill: NORMAL_UP, beat: { patrol: [[74.5, 70.5], [50.5, 70.5]], idleTime: [2, 4] } }),
   // 1a. The store (secret).
@@ -566,6 +577,12 @@ export default defineLevel({
   ...p.build(),
   lights: lamps,
   decals,
+  hangings: [
+    // Fuel hoses from the wall to the two west TIEs' balls.
+    ...[25, 55].map((x) => ({ type: 'hose', from: [x + 2.75, 56.45, 0.6], to: [x + 0.3, 62.9, 3.6], sag: 1.6 })),
+    // The power droid's lead up to the welder's torch.
+    { type: 'cable', from: [71.4, 67.2, 0.7], to: [69.5, 66.1, 3.45], sag: 0.5 },
+  ],
   things: [],
   list,
   triggers: [

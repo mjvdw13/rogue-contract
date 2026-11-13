@@ -160,7 +160,9 @@ Models (`models/station.js`): `tie-fighter`, `tie-rack`, `lambda-shuttle`,
 `ds-crate`, `ds-crate-tall`, `ds-container`, `ds-doorframe`,
 `tractor-terminal`, `ds-girder-post`, `ds-girder-beam`, `ds-panel-stack`,
 `ds-cable-reel`, `work-lamp`, `ds-cables`, `ds-cables-live`, `ds-steam-pipe`, `ds-beam-ring`, `ds-camera`, `ds-ceiling-lamp-bar`,
-`dianoga-eye`.
+`dianoga-eye`. The crews' gear (`models/station-crew.js`):
+`ds-service-stand` (the welding one spits sparks), `ds-fuel-socket`
+(a `hose` hanging to the TIE), `ds-beacon`, `ds-tool-cart`.
 
 Characters: stormtroopers, officers, probe droids; new: the
 interrogation droid (a monster, generated art) and the mouse droid (a
