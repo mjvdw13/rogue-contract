@@ -576,7 +576,7 @@ const list = [
   at('med-kit', 104.5, 138), at('energy-pack', 80, 138),
   // Work going on: a post on the bare deck welded from a stand; in the
   // gallery a panel hoisted up toward the truss, a cart below.
-  at('ds-service-stand-welding', 118, 132.4, { angle: 270 }), at('ds-tool-cart', 120.4, 131.4, { angle: 300 }),
+  at('ds-service-stand-welding', 118, 132.4, { angle: 270 }), at('ds-tool-cart', 116.2, 131.6, { angle: 300 }),
   at('ds-panel-hoisted', 22, 128, { angle: 0, z: 13 }), at('ds-tool-cart', 24.5, 131.5, { angle: 100 }),
   at('stormtrooper', 62.5, 124.5, { angle: 0, beat: { patrol: [[64.5, 124.5], [22.5, 124.5]], idleTime: [2, 4] } }), at('stormtrooper', 40.5, 134.5, { angle: 0, skill: NOT_EASIEST }),
   at('stormtrooper', 24.5, 120.5, { angle: 0, skill: NORMAL_UP }),
