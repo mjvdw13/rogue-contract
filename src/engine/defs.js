@@ -465,12 +465,13 @@ export function defineItem(def) {
  * own frame, as its model is built, turned and scaled with it; z above its
  * own), only while the player is near; a burst's `sound` plays from the
  * thing each time (with no `type`, the burst is only the sound); `if` and
- * `unless` (story flags) hold a burst back while the flags don't allow it.
+ * `unless` (story flags) hold a burst back while the flags don't allow it;
+ * `bob: false` starts a bobbing thing's burst from its resting height.
  * None by default.
  * @param {{id:string, glyph?:string, sheet:SheetSpec, anims?:Record<string,AnimSpec>, solid?:boolean,
  *   radius?:number, height?:number, z?:number, hanging?:boolean, fixed?:boolean, health?:number,
  *   spin?:number, bob?:{height:number, period:number, roll?:number},
- *   emit?:(BurstSpec & {every:number|[number,number], at?:[number,number,number], radius?:number, sound?:string, if?:string|string[], unless?:string|string[]})[],
+ *   emit?:(BurstSpec & {every:number|[number,number], at?:[number,number,number], radius?:number, sound?:string, if?:string|string[], unless?:string|string[], bob?:boolean})[],
  *   explode?:{radius:number, damage:number, sound?:string}}} def
  */
 export function defineDecoration(def) {

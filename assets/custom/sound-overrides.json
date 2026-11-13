@@ -41,5 +41,6 @@
   "detonator-explode": { "src": "assets/custom/sounds/impacts-explosions/EX-LRG1.mp3", "volume": 1.15 },
   "weld-arc": { "src": "assets/custom/sounds/enemies/WELD-1.mp3", "volume": 0.6 },
   "pump-hum": { "src": "assets/custom/sounds/ambience/MACHINE2.mp3", "volume": 0.5 },
-  "beam-hum": { "src": "assets/custom/sounds/ambience/ELECTRIC.mp3", "volume": 0.6 }
+  "beam-hum": { "src": "assets/custom/sounds/ambience/ELECTRIC.mp3", "volume": 0.6 },
+  "dianoga-gurgle": { "src": "assets/custom/sounds/enemies/CREATUR1.mp3", "volume": 0.7 }
 }

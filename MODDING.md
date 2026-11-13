@@ -649,6 +649,11 @@ sound, so it runs on without a gap.
 while the flags don't allow it: the tractor beam's coupling crackles
 `unless: 'beam-off'`, and falls quiet once the switch sets the flag.
 
+A decoration that bobs carries its bursts up and down with it; `bob:
+false` on a burst starts it from the thing's resting height instead
+(bubbles round the compactor's eye come up at the surface, however its
+stalk sways).
+
 They're cosmetic (the particles' own RNG) and only run while the player
 is within 32 tiles (`EMIT_RANGE` in `things/emit.js`), and not once the
 decoration is dead.

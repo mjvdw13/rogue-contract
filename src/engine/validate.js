@@ -273,6 +273,7 @@ export function validateContent(reg) {
           if (e?.at !== undefined && !(Array.isArray(e.at) && e.at.length === 3 && e.at.every((v) => typeof v === 'number'))) err(`${emitter}: at is [x, y, z] in its own frame`);
           if (e?.radius !== undefined && !(typeof e.radius === 'number' && e.radius >= 0)) err(`${emitter}: radius is a distance, 0 or more`);
           if (e?.sound !== undefined) checkSound(emitter, e.sound);
+          if (e?.bob !== undefined && typeof e.bob !== 'boolean') err(`${emitter}: bob is true or false`);
           if (e) checkConditions(emitter, e, readsOf(t.id));
         }
       }

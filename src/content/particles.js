@@ -313,6 +313,21 @@ export default [
     onFloor: 'die',
     cap: 30,
   }),
+  // A bubble coming up in the compactor's sludge: a small pale grey disc
+  // that swells and pops just over the surface.
+  defineParticle({
+    id: 'bubble',
+    colors: [{ ramp: 'steel', from: 26, to: 20 }],
+    life: [0.4, 0.9],
+    size: 0.07,
+    maxPx: 8,
+    shape: 'disc',
+    grow: 1.8,
+    blend: 'solid',
+    gravity: -0.3,
+    drag: 2,
+    cap: 40,
+  }),
   // Small flames licking up off something burning (Mission 2's speeder in
   // the workshop pit): little glowing discs that rise, swell a little and
   // cool from yellow to red.

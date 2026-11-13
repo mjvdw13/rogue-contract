@@ -175,6 +175,12 @@ export default [
     id: 'beam-hum',
     synth: { wave: 'saw', freq: 98, duration: 3.4, attack: 0.25, sustain: 1, release: 0.25, lowpass: 900, volume: 0.22, vibrato: { rate: 30, depth: 0.25 }, layers: [{ wave: 'square', freq: 49, duration: 3.4, attack: 0.25, release: 0.25, lowpass: 400, volume: 0.12 }] },
   }),
+  // The thing in the compactor, under the sludge (DF's CREATUR1 on the site).
+  defineSound({
+    id: 'dianoga-gurgle',
+    synth: { wave: 'sine', freq: 70, freqEnd: 110, duration: 0.18, attack: 0.01, release: 0.12, lowpass: 600, volume: 0.4, repeat: { count: 6, interval: 0.13, decay: 0.85, pitch: 0.92 }, layers: [{ wave: 'noise', duration: 0.9, attack: 0.05, release: 0.6, lowpass: 400, volume: 0.15 }] },
+    pitchVariance: 0.1,
+  }),
   defineSound({
     id: 'door-open',
     synth: { ...hiss(0.32, 0.55), layers: [{ wave: 'saw', freq: 70, freqEnd: 130, duration: 0.28, attack: 0.01, release: 0.12, lowpass: 700, volume: 0.35, vibrato: { rate: 30, depth: 0.5 } }] },

@@ -169,7 +169,17 @@ export default [
   defineDecoration({ id: 'ds-camera', model: 'ds-camera', fixed: true }),
   defineDecoration({ id: 'ds-ceiling-lamp-bar', model: 'ds-ceiling-lamp-bar', fixed: true }),
   // Something in the compactor's water, looking about.
-  defineDecoration({ id: 'dianoga-eye', model: 'dianoga-eye', fixed: true, bob: { height: 0.25, period: 5 } }),
+  // Bubbles come up round it, and now and then it gurgles.
+  defineDecoration({
+    id: 'dianoga-eye',
+    model: 'dianoga-eye',
+    fixed: true,
+    bob: { height: 0.25, period: 5 },
+    emit: [
+      { type: 'bubble', count: 1, every: [0.15, 0.5], at: [0, 0, 0.03], radius: 1.4, dir: [0, 0, 1], spread: 0.2, speed: [0, 0.15], bob: false },
+      { type: 'bubble', count: 6, every: [7, 15], at: [0.3, 0, 0.03], radius: 0.6, dir: [0, 0, 1], spread: 0.4, speed: [0.05, 0.3], bob: false, sound: 'dianoga-gurgle' },
+    ],
+  }),
   defineDecoration({ id: 'barricade', model: 'barricade', solid: true, height: 1.15 }),
   // Mos Eisley's, dusty and worn (models/barricade.js).
   defineDecoration({ id: 'barricade-worn', model: 'barricade-worn', solid: true, height: 1.15 }),

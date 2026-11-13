@@ -457,6 +457,22 @@ test('an emit burst with unless stops once the story flag is set', () => {
   assert.equal(bursts, before, 'none once it is set');
 });
 
+test('a bobbing decoration carries its bursts with it, unless a burst says bob: false', () => {
+  const dome = content.things.find((t) => t.id === 'droid-dome');
+  const dot = defineParticle({ id: 'test-dot', colors: [['gray', 10]], life: 10 });
+  const emit = [{ type: 'test-dot', count: 1, every: 0.1, at: [0, 0, 0.5] }, { type: 'test-dot', count: 1, every: 0.1, at: [0, 0, 0.5], bob: false }];
+  const reg = new Registry({ ...content, particles: [...content.particles, dot], things: [...content.things.filter((t) => t !== dome), { ...dome, emit, bob: { height: 0.3, period: 2 } }] });
+  const w = makeWorld(room(OPEN, ['', ' >'], { legend: { '.': ROOM } }), { noMonsters: true, registry: reg });
+  const d = w.spawn('droid-dome', 6.5, 3.5);
+  const zs = [[], []];
+  const burst = w.particles.burst.bind(w.particles);
+  w.particles.burst = (type, x, y, z, o) => (zs[o.bob === false ? 1 : 0].push(z - d.z), burst(type, x, y, z, o));
+  for (let k = 0; k < 2 * 60; k++) w.tick(DT, mockInput());
+  const spread = (l) => Math.max(...l) - Math.min(...l);
+  assert.ok(spread(zs[0]) > 0.2, `with the bob: ${spread(zs[0]).toFixed(2)}`);
+  assert.ok(zs[1].every((z) => Math.abs(z - 0.5) < 1e-9), 'bob: false: always at its resting height');
+});
+
 test('a decoration emits nothing while the player is far off', () => {
   const reg = emitting([{ type: 'test-dot', count: 3, every: 0.1 }]);
   const wide = OPEN.map((row) => row[0] + row.slice(1, -1).padEnd(46, row[1]) + row.at(-1));

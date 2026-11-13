@@ -15,7 +15,9 @@ const between = (rng, v) => (Array.isArray(v) ? v[0] + (v[1] - v[0]) * rng.next(
  * (as its model is built: x ahead at angle 0, y to its right, z up),
  * turned and scaled with it; a `dir` turns with it too. A burst with a
  * `sound` plays it from the thing each time. A burst with `if` or `unless`
- * (story flags) goes off only while the flags allow. Not once it's dead,
+ * (story flags) goes off only while the flags allow. A bobbing thing's
+ * bursts start where its bob carries it, unless the burst has `bob: false`
+ * (bubbles round something bobbing in water start at the surface). Not once it's dead,
  * nor while the player is more than EMIT_RANGE away.
  */
 export function emitThink(world, t, dt) {
@@ -36,7 +38,7 @@ export function emitThink(world, t, dt) {
     if ((e.if !== undefined || e.unless !== undefined) && !flagsAllow(world.flags, e)) continue;
     const [ax, ay, az] = e.at ?? [0, 0, 0];
     const dir = e.dir && [e.dir[0] * c - e.dir[1] * s, e.dir[0] * s + e.dir[1] * c, e.dir[2]];
-    if (e.type) ps.burst(e.type, t.x + (ax * c - ay * s) * k, t.y + (ax * s + ay * c) * k, t.z + (t.bobZ ?? 0) + az * k, { ...e, dir });
+    if (e.type) ps.burst(e.type, t.x + (ax * c - ay * s) * k, t.y + (ax * s + ay * c) * k, t.z + (e.bob === false ? 0 : (t.bobZ ?? 0)) + az * k, { ...e, dir });
     if (e.sound) world.playSoundFrom(e.sound, t);
   }
 }

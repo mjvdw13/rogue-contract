@@ -16,6 +16,7 @@ export const BENCH_KINDS = {
   spark: { label: 'Sparks (streak, glowing, add)', vel: (r) => [r(-3, 3), r(-3, 3), r(1, 5)] },
   'bolt-spark': { label: 'Bolt sparks (streak, glowing, add)', vel: (r) => [r(-3, 3), r(-3, 3), r(1, 4)] },
   'ion-spark': { label: 'Ion sparks (streak, glowing, add)', vel: (r) => [r(-5, 5), r(-5, 5), r(-3, 4)] },
+  bubble: { label: 'Bubbles (disc, half)', vel: (r) => [0, 0, r(0, 0.2)], z: [0.02, 0.05] },
   'beam-arc': { label: 'Beam arcs (streak, glowing, add)', vel: (r) => [r(-3, 3), r(-3, 3), r(-1, 1)] },
   ember: { label: 'Embers (dot, glowing, add)', vel: (r) => [r(-0.3, 0.3), r(-0.3, 0.3), r(0.2, 1)] },
   mote: { label: 'Motes (dot, glowing, add)', vel: (r) => [r(-0.1, 0.1), r(-0.1, 0.1), r(-0.05, 0.1)], z: [0.3, 3] },
