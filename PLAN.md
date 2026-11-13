@@ -875,6 +875,16 @@ These need Mark to try something, or to decide. Don't start them without him.
 
 In this order unless Mark says otherwise.
 
+### 0. Stairs' sides hung from one height (Mark, 2026-11-12)
+
+Since step sides hang from a world grid, review every stair (interior ones
+too) for walls whose texture still steps down with the stair.
+
+- [ ] M2's dug stairs (`stairDown()`): the walls beside a flight hang from
+      the flight's highest ceiling, not each step's own.
+- [ ] Review the rest (M2's curved courtyard stair and the garage's,
+      M1's, M3's, M4's) by snapshots; list which need it, ask Mark.
+
 ### 1. Mission 1: Mos Eisley
 
 The story's Map A. The design (areas, light, the town kit, art and sound

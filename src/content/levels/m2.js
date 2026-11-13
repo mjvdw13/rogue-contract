@@ -87,6 +87,12 @@ const CISTERN = { wall: 'duracrete', ceiling: 'duracrete' };
 const ROCK = { wall: 'sandstone', ceiling: 'sandstone-dark' };
 /** Each dug tile's lining, by its index (the last dig over a tile wins). */
 const linings = new Map();
+/**
+ * A stair's tiles, by index: the height its walls hang their texture from
+ * (the flight's highest ceiling), so their courses run level down the
+ * flight instead of stepping down with each step's ceiling.
+ */
+const hangs = new Map();
 
 /**
  * Space dug under the ground (or under a building) over the box: the lower
@@ -99,6 +105,7 @@ const linings = new Map();
 function under(x0, y0, x1, y1, { floorZ, ceilZ = (f) => f + 4, top, lining = WHITEWASH, floor = 'flagstone', ceiling = lining.ceiling, light = 112, side = lining.wall, extra = {} }) {
   p.rect(x0, y0, x1, y1, (x, y, old) => {
     linings.set(y * W + x, lining);
+    hangs.delete(y * W + x);
     const f = typeof floorZ === 'function' ? floorZ(x, y) : floorZ;
     const t = top ?? topOf(old);
     const c = typeof ceilZ === 'function' ? ceilZ(f, old, t) : ceilZ;
@@ -130,7 +137,7 @@ const doorway = (x0, y0, x1, y1, face, z = PIT) => {
  * flights of `flight` steps with a flat landing of `landing` tiles between
  * them, down to `to` at the most.
  */
-const stairDown = (x0, y0, x1, y1, from, { start = y0, flight = 8, landing = 2, to = -Infinity, ...opts } = {}) =>
+const stairDown = (x0, y0, x1, y1, from, { start = y0, flight = 8, landing = 2, to = -Infinity, ...opts } = {}) => {
   under(x0, y0, x1, y1, {
     floorZ: (x, y) => {
       const r = y - start, n = flight + landing;
@@ -140,6 +147,10 @@ const stairDown = (x0, y0, x1, y1, from, { start = y0, flight = 8, landing = 2, 
     light: 96,
     ...opts,
   });
+  let hang = -Infinity;
+  for (let y = y0; y < y1; y++) for (let x = x0; x < x1; x++) hang = Math.max(hang, p.get(x, y).slab.bottom);
+  for (let y = y0; y < y1; y++) for (let x = x0; x < x1; x++) hangs.set(y * W + x, hang);
+};
 
 /**
  * A light well: a 2 x 2 shaft from the yard down into a tunnel or room, open
@@ -186,18 +197,21 @@ function lineDug() {
       const n = p.get(nx, ny);
       if (!n || dug(n) || n.line || n.door) continue;
       const j = ny * W + nx;
-      const f = faces.get(j) ?? { lining, floor: Infinity, top: -Infinity };
+      const f = faces.get(j) ?? { lining, floor: Infinity, top: -Infinity, hang: -Infinity };
       if (c.slab.bottom > f.top) [f.lining, f.top] = [lining, c.slab.bottom];
+      f.hang = Math.max(f.hang, hangs.get(k) ?? c.slab.bottom);
       f.floor = Math.min(f.floor, c.floorZ);
       faces.set(j, f);
     }
   }
-  for (const [j, { lining, floor, top }] of faces) {
+  for (const [j, { lining, floor, top, hang }] of faces) {
     const x = j % W;
     const n = p.get(x, (j - x) / W);
     const dado = lining.dado ? [{ to: floor + 1, tex: lining.dado }] : [];
-    if (n.wall) p.set(x, (j - x) / W, { ...n, wall: lining.wall, ...(dado.length && { bands: dado }) });
-    else p.set(x, (j - x) / W, { ...n, bands: [...dado, { to: top, tex: lining.wall }, ...(n.bands ?? [])] });
+    // (Beside a stair, the wall hangs from the flight's top: a band ending there.)
+    const level = hang > top ? [{ to: hang, tex: lining.wall }] : [];
+    if (n.wall) p.set(x, (j - x) / W, { ...n, wall: lining.wall, ...(dado.length + level.length && { bands: [...dado, ...level] }) });
+    else p.set(x, (j - x) / W, { ...n, bands: [...dado, { to: hang, tex: lining.wall }, ...(n.bands ?? [])] });
   }
 }
 
