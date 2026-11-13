@@ -402,6 +402,13 @@ for (const x of [28, 44, 60]) lamps.push({ x, y: 128, radius: 10, light: 112 });
 p.rect(44, 106, 48, 114, bare(8, 12));
 p.rect(44, 104, 48, 106, door(8, { upper: T.hangarWall }));
 
+// The station's PA: an announcement as you come into the ring corridor,
+// the hub and the passage west off the bare deck.
+const tagged = (tag) => (x, y, old) => (old.wall || old.door ? old : { ...old, tag });
+p.rect(108, 97, 110, 103, tagged('pa-ring'));
+p.rect(161, 77, 163, 83, tagged('pa-hub'));
+p.rect(108, 120, 110, 126, tagged('pa-alert'));
+
 // ---------------------------------------------------------------- the walls
 // Every room is dug out of the station's dark structure; the walls round
 // it take its own panelling (its `upper`: pale in the corridors, black in
@@ -629,6 +636,18 @@ export default defineLevel({
       { action: 'lockDoors', tag: 'det-lift' },
       { action: 'closeDoors', tag: 'det-lift' },
       { action: 'message', text: 'ALARM: DETENTION BLOCK AA-19. LIFT SEALED. THE WASTE HATCH IS OPEN.' },
+    ] },
+    { on: 'enter', tag: 'pa-ring', do: [
+      { action: 'sound', id: 'pa-chime' },
+      { action: 'message', text: 'PA: DOCKING BAY 326, THE SCAN CREW REPORTS THE FREIGHTER SECURED. ONE PRISONER TAKEN TO DETENTION.' },
+    ] },
+    { on: 'enter', tag: 'pa-hub', do: [
+      { action: 'sound', id: 'pa-chime' },
+      { action: 'message', text: 'PA: CONSTRUCTION CREWS, SECTOR N-ONE: SHIFT CHANGE AT THE TOP OF THE HOUR. KEEP CLEAR OF THE OPEN DECKS.' },
+    ] },
+    { on: 'enter', tag: 'pa-alert', if: 'beam-off', do: [
+      { action: 'sound', id: 'pa-chime' },
+      { action: 'message', text: 'PA: SECURITY ALERT. TRACTOR BEAM SIX IS DOWN. ALL TROOPS TO DOCKING BAY 326.' },
     ] },
     { on: 'enter', tag: 'file', do: [{ action: 'message', text: "ON THE TABLE: 'DARK TROOPER PROJECT, PHASE ONE. APPROVED. FIELD TRIALS TO FOLLOW THE TEST OF THIS STATION'S PRIMARY WEAPON.'" }] },
     { on: 'enter', tag: 'crow', unless: 'beam-off', once: false, do: [{ action: 'message', text: "JAN: NOT WHILE THAT BEAM'S ON US." }] },

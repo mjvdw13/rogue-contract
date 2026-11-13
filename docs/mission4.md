@@ -40,6 +40,13 @@ and the finale, and gives the finale its reason.
   space behind a field. Mouse droids underfoot, interrogation droids in
   the cell block, and nothing but stars out of the hangar's mouth.
 
+The station's PA (2026-11-13, a chime, `pa-chime`, then a line) speaks
+three times: coming into the ring corridor (the scan crew has the
+freighter secured, one prisoner taken to detention), into the hub (the
+construction crews' shift change), and, once the beam is off, the
+passage west off the bare deck (all troops to Docking Bay 326: the squad
+waiting at the end).
+
 Sample lines (stand-ins, like every level's):
 
 > JAN: They took Rusk. Detention level, I'd bet. I can't lift with that
