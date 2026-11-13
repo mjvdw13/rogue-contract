@@ -18,7 +18,7 @@ import { SCAFFOLDS, scaffoldHeight } from './models/scaffold.js';
 import { BALCONY_FRAME } from './models/balcony.js';
 import { WIRES, CONSOLE } from './models/hold.js';
 import { CABLES as STATION_CABLES, STEAM_PIPE, BEAM_RING } from './models/station.js';
-import { SERVICE, WELD, CART, HOLO, LOCKERS, BENCH as DS_BENCH, BUNK as CELL_BUNK } from './models/station-crew.js';
+import { SERVICE, WELD, CART, HOLO, LOCKERS, PIPE_RUNS, BENCH as DS_BENCH, BUNK as CELL_BUNK } from './models/station-crew.js';
 import { TOWER_HEIGHT } from './models/market.js';
 import { BAR, TAPS, CORNER } from './models/cantina.js';
 import { POD } from './models/pod.js';
@@ -152,6 +152,7 @@ export default [
   defineDecoration({ id: 'ds-holo-ship', model: 'ds-holo-ship', fixed: true, spin: 0.5, bob: { height: 0.04, period: 3 } }),
   defineDecoration({ id: 'ds-holo-station', model: 'ds-holo-station', fixed: true, spin: 0.25 }),
   defineDecoration({ id: 'ds-door-panel', model: 'ds-door-panel', fixed: true }),
+  ...PIPE_RUNS.map((l) => defineDecoration({ id: `ds-pipe-run-${l}`, model: `ds-pipe-run-${l}`, fixed: true })),
   defineDecoration({ id: 'ds-panel-hoisted', model: 'ds-panel-hoisted', fixed: true }),
   defineDecoration({ id: 'ds-bunk', model: 'ds-bunk', fixed: true, height: CELL_BUNK.top }),
   // A lit ring round the tractor beam's column.

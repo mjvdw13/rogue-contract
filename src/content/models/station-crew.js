@@ -39,6 +39,10 @@ import { ModelBuilder } from './lib/build.js';
 // the wall's face, +x out of it), LOCKERS.width along it. `ds-bench`: a
 // steel bench, BENCH.length along y.
 //
+// `ds-pipe-run-<len>`: three pipes along a tunnel's ceiling, `len` long
+// along y and centred on the origin (placed at the ceiling: they hang
+// below it), on a hanger every 2.
+//
 // `ds-bunk`: a cell's bunk, a slab hinged out of the back wall on two
 // chains (the origin on the wall's face, +x out of it).
 
@@ -58,6 +62,8 @@ export const PANEL = { half: 1, tall: 2, eye: [0.85, 2.1] };
 export const LOCKERS = { width: 2.4, depth: 0.5, tall: 2.1 };
 /** A bench's length and top. */
 export const BENCH = { length: 2.4, top: 0.5 };
+/** The pipe runs' lengths. */
+export const PIPE_RUNS = [12, 18];
 /** A bunk's depth out of the wall, length and top. */
 export const BUNK = { depth: 0.9, length: 2.4, top: 0.95 };
 
@@ -271,6 +277,21 @@ function bench() {
   return m.build();
 }
 
+function pipeRun(len) {
+  const m = new ModelBuilder(`ds-pipe-run-${len}`);
+  // Two thin pipes and a fat one, each lagged dark at its joints.
+  for (const [x, r, style] of [[-0.45, 0.07, METAL], [-0.2, 0.07, IRON], [0.15, 0.14, METAL]]) {
+    m.cylinder([x, -len / 2, -0.3], r, len, { axis: 'y', segments: 6, ...style, top: false, bottom: false });
+    for (let y = -len / 2 + 1; y < len / 2; y += 3) m.cylinder([x, y - 0.1, -0.3], r + 0.025, 0.2, { axis: 'y', segments: 6, ...DARK });
+  }
+  // Hangers: a strap down from the ceiling and a bar under the pipes.
+  for (let y = -len / 2 + 0.5; y < len / 2; y += 2) {
+    m.box([-0.6, y - 0.03, -0.47], [0.35, y + 0.03, -0.44], IRON);
+    for (const x of [-0.6, 0.35]) m.box([x - 0.02, y - 0.03, -0.47], [x + 0.02, y + 0.03, 0], IRON);
+  }
+  return m.build();
+}
+
 function bunk() {
   const m = new ModelBuilder('ds-bunk');
   const { depth: d, length: l, top } = BUNK;
@@ -281,4 +302,4 @@ function bunk() {
   return m.build();
 }
 
-export default [serviceStand(), fuelSocket(), beacon(), toolCart(), holoTable(), holoShip(), holoStation(), doorPanel(), panelHoisted(), lockerBank(), bench(), bunk()];
+export default [serviceStand(), fuelSocket(), beacon(), toolCart(), holoTable(), holoShip(), holoStation(), doorPanel(), panelHoisted(), lockerBank(), bench(), ...PIPE_RUNS.map(pipeRun), bunk()];

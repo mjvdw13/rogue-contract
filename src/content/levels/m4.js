@@ -383,7 +383,7 @@ lamps.push({ x: 116, y: 123, radius: 9, light: 112, fx: 'flicker', min: 32 });
 p.rect(108, 120, 112, 126, bare(0, 6));
 // Cut cables hang from the ceilings where the panels aren't on; the live
 // ones spit sparks and light the deck in flashes. [x, y, ceiling].
-const LIVE_CABLES = [[138, 127, 8], [120, 118, 8], [110, 124.5, 6], [45.2, 110, 12]];
+const LIVE_CABLES = [[138, 127, 8], [120, 118, 8], [110, 124.5, 6], [45.2, 110, 12], [198.3, 56, 4]];
 const DEAD_CABLES = [[146, 118, 8], [129, 123, 8], [116, 132, 8], [150, 130, 8], [80, 116.5, 16]];
 for (const [x, y] of LIVE_CABLES) lamps.push({ x, y, radius: 6, light: 72, fx: 'flicker', min: 0 });
 // 9b. The panel yard, and stairs up its north wall to 4 m.
@@ -515,6 +515,8 @@ const list = [
   at('stormtrooper', 164.5, 56.5, { angle: 270 }), at('stormtrooper', 176.5, 56.5, { angle: 270 }),
   at('stormtrooper', 170.5, 46.5, { angle: 270, skill: NORMAL_UP }),
   at('interrogation-droid', 165, 48, { skill: NOT_EASIEST }),
+  // Wall consoles either side: the cells' monitors.
+  at('ds-console-wall', 160.1, 51, { angle: 0, z: DET }), at('ds-console-wall', 179.9, 51, { angle: 180, z: DET }),
   at('ds-desk', 170, 54, { angle: 90 }), at('ds-camera', 162, 46, { angle: 315, z: DET + 5 }), at('ds-camera', 178, 46, { angle: 225, z: DET + 5 }),
   at('med-kit', 162.5, 52.5), at('energy-cell', 177.5, 49.5),
   at('interrogation-droid', 170, 26, { skill: NORMAL_UP }),
@@ -541,6 +543,8 @@ const list = [
   at('stormtrooper', 197, 52.5, { angle: 90, skill: NOT_EASIEST }),
   at('stormtrooper', 189.5, 74.5, { angle: 90, ambush: true }), at('stormtrooper', 200.5, 82.5, { angle: 90, ambush: true }),
   at('probe-droid', 195, 80, { skill: NORMAL_UP }),
+  // Pipes along the maintenance tunnel's ceiling, past the loose live cable.
+  at('ds-pipe-run-18', 196.2, 54.5, { angle: 0, z: 4 }),
   at('coolant-tank-running', 189, 77), at('coolant-tank', 201, 82),
   // Leaking pipes: in the compactor, up the tunnels, on three of the pumps.
   at('ds-steam-pipe', 186.02, 20, { angle: 0 }), at('ds-steam-pipe', 201.98, 12, { angle: 180 }),
