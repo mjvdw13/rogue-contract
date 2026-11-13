@@ -260,7 +260,7 @@ p.rect(182, 78, 186, 82, hall({ upper: T.wallDark }));
 // ---------------------------------------------------------------- 5. detention block AA-19
 const DET = 12;
 const det = (floorZ, ceilZ, extra = {}) => room(floorZ, ceilZ, { floor: T.detFloor, side: T.detWall, upper: T.detWall, light: 120, ...extra });
-p.rect(160, 44, 180, 62, det(DET, DET + 5, { light: 136 }));
+p.rect(160, 44, 180, 62, det(DET, DET + 5, { light: 136, tag: 'det-control' }));
 p.chamfer(160, 44, 180, 62, 4, { wall: T.detWall });
 p.pool(170, 53, 5, 184);
 // Where the alarm's troopers come in, by the lift door.
@@ -638,6 +638,7 @@ export default defineLevel({
       { action: 'spawn', thing: 'stormtrooper', tag: 'alarm' },
       { action: 'sound', id: 'alarm-klaxon' },
       { action: 'setLight', tag: 'lane', light: 216, lightFx: 'glow', lightMin: 88 },
+      { action: 'setLight', tag: 'det-control', light: 176, lightFx: 'glow', lightMin: 72 },
       { action: 'lockDoors', tag: 'det-lift' },
       { action: 'closeDoors', tag: 'det-lift' },
       { action: 'message', text: 'ALARM: DETENTION BLOCK AA-19. LIFT SEALED. THE WASTE HATCH IS OPEN.' },

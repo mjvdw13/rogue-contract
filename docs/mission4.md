@@ -196,7 +196,7 @@ Indoors there is no haze. 120 reads dark with these textures, 160 normal.
 - Corridors 160, 208 under the lit panels, a lamp at each light column.
 - Briefing room 136, the table's centre lit.
 - Detention 120 to 136, the lane's red grid 168 (pulsing 88 to 216 once
-  the alarm sounds).
+  the alarm sounds; detention control pulses 72 to 176 with it).
 - Compactor 136, a flicker in the middle; maintenance 120 with pools of
   176; pump room 144.
 - The shaft 112, the walks 152, the column's glow pulsing until the beam
