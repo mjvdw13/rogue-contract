@@ -439,7 +439,8 @@ const list = [
   // The trapezoid surrounds of the hangar's doors.
   at('ds-doorframe', 79.85, 100, { angle: 180 }), at('ds-doorframe', 40, 56.15, { angle: 270 }),
   at('thermal-detonator', 75.5, 96.5),
-  at('stormtrooper', 62.5, 62.5, { angle: 180, skill: NORMAL_UP }),
+  // A trooper walking the deck between the fighters and the shuttle.
+  at('stormtrooper', 62.5, 70.5, { angle: 180, skill: NORMAL_UP, beat: { patrol: [[74.5, 70.5], [50.5, 70.5]], idleTime: [2, 4] } }),
   // 1a. The store (secret).
   at('shield-unit', 62, 109), at('energy-cell', 70.5, 109.5), at('energy-cell', 72, 108.5),
   // 1b. The troop bay: the squad that comes out when the beam is off.
@@ -457,8 +458,10 @@ const list = [
   at('ds-console', 83.2, 71, { angle: 0 }), at('ds-console', 83.2, 77, { angle: 0 }), at('ds-console', 83.2, 83, { angle: 0 }),
   at('ds-console-wall', 97.9, 68, { angle: 180 }), at('ds-console-wall', 97.9, 86, { angle: 180 }),
   at('med-kit', 95.5, 66.5), at('energy-cell', 84.5, 88.5),
-  // 3. The ring corridor.
-  at('stormtrooper', 122.5, 100.5, { angle: 180 }),
+  // 3. The ring corridor: a pair marching the first straight in step.
+  ...[[98.5], [101.5, NOT_EASIEST]].map(([y, skill]) => at('stormtrooper', 122.5, y, {
+    angle: 180, ...(skill && { skill }), beat: { patrol: [[106.5, y], [124.5, y]], idleTime: [3, 3] },
+  })),
   at('stormtrooper', 134.5, 92.5, { angle: 225, skill: NOT_EASIEST }),
   at('officer', 148.5, 80.5, { angle: 180, skill: NORMAL_UP }),
   at('stormtrooper', 152.5, 79, { angle: 180 }),
@@ -474,7 +477,9 @@ const list = [
   at('shield-unit', 119, 81), at('med-kit', 107, 92.5, { skill: [1, 2, 3] }),
   at('concussion-rifle', 113, 75), at('power-cell', 111, 74.5), at('power-cell', 115, 74.5),
   // 4. The hub.
-  at('stormtrooper', 166.5, 76.5, { angle: 180 }), at('stormtrooper', 174.5, 84.5, { angle: 180 }),
+  // One walks round the column.
+  at('stormtrooper', 166.5, 74.5, { angle: 0, beat: { patrol: [[164.5, 74.5], [175.5, 74.5], [175.5, 85.5], [164.5, 85.5]], loop: true, idleTime: [1, 2] } }),
+  at('stormtrooper', 174.5, 84.5, { angle: 180 }),
   at('stormtrooper', 170.5, 73.5, { angle: 270, skill: NORMAL_UP }),
   at('probe-droid', 175.5, 80, { skill: HARD }),
   at('ds-doorframe', 160.15, 80, { angle: 0 }), at('ds-doorframe', 170, 70.15, { angle: 270 }), at('ds-doorframe', 179.85, 80, { angle: 180 }),
@@ -513,7 +518,7 @@ const list = [
   at('ds-steam-pipe', 193.02, 96, { angle: 0 }),
   at('energy-pack', 189.5, 80.5), at('med-kit', 201.5, 78),
   // 8. The shaft: troopers round the ledge, probe droids over the drop.
-  at('stormtrooper', 161, 112, { angle: 0 }), at('stormtrooper', 195.5, 131, { angle: 180 }),
+  at('stormtrooper', 161, 112, { angle: 0, beat: { patrol: [[160.7, 112], [158.1, 120.3], [159.2, 128.8]], idleTime: [2, 4] } }), at('stormtrooper', 195.5, 131, { angle: 180 }),
   at('stormtrooper', 171, 140.5, { angle: 90, skill: NOT_EASIEST }),
   at('stormtrooper', 185.5, 140.3, { angle: 90, skill: HARD }),
   at('probe-droid', 166, 112, { z: 1, skill: NORMAL_UP }), at('probe-droid', 190, 134, { z: 1, skill: HARD }),
@@ -522,7 +527,7 @@ const list = [
   ...[-26, -12, 3.2, 11, 20].map((z) => at('ds-beam-ring', SX, SY, { z })),
   at('med-kit', 191.5, 107.5), at('energy-cell', 183.5, 125),
   // 9. The unfinished sector.
-  at('stormtrooper', 146.5, 116.5, { angle: 0 }), at('stormtrooper', 130.5, 132.5, { angle: 0 }),
+  at('stormtrooper', 146.5, 116.5, { angle: 0, beat: { patrol: [[146.5, 116.5], [146.5, 129]], idleTime: [2, 5] } }), at('stormtrooper', 130.5, 132.5, { angle: 0 }),
   at('stormtrooper', 116.5, 116.5, { angle: 0, skill: NOT_EASIEST }),
   at('probe-droid', 131, 122, { skill: NORMAL_UP }),
   at('energy-cell', 124, 120), // down in the first gap
@@ -544,7 +549,7 @@ const list = [
   at('work-lamp', 28, 129, { angle: 180 }), at('work-lamp', 44, 127, { angle: 180 }), at('work-lamp', 60, 129, { angle: 180 }),
   at('ds-panel-stack', 34, 122), at('ds-panel-stack', 56, 134, { angle: 60 }), at('ds-cable-reel', 21, 132), at('ds-crate', 68, 118),
   at('med-kit', 104.5, 138), at('energy-pack', 80, 138),
-  at('stormtrooper', 62.5, 128.5, { angle: 0 }), at('stormtrooper', 40.5, 134.5, { angle: 0, skill: NOT_EASIEST }),
+  at('stormtrooper', 62.5, 124.5, { angle: 0, beat: { patrol: [[64.5, 124.5], [22.5, 124.5]], idleTime: [2, 4] } }), at('stormtrooper', 40.5, 134.5, { angle: 0, skill: NOT_EASIEST }),
   at('stormtrooper', 24.5, 120.5, { angle: 0, skill: NORMAL_UP }),
   at('probe-droid', 30, 128, { skill: HARD }),
   at('med-kit', 46, 110), at('shield-unit', 20.5, 137.5, { skill: [1, 2, 3] }),

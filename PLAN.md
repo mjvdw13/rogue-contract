@@ -24,6 +24,19 @@ MODDING.md, if content authors need it). Keep this file short.
 | Title and repo | **Rogue Contract**. Public repo `mjvdw13/rogue-contract`, served by GitHub Pages from `main`. "Star Wars" and "Dark Forces" stay out of the title. |
 | Art, sound and rights | A non-commercial fan game. Mark's decisions (2026-10-12, 2026-10-15): ripped Dark Forces art and sound effects are committed in `assets/custom/` and used on the hosted site, through `overrides.json` and `sound-overrides.json`, with generated art and synth sounds as the fallback (and what tests and the smoke test use). Characters Mark makes with AI image tools are committed as our own art. Music stays original: no note-for-note John Williams. |
 
+## Mission 4: more life and detail
+
+Mark (2026-11-13): add more life and detail to `m4`, one area at a time.
+
+- [x] Troopers walk beats (a new `beat` placement field): a pair marching
+  the ring corridor, one round the hub's column, one on the shaft's ledge,
+  on the bare deck, the gallery and the hangar deck (skill 3+).
+- [ ] The hangar's deck crew at work: a TIE under repair, fuel lines, a
+  power droid, beacons at the mouth.
+- [ ] The control room and detention: consoles that blink, the screens.
+- [ ] The corridors and hub: wall details, a second mouse droid route.
+- [ ] The guts (compactor, maintenance, pumps) and the unfinished sector.
+
 ## Waiting on Mark
 
 These need Mark to try something, or to decide. Don't start them without him.

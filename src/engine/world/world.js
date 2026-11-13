@@ -20,7 +20,7 @@ import { Thing } from '../things/thing.js';
 import { overlap } from '../things/shape.js';
 import { PlayerState, playerThink, playerCamera } from '../things/player.js';
 import { monsterThink, wakeMonster, monsterPain, applyMomentum } from '../things/monster.js';
-import { makeCalm, endCalm, calmReact } from '../things/calm.js';
+import { makeCalm, makeBeat, endCalm, calmReact } from '../things/calm.js';
 import { makeTalk } from '../things/talk.js';
 import { pushable } from '../things/push.js';
 import { projectileThink, launchProjectile, effectThink } from '../things/projectile.js';
@@ -226,6 +226,7 @@ export class World {
         initNpc(this, t);
       }
       if (s.calm && t.kind === 'monster') makeCalm(this, t, s.calm);
+      else if (s.beat && t.kind === 'monster') makeBeat(this, t, s.beat);
       // Who they are in what they say, and what they say when used (things/talk.js).
       if (s.name) t.speaker = s.name;
       if (s.talk) t.talk = makeTalk(s.talk);

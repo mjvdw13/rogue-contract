@@ -649,13 +649,17 @@ export function defineSong(def) {
  * planning costs a little for every tile within reach, each time the player
  * crosses into a new tile.
  * `list` places things at exact spots: `{ type, x, y, angle?, z?, tag?,
- * skill?, drops?, ambush?, wander?, calm?, talk?, name? }`; a friendly's `wander` (tiles, 0
+ * skill?, drops?, ambush?, wander?, calm?, beat?, talk?, name? }`; a friendly's `wander` (tiles, 0
  * stands still) replaces its type's for that one. A monster's `calm` (true,
  * or `{ lines?, speed?, wander?, idleTime?, patrol?, loop? }` over its
  * type's `calm`) places it calm: it never attacks until the town turns
  * hostile (world.turnHostile: hurt, or gunfire). `patrol` is a
  * list of two or more [x, y] points it walks between in straight lines,
  * pausing at each, there and back, or round with `loop: true`.
+ * A hostile monster's `beat` (`{ patrol, loop?, speed?, stride?, idleTime? }`
+ * over its type's `calm`) is a patrol it walks while it looks out for the
+ * player; it drops it for good once it wakes (sees the player, hears
+ * gunfire or is hurt).
  * A friendly's or calm monster's `talk` is a conversation (things/talk.js):
  * a list of lines said one per use, staying on the last, or a list of
  * branches `{ if?, unless?, lines, set? }` picked by story flags, each

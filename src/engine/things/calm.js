@@ -20,13 +20,38 @@ import { pickLine, readyToReact } from './talk.js';
 /** Make monster `m` calm: `spec` is its placement's `calm` (true, or fields over its type's). */
 export function makeCalm(world, m, spec) {
   const c = { ...m.def.calm, ...(spec === true ? {} : spec) };
-  const route = c.patrol ? c.patrol.map(([x, y]) => ({ x, y })) : null;
   m.rng = new Rng(Math.floor(m.x * 977 + m.y * 131) + 1);
-  m.calm = {
-    lines: c.lines ?? [],
-    speed: c.speed,
+  m.calm = walker(m, c);
+  m.calm.lines = c.lines ?? [];
+  if (!m.calm.route) {
+    m.wanderReach = c.wander ?? 0;
+    m.area = wanderArea(world, m);
+  }
+  m.state = 'calm';
+  standPose(m);
+}
+
+/**
+ * Put monster `m` on a beat: `spec` is its placement's `beat` ({ patrol,
+ * loop?, speed?, stride?, idleTime? } over its type's `calm`). Unlike a calm
+ * one it's on the lookout: it walks the patrol while idle and drops it for
+ * good once it wakes (it sees the player, hears gunfire, or is hurt).
+ */
+export function makeBeat(world, m, spec) {
+  const { lines, wander, ...c } = { ...m.def.calm, ...spec };
+  m.rng = new Rng(Math.floor(m.x * 977 + m.y * 131) + 1);
+  m.beat = walker(m, c);
+  standPose(m);
+}
+
+/** The state of a calm or watchful walker, from its merged `calm`/`beat` fields. */
+function walker(m, c) {
+  const route = c.patrol ? c.patrol.map(([x, y]) => ({ x, y })) : null;
+  return {
+    lines: [],
+    speed: c.speed ?? 2,
     stride: c.stride,
-    idleTime: c.idleTime,
+    idleTime: c.idleTime ?? [2, 5],
     route,
     loop: !!c.loop,
     // The patrol point it heads for next (the nearest to start with), and which way along.
@@ -47,12 +72,19 @@ export function makeCalm(world, m, spec) {
     reactCooldown: 0,
     lastLine: null,
   };
-  if (!route) {
-    m.wanderReach = c.wander ?? 0;
-    m.area = wanderArea(world, m);
+}
+
+/** One tick of a monster on its beat (monsterThink calls it while it's idle). */
+export function beatThink(world, m, dt) {
+  const c = m.beat;
+  if (m.shoved > 0) {
+    m.shoved -= dt;
+    if (m.shoved <= 0) stand(m, c);
+    return;
   }
-  m.state = 'calm';
-  standPose(m);
+  if (c.mode === 'walk') return walk(world, m, c, dt);
+  c.timer -= dt;
+  if (c.timer <= 0) walkTo(m, c, c.route[c.leg].x, c.route[c.leg].y);
 }
 
 /** Turn a calm monster into a normal one: from now on it looks for the player. */
@@ -78,8 +110,7 @@ function standPose(m) {
   if (!m.setAnim('idle', false)) m.setAnim('walk', false);
 }
 
-function stand(m) {
-  const c = m.calm;
+function stand(m, c = m.calm) {
   const [a, b] = c.idleTime;
   c.mode = 'stand';
   c.goal = null;
@@ -89,9 +120,8 @@ function stand(m) {
   standPose(m);
 }
 
-function walkTo(m, x, y) {
-  const c = m.calm;
-  if (!m.def.anims.walk) return stand(m);
+function walkTo(m, c, x, y) {
+  if (!m.def.anims.walk) return stand(m, c);
   c.mode = 'walk';
   c.goal = { x, y };
   c.via = null;
@@ -119,7 +149,7 @@ function startStroll(world, m) {
   });
   if (!tiles.length) return stand(m);
   const i = m.rng.pick(tiles);
-  walkTo(m, (i % map.w) + 0.5 + m.rng.range(-0.2, 0.2), Math.floor(i / map.w) + 0.5 + m.rng.range(-0.2, 0.2));
+  walkTo(m, m.calm, (i % map.w) + 0.5 + m.rng.range(-0.2, 0.2), Math.floor(i / map.w) + 0.5 + m.rng.range(-0.2, 0.2));
 }
 
 /**
@@ -159,30 +189,29 @@ export function calmThink(world, m, dt) {
     case 'react':
       c.timer -= dt;
       if (c.timer > 0) break;
-      if (c.resume === 'walk' && c.goal) walkTo(m, c.goal.x, c.goal.y);
+      if (c.resume === 'walk' && c.goal) walkTo(m, c, c.goal.x, c.goal.y);
       else stand(m);
       break;
     case 'walk':
-      walk(world, m, dt);
+      walk(world, m, c, dt);
       break;
     default:
       c.timer -= dt;
       if (c.timer > 0) break;
-      if (c.route) walkTo(m, c.route[c.leg].x, c.route[c.leg].y);
+      if (c.route) walkTo(m, c, c.route[c.leg].x, c.route[c.leg].y);
       else if (m.wanderReach > 0 && m.area.size > 1 && m.rng.chance(0.75)) startStroll(world, m);
       else stand(m);
   }
 }
 
-function walk(world, m, dt) {
-  const c = m.calm;
+function walk(world, m, c, dt) {
   const dx = c.goal.x - m.x;
   const dy = c.goal.y - m.y;
   const d = Math.hypot(dx, dy);
   c.timer -= dt;
   if (d < 0.15 || c.timer <= 0) {
     if (c.route) c.leg = nextLeg(c);
-    return stand(m);
+    return stand(m, c);
   }
   // Heading for the goal, or for the spot beside whoever was in the way.
   if (c.via && Math.hypot(c.via.x - m.x, c.via.y - m.y) < 0.2) c.via = null;
@@ -221,7 +250,7 @@ function walk(world, m, dt) {
   }
   if ((c.blocked += dt) < 0.4) return;
   // Blocked for a moment: a stroll gives up; a patrol walks round.
-  if (!c.route) return stand(m);
+  if (!c.route) return stand(m, c);
   c.blocked = 0;
   c.via = c.via ? null : detour(world, m, Math.atan2(dy, dx));
   if (!c.via) {

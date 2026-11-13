@@ -1453,6 +1453,17 @@ The validator checks that every patrol point has room for the body and
 that each walk, from the spot to the nearest point too, is a clear
 straight line.
 
+A monster that isn't calm can walk a patrol too, as a guard on his
+rounds: `beat` takes `patrol`, `loop`, `speed`, `stride` and `idleTime`
+(over its type's `calm`, as above). It walks the beat while it looks out
+for the player, exactly as one standing would, and drops it for good once
+it wakes (it sees the player, hears gunfire or is hurt). It says nothing
+when bumped. A placement has `calm` or `beat`, not both.
+
+```js
+{ type: 'stormtrooper', x: 106.5, y: 98.5, beat: { patrol: [[106.5, 98.5], [124.5, 98.5]], idleTime: [3, 3] } },
+```
+
 A friendly or a calm monster can hold a conversation. `talk` is a list
 of lines: each press of use says the next, and it stays on the last.
 Bumping into them repeats what they last said without moving on (and says

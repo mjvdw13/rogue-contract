@@ -85,42 +85,54 @@ export function validateContent(reg) {
   // Flags read by each type's lines (type id to reads): checked in each level
   // that places the type and tells a story (sets a flag).
   const typeFlagReads = new Map();
+  // Beats are checked once each, on the first skill that places them.
+  const beatsChecked = new Set();
   const readsOf = (id) => typeFlagReads.get(id) ?? typeFlagReads.set(id, []).get(id);
   // A monster type's `calm`, or a placement's (which may also have a patrol).
   const CALM_FIELDS = ['lines', 'speed', 'stride', 'wander', 'idleTime', 'patrol', 'loop'];
-  const checkCalm = (owner, c, placed, reads) => {
+  const checkCalm = (owner, c, placed, reads, label = 'calm') => {
     if (placed && c === true) return;
     if (!c || typeof c !== 'object' || Array.isArray(c)) return err(`${owner}: "calm" must be true or an object`);
-    for (const k of Object.keys(c)) {
-      if (!CALM_FIELDS.includes(k)) err(`${owner}: calm has unknown field "${k}" (it takes ${CALM_FIELDS.join(', ')})`);
+    for (const k of label === 'calm' ? Object.keys(c) : []) {
+      if (!CALM_FIELDS.includes(k)) err(`${owner}: ${label} has unknown field "${k}" (it takes ${CALM_FIELDS.join(', ')})`);
     }
-    if (c.lines !== undefined) checkLines(`${owner}: calm`, c.lines, reads);
-    if (c.speed !== undefined && !(typeof c.speed === 'number' && c.speed > 0)) err(`${owner}: calm speed must be above 0 (tiles a second)`);
-    if (c.stride !== undefined && !(typeof c.stride === 'number' && c.stride > 0)) err(`${owner}: calm stride must be above 0 (tiles a walk cycle covers)`);
-    if (c.wander !== undefined && !(typeof c.wander === 'number' && c.wander >= 0)) err(`${owner}: calm wander must be a number of tiles, 0 or more`);
+    if (c.lines !== undefined) checkLines(`${owner}: ${label}`, c.lines, reads);
+    if (c.speed !== undefined && !(typeof c.speed === 'number' && c.speed > 0)) err(`${owner}: ${label} speed must be above 0 (tiles a second)`);
+    if (c.stride !== undefined && !(typeof c.stride === 'number' && c.stride > 0)) err(`${owner}: ${label} stride must be above 0 (tiles a walk cycle covers)`);
+    if (c.wander !== undefined && !(typeof c.wander === 'number' && c.wander >= 0)) err(`${owner}: ${label} wander must be a number of tiles, 0 or more`);
     const t = c.idleTime;
     if (t !== undefined && !(Array.isArray(t) && t.length === 2 && t.every((v) => typeof v === 'number' && v >= 0) && t[0] <= t[1])) {
-      err(`${owner}: calm idleTime must be [min, max] seconds, 0 or more`);
+      err(`${owner}: ${label} idleTime must be [min, max] seconds, 0 or more`);
     }
-    if (c.loop !== undefined && typeof c.loop !== 'boolean') err(`${owner}: calm loop must be true or false`);
+    if (c.loop !== undefined && typeof c.loop !== 'boolean') err(`${owner}: ${label} loop must be true or false`);
     if (c.patrol === undefined) return undefined;
     if (!placed) return err(`${owner}: a patrol belongs on a placement in a level, not on the type`);
     const point = (p) => Array.isArray(p) && p.length === 2 && p.every((v) => typeof v === 'number');
-    if (!(Array.isArray(c.patrol) && c.patrol.length >= 2 && c.patrol.every(point))) err(`${owner}: calm patrol must be a list of two or more [x, y] points`);
+    if (!(Array.isArray(c.patrol) && c.patrol.length >= 2 && c.patrol.every(point))) err(`${owner}: ${label} patrol must be a list of two or more [x, y] points`);
     return undefined;
+  };
+  // A hostile monster's beat: a patrol and how it walks it.
+  const BEAT_FIELDS = ['patrol', 'loop', 'speed', 'stride', 'idleTime'];
+  const checkBeat = (owner, c) => {
+    if (!c || typeof c !== 'object' || Array.isArray(c)) return err(`${owner}: "beat" must be an object with a "patrol"`);
+    for (const k of Object.keys(c)) {
+      if (!BEAT_FIELDS.includes(k)) err(`${owner}: beat has unknown field "${k}" (it takes ${BEAT_FIELDS.join(', ')})`);
+    }
+    if (c.patrol === undefined) return err(`${owner}: beat needs a "patrol" (two or more [x, y] points)`);
+    return checkCalm(owner, c, true, [], 'beat');
   };
   // A patrol walks straight from point to point (and from its spot to the
   // nearest), so each point must have room for the body and each walk a
   // clear line.
-  const checkPatrol = (who, map, sp, def) => {
-    const pts = sp.calm.patrol;
+  const checkPatrol = (who, map, sp, def, c = sp.calm) => {
+    const pts = c.patrol;
     const at = ([x, y]) => `(${x}, ${y})`;
     if (!def.anims.walk) warn(`${who} patrols but its type has no "walk" animation (it will stand still)`);
     for (const p of pts) {
       if (!map.inBounds(Math.floor(p[0]), Math.floor(p[1])) || blockedByMap(map, p[0], p[1], def.radius)) err(`${who}: patrol point ${at(p)} has no room for it to stand`);
     }
     const walks = pts.slice(1).map((p, i) => [pts[i], p]);
-    if (sp.calm.loop) walks.push([pts[pts.length - 1], pts[0]]);
+    if (c.loop) walks.push([pts[pts.length - 1], pts[0]]);
     const first = pts.reduce((a, p) => (Math.hypot(p[0] - sp.x, p[1] - sp.y) < Math.hypot(a[0] - sp.x, a[1] - sp.y) ? p : a));
     walks.push([[sp.x, sp.y], first]);
     for (const [a, p] of walks) {
@@ -456,6 +468,18 @@ export function validateContent(reg) {
             const before = errors.length;
             checkCalm(who, sp.calm, true, flagReads);
             if (errors.length === before && sp.calm.patrol) checkPatrol(who, b.map, sp, def);
+          }
+        }
+        const beatKey = `${owner}|${sp.type}|${sp.x}|${sp.y}`;
+        if (sp.beat !== null && !beatsChecked.has(beatKey)) {
+          beatsChecked.add(beatKey);
+          const who = `${owner}: a ${sp.type} at (${sp.x}, ${sp.y})`;
+          if (def.kind !== 'monster') err(`${who} has a "beat", which only monsters take`);
+          else if (sp.calm !== null) err(`${who} has both "calm" and "beat" (a calm one patrols with calm.patrol)`);
+          else {
+            const before = errors.length;
+            checkBeat(who, sp.beat);
+            if (errors.length === before) checkPatrol(who, b.map, sp, def, sp.beat);
           }
         }
         for (const d of sp.drops ?? []) {

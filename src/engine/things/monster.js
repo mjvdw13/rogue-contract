@@ -1,6 +1,6 @@
 import { performAttack } from '../combat/attacks.js';
 import { canSeeBody } from '../combat/aim.js';
-import { calmThink } from './calm.js';
+import { beatThink, calmThink } from './calm.js';
 import { shoveRate } from './push.js';
 
 /**
@@ -13,6 +13,8 @@ import { shoveRate } from './push.js';
  *   dead   -> death animation, then a corpse
  *   calm   -> goes about its business and never attacks (calm.js), until
  *             it or the town turns hostile (world.turnHostile)
+ * An idle monster with a `beat` walks its patrol while it looks out
+ * (calm.js), and leaves it for good once it wakes.
  * Hooks on the definition (onSight, onThink, onAttack, onPain, onDeath,
  * onEvent) allow custom behaviour without changing this file.
  */
@@ -22,6 +24,7 @@ export function wakeMonster(world, m, target) {
   if (target && !target.dead) m.target = target;
   else m.target ??= world.player;
   if (m.state !== 'idle') return;
+  m.beat = null;
   m.state = 'chase';
   m.reaction = (m.def.reactionTime ?? 0.4) * (world.skillInfo.fast ? 0.25 : 1);
   m.cooldown = Math.max(m.cooldown, 0);
@@ -158,8 +161,8 @@ function applyMomentum(world, t, dt) {
   if (Math.abs(t.vy) < 0.02) t.vy = 0;
 }
 
-function calmWalkRate(m) {
-  const { speed, stride } = m.calm;
+function calmWalkRate(m, c) {
+  const { speed, stride } = c;
   if (!stride) return speed / (m.def.speed || 1);
   // Cycles a second to cover `speed`, times how long a cycle takes at rate 1.
   return (speed / stride) * m.def.anims.walk.durations.reduce((t, d) => t + d, 0);
@@ -170,7 +173,8 @@ export function monsterThink(world, m, dt) {
   // A calm stroll is slower than a chase: its walk plays to match, so the feet
   // don't slide. With a stride, one cycle covers that many tiles. Pushed, it
   // plays at the push's pace.
-  const rate = m.calm && m.animName === 'walk' ? calmWalkRate(m) * shoveRate(m, m.calm.speed) : 1;
+  const slow = m.calm ?? (m.state === 'idle' ? m.beat : null);
+  const rate = slow && m.animName === 'walk' ? calmWalkRate(m, slow) * shoveRate(m, slow.speed) : 1;
   const finished = m.stepAnim(dt * rate, (ev) => {
     if (ev === 'fire') fireAttack(world, m);
     else if (ev.startsWith('sound:')) world.playSoundFrom(ev.slice(6), m);
@@ -189,6 +193,7 @@ export function monsterThink(world, m, dt) {
         m.timer = world.rng.range(0.15, 0.3);
         if (canSee(world, m, world.player)) wakeMonster(world, m, world.player);
       }
+      if (m.beat && m.state === 'idle') beatThink(world, m, dt);
       break;
     }
     case 'pain':

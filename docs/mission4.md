@@ -220,6 +220,12 @@ alarm's two troopers on every skill.
 | Panel yard | a trooper | a trooper at the top of the stairs | an officer | |
 | Gallery | a trooper | a 2nd trooper | a 3rd trooper | a probe droid |
 
+Troopers on beats (`beat`, 2026-11-13) walk until they see you: a pair
+marching the ring corridor's first straight in step, one round the hub's
+column, one along the shaft's west ledge past the door, one up and down
+the bare deck, one the length of the gallery, and (skill 3+) one across
+the hangar deck between the fighters and the shuttle.
+
 Items: power cells, energy packs and med kits along the route; a thermal
 detonator among the hangar's cargo; med kits in the control room, the
 hub, detention control, the compactor, the pump room, the shaft's north
