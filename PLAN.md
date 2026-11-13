@@ -52,6 +52,7 @@ Mark (2026-11-13): add more life and detail to `m4`, one area at a time.
 - [x] Detention control's cell monitors; pipes along the maintenance
   tunnel's ceiling and a live cable come loose there.
 - [x] The station's PA: three announcements on the way, with a chime.
+- [x] A second prisoner, a pilot the beam caught, with three lines.
 - [x] The unfinished sector: a post being welded on the bare deck, a panel
   hoisted toward the gallery's truss.
 

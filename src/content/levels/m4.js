@@ -534,6 +534,11 @@ const list = [
     talk: [{ lines: ['KATARN? YOU CAME UP HERE FOR ME?', "THEY'LL HAVE THE LIFT BY NOW. THE WASTE HATCH, END OF THE ROW. GO. I'LL KEEP BEHIND YOU."], set: 'rusk-free' }],
   }),
   at('prisoner', 176.5, 40, { angle: 180 }),
+  // A pilot taken off another ship the beam caught, counting the days.
+  at('prisoner', 163.5, 34.5, {
+    angle: 0,
+    talk: ["THEY PULLED MY SHIP IN THE SAME WAY. TRACTOR BEAM, THEN THE SCAN CREW.", "NINETEEN DAYS. I COUNT THE MEALS.", "IF YOU'RE LEAVING, LEAVE QUIET. THE DROID COMES WHEN IT'S LOUD."],
+  }),
   // A bunk in each cell (not over the loose panel in the second on the east).
   ...[0, 1, 2, 3, 4].flatMap((k) => [
     at('ds-bunk', 161.02, 16 + 6 * k, { angle: 0 }),
