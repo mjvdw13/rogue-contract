@@ -47,6 +47,8 @@ Mark (2026-11-13): add more life and detail to `m4`, one area at a time.
   blue light.
 - [x] The compactor: bubbles come up round the eye, and now and then it
   gurgles (DF's CREATUR1 on the site).
+- [x] The troop bay's lockers and benches; the fields across the hangar's
+  mouth and the gallery hum (DF's RUMBLE1), beacons at the gallery's.
 - [x] The unfinished sector: a post being welded on the bare deck, a panel
   hoisted toward the gallery's truss.
 

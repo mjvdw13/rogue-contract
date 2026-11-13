@@ -18,7 +18,7 @@ import { SCAFFOLDS, scaffoldHeight } from './models/scaffold.js';
 import { BALCONY_FRAME } from './models/balcony.js';
 import { WIRES, CONSOLE } from './models/hold.js';
 import { CABLES as STATION_CABLES, STEAM_PIPE, BEAM_RING } from './models/station.js';
-import { SERVICE, WELD, CART, HOLO, BUNK as CELL_BUNK } from './models/station-crew.js';
+import { SERVICE, WELD, CART, HOLO, LOCKERS, BENCH as DS_BENCH, BUNK as CELL_BUNK } from './models/station-crew.js';
 import { TOWER_HEIGHT } from './models/market.js';
 import { BAR, TAPS, CORNER } from './models/cantina.js';
 import { POD } from './models/pod.js';
@@ -141,6 +141,11 @@ export default [
   }),
   defineDecoration({ id: 'ds-fuel-socket', model: 'ds-fuel-socket', fixed: true }),
   defineDecoration({ id: 'ds-beacon', model: 'ds-beacon', fixed: true }),
+  // One by a field across an opening to space: the field's hum comes from it.
+  defineDecoration({ id: 'ds-beacon-field', model: 'ds-beacon', fixed: true, emit: [{ every: 3.7, sound: 'field-hum' }] }),
+  // The troop bay's lockers and benches.
+  defineDecoration({ id: 'ds-locker-bank', model: 'ds-locker-bank', solid: true, fixed: true, height: LOCKERS.tall }),
+  defineDecoration({ id: 'ds-bench', model: 'ds-bench', solid: true, radius: 0.5, height: DS_BENCH.top }),
   defineDecoration({ id: 'ds-tool-cart', model: 'ds-tool-cart', solid: true, radius: 0.5, height: CART.top }),
   // The control room's plotting table and the ship turning over it; a cell's bunk.
   defineDecoration({ id: 'ds-holo-table', model: 'ds-holo-table', solid: true, radius: HOLO.r, height: HOLO.top }),

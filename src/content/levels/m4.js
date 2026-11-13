@@ -145,8 +145,9 @@ for (const [x, y] of [[20, 55], [34, 55], [46, 55], [60, 55], [74, 55], [30, 104
   p.rect(x, y, x + 1, y + 1, { wall: T.hangarLight });
   lamps.push({ x: x === 15 ? 16.5 : x === 80 ? 79.5 : x + 0.5, y: y === 55 ? 56.5 : y === 104 ? 103.5 : y + 0.5, z: 3, radius: 6, light: 40 });
 }
-// Red beacons either side of the mouth, blinking together.
+// Red beacons either side of the mouth, blinking together (and the gallery's).
 for (const y of [61, 99]) lamps.push({ x: 16.7, y, z: 9.5, radius: 5, light: 64, fx: 'blink', min: 0, sync: 'mouth' });
+for (const y of [115.4, 138.6]) lamps.push({ x: 16.7, y, z: 14.5, radius: 5, light: 64, fx: 'blink', min: 0, sync: 'mouth' });
 // The east TIE's cockpit frame being welded: the arc's flicker.
 lamps.push({ x: 69, y: 65.4, z: 3.8, radius: 5, light: 96, fx: 'flicker', min: 0 });
 // The tiles under the Crow: the way out, once the beam is off.
@@ -451,12 +452,15 @@ const list = [
   at('ds-fuel-socket', 27.5, 56.02, { angle: 270 }), at('ds-fuel-socket', 57.5, 56.02, { angle: 270 }),
   at('ds-service-stand-welding', 69, 66.3, { angle: 90 }),
   at('power-droid', 71.6, 67.4, { angle: 150 }), at('ds-tool-cart', 66.4, 67.6, { angle: 20 }),
-  at('ds-beacon', 16.02, 61, { angle: 0, z: 10 }), at('ds-beacon', 16.02, 99, { angle: 0, z: 10 }),
+  at('ds-beacon-field', 16.02, 61, { angle: 0, z: 10 }), at('ds-beacon', 16.02, 99, { angle: 0, z: 10 }),
   // A trooper walking the deck between the fighters and the shuttle.
   at('stormtrooper', 62.5, 70.5, { angle: 180, skill: NORMAL_UP, beat: { patrol: [[74.5, 70.5], [50.5, 70.5]], idleTime: [2, 4] } }),
   // 1a. The store (secret).
   at('shield-unit', 62, 109), at('energy-cell', 70.5, 109.5), at('energy-cell', 72, 108.5),
-  // 1b. The troop bay: the squad that comes out when the beam is off.
+  // 1b. The troop bay: the squad that comes out when the beam is off. Their
+  // lockers along the back wall, benches either side of the door.
+  ...[33, 37.5, 42.5, 47].map((x) => at('ds-locker-bank', x, 46.02, { angle: 270 })),
+  at('ds-bench', 33.5, 52.6, { angle: 90 }), at('ds-bench', 46.5, 52.6, { angle: 90 }),
   at('stormtrooper', 34.5, 49.5, { angle: 270 }), at('stormtrooper', 38.5, 50.5, { angle: 270 }),
   at('stormtrooper', 42.5, 49.5, { angle: 270 }), at('stormtrooper', 46.5, 50.5, { angle: 270, skill: NOT_EASIEST }),
   at('officer', 40.5, 48, { angle: 270, skill: NOT_EASIEST }),
@@ -586,6 +590,8 @@ const list = [
   at('stormtrooper', 24.5, 120.5, { angle: 0, skill: NORMAL_UP }),
   at('probe-droid', 30, 128, { skill: HARD }),
   at('med-kit', 46, 110), at('shield-unit', 20.5, 137.5, { skill: [1, 2, 3] }),
+  // Beacons at either end of the gallery's field, the north one humming.
+  at('ds-beacon-field', 16.02, 115.4, { angle: 0, z: 15 }), at('ds-beacon', 16.02, 138.6, { angle: 0, z: 15 }),
 ];
 
 export default defineLevel({

@@ -175,6 +175,12 @@ export default [
     id: 'beam-hum',
     synth: { wave: 'saw', freq: 98, duration: 3.4, attack: 0.25, sustain: 1, release: 0.25, lowpass: 900, volume: 0.22, vibrato: { rate: 30, depth: 0.25 }, layers: [{ wave: 'square', freq: 49, duration: 3.4, attack: 0.25, release: 0.25, lowpass: 400, volume: 0.12 }] },
   }),
+  // A magnetic field across an opening to space: a deep, steady drone
+  // (3.7 s, DF's RUMBLE1 on the site), repeated by a beacon beside it.
+  defineSound({
+    id: 'field-hum',
+    synth: { wave: 'sine', freq: 46, duration: 3.7, attack: 0.3, sustain: 1, release: 0.3, volume: 0.3, vibrato: { rate: 0.8, depth: 0.2 }, layers: [{ wave: 'saw', freq: 92, duration: 3.7, attack: 0.3, release: 0.3, lowpass: 250, volume: 0.1 }] },
+  }),
   // The thing in the compactor, under the sludge (DF's CREATUR1 on the site).
   defineSound({
     id: 'dianoga-gurgle',

@@ -35,6 +35,10 @@ import { ModelBuilder } from './lib/build.js';
 // along y) on its way up to the truss, a lifting eye at each top corner
 // (the hoist's cables are hangings, from PANEL.eye).
 //
+// `ds-locker-bank`: four troopers' lockers against a wall (the origin on
+// the wall's face, +x out of it), LOCKERS.width along it. `ds-bench`: a
+// steel bench, BENCH.length along y.
+//
 // `ds-bunk`: a cell's bunk, a slab hinged out of the back wall on two
 // chains (the origin on the wall's face, +x out of it).
 
@@ -50,6 +54,10 @@ export const HOLO = { r: 0.95, top: 1, over: 1.35 };
 export const HOLO_STATION = { r: 0.75 };
 /** The hoisted panel's half length and height, and its lifting eyes (y, z). */
 export const PANEL = { half: 1, tall: 2, eye: [0.85, 2.1] };
+/** The locker bank's width along the wall, depth and height. */
+export const LOCKERS = { width: 2.4, depth: 0.5, tall: 2.1 };
+/** A bench's length and top. */
+export const BENCH = { length: 2.4, top: 0.5 };
 /** A bunk's depth out of the wall, length and top. */
 export const BUNK = { depth: 0.9, length: 2.4, top: 0.95 };
 
@@ -238,6 +246,31 @@ function panelHoisted() {
   return m.build();
 }
 
+function lockerBank() {
+  const m = new ModelBuilder('ds-locker-bank');
+  const { width: w, depth: d, tall: h } = LOCKERS;
+  m.box([0, -w / 2, 0], [d, w / 2, h], { ...METAL, bottom: false });
+  // The doors' seams, a vent at the top of each and a handle; a kick plate.
+  const door = w / 4;
+  for (let k = 0; k < 4; k++) {
+    const y0 = -w / 2 + k * door;
+    m.box([d, y0 - 0.01, 0.1], [d + 0.01, y0 + 0.01, h - 0.05], IRON);
+    for (const z of [h - 0.35, h - 0.28, h - 0.21]) m.box([d, y0 + 0.12, z], [d + 0.012, y0 + door - 0.12, z + 0.03], IRON);
+    m.box([d, y0 + door - 0.12, 1.0], [d + 0.04, y0 + door - 0.08, 1.2], DARK);
+  }
+  m.box([0, -w / 2, 0], [d + 0.02, w / 2, 0.1], DARK);
+  m.outlineLines([[0, -w / 2], [d, -w / 2], [d, w / 2], [0, w / 2]]);
+  return m.build();
+}
+
+function bench() {
+  const m = new ModelBuilder('ds-bench');
+  const { length: l, top } = BENCH;
+  m.box([-0.22, -l / 2, top - 0.06], [0.22, l / 2, top], METAL);
+  for (const s of [-1, 1]) m.box([-0.18, s * (l / 2 - 0.3) - 0.04, 0], [0.18, s * (l / 2 - 0.3) + 0.04, top - 0.06], { ...IRON, bottom: false, top: false });
+  return m.build();
+}
+
 function bunk() {
   const m = new ModelBuilder('ds-bunk');
   const { depth: d, length: l, top } = BUNK;
@@ -248,4 +281,4 @@ function bunk() {
   return m.build();
 }
 
-export default [serviceStand(), fuelSocket(), beacon(), toolCart(), holoTable(), holoShip(), holoStation(), doorPanel(), panelHoisted(), bunk()];
+export default [serviceStand(), fuelSocket(), beacon(), toolCart(), holoTable(), holoShip(), holoStation(), doorPanel(), panelHoisted(), lockerBank(), bench(), bunk()];
