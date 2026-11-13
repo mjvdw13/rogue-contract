@@ -528,7 +528,7 @@ const list = [
   at('stormtrooper', 197, 52.5, { angle: 90, skill: NOT_EASIEST }),
   at('stormtrooper', 189.5, 74.5, { angle: 90, ambush: true }), at('stormtrooper', 200.5, 82.5, { angle: 90, ambush: true }),
   at('probe-droid', 195, 80, { skill: NORMAL_UP }),
-  at('coolant-tank', 189, 77), at('coolant-tank', 201, 82),
+  at('coolant-tank-running', 189, 77), at('coolant-tank', 201, 82),
   // Leaking pipes: in the compactor, up the tunnels, on three of the pumps.
   at('ds-steam-pipe', 186.02, 20, { angle: 0 }), at('ds-steam-pipe', 201.98, 12, { angle: 180 }),
   at('ds-steam-pipe', 195.02, 32, { angle: 0 }), at('ds-steam-pipe', 195.02, 50, { angle: 0 }), at('ds-steam-pipe', 198.98, 57, { angle: 180 }),

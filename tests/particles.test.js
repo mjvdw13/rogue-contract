@@ -419,6 +419,29 @@ test("a decoration's emit gives off its bursts every so often, from its spot tur
   assert.equal(w.rng.state, state, "the particles don't touch the world's RNG");
 });
 
+test("an emit burst with a sound plays it from the decoration each time", () => {
+  const reg = emitting([{ type: 'test-dot', count: 1, every: 0.5, sound: 'droid-pain' }]);
+  const w = makeWorld(room(OPEN, ['', ' >'], { legend: { '.': ROOM } }), { noMonsters: true, registry: reg });
+  const d = w.spawn('droid-dome', 6.5, 3.5);
+  const played = [];
+  w.playSoundFrom = (id, t) => played.push([id, t]);
+  for (let k = 0; k < 2 * 60; k++) w.tick(DT, mockInput());
+  assert.ok(played.length >= 4 && played.length <= 5, `${played.length} sounds in 2 s`);
+  assert.ok(played.every(([id, t]) => id === 'droid-pain' && t === d));
+});
+
+test('an emit burst with a sound and no particle type is only the sound', () => {
+  const reg = emitting([{ every: 0.5, sound: 'droid-pain' }]);
+  assert.deepEqual(validateContent(reg).errors.filter((e) => e.includes('emit')), []);
+  const w = makeWorld(room(OPEN, ['', ' >'], { legend: { '.': ROOM } }), { noMonsters: true, registry: reg });
+  w.spawn('droid-dome', 6.5, 3.5);
+  let played = 0;
+  w.playSoundFrom = () => played++;
+  for (let k = 0; k < 2 * 60; k++) w.tick(DT, mockInput());
+  assert.ok(played >= 4, `${played} sounds in 2 s`);
+  assert.equal(w.particles.n, 0);
+});
+
 test('a decoration emits nothing while the player is far off', () => {
   const reg = emitting([{ type: 'test-dot', count: 3, every: 0.1 }]);
   const wide = OPEN.map((row) => row[0] + row.slice(1, -1).padEnd(46, row[1]) + row.at(-1));
@@ -429,10 +452,11 @@ test('a decoration emits nothing while the player is far off', () => {
 });
 
 test('the validator checks emit', () => {
-  const { errors } = validateContent(emitting([{ type: 'nope', every: 0, at: [1, 2], radius: -1 }]));
+  const { errors, warnings } = validateContent(emitting([{ type: 'nope', every: 0, at: [1, 2], radius: -1, sound: 'no-such-sound' }]));
   const has = (s) => assert.ok(errors.some((e) => e.includes(s)), `expected "${s}" in ${JSON.stringify(errors)}`);
   has('emit: unknown particle type "nope"');
   has('emit: every');
   has('emit: at');
   has('emit: radius');
+  assert.ok(warnings.some((e) => e.includes('emit: unknown sound "no-such-sound"')));
 });

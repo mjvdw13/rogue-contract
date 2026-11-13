@@ -170,7 +170,10 @@ friendly that squeals and runs).
 
 Music `station` (slow, D minor: a drone, a heartbeat of drums, a horn
 call, bells). Sounds `alarm-klaxon` (Rusk's alarm), `beam-down` (the
-terminal), `mouse-droid-squeal`. Not made: a turbolift's own sound, the
+terminal), `mouse-droid-squeal`. The machinery is heard (2026-11-13): the live cables crackle
+(`spark-crackle`) with each spray, the pipes hiss (`steam-hiss`) with each
+jet, the welder's arc buzzes (`weld-arc`, DF's WELD-1 on the site), and a
+tank in the pump room hums (`pump-hum`, DF's MACHINE2). Not made: a turbolift's own sound, the
 compactor's groan, the field's hum.
 
 ## Light

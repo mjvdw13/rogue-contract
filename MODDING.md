@@ -639,6 +639,12 @@ emit: [
 ],
 ```
 
+A burst with a `sound` plays it from the decoration each time it goes
+off: put it on the occasional big burst (a spray of sparks, a jet of
+steam), not on a trickle every tenth of a second. A burst with a `sound`
+and no `type` is only the sound: a machine's hum, `every` as long as the
+sound, so it runs on without a gap.
+
 They're cosmetic (the particles' own RNG) and only run while the player
 is within 32 tiles (`EMIT_RANGE` in `things/emit.js`), and not once the
 decoration is dead.

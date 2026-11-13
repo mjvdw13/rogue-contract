@@ -35,6 +35,8 @@ Mark (2026-11-13): add more life and detail to `m4`, one area at a time.
   power droid, beacons at the mouth.
 - [x] The control room and detention: a plotting table with the Crow turning
   over it in blue light, a bunk in each cell.
+- [x] The machinery heard: emitters' bursts may play a sound (crackle,
+  hiss, the weld's arc, the pump room's hum).
 - [ ] The corridors and hub: wall details, a second mouse droid route.
 - [ ] The guts (compactor, maintenance, pumps) and the unfinished sector.
 

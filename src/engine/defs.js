@@ -463,11 +463,13 @@ export function defineItem(def) {
  * each a BurstSpec (and `radius`, how far from its spot each particle may
  * start) every `every` seconds (or [min, max]), from `at` ([x, y, z] in its
  * own frame, as its model is built, turned and scaled with it; z above its
- * own), only while the player is near. None by default.
+ * own), only while the player is near; a burst's `sound` plays from the
+ * thing each time (with no `type`, the burst is only the sound). None by
+ * default.
  * @param {{id:string, glyph?:string, sheet:SheetSpec, anims?:Record<string,AnimSpec>, solid?:boolean,
  *   radius?:number, height?:number, z?:number, hanging?:boolean, fixed?:boolean, health?:number,
  *   spin?:number, bob?:{height:number, period:number, roll?:number},
- *   emit?:(BurstSpec & {every:number|[number,number], at?:[number,number,number], radius?:number})[],
+ *   emit?:(BurstSpec & {every:number|[number,number], at?:[number,number,number], radius?:number, sound?:string})[],
  *   explode?:{radius:number, damage:number, sound?:string}}} def
  */
 export function defineDecoration(def) {

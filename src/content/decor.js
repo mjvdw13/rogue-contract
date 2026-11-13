@@ -81,6 +81,8 @@ export default [
   defineDecoration({ id: 'terminal', model: 'terminal', solid: true, radius: 0.55, height: 1.1 }),
   defineDecoration({ id: 'reactor-ring', model: 'reactor-ring', spin: 0.5 }),
   defineDecoration({ id: 'coolant-tank', model: 'coolant-tank', solid: true, radius: 1, height: 3.6 }),
+  // One that's running: the pump room's hum comes from it.
+  defineDecoration({ id: 'coolant-tank-running', model: 'coolant-tank', solid: true, radius: 1, height: 3.6, emit: [{ every: 3.9, sound: 'pump-hum' }] }),
   defineDecoration({ id: 'shuttle', model: 'shuttle', solid: true, height: 3.5 }),
   // The battle station (m4): models/station.js.
   defineDecoration({ id: 'tie-fighter', model: 'tie-fighter', solid: true, fixed: true, height: 10.3 }),
@@ -108,7 +110,7 @@ export default [
     model: id,
     fixed: true,
     ...(spark && { emit: [
-      { type: 'spark', count: 14, every: [1.2, 4], at: spark, radius: 0.05, dir: [0, 0, -1], spread: 0.9, speed: [1, 3.5] },
+      { type: 'spark', count: 14, every: [1.2, 4], at: spark, radius: 0.05, dir: [0, 0, -1], spread: 0.9, speed: [1, 3.5], sound: 'spark-crackle' },
       { type: 'spark', count: 3, every: [0.2, 0.9], at: spark, radius: 0.05, dir: [0, 0, -1], spread: 0.8, speed: [0.5, 1.5] },
     ] }),
   })),
@@ -119,7 +121,7 @@ export default [
     fixed: true,
     emit: [
       { type: 'steam', count: 2, every: [0.25, 0.6], at: STEAM_PIPE.leak, radius: 0.05, dir: [1, 0, 0.5], spread: 0.25, speed: [0.6, 1.4] },
-      { type: 'steam', count: 7, every: [4, 9], at: STEAM_PIPE.leak, radius: 0.08, dir: [1, 0, 0.3], spread: 0.35, speed: [1.5, 3] },
+      { type: 'steam', count: 7, every: [4, 9], at: STEAM_PIPE.leak, radius: 0.08, dir: [1, 0, 0.3], spread: 0.35, speed: [1.5, 3], sound: 'steam-hiss' },
     ],
   }),
   // The crews' gear (models/station-crew.js): a service stand at a TIE (the
@@ -134,7 +136,7 @@ export default [
     height: SERVICE.deck + 1,
     emit: [
       { type: 'spark', count: 3, every: [0.05, 0.15], at: WELD, radius: 0.05, dir: [-0.3, 0, -1], spread: 0.9, speed: [0.5, 2.5] },
-      { type: 'spark', count: 16, every: [1.5, 4], at: WELD, radius: 0.08, dir: [-0.4, 0, -0.6], spread: 1.1, speed: [1.5, 4] },
+      { type: 'spark', count: 16, every: [1.5, 4], at: WELD, radius: 0.08, dir: [-0.4, 0, -0.6], spread: 1.1, speed: [1.5, 4], sound: 'weld-arc' },
     ],
   }),
   defineDecoration({ id: 'ds-fuel-socket', model: 'ds-fuel-socket', fixed: true }),

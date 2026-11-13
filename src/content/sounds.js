@@ -150,6 +150,25 @@ export default [
   }),
 
   // --------------------------------------------------------- world
+  // The battle station's machinery, played by decorations' emitters
+  // (decor.js): a live cable's crackle, a pipe's jet of steam, the welder's
+  // arc on the TIE, and the pump room's hum (3.9 s, the length of DF's
+  // MACHINE2 that stands in for it on the site, so it runs on without a gap).
+  defineSound({
+    id: 'spark-crackle',
+    synth: { wave: 'noise', duration: 0.35, attack: 0.001, release: 0.2, highpass: 1800, volume: 0.35, noiseHold: 3, repeat: { count: 4, interval: 0.06, decay: 0.7, pitch: 1.1 } },
+    pitchVariance: 0.15,
+  }),
+  defineSound({ id: 'steam-hiss', synth: { ...hiss(1.4, 0.35), attack: 0.08, release: 0.9 }, pitchVariance: 0.1 }),
+  defineSound({
+    id: 'weld-arc',
+    synth: { wave: 'saw', freq: 120, duration: 0.9, attack: 0.01, release: 0.3, lowpass: 2400, volume: 0.25, vibrato: { rate: 40, depth: 0.4 }, layers: [{ wave: 'noise', duration: 0.9, release: 0.3, highpass: 2500, volume: 0.25, noiseHold: 2 }] },
+    pitchVariance: 0.08,
+  }),
+  defineSound({
+    id: 'pump-hum',
+    synth: { wave: 'saw', freq: 55, duration: 3.9, attack: 0.3, sustain: 1, release: 0.3, lowpass: 300, volume: 0.25, vibrato: { rate: 2, depth: 0.15 }, layers: [{ wave: 'noise', duration: 3.9, attack: 0.3, release: 0.3, lowpass: 400, volume: 0.08 }] },
+  }),
   defineSound({
     id: 'door-open',
     synth: { ...hiss(0.32, 0.55), layers: [{ wave: 'saw', freq: 70, freqEnd: 130, duration: 0.28, attack: 0.01, release: 0.12, lowpass: 700, volume: 0.35, vibrato: { rate: 30, depth: 0.5 } }] },

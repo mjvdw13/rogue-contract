@@ -265,12 +265,14 @@ export function validateContent(reg) {
       if (t.kind !== 'decoration') err(`${owner}: only a decoration can emit`);
       if (!Array.isArray(t.emit)) err(`${emitter}: a list of bursts`);
       else {
-        checkBursts(emitter, t.emit);
+        // (A burst that's only a sound has no particle type.)
+        checkBursts(emitter, t.emit.filter((e) => !(e?.type === undefined && e?.sound !== undefined)));
         const range = (v) => [].concat(v).every((n) => typeof n === 'number' && n > 0) && [].concat(v).length <= 2;
         for (const e of t.emit) {
           if (!range(e?.every)) err(`${emitter}: every is seconds above 0, or [min, max]`);
           if (e?.at !== undefined && !(Array.isArray(e.at) && e.at.length === 3 && e.at.every((v) => typeof v === 'number'))) err(`${emitter}: at is [x, y, z] in its own frame`);
           if (e?.radius !== undefined && !(typeof e.radius === 'number' && e.radius >= 0)) err(`${emitter}: radius is a distance, 0 or more`);
+          if (e?.sound !== undefined) checkSound(emitter, e.sound);
         }
       }
     }

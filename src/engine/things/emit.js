@@ -12,8 +12,9 @@ const between = (rng, v) => (Array.isArray(v) ? v[0] + (v[1] - v[0]) * rng.next(
  * Each of `t.def.emit` gives off its burst every `every` seconds (the first
  * at a random point in the first wait), from `at` in the thing's own frame
  * (as its model is built: x ahead at angle 0, y to its right, z up),
- * turned and scaled with it; a `dir` turns with it too. Not once it's
- * dead, nor while the player is more than EMIT_RANGE away.
+ * turned and scaled with it; a `dir` turns with it too. A burst with a
+ * `sound` plays it from the thing each time. Not once it's dead, nor while
+ * the player is more than EMIT_RANGE away.
  */
 export function emitThink(world, t, dt) {
   const list = t.def.emit;
@@ -32,6 +33,7 @@ export function emitThink(world, t, dt) {
     t.emitWait[i] = between(rng, e.every);
     const [ax, ay, az] = e.at ?? [0, 0, 0];
     const dir = e.dir && [e.dir[0] * c - e.dir[1] * s, e.dir[0] * s + e.dir[1] * c, e.dir[2]];
-    ps.burst(e.type, t.x + (ax * c - ay * s) * k, t.y + (ax * s + ay * c) * k, t.z + (t.bobZ ?? 0) + az * k, { ...e, dir });
+    if (e.type) ps.burst(e.type, t.x + (ax * c - ay * s) * k, t.y + (ax * s + ay * c) * k, t.z + (t.bobZ ?? 0) + az * k, { ...e, dir });
+    if (e.sound) world.playSoundFrom(e.sound, t);
   }
 }
