@@ -76,7 +76,7 @@ loop back to the hangar:
    -> the chute -> [6 trash compactor] -> hatch -> [7 maintenance, pump room]
    -> [8 tractor beam shaft: the terminal on the column] -> the west door opens
    -> [9 unfinished sector: bare deck, panel yard, open hull gallery]
-   -> the gantry over [1 hangar]: the squad from the troop bay, the Crow, out.
+   -> the gantry over [1 hangar]: the garrison waiting on the deck, the Crow, out.
 ```
 
 | Step | Goal | How the player knows |
@@ -222,6 +222,7 @@ alarm's two troopers on every skill.
 |------|-------------|----|----|----|
 | Hangar | 2 mouse droids | | a trooper by the north-east crates | |
 | Troop bay (comes out when the beam is off) | 3 troopers | a 4th trooper, an officer | a 5th trooper | a 6th trooper, a probe droid |
+| The bay's garrison (sent in when the beam is off, waiting on the deck) | 7 troopers, 3 officers | 3 more troopers | 4 more troopers | 2 more troopers, 2 probe droids |
 | Lobby | a trooper | a 2nd trooper | | |
 | Control room | the deck officer (blue keycard), a trooper | | a trooper at the screens | |
 | Ring corridor | 2 troopers, 2 mouse droids | a trooper on the slant | an officer by the hub door | a 2nd trooper on the slant |
@@ -235,6 +236,18 @@ alarm's two troopers on every skill.
 | Bare deck | 2 troopers | a 3rd trooper | a probe droid | |
 | Panel yard | a trooper | a trooper at the top of the stairs | an officer | |
 | Gallery | a trooper | a 2nd trooper | a 3rd trooper | a probe droid |
+
+**The last fight** (Mark, 2026-11-13: the return to the hangar felt
+anti-climactic). Switching the beam off sends the garrison into the bay:
+the terminal's trigger spawns them on tagged spots on the deck (`spawn`
+with `wake: false`, `fog: false`, `angle: 270`), unseen, in an arc round
+the Crow facing the gantry, and they wait there rather than coming for
+Kyle. Jan says so at the terminal; stepping out of the passage onto the
+gantry sounds the klaxon and Jan's warning. 10 on skill 1, 13 on 2, 17 on
+3, 21 on 4 and 5, with the troop bay's squad besides. Two detonators and
+an energy pack in the passage before it, a med kit behind the crates at
+each end of the deck (the east one on skills 1-3). The exit isn't gated
+on them: you can run for the ramp under fire.
 
 Troopers on beats (`beat`, 2026-11-13) walk until they see you: a pair
 marching the ring corridor's first straight in step, one round the hub's

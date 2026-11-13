@@ -2,6 +2,7 @@ import { openDoor, closeDoor } from './doors.js';
 import { startLift } from './lifts.js';
 import { BUILTIN_PICKUPS } from '../things/pickups.js';
 import { bestWeapon } from '../things/weapons.js';
+import { contentAngle } from './level.js';
 
 /**
  * Built-in trigger actions. Triggers in a level run lists of these:
@@ -50,18 +51,27 @@ export const BUILTIN_ACTIONS = {
   sound(world, { id }) {
     world.playSound(id);
   },
-  /** Spawn things at the centre of every tile with `tag` (or at x, y). */
-  spawn(world, { thing, tag, x, y, fog = true }) {
+  /**
+   * Spawn things at the centre of every tile with `tag` (or at x, y). A
+   * monster comes for the player at once, unless `wake: false`: then it
+   * waits there, facing `angle` (content degrees), until it sees or hears
+   * them. With `skill` (a list), only on those skills. No monsters with
+   * the world's `noMonsters` setting (tests, benches), as at the start.
+   */
+  spawn(world, { thing, tag, x, y, fog = true, wake = true, angle, skill }) {
+    if (skill && !skill.includes(world.skill)) return;
+    if (world.settings.noMonsters && world.registry.things.get(thing)?.kind === 'monster') return;
     const spots = tag
       ? world.map.tilesWithTag(tag).map((i) => ({ x: (i % world.map.w) + 0.5, y: Math.floor(i / world.map.w) + 0.5 }))
       : [{ x, y }];
     for (const s of spots) {
-      const t = world.spawn(thing, s.x, s.y, world.player ? world.player.angle + Math.PI : 0);
+      const facing = angle !== undefined ? contentAngle(angle) : world.player ? world.player.angle + Math.PI : 0;
+      const t = world.spawn(thing, s.x, s.y, facing);
       if (t?.kind === 'monster') world.stats.totalKills += t.def.countKill ? 1 : 0;
       if (fog && world.registry.things.has('teleport-fog')) world.spawn('teleport-fog', s.x, s.y);
-      if (t?.kind === 'monster') world.wakeMonster(t, world.player);
+      if (t?.kind === 'monster' && wake) world.wakeMonster(t, world.player);
     }
-    world.playSoundAt('teleport', spots[0].x, spots[0].y);
+    if (fog) world.playSoundAt('teleport', spots[0].x, spots[0].y);
   },
   /**
    * Set the light level of tagged tiles, and the strength of tagged light

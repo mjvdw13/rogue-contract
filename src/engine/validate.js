@@ -536,6 +536,11 @@ export function validateContent(reg) {
         if (a.tag && !map.tags.has(a.tag) && !lit && !placed) err(`${owner}: ${where} refers to tag "${a.tag}" which no tile${name === 'setLight' ? ' or light' : name === 'setSignal' ? ' or placed thing' : ''} has`);
         if ((name === 'giveWeapon' || name === 'takeWeapon') && !reg.weapons.has(a.weapon)) err(`${owner}: ${where} ${name === 'giveWeapon' ? 'gives' : 'takes'} unknown weapon "${a.weapon}"`);
         if (a.thing && !reg.things.has(a.thing)) err(`${owner}: ${where} ${name === 'setSignal' ? 'tracks' : 'spawns'} unknown thing "${a.thing}"`);
+        if (name === 'spawn') {
+          if (a.wake !== undefined && typeof a.wake !== 'boolean') err(`${owner}: ${where}: spawn "wake" must be true or false`);
+          if (a.angle !== undefined && typeof a.angle !== 'number' && typeof a.angle !== 'string') err(`${owner}: ${where}: spawn "angle" is content degrees`);
+          if (a.skill !== undefined && !(Array.isArray(a.skill) && a.skill.length && a.skill.every((k) => Number.isInteger(k) && k >= 1 && k <= 5))) err(`${owner}: ${where}: spawn "skill" must be a list of skills, 1 to 5`);
+        }
         if (name === 'explode' && !reg.explosions?.has(a.explosion)) err(`${owner}: ${where} sets off unknown explosion "${a.explosion}"`);
         if (a.action === 'music' && a.id && !reg.songs.has(a.id)) warn(`${owner}: ${where} plays unknown song "${a.id}"`);
         if (a.action === 'setLight' && a.lightFx !== undefined && LIGHT_FX[a.lightFx] === undefined) err(`${owner}: ${where} sets unknown lightFx "${a.lightFx}"`);

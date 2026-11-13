@@ -124,6 +124,17 @@ These need Mark to try something, or to decide. Don't start them without him.
   (the door's picture on planks), whether the hall wants more (furniture
   for an entrance hall), and the lamps.
 
+- **Mission 4's last fight** (`?map=m4`, 2026-11-13, after Mark's note
+  that the return to the hangar was anti-climactic): switching the beam
+  off sends the garrison into the bay to wait for Kyle, troopers and
+  officers in an arc round the Crow facing the gantry (10 on skill 1 up
+  to 21 on 4-5, plus the troop bay's squad); the klaxon and Jan's warning
+  as you step out onto the gantry; detonators, an energy pack and med kits
+  for it. The `spawn` action learned `wake: false`, `angle` and `skill`.
+  To judge: the size of it on each skill, where they stand, and whether
+  the Crow should only take off once the deck is clear (now you can run
+  for the ramp under fire).
+
 - **Mission 4, more life and detail** (`?map=m4`, 2026-11-13, after
   "add more life and detail to m4"): troopers walk beats until they see
   you (a new `beat` placement field): a pair marching the ring corridor

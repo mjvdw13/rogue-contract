@@ -1562,8 +1562,12 @@ Actions:
 - `exit`, `secretExit` (goes to the level's `secretNext`) and `finale` (ends
   the episode)
 - `message` `{ text }`, `sound` `{ id }` and `music` `{ id }`
-- `spawn` `{ thing, tag }`: a monster or item appears in teleport fog on every
-  tile with the tag
+- `spawn` `{ thing, tag, wake?, angle?, skill?, fog? }`: a monster or item
+  appears in teleport fog on every tile with the tag, and a monster comes
+  for the player at once. `fog: false` brings it in unseen; `wake: false`
+  leaves it waiting where it appears, facing `angle` (content degrees),
+  until it sees or hears the player: a squad sent ahead to wait somewhere
+  the player hasn't reached. `skill` (a list) spawns only on those skills.
 - `setLight` `{ tag, light, lightFx?, lightMin? }`: without `lightFx`,
   tiles keep their effect and its range. With it (`'none'` for still), all
   the tagged tiles change together with the new effect, from `light` down to

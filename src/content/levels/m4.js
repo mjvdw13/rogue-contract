@@ -78,6 +78,11 @@ const lift = (stops, ceilZ, extra = {}, spec = {}) => ({
   lift: { stops, wait: 3, ...spec }, ...extra,
 });
 
+// Skills (docs/mission4.md has the table).
+const EASY = [1, 2];
+const NOT_EASIEST = [2, 3, 4, 5];
+const NORMAL_UP = [3, 4, 5];
+const HARD = [4, 5];
 const p = new Painter(W, H, hull);
 /** The town kit, for its circles (the shaft). */
 const kit = new Town(p, { skirt: null });
@@ -360,7 +365,12 @@ p.rect(177, 126, 179, 127, {
     { action: 'setLight', tag: 'beam-lamps', light: 16, lightFx: 'none' },
     { action: 'openDoors', tag: 'out' },
     { action: 'openDoors', tag: 'troops' },
-    { action: 'message', text: "TRACTOR BEAM 6 OFFLINE. JAN: THAT'S IT, WE'RE LOOSE. THE UNFINISHED DECKS WEST OF YOU RUN BACK TO THE BAY." },
+    // The garrison sent to the bay to stop the Crow leaving: they wait there.
+    ...[
+      ['stormtrooper', 'bay-squad'], ['stormtrooper', 'bay-squad-2', NOT_EASIEST], ['stormtrooper', 'bay-squad-3', NORMAL_UP],
+      ['stormtrooper', 'bay-squad-4', HARD], ['officer', 'bay-officers'], ['probe-droid', 'bay-probes', HARD],
+    ].map(([thing, tag, skill]) => ({ action: 'spawn', thing, tag, wake: false, fog: false, angle: 270, ...(skill && { skill }) })),
+    { action: 'message', text: "TRACTOR BEAM 6 OFFLINE. JAN: THAT'S IT, WE'RE LOOSE. BUT THEY KNOW IT: THEY'RE SENDING TROOPS INTO THE BAY. THE UNFINISHED DECKS WEST OF YOU RUN BACK TO IT." },
   ],
 });
 p.rect(154, 120, 156, 124, door(0, { lock: 'remote', tag: 'out', stayOpen: true, upper: T.wallDark }));
@@ -404,6 +414,22 @@ for (const x of [28, 44, 60]) lamps.push({ x, y: 128, radius: 10, light: 112 });
 p.rect(44, 106, 48, 114, bare(8, 12));
 p.rect(44, 104, 48, 106, door(8, { upper: T.hangarWall }));
 
+// The squad waiting in the bay for the way back (they're sent there when
+// the beam goes down: see the terminal's trigger). Spots on the deck in an
+// arc round the Crow, facing the gantry you come in by; more on harder
+// skills. [x, y] tile corners.
+const BAY_SQUAD = {
+  'bay-squad': [[28, 88], [33, 92], [50, 92], [54, 88], [32, 72], [48, 72], [62, 72]],
+  'bay-squad-2': [[22, 84], [58, 94], [70, 90]],
+  'bay-squad-3': [[44, 94], [36, 68], [66, 75], [72, 74]],
+  'bay-squad-4': [[24, 94], [56, 78]],
+  'bay-officers': [[40, 90], [66, 93], [26, 76]],
+  'bay-probes': [[40, 70], [52, 84]],
+};
+for (const [tag, spots] of Object.entries(BAY_SQUAD)) for (const [x, y] of spots) p.set(x, y, { ...p.get(x, y), tag });
+// Coming out onto the gantry over the bay.
+p.rect(44, 106, 48, 108, (x, y, old) => ({ ...old, tag: 'bay-sight' }));
+
 // The station's PA: an announcement as you come into the ring corridor,
 // the hub and the passage west off the bare deck.
 const tagged = (tag) => (x, y, old) => (old.wall || old.door ? old : { ...old, tag });
@@ -433,11 +459,6 @@ for (const [x, y, c] of lining) p.set(x, y, c);
 
 // ---------------------------------------------------------------- things
 const at = (type, x, y, extra = {}) => ({ type, x, y, ...extra });
-// Skills (docs/mission4.md has the table).
-const EASY = [1, 2];
-const NOT_EASIEST = [2, 3, 4, 5];
-const NORMAL_UP = [3, 4, 5];
-const HARD = [4, 5];
 const list = [
   // 1. The hangar: quiet at the start. The Crow in the middle, nose to the mouth.
   at('player', 47.5, 84.5, { angle: 0 }),
@@ -608,6 +629,10 @@ const list = [
   at('stormtrooper', 24.5, 120.5, { angle: 0, skill: NORMAL_UP }),
   at('probe-droid', 30, 128, { skill: HARD }),
   at('med-kit', 46, 110), at('shield-unit', 20.5, 137.5, { skill: [1, 2, 3] }),
+  // For the fight in the bay: detonators and an energy pack in the passage
+  // up to the gantry, a med kit behind the crates at either end of the deck.
+  at('thermal-detonator', 44.8, 108.5), at('thermal-detonator', 47.2, 108.5), at('energy-pack', 46, 112.5),
+  at('med-kit', 19.5, 96.5), at('med-kit', 77.5, 97.5, { skill: [1, 2, 3] }),
   // Beacons at either end of the gallery's field, the north one humming.
   at('ds-beacon-field', 16.02, 115.4, { angle: 0, z: 15 }), at('ds-beacon', 16.02, 138.6, { angle: 0, z: 15 }),
 ];
@@ -656,6 +681,10 @@ export default defineLevel({
     { on: 'enter', tag: 'pa-alert', if: 'beam-off', do: [
       { action: 'sound', id: 'pa-chime' },
       { action: 'message', text: 'PA: SECURITY ALERT. TRACTOR BEAM SIX IS DOWN. ALL TROOPS TO DOCKING BAY 326.' },
+    ] },
+    { on: 'enter', tag: 'bay-sight', if: 'beam-off', do: [
+      { action: 'sound', id: 'alarm-klaxon' },
+      { action: 'message', text: "JAN: KYLE, THE WHOLE DECK'S FULL OF THEM, OFFICERS AND ALL. THEY'RE WAITING FOR YOU. GET TO THE RAMP: I'LL HAVE HER LIFTING THE MOMENT YOU'RE ABOARD." },
     ] },
     { on: 'enter', tag: 'file', do: [{ action: 'message', text: "ON THE TABLE: 'DARK TROOPER PROJECT, PHASE ONE. APPROVED. FIELD TRIALS TO FOLLOW THE TEST OF THIS STATION'S PRIMARY WEAPON.'" }] },
     { on: 'enter', tag: 'crow', unless: 'beam-off', once: false, do: [{ action: 'message', text: "JAN: NOT WHILE THAT BEAM'S ON US." }] },
