@@ -257,6 +257,19 @@ test('with holster, weapons that attack stay down until the town turns; the fob 
   assert.ok(p.ammo.energy < ammo, 'and it fires');
 });
 
+test('with holster, holding the fob when the town turns draws the blaster, and the fob is kept', () => {
+  const w = makeWorld(town({ holster: true }));
+  const p = w.player.player;
+  runActions(w, [{ action: 'giveWeapon', weapon: 'fob' }]);
+  run(w, mockInput(), 1.5);
+  assert.equal(p.weapon, 'fob');
+  runActions(w, ['hostile']);
+  run(w, mockInput(), 1.5);
+  assert.equal(p.weapon, 'blaster');
+  assert.equal(p.weaponState.state, 'ready');
+  assert.ok(p.weapons.has('fob'));
+});
+
 test('the validator checks calm placements and patrols', () => {
   const level = defineLevel({
     ...hall([

@@ -2,9 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { makeWorld, mockInput, run } from './helpers.js';
 
-// Mos Eisley's calm half in order: the broker's fob, the trader's signal,
-// then the informant's pass. Before the signal the checkpoint and the hold
-// stay shut, so nothing can find Rusk first.
+// Mos Eisley as a chain (Mark, 2026-11-13): the broker, Rusk, the Crow.
+// The fob comes with Kyle and always points at the next place on the way.
 
 /** Stand the player at (x, y) facing `angle` (content degrees), let them land, press use, let a moment pass. */
 function talk(w, x, y, angle) {
@@ -13,128 +12,88 @@ function talk(w, x, y, angle) {
   w.use(w.player);
   run(w, mockInput(), 0.5);
 }
-/** Hear the broker out, until he hands over the fob. */
+/** Hear the broker out, until he's keyed Rusk into the fob. */
 function takeContract(w) {
-  for (let i = 0; i < 10 && !w.player.player.weapons.has('fob'); i++) talk(w, 92.6, 104.4, 260);
+  for (let i = 0; i < 10 && !w.flags.has('signal'); i++) talk(w, 92.6, 104.4, 260);
 }
-/** Talk to the Jawa trader in the sandcrawler's hold, from the top of its ramp's turn. */
-const trader = (w) => talk(w, 66.6, 8, 270);
+/** Step onto (x, y) and let a moment pass. */
+function stand(w, x, y) {
+  Object.assign(w.player, { x, y });
+  run(w, mockInput(), 0.3);
+}
 const door = (w, tag) => w.map.doors.find((d) => d.tag === tag);
 const shut = (w, tag) => door(w, tag).state === 'closed';
 const said = (w, who) => w.messages.filter((m) => m.startsWith(`${who}: `));
+const points = (w) => w.signal?.tag;
 
-test('in Mos Eisley the informant has no pass, and the hold stays shut, until the trader keys in the signal; the fob points at the checkpoint, then through it at Rusk', () => {
+test('in Mos Eisley the fob points the way in: the bay door, the cantina, the broker, the checkpoint, and past it Rusk', () => {
   const w = makeWorld('m1');
-  const informant = () => talk(w, 141.5, 55.5, 0);
+  run(w, mockInput(), 0.2);
+  assert.equal(w.player.player.weapon, 'fob', 'Kyle lands holding the fob');
+  assert.ok(said(w, 'JAN').length > 0, 'and Jan names the first stop');
+  assert.equal(points(w), 'bay-door');
+  stand(w, 32, 97);
+  assert.equal(points(w), 'cantina-door', 'out on the lane it points at the cantina');
+  stand(w, 94, 83.5);
+  assert.equal(points(w), 'broker', 'in its door, at the broker');
 
-  for (let i = 0; i < 3; i++) informant();
-  assert.ok(!w.flags.has('pass') && shut(w, 'checkpoint'), 'the informant sends Kyle away');
-  trader(w);
-  assert.ok(!w.flags.has('signal'), 'the trader has nothing for him without the contract');
-  assert.ok(shut(w, 'hold-door'));
+  stand(w, 137.5, 67);
+  assert.ok(shut(w, 'checkpoint'), 'without the pass the checkpoint stays shut');
+  assert.ok(shut(w, 'hold-door'), 'and so does the hold');
 
   takeContract(w);
-  assert.ok(w.player.player.weapons.has('fob'), 'the broker hands over the fob');
-  for (let i = 0; i < 2; i++) trader(w);
-  assert.ok(w.flags.has('signal'));
-  assert.equal(w.signal?.tag, 'checkpoint', "the fob points at the checkpoint's gate");
-  assert.ok(!shut(w, 'hold-door'), 'and the hold opens');
+  assert.ok(w.flags.has('pass') && w.flags.has('contract'), 'one talk: the contract and the pass');
+  assert.equal(points(w), 'checkpoint', "and the fob points at the checkpoint's gate");
+  assert.ok(!shut(w, 'hold-door'), 'the hold opens');
 
-  for (let i = 0; i < 2; i++) informant();
-  assert.ok(!shut(w, 'checkpoint'), 'now the pass opens the checkpoint');
-  assert.equal(said(w, 'INFORMANT').length, 5);
-  assert.equal(w.signal?.tag, 'checkpoint', 'the fob still points at the gate while Kyle is this side of it');
-  Object.assign(w.player, { x: 149.5, y: 67 });
-  run(w, mockInput(), 0.2);
-  assert.equal(w.signalAt()?.tag, 'rusk', 'through the gate, it tracks Rusk');
+  stand(w, 130.5, 67);
+  stand(w, 137.5, 67);
+  run(w, mockInput(), 2);
+  assert.ok(!shut(w, 'checkpoint'), 'the troopers let Kyle through');
+  stand(w, 149.5, 67);
+  assert.equal(points(w), 'rusk', 'through the gate, it tracks Rusk');
   assert.equal(w.hostile, false, 'the town is calm all the while');
 });
 
-test("Mos Eisley opens in stages: the main street runs open to the checkpoint, the junk yard waits for the fob, the alleys for the signal, and the switch shuts the blast doors and opens the back lane and the cantina's back door", () => {
+test('Mos Eisley stays a chain: the junk yard and the alleys stay shut, and the switch shuts the blast doors and opens the way round through the cantina', () => {
   const w = makeWorld('m1');
-  const alleys = ['side-gate', 'alley-gate', 'mouth-gate'];
+  const offRoute = ['junk-gate', 'side-gate', 'alley-gate', 'mouth-gate'];
   assert.equal(door(w, 'blast-doors').state, 'open', 'the blast doors stand open when Kyle lands');
-  for (const tag of ['junk-gate', ...alleys, 'lane-gate', 'cantina-back']) assert.ok(shut(w, tag), `${tag} is shut when Kyle lands`);
-  const input = mockInput();
-  input.hold('forward');
-  Object.assign(w.player, { x: 100, y: 68, angle: 0 });
-  run(w, input, 2);
-  assert.ok(w.player.x > 110, 'Kyle walks east through them');
-
+  for (const tag of [...offRoute, 'lane-gate', 'cantina-back']) assert.ok(shut(w, tag), `${tag} is shut when Kyle lands`);
   takeContract(w);
-  run(w, mockInput(), 1);
-  assert.equal(door(w, 'junk-gate').state, 'open', 'the fob opens the junk yard, for good');
-  for (const tag of alleys) assert.ok(shut(w, tag), `${tag} still waits for the signal`);
-  for (let i = 0; i < 2; i++) trader(w);
-  run(w, mockInput(), 3);
-  for (const tag of alleys) assert.equal(door(w, tag).state, 'open', `the signal opens ${tag}, for good`);
-  assert.equal(door(w, 'blast-doors').state, 'open');
-  assert.ok(shut(w, 'cantina-back') && shut(w, 'lane-gate'), "the back lane and the cantina's back door stay shut while the town is calm");
-
-  // Into the freighter's hold: Rusk, and the switch.
-  Object.assign(w.player, { x: 184, y: 134.5 });
+  stand(w, 184, 134.5);
   run(w, mockInput(), 3);
   assert.equal(w.hostile, true);
   assert.ok(shut(w, 'blast-doors'), 'the blast doors shut behind Kyle');
-  assert.ok(['lane-gate', 'cantina-back', ...alleys].every((tag) => !shut(w, tag)), 'the ways round them are open');
+  assert.ok(!shut(w, 'lane-gate') && !shut(w, 'cantina-back'), 'the back lane and the cantina are the way round');
+  for (const tag of offRoute) assert.ok(shut(w, tag), `${tag} stays shut`);
 });
 
-test('in Mos Eisley people point the way: Jan on landing, the informant at the checkpoint, Jan again at the switch', () => {
-  const w = makeWorld('m1');
-  const foot = () => {
-    Object.assign(w.player, { x: 137.5, y: 67 });
-    run(w, mockInput(), 0.2);
-    Object.assign(w.player, { x: 130.5, y: 67 });
-    run(w, mockInput(), 0.2);
-  };
-  assert.ok(said(w, 'JAN').length > 0, 'Jan names the first stop on landing');
-
-  takeContract(w);
-  for (let i = 0; i < 2; i++) trader(w);
-  foot();
-  foot();
-  assert.equal(said(w, 'INFORMANT').length, 1, 'with the signal, the informant calls Kyle over, once');
-
-  const jan = said(w, 'JAN').length;
-  Object.assign(w.player, { x: 184, y: 134.5 });
-  run(w, mockInput(), 0.5);
-  assert.equal(w.hostile, true);
-  assert.ok(said(w, 'JAN').length > jan, 'Jan speaks up at the switch');
-  const atSwitch = said(w, 'JAN').length;
-  foot();
-  assert.ok(said(w, 'JAN').length > atSwitch, 'and names the ways round at the checkpoint');
-  assert.equal(said(w, 'INFORMANT').length, 1, 'the informant keeps quiet now');
-});
-
-test('the way home from Mos Eisley: customs locks the bay at the switch, the customs terminal unlocks it, and back at the Crow the level ends', () => {
+test('the way home from Mos Eisley: Kyle draws, the fob leads round through the cantina to the bay, and under the Crow the level ends', () => {
   const w = makeWorld('m1');
   w.player.player.god = true;
-  const crow = () => {
-    Object.assign(w.player, { x: 34.5, y: 129.5 });
-    run(w, mockInput(), 0.2);
-    Object.assign(w.player, { x: 32, y: 135.5 });
-    run(w, mockInput(), 0.2);
-  };
-  crow();
+  stand(w, 34.5, 129.5);
   assert.equal(w.exitRequested ?? null, null, 'the Crow is no way out while the town is calm');
 
   takeContract(w);
-  for (let i = 0; i < 2; i++) trader(w);
-  Object.assign(w.player, { x: 184, y: 134.5 });
-  run(w, mockInput(), 3);
+  stand(w, 184, 134.5);
+  run(w, mockInput(), 2);
   assert.equal(w.hostile, true);
-
-  // Back along the lane to the bay door, facing it.
+  assert.equal(w.player.player.weapon, 'blaster', 'Kyle draws his blaster');
+  assert.ok(w.player.player.weapons.has('fob'), 'and keeps the fob');
+  assert.equal(points(w), 'lane-gate');
   const jan = said(w, 'JAN').length;
-  talk(w, 32, 98.4, 270);
-  assert.ok(shut(w, 'bay-door'), 'customs has locked it');
-  assert.ok(said(w, 'JAN').length > jan, 'and Jan says where its controls are');
+  stand(w, 137.5, 67);
+  assert.ok(said(w, 'JAN').length > jan, 'Jan names the way round at the checkpoint');
 
-  talk(w, 16.5, 103, 270); // the customs terminal
-  assert.ok(w.flags.has('bay-open'));
-  talk(w, 32, 98.4, 270);
-  assert.ok(!shut(w, 'bay-door'), 'now the bay door opens');
-  assert.equal(w.exitRequested ?? null, null);
-  crow();
+  stand(w, 128, 77.5);
+  assert.equal(points(w), 'cantina-back');
+  stand(w, 125.5, 106);
+  assert.equal(points(w), 'cantina-door');
+  stand(w, 94, 83.5);
+  assert.equal(points(w), 'bay-door');
+  stand(w, 32, 97);
+  assert.equal(points(w), 'crow');
+  stand(w, 34.5, 129.5);
   assert.equal(w.exitRequested, 'normal', 'and under the Crow the level ends');
 });

@@ -657,6 +657,13 @@ export class World {
     if (this.hostile) return;
     this.hostile = true;
     for (const t of this.things) if (t.calm) endCalm(t);
+    // (A level's `holster`) The town turns and Kyle draws: from a tool with
+    // no attack (the fob) to his best weapon, which comes up out of the holster.
+    const p = this.player?.player;
+    if (p && this.level?.holster && !this.registry.weapons.get(p.pendingWeapon ?? p.weapon)?.fire) {
+      const best = bestWeapon(this.registry, p);
+      if (best) p.pendingWeapon = best;
+    }
     this.triggers.hostile();
   }
 

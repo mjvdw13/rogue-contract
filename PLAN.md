@@ -916,6 +916,24 @@ These need Mark to try something, or to decide. Don't start them without him.
 
 In this order unless Mark says otherwise.
 
+### 0. Mission 1, a chain (Mark, 2026-11-13: M2 and M4 always move forward; M1 is open-ended)
+
+Three stops instead of six (broker, trader, informant, Rusk, customs
+terminal, the Crow), the fob from the start pointing at the next one, and
+no streets behind the houses.
+
+- [x] The calm half: the fob from landing, pointing at the bay door, the
+      cantina's door, the broker; the broker gives the contract, the pass
+      and Rusk's signal in one talk. The junk yard, the alleys and the
+      informant are left out (their gates stay shut).
+- [ ] The streets: yard walls close the south back lane either side of the
+      bay door, so the only way up is the square.
+- [x] The way home: Kyle draws his blaster at the switch and keeps the
+      fob, which points at the back lane, the cantina's back door, its
+      front door, the bay door and the Crow. No customs terminal.
+- [ ] The fob on the HUD while another weapon is held.
+- [ ] docs/mission1.md, snapshots, Waiting on Mark.
+
 ### 0. Stairs' sides hung from one height (Mark, 2026-11-12)
 
 Since step sides hang from a world grid, review every stair (interior ones

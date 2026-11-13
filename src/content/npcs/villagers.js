@@ -14,10 +14,8 @@ const range = (a, n) => Array.from({ length: n }, (_, i) => a + i);
 // triggers set, levels/m1.js). Each townsperson has a hint for some of the
 // steps among four ordinary lines, so about one bump in five points the way.
 const BROKER = { unless: 'contract' }; // to the broker in the cantina
-const JUNK_YARD = { if: 'contract', unless: 'signal' }; // to the Jawa trader
-const INFORMANT = { if: 'signal', unless: 'pass' }; // to the informant by the checkpoint
-const OLD_QUARTER = { if: 'pass', unless: 'loud' }; // to Rusk in the derelict bay
-const WAY_OUT = { if: 'loud', unless: 'bay-open' }; // round the blast doors, to the customs house
+const OLD_QUARTER = { if: 'contract', unless: 'loud' }; // through the checkpoint, to Rusk in the derelict bay
+const WAY_OUT = { if: 'loud' }; // round the blast doors, through the cantina, to the bay
 const hint = (when, line) => ({ ...when, lines: [line] });
 
 function villager({ id, name, glyph, frameWidth, frameHeight, height, lines }) {
@@ -71,9 +69,8 @@ export default [
       "I'm going to the Academy one day. You'll see.",
       "Don't tell anyone you saw me in town.",
       hint(BROKER, "Hunters always go to the cantina first. It's on the market."),
-      hint(JUNK_YARD, "The Jawas tag everything they sell. Their junk yard's up the alley off the market."),
-      hint(INFORMANT, 'An old man by the checkpoint sells passes. My uncle says stay away from him.'),
-      hint(WAY_OUT, 'You can get round the blast doors by the alleys. I do it all the time.'),
+      hint(OLD_QUARTER, "The old quarter's past the checkpoint, at the end of the street."),
+      hint(WAY_OUT, 'You can get round the blast doors through the cantina. I do it all the time.'),
     ],
   }),
   villager({
@@ -89,7 +86,7 @@ export default [
       "Troopers on every corner. It wasn't like this last season.",
       'Keep that blaster holstered around my children.',
       hint(BROKER, "If it's work you want, the Guild's man drinks at the cantina."),
-      hint(INFORMANT, 'Want past the checkpoint? Ask the man who lives beside it. Quietly.'),
+      hint(OLD_QUARTER, 'The checkpoint only lets you through with a pass. Have you got one?'),
       hint(WAY_OUT, "They've sealed the blast doors! Folk are going round through the cantina's back door."),
     ],
   }),
@@ -106,9 +103,8 @@ export default [
       "I don't know anyone. I didn't see anything.",
       "Buy me a drink and maybe I'll remember.",
       hint(BROKER, 'The Guild keeps a broker in the cantina. Back alcove, west side.'),
-      hint(JUNK_YARD, 'Lost a part? Then a Jawa sold it. Try their junk yard, north of the market.'),
       hint(OLD_QUARTER, "Nothing past that gate but squatters, and a dead freighter in the old bay."),
-      hint(WAY_OUT, "Customs has locked the bays. You'd need the controls in the customs house."),
+      hint(WAY_OUT, "They've sealed the blast doors. The cantina's back door is the only way round."),
     ],
   }),
   villager({
@@ -138,7 +134,6 @@ export default [
       'Sand gets into everything. Even your thoughts.',
       'Tuskens were out past the Dune Sea last night.',
       "Leave me be. I've walked a long way.",
-      hint(JUNK_YARD, 'The Jawas remember every part they sell, and whose hands it went to.'),
       hint(OLD_QUARTER, 'Someone has been living in the old freighter, in the dead bay. He does not come out by day.'),
     ],
   }),

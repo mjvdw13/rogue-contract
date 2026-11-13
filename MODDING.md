@@ -185,7 +185,8 @@ A level with `holster: true` keeps the player's weapons that attack down
 (out of sight, unable to fire) until the town turns, so the player can't
 turn it early: only the `hostile` action does (the validator wants one).
 Number keys still switch weapons, and one with no attack (a tracker)
-comes up as usual.
+comes up as usual. When the town turns, a player holding one with no
+attack draws their best weapon.
 
 **Hooks** run your own code: `onSpawn(world, self)`, `onSight(world, self)`,
 `onThink(world, self, dt)` (return `true` to skip the normal AI that tick),

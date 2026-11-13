@@ -673,7 +673,8 @@ export function defineSong(def) {
  * `unless` (a story flag or a list): see world/triggers.js. `holster: true`
  * keeps the player's weapons that attack down until the town turns (the
  * `hostile` action): a calm town can't be turned early, and a weapon with
- * no attack (a tracker) still comes up.
+ * no attack (a tracker) still comes up. Held when the town turns, the
+ * player draws their best weapon.
  * @param {{id:string, name:string, tiles:string[], things?:string[], legend?:object,
  *   thingLegend?:object, list?:object[], triggers?:object[], music?:string, sky?:string,
  *   fog?:number, haze?:{color:number[], half?:number, gust?:number}, skyWrap?:number,
