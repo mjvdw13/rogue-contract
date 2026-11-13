@@ -25,6 +25,10 @@ import { ModelBuilder } from './lib/build.js';
 // `ds-door-panel`: the control beside a door: a slim box on the wall (the
 // origin on the wall's face), a lit readout and three buttons.
 //
+// `ds-panel-hoisted`: one wall panel (2 by 1, standing on its long edge
+// along y) on its way up to the truss, a lifting eye at each top corner
+// (the hoist's cables are hangings, from PANEL.eye).
+//
 // `ds-bunk`: a cell's bunk, a slab hinged out of the back wall on two
 // chains (the origin on the wall's face, +x out of it).
 
@@ -36,6 +40,8 @@ export const WELD = [0.95, 0, SERVICE.deck + 0.4];
 export const CART = { top: 1 };
 /** The plotting table's radius and top, and the hologram's height over the floor. */
 export const HOLO = { r: 0.95, top: 1, over: 1.35 };
+/** The hoisted panel's half length and height, and its lifting eyes (y, z). */
+export const PANEL = { half: 1, tall: 2, eye: [0.85, 2.1] };
 /** A bunk's depth out of the wall, length and top. */
 export const BUNK = { depth: 0.9, length: 2.4, top: 0.95 };
 
@@ -165,6 +171,14 @@ function doorPanel() {
   return m.build();
 }
 
+function panelHoisted() {
+  const m = new ModelBuilder('ds-panel-hoisted');
+  const { half: l, tall: h } = PANEL;
+  m.box([-0.05, -l, 0], [0.05, l, h], { ...IRON, sides: { tex: 'ds-wall', uv: [[0, 0], [1, 0], [1, 1], [0, 1]] } });
+  for (const s of [-1, 1]) m.box([-0.03, s * PANEL.eye[0] - 0.05, h], [0.03, s * PANEL.eye[0] + 0.05, PANEL.eye[1]], METAL);
+  return m.build();
+}
+
 function bunk() {
   const m = new ModelBuilder('ds-bunk');
   const { depth: d, length: l, top } = BUNK;
@@ -175,4 +189,4 @@ function bunk() {
   return m.build();
 }
 
-export default [serviceStand(), fuelSocket(), beacon(), toolCart(), holoTable(), holoShip(), doorPanel(), bunk()];
+export default [serviceStand(), fuelSocket(), beacon(), toolCart(), holoTable(), holoShip(), doorPanel(), panelHoisted(), bunk()];

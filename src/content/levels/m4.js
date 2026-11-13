@@ -375,6 +375,8 @@ p.rect(136, 120, 140, 136, gap(-2.25));
 p.rect(136, 121, 140, 122, gap(-1.5));
 p.rect(136, 120, 140, 121, gap(-0.75));
 for (const [x, y] of [[148, 122], [131, 116], [130, 131]]) lamps.push({ x, y, radius: 9, light: 112 });
+// A girder post being welded: the arc's flicker.
+lamps.push({ x: 118, y: 133.2, z: 3.8, radius: 5, light: 96, fx: 'flicker', min: 0 });
 // The west work lamp is on the blink.
 lamps.push({ x: 116, y: 123, radius: 9, light: 112, fx: 'flicker', min: 32 });
 p.rect(108, 120, 112, 126, bare(0, 6));
@@ -572,6 +574,10 @@ const list = [
   at('work-lamp', 28, 129, { angle: 180 }), at('work-lamp', 44, 127, { angle: 180 }), at('work-lamp', 60, 129, { angle: 180 }),
   at('ds-panel-stack', 34, 122), at('ds-panel-stack', 56, 134, { angle: 60 }), at('ds-cable-reel', 21, 132), at('ds-crate', 68, 118),
   at('med-kit', 104.5, 138), at('energy-pack', 80, 138),
+  // Work going on: a post on the bare deck welded from a stand; in the
+  // gallery a panel hoisted up toward the truss, a cart below.
+  at('ds-service-stand-welding', 118, 132.4, { angle: 270 }), at('ds-tool-cart', 120.4, 131.4, { angle: 300 }),
+  at('ds-panel-hoisted', 22, 128, { angle: 0, z: 13 }), at('ds-tool-cart', 24.5, 131.5, { angle: 100 }),
   at('stormtrooper', 62.5, 124.5, { angle: 0, beat: { patrol: [[64.5, 124.5], [22.5, 124.5]], idleTime: [2, 4] } }), at('stormtrooper', 40.5, 134.5, { angle: 0, skill: NOT_EASIEST }),
   at('stormtrooper', 24.5, 120.5, { angle: 0, skill: NORMAL_UP }),
   at('probe-droid', 30, 128, { skill: HARD }),
@@ -594,6 +600,8 @@ export default defineLevel({
     ...[25, 55].map((x) => ({ type: 'hose', from: [x + 2.75, 56.45, 0.6], to: [x + 0.3, 62.9, 3.6], sag: 1.6 })),
     // The power droid's lead up to the welder's torch.
     { type: 'cable', from: [71.4, 67.2, 0.7], to: [69.5, 66.1, 3.45], sag: 0.5 },
+    // The hoisted panel's cables up to the gallery's ceiling.
+    ...[-0.85, 0.85].map((dy) => ({ type: 'cable', from: [22, 128 + dy, 15.1], to: [22, 128 + dy * 1.4, 19.95], sag: 0.05 })),
   ],
   things: [],
   list,
