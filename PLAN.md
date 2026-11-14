@@ -34,11 +34,36 @@ These need Mark to try something, or to decide. Don't start them without him.
   judge: the sky's brightness and colour (the palette draws it in broad
   grey and olive bands), the far stacks and platforms, the quay's floor
   up close (blotchy?).
+- **Mission 5's look** (`?map=m5`, 2026-11-14). Every area is dressed
+  now, and the yard has its models: crane way, berth ribs, keel blocks,
+  smokestacks, glow-rod pylons, plasma cutters, landing clamps, plate
+  stacks. To judge: does it read as a Star Wars breaking yard and not a
+  dockyard on Earth; the smog (soot on the wind, the haze's colour and
+  its half distance of 44, the hauler's open hold fading into it by
+  `haze.indoors`); the skyline north of the waterfront; which areas are
+  too bare or too busy.
+- **Mission 5's fights** (`?map=m5`, 2026-11-14). 16 / 34 / 42 monsters
+  by skill, more spawned by the reactor's switch and the manifest. The
+  repeater is in the freighter on Berth 1, the mortar in a cabin off the
+  hauler's crew deck. Nobody has played them. To judge: the sweep squad
+  in the Bottoms, the cutting floor, the dark hold and the squad the
+  power brings, the crane way under the probe droids, the dry dock
+  fought downhill, Bossk on the apron; whether ammo and health run
+  short or pile up; whether those two weapons are the right ones here.
+  The table is in `docs/mission5.md`.
+- **Mission 5's words and sound** (`?map=m5`, 2026-11-14). Seven
+  stand-in lines along the way (Jan at the Bottoms, Berth 1, the hauler,
+  the bridge and the apron; the yard's speakers at the bend and the
+  cab). The crane sounds a horn every 18 to 40 s; the reactor's switch
+  has a start-up drone. The song is Mission 4's (`station`). To judge:
+  the wording, the horn (too often, too loud?), and whether the level
+  wants its own song.
 - **Mission 5's great crane** (`?map=m5`, 2026-11-14). Twin girders
   across the two legs, a machinery house, a boom east over the dry dock
-  with the hook hanging 5 over the rim, a counter-jib west, five red
-  beacons. To judge: its shape and bulk (from Berth 3, the dock and the
-  apron), the legs' paint, how high the hook hangs, and whether it shows
+  with a mag-grapple (a drum, a glowing plate, four claws) hanging 5
+  over the rim, a counter-jib west, five red beacons. To judge: its
+  shape and bulk (from Berth 3, the dock and the apron), the legs'
+  paint, how high the grapple hangs, and whether it shows
   enough from the pier (a faint shape and one red point now; a longer
   haze or its shape in the sky's picture would make more of it).
 - **Mission 5's ending** (`?map=m5`, 2026-11-14). Mark played the
@@ -1718,108 +1743,37 @@ cold cache costs only 7%. So changes that keep every pixel are worth
 ### 12. Mission 5: Breakers' Row, Corellia (Mark, 2026-11-14)
 
 A level in a Corellian ship-breaking yard, built on the look of Mission
-1's gutted freighter (its textures, the panels off, the hanging wires and
-sparks, the haze). The design (story proposal, flow, areas with boxes,
-the kit, light, secrets, risks) is `docs/mission5.md`: read it first.
-Painted in code as Missions 3 and 4 are (`src/content/levels/m5.js`).
-Each step is a commit, playable at `?map=m5`. Area numbers are the
-design's.
+1's gutted freighter. The design (story, flow, areas, the kit, light,
+secrets, the fights' table, engine notes, what was checked) is
+`docs/mission5.md`: read it first. Painted in code as Missions 3 and 4
+are (`src/content/levels/m5.js`), playable at `?map=m5`.
 
-Steps marked (parallel) don't touch `m5.js` and can be done by another
-session at the same time as the blockout; say here which one you've
-taken. The blockout steps are in order, one session at a time.
-
-- [x] Design: `docs/mission5.md`.
-- [x] Blockout A, areas 1 to 3 (pier, quay, sea wall, the Bottoms, pump
-      house, pipe gallery), stand-in textures, a stand-in sky
-      (`sky-dusk`), the yard as bare ground with blocks for the hauler
-      and the crane's legs. The level ends at the gallery's south end
-      (a temporary exit) until Berth 1 is there.
-- [x] Blockout B, areas 4 to 6 (Berth 1 with Mission 1's freighter and
-      the steps up through its deck; the cutting floor with slanted plate
-      stacks, a sunk lane, the shed; the hauler: hold, bulkhead, reactor
-      room, the lift at the cut face, crew deck and cabins, aft stair,
-      bridge). The `power` flag: lift, lamps, the squad. The level ends
-      at the bridge's south door until the crane way is there.
-- [x] Blockout C, areas 7 to 10 (gangway, crane way with its gap and
-      hoist, the cab and its lift, the dry dock's terraces and flights,
-      the office behind the red door, its lift, the apron, the exit `if`
-      `manifest`; Bossk and a squad spawn on the apron). The route is
-      walked start to exit by `tests/m5-route.test.js`.
-- [x] Mark played the blockout (2026-11-14): "everything is great". His
-      one note, done: once Bossk is dead the Crow flies in to the apron
-      (the new `fly` action), and the level ends when you reach it.
-- [ ] **Slow frames** (found in blockout C, measured again with the
-      quay's freight boxes in): the worst views (33 to 34 ms at 640 x
-      400, single thread, against 18 on average) are from out in the
-      harbour looking along the water, not along the quay; the boxes
+- [x] Design, the blockout (Mark played it: "everything is great"), the
+      ending with the Crow, textures and sky, the models
+      (`models/crane.js`, `yard5.js`, `breakers.js`, `hold.js`), every
+      area dressed, light and air (`soot`, `haze.indoors`), the skyline,
+      the fights and items by skill, Jan's lines and the yard's sounds.
+- [x] The route walked by a test (`tests/m5-route.test.js`); frame time
+      measured (`docs/mission5.md`, Checked).
+- [ ] **Slow frames**: 19 ms on average and 38 at worst at 640 x 400 on
+      one thread. The worst views are from out in the harbour looking
+      along the water, not along the quay; the quay's freight boxes
       changed little. It's the open floor to the map's edge. If Mark
       feels it in play: end the water nearer (a breakwater), or look at
       the floor pass for far spans (`node tools/bench.mjs m5 --res 2
       --worst 5`).
-      directly as the town's and the station's are (no generated
-      stand-ins). The blockout wears `quay`, `sea-wall`, `harbour-water`,
-      `slag`, `dock-floor`, `dock-wall` and three of the shack walls. For
-      the dressing to place: `quay-edge`, `shack-green`, `shack-shutter`,
-      `crane-yellow`, `hull-section`, `sign-bottoms`, `berth-1` to `-4`.
-      Running derive.mjs reformats `overrides.json`; restore it (`git
-      checkout`) unless DERIVED changed.
-- [x] **The sky**: `sky-corellia` (derive.mjs, with a new `skyline`
-      step for far shapes): overcast, a glow and a pale sun low in the
-      east, the slum's roofs and five stacks to the north, yard platforms
-      over the water to the south. The great crane isn't in it: decide
-      that with the crane's model (the item above).
-- [ ] (parallel) **Models, the yard's big pieces**, one a commit:
-  - [x] The great gantry crane (`models/crane.js`, `great-crane`): the
-        legs stay tiles, now in `crane-yellow`; the model is the
-        girders, house, boom, hook and beacons. Placed in m5.
-  - [x] The rest (`models/yard5.js`): `crane-way-trestle` and two
-        spans, `berth-rib` (whole, `-cut`, `-stub`), `keel-block`,
-        `smokestack` (smoking), `yard-hoist`. Placed in m5 but for the
-        smokestack, which the skyline and the cutting floor will place.
-        Berth 3's keel is tiles, in `hull-section`.
-- [x] **Models, the small pieces** (`models/breakers.js`, `hold.js`):
-      `hold-rib-wide` (the hauler's hold is 16 across, 5 high; Mission
-      1's rib comes out the same), `hold-wires-run`, `deck-edge`,
-      `plate-stack`, `cutting-torch` (a plasma cutter), `lamp-post` (a
-      glow-rod pylon) and `-dead`, `bollard` (a landing clamp),
-      `vent-stack`, `shack-sign`. Lean-tos are the town kit's.
-- [ ] **Keep it Star Wars** (Mark, 2026-11-14: "make sure it doesn't
-      end up just looking like earth"): plasma cutters, power cells,
-      mag-grapples, glow rods, droids, pods, repulsor craft, Aurebesh,
-      ship parts you'd know. No gas bottles, timber, hooks, street lamps.
-- [x] **Dressing, area by area**, with snapshots (`--custom`), swapping
-      the stand-ins for the kit. One commit an area or pair. Dressing
-      has a purpose. In m5.js under DRESSING (`dress`, `pylon()`).
-  - [x] 1 and 2: the pier, the quay, the Bottoms.
-  - [x] 3 and 4: pump house, gallery, Berth 1.
-  - [x] 5: the cutting floor, and freight boxes along the quay.
-  - [x] 6: the hauler: hold, crew deck, reactor room, bridge.
-  - [x] 7 and 8: the crane way, Berth 3, the cab.
-  - [x] 9 and 10: the dry dock, the office, the apron.
-- [x] **Light and air**: soot flakes on a wind off the water (a `soot`
-      particle, the level's `weather`), smoke off the stack and the
-      flues, steam in the pump house, the gallery and the hauler, glow
-      rods and work lamps in pools, the reactor's lamp coming up with
-      the power, and `haze.indoors` so the hauler's open hold fades into
-      the smog. The haze's colour and half distance are as the design's;
-      Mark judges them.
-- [x] **The skyline**: scenery blocks on the roofs north of the
-      waterfront (the slum in tiers to 24, the works' sheds to 20), six
-      `smokestack` models standing out of them, two platforms over the
-      water. The sky's picture carries the far ones.
-- [x] **Fights and items**: 16 / 34 / 42 placed by skill, the hold's
-      and the apron's squads by skill too, beats for three patrols, the
-      repeater and the mortar, the four secrets filled. The table is in
-      `docs/mission5.md`. Ammo 14.0 (about 10.5 with the spawned ones).
-      Nobody has played the fights: under Waiting on Mark at the end.
-- [x] **Words and sound**: Jan's lines and the yard's PA at each gate
-      (stand-ins), the dead lift's message, the manifest; a harbour
-      ambience (gulls are out: machinery, a horn far off), the reactor's
-      start; a song (`corellia`) or a stand-in from the existing ones.
-- [ ] **Checked**: `npm test`, `npm run validate`, smoke; the design's
-      "Checked" section (route time, frame times, what nobody has played).
-      Then under Waiting on Mark: the look, the fights, the song.
+- [ ] **Keep it Star Wars** in anything added (Mark, 2026-11-14: "make
+      sure it doesn't end up just looking like earth"): plasma cutters,
+      power cells, mag-grapples, glow rods, droids, pods, repulsor craft,
+      Aurebesh, ship parts you'd know. No gas bottles, timber, hooks,
+      street lamps.
+- [ ] Still to make, if Mark wants them: a song of its own (`corellia`;
+      it plays `station` now), an engine sound for the Crow coming in, a
+      low machinery bed for the yard (there is the horn, the cutters and
+      the pumps, but no steady background), the great crane in the sky's
+      picture.
+- [ ] Waiting on Mark: the look, the fights (nobody has played them),
+      the words, the song (the entries at the top).
 
 ## Small fixes and known rough edges
 

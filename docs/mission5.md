@@ -292,19 +292,30 @@ Missions 3 and 4 are near 12).
 - **Frame time:** the cutting floor and the dock are the open places.
   Measure them at the blockout (`tools/bench.mjs`), before dressing.
 
-## Checked (the blockout, 2026-11-14)
+## Checked (the finished level, 2026-11-14)
 
+- `npm test` (473 pass), `npm run validate` (0 errors, 0 warnings: every
+  item and place reachable on all five skills) and `npm run smoke`.
 - `tests/m5-route.test.js` walks the whole route with no monsters, pier
-  to apron: the sluice's switch, the crouch, the freighter, the reactor
-  and the lift, the stair, the jump on the crane way, the cab's lift,
-  the dock's three flights, the red door, the manifest. It found the
-  pump house's stairs couldn't be stepped onto from the side, and the
-  sky coming down to head height beside plain doors under it; both are
-  in the engine notes.
-- Frame time, headless at 640 x 400, 40 views (`tools/bench.mjs m5 --res
-  2`): 18 ms on average, 37 at worst (Mission 4 on the same run: 11 and
-  42). The worst three are all looks along the quay, 350 tiles of open
-  waterfront; cargo and sheds standing on it will cut them short.
-- Not checked: anything by eye in a browser, the fights (twelve
-  stand-in troopers), the look (stand-in textures, sky and crane).
-
+  to the Crow: the sluice's switch, the crouch, the freighter, the
+  reactor and the lift, the stair, the jump on the crane way, the cab's
+  lift, the dock's three flights, the red door, the manifest, Bossk. It
+  takes 123 s of game time at a walk without a stop, so a first play
+  with the fights should be 12 to 20 minutes. All seven of Jan's and
+  the speakers' lines fire on the way.
+- In the blockout it found the pump house's stairs couldn't be stepped
+  onto from the side, and the sky coming down to head height beside
+  plain doors under it; both are in the engine notes. Later it caught a
+  cargo pod on the route, a freight box inside the dry dock and lockers
+  across the office's lift.
+- Frame time, headless at 640 x 400 on one thread, 40 views
+  (`tools/bench.mjs m5 --res 2`): 19 ms on average, 31 at the 90th
+  percentile, 38 at worst (Mission 4 on the same run: 11, 21 and 42).
+  The world pass is 17 of the 19; the models are 2. The worst views are
+  from out in the harbour along the open water. `haze.indoors` costs
+  about 5% of the world pass here.
+- Every area was looked at in snapshots with the Dark Forces art
+  (`tools/snapshot.mjs m5 --custom`) as it was dressed.
+- Not checked: anything by eye in a browser, the fights and the item
+  balance by playing (the numbers are the validator's: ammo 14.0), the
+  sounds by ear, the frame time on Mark's machine with threads.
