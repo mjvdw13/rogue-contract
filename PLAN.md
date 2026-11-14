@@ -28,14 +28,13 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
-- **Mission 5's blockout: Breakers' Row** (`?map=m5`, 2026-11-14;
-  `docs/mission5.md`). Every area is laid out in stand-in textures and
-  the route runs from the pier to the apron: nothing is dressed, the sky
-  is Mission 2's, the crane is two blocks, and there are twelve troopers
-  in all. To judge: the flow and whether you always know where to go;
-  the sizes (the Bottoms' street, the hauler's hold, the dock); the
-  climb through the hauler and the jump on the crane way; anything that
-  drags. `?map=m5&god` to walk it without the fights.
+- **Mission 5's ending** (`?map=m5`, 2026-11-14). Mark played the
+  blockout ("everything is great") and asked for this: the level no
+  longer ends on the apron's spot once the manifest is taken. Kill
+  Bossk, Jan says she's coming in, the Crow flies in over the dock and
+  sets down (7.5 s), and the level ends when you reach it. To judge: the
+  Crow's path and speed, where it lands, Jan's two lines. It has no
+  engine sound on the way in yet.
 - **The TIE rebuilt from Mark's schematic** (`?map=m4`, 2026-11-13). Canon
   proportions at 0.8: wings 11.4 long and 14 tall (were 8 by 10), the ball
   4 across, its top now 14.4. Grey frame and spokes over plain black panels  (Mark: no lines), the hub through the wing, the angled pylons, a framed window
@@ -1423,8 +1422,6 @@ trigger goes in the validator (it rejects unknown actions), MODDING.md and a
 test. Order: the Crow pieces, then calm troopers and the switch, then
 conversations, then the fob.
 
-- [ ] **`fly` action:** moves a model decoration along timed keyframes (x, y,
-      z, facing, seconds).
 - [ ] **`cutscene` action:** the view from a tagged spot looking at a target
       for a few seconds, HUD and weapon hidden, input locked; use or fire
       skips. An override of `world.camera()`.
@@ -1743,13 +1740,14 @@ taken. The blockout steps are in order, one session at a time.
       the office behind the red door, its lift, the apron, the exit `if`
       `manifest`; Bossk and a squad spawn on the apron). The route is
       walked start to exit by `tests/m5-route.test.js`.
+- [x] Mark played the blockout (2026-11-14): "everything is great". His
+      one note, done: once Bossk is dead the Crow flies in to the apron
+      (the new `fly` action), and the level ends when you reach it.
 - [ ] **Found in blockout C:** the worst frames (37 ms at 640 x 400,
       against 18 on average) are looks along the open quay. When
       dressing, stand cargo and sheds on it so no view runs its whole
       length, and measure again (`node tools/bench.mjs m5 --res 2
       --worst 5`).
-- [ ] **Mark plays the blockout** (Waiting on Mark): the flow, the
-      sizes, the heights, before the kit and dressing go on.
 - [ ] (parallel) **Textures**: a CORELLIA set in
       `assets/custom/derive.mjs` from the Dark Forces pack (the design
       lists them: quay concrete, sea wall, shack walls, shutter, harbour

@@ -412,7 +412,9 @@ p.rect(325, 45, 327, 46, {
 p.rect(330, 42, 334, 46, room(DOCK, 4, { floor: 'lift-floor', side: T.step, lift: { stops: [DOCK, 0], wait: 3 } }));
 kit.arch(330, 40, 334, 42, { h: 12, lintel: 4, floor: T.quay });
 p.rect(314, 22, 344, 40, ground(0));
-p.rect(324, 26, 332, 32, (x, y, c) => ({ ...c, tag: 'crow' }));
+p.rect(323, 25, 333, 33, (x, y, c) => ({ ...c, tag: 'crow' }));
+/** The Crow's way in: from high over the dock's east side, round and down onto the spot, nose west. */
+const CROW_IN = [[344, 50, 36, 135, 0], [338, 34, 16, 160, 4], [328, 29, 0, 180, 3.5]];
 p.set(318, 30, { ...p.get(318, 30), tag: 'bossk-spot' });
 for (const [x, y] of [[322, 36], [338, 34], [340, 26]]) p.set(x, y, { ...p.get(x, y), tag: 'apron-squad' });
 
@@ -481,8 +483,16 @@ export default defineLevel({
   things: [],
   list: [...list, ...kit.things],
   triggers: [
-    // The way out: the pickup spot on the apron, once the manifest is taken.
-    { on: 'enter', tag: 'crow', if: 'manifest', do: [{ action: 'message', text: "JAN: I SEE YOU. AND I SEE WHO'S BEHIND YOU. GET IN." }, { action: 'exit' }] },
+    // The way out (Mark, 2026-11-14): once Bossk is dead the Crow comes in
+    // over the dock and sets down on the apron; reach it and the level ends.
+    { on: 'killed', thing: 'bossk', do: [
+      { action: 'message', text: "JAN: THAT'S HIM DOWN. I'M COMING IN." },
+      { action: 'fly', thing: 'moldy-crow', path: CROW_IN, then: [
+        { action: 'setFlag', flag: 'crow-down' },
+        { action: 'message', text: 'JAN: RAMP IS DOWN. MOVE.' },
+      ] },
+    ] },
+    { on: 'enter', tag: 'crow', if: 'crow-down', do: [{ action: 'exit' }] },
     // The hauler's cargo lift: dead until the reactor runs.
     { on: 'enter', tag: 'cargo-lift', unless: 'power', once: false, do: [{ action: 'message', text: 'CARGO LIFT: NO POWER.' }] },
     { on: 'enter', tag: 'cargo-lift', if: 'power', once: false, do: [{ action: 'lift', tag: 'cargo-lift' }] },

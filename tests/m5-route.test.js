@@ -10,7 +10,7 @@ import { makeWorld, mockInput } from './helpers.js';
 // Each waypoint is [x, y, ...what]: 'use' taps use on the way there (doors);
 // 'z=N' waits there until the floor is at N (lifts); 'face=A' turns to A
 // degrees there and uses (switches); 'crouch' goes there crouching; 'jump'
-// jumps on setting off.
+// jumps on setting off; 'bossk' kills Bossk there and waits for the Crow.
 const ROUTE = [
   // The pier, the arch, the Bottoms: north, the slant, east to the pump house.
   [25, 100], [25, 90], [25, 70], [28, 66], [45, 59], [60, 51], [94, 51], [99.5, 51, 'use'],
@@ -32,7 +32,7 @@ const ROUTE = [
   [310, 101], [313, 101], [313, 95], [313, 67], [315, 66.5], [315, 60.8], [317, 61], [317, 93], [319, 93.5], [319, 99],
   [322.5, 99], [323, 62], [327, 61.5], [327, 56, 'use'],
   // The manifest, the lift, the apron, the Crow's spot.
-  [326, 46.7, 'face=90'], [332, 44, 'z=0'], [332, 38], [328, 29],
+  [326, 46.7, 'face=90'], [332, 44, 'z=0'], [332, 38, 'bossk'], [331, 32.5],
 ];
 
 test('Mission 5 can be walked from the pier to the manifest and the apron', () => {
@@ -73,6 +73,16 @@ test('Mission 5 can be walked from the pier to the manifest and the apron', () =
           tick();
           break;
         }
+        if (what.includes('bossk')) {
+          // (No monsters on this walk, so the manifest's alarm brought nobody.)
+          assert.ok(!world.flags.has('crow-down'), 'no Crow before Bossk is dead');
+          const bossk = world.spawn('bossk', 318.5, 30.5);
+          world.damage(bossk, 1e6, pt, pt);
+          for (let i = 0; i < 20 * 60 && !world.flags.has('crow-down'); i++, ticks++) tick();
+          assert.ok(world.flags.has('crow-down'), 'the Crow came in and set down');
+          assert.ok(!world.exitRequested, 'and the level waits for Kyle to reach it');
+          break;
+        }
         if (!lift || Math.abs(pt.z - Number(lift.slice(2))) < 0.05) break;
       }
       tick();
@@ -85,5 +95,5 @@ test('Mission 5 can be walked from the pier to the manifest and the apron', () =
   }
   assert.ok(world.flags.has('power'), 'the reactor was started');
   assert.ok(world.flags.has('manifest'), 'the manifest was taken');
-  assert.equal(world.exitRequested, 'normal', 'the level ended');
+  assert.equal(world.exitRequested, 'normal', 'the level ended at the Crow');
 });

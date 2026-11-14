@@ -83,7 +83,8 @@ only for now).
    -> gangway -> [7 the crane way, 12 up, over Berth 3's ribs]
    -> [8 the great crane's cab: the red keycard] -> lift down
    -> [9 Berth 4: the dry dock, down its steps] -> red door
-   -> [10 dispatch office: the manifest] -> lift up -> the apron: the Crow.
+   -> [10 dispatch office: the manifest] -> lift up -> the apron: Bossk
+   -> the Crow flies in -> reach it.
 ```
 
 | Step | Goal | How the player knows |
@@ -98,7 +99,7 @@ only for now).
 | 7 | The cab | The rail leads to it; its lit window |
 | 8 | The dock | The cab's window looks down into it; the officer's key; the lift |
 | 9 | The red door in the dock's head wall | Lit red; the only door down there |
-| 10 | The Crow | Jan's line; one lift up |
+| 10 | Bossk, then the Crow | Jan's line; one lift up. Jan says she's coming in when he falls; the ship comes down in front of you |
 
 ## Areas (x, y in tiles; heights in units)
 
@@ -134,7 +135,7 @@ blockout, not final.
 | 8 | The crane's cab | 299..307, 93..103 | 12 / 16 | In the south leg of the great gantry (298..308, 92..104, 30 high; the north leg 298..308, 54..60). In from the rail by an arch in its west wall. The dock officer (the red keycard), a console, a window east over the dock (sill 1). Lift (300..304, 88..92), 12 to 0, by an arch in its north wall. |
 | 9 | Berth 4: the dry dock | 312..342, 60..100 | rim 0; steps -2.5, -5; floor -7.5 / sky | Long axis north to south. The floor is 320..334. West and east sides step down in two terraces 4 wide (-2.5 at 312..316 and 338..342, -5 at 316..320 and 334..338). Three flights on the west side, each along the terraces so it's walked onto from its end: rim to -2.5 at the south end (312..314, 96..100), -2.5 to -5 at the north end (314..316, 60..66), -5 to the floor at the south end (318..320, 94..100): the walk down is a zigzag, or you jump. The caisson is the quay at the south end, the sea behind it. Keel blocks down the middle (326..328, every 6), the sealed crates between them, a shuttle (`lambda-shuttle`) taking them on. The gantry's beam overhead, a hook hanging. The main fight. |
 | 10 | Dispatch office | 320..334, 46..58 | -7.5 / -3.5 | In the building across the dock's head (308..346, 56..60). Red door (325..329, 58..60). Screens, files, the manifest's terminal in the north wall (325..327): sets `manifest`, sounds the alarm, brings Bossk and the last squad onto the apron (waiting, unseen). Lift (330..334, 42..46), -7.5 to 0. |
-| 10 | The apron | 314..344, 22..40 | 0 / sky | The pickup spot (324..332, 26..32, tag `crow`). The last squad, and Bossk. The exit is the spot, `if` `manifest`. |
+| 10 | The apron | 314..344, 22..40 | 0 / sky | The last squad, and Bossk. When Bossk is dead (Mark, 2026-11-14) the Crow flies in over the dock and sets down on the pickup spot (323..333, 25..33, tag `crow`; the `fly` action, 7.5 s); the level ends when Kyle reaches it (`if` `crow-down`), not before. |
 
 ## The kit (design language)
 

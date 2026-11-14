@@ -3,6 +3,7 @@ import { startLift } from './lifts.js';
 import { BUILTIN_PICKUPS } from '../things/pickups.js';
 import { bestWeapon } from '../things/weapons.js';
 import { contentAngle } from './level.js';
+import { startFlight } from './flights.js';
 
 /**
  * Built-in trigger actions. Triggers in a level run lists of these:
@@ -129,6 +130,15 @@ export const BUILTIN_ACTIONS = {
     if (!p || !p.weapons.delete(weapon)) return;
     if (p.pendingWeapon === weapon) p.pendingWeapon = null;
     if (p.weapon === weapon) p.pendingWeapon = bestWeapon(world.registry, p);
+  },
+  /**
+   * Fly the first thing of type `thing` along `path`: keyframes
+   * [x, y, z, angle, seconds], the first where it starts, each next one
+   * reached `seconds` after the one before (eased). With none placed, one
+   * is made at the first keyframe. On arrival the actions in `then` run.
+   */
+  fly(world, { thing, path, then }) {
+    startFlight(world, thing, path, then);
   },
   /** Change the music. */
   music(world, { id }) {

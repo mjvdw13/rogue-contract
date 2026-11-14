@@ -544,14 +544,29 @@ export function validateContent(reg) {
         if (name === 'explode' && !reg.explosions?.has(a.explosion)) err(`${owner}: ${where} sets off unknown explosion "${a.explosion}"`);
         if (a.action === 'music' && a.id && !reg.songs.has(a.id)) warn(`${owner}: ${where} plays unknown song "${a.id}"`);
         if (a.action === 'setLight' && a.lightFx !== undefined && LIGHT_FX[a.lightFx] === undefined) err(`${owner}: ${where} sets unknown lightFx "${a.lightFx}"`);
+        if (name === 'fly') {
+          if (!a.thing) err(`${owner}: ${where}: fly needs a "thing" to fly`);
+          const keys = Array.isArray(a.path) ? a.path : [];
+          const good = (k, i) => Array.isArray(k) && k.length === 5 && k.every((v) => typeof v === 'number' && Number.isFinite(v)) && (i === 0 || k[4] > 0);
+          if (keys.length < 2 || !keys.every(good)) err(`${owner}: ${where}: fly "path" is two or more keyframes [x, y, z, angle, seconds], seconds over 0 after the first`);
+          else if (keys.some(([x, y]) => x < 0 || y < 0 || x >= map.w || y >= map.h)) err(`${owner}: ${where}: fly "path" leaves the map`);
+          if (a.then !== undefined) checkActions(`${where}, fly's "then"`, a.then);
+        }
         if (name === 'setFlag') {
           if (!(typeof a.flag === 'string' && a.flag !== '')) err(`${owner}: ${where} sets a flag but has no "flag" name`);
           if (a.value !== undefined && typeof a.value !== 'boolean') err(`${owner}: ${where}: setFlag "value" must be true or false`);
         }
       }
     };
-    for (const t of level.triggers ?? []) for (const a of [].concat(t.do ?? [])) if (a?.action === 'setFlag' && typeof a.flag === 'string') flagsSet.add(a.flag);
-    for (const u of map.uses.values()) for (const a of u.actions) if (a?.action === 'setFlag' && typeof a.flag === 'string') flagsSet.add(a.flag);
+    // (A flight's `then` actions set flags too.)
+    const noteFlags = (list) => {
+      for (const a of [].concat(list ?? [])) {
+        if (a?.action === 'setFlag' && typeof a.flag === 'string') flagsSet.add(a.flag);
+        if (a?.action === 'fly') noteFlags(a.then);
+      }
+    };
+    for (const t of level.triggers ?? []) noteFlags(t.do);
+    for (const u of map.uses.values()) noteFlags(u.actions);
     (level.triggers ?? []).forEach((t, i) => {
       const where = `trigger #${i + 1}`;
       if (!TRIGGER_EVENTS.includes(t.on)) err(`${owner}: ${where} has unknown event "${t.on}"`);

@@ -16,6 +16,7 @@ import { FlowField, WALKER, UNREACHABLE } from './nav.js';
 import { noiseAlert } from './noise.js';
 import { Triggers } from './triggers.js';
 import { runActions } from './actions.js';
+import { updateFlights } from './flights.js';
 import { Thing } from '../things/thing.js';
 import { overlap } from '../things/shape.js';
 import { PlayerState, playerThink, playerCamera } from '../things/player.js';
@@ -130,6 +131,8 @@ export class World {
     this.camFrom = null;
     /** Story flags (the setFlag action), for triggers' and conversations' `if` and `unless`. */
     this.flags = new Set();
+    /** Things being flown along keyframes (the fly action, world/flights.js). */
+    this.flights = [];
     /** What a tracker weapon tracks (the setSignal action): `{ tag }` or `{ thing }`, or null. */
     this.signal = null;
     /** The flow field toward the signal, for trackers that follow the route (signalWay); made when first wanted. */
@@ -960,6 +963,7 @@ export class World {
     this.lights.update(dt);
     updateDoors(this, dt);
     updateLifts(this, dt);
+    updateFlights(this, dt);
     // Where the eye was, for frames drawn before the next tick (camera()).
     const was = playerCamera(this, this.player);
     this.camFrom = { x: was.x, y: was.y, z: was.z };

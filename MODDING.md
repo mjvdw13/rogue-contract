@@ -1588,6 +1588,23 @@ Actions:
 - `giveWeapon` `{ weapon }`: gives the player a weapon and switches to it;
   `takeWeapon` `{ weapon }` takes it away (held, they switch to their best
   weapon)
+- `fly` `{ thing, path, then? }`: flies the first thing of that type
+  along `path`, a list of keyframes `[x, y, z, angle, seconds]` (tiles,
+  the height, content degrees). The first is where it starts (its
+  seconds don't count); each next one is reached that many seconds after
+  the one before, easing in and out, turning the short way. If the level
+  has no such thing, one is made at the first keyframe, so a ship can
+  come in from nowhere. When it arrives the actions in `then` run: set
+  a flag there, and let an `enter` trigger `if` that flag end the level
+  under it. Nothing stops a flight: keep its path clear. Mission 5's
+  pickup:
+
+  ```js
+  { on: 'killed', thing: 'bossk', do: [{ action: 'fly', thing: 'moldy-crow',
+    path: [[344, 50, 36, 135, 0], [338, 34, 16, 160, 4], [328, 29, 0, 180, 3.5]],
+    then: [{ action: 'setFlag', flag: 'crow-down' }] }] },
+  { on: 'enter', tag: 'crow', if: 'crow-down', do: ['exit'] },
+  ```
 
 ### Checking a level
 
