@@ -5,6 +5,7 @@ import { Registry } from '../src/engine/registry.js';
 import { defineLevel, defineWeapon } from '../src/engine/defs.js';
 import { validateContent } from '../src/engine/validate.js';
 import { runActions } from '../src/engine/world/actions.js';
+import { carriedTracker } from '../src/engine/things/weapons.js';
 import { makeWorld, mockInput, registry, room, run } from './helpers.js';
 
 // A long hall, 60 x 5, the player at its west end facing east.
@@ -182,6 +183,26 @@ test('the signal follows a tagged thing, else its tiles, or the nearest of a typ
   assert.equal(w.signalAt().x, 10.5, 'the nearest of the type');
   runActions(w, [{ action: 'setSignal' }]);
   assert.equal(w.signalAt(), null);
+});
+
+test('with another weapon in hand, the carried fob still reads the signal for the HUD: off to the right, then ahead', () => {
+  const w = holding(hall([{ type: 'villager-man', x: 30.5, y: 4.5, wander: 0, tag: 'rusk' }]));
+  assert.equal(carriedTracker(w), null, 'nothing while the fob is in hand');
+  w.player.player.pendingWeapon = 'blaster';
+  run(w, mockInput(), 1.5);
+  assert.equal(carriedTracker(w), null, 'nothing with no signal');
+  runActions(w, [{ action: 'setSignal', tag: 'rusk' }]);
+  Object.assign(w.player, { x: 30.5, y: 2.5, angle: 0 }); // facing east, Rusk south of the player
+  run(w, mockInput(), 0.1);
+  const right = carriedTracker(w);
+  assert.ok(right.off > 45, 'south, facing east: off to the right');
+  w.player.angle = Math.PI; // facing west
+  run(w, mockInput(), 0.1);
+  assert.ok(carriedTracker(w).off < -45, 'facing west: off to the left');
+  w.player.angle = Math.PI / 2; // facing south
+  run(w, mockInput(), 0.1);
+  assert.ok(Math.abs(carriedTracker(w).off) < 1);
+  assert.equal(carriedTracker(w).band, 'litFacing', 'ahead, in the facing colour');
 });
 
 test('takeWeapon takes the fob from the hand and switches to the best weapon', () => {

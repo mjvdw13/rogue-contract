@@ -931,7 +931,7 @@ no streets behind the houses.
 - [x] The way home: Kyle draws his blaster at the switch and keeps the
       fob, which points at the back lane, the cantina's back door, its
       front door, the bay door and the Crow. No customs terminal.
-- [ ] The fob on the HUD while another weapon is held.
+- [x] The fob on the HUD while another weapon is held.
 - [ ] docs/mission1.md, snapshots, Waiting on Mark.
 
 ### 0. Stairs' sides hung from one height (Mark, 2026-11-12)

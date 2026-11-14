@@ -1,6 +1,7 @@
 import { VIEW_W, VIEW_H, SCREEN_H } from '../config.js';
 import { F_SOLID, F_DOOR, F_USE, F_EXIT, F_VOID, F_SLAB } from '../world/tilemap.js';
 import { lineOfSight3D } from '../world/physics.js';
+import { carriedTracker } from '../things/weapons.js';
 
 /**
  * Corner HUD layout: each panel's size and its readout insets [x, y, w, h].
@@ -19,6 +20,10 @@ const MESSAGE_TIME = 4;
 const NAME_RANGE = 24;
 /** How far over a person's head their name floats (pixels), the same near or far. */
 const NAME_GAP = 3;
+/** The tracker's pip (a tracker carried, another weapon in hand): half its strip's width (pixels), standing for 90 degrees either side of ahead. */
+const PIP_REACH = 40;
+/** The pip's colour for each of a tracker's lights: on it, toward it, turned away. */
+const PIP_COLOURS = { litFacing: [70, 230, 60], litWarm: [255, 176, 0], lit: [255, 40, 30] };
 
 /**
  * Dark Forces-style corner readouts, pickup messages and the automap.
@@ -93,6 +98,25 @@ export class Hud {
     (reg.config.keys ?? []).forEach((k, i) => {
       if (p.keys.has(k.id) && icons) s.blit(icons.frame(k.icon ?? i), R.x + kx + 2, R.y + ky + i * 9);
     });
+
+    // A tracker carried while another weapon is in hand: a pip on a strip at
+    // the bottom between the corners, as far left or right of the middle as
+    // the signal lies off ahead (the edge at 90 degrees and past), in the
+    // tracker's colours, so it still points the way in a fight.
+    const tr = carriedTracker(world);
+    if (tr) {
+      const pal = g.palette;
+      const cx = Math.round(VIEW_W / 2);
+      const y = SCREEN_H - 7;
+      const dark = pal.ramp('gray', 0);
+      s.fillRect(cx - PIP_REACH - 3, y, PIP_REACH * 2 + 7, 3, dark);
+      s.fillRect(cx - PIP_REACH - 2, y + 1, PIP_REACH * 2 + 5, 1, pal.ramp('gray', 0.45));
+      s.fillRect(cx, y - 1, 1, 5, pal.ramp('gray', 0.75));
+      const x = cx + Math.round((Math.max(-90, Math.min(90, tr.off)) / 90) * PIP_REACH);
+      s.fillRect(x - 3, y - 2, 7, 7, dark);
+      this._pips ??= Object.fromEntries(Object.entries(PIP_COLOURS).map(([k, c]) => [k, pal.nearest(...c)]));
+      s.fillRect(x - 2, y - 1, 5, 5, this._pips[tr.band]);
+    }
   }
 
   drawMessages() {

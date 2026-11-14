@@ -351,7 +351,10 @@ bands can widen as the player closes in. Turning into another band blinks
 at once (but no sooner than `blink[0]` after the last), so far off the
 light answers a turn without waiting out a long blink. With no signal it
 stays on `idle`. Give it with the `giveWeapon` action and take it back
-with `takeWeapon`.
+with `takeWeapon`. Carried while another weapon is in hand, it shows on
+the HUD instead: a pip on a strip at the bottom of the screen, as far left
+or right of the middle as the signal lies off ahead (the ends at 90
+degrees), green, amber or red as its light would be.
 
 `route: true` (default false) points it along the way a walker would go
 instead of straight at the signal: at the furthest point of the route the

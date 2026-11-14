@@ -2341,7 +2341,8 @@ export default defineLevel({
         // The blast doors shut, so the way home is round them, through the
         // cantina: the fob points at the back lane's gate.
         { action: 'setFlag', flag: 'loud' },
-        { action: 'message', text: "JAN: THEY'VE SEALED THE BLAST DOORS. GO ROUND THROUGH THE CANTINA." },
+        { action: 'message', text: "JAN: THEY'VE SEALED THE BLAST DOORS." },
+        { action: 'message', text: 'JAN: GO ROUND, THROUGH THE CANTINA.' },
         { action: 'setSignal', tag: 'lane-gate' },
         { action: 'closeDoors', tag: 'blast-doors' },
         { action: 'openDoors', tag: 'lane-gate' },
@@ -2353,10 +2354,10 @@ export default defineLevel({
         { action: 'spawn', thing: 'sandtrooper', tag: 'roof-sniper' },
       ],
     },
-    { on: 'enter', tag: 'checkpoint-foot', if: 'loud', do: [{ action: 'message', text: "JAN: THE BACK LANE, KYLE. THE CANTINA'S BACK DOOR." }] },
+    { on: 'enter', tag: 'checkpoint-foot', if: 'loud', do: [{ action: 'message', text: "JAN: THE BACK LANE. THE CANTINA'S BACK DOOR." }] },
     { on: 'enter', tag: 'lane-gate', if: 'loud', do: [{ action: 'setSignal', tag: 'cantina-back' }] },
     { on: 'enter', tag: 'cantina-back', if: 'loud', do: [{ action: 'setSignal', tag: 'cantina-door' }] },
-    { on: 'enter', tag: 'cantina-door', if: 'loud', do: [{ action: 'setSignal', tag: 'bay-door' }, { action: 'message', text: 'JAN: WEST ALONG THE MAIN STREET. THE CROW IS WARM.' }] },
+    { on: 'enter', tag: 'cantina-door', if: 'loud', do: [{ action: 'setSignal', tag: 'bay-door' }, { action: 'message', text: 'JAN: WEST DOWN THE MAIN STREET TO THE CROW.' }] },
     { on: 'enter', tag: 'bay-lane', if: 'loud', do: [{ action: 'setSignal', tag: 'crow' }] },
     { on: 'enter', tag: 'crow', if: 'loud', do: [{ action: 'message', text: "JAN: CUSTOMS WON'T BE CHECKING PAPERS NOW." }, { action: 'takeWeapon', weapon: 'fob' }, { action: 'exit' }] },
   ],
