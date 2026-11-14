@@ -629,6 +629,71 @@ dress.push(
   at('hold-panel-down', 249, 80, { z: BRIDGE, angle: 50 }),
 );
 
+// ---------------------------------------------------------------- 7. the crane way and Berth 3
+// Cables hang off the rail and sway; one is strung across the gap. On
+// the quay under it: landing clamps along the edge, freight by the hoist.
+kit.hangings.push(
+  { type: 'cable', from: [259, 100.05, RAIL - 0.5], length: 3.5 }, { type: 'cable', from: [271.5, 95.95, RAIL - 0.5], length: 2.5 },
+  { type: 'cable', from: [284, 100.05, RAIL - 0.5], length: 4 }, { type: 'cable', from: [293, 95.95, RAIL - 0.5], length: 3 },
+  { type: 'cable', from: [275.9, 99.6, RAIL + 0.7], to: [279.1, 99.6, RAIL + 0.7], sag: 0.9 },
+  { type: 'hose', from: [275.9, 96.4, RAIL - 0.3], to: [279.1, 96.4, RAIL - 0.3], sag: 1.6 },
+);
+for (const x of [258, 274, 290]) dress.push(at('bollard', x, 103.3, { angle: 90 }));
+dress.push(at('cargo-pod', 263.5, 101.2), at('canister', 271.4, 101.6), at('power-unit', 265.2, 99));
+kit.door(250, 98, 'E', { h: 8, tex: 'door-grey', wall: T.shackC, jamb: false });
+// Berth 3: its number on the yard's wall, a plasma cutter at the next
+// frame to come down, plates off it stacked, a pit droid, the crate left
+// on the keel (secret 4).
+decals.push({ x: 281, y: 56, z: 5, face: 'S', tex: 'berth-3', scale: 2 });
+dress.push(
+  at('cutting-torch', 290.4, 85.6, { angle: 60 }), at('plate-stack', 270, 62.5, { angle: 10 }), at('plate-stack', 286, 63, { angle: 95 }),
+  at('pit-droid', 288.6, 83.8, { angle: 300 }), at('crate-grey-small', 283.3, 77, { z: 0.5 }),
+);
+pylon(265, 58); pylon(296, 90.5, 0, false);
+
+// ---------------------------------------------------------------- 8. the cab
+// The dock officer's post: a console bank and his seat, a comm unit, a
+// lamp. The window east is left clear: it's the first look into the dock.
+dress.push(
+  at('ds-console-wall', 303, 102.9, { z: RAIL, angle: 90 }), at('ds-chair', 303, 100.8, { z: RAIL, angle: 270 }),
+  at('ds-console', 300, 94.6, { z: RAIL, angle: 0 }),
+);
+kit.grimeIndoors(299, 93, 307, 103, { amount: 1.5, seed: 79 });
+// Hazard stripes round the legs' feet.
+for (const [x, y, face] of [[298, 94.5, 'W'], [298, 102, 'W'], [298, 57, 'W'], [308, 57, 'E'], [308, 98, 'E'], [303, 60, 'S'], [303, 92, 'N']]) decals.push({ x, y, z: 1.2, face, tex: 'decal-hazard' });
+
+// ---------------------------------------------------------------- 9. the dry dock
+// A cradle on each keel block; the Imperials' sealed crates and
+// containers between them (the only clean things in the yard, and the
+// fight's cover); their floodlights on the rim; the berth's number on the
+// head wall; a light over the red door.
+for (let y = 66; y < 96; y += 6) dress.push(at('keel-block', 327, y + 1, { z: DOCK + 1 }));
+dress.push(
+  at('ds-container', 323, 69.5, { z: DOCK, angle: 0 }), at('ds-crate-tall', 331, 74.6, { z: DOCK }), at('ds-crate', 322.4, 87, { z: DOCK }), at('ds-crate', 323.9, 88.3, { z: DOCK }),
+  at('ds-container', 331.4, 92, { z: DOCK, angle: 90 }), at('ds-crate-tall', 322.2, 63.4, { z: DOCK }), at('ds-crate', 331.6, 63.6, { z: DOCK }),
+  at('floodlight-tower', 310.4, 64, { angle: 0 }), at('floodlight-tower', 343.6, 96, { angle: 180 }),
+);
+decals.push({ x: 317.5, y: 60, z: 2, face: 'S', tex: 'berth-4', scale: 1.5 });
+lamps.push({ x: 327, y: 61.5, z: DOCK + 3, radius: 5, light: 110 }, { x: 314, y: 64, z: 0, radius: 8, light: 88 }, { x: 340, y: 96, z: 0, radius: 8, light: 88 });
+
+// ---------------------------------------------------------------- 10. the office and the apron
+// Dispatch: consoles along the west wall, the clerk's desk and seat,
+// lockers, a holo table showing what's being shipped.
+dress.push(
+  at('ds-console-wall', 320.1, 50, { z: DOCK, angle: 0 }), at('ds-console-wall', 320.1, 54, { z: DOCK, angle: 0 }),
+  at('ds-locker-bank', 333.98, 54, { z: DOCK, angle: 180 }),
+  at('ds-holo-table', 330, 53, { z: DOCK }), at('ds-holo-station', 330, 53, { z: DOCK + 1.35 }),
+  at('ds-chair', 324.6, 51, { z: DOCK, angle: 180 }), at('ceiling-lamp', 327, 52),
+);
+// The apron: a landing pad. Clamps at the spot's corners, pylons and a
+// sensor mast at its edge, containers (cover from Bossk), a fuel pump.
+for (const [x, y] of [[322, 24], [334, 24], [322, 34], [334, 34]]) dress.push(at('bollard', x, y));
+pylon(315.5, 23.5); pylon(342.5, 23.5); pylon(315.5, 38.5);
+dress.push(
+  at('sensor-mast', 341.5, 37.5), at('ds-container', 318, 30, { angle: 90 }), at('ds-container', 339.5, 30.5, { angle: 0 }),
+  at('bay-fuel-pump', 336.5, 23.6, { angle: 270 }), at('ds-crate', 336, 37),
+);
+
 // A room indoors (a ceiling, not the sky) inside a building shows from
 // outside as a wall up to the sky, wherever something looks over the
 // building's roof into it. So every tile of building next to one becomes

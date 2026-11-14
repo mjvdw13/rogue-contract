@@ -1794,15 +1794,15 @@ taken. The blockout steps are in order, one session at a time.
       end up just looking like earth"): plasma cutters, power cells,
       mag-grapples, glow rods, droids, pods, repulsor craft, Aurebesh,
       ship parts you'd know. No gas bottles, timber, hooks, street lamps.
-- [ ] **Dressing, area by area**, with snapshots (`--custom`), swapping
+- [x] **Dressing, area by area**, with snapshots (`--custom`), swapping
       the stand-ins for the kit. One commit an area or pair. Dressing
       has a purpose. In m5.js under DRESSING (`dress`, `pylon()`).
   - [x] 1 and 2: the pier, the quay, the Bottoms.
   - [x] 3 and 4: pump house, gallery, Berth 1.
   - [x] 5: the cutting floor, and freight boxes along the quay.
   - [x] 6: the hauler: hold, crew deck, reactor room, bridge.
-  - [ ] 7 and 8: the crane way, Berth 3, the cab.
-  - [ ] 9 and 10: the dry dock, the office, the apron.
+  - [x] 7 and 8: the crane way, Berth 3, the cab.
+  - [x] 9 and 10: the dry dock, the office, the apron.
 - [ ] **Light and air**: the haze's colour and half distance, soot
       flakes (`weather`), the wind, smoke from the stacks and the
       furnace, steam in the pump house and the hauler, lamps and pools
