@@ -250,15 +250,23 @@ export function weaponThink(world, pt, input, dt) {
  * the straight line (world.signalWay). Dark with no signal.
  */
 function track(world, pt, def, ws, dt) {
-  const { blink } = def.track;
-  const r = trackerReading(world, pt, def);
-  if (!r) {
+  const { near, far, blink, facing, warm, route } = def.track;
+  const s = route ? world.signalWay(pt) : world.signalAt();
+  if (!s) {
     ws.blink = 0;
     ws.band = null;
     if (ws.animName !== 'idle') ws.setAnim('idle');
     return;
   }
-  const { k, band } = r;
+  const d = route ? s.d : Math.hypot(s.x - pt.x, s.y - pt.y);
+  const k = Math.min(1, Math.max(0, (d - near) / Math.max(far - near, 1e-6)));
+  // A [near, far] pair at this distance, in proportion (a number stays put).
+  const at = (v) => (Array.isArray(v) ? v[0] + (v[1] - v[0]) * k : v);
+  let off = Math.abs(Math.atan2(s.y - pt.y, s.x - pt.x) - pt.angle) % (2 * Math.PI);
+  if (off > Math.PI) off = 2 * Math.PI - off;
+  off = (off * 180) / Math.PI;
+  const anims = def.anims;
+  const band = anims.litFacing && off <= at(facing) ? 'litFacing' : anims.litWarm && warm != null && off <= at(warm) ? 'litWarm' : 'lit';
   ws.blink -= dt;
   ws.sinceBlink = (ws.sinceBlink ?? Infinity) + dt;
   if (ws.blink > 0 && (band === ws.band || ws.sinceBlink < blink[0])) return;
@@ -267,49 +275,6 @@ function track(world, pt, def, ws, dt) {
   ws.band = band;
   ws.setAnim(band);
   if (def.sounds.beep) world.playSound(def.sounds.beep);
-}
-
-/**
- * (`track`) What tracker `def` reads for the player now, or null with no
- * signal: `k` how far off the signal is (0 at `near`, 1 at `far`), `off`
- * the degrees it lies off ahead (to the right above 0), and `band` the
- * light it shows (`litFacing`, `litWarm` or `lit`).
- */
-export function trackerReading(world, pt, def) {
-  const { near, far, facing, warm, route } = def.track;
-  const s = route ? world.signalWay(pt) : world.signalAt();
-  if (!s) return null;
-  const d = route ? s.d : Math.hypot(s.x - pt.x, s.y - pt.y);
-  const k = Math.min(1, Math.max(0, (d - near) / Math.max(far - near, 1e-6)));
-  // A [near, far] pair at this distance, in proportion (a number stays put).
-  const at = (v) => (Array.isArray(v) ? v[0] + (v[1] - v[0]) * k : v);
-  let off = (Math.atan2(s.y - pt.y, s.x - pt.x) - pt.angle) % (2 * Math.PI);
-  if (off > Math.PI) off -= 2 * Math.PI;
-  if (off < -Math.PI) off += 2 * Math.PI;
-  off = (off * 180) / Math.PI;
-  const anims = def.anims;
-  const a = Math.abs(off);
-  const band = anims.litFacing && a <= at(facing) ? 'litFacing' : anims.litWarm && warm != null && a <= at(warm) ? 'litWarm' : 'lit';
-  return { k, off, band };
-}
-
-/**
- * A tracker the player carries but isn't holding, and its reading, for the
- * HUD's pip: so it points the way while another weapon is in hand. Null
- * with none, or no signal.
- */
-export function carriedTracker(world) {
-  const pt = world.player;
-  const p = pt?.player;
-  if (!p || p.dead) return null;
-  for (const id of p.weapons) {
-    if (id === p.weapon) continue;
-    const def = world.registry.weapons.get(id);
-    if (!def?.track) continue;
-    const r = trackerReading(world, pt, def);
-    if (r) return { def, ...r };
-  }
-  return null;
 }
 
 /** Psprite list for the renderer (weapon sprite with bob). */
