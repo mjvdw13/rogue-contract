@@ -158,7 +158,7 @@ function tieFighter() {
   // A wing (the schematic's side view): a hexagon 11.4 long and 14 tall,
   // flat along its top and bottom and pointed fore and aft. A grey frame
   // round its edge and a grey spoke from the hub to each corner, over six
-  // black panels whose lines fan out from the hub.
+  // near-black plated panels.
   const HEX = [[5.7, 0], [4, 7], [-4, 7], [-5.7, 0], [-4, -7], [4, -7]];
   const T = 0.12;
   const HUB = 0.23;
@@ -174,9 +174,9 @@ function tieFighter() {
       const w = 0.19 / l;
       const p = [-a[1] * w, a[0] * w];
       for (const o of [-1, 1]) {
-        // The panel, the texture's foot along the wing's edge; the frame
+        // The panel, its plating tiled at the texture's own size; the frame
         // along that edge; the spoke out to corner `a`, a little proud.
-        m.face([P(a, HUB, o * T), P(b, HUB, o * T), P(b, RIM, o * T), P(a, RIM, o * T)], { tex: 'tie-wing', uv: [[0.5 - HUB / 2, HUB], [0.5 + HUB / 2, HUB], [1, 1], [0, 1]] }, inside);
+        m.face([P(a, HUB, o * T), P(b, HUB, o * T), P(b, RIM, o * T), P(a, RIM, o * T)], { tex: 'tie-wing' }, inside);
         m.face([P(a, RIM, o * T), P(b, RIM, o * T), P(b, 1, o * T), P(a, 1, o * T)], HULL, inside);
         const Q = (k, d) => [a[0] * k + p[0] * d, s * (Y + o * (T + 0.03)), ZC + a[1] * k + p[1] * d];
         m.face([Q(HUB, -1), Q(HUB, 1), Q(RIM, 1), Q(RIM, -1)], HULL, inside);

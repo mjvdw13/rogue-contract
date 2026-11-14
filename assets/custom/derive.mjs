@@ -375,8 +375,9 @@ export const STATION = [
   // Skins for the models (models/station.js): the TIE fighter's solar
   // panel as Dark Forces drew it, its hull, machinery and window; crates;
   // consoles; plain metals and lamps.
-  // The wing's panels: plain black (Mark, 2026-11-13); the frame and spokes are modelled.
-  { out: 'tie-wing', paint: 'flat', size: [16, 16], color: [10, 11, 14] },
+  // The wing's panels: near black, but plated (Mark, 2026-11-13): DF's floor
+  // panel with its seams and rivets, darkened. The frame and spokes are modelled.
+  { out: 'tie-wing', df: 'ZPPANEL1', gradient: [[4, 4, 6], [10, 11, 14], [17, 18, 23], [26, 28, 35], [38, 41, 50]], keep: 0, contrast: 0.9 },
   { out: 'tie-hull', df: 'IPGRDBLY', gradient: [[40, 46, 58], [84, 91, 111], [108, 114, 134], [144, 150, 168], [176, 184, 200]], keep: 0, contrast: 0.8 },
   { out: 'tie-dark', df: 'ENGTEXTS', scale: [32, 32], gradient: [[6, 6, 8], [20, 21, 26], [36, 38, 46], [56, 60, 72]], keep: 0, contrast: 1 },
   { out: 'tie-window', paint: 'tieWindow', size: [64, 64], glass: [20, 26, 38], frame: [144, 150, 168] },
