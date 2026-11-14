@@ -90,6 +90,9 @@ are shut, and so is the alleys' mouth, so down the back lane (two
 troopers at its gate) and in at the cantina's back door → through the
 cantina and out onto the market → west along the main street → down the
 square to the bay door → Bay 87, where the level ends under the Crow.
+The back door is the first thing through the lane's gate (on its west
+side, 4 tiles in; the lane ends just past it), and a service corridor
+runs from it down to the cantina's back room.
 
 **What holds the player back:**
 

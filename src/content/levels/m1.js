@@ -581,6 +581,10 @@ town.fixture('cantina-sign', 128, 77, 'N', { z: 3.6 });
 list.push(at('floodlight-tower-worn', 125.2, 72.2));
 tagTile(127, 79, 'lane-guard');
 tagTile(129, 79, 'lane-guard');
+// The lane ends just past the cantina's back door (Mark, 2026-11-13: no
+// other ways off it): a house's blank end across it, so the light well, the
+// yard and the storehouse beyond are out of play.
+town.block(126, 84, 130, 86, { h: 6, wall: 'adobe-grey', skirt: 'dirt' });
 // In front of the blast doors, where Jan names the lane once they're shut.
 p.rect(106, 62, 112, 76, (_, __, c) => (c.wall || c.door || c.tag ? c : { ...c, tag: 'blast-foot' }));
 town.platform(126, 112, 132, 118, { h: 0.5, steps: 'N' });
@@ -594,10 +598,11 @@ town.grimeBoxes.push([118, 86, 149, 122, 2]);
 list.push(
   // The cantina's power, against its wall under the conduit.
   at('power-unit', 126.01, 92.4, { angle: 90 }),
-  // Empties by the back door: kegs (drums), a canister or two, stacked crates.
-  at('barrel-rust', 126.45, 100.9), at('barrel-grey', 126.5, 101.65), at('barrel-rust', 127.2, 101.25),
-  at('barrel-rust', 126.45, 102.4), at('canister', 126.4, 103.2), at('canister-rust', 126.85, 103.35, { angle: 40 }),
-  at('floor-spill-1', 127.3, 104.2, { angle: 30 }), at('floor-spill-2', 127.6, 107.4, { angle: 200 }),
+  // Empties by the back door, against the lane's end: kegs (drums), a
+  // canister, and the storehouse's spare cells on a crate.
+  at('barrel-rust', 126.5, 83.45), at('barrel-grey', 127.25, 83.5), at('canister-rust', 127.9, 83.4, { angle: 40 }),
+  at('crate-grey-small', 129.35, 83.3, { angle: 8 }), at('energy-cell', 128.7, 83.5), at('energy-cell', 128.3, 82.8),
+  at('floor-spill-1', 127.3, 81.8, { angle: 30 }),
   // The rubbish across the lane: a heap, a broken crate, scrap and litter,
   // grease soaked into the sand, and a Jawa going through it.
   at('junk-heap', 129.2, 108.6, { angle: 95 }), at('crate-rust-long', 129.5, 106.7, { angle: 78 }), at('scrap', 129.99, 110.4, { angle: 270 }),
@@ -1314,17 +1319,24 @@ const roofOver = (x0, y0, x1, y1, ceilZ, h) => p.rect(x0, y0, x1, y1, (_, __, c)
   // (S's walls round them in the room's light; the rooms' own tiles keep the
   // sun on the roof over them, under S's dome, which takes its light.)
   p.rect(91, 84, 102, 89, (_, __, c) => (c.slab || c.door ? c : { ...c, light }));
-  // The way out: the back-bar's door, a back room, and a passage up two
-  // steps to the back door.
+  // The way out: the back-bar's door, a back room, a passage up two steps,
+  // and a service corridor north behind the back lane's west wall to the
+  // back door, just past the lane's gate (Mark's play test, 2026-11-13: the
+  // door 28 tiles down the lane, past a light well and a yard, was hard to
+  // find; now it's the first thing through the gate).
   town.door(99, 111, 'S', { h, tex: 'door-grey', wall, opens: true, floorZ: F });
   town.room(93, 111, 115, 116, { h, floorZ: F, ceilZ, wall, light });
   town.room(112, 104, 115, 111, { h, floorZ: F, ceilZ, wall, light });
   town.room(115, 105, 118, 107, { h, floorZ: F, ceilZ, wall, light });
-  town.stair(118, 105, 126, 107, { up: 'E', from: F, top: 0, rise: 0.25, floor: 'flagstone', side: wall });
-  roofOver(118, 105, 126, 107, ceilZ, 8);
-  town.door(126, 106, 'E', { h: 8, tex: 'door-grey', opens: true });
+  town.stair(118, 105, 123, 107, { up: 'E', from: F, top: 0, rise: 0.25, floor: 'flagstone', side: wall });
+  roofOver(118, 105, 123, 107, ceilZ, 8);
+  town.room(123, 80, 125, 107, { h: 8, ceilZ, floor: 'flagstone', wall, light });
+  town.door(126, 82, 'E', { h: 8, tex: 'door-grey', opens: true });
   // Locked until the switch: the back way is only wanted on the way home.
-  p.rect(125, 105, 126, 107, (_, __, c) => ({ ...c, lock: 'remote', tag: 'cantina-back', stayOpen: true }));
+  p.rect(125, 81, 126, 83, (_, __, c) => ({ ...c, lock: 'remote', tag: 'cantina-back', stayOpen: true }));
+  // A bulb at each end of the corridor.
+  town.things.push(at('cantina-lamp', 124, 82, { z: ceilZ - LAMP_CORD }), at('cantina-lamp', 124, 104, { z: ceilZ - LAMP_CORD }));
+  lights.push({ x: 124, y: 82, z: 2.5, radius: 4, light: 40 }, { x: 124, y: 104, z: 2.5, radius: 4, light: 40 });
   // The back room: kegs, crates and canisters along its walls, a power unit
   // in the far corner, the storeroom's crates and a cargo pod out of the
   // way to the back door; a bulb over each.
@@ -2027,8 +2039,6 @@ list.push(
   at('canister-rust', 180.6, 46.6), at('med-kit', 181.4, 46.8),
   // The wash's east bank: what the last flood left at the alley's end.
   at('crate-rust-long', 203.4, 70.35, { angle: 90 }), at('med-kit', 202.4, 69.7), at('energy-pack', 202.3, 70.5, { skill: [1, 2] }),
-  // Beside the cantina's storehouse, off the back lane: its spare cells.
-  at('crate-grey-small', 121.6, 109.4, { angle: 8 }), at('energy-cell', 122.5, 109.3), at('energy-cell', 122.4, 108.6),
   // The west end's alleys, since the north back lane was walled off
   // (2026-11-05). The slot past A, by the town's wall: a crate left there, cells on it.
   at('crate-grey-small', 2.8, 50.7, { angle: 10 }), at('energy-cell', 3.4, 51.6), at('energy-cell', 2.6, 51.9, { skill: [1, 2] }),

@@ -4,9 +4,9 @@ import { analyseLevel } from '../tools/lib/levelcheck.mjs';
 import { registry } from './helpers.js';
 import m1 from '../src/content/levels/m1.js';
 
-// Chalmun's cantina in Mos Eisley is one of the two ways round the blast
-// doors: in at its street door, round the bar, out through the back-bar's
-// door and the back room to the back door on the back lane. Its furniture
+// Chalmun's cantina in Mos Eisley is the way round the blast doors: in at
+// its street door, round the bar, out through the back-bar's door, the back
+// room and the service corridor to the back door on the back lane. Its furniture
 // (the bar, the taps, stools, booths, shelves) is models that collide, and
 // mustn't close that way.
 
@@ -27,7 +27,9 @@ test('the cantina leads from its street door round the bar to its back door', ()
   assert.ok(reached(98, 92), 'down the steps into the room');
   assert.ok(reached(96, 104), "behind the bar, past the east arm's end");
   assert.ok(reached(98, 110) || reached(99, 110), "the back-bar's door");
-  assert.ok(reached(125, 106), 'the passage to the back door');
+  assert.ok(reached(120, 106), 'the passage up the steps');
+  assert.ok(reached(124, 95), 'the corridor north');
+  assert.ok(reached(125, 82), "the back door, by the lane's gate");
 });
 
 test("behind the storeroom a secret door in the plaster opens into the secret back room", () => {

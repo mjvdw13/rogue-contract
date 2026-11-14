@@ -39,9 +39,16 @@ These need Mark to try something, or to decide. Don't start them without him.
   down the street from the blast doors, two troopers posted at the gate
   after the switch, and Jan naming the lane in front of the blast doors
   and at the checkpoint. The alleys' mouth by the checkpoint shuts at the
-  switch, so the cantina stays the only way round (a test checks it). To
-  judge: whether the lane is easy enough to find now, the tower and sign
-  (too much, too little), the guards, and Jan's lines.
+  switch, so the cantina stays the only way round (a test checks it).
+  After Mark's next note (the back door still hard to find): the back door
+  is now on the lane's west side 4 tiles past the gate, and the lane ends
+  in a house's blank end just after it (the light well, the yard and the
+  storehouse out of play; the empties and the spare cells moved to the
+  lane's end). Inside, a straight service corridor 2 wide and 25 long, a
+  bulb at each end, runs south to the old passage up from the back room.
+  To judge: whether the lane is easy enough to find now, the tower and
+  sign (too much, too little), the guards, Jan's lines, and whether the
+  corridor is too long (the cantina's back room is 25 tiles south).
 
 - **The rest of Dark Forces' weapons** (`?map=sandbox&god`, 2026-11-11):
   all in the sandbox's start room, in a row east of you (3 rifle, 5
