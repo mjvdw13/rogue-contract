@@ -69,7 +69,7 @@ function plateStack() {
     const [dx, dy] = [((i * 3) % 4 - 1.5) * 0.06, ((i * 5) % 3 - 1) * 0.07];
     const k = 1 - i * 0.03;
     const pts = [[-hx * k, -hy * k], [hx * k, -hy * k], [hx * k, hy * k], [-hx * k, hy * k]].map(([x, y]) => [x * c - y * s + dx, x * s + y * c + dy]);
-    m.prism(pts, i * t, (i + 1) * t - 0.02, { ...(i % 2 ? RUST : PLATE), bottom: false, top: i === n - 1 || i % 2 === 0 ? undefined : false, sides: { tex: 'hull-section', texScale: 0.5 } });
+    m.prism(pts, i * t, (i + 1) * t - 0.02, { ...(i % 2 ? RUST : PLATE), bottom: false, top: i === n - 1 || i % 2 === 0 ? undefined : false, sides: { tex: 'metal-grey', texScale: 0.5 } });
   }
   m.outlineLines([[-hx, -hy], [hx, -hy], [hx, hy], [-hx, hy]]);
   return m.build();

@@ -1801,7 +1801,7 @@ taken. The blockout steps are in order, one session at a time.
       the stand-ins for the kit. One commit an area or pair. Dressing
       has a purpose. In m5.js under DRESSING (`dress`, `pylon()`).
   - [x] 1 and 2: the pier, the quay, the Bottoms.
-  - [ ] 3 and 4: pump house, gallery, Berth 1.
+  - [x] 3 and 4: pump house, gallery, Berth 1.
   - [ ] 5: the cutting floor.
   - [ ] 6: the hauler (the most work: ribs, wires, panels, grime,
         before and after the power).

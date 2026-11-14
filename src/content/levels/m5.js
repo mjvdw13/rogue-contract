@@ -167,7 +167,9 @@ p.rect(98, 40, 124, 58, room(PUMP, PUMP + 6));
 // (A door wants solid wall at its jambs, not a building's raised floor.)
 p.rect(96, 48, 98, 54, { wall: T.seaWall });
 p.rect(96, 49, 98, 53, skyDoor(PUMP, 13, { light: 144, side: T.seaWall }));
-for (const [x, y] of [[104, 44], [114, 44], [104, 54], [114, 54]]) p.rect(x, y, x + 4, y + 4, { wall: T.guts });
+// The four pumps: a plinth each, the tank on it (the dressing's).
+const PUMPS = [[104, 44], [114, 44], [104, 54], [114, 54]];
+for (const [x, y] of PUMPS) p.rect(x, y, x + 4, y + 4, room(PUMP + 2, PUMP + 6, { floor: T.step, side: T.guts }));
 // The walk: stairs up the west wall beside the door, then a grate deck
 // along the north and east walls to a plinth in the south-east corner.
 const walk = room(PUMP, PUMP + 6, { slab: { bottom: PUMP + 2.5, top: PUMP + 3, floor: T.grate, ceiling: T.grate, side: T.step, light: 120 } });
@@ -501,6 +503,49 @@ dress.push(
   at('canister', 66.2, 47), at('canister-rust', 83.6, 55),
 );
 pylon(61, 55.2, 2); pylon(94.8, 47, 3);
+
+// ---------------------------------------------------------------- 3. pump house and gallery
+// A coolant tank humming on each plinth, pipes under the ceiling, joints
+// leaking steam, a power droid plugged in by the door, a hose left out.
+for (const [x, y] of PUMPS) dress.push(at('coolant-tank-running', x + 2, y + 2));
+dress.push(
+  at('ds-pipe-run-12', 111, 50, { z: PUMP + 6, angle: 0 }), at('ds-pipe-run-12', 111, 51, { z: PUMP + 6, angle: 90 }),
+  at('ds-steam-pipe', 98.02, 56, { angle: 0 }), at('ds-steam-pipe', 110, 57.98, { angle: 90 }), at('ds-steam-pipe', 120.98, 50, { angle: 180 }),
+  at('ceiling-lamp', 102, 51), at('ceiling-lamp', 111, 51), at('ceiling-lamp', 119.5, 51),
+  at('power-droid', 101.5, 55.5, { angle: 90 }), at('bay-hose-coil', 109.5, 50.2), at('canister', 119.4, 56.6),
+);
+kit.grimeIndoors(98, 40, 124, 58, { amount: 2, seed: 53 });
+// The stairs and the gallery: steam off the joints, pipes overhead, one
+// lamp at the corner.
+dress.push(
+  at('ds-steam-pipe', 133, 47.02, { angle: 270 }), at('ds-steam-pipe', 148.02, 58, { angle: 0 }), at('ds-steam-pipe', 151.98, 72, { angle: 180 }),
+  at('ds-pipe-run-12', 150, 56, { z: GALLERY + 3.5, angle: 0 }), at('ds-pipe-run-12', 150, 73.5, { z: GALLERY + 3.5, angle: 0 }),
+  at('ceiling-lamp', 150, 49),
+);
+kit.grimeIndoors(144, 47, 152, 56, { amount: 2.5, seed: 59 });
+
+// ---------------------------------------------------------------- 4. Berth 1
+// The freighter's hold as Mission 1 left it: ribs, wires out of the
+// ceiling (one live), panels off, a dead console.
+for (const x of [153, 156, 159, 162]) dress.push(at('hold-rib', x, HOLD.y, { angle: 0, lit: 96 }));
+dress.push(
+  at('hold-wires', 155, 85.4, { angle: 30, lit: 96 }), at('hold-wires-live', 161.4, 84.6, { angle: 0, lit: 96 }),
+  at('hold-console', 157.5, 87, { angle: 180, lit: 96 }),
+  at('hold-panel-leaning', 162.6, 87, { angle: 180, lit: 96 }), at('hold-panel-down', 160.4, 84.6, { angle: 20, lit: 96 }),
+);
+kit.grimeIndoors(150, 80, 164, 87, { amount: 3, seed: 61 });
+// The slip round it: the berth's number on the yard's wall, a scaffold
+// against the hull, a plasma cutter at work on the stern, plates stacked
+// as they come off, and two pit droids doing the carrying.
+decals.push({ x: 130, y: 76, z: 4.5, face: 'E', tex: 'berth-1', scale: 2 });
+dress.push(
+  at('scaffold', 157, 88.2, { angle: 0 }),
+  at('cutting-torch', 169.6, 78.6, { angle: 200 }),
+  at('plate-stack', 171.5, 89.5, { angle: 15 }), at('plate-stack', 143.5, 90, { angle: 80 }),
+  at('pit-droid', 169, 87.6, { angle: 150 }), at('pit-droid', 145.6, 86.4, { angle: 30 }),
+  at('cargo-pod', 138, 66), at('power-unit', 168.2, 80),
+);
+pylon(133, 64); pylon(133, 89);
 
 // A room indoors (a ceiling, not the sky) inside a building shows from
 // outside as a wall up to the sky, wherever something looks over the
