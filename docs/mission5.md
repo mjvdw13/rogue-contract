@@ -128,12 +128,13 @@ blockout, not final.
 | 6c | Crew deck | 212..240, 68..84 | 6 / 9.5 | The whole deck over the hold (a slab, 5 to 6), from the lift, aft. Along the north side at 222..232, 68..76 it has fallen into the hold: an edge to look down from, and to be shot at from. Cabins behind doors in the hold's walls: two north (62..66), one south (86..90), 2 m deep (bunks, pickups, a weapon). At the cut face the deck stops two tiles short (206..208), the hull's roof still over the gap. |
 | 6d | Aft stair | passage 232..240, 62..66; stair 242..254, 62..66 | 6 up to 12 | A door in the north wall (234..238) into a passage, a door through the bulkhead, and twelve steps up the hull's north side under the sky to a landing (254..260). |
 | 6e | Bridge | 242..260, 68..86 | 12 / sky | The reactor room's roof. Its own roof is gone (a tile holds two storeys: the reactor room and this deck): a tub of hull walls 5 high, the sills a step high where its windows were, east and south: the crane, the dock, the sun. Dead consoles, wires. In from the landing by an arch (255..259, 66..68); out by an arch in its south wing (252..256, 86..92) onto a gangway to the crane way. |
-| 7 | The crane way | 252..300, 96..100 | a slab, top 12 / sky | A crane rail on trestles along the quay, 2 m wide, the water 16 below on the south. Grate deck: the quay shows through. A 3-tile gap at 276..279 (a jump). A hoist at 268 back up from the quay if you fall. Probe droids come in over the water; a trooper on the cab's balcony. |
-| 7a | Berth 3: the ribs | 264..298, 60..94 | 0 stepping to -1 / sky | A hull cut down to its keel and frames, seen from above. Reached only by falling or by the hoist. Secret 4: a crate on the keel. |
-| 8 | The crane's cab | 298..308, 92..104 | 12 / 16 | In the south leg of the great gantry. The dock officer (the red keycard), a console, a window north over the dock. Lift (300..304, 88..92), 12 to 0. |
-| 9 | Berth 4: the dry dock | 308..346, 58..102 | rim 0; steps -2.5, -5; floor -7.5 / sky | Long axis north to south. The floor is 320..334, 60..100. West and east sides step down in two terraces 4 wide (-2.5 at 312..316 and 338..342, -5 at 316..320 and 334..338). Flights between them at opposite ends, so the walk down is a zigzag; you can also jump down. The caisson gate at the south end, the sea behind it. Keel blocks down the middle, the sealed crates stacked on them, a shuttle (`lambda-shuttle`) taking them on. The gantry's beam overhead, a hook hanging. The main fight. |
-| 10 | Dispatch office | 320..334, 46..58 | -7.5 / -3 | In the dock's head wall. Red door (325..329, 58). Screens, files, the manifest terminal (sets `manifest`, sounds the alarm). Lift (330..334, 42..46), -7.5 to 0. |
-| 10 | The apron | 314..344, 24..42 | 0 / sky | The pickup spot. The last squad, and Bossk. The exit is the marked spot, `if` `manifest`. |
+| 7 | The crane way | gangway 252..256, 92..96; rail 252..298, 96..100 | a slab, top 12 / sky | A crane rail on trestles along the quay, 2 m wide, the water 16 below on the south. Grate deck: the quay shows through. Railings 0.75 high. A 3-tile gap at 276..279 (a jump). A hoist (266..270, 100..102; 0 to 12) back up from the quay if you fall. Probe droids come in over the water; a trooper on the cab's side of the gap. |
+| 7 | Past the hauler | 206..262, 56..60 and 244..250, 92..104 | buildings | A shed along the hauler's north side and a winch house across the quay at its stern: the only way east is through the ship. |
+| 7a | Berth 3: the ribs | 264..298, 60..92 | 0 / sky | A hull cut down to its keel and frames, seen from above. Reached by falling off the rail, or from the dock's rim. Secret 4: a crate on the keel (280..284, 76..78). A slip into the water at 284..288, 104..112: the way out of the harbour at this end. |
+| 8 | The crane's cab | 299..307, 93..103 | 12 / 16 | In the south leg of the great gantry (298..308, 92..104, 30 high; the north leg 298..308, 54..60). In from the rail by an arch in its west wall. The dock officer (the red keycard), a console, a window east over the dock (sill 1). Lift (300..304, 88..92), 12 to 0, by an arch in its north wall. |
+| 9 | Berth 4: the dry dock | 312..342, 60..100 | rim 0; steps -2.5, -5; floor -7.5 / sky | Long axis north to south. The floor is 320..334. West and east sides step down in two terraces 4 wide (-2.5 at 312..316 and 338..342, -5 at 316..320 and 334..338). Three flights on the west side, each along the terraces so it's walked onto from its end: rim to -2.5 at the south end (312..314, 96..100), -2.5 to -5 at the north end (314..316, 60..66), -5 to the floor at the south end (318..320, 94..100): the walk down is a zigzag, or you jump. The caisson is the quay at the south end, the sea behind it. Keel blocks down the middle (326..328, every 6), the sealed crates between them, a shuttle (`lambda-shuttle`) taking them on. The gantry's beam overhead, a hook hanging. The main fight. |
+| 10 | Dispatch office | 320..334, 46..58 | -7.5 / -3.5 | In the building across the dock's head (308..346, 56..60). Red door (325..329, 58..60). Screens, files, the manifest's terminal in the north wall (325..327): sets `manifest`, sounds the alarm, brings Bossk and the last squad onto the apron (waiting, unseen). Lift (330..334, 42..46), -7.5 to 0. |
+| 10 | The apron | 314..344, 22..40 | 0 / sky | The pickup spot (324..332, 26..32, tag `crow`). The last squad, and Bossk. The exit is the spot, `if` `manifest`. |
 
 ## The kit (design language)
 
@@ -271,3 +272,20 @@ in the hauler's cabins, heavy ammo before the dock.
   no new engine work expected.
 - **Frame time:** the cutting floor and the dock are the open places.
   Measure them at the blockout (`tools/bench.mjs`), before dressing.
+
+## Checked (the blockout, 2026-11-14)
+
+- `tests/m5-route.test.js` walks the whole route with no monsters, pier
+  to apron: the sluice's switch, the crouch, the freighter, the reactor
+  and the lift, the stair, the jump on the crane way, the cab's lift,
+  the dock's three flights, the red door, the manifest. It found the
+  pump house's stairs couldn't be stepped onto from the side, and the
+  sky coming down to head height beside plain doors under it; both are
+  in the engine notes.
+- Frame time, headless at 640 x 400, 40 views (`tools/bench.mjs m5 --res
+  2`): 18 ms on average, 37 at worst (Mission 4 on the same run: 11 and
+  42). The worst three are all looks along the quay, 350 tiles of open
+  waterfront; cargo and sheds standing on it will cut them short.
+- Not checked: anything by eye in a browser, the fights (twelve
+  stand-in troopers), the look (stand-in textures, sky and crane).
+

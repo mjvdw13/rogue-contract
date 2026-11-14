@@ -7,9 +7,9 @@ import { FREIGHTER } from '../models/freighter.js';
 // docs/mission5.md (area numbers below match its table). Painted in code on
 // the fine grid (1 tile = 0.5 m; the player is 1.7 tall and 1 wide).
 //
-// A BLOCKOUT: areas 1 to 6 are laid out; east of the hauler the yard is
-// bare ground with blocks standing in for the crane's legs (PLAN.md, item
-// 12). Textures are stand-ins from the other levels' sets.
+// A BLOCKOUT: every area is laid out and the route runs from the pier to
+// the apron (PLAN.md, item 12). Textures are stand-ins from the other
+// levels' sets, and blocks stand in for the great crane's legs.
 
 const W = 352;
 const H = 144;
@@ -328,14 +328,93 @@ p.rect(260, 70, 262, 84, kit.roofCell({ h: BRIDGE + 1, ...HULL }));
 p.rect(244, 86, 250, 92, kit.roofCell({ h: BRIDGE + 1, ...HULL }));
 // The door in its south wing, onto the gangway to the crane way.
 kit.arch(252, 86, 256, 92, { h: 17, lintel: 3, floorZ: BRIDGE, wall: T.hull, roof: T.hull, floor: T.grate });
-// (Blockout: the level ends here until the crane way is built.)
-p.rect(252, 90, 256, 92, (x, y, c) => ({ ...c, exit: true }));
 // The ship's lamps: dark until the reactor runs.
 for (const [x, y, z] of [[214, 76, 4.5], [226, 80, 4.5], [236, 72, 4.5], [216, 72, 9], [236, 80, 9], [251, 70, 9], [251, 84, 9]]) {
   lamps.push({ x, y, z, radius: 7, light: 8, tag: 'hauler-lamps' });
 }
+// The only way past the hauler is through it: a shed along its north
+// side, a winch house across the quay at its stern.
+kit.block(206, 56, 262, 60, { h: 10, wall: T.shackB });
+kit.block(244, 92, 250, 104, { h: 8, wall: T.shackC });
+
+// ---------------------------------------------------------------- 7. the crane way
+// A crane rail on trestles along the quay, 12 up, from the bridge's
+// gangway to the great crane's leg: a grate deck 2 m wide over the quay,
+// the water beyond its south rail. A gap three tiles long to jump; a
+// hoist back up for anyone who falls.
+const RAIL = 12;
+const way = ground(0, T.quay, { slab: { bottom: RAIL - 0.5, top: RAIL, floor: T.grate, ceiling: T.grate, side: T.step, light: DAY } });
+const wayRail = { tex: T.railing, height: 0.75 };
+p.rect(252, 92, 256, 96, way);
+p.rect(252, 96, 298, 100, way);
+p.rect(276, 96, 279, 100, ground(0));
+p.fence(252, 92, 253, 96, 'W', wayRail).fence(255, 92, 256, 96, 'E', wayRail);
+p.fence(256, 96, 298, 97, 'N', wayRail).fence(252, 99, 298, 100, 'S', wayRail).fence(252, 96, 253, 100, 'W', wayRail);
+// The hoist, beside the rail west of the gap. (A lift can't hold a slab:
+// the rail's south fence is open where it comes up.)
+p.rect(266, 100, 270, 102, ground(0, 'lift-floor', { side: T.step, lift: { stops: [0, RAIL], wait: 3 } }));
+p.rect(266, 99, 270, 100, way);
+// 7a. Berth 3, under the rail's north side: a hull down to its keel
+// and ribs (models to come). Secret 4 is on the keel.
+p.rect(280, 76, 284, 78, ground(0.5, T.yard, { secret: true }));
+// A slip into the water, the way out of the harbour at this end.
+p.stairs(284, 104, 288, 112, 'S', -0.5, -0.5, (z) => ground(z));
+
+// ---------------------------------------------------------------- 8. the great crane's cab
+// The crane's legs (blocks standing in for the model), the cab in the
+// south one at the rail's height: the dock officer and the red keycard,
+// a window east over the dry dock, a lift down its north side.
 kit.block(298, 92, 308, 104, { h: 30, wall: T.step, roof: T.step });
-kit.block(298, 54, 308, 62, { h: 30, wall: T.step, roof: T.step });
+kit.block(298, 54, 308, 60, { h: 30, wall: T.step, roof: T.step });
+kit.room(299, 93, 307, 103, { h: 30, floorZ: RAIL, ceilZ: RAIL + 4, floor: T.grate, ceiling: T.ceiling, wall: T.step, roof: T.step, light: 152 });
+kit.arch(298, 96, 299, 100, { h: 30, lintel: 3, floorZ: RAIL, wall: T.step, roof: T.step, floor: T.grate });
+p.rect(307, 95, 308, 101, (x, y, c) => ({ ...p.get(306, 98), floorZ: RAIL + 1, side: T.step }));
+kit.arch(300, 92, 304, 93, { h: 30, lintel: 3, floorZ: RAIL, wall: T.step, roof: T.step, floor: T.grate });
+p.rect(300, 88, 304, 92, ground(RAIL, 'lift-floor', { side: T.step, lift: { stops: [RAIL, 0], wait: 3 } }));
+
+// ---------------------------------------------------------------- 9. Berth 4: the dry dock
+// Long axis north to south: the floor 7.5 down, its west and east sides
+// stepping down in two terraces 4 wide, the head wall sheer at the north
+// end, the caisson and the sea at the south. Flights run along the west
+// terraces at opposite ends, so the walk down is a zigzag.
+const DOCK = -7.5;
+const dock = (z) => ground(z, T.quay, { light: 152 });
+p.rect(312, 60, 342, 100, dock(-2.5));
+p.rect(316, 60, 338, 100, dock(-5));
+p.rect(320, 60, 334, 100, dock(DOCK));
+p.stairs(312, 96, 314, 100, 'S', -2, 0.5, dock);
+p.rect(314, 60, 316, 66, (x, y) => dock(Math.max(-5, -3 - (65 - y) * 0.5)));
+p.rect(318, 94, 320, 100, (x, y) => dock(Math.max(DOCK, -5.5 - (y - 94) * 0.5)));
+// Keel blocks down the middle (the crates and the shuttle stand on the
+// floor between them).
+for (let y = 66; y < 96; y += 6) p.rect(326, y, 328, y + 2, dock(DOCK + 1));
+// The dock's head: a building across its north end, the dispatch office
+// in it at the floor's height behind the red door.
+kit.block(308, 56, 346, 60, { h: 6, wall: T.seaWall });
+
+// ---------------------------------------------------------------- 10. dispatch office and the apron
+p.rect(324, 58, 330, 60, { wall: T.machine });
+p.rect(325, 58, 329, 60, skyDoor(DOCK, 6, { lock: 'red' }));
+p.rect(320, 46, 334, 58, room(DOCK, DOCK + 4, { light: 144 }));
+// The manifest's terminal, in the north wall.
+p.rect(325, 45, 327, 46, {
+  wall: T.switchOff,
+  switchTo: T.switchOn,
+  use: [
+    { action: 'setFlag', flag: 'manifest' },
+    { action: 'message', text: "MANIFEST: REACTOR CORES, 40. HULL ALLOY, 600 TONNES. CONSIGNEE: 'ARC HAMMER'. NO PORT GIVEN." },
+    { action: 'sound', id: 'alarm-klaxon' },
+    { action: 'spawn', thing: 'bossk', tag: 'bossk-spot', wake: false, fog: false, angle: 270 },
+    { action: 'spawn', thing: 'stormtrooper', tag: 'apron-squad', wake: false, fog: false, angle: 270 },
+  ],
+});
+// Its lift up to the apron, and the apron: the pickup spot.
+p.rect(330, 42, 334, 46, room(DOCK, 4, { floor: 'lift-floor', side: T.step, lift: { stops: [DOCK, 0], wait: 3 } }));
+kit.arch(330, 40, 334, 42, { h: 12, lintel: 4, floor: T.quay });
+p.rect(314, 22, 344, 40, ground(0));
+p.rect(324, 26, 332, 32, (x, y, c) => ({ ...c, tag: 'crow' }));
+p.set(318, 30, { ...p.get(318, 30), tag: 'bossk-spot' });
+for (const [x, y] of [[322, 36], [338, 34], [340, 26]]) p.set(x, y, { ...p.get(x, y), tag: 'apron-squad' });
 
 // A room indoors (a ceiling, not the sky) inside a building shows from
 // outside as a wall up to the sky, wherever something looks over the
@@ -374,6 +453,13 @@ const list = [
   at('stormtrooper', 250.5, 69.5, { angle: 180 }),
   at('freighter', HOLD.x, HOLD.y, { angle: 0, lit: DAY }),
   at('energy-cell', 181, 60), at('med-kit', 243.5, 84.5), at('energy-pack', 237, 88.5),
+  // The crane way to the dock: one on the cab's side of the gap, the
+  // dock officer in the cab (the red keycard), three in the dock.
+  at('stormtrooper', 292.5, 98, { angle: 180, z: RAIL }),
+  at('officer', 304.5, 98.5, { angle: 180, drops: ['keycard-red'] }),
+  at('stormtrooper', 323.5, 70.5, { angle: 90 }), at('stormtrooper', 331.5, 86.5, { angle: 90 }), at('stormtrooper', 317.5, 80.5, { angle: 180 }),
+  at('lambda-shuttle', 327, 44 + 36, { angle: 90, z: DOCK }),
+  at('energy-pack', 282, 77, { z: 0.5 }), at('med-kit', 301, 101.5), at('med-kit', 322, 56),
   // Secret 1 and 2.
   at('shield-unit', 18, 127), at('energy-pack', 44, 33),
 ];
@@ -395,6 +481,8 @@ export default defineLevel({
   things: [],
   list: [...list, ...kit.things],
   triggers: [
+    // The way out: the pickup spot on the apron, once the manifest is taken.
+    { on: 'enter', tag: 'crow', if: 'manifest', do: [{ action: 'message', text: "JAN: I SEE YOU. AND I SEE WHO'S BEHIND YOU. GET IN." }, { action: 'exit' }] },
     // The hauler's cargo lift: dead until the reactor runs.
     { on: 'enter', tag: 'cargo-lift', unless: 'power', once: false, do: [{ action: 'message', text: 'CARGO LIFT: NO POWER.' }] },
     { on: 'enter', tag: 'cargo-lift', if: 'power', once: false, do: [{ action: 'lift', tag: 'cargo-lift' }] },

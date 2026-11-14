@@ -28,6 +28,14 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
+- **Mission 5's blockout: Breakers' Row** (`?map=m5`, 2026-11-14;
+  `docs/mission5.md`). Every area is laid out in stand-in textures and
+  the route runs from the pier to the apron: nothing is dressed, the sky
+  is Mission 2's, the crane is two blocks, and there are twelve troopers
+  in all. To judge: the flow and whether you always know where to go;
+  the sizes (the Bottoms' street, the hauler's hold, the dock); the
+  climb through the hauler and the jump on the crane way; anything that
+  drags. `?map=m5&god` to walk it without the fights.
 - **The TIE rebuilt from Mark's schematic** (`?map=m4`, 2026-11-13). Canon
   proportions at 0.8: wings 11.4 long and 14 tall (were 8 by 10), the ball
   4 across, its top now 14.4. Grey frame and spokes over plain black panels  (Mark: no lines), the hub through the wing, the angled pylons, a framed window
@@ -1730,14 +1738,18 @@ taken. The blockout steps are in order, one session at a time.
       room, the lift at the cut face, crew deck and cabins, aft stair,
       bridge). The `power` flag: lift, lamps, the squad. The level ends
       at the bridge's south door until the crane way is there.
-- [ ] **Blockout C, areas 7 to 10** (gangway, crane way with its gap and
-      hoist, Berth 3 below, the cab and its lift, the dry dock's
-      terraces and flights, the office, its lift, the apron, the exit
-      `if` `manifest`). Red keycard on the cab's officer.
-- [ ] **The route walked by a test** (`tests/m5-route.test.js`): it
-      walks from the pier to the bridge now; extend it with blockout C.
-      Then frame time on the cutting floor and in the dock
-      (`tools/bench.mjs`), before any dressing.
+- [x] Blockout C, areas 7 to 10 (gangway, crane way with its gap and
+      hoist, the cab and its lift, the dry dock's terraces and flights,
+      the office behind the red door, its lift, the apron, the exit `if`
+      `manifest`; Bossk and a squad spawn on the apron). The route is
+      walked start to exit by `tests/m5-route.test.js`.
+- [ ] **Found in blockout C:** the worst frames (37 ms at 640 x 400,
+      against 18 on average) are looks along the open quay. When
+      dressing, stand cargo and sheds on it so no view runs its whole
+      length, and measure again (`node tools/bench.mjs m5 --res 2
+      --worst 5`).
+- [ ] **Mark plays the blockout** (Waiting on Mark): the flow, the
+      sizes, the heights, before the kit and dressing go on.
 - [ ] (parallel) **Textures**: a CORELLIA set in
       `assets/custom/derive.mjs` from the Dark Forces pack (the design
       lists them: quay concrete, sea wall, shack walls, shutter, harbour
