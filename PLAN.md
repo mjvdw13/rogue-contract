@@ -28,6 +28,15 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
+- **Mission 5's design: Breakers' Row, on Corellia** (`docs/mission5.md`,
+  2026-11-14). A ship-breaking yard on the Coronet waterfront: ten areas
+  in a line from a pier, through a slum street and a pipe gallery, down a
+  row of four berths (the light freighter from Mos Eisley, a bulk hauler
+  cut in half and climbed from bilge to bridge, a hull down to its ribs, a
+  dry dock) to the great crane, seen from the start. Nothing is built. To
+  judge before the blockout: the flow and the areas; the story proposal
+  (the manifest names the Arc Hammer; Bossk as the last fight or not);
+  the name.
 - **The TIE rebuilt from Mark's schematic** (`?map=m4`, 2026-11-13). Canon
   proportions at 0.8: wings 11.4 long and 14 tall (were 8 by 10), the ball
   4 across, its top now 14.4. Grey frame and spokes over plain black panels  (Mark: no lines), the hub through the wing, the angled pylons, a framed window
@@ -1696,6 +1705,87 @@ cold cache costs only 7%. So changes that keep every pixel are worth
   - The palette lookup in the shader, not in a loop (the frame goes to
     the card as 1 byte a pixel): about 0.1 ms at 1x, 0.3 at 2x. Nothing
     looks different. Small.
+
+### 12. Mission 5: Breakers' Row, Corellia (Mark, 2026-11-14)
+
+A level in a Corellian ship-breaking yard, built on the look of Mission
+1's gutted freighter (its textures, the panels off, the hanging wires and
+sparks, the haze). The design (story proposal, flow, areas with boxes,
+the kit, light, secrets, risks) is `docs/mission5.md`: read it first.
+Painted in code as Missions 3 and 4 are (`src/content/levels/m5.js`).
+Each step is a commit, playable at `?map=m5`. Area numbers are the
+design's.
+
+Steps marked (parallel) don't touch `m5.js` and can be done by another
+session at the same time as the blockout; say here which one you've
+taken. The blockout steps are in order, one session at a time.
+
+- [x] Design: `docs/mission5.md`.
+- [ ] Mark's nod on the design (Waiting on Mark) before the blockout.
+- [ ] **Blockout A, areas 1 to 3** (pier, quay, sea wall, the Bottoms,
+      pump house, pipe gallery): `m5.js` with stand-in textures from
+      the existing sets (`hold-*`, `derelict-*`, `metal-rust`), the
+      level in `levels/index.js` (not in the episode), the start, the
+      sluice switch and door, a plain sky and the haze. Shacks as
+      volumes with alleys, the slant, the two changes of level. A
+      `mapview` and four snapshots looked at. Check the first risk here:
+      put a stand-in block where the crane will be and see what the haze
+      leaves of it from the pier and the upper street.
+- [ ] **Blockout B, areas 4 to 6** (Berth 1 with Mission 1's freighter
+      and the steps up through its deck; the cutting floor; the hauler:
+      hold, bulkhead, reactor room, the lift at the cut face, crew deck,
+      aft stair, bridge). The `power` flag: lift, lights, the squad.
+      Two storeys a tile at most (the design's engine notes).
+- [ ] **Blockout C, areas 7 to 10** (gangway, crane way with its gap and
+      hoist, Berth 3 below, the cab and its lift, the dry dock's
+      terraces and flights, the office, its lift, the apron, the exit
+      `if` `manifest`). Red keycard on the cab's officer.
+- [ ] **The route walked by a test** (`tests/m5-route.test.js`, as
+      `m4-route`): start to exit with no monsters, every gate in order.
+      Frame time on the cutting floor and in the dock
+      (`tools/bench.mjs`), before any dressing.
+- [ ] (parallel) **Textures**: a CORELLIA set in
+      `assets/custom/derive.mjs` from the Dark Forces pack (the design
+      lists them: quay concrete, sea wall, shack walls, shutter, harbour
+      water, slag ground, wet dock concrete, crane paint, the hull's cut
+      section, berth numbers 1 to 4 and an Aurebesh sign as decals), with
+      generated stand-ins in `tools/art` so tests see them.
+- [ ] (parallel) **The sky**: `sky-corellia`, once round (`skyWrap: 1`):
+      overcast, a dirty yellow glow and a pale sun low in the east, smoke.
+      Far shapes painted in: stacks, yard platforms over the water.
+- [ ] (parallel) **Models, the yard's big pieces** (`models/yard5.js` or
+      as fits): the great gantry crane (legs, beam, cab, hook, beacons),
+      the crane way's trestle and rail, the ribs of Berth 3, keel blocks,
+      a smokestack, a hoist. Snapshots in the sandbox.
+- [ ] (parallel) **Models, the small pieces**: `hold-rib` taking a span
+      (the hauler's hold is 24 wide; Mission 1's must come out the same),
+      a long run of hanging wires, the fallen deck's edge, plate stacks,
+      a cutting torch on a stand (sparks, `weld-arc`), lamp post,
+      bollard, shack dressing (lean-to, vent stack, the lit sign).
+- [ ] **Dressing, area by area**, with snapshots (`--custom`), swapping
+      the stand-ins for the kit: 1 and 2; 3 and 4; 5; 6 (the most work:
+      ribs, wires, panels, grime, before and after the power); 7 and 8;
+      9 and 10. One commit an area or pair. Dressing has a purpose, and
+      it's sci-fi (canisters, pods, droid parts).
+- [ ] **Light and air**: the haze's colour and half distance, soot
+      flakes (`weather`), the wind, smoke from the stacks and the
+      furnace, steam in the pump house and the hauler, lamps and pools
+      by the design's numbers, the reactor's change of light.
+- [ ] **The skyline**: the slum climbing behind the sea wall, the stacks,
+      the platforms (a backdrop or scenery blocks; `lib/backdrop.js` is
+      a canyon's, so this may want its own).
+- [ ] **Fights and items**: enemies by skill (a table in the design, as
+      Mission 4's), beats for the patrols, the sweep squad, the hold's
+      ambush on `power`, the dock, the apron; pickups, a weapon each
+      third; the four secrets. The validator's ammo budget near Missions
+      3 and 4's (about 12).
+- [ ] **Words and sound**: Jan's lines and the yard's PA at each gate
+      (stand-ins), the dead lift's message, the manifest; a harbour
+      ambience (gulls are out: machinery, a horn far off), the reactor's
+      start; a song (`corellia`) or a stand-in from the existing ones.
+- [ ] **Checked**: `npm test`, `npm run validate`, smoke; the design's
+      "Checked" section (route time, frame times, what nobody has played).
+      Then under Waiting on Mark: the look, the fights, the song.
 
 ## Small fixes and known rough edges
 
