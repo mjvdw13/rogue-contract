@@ -375,9 +375,8 @@ export const STATION = [
   // Skins for the models (models/station.js): the TIE fighter's solar
   // panel as Dark Forces drew it, its hull, machinery and window; crates;
   // consoles; plain metals and lamps.
-  // The wing's panels as in Mark's schematic: black, fine lines up them
-  // (the model fans them out from the hub).
-  { out: 'tie-wing', paint: 'tieWing', size: [64, 64], panel: [10, 11, 14], line: [40, 43, 52], every: 3 },
+  // The wing's panels: plain black (Mark, 2026-11-13); the frame and spokes are modelled.
+  { out: 'tie-wing', paint: 'flat', size: [16, 16], color: [10, 11, 14] },
   { out: 'tie-hull', df: 'IPGRDBLY', gradient: [[40, 46, 58], [84, 91, 111], [108, 114, 134], [144, 150, 168], [176, 184, 200]], keep: 0, contrast: 0.8 },
   { out: 'tie-dark', df: 'ENGTEXTS', scale: [32, 32], gradient: [[6, 6, 8], [20, 21, 26], [36, 38, 46], [56, 60, 72]], keep: 0, contrast: 1 },
   { out: 'tie-window', paint: 'tieWindow', size: [64, 64], glass: [20, 26, 38], frame: [144, 150, 168] },
@@ -923,11 +922,6 @@ const PAINT = {
     return img;
   },
   /** The TIE fighter's window: dark glass in a ring, eight spokes to a hub. */
-  tieWing({ size: [w, h], panel, line, every }) {
-    const img = blank(w, h, [...panel, 255]);
-    for (let x = 1; x < w; x += every) fillRect(img, x, 0, 1, h, [...line, 255]);
-    return img;
-  },
   tieWindow({ size: [w, h], glass, frame }) {
     const img = blank(w, h, [...frame, 255]);
     const c = w / 2;
