@@ -6,9 +6,10 @@ import { ModelBuilder } from './lib/build.js';
 // +x (east at angle 0) unless said.
 //
 // `tie-fighter`: a TIE/LN parked on the hangar deck in a low cradle (a rail
-// under each wing, a beam between them), at about 0.8 of canon: two
-// hexagonal solar wings TIE.wing either side, the ball cockpit between them
-// on its pylons, the round window forward. It collides along its wings, its
+// under each wing, a beam between them), at 0.8 of canon in the proportions of
+// Mark's schematic (2026-11-13): two hexagonal solar wings, 11.4 long and
+// 14 tall, TIE.wing either side, the ball cockpit (4 across) between them
+// on its pylons, the framed window forward. It collides along its wings, its
 // cradle and across under the ball.
 //
 // `tie-rack`: the gantry a TIE hangs from: two rails along y, RACK.half
@@ -61,9 +62,9 @@ import { ModelBuilder } from './lib/build.js';
 // the cockpit. It collides as its body's outline.
 
 /** The TIE: its wings' planes (either side of the middle), its ball's centre height and radius, its top. */
-export const TIE = { wing: 5, z: 5.3, ball: 1.8, top: 10.3 };
+export const TIE = { wing: 5, z: 7.4, ball: 2, top: 14.4 };
 /** The rack: its rails' reach along y, how far its jaws hang below the ceiling, and how high over a deck it holds a parked TIE. */
-export const RACK = { half: 6, drop: 1.2, over: 11.1 };
+export const RACK = { half: 6, drop: 1.2, over: 15.2 };
 /** The console: its reach along y, its depth, its top. */
 export const DESK = { half: 1, depth: 0.9, top: 1.1 };
 /** The wall bank: its reach along y, its depth out of the wall, its top. */
@@ -153,70 +154,94 @@ const facing = (m, x, [y0, y1], [z0, z1], style) => m.face([[x, y0, z1], [x, y1,
 
 function tieFighter() {
   const m = new ModelBuilder('tie-fighter');
-  const { wing: Y, z: ZC } = TIE;
-  // A wing: a hexagon 8 long and 10 tall, pointed fore and aft, its six
-  // solar panels round a hub, a dark spoke to each corner and a dark rim.
-  const HEX = [[4, 0], [2, 5], [-2, 5], [-4, 0], [-2, -5], [2, -5]];
-  const T = 0.1;
-  const HUB = 0.22;
+  const { wing: Y, z: ZC, ball: R } = TIE;
+  // A wing (the schematic's side view): a hexagon 11.4 long and 14 tall,
+  // flat along its top and bottom and pointed fore and aft. A grey frame
+  // round its edge and a grey spoke from the hub to each corner, over six
+  // black panels whose lines fan out from the hub.
+  const HEX = [[5.7, 0], [4, 7], [-4, 7], [-5.7, 0], [-4, -7], [4, -7]];
+  const T = 0.12;
+  const HUB = 0.23;
+  const RIM = 0.955;
   for (const s of [-1, 1]) {
-    // (`out` is away from the ball.)
+    // A point on the wing at `k` of the way out to corner [x, z], `out` from its middle plane (away from the ball).
     const P = ([x, z], k, out) => [x * k, s * (Y + out), ZC + z * k];
     const inside = [0, s * Y, ZC];
     for (let i = 0; i < 6; i++) {
       const [a, b] = [HEX[i], HEX[(i + 1) % 6]];
-      m.face([P(a, 1, T), P(b, 1, T), P(b, 1, -T), P(a, 1, -T)], DARK, inside);
+      m.face([P(a, 1, T), P(b, 1, T), P(b, 1, -T), P(a, 1, -T)], HULL, inside);
       const l = Math.hypot(...a);
-      const p = [(-a[1] / l) * 0.14, (a[0] / l) * 0.14];
+      const w = 0.19 / l;
+      const p = [-a[1] * w, a[0] * w];
       for (const o of [-1, 1]) {
-        // One panel of the six: the texture's foot along the wing's edge.
-        m.face([P(a, HUB, o * T), P(b, HUB, o * T), P(b, 1, o * T), P(a, 1, o * T)], { tex: 'tie-wing', uv: [[0.5 - HUB / 2, HUB], [0.5 + HUB / 2, HUB], [1, 1], [0, 1]] }, inside);
-        const Q = (k, w) => [a[0] * k + p[0] * w, s * (Y + o * (T + 0.02)), ZC + a[1] * k + p[1] * w];
-        m.face([Q(HUB, -1), Q(HUB, 1), Q(0.97, 1), Q(0.97, -1)], DARK, inside);
+        // The panel, the texture's foot along the wing's edge; the frame
+        // along that edge; the spoke out to corner `a`, a little proud.
+        m.face([P(a, HUB, o * T), P(b, HUB, o * T), P(b, RIM, o * T), P(a, RIM, o * T)], { tex: 'tie-wing', uv: [[0.5 - HUB / 2, HUB], [0.5 + HUB / 2, HUB], [1, 1], [0, 1]] }, inside);
+        m.face([P(a, RIM, o * T), P(b, RIM, o * T), P(b, 1, o * T), P(a, 1, o * T)], HULL, inside);
+        const Q = (k, d) => [a[0] * k + p[0] * d, s * (Y + o * (T + 0.03)), ZC + a[1] * k + p[1] * d];
+        m.face([Q(HUB, -1), Q(HUB, 1), Q(RIM, 1), Q(RIM, -1)], HULL, inside);
       }
     }
-    // The hub: a plate outside, and inside the boss the pylon runs into.
-    m.face(HEX.map((h) => P(h, HUB + 0.04, T + 0.04)), IRON, inside);
-    const boss = (k) => HEX.map(([x, z]) => [x * k, ZC + z * k]);
-    m.loft(boss(0.3), s * (Y - T), boss(0.2), s * (Y - T - 0.4), { axis: 'y', ...IRON, bottom: false });
-    // The pylon, broad at the ball and narrowing to the wing.
-    const rect = (a, b) => [[-a, ZC - b], [a, ZC - b], [a, ZC + b], [-a, ZC + b]];
-    m.loft(rect(0.95, 0.75), s * 1.3, rect(0.5, 0.42), s * (Y - T - 0.4), { axis: 'y', ...HULL, top: false, bottom: false });
+    // The hub: a hexagonal block through the wing, a round boss on its
+    // outer face, and on its inner face the pylon.
+    const hub = (k) => HEX.map(([x, z]) => [x * k, ZC + z * k]);
+    m.prism(hub(HUB), s * (Y - 0.5), s * (Y + 0.45), { axis: 'y', ...HULL });
+    m.loft(hub(0.13), s * (Y + 0.45), hub(0.1), s * (Y + 0.65), { axis: 'y', ...IRON, bottom: false });
+    m.cylinder([0, s * (Y + 0.65), ZC], 0.25, s * 0.12, { axis: 'y', segments: 8, ...DARK, bottom: false });
+    // The pylon: grey on top, broad at the ball and narrowing to the wing,
+    // its underside a dark wedge that drops away under it toward the wing.
+    const top = (a, lo, hi) => [[-a, lo], [a, lo], [a, hi], [-a, hi]];
+    m.loft(top(0.85, ZC - 0.25, ZC + 1), s * 1.2, top(0.6, ZC - 0.15, ZC + 0.5), s * (Y - 0.5), { axis: 'y', ...HULL, top: false, bottom: false });
+    const under = (a, b, hi, lo) => [[-b, lo], [b, lo], [a, hi], [-a, hi]];
+    m.loft(under(0.8, 0.35, ZC - 0.25, ZC - 1.05), s * 1.2, under(0.55, 0.4, ZC - 0.15, ZC - 1.25), s * (Y - 0.5), { axis: 'y', ...DARK, top: false, bottom: false });
   }
 
-  // The ball: rings round its fore-and-aft axis, the window its front, the
-  // engines' plate its back.
-  const ring = (r) => Array.from({ length: 10 }, (_, i) => {
-    const a = Math.PI / 10 + (i / 10) * Math.PI * 2;
+  // The ball, 4 across: rings round its fore-and-aft axis. Forward, the
+  // window in a raised frame; aft, a round plate.
+  const N = 12;
+  const ring = (r) => Array.from({ length: N }, (_, i) => {
+    const a = Math.PI / N + (i / N) * Math.PI * 2;
     return [Math.cos(a) * r, ZC + Math.sin(a) * r];
   });
-  const RINGS = [[-1.5, 1], [-0.85, 1.59], [0, TIE.ball], [0.85, 1.59], [1.5, 1]];
-  const WINDOW = { tex: 'tie-window', uv: ring(1).map(([y, z]) => [0.5 - y / 2, 0.5 - (z - ZC) / 2]) };
+  const at = (x) => [x, Math.sqrt(R * R - x * x)];
+  const RINGS = [at(-1.78), at(-1.3), at(-0.65), [0, R], at(0.65), at(1.25), at(1.58)];
+  const BACK = { ...IRON };
   for (let i = 0; i + 1 < RINGS.length; i++) {
     const [[x0, r0], [x1, r1]] = [RINGS[i], RINGS[i + 1]];
-    m.loft(ring(r0), x0, ring(r1), x1, { axis: 'x', ...HULL, bottom: i === 0 ? DARK : false, top: i === 3 ? WINDOW : false });
+    m.loft(ring(r0), x0, ring(r1), x1, { axis: 'x', ...HULL, bottom: i === 0 ? BACK : false, top: false });
   }
-  // The twin ion engines, red in the back plate; the hatch on top; the two
-  // cannons under the window.
-  for (const y of [-0.4, 0.4]) m.face([[-1.52, y - 0.17, ZC + 0.1], [-1.52, y + 0.17, ZC + 0.1], [-1.52, y + 0.17, ZC - 0.1], [-1.52, y - 0.17, ZC - 0.1]], RED, [0, 0, ZC]);
-  m.cylinder([0, 0, ZC + TIE.ball - 0.12], 0.6, 0.22, { segments: 8, ...IRON, bottom: false });
-  for (const y of [-0.45, 0.45]) m.box([0.95, y - 0.07, ZC - 1.12], [1.8, y + 0.07, ZC - 0.98], IRON);
+  // The window's frame stands out from the ball, the glass set in it.
+  const [xw, rw] = RINGS[RINGS.length - 1];
+  const WR = rw - 0.12;
+  const WINDOW = { tex: 'tie-window', uv: ring(WR).map(([y, z]) => [0.5 - y / (2 * WR), 0.5 - (z - ZC) / (2 * WR)]) };
+  m.loft(ring(rw), xw, ring(WR), xw + 0.16, { axis: 'x', ...IRON, bottom: false, top: WINDOW });
+  // The back plate: a hexagon in its middle, a red lamp either side.
+  const back = RINGS[0][0];
+  m.prism(Array.from({ length: 6 }, (_, i) => [Math.cos((i * Math.PI) / 3) * 0.32, ZC + Math.sin((i * Math.PI) / 3) * 0.32]), back - 0.08, back, { axis: 'x', ...DARK, top: false });
+  for (const y of [-0.6, 0.6]) m.face([[back - 0.01, y - 0.07, ZC + 0.07], [back - 0.01, y + 0.07, ZC + 0.07], [back - 0.01, y + 0.07, ZC - 0.07], [back - 0.01, y - 0.07, ZC - 0.07]], RED, [0, 0, ZC]);
+  // The hatch on top; the two cannons under the window, red at their mouths.
+  m.cylinder([0, 0, ZC + R - 0.1], 0.65, 0.22, { segments: 8, ...IRON, top: HULL, bottom: false });
+  m.cylinder([0, 0, ZC + R + 0.12], 0.3, 0.05, { segments: 6, ...DARK, bottom: false });
+  for (const y of [-0.6, 0.6]) {
+    m.box([1.05, y - 0.09, ZC - 1.38], [1.72, y + 0.09, ZC - 1.2], IRON);
+    m.face([[1.73, y - 0.06, ZC - 1.23], [1.73, y + 0.06, ZC - 1.23], [1.73, y + 0.06, ZC - 1.35], [1.73, y - 0.06, ZC - 1.35]], RED, [0, 0, ZC]);
+  }
 
   // The cradle: a rail under each wing with two cheeks holding its foot,
   // and a beam between the rails.
   for (const s of [-1, 1]) {
-    m.box([-3, s * Y - 0.5, 0], [3, s * Y + 0.5, 0.35], { ...IRON, bottom: false });
-    for (const x of [-2.4, 2.4]) m.box([x - 0.2, s * Y - 0.32, 0.35], [x + 0.2, s * Y + 0.32, 1.2], { ...METAL, bottom: false });
+    m.box([-4.4, s * Y - 0.5, 0], [4.4, s * Y + 0.5, 0.35], { ...IRON, bottom: false });
+    for (const x of [-3.2, 3.2]) m.box([x - 0.2, s * Y - 0.32, 0.35], [x + 0.2, s * Y + 0.32, 1.3], { ...METAL, bottom: false });
   }
   m.box([-0.3, -Y + 0.5, 0], [0.3, Y - 0.5, 0.2], { ...IRON, bottom: false });
-  m.face([[4.6, -Y - 1, 0.01], [4.6, Y + 1, 0.01], [-4.6, Y + 1, 0.01], [-4.6, -Y - 1, 0.01]], SHADOW, [0, 0, -1]);
+  m.face([[6.2, -Y - 1, 0.01], [6.2, Y + 1, 0.01], [-6.2, Y + 1, 0.01], [-6.2, -Y - 1, 0.01]], SHADOW, [0, 0, -1]);
 
   // Collision: the rails, the wings past them, and across under the ball
   // (nobody gets in between the wings behind it and stuck).
   for (const s of [-1, 1]) {
-    m.outlineLines([[-3, s * Y - 0.5], [3, s * Y - 0.5], [3, s * Y + 0.5], [-3, s * Y + 0.5]]);
-    m.line(-4, s * Y, -3, s * Y);
-    m.line(3, s * Y, 4, s * Y);
+    m.outlineLines([[-4.4, s * Y - 0.5], [4.4, s * Y - 0.5], [4.4, s * Y + 0.5], [-4.4, s * Y + 0.5]]);
+    m.line(-5.7, s * Y, -4.4, s * Y);
+    m.line(4.4, s * Y, 5.7, s * Y);
   }
   m.line(0, -Y + 0.5, 0, Y - 0.5);
   return m.build();

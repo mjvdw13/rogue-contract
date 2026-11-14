@@ -154,7 +154,7 @@ for (const [x, y] of [[20, 55], [34, 55], [46, 55], [60, 55], [74, 55], [30, 104
 for (const y of [61, 99]) lamps.push({ x: 16.7, y, z: 9.5, radius: 5, light: 64, fx: 'blink', min: 0, sync: 'mouth' });
 for (const y of [115.4, 138.6]) lamps.push({ x: 16.7, y, z: 14.5, radius: 5, light: 64, fx: 'blink', min: 0, sync: 'mouth' });
 // The east TIE's cockpit frame being welded: the arc's flicker.
-lamps.push({ x: 69, y: 65.4, z: 3.8, radius: 5, light: 96, fx: 'flicker', min: 0 });
+lamps.push({ x: 69, y: 65.4, z: 5.8, radius: 5, light: 96, fx: 'flicker', min: 0 });
 // The tiles under the Crow: the way out, once the beam is off.
 p.rect(36, 77, 44, 83, (x, y, old) => ({ ...old, tag: 'crow' }));
 
@@ -466,7 +466,7 @@ const list = [
   at('mouse-droid', 58.5, 76.5), at('mouse-droid', 30.5, 92.5),
   // Three TIE fighters in their cradles along the north wall, a rack over
   // each; a shuttle and cargo in the south-east; lamp bars under the roof.
-  ...[25, 55, 69].flatMap((x) => [at('tie-fighter', x, 63.5, { angle: 270 }), at('tie-rack', x, 63.5, { angle: 270, z: 12.3 })]),
+  ...[25, 55, 69].flatMap((x) => [at('tie-fighter', x, 63.5, { angle: 270 }), at('tie-rack', x, 63.5, { angle: 270, z: 16.4 })]),
   at('lambda-shuttle', 66.5, 82.5, { angle: 180 }),
   at('ds-container', 74, 92.5, { angle: 90 }), at('ds-container', 76.5, 88, { angle: 0 }),
   at('ds-crate', 71, 95.5), at('ds-crate-tall', 72.8, 95.5), at('ds-crate', 60.5, 97),
@@ -650,9 +650,9 @@ export default defineLevel({
   decals,
   hangings: [
     // Fuel hoses from the wall to the two west TIEs' balls.
-    ...[25, 55].map((x) => ({ type: 'hose', from: [x + 2.75, 56.45, 0.6], to: [x + 0.3, 62.9, 3.6], sag: 1.6 })),
+    ...[25, 55].map((x) => ({ type: 'hose', from: [x + 2.75, 56.45, 0.6], to: [x + 0.3, 62.6, 5.65], sag: 1.6 })),
     // The power droid's lead up to the welder's torch.
-    { type: 'cable', from: [71.4, 67.2, 0.7], to: [69.5, 66.1, 3.45], sag: 0.5 },
+    { type: 'cable', from: [71.4, 67.2, 0.7], to: [69.5, 66.1, 5.45], sag: 0.5 },
     // The hoisted panel's cables up to the gallery's ceiling.
     ...[-0.85, 0.85].map((dy) => ({ type: 'cable', from: [22, 128 + dy, 15.1], to: [22, 128 + dy * 1.4, 19.95], sag: 0.05 })),
   ],

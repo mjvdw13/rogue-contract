@@ -375,7 +375,9 @@ export const STATION = [
   // Skins for the models (models/station.js): the TIE fighter's solar
   // panel as Dark Forces drew it, its hull, machinery and window; crates;
   // consoles; plain metals and lamps.
-  { out: 'tie-wing', df: 'TIEWNG' },
+  // The wing's panels as in Mark's schematic: black, fine lines up them
+  // (the model fans them out from the hub).
+  { out: 'tie-wing', paint: 'tieWing', size: [64, 64], panel: [10, 11, 14], line: [40, 43, 52], every: 3 },
   { out: 'tie-hull', df: 'IPGRDBLY', gradient: [[40, 46, 58], [84, 91, 111], [108, 114, 134], [144, 150, 168], [176, 184, 200]], keep: 0, contrast: 0.8 },
   { out: 'tie-dark', df: 'ENGTEXTS', scale: [32, 32], gradient: [[6, 6, 8], [20, 21, 26], [36, 38, 46], [56, 60, 72]], keep: 0, contrast: 1 },
   { out: 'tie-window', paint: 'tieWindow', size: [64, 64], glass: [20, 26, 38], frame: [144, 150, 168] },
@@ -921,6 +923,11 @@ const PAINT = {
     return img;
   },
   /** The TIE fighter's window: dark glass in a ring, eight spokes to a hub. */
+  tieWing({ size: [w, h], panel, line, every }) {
+    const img = blank(w, h, [...panel, 255]);
+    for (let x = 1; x < w; x += every) fillRect(img, x, 0, 1, h, [...line, 255]);
+    return img;
+  },
   tieWindow({ size: [w, h], glass, frame }) {
     const img = blank(w, h, [...frame, 255]);
     const c = w / 2;
@@ -930,7 +937,8 @@ const PAINT = {
         const dy = y + 0.5 - c;
         const r = Math.hypot(dx, dy) / c;
         const a = ((Math.atan2(dy, dx) / Math.PI) * 4 + 8.5) % 1;
-        if (r < 0.9 && r > 0.26 && Math.abs(a - 0.5) < 0.5 - 0.05 / r) fillRect(img, x, y, 1, 1, glass.map((v) => Math.round(v * (1.25 - r * 0.5))));
+        const oct = r * Math.cos((a - 0.5) * (Math.PI / 4));
+        if (oct < 0.24 || (r < 0.9 && oct > 0.3 && Math.abs(a - 0.5) < 0.5 - 0.05 / r)) fillRect(img, x, y, 1, 1, glass.map((v) => Math.round(v * (1.25 - r * 0.5))));
       }
     }
     return img;

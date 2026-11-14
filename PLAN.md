@@ -28,6 +28,14 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
+- **The TIE rebuilt from Mark's schematic** (`?map=m4`, 2026-11-13). Canon
+  proportions at 0.8: wings 11.4 long and 14 tall (were 8 by 10), the ball
+  4 across, its top now 14.4. Grey frame and spokes over black panels with
+  fine lines, the hub through the wing, the angled pylons, a framed window
+  with a glass middle pane, red cannon mouths and back lamps. The racks,
+  fuel hoses and welding stand (its deck now 5.4 up) moved to fit. To judge:
+  the size in the hangar, the wing panels' lines.
+
 - **Mission 1 as a chain** (`?map=m1`, 2026-11-13; `docs/mission1.md`, "A
   chain through an open town"). After Mark's first play of it: the fob's
   few stops and the cantina on the way back kept; the junk yard, the

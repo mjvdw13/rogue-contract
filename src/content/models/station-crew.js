@@ -47,7 +47,7 @@ import { ModelBuilder } from './lib/build.js';
 // chains (the origin on the wall's face, +x out of it).
 
 /** The service stand's deck height and its half sizes. */
-export const SERVICE = { deck: 3.4, half: [0.8, 0.7] };
+export const SERVICE = { deck: 5.4, half: [0.8, 0.7] };
 /** Where the welding stand's sparks fly from (its own frame). */
 export const WELD = [0.95, 0, SERVICE.deck + 0.4];
 /** The tool cart's top. */
@@ -110,8 +110,9 @@ function serviceStand() {
   m.box([-a, -b, D - 0.12], [a, b, D], { ...METAL, top: GRATE });
   // The ladder up its back.
   for (const s of [-1, 1]) strut(m, [-a - 0.9, s * 0.4, 0], [-a, s * 0.4, D], 0.035, METAL);
-  for (let k = 1; k < 8; k++) {
-    const t = k / 8;
+  const rungs = Math.round(D * 2.4);
+  for (let k = 1; k < rungs; k++) {
+    const t = k / rungs;
     m.box([-a - 0.9 * (1 - t) - 0.06, -0.4, D * t - 0.03], [-a - 0.9 * (1 - t) + 0.06, 0.4, D * t], IRON);
   }
   // Rails along the sides, waist high over the deck.

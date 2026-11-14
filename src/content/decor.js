@@ -85,7 +85,7 @@ export default [
   defineDecoration({ id: 'coolant-tank-running', model: 'coolant-tank', solid: true, radius: 1, height: 3.6, emit: [{ every: 3.9, sound: 'pump-hum' }] }),
   defineDecoration({ id: 'shuttle', model: 'shuttle', solid: true, height: 3.5 }),
   // The battle station (m4): models/station.js.
-  defineDecoration({ id: 'tie-fighter', model: 'tie-fighter', solid: true, fixed: true, height: 10.3 }),
+  defineDecoration({ id: 'tie-fighter', model: 'tie-fighter', solid: true, fixed: true, height: 14.4 }),
   defineDecoration({ id: 'tie-rack', model: 'tie-rack', fixed: true }),
   defineDecoration({ id: 'lambda-shuttle', model: 'lambda-shuttle', solid: true, fixed: true, height: 19.1 }),
   defineDecoration({ id: 'ds-console', model: 'ds-console', solid: true, fixed: true, radius: 0.9, height: 1.1 }),
