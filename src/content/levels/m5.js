@@ -42,6 +42,8 @@ const T = {
   step: 'band-steel',
   crane: 'crane-yellow',
   hullCut: 'hull-section',
+  boxA: 'shack-green',
+  boxB: 'shack-shutter',
   door: 'door-grey',
   jamb: 'imp-jamb',
   bars: 'imp-bars',
@@ -237,12 +239,12 @@ p.rect(150, 80, 160, 82, (x, y, c) => ({ ...c, floor: T.step, floorZ: Math.min(0
 // Between the freighter and the hauler: hull plates in stacks lying at
 // angles (cover, and steps onto the low ones), a cutting lane sunk a
 // step, the foreman's shed and the furnace along the north side.
-const stack = (points, h) => kit.slanted(points, { h, wall: T.shackC, roof: T.yard, skirt: null });
+const stack = (points, h) => kit.slanted(points, { h, wall: T.hullCut, roof: T.hull, skirt: null });
 stack([[174, 72], [182, 68], [184, 72], [176, 76]], 2);
 stack([[186, 80], [196, 82], [195, 86], [185, 84]], 1);
 stack([[176, 88], [182, 85], [184, 89], [178, 92]], 1.5);
-kit.block(190, 62, 198, 66, { h: 3, wall: T.shackC, roof: T.yard });
-kit.block(192, 62, 196, 66, { h: 4, wall: T.shackC, roof: T.yard });
+kit.block(190, 62, 198, 66, { h: 3, wall: T.hullCut, roof: T.hull });
+kit.block(192, 62, 196, 66, { h: 4, wall: T.hullCut, roof: T.hull });
 p.rect(188, 70, 202, 76, (x) => ground(x === 188 || x === 201 ? -0.5 : -1, T.yard, { light: 152 }));
 // The foreman's shed, its door to the south.
 kit.house(176, 56, 186, 64, { h: 5, wall: T.shackB });
@@ -546,6 +548,38 @@ dress.push(
   at('cargo-pod', 138, 66), at('power-unit', 168.2, 80),
 );
 pylon(133, 64); pylon(133, 89);
+
+// ---------------------------------------------------------------- 5. the cutting floor
+// The stacks are cut hull (the tiles above). In the lane a skyhopper is
+// coming apart under two plasma cutters, work lamps on it; the furnace
+// burns in front of its block, fed from a heap, its stack smoking over
+// the roof; a skiff waits at the quay with the next load.
+dress.push(
+  at('skyhopper', 195.5, 73, { angle: 200 }),
+  at('cutting-torch', 191.6, 71.6, { angle: 340 }), at('cutting-torch', 199.6, 74.6, { angle: 160 }),
+  at('work-lamp', 190.2, 74.6), at('work-lamp', 200.6, 71),
+  at('furnace', 201.5, 64.4, { angle: 0 }), at('smokestack', 202, 59, { lit: DAY }),
+  at('junk-heap', 196.6, 67.4), at('scrap', 204.4, 66.6), at('pit-droid', 198, 66.4, { angle: 60 }),
+  at('plate-stack', 172, 66, { angle: 20 }), at('plate-stack', 187, 92.5, { angle: 100 }), at('plate-stack', 203, 86, { angle: 75 }),
+  at('speeder-engine', 187.5, 65.6, { angle: 40 }), at('power-droid-rust', 175, 65.4, { angle: 270 }),
+  at('cargo-skiff', 178, 96.5, { angle: 0 }), at('cargo-pod', 171, 80.6), at('canister-rust', 172.6, 81.4),
+);
+lamps.push({ x: 201.5, y: 65, z: 1.5, radius: 7, light: 96 }, { x: 191, y: 73, z: 1, radius: 5, light: 72 }, { x: 200, y: 73, z: 1, radius: 5, light: 72 });
+pylon(169, 58); pylon(204.6, 99);
+// The foreman's shed: his terminal and bench, a lamp, a comm unit by the door.
+dress.push(at('terminal', 178.6, 58.2, { angle: 270 }), at('workbench', 183.4, 59.5, { angle: 90 }), at('ceiling-lamp', 181, 60));
+kit.fixture('comm-unit', 184.5, 64, 'S', { z: 1.2 });
+kit.grimeIndoors(177, 57, 185, 63, { amount: 2, seed: 67 });
+// Berth 2's number on the hauler's cut hull.
+decals.push({ x: 206, y: 65, z: 5.5, face: 'W', tex: 'berth-2', scale: 2 });
+
+// ---------------------------------------------------------------- the quay
+// Freight boxes stacked on the waterfront, either side by turns, so no
+// view runs its whole length (the longest looks were the slowest frames).
+for (const [x0, y0, x1, y1, h, tex] of [
+  [62, 92, 70, 99, 5, T.boxA], [94, 97, 102, 104, 6, T.boxB], [122, 92, 130, 98, 5, T.boxB], [148, 97, 156, 104, 5, T.boxA],
+  [214, 92, 224, 98, 6, T.boxA], [232, 98, 240, 104, 5, T.boxB], [318, 92, 326, 97, 5, T.boxB],
+]) kit.block(x0, y0, x1, y1, { h, wall: tex, roof: T.roof });
 
 // A room indoors (a ceiling, not the sky) inside a building shows from
 // outside as a wall up to the sky, wherever something looks over the

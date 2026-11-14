@@ -1759,13 +1759,14 @@ taken. The blockout steps are in order, one session at a time.
 - [x] Mark played the blockout (2026-11-14): "everything is great". His
       one note, done: once Bossk is dead the Crow flies in to the apron
       (the new `fly` action), and the level ends when you reach it.
-- [ ] **Found in blockout C:** the worst frames (37 ms at 640 x 400,
-      against 18 on average) are looks along the open quay. When
-      dressing, stand cargo and sheds on it so no view runs its whole
-      length, and measure again (`node tools/bench.mjs m5 --res 2
+- [ ] **Slow frames** (found in blockout C, measured again with the
+      quay's freight boxes in): the worst views (33 to 34 ms at 640 x
+      400, single thread, against 18 on average) are from out in the
+      harbour looking along the water, not along the quay; the boxes
+      changed little. It's the open floor to the map's edge. If Mark
+      feels it in play: end the water nearer (a breakwater), or look at
+      the floor pass for far spans (`node tools/bench.mjs m5 --res 2
       --worst 5`).
-- [x] **Textures**: the CORELLIA set in `assets/custom/derive.mjs` (14
-      textures and 5 decals), loaded from `assets/custom/textures/`
       directly as the town's and the station's are (no generated
       stand-ins). The blockout wears `quay`, `sea-wall`, `harbour-water`,
       `slag`, `dock-floor`, `dock-wall` and three of the shack walls. For
@@ -1802,7 +1803,7 @@ taken. The blockout steps are in order, one session at a time.
       has a purpose. In m5.js under DRESSING (`dress`, `pylon()`).
   - [x] 1 and 2: the pier, the quay, the Bottoms.
   - [x] 3 and 4: pump house, gallery, Berth 1.
-  - [ ] 5: the cutting floor.
+  - [x] 5: the cutting floor, and freight boxes along the quay.
   - [ ] 6: the hauler (the most work: ribs, wires, panels, grime,
         before and after the power).
   - [ ] 7 and 8: the crane way, Berth 3, the cab.
