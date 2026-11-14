@@ -98,7 +98,7 @@ As built (`m4.js`).
 
 | # | Area | Box (x0..x1, y0..y1) | Floor / ceiling | Notes |
 |---|------|----------------------|-----------------|-------|
-| 1 | Docking Bay 326 | 16..80, 56..104 | 0 / 22 | 32 m by 24 m. The mouth (15, 62..98, 7 m high) in the station's hull, a field across it, only stars beyond (Mark, 2026-11-10: just a starfield). The Crow in the middle, nose to the mouth, guide lines painted in from the mouth either side of it; three TIE fighters in cradles along the north wall; a shuttle and cargo in the south-east. Light bars up the walls, the crest over the control room's window high on the east wall. A gantry (a slab, top 8) along the south wall, a lift at its west end. The troop bay's door in the north wall. |
+| 1 | Docking Bay 326 | 16..80, 56..104 | 0 / 22 | 32 m by 24 m. The mouth (15, 62..98, 7 m high) in the station's hull, a field across it, only stars beyond (Mark, 2026-11-10: just a starfield). The Crow in the middle, nose to the mouth, guide lines painted in from the mouth either side of it; three TIE fighters in cradles along the north wall; cargo staged round the deck (Mark, 2026-11-13: no shuttle, big crates so it isn't barren): containers two high with crates on them in the east half, under the gantry, between the west fighters and by the mouth. Light bars up the walls, the crest over the control room's window high on the east wall. A gantry (a slab, top 8) along the south wall, a lift at its west end. The troop bay's door in the north wall. |
 | 1a | Cargo lift and store | 64..70, 98..104; 64..70, 104..106 and 60..74, 106..112 | lift 0 to -8; -8 / -3 | Secret 1. The lift is marked with hazard stripes. |
 | 1b | Troop bay | 30..50, 46..54 | 0 / 6 | Shut until the beam is off: the last fight's squad. |
 | 2 | Lobby | 82..100, 94..106 | 0 / 6 | From the hangar's east door. Lift (86..90, 90..94) up to 8. The ring door east (remote). |
@@ -253,7 +253,7 @@ Troopers on beats (`beat`, 2026-11-13) walk until they see you: a pair
 marching the ring corridor's first straight in step, one round the hub's
 column, one along the shaft's west ledge past the door, one up and down
 the bare deck, one the length of the gallery, and (skill 3+) one across
-the hangar deck between the fighters and the shuttle.
+the hangar deck between the fighters and the cargo.
 
 Items: power cells, energy packs and med kits along the route; a thermal
 detonator among the hangar's cargo; med kits in the control room, the

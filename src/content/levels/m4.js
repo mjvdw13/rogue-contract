@@ -459,15 +459,30 @@ for (const [x, y, c] of lining) p.set(x, y, c);
 
 // ---------------------------------------------------------------- things
 const at = (type, x, y, extra = {}) => ({ type, x, y, ...extra });
+// `n` cargo containers one on another (each 2.2 tall), the bottom one on the floor.
+const stack = (x, y, angle, n) => Array.from({ length: n }, (_, i) => at('ds-container', x, y, { angle, ...(i ? { z: i * 2.2 } : {}) }));
 const list = [
   // 1. The hangar: quiet at the start. The Crow in the middle, nose to the mouth.
   at('player', 47.5, 84.5, { angle: 0 }),
   at('moldy-crow', 40, 80, { angle: 180 }),
   at('mouse-droid', 58.5, 76.5), at('mouse-droid', 30.5, 92.5),
   // Three TIE fighters in their cradles along the north wall, a rack over
-  // each; a shuttle and cargo in the south-east; lamp bars under the roof.
+  // each; cargo staged round the deck (below); lamp bars under the roof.
   ...[25, 55, 69].flatMap((x) => [at('tie-fighter', x, 63.5, { angle: 270 }), at('tie-rack', x, 63.5, { angle: 270, z: 16.4 })]),
-  at('lambda-shuttle', 66.5, 82.5, { angle: 180 }),
+  // Cargo waiting to be loaded, big enough to hide behind: containers two
+  // high and crates stacked on them.
+  // Staged in the east half where the shuttle stood, along the south wall
+  // under the gantry, between the two west fighters and by the mouth; clear
+  // of the doors, the lifts, the Crow's pad and the garrison's spots.
+  ...stack(62, 84, 90, 2), at('ds-crate-tall', 62, 83.2, { z: 4.4 }),
+  at('ds-container', 68, 83, { angle: 0 }), at('ds-crate', 67, 83, { z: 2.2 }), at('ds-crate-tall', 70.9, 85.6, { angle: 10 }),
+  at('ds-container', 73, 79, { angle: 90 }), at('ds-crate', 73, 78.4, { z: 2.2 }), at('ds-crate', 73, 79.9, { z: 2.2 }),
+  at('ds-container', 66, 88.5, { angle: 0 }), at('ds-crate-tall', 65, 88.5, { z: 2.2 }),
+  ...stack(30, 98.5, 0, 2),
+  at('ds-crate-tall', 35, 98.8), at('ds-crate', 36.6, 98.8), at('ds-crate', 35, 98.8, { z: 2.6 }),
+  at('ds-container', 52, 98.5, { angle: 0 }), at('ds-crate', 53, 98.5, { z: 2.2 }),
+  ...stack(34, 60, 90, 2), at('ds-container', 46, 60, { angle: 90 }), at('ds-crate-tall', 46, 59.2, { z: 2.2 }),
+  ...stack(20, 92, 90, 2),
   at('ds-container', 74, 92.5, { angle: 90 }), at('ds-container', 76.5, 88, { angle: 0 }),
   at('ds-crate', 71, 95.5), at('ds-crate-tall', 72.8, 95.5), at('ds-crate', 60.5, 97),
   at('ds-crate', 77, 60.5), at('ds-crate', 78.2, 62.4, { angle: 20 }), at('ds-crate-tall', 78.4, 58.2),
@@ -483,7 +498,7 @@ const list = [
   at('ds-service-stand-welding', 69, 66.3, { angle: 90 }),
   at('power-droid', 71.6, 67.4, { angle: 150 }), at('ds-tool-cart', 66.4, 67.6, { angle: 20 }),
   at('ds-beacon-field', 16.02, 61, { angle: 0, z: 10 }), at('ds-beacon', 16.02, 99, { angle: 0, z: 10 }),
-  // A trooper walking the deck between the fighters and the shuttle.
+  // A trooper walking the deck between the fighters and the cargo.
   at('stormtrooper', 62.5, 70.5, { angle: 180, skill: NORMAL_UP, beat: { patrol: [[74.5, 70.5], [50.5, 70.5]], idleTime: [2, 4] } }),
   // 1a. The store (secret).
   at('shield-unit', 62, 109), at('energy-cell', 70.5, 109.5), at('energy-cell', 72, 108.5),

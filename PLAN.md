@@ -34,6 +34,9 @@ These need Mark to try something, or to decide. Don't start them without him.
   with a glass middle pane, red cannon mouths and back lamps. The racks,
   fuel hoses and welding stand (its deck now 5.4 up) moved to fit. To judge:
   the size in the hangar.
+- **The hangar without the shuttle** (`?map=m4`, 2026-11-13): large cargo in
+  its place and round the deck, containers two high with crates on top, as
+  cover for the last fight. To judge: enough, too much, where.
 
 - **Mission 1 as a chain** (`?map=m1`, 2026-11-13; `docs/mission1.md`, "A
   chain through an open town"). After Mark's first play of it: the fob's
