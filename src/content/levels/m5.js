@@ -41,6 +41,7 @@ const T = {
   pipes: 'hold-pipes',
   step: 'band-steel',
   crane: 'crane-yellow',
+  hullCut: 'hull-section',
   door: 'door-grey',
   jamb: 'imp-jamb',
   bars: 'imp-bars',
@@ -360,7 +361,8 @@ p.rect(266, 100, 270, 102, ground(0, 'lift-floor', { side: T.step, lift: { stops
 p.rect(266, 99, 270, 100, way);
 // 7a. Berth 3, under the rail's north side: a hull down to its keel
 // and ribs (models to come). Secret 4 is on the keel.
-p.rect(280, 76, 284, 78, ground(0.5, T.yard, { secret: true }));
+p.rect(266, 76, 297, 78, ground(0.5, T.hullCut, { side: T.hullCut }));
+p.rect(280, 76, 284, 78, ground(0.5, T.hullCut, { side: T.hullCut, secret: true }));
 // A slip into the water, the way out of the harbour at this end.
 p.stairs(284, 104, 288, 112, 'S', -0.5, -0.5, (z) => ground(z));
 
@@ -460,6 +462,16 @@ const list = [
   at('freighter', HOLD.x, HOLD.y, { angle: 0, lit: DAY }),
   // The great crane's top (models/crane.js), midway between its legs.
   at('great-crane', 303, 79, { angle: 0, lit: DAY }),
+  // The crane way's trestles and spans (models/yard5.js), the gap
+  // between the spans; the hoist's frame round its lift.
+  ...[254.5, 262.5, 273.5, 281.5, 289.5].map((x) => at('crane-way-trestle', x, 98, { angle: 0, lit: DAY })),
+  at('crane-way-span-24', 252, 98, { angle: 0, lit: DAY }), at('crane-way-span-19', 279, 98, { angle: 0, lit: DAY }),
+  at('yard-hoist', 268, 101, { angle: 0, lit: DAY }),
+  // Berth 3: the frames of a hull on its keel (the tiles), more of them
+  // burnt off toward the stern; keel blocks left beside it.
+  ...[['berth-rib', 268], ['berth-rib', 272], ['berth-rib-cut', 276], ['berth-rib', 280], ['berth-rib-stub', 284], ['berth-rib-cut', 288, 180], ['berth-rib', 292], ['berth-rib-stub', 296, 180]]
+    .map(([type, x, angle = 0]) => at(type, x, 77, { angle, lit: DAY })),
+  at('keel-block', 274, 74.3), at('keel-block', 286, 79.7), at('keel-block', 294, 74.3),
   at('energy-cell', 181, 60), at('med-kit', 243.5, 84.5), at('energy-pack', 237, 88.5),
   // The crane way to the dock: one on the cab's side of the gap, the
   // dock officer in the cab (the red keycard), three in the dock.

@@ -17,6 +17,7 @@ import { BAY_WALL, DERELICT_WALL, BAY_HOSES } from './models/bay.js';
 import { SCAFFOLDS, scaffoldHeight } from './models/scaffold.js';
 import { BALCONY_FRAME } from './models/balcony.js';
 import { WIRES, CONSOLE } from './models/hold.js';
+import { CRANE_WAY, BERTH_RIB, KEEL_BLOCK, STACK, YARD_HOIST } from './models/yard5.js';
 import { CABLES as STATION_CABLES, STEAM_PIPE, BEAM_RING } from './models/station.js';
 import { SERVICE, WELD, CART, HOLO, LOCKERS, PIPE_RUNS, BENCH as DS_BENCH, BUNK as CELL_BUNK } from './models/station-crew.js';
 import { TOWER_HEIGHT } from './models/market.js';
@@ -428,6 +429,23 @@ export default [
   // level's tiles are its legs; the model is the girders, boom and hook,
   // all overhead.
   defineDecoration({ id: 'great-crane', model: 'great-crane', fixed: true }),
+  // The yard's big pieces (models/yard5.js). The crane way's trestles
+  // collide at their feet, under the deck; its spans are overhead.
+  defineDecoration({ id: 'crane-way-trestle', model: 'crane-way-trestle', solid: true, height: CRANE_WAY.top - CRANE_WAY.deck - 0.1, fixed: true }),
+  ...Object.keys(CRANE_WAY.spans).map((id) => defineDecoration({ id, model: id, fixed: true })),
+  // Berth 3's frames collide at their uprights; keel blocks all round.
+  ...Object.keys(BERTH_RIB.kinds).map((id) => defineDecoration({ id, model: id, solid: true, height: BERTH_RIB.height, fixed: true })),
+  defineDecoration({ id: 'keel-block', model: 'keel-block', solid: true, height: KEEL_BLOCK.height, fixed: true }),
+  // A works chimney, smoke rolling off its mouth downwind (east).
+  defineDecoration({
+    id: 'smokestack',
+    model: 'smokestack',
+    solid: true,
+    height: STACK.height,
+    fixed: true,
+    emit: [{ type: 'smoke-cloud', count: 1, every: [0.25, 0.5], at: [0, 0, STACK.height + 0.5], radius: STACK.mouth * 0.6, dir: [0.5, 0, 1], spread: 0.3, speed: [1.2, 2.2] }],
+  }),
+  defineDecoration({ id: 'yard-hoist', model: 'yard-hoist', solid: true, height: YARD_HOIST.top, fixed: true }),
   // The Jawas' sandcrawler (models/sandcrawler.js): the level's tiles are its
   // hold and collide; the model is its outside. Steam wisps from the vents
   // either side of its door, and every few seconds one hisses out a jet.
