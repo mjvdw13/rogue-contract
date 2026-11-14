@@ -1800,8 +1800,7 @@ taken. The blockout steps are in order, one session at a time.
   - [x] 1 and 2: the pier, the quay, the Bottoms.
   - [x] 3 and 4: pump house, gallery, Berth 1.
   - [x] 5: the cutting floor, and freight boxes along the quay.
-  - [ ] 6: the hauler (the most work: ribs, wires, panels, grime,
-        before and after the power).
+  - [x] 6: the hauler: hold, crew deck, reactor room, bridge.
   - [ ] 7 and 8: the crane way, Berth 3, the cab.
   - [ ] 9 and 10: the dry dock, the office, the apron.
 - [ ] **Light and air**: the haze's colour and half distance, soot

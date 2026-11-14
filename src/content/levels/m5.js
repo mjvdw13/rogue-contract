@@ -581,6 +581,54 @@ for (const [x0, y0, x1, y1, h, tex] of [
   [214, 92, 224, 98, 6, T.boxA], [232, 98, 240, 104, 5, T.boxB],
 ]) kit.block(x0, y0, x1, y1, { h, wall: tex, roof: T.roof });
 
+// ---------------------------------------------------------------- 6. the hauler
+// The hold: frames across it every 5, freight left in it (cover for the
+// fight back to the lift), the fallen deck's plates on the floor under
+// its broken edge, wires down (one live), panels off, steam off the
+// joints. Before the power the only light is the day through the cut
+// and three work lamps.
+for (const x of [213, 218, 223, 228, 233, 238]) dress.push(at('hold-rib-wide', x, 76, { angle: 0, lit: 104 }));
+dress.push(
+  at('ds-container', 216.5, 70.6, { angle: 0 }), at('ds-container', 230.5, 81.4, { angle: 90 }), at('ds-crate', 224.5, 82.4), at('ds-crate', 237.4, 81.6),
+  at('cargo-pod', 221, 78.6), at('canister-rust', 212.6, 82.6), at('bay-crate-rust-long', 235, 76.6, { angle: 90 }),
+  at('deck-plate-long', 226, 71.4, { angle: 25 }), at('deck-plate', 229.4, 74, { angle: 70 }), at('deck-plate-rust', 223.6, 73.6, { angle: 140 }),
+  at('rubble', 227.6, 69.4), at('scrap', 224.4, 69.6),
+  at('deck-edge', 225, 76, { z: DECK, angle: 180, lit: 104 }), at('deck-edge', 229.5, 76, { z: DECK, angle: 180, lit: 104 }),
+  at('deck-edge', 222, 71.5, { z: DECK, angle: 90, lit: 104 }), at('deck-edge', 232, 72.5, { z: DECK, angle: 270, lit: 104 }),
+  at('hold-wires-run', 217, 73, { angle: 0, lit: 104 }), at('hold-wires-run', 236, 78.5, { angle: 90, lit: 104 }),
+  at('hold-wires-live', 220, 81, { z: 1, angle: 0, lit: 104 }),
+  at('hold-panel-leaning', 215.5, 68, { angle: 0, lit: 104 }), at('hold-panel-leaning', 228.5, 84, { angle: 180, lit: 104 }), at('hold-panel-down', 220.5, 73.4, { angle: 30, lit: 104 }),
+  at('ds-steam-pipe', 222, 83.98, { angle: 90 }), at('ds-steam-pipe', 234, 68.02, { angle: 270 }),
+  at('work-lamp', 212.6, 72.4), at('work-lamp', 227, 77.6), at('work-lamp', 238.6, 72.6),
+);
+lamps.push(
+  { x: 207, y: 76, z: 2.5, radius: 9, light: 150 }, { x: 207, y: 76, z: 8, radius: 8, light: 150 },
+  { x: 212.6, y: 72.4, z: 2, radius: 5, light: 96 }, { x: 227, y: 77.6, z: 2, radius: 5, light: 96 }, { x: 238.6, y: 72.6, z: 2, radius: 5, light: 96 },
+);
+kit.grimeIndoors(208, 68, 240, 84, { amount: 3, seed: 71 });
+// The crew deck: wires out of its ceiling, a bunk in each cabin.
+dress.push(
+  at('hold-wires', 216, 80.5, { z: DECK + 1.5, angle: 60, lit: 120 }), at('hold-wires', 236, 71, { z: DECK + 1.5, angle: 200, lit: 120 }),
+  at('ds-bunk', 210.02, 64, { z: DECK, angle: 0 }), at('ds-bunk', 222.02, 64, { z: DECK, angle: 0 }), at('ds-bunk', 219.98, 88, { z: DECK, angle: 180 }),
+);
+// The reactor room: the ring in its pit, a coolant tank at two corners,
+// a terminal by the start switch; its glow comes up with the power.
+dress.push(
+  at('reactor-ring', 251, 77, { z: -2 }),
+  at('coolant-tank', 243.6, 69.6), at('coolant-tank', 258.4, 84.4),
+  at('terminal', 254, 85.2, { angle: 90 }), at('ds-steam-pipe', 242.02, 82, { angle: 0 }),
+);
+lamps.push({ x: 251, y: 77, z: 0, radius: 9, light: 8, tag: 'hauler-lamps' });
+kit.grimeIndoors(242, 68, 260, 86, { amount: 2, seed: 73 });
+// The bridge, open to the sky: dead consoles under the empty windows,
+// two seats left facing them.
+dress.push(
+  at('hold-console', 247, 68, { z: BRIDGE, angle: 0 }), at('hold-console', 252, 68, { z: BRIDGE, angle: 0 }),
+  at('hold-console', 260, 74, { z: BRIDGE, angle: 270 }), at('hold-console', 260, 79.5, { z: BRIDGE, angle: 270 }),
+  at('ds-chair', 258, 74, { z: BRIDGE, angle: 0 }), at('ds-chair', 258, 79.5, { z: BRIDGE, angle: 0 }),
+  at('hold-panel-down', 249, 80, { z: BRIDGE, angle: 50 }),
+);
+
 // A room indoors (a ceiling, not the sky) inside a building shows from
 // outside as a wall up to the sky, wherever something looks over the
 // building's roof into it. So every tile of building next to one becomes
