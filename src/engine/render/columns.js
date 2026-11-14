@@ -6,6 +6,7 @@ import { layoutDecals } from '../world/decals.js';
 import { drawBackdropColumn } from './backdrop.js';
 import { TEXELS_PER_UNIT as TPU, TRANSPARENT, SHADE_STEP, LIGHT_LEVELS } from '../config.js';
 
+/** The fewest tiles a ray may cross before it gives up (a bigger map allows more: see drawWorld). */
 const MAX_STEPS = 320;
 /** Per screen row, the sky's colormap (see drawWorld). */
 let skyCm = new Int32Array(0);
@@ -170,6 +171,9 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
   // (The last MAX_WIN slots of a column's windows are kept for the batch at a skyline stop.)
   const FILL = SEG - MAX_WIN;
   const mw = map.w;
+  // A ray can cross the whole map: one that stopped short left its column
+  // black (a wall seen from over 220 tiles off, on a map 352 wide).
+  const maxSteps = Math.max(MAX_STEPS, map.w + map.h);
   const mh = map.h;
   const { flags, wallTex, doorIndex, doors, seen, floorZ, ceilZ, floorTex, ceilTex, sideTex, upperTex, slantIndex, slants } = map;
   const { fences, fenceAt } = map;
@@ -683,7 +687,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
     wBot[0] = H;
     wSt[0] = flags[cur] & F_SLAB && camZ >= (slabBot[cur] + slabTop[cur]) / 2 ? 1 : 0;
 
-    for (let step = 0; step < MAX_STEPS; step++) {
+    for (let step = 0; step < maxSteps; step++) {
       // Distance at which the ray leaves the current tile, and which side it crosses.
       let side;
       let tExit;
