@@ -1808,11 +1808,11 @@ taken. The blockout steps are in order, one session at a time.
       waterfront (the slum in tiers to 24, the works' sheds to 20), six
       `smokestack` models standing out of them, two platforms over the
       water. The sky's picture carries the far ones.
-- [ ] **Fights and items**: enemies by skill (a table in the design, as
-      Mission 4's), beats for the patrols, the sweep squad, the hold's
-      ambush on `power`, the dock, the apron; pickups, a weapon each
-      third; the four secrets. The validator's ammo budget near Missions
-      3 and 4's (about 12).
+- [x] **Fights and items**: 16 / 34 / 42 placed by skill, the hold's
+      and the apron's squads by skill too, beats for three patrols, the
+      repeater and the mortar, the four secrets filled. The table is in
+      `docs/mission5.md`. Ammo 14.0 (about 10.5 with the spawned ones).
+      Nobody has played the fights: under Waiting on Mark at the end.
 - [ ] **Words and sound**: Jan's lines and the yard's PA at each gate
       (stand-ins), the dead lift's message, the manifest; a harbour
       ambience (gulls are out: machinery, a horn far off), the reactor's

@@ -222,17 +222,35 @@ vent stack, the sign), a smokestack, a hoist.
 4. Berth 3: a crate on the keel among the ribs, for anyone who drops
    off the crane way.
 
-## Enemies and items (a first sketch; the table comes with the fights)
+## Enemies and items
 
 Stormtroopers and officers throughout (the dock's garrison), probe
-droids outdoors over the water and the dock. A calm start: two troopers
-on the pier. The street's sweep squad is the first real fight; the
-freighter holds one surprise; the cutting floor is the first open fight
-with cover; the hauler is close work in the dark, then an ambush from
-below when the power comes on; the crane way is exposed, shot at from
-ahead and by droids; the dock is the big one, fought downhill; the
-apron is short and hot. A weapon each third: one in the freighter, one
-in the hauler's cabins, heavy ammo before the dock.
+droids outdoors. Everything in a row's first column is on every skill;
+the rest come in from skill 2, 3 or 4 up (`NOT_EASIEST`, `NORMAL_UP`,
+`HARD` in `m5.js`, under FIGHTS AND ITEMS). Placed at the start: 16 on
+skill 1, 34 on 3, 42 on 5; the switches bring the rest.
+
+| # | Where | Every skill | From 2 | From 3 | From 4 |
+|---|---|---|---|---|---|
+| 1 | Pier and quay (calm) | 2 troopers, one walking the quay | | | 1 at the gate |
+| 2 | The Bottoms | the sweep squad: 2 troopers, one on a beat | 1 on the lower street, 1 more in the squad | its officer | 1 in the alley |
+| 3 | Pump house, gallery | 1 on the floor | | 1 on the walk, 1 in the gallery | an officer |
+| 4 | The freighter | 1 searching the hold | | | |
+| 5 | Cutting floor | 2 among the stacks | 1 on a beat by the lane | 1 at the cut, an officer | a probe droid |
+| 6 | The hauler | 1 in the hold, 1 in the reactor room | | 1 more in the hold, 1 on the bridge | |
+| 6 | The power (spawned) | 2 troopers | | 2 more | an officer |
+| 7 | Crane way | 1 past the gap | a probe droid | 1 more past the gap | a probe droid |
+| 8 | The cab | the dock officer (red keycard) | | | a guard |
+| 9 | The dry dock | 4 troopers | 2 more | 1 more, an officer, a probe droid | 1 more, a probe droid |
+| 10 | Office | | the clerk (an officer) | | |
+| 10 | The apron (spawned) | Bossk, 2 troopers | | 2 more | a probe droid |
+
+Weapons: the repeater in the freighter's hold, the mortar in the
+hauler's first cabin, shells and a power cell in the cab before the
+dock. Secrets hold a shield (1), a detonator belt (2), a shield, cells
+and shells (3), a pack and a detonator (4). The validator's ammo figure
+is 14.0 on skill 3, without the spawned ones (about 10.5 with them;
+Missions 3 and 4 are near 12).
 
 ## Engine notes and risks
 

@@ -286,7 +286,7 @@ for (const [x0, y0, x1, y1] of [[214, 78, 220, 82], [228, 70, 234, 73]]) {
 // reactor runs (the triggers call it).
 p.rect(208, 74, 212, 78, room(0, DECK_CEIL, { floor: 'lift-floor', light: 104, side: T.step, tag: 'cargo-lift', lift: { stops: [0, DECK], wait: 3, on: [] } }));
 // Where the squad comes in when the power's on.
-for (const [x, y] of [[214, 70], [218, 82], [226, 80], [236, 70]]) p.set(x, y, { ...p.get(x, y), tag: 'hold-squad' });
+for (const [x, y, tag] of [[214, 70, 'hold-squad'], [226, 80, 'hold-squad'], [218, 82, 'hold-squad-2'], [236, 70, 'hold-squad-2'], [229, 78, 'hold-squad-3']]) p.set(x, y, { ...p.get(x, y), tag });
 // Secret 3: a smuggler's hold behind a loose panel in the south wall.
 p.rect(234, 86, 240, 90, room(0, 2.5, { light: 96, secret: true }));
 p.rect(236, 84, 238, 86, door(0, { door: T.guts, jamb: T.machine, ceilZ: 2.5, light: 96 }));
@@ -327,6 +327,8 @@ p.rect(250, 86, 252, 87, {
     { action: 'setFlag', flag: 'power' },
     { action: 'setLight', tag: 'hauler-lamps', light: 80, lightFx: 'flicker', lightMin: 24 },
     { action: 'spawn', thing: 'stormtrooper', tag: 'hold-squad' },
+    { action: 'spawn', thing: 'stormtrooper', tag: 'hold-squad-2', skill: [3, 4, 5] },
+    { action: 'spawn', thing: 'officer', tag: 'hold-squad-3', skill: [4, 5] },
     { action: 'message', text: "REACTOR START. SHIP'S POWER RESTORED: LIGHTING, CARGO LIFT." },
   ],
 });
@@ -416,6 +418,8 @@ p.rect(325, 45, 327, 46, {
     { action: 'sound', id: 'alarm-klaxon' },
     { action: 'spawn', thing: 'bossk', tag: 'bossk-spot', wake: false, fog: false, angle: 270 },
     { action: 'spawn', thing: 'stormtrooper', tag: 'apron-squad', wake: false, fog: false, angle: 270 },
+    { action: 'spawn', thing: 'stormtrooper', tag: 'apron-squad-2', wake: false, fog: false, angle: 270, skill: [3, 4, 5] },
+    { action: 'spawn', thing: 'probe-droid', tag: 'apron-squad-3', wake: false, fog: false, angle: 270, skill: [4, 5] },
   ],
 });
 // Its lift up to the apron, and the apron: the pickup spot.
@@ -426,7 +430,7 @@ p.rect(323, 25, 333, 33, (x, y, c) => ({ ...c, tag: 'crow' }));
 /** The Crow's way in: from high over the dock's east side, round and down onto the spot, nose west. */
 const CROW_IN = [[344, 50, 36, 135, 0], [338, 34, 16, 160, 4], [328, 29, 0, 180, 3.5]];
 p.set(318, 30, { ...p.get(318, 30), tag: 'bossk-spot' });
-for (const [x, y] of [[322, 36], [338, 34], [340, 26]]) p.set(x, y, { ...p.get(x, y), tag: 'apron-squad' });
+for (const [x, y, tag] of [[322, 36, 'apron-squad'], [338, 34, 'apron-squad'], [340, 26, 'apron-squad-2'], [318, 36, 'apron-squad-2'], [330, 24, 'apron-squad-3']]) p.set(x, y, { ...p.get(x, y), tag });
 
 // ---------------------------------------------------------------- the skyline
 // Beyond play, on the roofs of the mass north of the waterfront: the slum
@@ -707,7 +711,7 @@ dress.push(
 for (const [x, y] of [[322, 24], [334, 24], [322, 34], [334, 34]]) dress.push(at('bollard', x, y));
 pylon(315.5, 23.5); pylon(342.5, 23.5); pylon(315.5, 38.5);
 dress.push(
-  at('sensor-mast', 341.5, 37.5), at('ds-container', 318, 30, { angle: 90 }), at('ds-container', 339.5, 30.5, { angle: 0 }),
+  at('sensor-mast', 341.5, 37.5), at('ds-container', 317.4, 25.6, { angle: 90 }), at('ds-container', 339.5, 30.5, { angle: 0 }),
   at('bay-fuel-pump', 336.5, 23.6, { angle: 270 }), at('ds-crate', 336, 37),
 );
 
@@ -736,16 +740,6 @@ kit.seal();
 const list = [
   // 1. The pier's seaward end, facing the sea wall.
   at('player', 25, 136, { angle: 90 }),
-  // Two dock troopers at the pier's head, and one in the pump house: the
-  // first of the fights (the rest come with the fights' step, PLAN.md).
-  at('stormtrooper', 23.5, 99.5, { angle: 270 }), at('stormtrooper', 27.5, 96.5, { angle: 270 }),
-  at('stormtrooper', 110.5, 50.5, { angle: 180 }),
-  at('energy-cell', 36.5, 100.5), at('energy-cell', 62.5, 54.5), at('med-kit', 100.5, 56.5),
-  // Berth 1 to the hauler: one searching the freighter, two on the
-  // cutting floor, one in the reactor room.
-  at('stormtrooper', 161.5, 84.5, { angle: 180 }),
-  at('stormtrooper', 186.5, 68.5, { angle: 180 }), at('stormtrooper', 198.5, 88.5, { angle: 180 }),
-  at('stormtrooper', 250.5, 69.5, { angle: 180 }),
   at('freighter', HOLD.x, HOLD.y, { angle: 0, lit: DAY }),
   // The great crane's top (models/crane.js), midway between its legs.
   at('great-crane', 303, 79, { angle: 0, lit: DAY }),
@@ -759,16 +753,96 @@ const list = [
   ...[['berth-rib', 268], ['berth-rib', 272], ['berth-rib-cut', 276], ['berth-rib', 280], ['berth-rib-stub', 284], ['berth-rib-cut', 288, 180], ['berth-rib', 292], ['berth-rib-stub', 296, 180]]
     .map(([type, x, angle = 0]) => at(type, x, 77, { angle, lit: DAY })),
   at('keel-block', 274, 74.3), at('keel-block', 286, 79.7), at('keel-block', 294, 74.3),
-  at('energy-cell', 181, 60), at('med-kit', 243.5, 84.5), at('energy-pack', 237, 88.5),
-  // The crane way to the dock: one on the cab's side of the gap, the
-  // dock officer in the cab (the red keycard), three in the dock.
-  at('stormtrooper', 292.5, 98, { angle: 180, z: RAIL }),
-  at('officer', 304.5, 98.5, { angle: 180, drops: ['keycard-red'] }),
-  at('stormtrooper', 323.5, 70.5, { angle: 90 }), at('stormtrooper', 331.5, 86.5, { angle: 90 }), at('stormtrooper', 317.5, 80.5, { angle: 180 }),
   at('lambda-shuttle', 327, 44 + 36, { angle: 90, z: DOCK }),
-  at('energy-pack', 282, 77, { z: 0.5 }), at('med-kit', 301, 101.5), at('med-kit', 322, 56),
-  // Secret 1 and 2.
-  at('shield-unit', 18, 127), at('energy-pack', 44, 33),
+];
+
+// ================================================================ FIGHTS AND ITEMS
+// By skill (docs/mission5.md has the table): everything not marked is on
+// every skill; the rest come in from 2, 3 or 4 up.
+const NOT_EASIEST = [2, 3, 4, 5];
+const NORMAL_UP = [3, 4, 5];
+const HARD = [4, 5];
+const st = (x, y, angle, extra = {}) => at('stormtrooper', x, y, { angle, ...extra });
+const fights = [
+  // 1. A calm start: two dock troopers at the pier's head, one walking
+  // the quay. A third at the gate on the hard skills.
+  st(23.5, 99.5, 270), st(27.5, 96.5, 270, { beat: { patrol: [[12.5, 98.5], [35.5, 98.5]], idleTime: [3, 5] } }),
+  st(40.5, 99.5, 180, { skill: HARD }),
+  // 2. The Bottoms. One on the lower street; then the sweep squad coming
+  // down the upper street, an officer behind it: the first real fight.
+  st(25.5, 68.5, 270, { skill: NOT_EASIEST }),
+  st(88.5, 50.5, 180, { beat: { patrol: [[64.5, 50.5], [92.5, 50.5]], idleTime: [2, 4] } }),
+  st(90.5, 52.5, 180), st(92.5, 48.5, 180, { skill: NOT_EASIEST }),
+  at('officer', 94.5, 51, { angle: 180, skill: NORMAL_UP }),
+  st(46.5, 49.5, 270, { skill: HARD }),
+  // 3. The pump house: one on the floor, one up on the walk, an officer
+  // by the plinth on the hard skills. One in the gallery past the crouch.
+  st(110.5, 50.5, 180), st(112.5, 41.5, 270, { z: PUMP + 3, skill: NORMAL_UP }),
+  at('officer', 119.5, 53.5, { angle: 180, skill: HARD }),
+  st(150, 73.5, 90, { skill: NORMAL_UP }),
+  // 4. The freighter's one surprise: a trooper searching the hold, his
+  // back to the steps.
+  st(161.5, 84.5, 0),
+  // 5. The cutting floor, the first open fight with cover: two among
+  // the stacks, one walking the lane's edge, one at the cut; an officer
+  // by the furnace; a probe droid in off the water on the hard skills.
+  st(186.5, 68.5, 180), st(198.5, 88.5, 180),
+  st(193.5, 78.5, 180, { skill: NOT_EASIEST, beat: { patrol: [[187.5, 78.5], [203.5, 78.5]], idleTime: [2, 3] } }),
+  st(204.5, 80.5, 180, { skill: NORMAL_UP }),
+  at('officer', 199.5, 68, { angle: 225, skill: NORMAL_UP }),
+  at('probe-droid', 190, 97, { skill: HARD }),
+  // 6. The hauler. Close work in the dark: two in the hold, one in the
+  // reactor room, one on the bridge. The power brings the squad (the
+  // switch's spawns): two on every skill, two more from 3 up, and an
+  // officer on the deck's edge on the hard ones.
+  st(232.5, 78.5, 180), st(238.5, 80.5, 180, { skill: NORMAL_UP }),
+  st(250.5, 69.5, 180), st(250.5, 78.5, 90, { z: BRIDGE, skill: NORMAL_UP }),
+  // 7. The crane way, exposed: one each side of the gap, probe droids in
+  // over the quay.
+  st(292.5, 98, 180, { z: RAIL }), st(285.5, 98, 180, { z: RAIL, skill: NORMAL_UP }),
+  at('probe-droid', 272, 102.5, { skill: NOT_EASIEST }), at('probe-droid', 288, 94, { skill: HARD }),
+  // 8. The cab: the dock officer (the red keycard), a guard on the hard skills.
+  at('officer', 304.5, 98.5, { angle: 180, drops: ['keycard-red'] }),
+  st(301.5, 95.5, 270, { z: RAIL, skill: HARD }),
+  // 9. The dry dock, the big one, fought downhill: troopers among the
+  // crates and on the terraces, an officer at the red door, probe droids
+  // over the floor.
+  st(323.5, 70.5, 90), st(331.5, 86.5, 90), st(317.5, 80.5, 180), st(329.5, 66.5, 270),
+  st(324.5, 92.5, 90, { skill: NOT_EASIEST }), st(340, 70.5, 180, { skill: NOT_EASIEST }),
+  st(336, 88.5, 180, { skill: NORMAL_UP }), st(314.5, 72.5, 270, { skill: HARD }),
+  at('officer', 327, 62.5, { angle: 270, skill: NORMAL_UP }),
+  at('probe-droid', 330, 78, { skill: NORMAL_UP }), at('probe-droid', 324, 84, { skill: HARD }),
+  // 10. The clerk in the office. (Bossk and the apron's squad are the
+  // terminal's spawns.)
+  at('officer', 327, 50.5, { angle: 270, skill: NOT_EASIEST }),
+];
+const items = [
+  // First third: the pier to the pump house.
+  at('energy-cell', 36.5, 100.5), at('energy-cell', 27, 72.5), at('med-kit', 21.5, 70.5),
+  at('energy-cell', 62.5, 54.5), at('energy-cell', 78.5, 47.5), at('med-kit', 100.5, 56.5),
+  at('energy-cell', 122.5, 41.5, { z: PUMP + 3 }), at('energy-cell', 150, 53),
+  // The freighter: the repeater (the first weapon), and its cells.
+  at('repeater', 158.5, 85.5), at('power-cell', 156.5, 85.2), at('med-kit', 163, 82.6),
+  // Second third: the cutting floor and the hauler.
+  at('energy-cell', 181, 60), at('energy-cell', 172.5, 74), at('power-cell', 188.5, 67.5), at('med-kit', 204, 90.5),
+  at('thermal-detonator', 189, 73),
+  at('med-kit', 213, 80.5),
+  // The cabins off the crew deck: the mortar (the second weapon) and its
+  // shells, a shield, cells.
+  at('mortar', 214, 64, { z: DECK }), at('mortar-shells', 216, 64, { z: DECK }), at('shield-unit', 218, 64, { z: DECK }),
+  at('energy-cell', 214, 88, { z: DECK }), at('med-kit', 216, 88, { z: DECK }),
+  at('med-kit', 243.5, 84.5), at('med-kit', 257, 84, { z: BRIDGE }),
+  // Last third: heavy ammo in the cab before the dock, more in the dock
+  // and the office.
+  at('med-kit', 301, 101.5, { z: RAIL }), at('mortar-shell', 305.5, 95, { z: RAIL }), at('power-cell', 305.5, 96.2, { z: RAIL }),
+  at('med-kit', 313, 98.6), at('energy-cell', 318.6, 62), at('med-kit', 333, 97), at('thermal-detonator', 332.5, 70),
+  at('med-kit', 322, 56), at('shield-unit', 332.5, 56.5), at('energy-cell', 321.5, 47.5),
+  // The secrets: 1 under the pier, 2 the back room over the alley, 3 the
+  // smuggler's hold, 4 the crate on Berth 3's keel.
+  at('shield-unit', 18, 127), at('med-kit', 17.5, 125.5),
+  at('detonator-belt', 44, 33), at('med-kit', 42, 32.5),
+  at('shield-unit', 237, 88.5), at('power-cell', 235.5, 88.5), at('mortar-shells', 238.5, 88.5),
+  at('energy-pack', 282, 77, { z: 0.5 }), at('thermal-detonator', 281, 77, { z: 0.5 }),
 ];
 
 export default defineLevel({
@@ -789,7 +863,7 @@ export default defineLevel({
   decals: [...decals, ...kit.decals],
   hangings: [...kit.hangings],
   things: [],
-  list: [...list, ...dress, ...kit.things],
+  list: [...list, ...fights, ...items, ...dress, ...kit.things],
   triggers: [
     // The way out (Mark, 2026-11-14): once Bossk is dead the Crow comes in
     // over the dock and sets down on the apron; reach it and the level ends.
