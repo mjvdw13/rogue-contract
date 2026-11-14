@@ -424,6 +424,84 @@ const CROW_IN = [[344, 50, 36, 135, 0], [338, 34, 16, 160, 4], [328, 29, 0, 180,
 p.set(318, 30, { ...p.get(318, 30), tag: 'bossk-spot' });
 for (const [x, y] of [[322, 36], [338, 34], [340, 26]]) p.set(x, y, { ...p.get(x, y), tag: 'apron-squad' });
 
+// ================================================================ DRESSING
+// Area by area (PLAN.md, item 12). Things with a purpose, and Star Wars:
+// glow rods, landing clamps, droids, pods, repulsor craft, Aurebesh.
+const dress = [];
+/** A lit glow-rod pylon and its pool of light, or a dead one. */
+const pylon = (x, y, z = 0, lit = true) => {
+  dress.push(at(lit ? 'lamp-post' : 'lamp-post-dead', x, y));
+  if (lit) lamps.push({ x, y, z: z + 4.4, radius: 5, light: 64 });
+};
+
+// ---------------------------------------------------------------- 1. the pier and the quay
+// The pier: pylons down its sides (one dead), landing clamps where a ship
+// is tied down, and a cargo skiff left at the quay's west end.
+pylon(20.9, 108); pylon(29.1, 120); pylon(20.9, 132); pylon(29.1, 108, 0, false);
+for (const [x, y] of [[21, 138.5], [29, 138.5], [21, 126], [29, 126], [15, 103.2], [35, 103.2]]) dress.push(at('bollard', x, y, { angle: 90 }));
+dress.push(at('cargo-skiff', 13, 97, { angle: 0 }));
+// Freight waiting on the gate, a power droid left standing by it; the
+// Imperials' own gear at the bars: a floodlight and a barricade.
+dress.push(
+  at('cargo-pod', 33.5, 93.6, { angle: 0 }), at('canister', 35.6, 93.5), at('canister-rust', 36.4, 94.4),
+  at('power-droid-rust', 37.2, 98.5, { angle: 180 }),
+  at('floodlight-tower-worn', 43.6, 96.9, { angle: 180 }), at('barricade-worn', 41.5, 100.6, { angle: 90 }),
+);
+kit.door(38, 94, 'W', { h: 6, tex: 'door-grey', wall: T.shackB, jamb: false });
+kit.pipe(12, 92, 'S').pipe(31, 92, 'S');
+kit.fixture('conduit-10', 15, 92, 'S', { z: 5 });
+// The Bottoms' name over the arch, lit.
+decals.push({ x: 25, y: 92, z: 5.6, face: 'S', tex: 'sign-bottoms' });
+
+// ---------------------------------------------------------------- 2. the Bottoms
+// Lower street. West side: a door, a lean-to with a flue beside it,
+// windows over. East side: the shuttered droid shop under the lit sign,
+// its power unit, a dead astromech and a dome outside it.
+kit.door(20, 82, 'E', { h: 10, tex: 'door-grey', wall: T.shackB, jamb: false });
+kit.door(30, 85, 'W', { h: 6, tex: 'door-red', wall: T.shack, jamb: false });
+kit.block(20, 64, 22, 70, { h: 4, wall: T.shackC });
+kit.leanTo(20, 64, 22, 70, { h: 3, face: 'E', floorZ: 1 });
+kit.fixture('vent-stack', 20, 72.5, 'E', { z: 1 });
+kit.window(20, 77.5, 'E', { z: 5 }).window(20, 85.5, 'E', { z: 6.5, tex: 'window-louvre' });
+kit.pipe(20, 87, 'E').pipe(30, 81, 'W');
+kit.fixture('conduit-8', 20, 80, 'E', { z: 4 }).fixture('wall-unit', 30, 83, 'W', { z: 2.4 });
+kit.vent(30, 76.5, 'W', { z: 1.6, tex: 'shutter' }).vent(30, 74, 'W', { z: 4.5, tex: 'wall-fan' }).vent(20, 75, 'E', { z: 3, tex: 'wall-meter' });
+kit.fixture('shack-sign', 30, 78.5, 'W', { z: 3.6 });
+lamps.push({ x: 28.6, y: 78.5, z: 4.4, radius: 5, light: 72 });
+dress.push(
+  at('power-unit', 29.2, 79.6), at('astromech-rust', 28.9, 75.2, { angle: 200 }), at('droid-dome', 28.7, 73.7),
+  at('canister-rust', 21, 80.3), at('canister', 21.1, 79.2),
+);
+kit.hangings.push(
+  { type: 'cable', from: [20.05, 78, 8], to: [29.95, 76, 7.4], sag: 1.3 },
+  { type: 'cable', from: [20.05, 84, 7.2], to: [29.95, 86, 5.6], sag: 1 },
+  { type: 'cable', from: [20.05, 66, 8.5], to: [29.95, 74, 9], sag: 1.6 },
+);
+// The bend: a landspeeder parked along its south side, scrap by it.
+dress.push(at('landspeeder', 50, 59.2, { angle: 28 }), at('scrap', 44.5, 62.6), at('canister-rust', 37, 59.2));
+pylon(31.2, 61.2, 1);
+// Upper street. Doors and windows either side, a lean-to against the
+// south shacks, a flue, cables across, a tank on the wall; freight under
+// the conveyor (cover when the sweep squad comes down), a power droid.
+kit.door(64, 46, 'S', { h: 10, tex: 'door-grey', wall: T.shackC, jamb: false, floorZ: 2 });
+kit.door(82, 56, 'N', { h: 11, tex: 'door-red', wall: T.shackB, jamb: false, floorZ: 2 });
+kit.window(88.5, 46, 'S', { z: 5.5 }).window(66.5, 56, 'N', { z: 6, tex: 'window-louvre' }).window(79.5, 46, 'S', { z: 5.5, tex: 'window-louvre' });
+kit.pipe(78, 46, 'S', { floorZ: 2 }).pipe(68, 56, 'N', { floorZ: 2 });
+kit.block(86, 54, 92, 56, { h: 6, wall: T.shackC });
+kit.leanTo(86, 54, 92, 56, { h: 3, face: 'N', floorZ: 3 });
+kit.fixture('vent-stack', 67.5, 46, 'S', { z: 2 }).fixture('conduit-6', 91, 46, 'S', { z: 6 }).fixture('wall-tank', 94, 56, 'N', { z: 3 });
+kit.vent(84, 46, 'S', { z: 4.6, tex: 'vent-slats' }).vent(62, 56, 'N', { z: 4.4, tex: 'wall-meter' });
+kit.hangings.push(
+  { type: 'cable', from: [62, 46.05, 9], to: [66, 55.95, 8.4], sag: 1.4 },
+  { type: 'cable', from: [88, 46.05, 7.6], to: [84, 55.95, 9.5], sag: 1.2 },
+  { type: 'cable', from: [78, 46.05, 7], to: [79, 55.95, 8], sag: 0.9 },
+);
+dress.push(
+  at('bay-crate-rust-long', 73, 54.6, { angle: 0 }), at('cargo-pod', 71.6, 47.4), at('power-droid-rust', 80.5, 54.4, { angle: 90 }),
+  at('canister', 66.2, 47), at('canister-rust', 83.6, 55),
+);
+pylon(61, 55.2, 2); pylon(94.8, 47, 3);
+
 // A room indoors (a ceiling, not the sky) inside a building shows from
 // outside as a wall up to the sky, wherever something looks over the
 // building's roof into it. So every tile of building next to one becomes
@@ -499,7 +577,7 @@ export default defineLevel({
   decals: [...decals, ...kit.decals],
   hangings: [...kit.hangings],
   things: [],
-  list: [...list, ...kit.things],
+  list: [...list, ...dress, ...kit.things],
   triggers: [
     // The way out (Mark, 2026-11-14): once Bossk is dead the Crow comes in
     // over the dock and sets down on the apron; reach it and the level ends.
