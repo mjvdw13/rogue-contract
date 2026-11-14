@@ -428,6 +428,21 @@ const CROW_IN = [[344, 50, 36, 135, 0], [338, 34, 16, 160, 4], [328, 29, 0, 180,
 p.set(318, 30, { ...p.get(318, 30), tag: 'bossk-spot' });
 for (const [x, y] of [[322, 36], [338, 34], [340, 26]]) p.set(x, y, { ...p.get(x, y), tag: 'apron-squad' });
 
+// ---------------------------------------------------------------- the skyline
+// Beyond play, on the roofs of the mass north of the waterfront: the slum
+// climbing in tiers behind the Bottoms, the works' sheds behind the yard,
+// refinery stacks standing out of them (their smoke goes east on the
+// wind), and two yard platforms out over the water. The sky's picture
+// carries the far ones.
+for (const [x0, y0, x1, y1, h, wall] of [
+  [2, 20, 60, 30, 16, T.shackB], [6, 10, 40, 20, 20, T.shack], [46, 12, 68, 20, 19, T.shackC], [20, 2, 64, 10, 24, T.shackC],
+  [78, 20, 120, 32, 17, T.shackB], [84, 8, 128, 20, 22, T.shack], [100, 2, 150, 8, 26, T.shackC],
+  [132, 30, 172, 44, 16, T.seaWall], [178, 26, 204, 48, 20, T.boxB], [212, 30, 258, 50, 15, T.seaWall], [266, 30, 304, 52, 18, T.boxA],
+]) kit.block(x0, y0, x1, y1, { h, wall, roof: T.roof });
+kit.block(110, 128, 150, 138, { h: 5, wall: T.seaWall, roof: T.quay });
+kit.block(220, 130, 270, 140, { h: 7, wall: T.seaWall, roof: T.quay });
+const STACKS = [[100, 14], [150, 37], [192, 36], [236, 40], [286, 42], [246, 135]];
+
 // ================================================================ DRESSING
 // Area by area (PLAN.md, item 12). Things with a purpose, and Star Wars:
 // glow rods, landing clamps, droids, pods, repulsor craft, Aurebesh.
@@ -566,6 +581,8 @@ dress.push(
 );
 lamps.push({ x: 201.5, y: 65, z: 1.5, radius: 7, light: 96 }, { x: 191, y: 73, z: 1, radius: 5, light: 72 }, { x: 200, y: 73, z: 1, radius: 5, light: 72 });
 pylon(169, 58); pylon(204.6, 99);
+// The skyline's stacks.
+for (const [x, y] of STACKS) dress.push(at('smokestack', x, y, { lit: DAY }));
 // The foreman's shed: his terminal and bench, a lamp, a comm unit by the door.
 dress.push(at('terminal', 178.6, 58.2, { angle: 270 }), at('workbench', 183.4, 59.5, { angle: 90 }), at('ceiling-lamp', 181, 60));
 kit.fixture('comm-unit', 184.5, 64, 'S', { z: 1.2 });

@@ -1735,12 +1735,6 @@ taken. The blockout steps are in order, one session at a time.
       (`sky-dusk`), the yard as bare ground with blocks for the hauler
       and the crane's legs. The level ends at the gallery's south end
       (a temporary exit) until Berth 1 is there.
-- [ ] **Found in blockout A, to settle:** the map's south-east edge
-      shows as a low wall on the horizon over the water from the pier:
-      the skyline step must end the sea cleanly. (The crane is settled
-      as far as it can be without Mark: with its model up, its top and a
-      red beacon show over the hauler from the pier at `half: 44`, a
-      faint shape as the design asks. See Waiting on Mark.)
 - [x] Blockout B, areas 4 to 6 (Berth 1 with Mission 1's freighter and
       the steps up through its deck; the cutting floor with slanted plate
       stacks, a sunk lane, the shed; the hauler: hold, bulkhead, reactor
@@ -1810,9 +1804,10 @@ taken. The blockout steps are in order, one session at a time.
       the power, and `haze.indoors` so the hauler's open hold fades into
       the smog. The haze's colour and half distance are as the design's;
       Mark judges them.
-- [ ] **The skyline**: the slum climbing behind the sea wall, the stacks,
-      the platforms (a backdrop or scenery blocks; `lib/backdrop.js` is
-      a canyon's, so this may want its own).
+- [x] **The skyline**: scenery blocks on the roofs north of the
+      waterfront (the slum in tiers to 24, the works' sheds to 20), six
+      `smokestack` models standing out of them, two platforms over the
+      water. The sky's picture carries the far ones.
 - [ ] **Fights and items**: enemies by skill (a table in the design, as
       Mission 4's), beats for the patrols, the sweep squad, the hold's
       ambush on `power`, the dock, the apron; pickups, a weapon each
