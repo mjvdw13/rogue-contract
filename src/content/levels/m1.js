@@ -571,6 +571,18 @@ town.block(126, 118, 150, 122, { h: 8 }).block(149, 96, 162, 118, { h: 8 });
 town.arch(126, 77, 130, 78, { h: 5, wall: 'adobe-grey' });
 p.rect(126, 77, 130, 78, (_, __, c) => ({ ...c, door: 'door-planks-rising', style: 'rise', lock: 'remote' }));
 gateTag(126, 77, 130, 78, 'lane-gate');
+// Its way marked from the street (Mark's play test, 2026-11-13: from the
+// shut blast doors the lane was hard to find, a gap in a long wall): the
+// cantina's sign over the gate; one of the troopers' floodlight towers on
+// the corner, standing out past the wall's line so it shows from the blast
+// doors; and at the switch two troopers posted just inside the gate, facing
+// the street, so the guarded opening reads as the way.
+town.fixture('cantina-sign', 128, 77, 'N', { z: 3.6 });
+list.push(at('floodlight-tower-worn', 125.2, 72.2));
+tagTile(127, 79, 'lane-guard');
+tagTile(129, 79, 'lane-guard');
+// In front of the blast doors, where Jan names the lane once they're shut.
+p.rect(106, 62, 112, 76, (_, __, c) => (c.wall || c.door || c.tag ? c : { ...c, tag: 'blast-foot' }));
 town.platform(126, 112, 132, 118, { h: 0.5, steps: 'N' });
 town.door(128, 118, 'N', { h: 8, tex: 'door-grey', floorZ: 0.5 });
 town.window(130, 92.5, 'W', { z: 2.6, tex: 'window-louvre' }).window(130, 108.5, 'W', { z: 2.4 }).window(140, 94.5, 'E', { z: 2.6 });
@@ -1520,14 +1532,8 @@ for (const [x, y] of [[78.5, 9.6], [68, 8.5], [86.5, 8]]) lights.push({ x, y, z:
 list.push(
   at('jawa', 66.6, 10.2, {
     angle: 80,
-    tag: 'trader',
-    name: 'Jawa trader',
     calm: { wander: 0 },
-    talk: [
-      { unless: 'contract', lines: ['Utinni!', 'Kkkt!'] },
-      { unless: 'signal', lines: ["Utinni! M'um m'aloo... eeh-chu-ta?", "(He reads a code off a coupling's tag and keys it into your fob.)"], set: 'signal' },
-      { lines: ['Utinni!'] },
-    ],
+    talk: [{ lines: ["Utinni! M'um m'aloo... eeh-chu-ta?", 'Kkkt!'] }],
   }),
 );
 
@@ -1736,14 +1742,14 @@ town.door(104, 33, 'S', { h: 7.5, tex: 'shutter', tall: 2.25, width: 2, jamb: fa
   const GUNS = { h: 6, wall: 'adobe-grey', light: 88, ceilZ: 3.75 };
   town.room(99, 28, 101, 36, GUNS).room(101, 29, 102, 32, GUNS).room(102, 27, 105, 32, { ...GUNS, h: 7.5, wall: 'adobe-pale' });
   town.arch(101, 33, 102, 35, { h: 6, lintel: 3, wall: 'adobe-grey' });
-  // (Out of play since the alleys were shut for good, Mark 2026-11-13:
-  // no longer a secret, and its ammo gone.)
-  p.rect(101, 33, 102, 35, (_, __, c) => ({ ...c, door: 'adobe-grey', style: 'rise' }));
+  p.rect(101, 33, 102, 35, (_, __, c) => ({ ...c, door: 'adobe-grey', style: 'rise', secret: true }));
+  p.rect(99, 28, 105, 36, (_, __, c) => (c.slab && !c.door ? { ...c, secret: true } : c));
   // (Its walls in its own dim light, not the sun's, where they've no face outside.)
   p.light(98, 26, 106, 32, GUNS.light).light(98, 32, 101, 36, GUNS.light).light(101, 32, 102, 33, GUNS.light);
   list.push(
     at('rack-b', 103.5, 27.05, { angle: 0 }), at('crate-tan', 99.6, 28.6, { angle: 10 }), at('crate-grey-small', 99.6, 28.6, { z: 0.9, angle: 40 }),
     at('barrel-rust', 99.5, 34.5), at('canister-rust', 99.45, 33.6),
+    at('thermal-detonator', 103.5, 29.6), at('energy-cell', 102.6, 30.8), at('energy-cell', 99.8, 31),
     at('cantina-lamp', 102.5, 29.5, { z: GUNS.ceilZ - LAMP_CORD }),
     // Outside, a crate stood half across the door, and the shop's sign's drums.
     at('crate-tan', 102.62, 34.8, { angle: 8 }), at('canister', 105.3, 33.6), at('barrel-grey', 105.45, 34.5),
@@ -2007,10 +2013,16 @@ list.push(
 // full health, so the calm half leaves them for the fight; the easy skills
 // find a little more.
 list.push(
-  // (The back alleys' finds went when the alleys were shut for good, Mark
-  // 2026-11-13; their dressing stays.)
-  at('crate-tan', 130.5, 43.5, { angle: 3 }), at('bedroll', 131, 19.6, { angle: 90 }), at('crate-grey-small', 144.6, 46.4, { angle: 350 }),
-  at('cargo-pod', 104.5, 46.2, { angle: 90 }), at('crate-rust-long', 106.45, 26.8, { angle: 90 }),
+  // The second lane's south alley: a spacer's crate, two cells on it.
+  at('crate-tan', 130.5, 43.5, { angle: 3 }), at('energy-cell', 131.6, 43.4), at('energy-cell', 132.4, 43.1),
+  // Its north alley: someone sleeps rough at its end, their med kit by them.
+  at('bedroll', 131, 19.6, { angle: 90 }), at('med-kit', 131, 18.7), at('med-kit', 130.6, 20.6, { skill: [1, 2] }),
+  // Off the thug's square: his men's spare cells by a crate.
+  at('crate-grey-small', 144.6, 46.4, { angle: 350 }), at('energy-cell', 145.5, 46.3), at('energy-cell', 145.4, 45.6, { skill: [1, 2] }),
+  // The first lane's south alley, behind the garage: a pack off a speeder.
+  at('cargo-pod', 104.5, 46.2, { angle: 90 }), at('energy-pack', 102.8, 46.3),
+  // The gun shop's alley: its overflow, a cell left on a crate's lid.
+  at('crate-rust-long', 106.45, 26.8, { angle: 90 }), at('energy-cell', 107.5, 26.6),
   // The north street's alley to the comm tower's foot: a med kit in a canister's shade.
   at('canister-rust', 180.6, 46.6), at('med-kit', 181.4, 46.8),
   // The wash's east bank: what the last flood left at the alley's end.
@@ -2279,12 +2291,14 @@ export default defineLevel({
   holster: true,
   // The story as a chain (Mark, 2026-11-13: M2 and M4 always move forward,
   // M1 was open-ended): three stops, the broker, Rusk and the Crow, and the
-  // fob from landing, always pointing at the next place on the way. It
-  // points straight at each (Mark, 2026-11-04: the route round every corner
-  // was too confusing), so the places are near enough to see the way:
-  // going in, the bay door, the cantina's door, the broker, the
-  // checkpoint's gate, Rusk; coming home, the back lane's gate, the
-  // cantina's back door, its front door, the bay door, the Crow.
+  // fob from landing, pointing at the next place on the way in. It points
+  // straight at each (Mark, 2026-11-04: the route round every corner was too
+  // confusing), so the places are near enough to see the way: the bay door,
+  // the cantina's door, the broker, the checkpoint's gate, Rusk. Rusk takes
+  // it (Mark's play test, 2026-11-13: the way home wants no tracker), and the
+  // way home is round the shut blast doors, down the back lane and through
+  // the cantina. The junk yard, the alleys and their streets are open from
+  // the start, to explore (Mark: off the way, not out of the level).
   triggers: [
     // Jan on landing, so the first stop is named, and the fob to find it.
     {
@@ -2292,12 +2306,16 @@ export default defineLevel({
       do: [
         { action: 'giveWeapon', weapon: 'fob' },
         { action: 'setSignal', tag: 'bay-door' },
+        { action: 'openDoors', tag: 'junk-gate' },
+        { action: 'openDoors', tag: 'side-gate' },
+        { action: 'openDoors', tag: 'alley-gate' },
+        { action: 'openDoors', tag: 'mouth-gate' },
         { action: 'message', text: "JAN: YOUR BROKER'S IN THE CANTINA, ON THE MARKET." },
         { action: 'message', text: "JAN: I'VE PUT HIM ON YOUR FOB. GREEN'S THE WAY." },
       ],
     },
-    { on: 'enter', tag: 'bay-lane', unless: ['contract', 'loud'], do: [{ action: 'setSignal', tag: 'cantina-door' }] },
-    { on: 'enter', tag: 'cantina-door', unless: ['contract', 'loud'], do: [{ action: 'setSignal', tag: 'broker' }] },
+    { on: 'enter', tag: 'bay-lane', unless: 'contract', do: [{ action: 'setSignal', tag: 'cantina-door' }] },
+    { on: 'enter', tag: 'cantina-door', unless: 'contract', do: [{ action: 'setSignal', tag: 'broker' }] },
     {
       on: 'enter',
       tag: 'ledger',
@@ -2329,36 +2347,44 @@ export default defineLevel({
       do: [{ action: 'message', text: 'TROOPER: YOUR PASS CHECKS OUT. GO ON.' }, { action: 'openDoors', tag: 'checkpoint' }],
     },
     { on: 'enter', tag: 'past-checkpoint', if: 'signal', unless: 'loud', do: [{ action: 'setSignal', tag: 'rusk' }] },
+    // In the hold Rusk pulls the fob's Imperial tracer, and the town turns.
     {
       on: 'enter',
       tag: 'hold',
       if: 'signal',
-      do: [{ action: 'message', text: "RUSK (STAND-IN): THAT FOB IS IMPERIAL. THEY'RE ALREADY HERE." }, { action: 'hostile' }],
+      do: [
+        { action: 'message', text: "RUSK (STAND-IN): THAT FOB IS IMPERIAL. THEY'RE ALREADY HERE." },
+        { action: 'takeWeapon', weapon: 'fob' },
+        { action: 'setSignal' },
+        { action: 'hostile' },
+      ],
     },
     {
       on: 'hostile',
       do: [
-        // The blast doors shut, so the way home is round them, through the
-        // cantina: the fob points at the back lane's gate.
+        // The blast doors shut, and the alleys' mouth by the checkpoint, so
+        // the way home is the back lane and the cantina (Mark, 2026-11-13:
+        // through the cantina, every time). Two troopers post themselves at
+        // the lane's gate, under the cantina's sign.
         { action: 'setFlag', flag: 'loud' },
-        { action: 'message', text: "JAN: THEY'VE SEALED THE BLAST DOORS. GO ROUND THROUGH THE CANTINA." },
-        { action: 'setSignal', tag: 'lane-gate' },
+        { action: 'message', text: "JAN: THEY'VE SEALED THE BLAST DOORS." },
+        { action: 'message', text: 'JAN: GO ROUND, THROUGH THE CANTINA.' },
         { action: 'closeDoors', tag: 'blast-doors' },
+        { action: 'closeDoors', tag: 'mouth-gate' },
         { action: 'openDoors', tag: 'lane-gate' },
         { action: 'openDoors', tag: 'cantina-back' },
         { action: 'openDoors', tag: 'checkpoint' },
+        { action: 'spawn', thing: 'sandtrooper', tag: 'lane-guard', fog: false, wake: false, angle: 90 },
         { action: 'spawn', thing: 'sandtrooper', tag: 'derelict-rim' },
         { action: 'spawn', thing: 'sandtrooper', tag: 'derelict-gate' },
         { action: 'spawn', thing: 'sandtrooper', tag: 'quarter-north' },
         { action: 'spawn', thing: 'sandtrooper', tag: 'roof-sniper' },
       ],
     },
-    { on: 'enter', tag: 'checkpoint-foot', if: 'loud', do: [{ action: 'message', text: "JAN: THE BACK LANE, KYLE. THE CANTINA'S BACK DOOR." }] },
-    { on: 'enter', tag: 'lane-gate', if: 'loud', do: [{ action: 'setSignal', tag: 'cantina-back' }] },
-    { on: 'enter', tag: 'cantina-back', if: 'loud', do: [{ action: 'setSignal', tag: 'cantina-door' }] },
-    { on: 'enter', tag: 'cantina-door', if: 'loud', do: [{ action: 'setSignal', tag: 'bay-door' }, { action: 'message', text: 'JAN: WEST ALONG THE MAIN STREET. THE CROW IS WARM.' }] },
-    { on: 'enter', tag: 'bay-lane', if: 'loud', do: [{ action: 'setSignal', tag: 'crow' }] },
-    { on: 'enter', tag: 'crow', if: 'loud', do: [{ action: 'message', text: "JAN: CUSTOMS WON'T BE CHECKING PAPERS NOW." }, { action: 'takeWeapon', weapon: 'fob' }, { action: 'exit' }] },
+    { on: 'enter', tag: 'checkpoint-foot', if: 'loud', do: [{ action: 'message', text: 'JAN: THE BACK LANE, UNDER THE CANTINA SIGN.' }] },
+    { on: 'enter', tag: 'blast-foot', if: 'loud', do: [{ action: 'message', text: "JAN: SEALED TIGHT. TRY THE CANTINA'S BACK LANE." }, { action: 'message', text: 'JAN: BACK EAST, UNDER THE CANTINA SIGN.' }] },
+    { on: 'enter', tag: 'cantina-door', if: 'loud', do: [{ action: 'message', text: 'JAN: WEST DOWN THE MAIN STREET TO THE CROW.' }] },
+    { on: 'enter', tag: 'crow', if: 'loud', do: [{ action: 'message', text: "JAN: CUSTOMS WON'T BE CHECKING PAPERS NOW." }, { action: 'exit' }] },
   ],
   ...p.build(),
   things: [],

@@ -28,24 +28,20 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
-- **Mission 1 as a chain** (`?map=m1`, 2026-11-13, after Mark's note that
-  M2 and M4 always move forward and M1 is open-ended; `docs/mission1.md`,
-  "A chain, not a hunt"): three stops instead of six. Kyle lands holding
-  the fob, already pointing: the bay door, the cantina's door, the broker.
-  The broker gives the contract, the pass and Rusk's signal in one talk;
-  the checkpoint's troopers let Kyle through; past the gate the fob tracks
-  Rusk. The junk yard, the back alleys, the informant (a local now) and
-  the customs terminal are out of the story; their gates stay shut (the
-  alleys' nine pickups and the gun shop's secret went). Five yard walls
-  close the south back lane, so the bay door's lane leads only up the
-  square. At the switch Kyle draws his blaster and keeps the fob; it leads
-  round the shut blast doors through the back lane and the cantina, then
-  west to the bay door and the Crow. With the blaster in hand the fob
-  shows as a pip on a strip at the bottom of the screen. To judge: whether
-  it now feels like moving forward; whether the junk yard (the
-  sandcrawler, the trader) should come back as a short detour; the pip
-  (place, size, colours); Jan's and the broker's stand-in lines; and
-  whether the walls read as walls or as the town's end.
+- **Mission 1 as a chain** (`?map=m1`, 2026-11-13; `docs/mission1.md`, "A
+  chain through an open town"). After Mark's first play of it: the fob's
+  few stops and the cantina on the way back kept; the junk yard, the
+  sandcrawler, the back alleys and their streets open again (from the
+  start, off the way: the trader is just a Jawa now); the hangar's direct
+  way up the square kept; Rusk takes the fob again, and the HUD pip is
+  gone. The way to the back lane from the shut blast doors: the cantina's
+  sign over the lane's gate, a floodlight tower on its corner that shows
+  down the street from the blast doors, two troopers posted at the gate
+  after the switch, and Jan naming the lane in front of the blast doors
+  and at the checkpoint. The alleys' mouth by the checkpoint shuts at the
+  switch, so the cantina stays the only way round (a test checks it). To
+  judge: whether the lane is easy enough to find now, the tower and sign
+  (too much, too little), the guards, and Jan's lines.
 
 - **The rest of Dark Forces' weapons** (`?map=sandbox&god`, 2026-11-11):
   all in the sandbox's start room, in a row east of you (3 rifle, 5

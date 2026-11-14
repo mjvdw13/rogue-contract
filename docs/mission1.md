@@ -65,59 +65,66 @@ y    +----------------------------------------------------------------------+
   6 rooftops   9 old quarter   w dry wash   0 derelict bay
 ```
 
-**A chain, not a hunt** (Mark, 2026-11-13: Missions 2 and 4 always move
-forward; this one was open-ended, six stops spread over the whole town).
-Three stops now, the broker, Rusk and the Crow, and the fob from landing,
-always pointing straight at the next place on the way.
+**A chain through an open town** (Mark, 2026-11-13: Missions 2 and 4
+always move forward; this one had six stops spread over the whole town).
+Three stops now, the broker, Rusk and the Crow, with the fob from landing
+pointing straight at the next place on the way in. The rest of the town
+stays open to explore, off the way (Mark, after playing it: the smaller
+map was less fun).
 
 **Going east (calm):** Bay 87 → the bay door's lane, up the square → the
 main street → the market → the cantina, south of it (the broker: the
 contract, the checkpoint's pass and Rusk's signal for the fob, in one
 talk) → back to the main street, east past the blast doors to the
 checkpoint (the troopers read the pass as Kyle walks up) → down the old
-quarter's slanting street → the derelict bay (Rusk).
+quarter's slanting street → the derelict bay (Rusk). Off the way, open
+from the start: the junk yard and the sandcrawler (the trader is just a
+Jawa selling now), the back alleys behind the market's north side, and
+their mouth by the checkpoint.
 
-**Coming back west (loud):** Kyle draws his blaster at the switch and
-keeps the fob. The derelict bay → the old quarter, or along the dry wash
-→ the checkpoint (open now, troopers behind its barricades, a sniper on
-the roofs) → the blast doors are shut, so down the back lane and in at
-the cantina's back door → through the cantina and out onto the market →
-west along the main street → down the square to the bay door → Bay 87,
-where the level ends under the Crow.
+**Coming back west (loud):** Rusk takes the fob (its Imperial tracer
+brought them) and Kyle draws his blaster; no tracker home. The derelict
+bay → the old quarter, or along the dry wash → the checkpoint (open now,
+troopers behind its barricades, a sniper on the roofs) → the blast doors
+are shut, and so is the alleys' mouth, so down the back lane (two
+troopers at its gate) and in at the cantina's back door → through the
+cantina and out onto the market → west along the main street → down the
+square to the bay door → Bay 87, where the level ends under the Crow.
 
 **What holds the player back:**
 
-- The streets lead one way (Mark, 2026-11-05 and 2026-11-13): yard walls
-  2.5 tall close both back lanes behind the west end's houses, so the
-  gaps between them are short dead ends, and the bay door's lane leads
-  only up the square. The junk yard's gates, the back alleys' and the
-  one at the alleys' east mouth stay shut all game; the customs house,
-  the junk yard, the stable and the alleys are out of play, glimpsed over
-  walls and gates.
+- Yard walls 2.5 tall close the back lanes behind the west end's houses
+  (the north one 2026-11-05, the south one 2026-11-13), so the bay door's
+  lane leads only up the square. The customs house and the stable are
+  out of play, glimpsed over walls.
 - Kyle's blaster stays holstered until the switch (Mark, 2026-10-30), so
   the town can't turn early: it turns when he finds Rusk.
 - The checkpoint's gate opens for the pass (from the broker), and at the
   switch.
 - The freighter's hold in the derelict bay is shut (a door in its stern)
   until the broker keys in Rusk's signal. Stepping into it turns the town.
-- The blast doors shut at the switch; the back lane's gate and the
-  cantina's back door open, so the way home is through the cantina.
+- The back lane's gate and the cantina's back door are shut until the
+  switch. At the switch the blast doors and the alleys' mouth shut, so
+  the cantina is the only way home (Mark: through the cantina, every
+  time; a test checks no walker gets round without its back door).
 
 **What points the way** (stand-in words, Mark to write the real ones):
 
-- The fob, from landing (straight at each, Mark 2026-11-04: the route
-  round every corner was too confusing): the bay door, then from its lane
-  the cantina's door, then inside it the broker; from the broker the
-  checkpoint's gate, and through the gate (tag `past-checkpoint`) Rusk.
-  Coming home: the back lane's gate, the cantina's back door, its front
-  door, the bay door, the Crow. Held, its light blinks green, amber or
-  red; carried with the blaster in hand, a pip on the HUD does the same.
+- The fob, from landing to Rusk (straight at each, Mark 2026-11-04: the
+  route round every corner was too confusing): the bay door, then from
+  its lane the cantina's door, then inside it the broker; from the broker
+  the checkpoint's gate, and through the gate (tag `past-checkpoint`)
+  Rusk.
 - On landing, Jan: the broker's in the cantina, and he's on the fob.
 - The checkpoint's troopers: no pass, no way through; with it, they let
   Kyle through.
 - At the switch, Jan: the blast doors are sealed, go round through the
-  cantina. Back at the checkpoint's foot she names the back lane; out of
-  the cantina's door, the main street west to the Crow.
+  cantina. In front of the shut blast doors (tag `blast-foot`) she names
+  the back lane, back east under the cantina's sign; at the checkpoint's
+  foot again; out of the cantina's door, the main street west to the Crow.
+- The back lane's mouth, marked from the street: the cantina's sign over
+  its gate, a floodlight tower on its corner that shows from the blast
+  doors, and after the switch two troopers posted at the gate.
 - Townsfolk's hints follow the three steps (`villagers.js`).
 
 **Levels and slants** (above, "Off the grid, and up and down"): Mos

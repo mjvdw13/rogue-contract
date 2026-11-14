@@ -1,9 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { makeWorld, mockInput, run } from './helpers.js';
+import { FlowField, WALKER, UNREACHABLE } from '../src/engine/world/nav.js';
+import { F_SOLID } from '../src/engine/world/tilemap.js';
 
 // Mos Eisley as a chain (Mark, 2026-11-13): the broker, Rusk, the Crow.
-// The fob comes with Kyle and always points at the next place on the way.
+// The fob comes with Kyle and points at the next place on the way in; Rusk
+// takes it, and the way home is through the cantina.
 
 /** Stand the player at (x, y) facing `angle` (content degrees), let them land, press use, let a moment pass. */
 function talk(w, x, y, angle) {
@@ -55,21 +58,33 @@ test('in Mos Eisley the fob points the way in: the bay door, the cantina, the br
   assert.equal(w.hostile, false, 'the town is calm all the while');
 });
 
-test('Mos Eisley stays a chain: the junk yard and the alleys stay shut, and the switch shuts the blast doors and opens the way round through the cantina', () => {
+test("Mos Eisley: the junk yard and the alleys are open to explore; the switch shuts the blast doors and the alleys' mouth, so the way round is through the cantina", () => {
   const w = makeWorld('m1');
+  run(w, mockInput(), 2);
   const offRoute = ['junk-gate', 'side-gate', 'alley-gate', 'mouth-gate'];
   assert.equal(door(w, 'blast-doors').state, 'open', 'the blast doors stand open when Kyle lands');
-  for (const tag of [...offRoute, 'lane-gate', 'cantina-back']) assert.ok(shut(w, tag), `${tag} is shut when Kyle lands`);
+  for (const tag of offRoute) assert.ok(!shut(w, tag), `${tag} is open from the start`);
+  for (const tag of ['lane-gate', 'cantina-back']) assert.ok(shut(w, tag), `${tag} is shut while the town is calm`);
   takeContract(w);
   stand(w, 184, 134.5);
   run(w, mockInput(), 3);
   assert.equal(w.hostile, true);
   assert.ok(shut(w, 'blast-doors'), 'the blast doors shut behind Kyle');
+  assert.ok(shut(w, 'mouth-gate'), "and the alleys' mouth by the checkpoint");
   assert.ok(!shut(w, 'lane-gate') && !shut(w, 'cantina-back'), 'the back lane and the cantina are the way round');
-  for (const tag of offRoute) assert.ok(shut(w, tag), `${tag} stays shut`);
+
+  // From the checkpoint's foot a walker reaches the market, and only by the cantina's back door.
+  const reaches = () => {
+    const field = new FlowField(w.map, WALKER);
+    field.update(137, 67, true, w.map.floorZ[67 * w.map.w + 137] + WALKER.step);
+    return field.dist[field.nodeAt(80, 70)] !== UNREACHABLE;
+  };
+  assert.ok(reaches(), 'the market can be reached');
+  for (const i of w.map.tilesWithTag('cantina-back')) w.map.flags[i] |= F_SOLID;
+  assert.ok(!reaches(), "and not without the cantina's back door");
 });
 
-test('the way home from Mos Eisley: Kyle draws, the fob leads round through the cantina to the bay, and under the Crow the level ends', () => {
+test('the way home from Mos Eisley: Rusk takes the fob, Kyle draws, Jan names the back lane, guards stand at its gate, and under the Crow the level ends', () => {
   const w = makeWorld('m1');
   w.player.player.god = true;
   stand(w, 34.5, 129.5);
@@ -79,21 +94,18 @@ test('the way home from Mos Eisley: Kyle draws, the fob leads round through the 
   stand(w, 184, 134.5);
   run(w, mockInput(), 2);
   assert.equal(w.hostile, true);
-  assert.equal(w.player.player.weapon, 'blaster', 'Kyle draws his blaster');
-  assert.ok(w.player.player.weapons.has('fob'), 'and keeps the fob');
-  assert.equal(points(w), 'lane-gate');
-  const jan = said(w, 'JAN').length;
-  stand(w, 137.5, 67);
-  assert.ok(said(w, 'JAN').length > jan, 'Jan names the way round at the checkpoint');
+  assert.ok(!w.player.player.weapons.has('fob'), 'Rusk takes the fob');
+  assert.equal(w.player.player.weapon, 'blaster', 'and Kyle draws his blaster');
+  assert.equal(w.signal, null);
+  const guards = w.things.filter((t) => t.kind === 'monster' && !t.dead && t.x > 126 && t.x < 130 && t.y > 78 && t.y < 80);
+  assert.equal(guards.length, 2, "two troopers at the back lane's gate");
 
-  stand(w, 128, 77.5);
-  assert.equal(points(w), 'cantina-back');
-  stand(w, 125.5, 106);
-  assert.equal(points(w), 'cantina-door');
-  stand(w, 94, 83.5);
-  assert.equal(points(w), 'bay-door');
-  stand(w, 32, 97);
-  assert.equal(points(w), 'crow');
+  let jan = said(w, 'JAN').length;
+  stand(w, 108, 70);
+  assert.ok(said(w, 'JAN').length > jan, 'at the shut blast doors Jan names the back lane');
+  jan = said(w, 'JAN').length;
+  stand(w, 137.5, 67);
+  assert.ok(said(w, 'JAN').length > jan, 'and at the checkpoint');
   stand(w, 34.5, 129.5);
   assert.equal(w.exitRequested, 'normal', 'and under the Crow the level ends');
 });
