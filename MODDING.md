@@ -892,7 +892,13 @@ at 144 reads at 10 m; one at 104 stays dark. With `haze`, surfaces under the
 sky (seen from a sky tile) fade toward the haze colour with distance
 instead, halfway there at `half` tiles (40 by default): a night canyon
 fades into purple air rather than black. Pick a colour like the sky's near
-the horizon. Indoors, haze changes nothing.
+the horizon. Indoors, haze changes nothing, so a room seen from far down a
+hazy street is a black hole in it. `haze: { ..., indoors: true }` fixes
+that: a ray that has run through the open air before it comes indoors
+keeps the haze it came through, and the fog counts only from where it came
+in. A hold seen across a yard fades into the smog; step inside and nothing
+has changed. (Models and sprites indoors stay unhazed.) It costs about 5%
+of the world pass on a level with many such views.
 
 The sky's texture goes round the horizon `skyWrap` times, twice by
 default (Dark Forces' skies span 180 degrees). With `skyWrap: 1` it goes

@@ -1741,10 +1741,6 @@ taken. The blockout steps are in order, one session at a time.
       as far as it can be without Mark: with its model up, its top and a
       red beacon show over the hauler from the pier at `half: 44`, a
       faint shape as the design asks. See Waiting on Mark.)
-- [ ] **Found with the crane:** from the pier and the quay a black,
-      unhazed block shows at the hauler's west end (snapshot `--at
-      25,136,8`). It was there before the crane. Find what it is (an
-      unlit indoor face seen through a hole?) before dressing area 6.
 - [x] Blockout B, areas 4 to 6 (Berth 1 with Mission 1's freighter and
       the steps up through its deck; the cutting floor with slanted plate
       stacks, a sunk lane, the shed; the hauler: hold, bulkhead, reactor

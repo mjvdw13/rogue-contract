@@ -57,6 +57,8 @@ export class View {
     this.fixedColormap = -1;
     /** Haze: on outdoors (under the sky) this frame, and the haze step (0 to HAZE_STEPS - 1, fractional) by distance. */
     this.hazeOn = false;
+    /** The haze reaches indoors too (the level's `haze.indoors`). */
+    this.hazeIndoors = false;
     this.hazeHalf = 0;
     this.hazeTab = new Float32Array(HAZE_LEN);
   }
@@ -114,6 +116,7 @@ export class View {
     this.extraLight = extra;
     for (let l = 0; l < 256; l++) this.lightStart[l] = (LIGHT_BLACK - l) / 4 - extra;
     this.hazeOn = !!haze && this.fixedColormap < 0;
+    this.hazeIndoors = this.hazeOn && !!haze.indoors;
     if (this.hazeOn && haze.half !== this.hazeHalf) {
       this.hazeHalf = haze.half;
       for (let k = 0; k < HAZE_LEN; k++) this.hazeTab[k] = (HAZE_STEPS - 1) * (1 - Math.pow(0.5, k / HAZE_RES / haze.half));

@@ -594,6 +594,7 @@ export function validateContent(reg) {
       const c = level.haze.color;
       if (!Array.isArray(c) || c.length !== 3 || !c.every((v) => typeof v === 'number' && v >= 0 && v <= 255)) err(`${owner}: haze needs a "color" of three numbers 0-255, like [40, 36, 64]`);
       if (level.haze.half !== undefined && !(level.haze.half > 0)) err(`${owner}: haze "half" (the distance in tiles at which it's halfway) must be above 0`);
+      if (level.haze.indoors !== undefined && typeof level.haze.indoors !== 'boolean') err(`${owner}: haze "indoors" (the haze reaches into rooms seen from outside) must be true or false`);
       if (level.haze.gust !== undefined && !(level.haze.gust > 0)) err(`${owner}: haze "gust" (its half distance in a full gust of the weather) must be above 0`);
     }
     if (level.weather) {

@@ -649,7 +649,7 @@ export default defineLevel({
   sky: T.sky,
   skyWrap: 1,
   // Smog: the far end of the row is a shape in yellow-grey air.
-  haze: { color: [150, 142, 112], half: 44 },
+  haze: { color: [150, 142, 112], half: 44, indoors: true },
   par: 660,
   ...p.build(),
   lights: lamps,

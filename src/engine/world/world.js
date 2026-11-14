@@ -148,7 +148,7 @@ export class World {
     this.grid = new ThingGrid(this.map.w, this.map.h);
     this.fog = level.fog ?? 0.05;
     /** Outdoors, surfaces fade toward this colour with distance (halfway at `half` tiles) instead of darkening. */
-    this.haze = level.haze ? { color: level.haze.color, half: level.haze.half ?? 40 } : null;
+    this.haze = level.haze ? { color: level.haze.color, half: level.haze.half ?? 40, indoors: !!level.haze.indoors } : null;
     /** The haze's half distance in a lull, and in a full gust (`haze.gust`: it swells with the weather's gusts). */
     this.hazeHalf = this.haze ? [this.haze.half, level.haze.gust ?? this.haze.half] : null;
     /** Terrain past the edge of play, drawn where the sky shows (world/backdrop.js). */

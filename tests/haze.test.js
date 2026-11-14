@@ -72,3 +72,28 @@ test('outdoors, far surfaces fade toward the haze colour instead of darkening', 
 test('indoors, haze changes nothing', () => {
   assert.deepEqual(farWall(false, true), farWall(false, false));
 });
+
+/** A street 50 tiles long under the sky, then a room 9 deep at its far end; the colours of the middle of the room's back wall, seen from the street's west end. */
+function roomAtTheEnd(indoors) {
+  const row = '#' + '.'.repeat(50) + ','.repeat(9) + '#';
+  const level = room(['#'.repeat(61), row, row, row, '#'.repeat(61)], ['', ' >'], {
+    legend: {
+      '.': { floor: 'imp-floor', ceiling: 'sky', ceilZ: 3, light: 144 },
+      ',': { floor: 'imp-floor', ceiling: 'imp-ceiling', ceilZ: 3, light: 144 },
+    },
+    sky: 'sky-night',
+    haze: { color: HAZE, half: 10, indoors },
+  });
+  const px = shot(level, { x: 1.5, y: 2.5, angle: 0, z: 1 });
+  const s = renderer.surface;
+  const out = [];
+  for (let y = s.h / 2 - 2; y < s.h / 2 + 2; y++) for (let x = s.w / 2 - 2; x < s.w / 2 + 2; x++) out.push(colour(px[y * s.w + x]));
+  return out;
+}
+
+test('with `haze.indoors`, a room seen down a hazy street fades into the haze too, not to black', () => {
+  const hazed = mean(roomAtTheEnd(true));
+  const plain = mean(roomAtTheEnd(false));
+  assert.ok(near(hazed, HAZE) < 20, `the room's back wall through the haze (${hazed})`);
+  assert.ok(near(plain, HAZE) > near(hazed, HAZE) + 10, `without it the room is dark, not hazy (${plain})`);
+});

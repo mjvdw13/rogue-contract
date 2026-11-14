@@ -192,6 +192,10 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
   const extra = view.extraLight;
   const lm = map.lightmap;
   const hazeOn = view.hazeOn;
+  // Haze reaching indoors (the level's `haze.indoors`): REG[5] is how far
+  // this column's ray has run through tiles under the sky, REG[6] where
+  // it entered the tile it's in.
+  const hazeIn = view.hazeIndoors;
   const hazeTab = view.hazeTab;
   const bdBuf = view.bdBuf;
 
@@ -434,11 +438,12 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
   /**
    * The (fractional) colormap level of a face the ray meets at distance t,
    * in storey s: the smooth light there, and the faces' fake contrast.
-   * Outdoors in haze (`out`), without the fog.
+   * Outdoors in haze (`out`), without the fog. Indoors with the haze
+   * reaching in, without the fog of the ray's run under the sky.
    */
-  const faceLevel = (s, t, contrast, out) => (fixed >= 0 ? fixed : view.levelF(lm.sample(px + rdx * t, py + rdy * t, s), t) + contrast - (out ? t * fog : 0));
-  /** A face's haze step at distance t (0 indoors). */
-  const faceHaze = (t, out) => (out ? view.hazeF(t) : 0);
+  const faceLevel = (s, t, contrast, out) => (fixed >= 0 ? fixed : view.levelF(lm.sample(px + rdx * t, py + rdy * t, s), t) + contrast - (out ? t * fog : REG[5] * fog));
+  /** A face's haze step at distance t (indoors 0, or the haze of the ray's run under the sky). */
+  const faceHaze = (t, out) => (out ? view.hazeF(t) : REG[5] > 0 ? view.hazeF(REG[5]) : 0);
   /**
    * Rows [a, b) of this column's floor (kk > 0) or ceiling (kk < 0) in
    * texture `tex` (kk, t0, l0 and dl in REG), kk being (camZ - the plane's height) * fy: a row's
@@ -467,7 +472,11 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
     }
     // The level before the light diminishing is c0 + c1 * dist; the
     // diminishing (DIMINISH / dist) is dk times the row's offset from the horizon.
-    const c0 = (LIGHT_BLACK - l0 + t0 * dl) * 0.25 - extra;
+    // (Indoors with the haze reaching in: the fog only from where the ray
+    // came indoors, and the haze it came through, the same down the span.)
+    const sky = hazy ? 0 : REG[5];
+    const hs = sky > 0 ? view.hazeF(sky) : 0;
+    const c0 = (LIGHT_BLACK - l0 + t0 * dl) * 0.25 - extra - sky * fog;
     const c1 = (hazy ? 0 : fog) - dl * 0.25;
     const dk = DIMINISH / kk;
     // (A number for sure, by the plus: an imported constant put straight
@@ -486,6 +495,9 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
       if (hazy) {
         const hk = (dist * HAZE_RES) | 0;
         const h = (hazeTab[hk < HAZE_LEN ? hk : HAZE_LEN - 1] + d + 0.5) | 0;
+        if (h) lv += HAZE_ROW + (h - 1) * 32;
+      } else if (hs > 0) {
+        const h = (hs + d + 0.5) | 0;
         if (h) lv += HAZE_ROW + (h - 1) * 32;
       }
       fb[o] = colormaps[lv * 256 + pix[ty * tw + tx]];
@@ -669,6 +681,8 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
     segBase = x * SEG;
     let cur = mapX >= 0 && mapY >= 0 && mapX < mw && mapY < mh ? mapY * mw + mapX : -1;
     let tEnter = 0;
+    REG[5] = 0;
+    REG[6] = 0;
     let end = 1e6;
     let nf = 0;
     /** The rising door whose panel this column has met (a panel on a tile edge is met from both tiles). */
@@ -705,6 +719,10 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
       if (tExit < 1e-4) tExit = 1e-4;
       // Outdoors in haze: faces seen from this tile fade toward the haze colour.
       const out = hazeOn && (flags[cur] & F_SKY) !== 0;
+      if (hazeIn) {
+        if (out) REG[5] += tExit - REG[6];
+        REG[6] = tExit;
+      }
 
       // An angled wall in the current tile stops the ray where it crosses the line.
       // (Angled-wall tiles have no slab: their windows are all in storey 0.)
@@ -884,6 +902,9 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
       let hz = 0;
       if (out) {
         const hk = (tExit * HAZE_RES) | 0;
+        hz = hazeTab[hk < HAZE_LEN ? hk : HAZE_LEN - 1];
+      } else if (REG[5] > 0) {
+        const hk = (REG[5] * HAZE_RES) | 0;
         hz = hazeTab[hk < HAZE_LEN ? hk : HAZE_LEN - 1];
       }
       // Position along the wall in world units (mirrored on two sides so

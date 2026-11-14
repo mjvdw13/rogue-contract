@@ -249,7 +249,7 @@ export class WorldPool {
       id,
       cam: { x: cam.x, y: cam.y, angle: cam.angle, z: cam.z, horizonOffset: cam.horizonOffset, extraLight: cam.extraLight, fixedColormap: cam.fixedColormap },
       fog: view.fog,
-      haze: scene.haze ? { half: scene.haze.half } : null,
+      haze: scene.haze ? { half: scene.haze.half, indoors: scene.haze.indoors } : null,
       skyWrap: view.skyWrap,
       skyHaze: view.skyHaze,
       sky: sky ? textures.indexOf(sky) : -1,
