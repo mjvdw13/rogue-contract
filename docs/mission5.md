@@ -117,17 +117,17 @@ blockout, not final.
 | 2 | Lower street | 20..30, 62..88 | 0 up to 1 / sky | Shacks stacked two and three high either side, pipes across overhead, a shuttered shop, a lit sign. Residents run indoors. |
 | 2 | The bend | from (30, 62) to (60, 46) | 1 up to 2 / sky | The street runs north-east on the slant, 8 wide. An alley off its north side (secret 2: over a crate and an awning to a back room). |
 | 2 | Upper street | 60..96, 44..54 | 2 up to 3 / sky | East, toward the crane. The ore conveyor crosses overhead on trestles at 70..76 (a slab, 8 to 10). A sweep squad comes down it. |
-| 3 | Pump house | 100..124, 40..58 | 3 / 9 | Door at 100, 47..51. Four pumps, steam. A walk at 6 round the north and east walls, stairs up to it: the sluice switch at its end. A grate in the floor looks down on the gallery's shut door. |
-| 3 | Pipe gallery | 124..150, 44..50, then 146..152, 50..80 | 3 down to -2 / 4 high | Stairs down, the sluice door (`remote`, tag `sluice`) at 130, then east and south under the yard wall (x 128). Pipes, grate floor over runoff, a crouch under a fallen pipe (y 62..68). Steps up at its south end. |
-| 4 | Berth 1: the light freighter | hold 150..164, 80..87 | -2 up to 0 / 3.25 | Mission 1's freighter (`models/freighter.js`) on the slip, nose west. The gallery's steps come up through its deck where the plates are gone. Ribs, wires, panels, a live wire. A trooper searching it. The stern hatch (166, 81..86) opens east. |
+| 3 | Pump house | 98..124, 40..58 | 3 / 9 | Door at 96..98, 49..53. Four pumps, steam. Stairs up the west wall beside the door (98..101, 43..49) to a walk at 6 along the north and east walls, to a plinth in the south-east corner: the sluice switch in the wall there. Under the walk, in the east wall, stairs go down to the gallery's door, seen shut from the floor. |
+| 3 | Pipe gallery | stairs 124..142, 47..51; then 144..152, 47..51 and 148..152, 51..80 | 3 down to -5 / 3.5 high | Sixteen steps down, the sluice door (`remote`, tag `sluice`) at 142..144, then east and south, 5 under the yard (the lower storey of its ground). Pipes, grate floor over runoff, a crouch under a fallen pipe (y 62..68). It ends under the freighter's nose. |
+| 4 | Berth 1: the light freighter | hold 150..164, 80..87 | -5 up to 0 / 3.25 | Mission 1's freighter (`models/freighter.js`) on the slip, nose west. The gallery's ten steps come up through its deck along the north side (150..160, 80..82), where the plates are gone. Ribs, wires, panels, a live wire. A trooper searching it. The stern hatch (166, 81..86) opens east. |
 | 4 | Slip 1 | 130..176, 62..104 | 0, stepping to -2 at the water | The yard's west end, the wall with BERTH 1 on it. Only the part east of the freighter is on the route. |
 | 5 | The cutting floor | 168..206, 56..104 | 0 / sky | Hull plates in stacks 1 to 3 high (cover, and steps onto them), a cutting lane sunk 1 with torches working (sparks), the furnace in the north-east corner (the `furnace` model, its glow, a stack smoking), the foreman's shed (176..186, 56..64). Off the grid: the stacks lie at angles. |
 | 6 | Berth 2: the bulk hauler | hull 206..262, 60..92 | two decks and the bridge | Cut across at x 206: from the cutting floor you see its decks in section, and the lift's platform at the cut. Hull walls 2 thick. Forward (208..240) it's the hold under the crew deck; aft (242..260) the reactor room under the bridge. |
-| 6a | Lower hold | 208..240, 64..88 | 0 / 5 | 16 m by 12 m. Frames across it every 2.5, containers, deck plates gone over the bilge (-2.25, runoff, two steps out). Dark. The cargo lift (208..212, 74..78; 0 to 6) stands at the cut face, open to the yard, dead. Secret 3: a smuggler's hold behind a loose panel (238, 84..86). |
-| 6b | Reactor room | 242..260, 66..86 | -2 / 11 | Through the bulkhead (240..242, door 74..78). A walk at 0 round the pit, the reactor (`reactor-ring`) in it. The start switch on the east wall: sets `power`, lights the ship, wakes the lift, spawns the squad in the hold. The fight is the way back to the lift. |
-| 6c | Crew deck | spine 212..240, 74..78; cabins north 64..73, south 79..88 | 6 / 9.5 | From the lift, aft. Cabins either side (bunks, a galley: pickups, a weapon). North of the spine at 222..232 the deck has fallen into the hold: an edge to look down from, and to be shot at from. |
-| 6d | Aft stair | 242..254, 62..66 | 6 up to 12 | From the spine's end through the bulkhead and up the hull's north side, over the reactor room's walk. Plating gone beside it: the yard and the smog. |
-| 6e | Bridge | 244..260, 66..86 | 12 / 16 | Over the reactor. Its windows are gone east and south: the crane, the dock, the sun. Dead consoles, wires everywhere, roof panels gone (sky, and haze coming down). A door in its south wing (252..256, 86..90) onto a gangway to the crane way. |
+| 6a | Lower hold | 208..240, 68..84 | 0 / 5 | 16 m by 8 m, solid walls either side (66..68, 84..86). Frames across it every 2.5, containers, deck plates gone over the bilge in two places (-2.25, runoff, two steps out). Dark. The cargo lift (208..212, 74..78; 0 to 6) stands at the cut face, dead: stepping on it says so until `power` is set, then calls it. Secret 3: a smuggler's hold (234..240, 86..90) behind a loose panel in the south wall (236..238). |
+| 6b | Reactor room | 242..260, 68..86 | 0, the pit -2 / 11 | Through the bulkhead (240..242, door 74..78). A walk 3 wide round the pit (245..257, 71..83; four steps down on its west side), the reactor (`reactor-ring`) in it. The start switch in the south wall (250..252, 86): sets `power`, lights the ship's lamps (`hauler-lamps`), spawns the squad in the hold (`hold-squad`). The fight is the way back to the lift. |
+| 6c | Crew deck | 212..240, 68..84 | 6 / 9.5 | The whole deck over the hold (a slab, 5 to 6), from the lift, aft. Along the north side at 222..232, 68..76 it has fallen into the hold: an edge to look down from, and to be shot at from. Cabins behind doors in the hold's walls: two north (62..66), one south (86..90), 2 m deep (bunks, pickups, a weapon). At the cut face the deck stops two tiles short (206..208), the hull's roof still over the gap. |
+| 6d | Aft stair | passage 232..240, 62..66; stair 242..254, 62..66 | 6 up to 12 | A door in the north wall (234..238) into a passage, a door through the bulkhead, and twelve steps up the hull's north side under the sky to a landing (254..260). |
+| 6e | Bridge | 242..260, 68..86 | 12 / sky | The reactor room's roof. Its own roof is gone (a tile holds two storeys: the reactor room and this deck): a tub of hull walls 5 high, the sills a step high where its windows were, east and south: the crane, the dock, the sun. Dead consoles, wires. In from the landing by an arch (255..259, 66..68); out by an arch in its south wing (252..256, 86..92) onto a gangway to the crane way. |
 | 7 | The crane way | 252..300, 96..100 | a slab, top 12 / sky | A crane rail on trestles along the quay, 2 m wide, the water 16 below on the south. Grate deck: the quay shows through. A 3-tile gap at 276..279 (a jump). A hoist at 268 back up from the quay if you fall. Probe droids come in over the water; a trooper on the cab's balcony. |
 | 7a | Berth 3: the ribs | 264..298, 60..94 | 0 stepping to -1 / sky | A hull cut down to its keel and frames, seen from above. Reached only by falling or by the hoist. Secret 4: a crate on the keel. |
 | 8 | The crane's cab | 298..308, 92..104 | 12 / 16 | In the south leg of the great gantry. The dock officer (the red keycard), a console, a window north over the dock. Lift (300..304, 88..92), 12 to 0. |
@@ -246,6 +246,20 @@ in the hauler's cabins, heavy ammo before the dock.
   is 5 down, not 2; the steps up into the freighter climb from -5.
 - **Doors want solid wall at their jambs**, not a building's raised
   floor (the validator says so).
+- **A room indoors inside a building** (a ceiling, not the sky: the
+  pump house, the gallery's stairs, the hauler's forward decks) shows
+  from outside as a wall up to the sky wherever something looks over
+  the building's roof into it. `m5.js` ends with a pass that turns every
+  tile of building next to such a room into solid wall; the sky comes
+  down to the roofline beside a wall, and the view ends there. So
+  buildings round a room are two tiles thick. Where a room opens onto
+  the yard (the hauler's cut face) the open tiles' own sky sits just
+  over their roof.
+- **A door with the sky on one side** is a sky tile with a slab over
+  the opening (`skyDoor`, as the town kit's doors): a plain door is a
+  solid wall to `seal()`, and the sky comes down to head height beside
+  it. The same goes for solid wall beside a stair under the sky: the
+  bridge's stair has hull (raised floor), not wall, on both sides.
 - **Two storeys a tile.** A tile holds a floor and one slab, so the
   hauler never has three decks over one tile: forward it's the hold
   under the crew deck, aft the reactor room under the bridge (and under

@@ -1724,18 +1724,19 @@ taken. The blockout steps are in order, one session at a time.
       Eisley's); try both once the crane's model exists. And the map's
       south-east edge shows as a low wall on the horizon over the water
       from the pier: the skyline step must end the sea cleanly.
-- [ ] **Blockout B, areas 4 to 6** (Berth 1 with Mission 1's freighter
-      and the steps up through its deck; the cutting floor; the hauler:
-      hold, bulkhead, reactor room, the lift at the cut face, crew deck,
-      aft stair, bridge). The `power` flag: lift, lights, the squad.
-      Two storeys a tile at most (the design's engine notes).
+- [x] Blockout B, areas 4 to 6 (Berth 1 with Mission 1's freighter and
+      the steps up through its deck; the cutting floor with slanted plate
+      stacks, a sunk lane, the shed; the hauler: hold, bulkhead, reactor
+      room, the lift at the cut face, crew deck and cabins, aft stair,
+      bridge). The `power` flag: lift, lamps, the squad. The level ends
+      at the bridge's south door until the crane way is there.
 - [ ] **Blockout C, areas 7 to 10** (gangway, crane way with its gap and
       hoist, Berth 3 below, the cab and its lift, the dry dock's
       terraces and flights, the office, its lift, the apron, the exit
       `if` `manifest`). Red keycard on the cab's officer.
-- [ ] **The route walked by a test** (`tests/m5-route.test.js`, as
-      `m4-route`): start to exit with no monsters, every gate in order.
-      Frame time on the cutting floor and in the dock
+- [ ] **The route walked by a test** (`tests/m5-route.test.js`): it
+      walks from the pier to the bridge now; extend it with blockout C.
+      Then frame time on the cutting floor and in the dock
       (`tools/bench.mjs`), before any dressing.
 - [ ] (parallel) **Textures**: a CORELLIA set in
       `assets/custom/derive.mjs` from the Dark Forces pack (the design
