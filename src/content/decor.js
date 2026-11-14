@@ -424,6 +424,10 @@ export default [
   // The gutted freighter in the derelict bay (models/freighter.js): the
   // level's tiles are its hold and collide; the model is its outside.
   defineDecoration({ id: 'freighter', model: 'freighter', fixed: true }),
+  // The great gantry crane over Mission 5's dry dock (models/crane.js): the
+  // level's tiles are its legs; the model is the girders, boom and hook,
+  // all overhead.
+  defineDecoration({ id: 'great-crane', model: 'great-crane', fixed: true }),
   // The Jawas' sandcrawler (models/sandcrawler.js): the level's tiles are its
   // hold and collide; the model is its outside. Steam wisps from the vents
   // either side of its door, and every few seconds one hisses out a jet.

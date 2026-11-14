@@ -10,7 +10,7 @@ import { FREIGHTER } from '../models/freighter.js';
 // A BLOCKOUT: every area is laid out and the route runs from the pier to
 // the apron (PLAN.md, item 12). The outdoor textures are Corellia's own
 // (derive.mjs, CORELLIA); the rest are stand-ins from the other levels'
-// sets, and blocks stand in for the great crane's legs.
+// sets. The great crane's legs are tiles; its top is a model.
 
 const W = 352;
 const H = 144;
@@ -40,6 +40,7 @@ const T = {
   ceiling: 'hold-ceiling',
   pipes: 'hold-pipes',
   step: 'band-steel',
+  crane: 'crane-yellow',
   door: 'door-grey',
   jamb: 'imp-jamb',
   bars: 'imp-bars',
@@ -364,15 +365,15 @@ p.rect(280, 76, 284, 78, ground(0.5, T.yard, { secret: true }));
 p.stairs(284, 104, 288, 112, 'S', -0.5, -0.5, (z) => ground(z));
 
 // ---------------------------------------------------------------- 8. the great crane's cab
-// The crane's legs (blocks standing in for the model), the cab in the
+// The crane's legs (its top is models/crane.js), the cab in the
 // south one at the rail's height: the dock officer and the red keycard,
 // a window east over the dry dock, a lift down its north side.
-kit.block(298, 92, 308, 104, { h: 30, wall: T.step, roof: T.step });
-kit.block(298, 54, 308, 60, { h: 30, wall: T.step, roof: T.step });
-kit.room(299, 93, 307, 103, { h: 30, floorZ: RAIL, ceilZ: RAIL + 4, floor: T.grate, ceiling: T.ceiling, wall: T.step, roof: T.step, light: 152 });
-kit.arch(298, 96, 299, 100, { h: 30, lintel: 3, floorZ: RAIL, wall: T.step, roof: T.step, floor: T.grate });
+kit.block(298, 92, 308, 104, { h: 30, wall: T.crane, roof: T.step });
+kit.block(298, 54, 308, 60, { h: 30, wall: T.crane, roof: T.step });
+kit.room(299, 93, 307, 103, { h: 30, floorZ: RAIL, ceilZ: RAIL + 4, floor: T.grate, ceiling: T.ceiling, wall: T.crane, roof: T.step, light: 152 });
+kit.arch(298, 96, 299, 100, { h: 30, lintel: 3, floorZ: RAIL, wall: T.crane, roof: T.step, floor: T.grate });
 p.rect(307, 95, 308, 101, (x, y, c) => ({ ...p.get(306, 98), floorZ: RAIL + 1, side: T.step }));
-kit.arch(300, 92, 304, 93, { h: 30, lintel: 3, floorZ: RAIL, wall: T.step, roof: T.step, floor: T.grate });
+kit.arch(300, 92, 304, 93, { h: 30, lintel: 3, floorZ: RAIL, wall: T.crane, roof: T.step, floor: T.grate });
 p.rect(300, 88, 304, 92, ground(RAIL, 'lift-floor', { side: T.step, lift: { stops: [RAIL, 0], wait: 3 } }));
 
 // ---------------------------------------------------------------- 9. Berth 4: the dry dock
@@ -457,6 +458,8 @@ const list = [
   at('stormtrooper', 186.5, 68.5, { angle: 180 }), at('stormtrooper', 198.5, 88.5, { angle: 180 }),
   at('stormtrooper', 250.5, 69.5, { angle: 180 }),
   at('freighter', HOLD.x, HOLD.y, { angle: 0, lit: DAY }),
+  // The great crane's top (models/crane.js), midway between its legs.
+  at('great-crane', 303, 79, { angle: 0, lit: DAY }),
   at('energy-cell', 181, 60), at('med-kit', 243.5, 84.5), at('energy-pack', 237, 88.5),
   // The crane way to the dock: one on the cab's side of the gap, the
   // dock officer in the cab (the red keycard), three in the dock.

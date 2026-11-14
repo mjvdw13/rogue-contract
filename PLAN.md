@@ -34,6 +34,13 @@ These need Mark to try something, or to decide. Don't start them without him.
   judge: the sky's brightness and colour (the palette draws it in broad
   grey and olive bands), the far stacks and platforms, the quay's floor
   up close (blotchy?).
+- **Mission 5's great crane** (`?map=m5`, 2026-11-14). Twin girders
+  across the two legs, a machinery house, a boom east over the dry dock
+  with the hook hanging 5 over the rim, a counter-jib west, five red
+  beacons. To judge: its shape and bulk (from Berth 3, the dock and the
+  apron), the legs' paint, how high the hook hangs, and whether it shows
+  enough from the pier (a faint shape and one red point now; a longer
+  haze or its shape in the sky's picture would make more of it).
 - **Mission 5's ending** (`?map=m5`, 2026-11-14). Mark played the
   blockout ("everything is great") and asked for this: the level no
   longer ends on the apron's spot once the manifest is taken. Kill
@@ -1728,13 +1735,16 @@ taken. The blockout steps are in order, one session at a time.
       (`sky-dusk`), the yard as bare ground with blocks for the hauler
       and the crane's legs. The level ends at the gallery's south end
       (a temporary exit) until Berth 1 is there.
-- [ ] **Found in blockout A, to settle:** from the pier the hauler (180
-      tiles off) and the crane's legs (270) are faint shapes, nearly the
-      haze's colour at `half: 44`. The crane needs its beacons as lights
-      and its shape in the sky's picture, or a longer haze (64, as Mos
-      Eisley's); try both once the crane's model exists. And the map's
-      south-east edge shows as a low wall on the horizon over the water
-      from the pier: the skyline step must end the sea cleanly.
+- [ ] **Found in blockout A, to settle:** the map's south-east edge
+      shows as a low wall on the horizon over the water from the pier:
+      the skyline step must end the sea cleanly. (The crane is settled
+      as far as it can be without Mark: with its model up, its top and a
+      red beacon show over the hauler from the pier at `half: 44`, a
+      faint shape as the design asks. See Waiting on Mark.)
+- [ ] **Found with the crane:** from the pier and the quay a black,
+      unhazed block shows at the hauler's west end (snapshot `--at
+      25,136,8`). It was there before the crane. Find what it is (an
+      unlit indoor face seen through a hole?) before dressing area 6.
 - [x] Blockout B, areas 4 to 6 (Berth 1 with Mission 1's freighter and
       the steps up through its deck; the cutting floor with slanted plate
       stacks, a sunk lane, the shed; the hauler: hold, bulkhead, reactor
@@ -1768,10 +1778,13 @@ taken. The blockout steps are in order, one session at a time.
       east, the slum's roofs and five stacks to the north, yard platforms
       over the water to the south. The great crane isn't in it: decide
       that with the crane's model (the item above).
-- [ ] (parallel) **Models, the yard's big pieces** (`models/yard5.js` or
-      as fits): the great gantry crane (legs, beam, cab, hook, beacons),
-      the crane way's trestle and rail, the ribs of Berth 3, keel blocks,
-      a smokestack, a hoist. Snapshots in the sandbox.
+- [ ] (parallel) **Models, the yard's big pieces**, one a commit:
+  - [x] The great gantry crane (`models/crane.js`, `great-crane`): the
+        legs stay tiles, now in `crane-yellow`; the model is the
+        girders, house, boom, hook and beacons. Placed in m5.
+  - [ ] The crane way's trestles and rail.
+  - [ ] The ribs of Berth 3, and keel blocks.
+  - [ ] A smokestack, and a hoist.
 - [ ] (parallel) **Models, the small pieces**: `hold-rib` taking a span
       (the hauler's hold is 24 wide; Mission 1's must come out the same),
       a long run of hanging wires, the fallen deck's edge, plate stacks,
