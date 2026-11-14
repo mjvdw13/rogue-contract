@@ -31,7 +31,7 @@ function tour(assets, id, n, each) {
   }
 }
 
-test('the world drawn on worker threads is the same, to the byte, as on one', async () => {
+test('the world and its models drawn on worker threads are the same, to the byte, as on one', async () => {
   const { assets, palette, renderer } = await headlessRenderer();
   const surface = renderer.surface;
   const threaded = new Renderer(surface, assets, palette);
@@ -57,6 +57,7 @@ test('the world drawn on worker threads is the same, to the byte, as on one', as
         assert.deepEqual(threaded.view.zbuf, renderer.view.zbuf, `${level.id}, view ${k}: the columns' depths`);
       });
     }
+    assert.ok(pool.workerModelChunks > 0, 'the workers drew some models');
     assert.ok(pool.alive, 'the pool is still on');
   } finally {
     pool.stop();

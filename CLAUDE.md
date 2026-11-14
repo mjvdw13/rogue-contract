@@ -33,7 +33,7 @@ src/engine/      the engine; never mentions Star Wars or any content id
   combat/        aim (auto-aim, lockOn), attacks, damage (hitscan, splash)
   render/        columns.js (the world renderer, one hot function), sprites,
                  models, particles, backdrop, psprite (the weapon), view
-                 pool.js and worker.js (the world pass on worker threads)
+                 pool.js and worker.js (the world pass and models on worker threads)
   gfx/ audio/ input/ ui/ scenes/ core/
 src/content/     the game as data: monsters/, weapons/, items/, npcs/,
                  models/, levels/ (m3 is painted in code by levels/lib/painter.js;
@@ -89,9 +89,10 @@ only way to check visual work without a browser.
    a set of snapshots before and after and comparing bytes. `drawWorld` in
    `render/columns.js` is one long function on purpose (closures and calls
    per column cost frame time); measure before restructuring it. It runs
-   on worker threads too (`render/pool.js`): whatever it reads must be in
-   shared memory (`shared()` in `core/shared.js`) or copied to the workers
-   (`mapCopy` in pool.js), and a column may not depend on another.
+   on worker threads too (`render/pool.js`), and so does `drawModels`:
+   whatever they read must be in shared memory (`shared()` in
+   `core/shared.js`) or copied to the workers (`mapCopy` in pool.js, the
+   things' places), and a column may not depend on another.
    `tests/threads.test.js` compares the two ways byte for byte.
 5. **Before committing:** `npm test` and `npm run validate`. Run the smoke
    test when you touch boot, scenes, menus, the HUD, asset loading or

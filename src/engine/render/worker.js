@@ -1,10 +1,12 @@
 // A worker thread of the world renderer's pool (render/pool.js, which
 // says what the messages hold and how the columns are shared out). It keeps
-// a copy of what `drawWorld` reads that isn't in shared memory, and draws
-// the columns it claims of each frame.
+// a copy of what `drawWorld` and `drawModels` read that isn't in shared
+// memory, and draws the columns it claims of each frame: the world's, then
+// the models'.
 import { View } from './view.js';
 import { drawWorld } from './columns.js';
-import { CLAIM, BUSY, CHUNK, WORKED, ID_SHIFT, CHUNK_MASK } from './pool.js';
+import { drawModels } from './models.js';
+import { CLAIM, BUSY, CHUNK, WORKED, WDONE, MCLAIM, MCHUNK, MWORKED, THING, ID_SHIFT, CHUNK_MASK } from './pool.js';
 import { TileMap, Door } from '../world/tilemap.js';
 import { Slant } from '../world/slants.js';
 import { LightMap } from '../world/lightmap.js';
@@ -20,6 +22,12 @@ let cms;
 let map = null;
 let backdrop = null;
 let doorOpen = null;
+/** The models, by the number the pool gave them. */
+const models = [];
+/** Stand-ins for the things with models, remade from their places each frame (and kept). */
+const things = [];
+/** The things' places, shared with the pool. */
+let placed = null;
 
 function handle(m) {
   if (m.ctl) ctl = m.ctl;
@@ -52,6 +60,8 @@ function frame(f) {
       t.curCM = fr.cm;
     }
   }
+  if (f.models?.added) for (const m of f.models.added) models.push(m);
+  if (f.models?.buf) placed = f.models.buf;
   if ((Atomics.load(ctl, CLAIM) >>> ID_SHIFT) !== f.id) return;
   Atomics.add(ctl, BUSY, 1);
   try {
@@ -70,10 +80,46 @@ function frame(f) {
       if (v >>> ID_SHIFT !== f.id || x0 >= W) break;
       if (Atomics.compareExchange(ctl, CLAIM, v, v + 1) !== v) continue;
       drawWorld(view, map, textures, sky, fb, W, cms, backdrop, x0, x0 + size < W ? x0 + size : W);
+      if (Atomics.add(ctl, WDONE, 1) + 1 === Math.ceil(W / size)) Atomics.notify(ctl, WDONE);
       Atomics.add(ctl, WORKED, 1);
     }
+    if (f.models) drawThings(f, W, size);
   } finally {
     Atomics.sub(ctl, BUSY, 1);
+  }
+}
+
+/** The models' pass: once every column of the world is drawn, the model chunks this thread claims. */
+function drawThings(f, W, size) {
+  const chunks = Math.ceil(W / size);
+  // (Asleep, not spinning: a spinning thread slows the one sharing its core.)
+  for (let v; (v = Atomics.load(ctl, WDONE)) < chunks; ) {
+    if (Atomics.load(ctl, CLAIM) >>> ID_SHIFT !== f.id) return;
+    Atomics.wait(ctl, WDONE, v, 2);
+  }
+  const p = placed;
+  const n = f.models.n;
+  things.length = n;
+  for (let k = 0, o = 0; k < n; k++, o += THING) {
+    const t = (things[k] ??= { model: null, x: 0, y: 0, z: 0, angle: 0, bobZ: 0, bobRoll: 0, def: { scale: 1 }, fixedLight: -1 });
+    t.model = models[p[o]];
+    t.x = p[o + 1];
+    t.y = p[o + 2];
+    t.z = p[o + 3];
+    t.angle = p[o + 4];
+    t.bobZ = p[o + 5];
+    t.bobRoll = p[o + 6];
+    t.def.scale = p[o + 7];
+    t.fixedLight = p[o + 8];
+  }
+  const msize = ctl[MCHUNK];
+  for (;;) {
+    const v = Atomics.load(ctl, MCLAIM);
+    const x0 = (v & CHUNK_MASK) * msize;
+    if (v >>> ID_SHIFT !== f.id || x0 >= W) break;
+    if (Atomics.compareExchange(ctl, MCLAIM, v, v + 1) !== v) continue;
+    drawModels(view, things, map, textures, fb, W, cms, null, x0, x0 + msize);
+    Atomics.add(ctl, MWORKED, 1);
   }
 }
 

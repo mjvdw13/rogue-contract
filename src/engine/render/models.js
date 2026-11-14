@@ -54,13 +54,17 @@ const slz = new Float64Array(MAX_POLY);
  * @param {Array<any>} things
  * @param {import('../world/tilemap.js').TileMap} map
  * @param {import('../assets.js').Texture[]} textures
+ * @param {number} [xa] the first column to draw (render/pool.js shares them out among threads)
+ * @param {number} [xb] the column after the last; a pixel comes out the same whatever range it's drawn in
  * @returns {boolean} whether the depth buffer is in use (a fence or model may have drawn)
  */
-export function drawModels(view, things, map, textures, fb, fbW, colormaps, skip) {
+export function drawModels(view, things, map, textures, fb, fbW, colormaps, skip, xa = 0, xb = Infinity) {
   const { W, H, x: px, y: py, dirX, dirY, planeX, planeY, fy, camZ, horizon, zbuf, mdepth } = view;
   const { segDist, segTop, segBot, segFirst, segCount, SEG } = view;
   const invDet = 1 / (planeX * dirY - dirX * planeY);
   const halfW = W / 2;
+  const XA = xa > 0 ? xa : 0;
+  const XB = xb < W ? xb : W;
   let cleared = view.depthValid;
 
   for (const t of things) {
@@ -99,7 +103,7 @@ export function drawModels(view, things, map, textures, fb, fbW, colormaps, skip
       yHi = Math.ceil(horizon - (a * fy) / (a < 0 ? dMin : dMax)) + 2;
     }
     let hidden = true;
-    for (let x = Math.max(0, Math.floor(halfW * (1 + qLo)) - 1), x1 = Math.min(W, Math.ceil(halfW * (1 + qHi)) + 1); x < x1; x++) {
+    for (let x = Math.max(XA, Math.floor(halfW * (1 + qLo)) - 1), x1 = Math.min(XB, Math.ceil(halfW * (1 + qHi)) + 1); x < x1; x++) {
       if (zbuf[x] <= dMin - 1e-6) continue;
       // The windows of the last batch nearer than its nearest point, and of
       // every batch within its depth.
@@ -266,8 +270,8 @@ export function drawModels(view, things, map, textures, fb, fbW, colormaps, skip
       }
       let x0 = Math.ceil(minX - 0.5);
       let x1 = Math.ceil(maxX - 0.5);
-      if (x0 < 0) x0 = 0;
-      if (x1 > W) x1 = W;
+      if (x0 < XA) x0 = XA;
+      if (x1 > XB) x1 = XB;
       if (x1 <= x0) continue;
 
       if (!cleared) {

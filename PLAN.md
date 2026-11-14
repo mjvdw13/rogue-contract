@@ -1641,6 +1641,10 @@ cold cache costs only 7%. So changes that keep every pixel are worth
         640x400); the whole frame 1.5, 1.8 and 1.8, the 90th percentile
         from 16 or 17 ms to 10 or 11. The models are now the bigger
         part of the worst frames.
+  - [x] The models drawn on the threads too, after the world (bench, 8
+        threads, against the world alone threaded: Mos Eisley 4.4 to 3.6
+        ms on average, the 90th percentile 8.2-9.8 to 6.4-6.6; Mission 4
+        2.7 to 2.3 and 5.3 to 4.2; on 4 threads 10% on average).
   - [ ] Waiting on Mark: to try on the site. The frame rate and the
         threads drawing show in the corner all the time for now (8
         threads on this laptop): put it back behind the SHOW FPS

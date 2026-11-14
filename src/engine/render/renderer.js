@@ -64,11 +64,17 @@ export class Renderer {
     const ms = this.ms;
     const tw = performance.now();
     // On every thread, with a pool; on this one without, or if the pool fails.
-    if (!this.pool?.drawWorld(view, scene, cam, textures, s.px, cms)) {
+    // (The pool draws the models too, after the world.)
+    const pool = this.pool;
+    let tm;
+    if (pool?.drawWorld(view, scene, cam, textures, s.px, cms, scene.things, extras.skip)) {
+      tm = tw + pool.worldMs;
+      if (!pool.drewModels) view.depthValid = drawModels(view, scene.things, scene.map, textures, s.px, s.pw, cms, extras.skip);
+    } else {
       drawWorld(view, scene.map, textures, scene.skyTexture ?? null, s.px, s.pw, cms, scene.backdrop ?? null);
+      tm = performance.now();
+      view.depthValid = drawModels(view, scene.things, scene.map, textures, s.px, s.pw, cms, extras.skip);
     }
-    const tm = performance.now();
-    view.depthValid = drawModels(view, scene.things, scene.map, textures, s.px, s.pw, cms, extras.skip);
     ms.world = tm - tw;
     ms.models = performance.now() - tm;
     // Hangings: the cloths are models; the ropes write their depth, so what's behind them hides.
