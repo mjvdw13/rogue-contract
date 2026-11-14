@@ -763,6 +763,9 @@ export default defineLevel({
   skyWrap: 1,
   // Smog: the far end of the row is a shape in yellow-grey air.
   haze: { color: [150, 142, 112], half: 44, indoors: true },
+  // Soot coming down out of it, on a wind off the water that carries the
+  // stacks' smoke east.
+  weather: { type: 'soot', count: 80, wind: [0.7, 0.15, 0] },
   par: 660,
   ...p.build(),
   lights: lamps,

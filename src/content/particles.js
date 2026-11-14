@@ -590,4 +590,17 @@ export default [
     onFloor: 'die',
     cap: 400,
   }),
+  // Soot in the air over a works (a level's `weather`, Mission 5): dark
+  // flakes a little bigger than dust, sinking at 0.1 units a second.
+  defineParticle({
+    id: 'soot',
+    colors: [{ ramp: 'gray', from: 1, to: 3 }, { ramp: 'gray', from: 3, to: 1 }],
+    life: [4, 8],
+    size: 0.035,
+    maxPx: 2,
+    gravity: 0.05,
+    drag: 0.5,
+    onFloor: 'die',
+    cap: 400,
+  }),
 ];

@@ -1803,10 +1803,13 @@ taken. The blockout steps are in order, one session at a time.
   - [x] 6: the hauler: hold, crew deck, reactor room, bridge.
   - [x] 7 and 8: the crane way, Berth 3, the cab.
   - [x] 9 and 10: the dry dock, the office, the apron.
-- [ ] **Light and air**: the haze's colour and half distance, soot
-      flakes (`weather`), the wind, smoke from the stacks and the
-      furnace, steam in the pump house and the hauler, lamps and pools
-      by the design's numbers, the reactor's change of light.
+- [x] **Light and air**: soot flakes on a wind off the water (a `soot`
+      particle, the level's `weather`), smoke off the stack and the
+      flues, steam in the pump house, the gallery and the hauler, glow
+      rods and work lamps in pools, the reactor's lamp coming up with
+      the power, and `haze.indoors` so the hauler's open hold fades into
+      the smog. The haze's colour and half distance are as the design's;
+      Mark judges them.
 - [ ] **The skyline**: the slum climbing behind the sea wall, the stacks,
       the platforms (a backdrop or scenery blocks; `lib/backdrop.js` is
       a canyon's, so this may want its own).
