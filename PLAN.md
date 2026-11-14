@@ -1782,19 +1782,31 @@ taken. The blockout steps are in order, one session at a time.
   - [x] The great gantry crane (`models/crane.js`, `great-crane`): the
         legs stay tiles, now in `crane-yellow`; the model is the
         girders, house, boom, hook and beacons. Placed in m5.
-  - [ ] The crane way's trestles and rail.
-  - [ ] The ribs of Berth 3, and keel blocks.
-  - [ ] A smokestack, and a hoist.
-- [ ] (parallel) **Models, the small pieces**: `hold-rib` taking a span
-      (the hauler's hold is 24 wide; Mission 1's must come out the same),
-      a long run of hanging wires, the fallen deck's edge, plate stacks,
-      a cutting torch on a stand (sparks, `weld-arc`), lamp post,
-      bollard, shack dressing (lean-to, vent stack, the lit sign).
+  - [x] The rest (`models/yard5.js`): `crane-way-trestle` and two
+        spans, `berth-rib` (whole, `-cut`, `-stub`), `keel-block`,
+        `smokestack` (smoking), `yard-hoist`. Placed in m5 but for the
+        smokestack, which the skyline and the cutting floor will place.
+        Berth 3's keel is tiles, in `hull-section`.
+- [x] **Models, the small pieces** (`models/breakers.js`, `hold.js`):
+      `hold-rib-wide` (the hauler's hold is 16 across, 5 high; Mission
+      1's rib comes out the same), `hold-wires-run`, `deck-edge`,
+      `plate-stack`, `cutting-torch` (a plasma cutter), `lamp-post` (a
+      glow-rod pylon) and `-dead`, `bollard` (a landing clamp),
+      `vent-stack`, `shack-sign`. Lean-tos are the town kit's.
+- [ ] **Keep it Star Wars** (Mark, 2026-11-14: "make sure it doesn't
+      end up just looking like earth"): plasma cutters, power cells,
+      mag-grapples, glow rods, droids, pods, repulsor craft, Aurebesh,
+      ship parts you'd know. No gas bottles, timber, hooks, street lamps.
 - [ ] **Dressing, area by area**, with snapshots (`--custom`), swapping
-      the stand-ins for the kit: 1 and 2; 3 and 4; 5; 6 (the most work:
-      ribs, wires, panels, grime, before and after the power); 7 and 8;
-      9 and 10. One commit an area or pair. Dressing has a purpose, and
-      it's sci-fi (canisters, pods, droid parts).
+      the stand-ins for the kit. One commit an area or pair. Dressing
+      has a purpose. In m5.js under DRESSING (`dress`, `pylon()`).
+  - [x] 1 and 2: the pier, the quay, the Bottoms.
+  - [ ] 3 and 4: pump house, gallery, Berth 1.
+  - [ ] 5: the cutting floor.
+  - [ ] 6: the hauler (the most work: ribs, wires, panels, grime,
+        before and after the power).
+  - [ ] 7 and 8: the crane way, Berth 3, the cab.
+  - [ ] 9 and 10: the dry dock, the office, the apron.
 - [ ] **Light and air**: the haze's colour and half distance, soot
       flakes (`weather`), the wind, smoke from the stacks and the
       furnace, steam in the pump house and the hauler, lamps and pools

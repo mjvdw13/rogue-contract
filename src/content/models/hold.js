@@ -21,17 +21,22 @@ function strap(m, a, b, w, style, across) {
 
 // `hold-rib`: a frame across the hold, wall to wall and under the ceiling,
 // gussets in its top corners. Built across y, the origin on the deck in
-// the middle of the hold.
-function rib() {
-  const m = new ModelBuilder('hold-rib');
-  const { half: h, height: H } = HOLD;
-  const [w, d] = [0.16, 0.18];
+// the middle of the hold. `hold-rib-wide` is the bulk hauler's (levels/m5.js):
+// the same frame for a hold 16 across and 5 high, in heavier section.
+export const RIBS = {
+  'hold-rib': { half: HOLD.half, height: HOLD.height, w: 0.16, d: 0.18, gusset: 0.7 },
+  'hold-rib-wide': { half: 8, height: 5, w: 0.25, d: 0.3, gusset: 1.4 },
+};
+
+function rib(id) {
+  const m = new ModelBuilder(id);
+  const { half: h, height: H, w, d, gusset } = RIBS[id];
   for (const s of [-1, 1]) {
     const y = s * h;
     m.box([-w, Math.min(y, y - s * d), 0], [w, Math.max(y, y - s * d), H], { ...RIB, top: false, bottom: false });
     // The gusset: a plate across the corner, both sides.
-    const [y0, y1] = [y - s * d, y - s * (d + 0.7)];
-    m.face([[0, y0, H - d], [0, y0, H - d - 0.7], [0, y1, H - d]], { ...RIB, twoSided: true });
+    const [y0, y1] = [y - s * d, y - s * (d + gusset)];
+    m.face([[0, y0, H - d], [0, y0, H - d - gusset], [0, y1, H - d]], { ...RIB, twoSided: true });
   }
   m.box([-w, -h, H - d], [w, h, H], { ...RIB, top: false, side: (i) => (i === 1 || i === 3 ? false : undefined) });
   return m.build();
@@ -45,6 +50,8 @@ export const WIRES = {
   'hold-wires': { top: 4, spark: null },
   'hold-wires-live': { top: 4, spark: [0.35, 0.2, 1.95] },
 };
+/** `hold-wires-run`: a run of cable 8 long (along x) sagging in loops under a ceiling 5 up, ends hanging. */
+export const WIRE_RUN = { length: 8, top: 5 };
 const INSULATION = [[24, 22, 20], [70, 30, 24], [18, 18, 20], [96, 82, 30], [30, 34, 44]];
 
 function wires(id) {
@@ -63,6 +70,25 @@ function wires(id) {
   ends.forEach(([x, y, low], i) => {
     const pts = [[x - 0.1, y, top], [x - 0.05, y + 0.05, (top + low) / 2 + 0.3], [x + 0.05, y, (top + low) / 2 - 0.2], [x, y, low]];
     for (let j = 0; j < pts.length - 1; j++) strap(m, pts[j], pts[j + 1], 0.05, c(i + 3), 'x');
+  });
+  return m.build();
+}
+
+function wireRun() {
+  const m = new ModelBuilder('hold-wires-run');
+  const { top } = WIRE_RUN;
+  const c = (i) => ({ color: INSULATION[i % INSULATION.length] });
+  // Loops from clip to clip: [x0, x1, y, how low it sags].
+  const loops = [[-4, -1.4, -0.2, 3.6], [-1.4, 1.1, -0.2, 4.1], [1.1, 4, -0.2, 3.3], [-3.6, 0.2, 0.15, 3.9], [0.2, 3.7, 0.15, 4.2], [-2.2, 2.6, 0.4, 3.1]];
+  loops.forEach(([x0, x1, y, low], i) => {
+    const n = 5;
+    const pt = (u) => [x0 + (x1 - x0) * u, y, top - (top - low) * Math.sin(Math.PI * u)];
+    for (let j = 0; j < n; j++) strap(m, pt(j / n), pt((j + 1) / n), 0.07, c(i), 'y');
+  });
+  // Ends cut and left hanging.
+  [[-2.9, 0.1, 2.4], [0.6, -0.3, 2.9], [3.2, 0.3, 2.1]].forEach(([x, y, low], i) => {
+    const pts = [[x - 0.1, y, top], [x + 0.08, y, (top + low) / 2], [x, y, low]];
+    for (let j = 0; j < pts.length - 1; j++) strap(m, pts[j], pts[j + 1], 0.07, c(i + 2), 'x');
   });
   return m.build();
 }
@@ -99,4 +125,4 @@ function console_() {
   return m.build();
 }
 
-export default [rib(), ...Object.keys(WIRES).map(wires), panelLeaning(), panelDown(), console_()];
+export default [...Object.keys(RIBS).map(rib), ...Object.keys(WIRES).map(wires), wireRun(), panelLeaning(), panelDown(), console_()];

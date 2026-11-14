@@ -18,6 +18,7 @@ import { SCAFFOLDS, scaffoldHeight } from './models/scaffold.js';
 import { BALCONY_FRAME } from './models/balcony.js';
 import { WIRES, CONSOLE } from './models/hold.js';
 import { CRANE_WAY, BERTH_RIB, KEEL_BLOCK, STACK, YARD_HOIST } from './models/yard5.js';
+import { LAMP_POST, BOLLARD, PLATE_STACK, TORCH, VENT } from './models/breakers.js';
 import { CABLES as STATION_CABLES, STEAM_PIPE, BEAM_RING } from './models/station.js';
 import { SERVICE, WELD, CART, HOLO, LOCKERS, PIPE_RUNS, BENCH as DS_BENCH, BUNK as CELL_BUNK } from './models/station-crew.js';
 import { TOWER_HEIGHT } from './models/market.js';
@@ -446,6 +447,31 @@ export default [
     emit: [{ type: 'smoke-cloud', count: 1, every: [0.25, 0.5], at: [0, 0, STACK.height + 0.5], radius: STACK.mouth * 0.6, dir: [0.5, 0, 1], spread: 0.3, speed: [1.2, 2.2] }],
   }),
   defineDecoration({ id: 'yard-hoist', model: 'yard-hoist', solid: true, height: YARD_HOIST.top, fixed: true }),
+  // The yard's small pieces (models/breakers.js, models/hold.js). The
+  // torch is left burning: a spray of sparks off its plasma and the arc's
+  // crackle; the flue smokes.
+  ...['lamp-post', 'lamp-post-dead'].map((id) => defineDecoration({ id, model: id, solid: true, radius: 0.34, height: LAMP_POST.height, fixed: true })),
+  defineDecoration({ id: 'bollard', model: 'bollard', solid: true, radius: BOLLARD.radius, height: BOLLARD.height, fixed: true }),
+  defineDecoration({ id: 'plate-stack', model: 'plate-stack', solid: true, height: PLATE_STACK.height, fixed: true }),
+  defineDecoration({
+    id: 'cutting-torch',
+    model: 'cutting-torch',
+    solid: true,
+    radius: TORCH.radius,
+    height: TORCH.height,
+    fixed: true,
+    emit: [
+      { type: 'spark', count: 3, every: [0.05, 0.15], at: TORCH.tip, radius: 0.04, dir: [0.6, 0, -0.5], spread: 0.9, speed: [1, 3] },
+      { type: 'spark', count: 18, every: [1.5, 4], at: TORCH.tip, radius: 0.06, dir: [0.5, 0, 0.2], spread: 1.2, speed: [2, 4.5], sound: 'weld-arc' },
+    ],
+  }),
+  ...['hold-rib-wide', 'hold-wires-run', 'deck-edge', 'shack-sign'].map((id) => defineDecoration({ id, model: id, fixed: true })),
+  defineDecoration({
+    id: 'vent-stack',
+    model: 'vent-stack',
+    fixed: true,
+    emit: [{ type: 'smoke-wisp', count: 1, every: [0.3, 0.7], at: VENT.mouth, radius: 0.1, dir: [0.3, 0, 1], spread: 0.3, speed: [0.3, 0.7] }],
+  }),
   // The Jawas' sandcrawler (models/sandcrawler.js): the level's tiles are its
   // hold and collide; the model is its outside. Steam wisps from the vents
   // either side of its door, and every few seconds one hisses out a jet.

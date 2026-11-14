@@ -124,23 +124,24 @@ function berthRib(id) {
   return m.build();
 }
 
-// `keel-block`: baulks stacked crosswise, a ship's weight once on them.
+// `keel-block`: a berth cradle: a durasteel block a hull's weight sat on,
+// a striped foot, its repulsor pad dead on top.
 export const KEEL_BLOCK = { half: [1, 0.7], height: 1.2 };
 
 function keelBlock() {
   const m = new ModelBuilder('keel-block');
   const { half: [hx, hy], height: H } = KEEL_BLOCK;
-  const wood = { tex: 'planks' };
-  m.box([-hx, -hy, 0], [hx, hy, 0.45], { ...wood, bottom: false });
-  m.box([-hx + 0.15, -hy + 0.1, 0.45], [hx - 0.15, hy - 0.1, 0.85], { ...RUST, bottom: false });
-  m.box([-hx + 0.05, -hy + 0.05, 0.85], [hx - 0.05, hy - 0.05, H], { ...wood, bottom: false });
-  m.outlineLines([[-hx, -hy], [hx, -hy], [hx, hy], [-hx, hy]]);
+  const rect = (x, y) => [[-x, -y], [x, -y], [x, y], [-x, y]];
+  m.box([-hx, -hy, 0], [hx, hy, 0.35], { ...HAZARD, top: STEEL, bottom: false });
+  m.loft(rect(hx - 0.1, hy - 0.1), 0.35, rect(hx - 0.35, hy - 0.25), H - 0.1, { ...STEEL, texScale: 1, bottom: false, top: false });
+  m.box([-hx + 0.3, -hy + 0.2, H - 0.1], [hx - 0.3, hy - 0.2, H], { ...RUST, texScale: 1, bottom: false, top: { tex: null, color: [30, 44, 52] } });
+  m.outlineLines(rect(hx, hy));
   return m.build();
 }
 
 // ---------------------------------------------------------------- a smokestack
-// A works chimney: a tapering shaft on a plinth, banded, soot round its
-// mouth, a beacon on its rim. Its smoke is the decoration's.
+// A refinery stack: a tapering shaft on a plinth, banded, soot round its
+// mouth, two service rings with running lights, a sensor spike on its rim. Its smoke is the decoration's.
 export const STACK = { height: 34, radius: 2.4, mouth: 1.5 };
 
 function smokestack() {
@@ -153,7 +154,14 @@ function smokestack() {
   const cuts = [2.5, H * 0.45, H * 0.45 + 1, H - 4, H];
   const styles = [shaft, { ...HAZARD, texScale: 2 }, shaft, { tex: 'slag', texScale: 2 }];
   for (let i = 0; i < 4; i++) m.loft(ring(at(cuts[i])), cuts[i], ring(at(cuts[i + 1])), cuts[i + 1], { ...styles[i], bottom: false, top: i === 3 ? { tex: null, color: [10, 9, 8] } : false });
-  m.box([mouth - 0.3, -0.3, H], [mouth + 0.3, 0.3, H + 0.6], { ...RED, bottom: false });
+  // Two service rings with running lights, and a sensor spike on the rim.
+  for (const z of [H * 0.45 + 1.4, H - 5]) {
+    m.loft(ring(at(z) + 0.9, 8), z, ring(at(z) + 0.9, 8), z + 0.35, { ...STEEL });
+    for (const [x, y] of ring(at(z) + 0.95, 4)) m.box([x - 0.2, y - 0.2, z + 0.35], [x + 0.2, y + 0.2, z + 0.75], { ...RED, bottom: false });
+  }
+  const sq = (r) => [[mouth - r, -r], [mouth + r, -r], [mouth + r, r], [mouth - r, r]];
+  m.loft(sq(0.15), H, sq(0.03), H + 4, { ...STEEL, bottom: false });
+  m.box([mouth - 0.25, -0.25, H + 4], [mouth + 0.25, 0.25, H + 4.5], { ...RED, bottom: false });
   m.outlineLines([[-R - 0.6, -R - 0.6], [R + 0.6, -R - 0.6], [R + 0.6, R + 0.6], [-R - 0.6, R + 0.6]]);
   return m.build();
 }

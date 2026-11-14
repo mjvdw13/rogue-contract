@@ -4,7 +4,7 @@ import { ModelBuilder } from './lib/build.js';
 // seen from the pier on. Its two legs are the level's tiles (the cab is a
 // room in the south one); the model is everything on top of them: twin
 // girders spanning the legs, a machinery house on the girders, a boom out
-// east over the dry dock with the hook hanging from its trolley, a
+// east over the dry dock with a mag-grapple hanging from its trolley, a
 // counter-jib and its weight to the west, an A-frame and its stays, and
 // red beacons. Yellow paint gone to rust.
 //
@@ -19,7 +19,7 @@ export const CRANE = {
   legs: [-19, 13],
   /** The boom's tip, east of the origin. */
   reach: 32,
-  /** The hook's place along the boom, and its lowest point. */
+  /** The grapple's place along the boom, and its lowest point. */
   hook: [24, 5.2],
   /** The beacons, [x, y, z], for the level's lights. */
   beacons: [[0, 0, 39.5], [32, 0, 36], [-16, 0, 35.5], [0, -27, 33.5], [0, 27, 33.5]],
@@ -32,6 +32,7 @@ const STEEL = { tex: 'blast-steel', texScale: 2 };
 const HAZARD = { tex: 'blast-hazard', texScale: 2 };
 const CABLE = { color: [34, 30, 26], twoSided: true };
 const RED = { color: [255, 40, 30], glow: true };
+const MAG = { tex: null, color: [120, 200, 255], glow: true };
 const LIT = { tex: null, color: [226, 196, 110], glow: true };
 
 function greatCrane() {
@@ -81,14 +82,18 @@ function greatCrane() {
     stay([0, y * 0.3, apex[2] - 0.2], [-15.5, y * 2, T + 5.5]);
   }
 
-  // The trolley under the boom, the falls, the block and the hook.
+  // The trolley under the boom, the falls, and the mag-grapple: a drum
+  // with its emitter plate glowing underneath and four claws round it.
   m.box([hx - 1.5, -1.5, T + 3.2], [hx + 1.5, 1.5, T + 4], STEEL);
-  const block = hz + 1.8;
-  for (const [x, y] of [[-0.6, -0.3], [0.6, 0.3]]) stay([hx + x, y, T + 3.2], [hx + x, y, block + 2], 0.09);
-  m.box([hx - 0.9, -0.5, block], [hx + 0.9, 0.5, block + 2], { ...HAZARD, top: STEEL, bottom: STEEL });
-  m.box([hx - 0.15, -0.15, hz + 0.4], [hx + 0.15, 0.15, block], { ...STEEL, top: false });
-  m.box([hx - 0.15, -0.15, hz], [hx + 1, 0.15, hz + 0.4], STEEL);
-  m.box([hx + 0.7, -0.15, hz + 0.4], [hx + 1, 0.15, hz + 1.1], { ...STEEL, bottom: false });
+  const head = hz + 1.3;
+  for (const [x, y] of [[-0.6, -0.3], [0.6, 0.3]]) stay([hx + x, y, T + 3.2], [hx + x, y, head + 1.6], 0.09);
+  m.cylinder([hx, 0, head + 0.3], 1.3, 1.3, { segments: 8, ...HAZARD, top: STEEL, bottom: false });
+  m.cylinder([hx, 0, head], 1.05, 0.3, { segments: 8, ...STEEL, top: false, bottom: MAG });
+  for (const [cx, cy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+    const [x, y] = [hx + cx * 1.45, cy * 1.45];
+    const sq = (px, py, r) => [[px - r, py - r], [px + r, py - r], [px + r, py + r], [px - r, py + r]];
+    m.loft(sq(x, y, 0.22), head + 1.1, sq(x - cx * 0.5, y - cy * 0.5, 0.1), hz, { ...STEEL, top: false });
+  }
 
   // The beacons: a tile across, to show as a point from the pier.
   for (const [x, y, z] of CRANE.beacons) m.box([x - 0.5, y - 0.5, z], [x + 0.5, y + 0.5, z + 1], { ...RED, bottom: false });

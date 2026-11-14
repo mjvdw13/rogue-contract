@@ -48,5 +48,6 @@ import station from './station.js';
 import stationCrew from './station-crew.js';
 import crane from './crane.js';
 import yard5 from './yard5.js';
+import breakers from './breakers.js';
 
-export default [terminal, reactorRing, coolantTank, shuttle, ...barricades, boulderLarge, boulderSmall, ...floodlightTowers, sensorMast, sensorDish, ...domes, doorJamb, ...doorLips, ...arches, ...buttresses, ...awnings, ...tin, ...pipes, ...clutter, landspeeder, ...bay, moldyCrow, ...market, ...cantina, ...hitching, ...pod, ...stains, ...sandcrawler, ...junkPiles, ...furnace, ...skiff, ...droids, ...racks, ...freighter, ...scaffolds, ...balcony, ...hold, ...garage, ...hostel, ...quarter, ...stable, ...vaporators, ...farm, ...garden, ...reservoir, ...workshop, ...yard, ...station, ...stationCrew, ...crane, ...yard5];
+export default [terminal, reactorRing, coolantTank, shuttle, ...barricades, boulderLarge, boulderSmall, ...floodlightTowers, sensorMast, sensorDish, ...domes, doorJamb, ...doorLips, ...arches, ...buttresses, ...awnings, ...tin, ...pipes, ...clutter, landspeeder, ...bay, moldyCrow, ...market, ...cantina, ...hitching, ...pod, ...stains, ...sandcrawler, ...junkPiles, ...furnace, ...skiff, ...droids, ...racks, ...freighter, ...scaffolds, ...balcony, ...hold, ...garage, ...hostel, ...quarter, ...stable, ...vaporators, ...farm, ...garden, ...reservoir, ...workshop, ...yard, ...station, ...stationCrew, ...crane, ...yard5, ...breakers];
