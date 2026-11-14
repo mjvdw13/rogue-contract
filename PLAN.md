@@ -28,15 +28,6 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
-- **Mission 5's design: Breakers' Row, on Corellia** (`docs/mission5.md`,
-  2026-11-14). A ship-breaking yard on the Coronet waterfront: ten areas
-  in a line from a pier, through a slum street and a pipe gallery, down a
-  row of four berths (the light freighter from Mos Eisley, a bulk hauler
-  cut in half and climbed from bilge to bridge, a hull down to its ribs, a
-  dry dock) to the great crane, seen from the start. Nothing is built. To
-  judge before the blockout: the flow and the areas; the story proposal
-  (the manifest names the Arc Hammer; Bossk as the last fight or not);
-  the name.
 - **The TIE rebuilt from Mark's schematic** (`?map=m4`, 2026-11-13). Canon
   proportions at 0.8: wings 11.4 long and 14 tall (were 8 by 10), the ball
   4 across, its top now 14.4. Grey frame and spokes over plain black panels  (Mark: no lines), the hub through the wing, the angled pylons, a framed window
@@ -1721,16 +1712,18 @@ session at the same time as the blockout; say here which one you've
 taken. The blockout steps are in order, one session at a time.
 
 - [x] Design: `docs/mission5.md`.
-- [ ] Mark's nod on the design (Waiting on Mark) before the blockout.
-- [ ] **Blockout A, areas 1 to 3** (pier, quay, sea wall, the Bottoms,
-      pump house, pipe gallery): `m5.js` with stand-in textures from
-      the existing sets (`hold-*`, `derelict-*`, `metal-rust`), the
-      level in `levels/index.js` (not in the episode), the start, the
-      sluice switch and door, a plain sky and the haze. Shacks as
-      volumes with alleys, the slant, the two changes of level. A
-      `mapview` and four snapshots looked at. Check the first risk here:
-      put a stand-in block where the crane will be and see what the haze
-      leaves of it from the pier and the upper street.
+- [x] Blockout A, areas 1 to 3 (pier, quay, sea wall, the Bottoms, pump
+      house, pipe gallery), stand-in textures, a stand-in sky
+      (`sky-dusk`), the yard as bare ground with blocks for the hauler
+      and the crane's legs. The level ends at the gallery's south end
+      (a temporary exit) until Berth 1 is there.
+- [ ] **Found in blockout A, to settle:** from the pier the hauler (180
+      tiles off) and the crane's legs (270) are faint shapes, nearly the
+      haze's colour at `half: 44`. The crane needs its beacons as lights
+      and its shape in the sky's picture, or a longer haze (64, as Mos
+      Eisley's); try both once the crane's model exists. And the map's
+      south-east edge shows as a low wall on the horizon over the water
+      from the pier: the skyline step must end the sea cleanly.
 - [ ] **Blockout B, areas 4 to 6** (Berth 1 with Mission 1's freighter
       and the steps up through its deck; the cutting floor; the hauler:
       hold, bulkhead, reactor room, the lift at the cut face, crew deck,

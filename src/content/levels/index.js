@@ -6,10 +6,11 @@ import m1 from './m1.js';
 import m2 from './m2.js';
 import m3 from './m3.js';
 import m4 from './m4.js';
+import m5 from './m5.js';
 import sandbox from './sandbox.js';
 
 // The sandbox is a test map for the height engine (?map=sandbox), outside the episode.
-export const levels = [m1, m2, m3, m4, sandbox];
+export const levels = [m1, m2, m3, m4, m5, sandbox];
 
 export const episodes = [
   defineEpisode({

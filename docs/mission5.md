@@ -5,13 +5,13 @@ and shipyards, built on the look of the gutted freighter Rusk hides in
 (Mission 1): its panelling, the panels off the walls, the wires hanging
 and spitting sparks, the haze. To be painted in code as Missions 3 and 4
 are (`src/content/levels/m5.js`, `lib/painter.js`), playable at `?map=m5`.
-Not built yet: this is the design, and PLAN.md has the steps.
+Being built: PLAN.md (item 12) has the steps and how far they've got.
 
 The idea in one line: **a ship-breaking yard on the Coronet waterfront.
 Ships come here to be cut up, and Kyle goes down the row of them, each
 further gone than the last, to the great crane at the end.**
 
-## Story (a proposal: Mark decides)
+## Story (Mark, 2026-11-14: the Arc Hammer and Bossk are in)
 
 - **Why Corellia.** The garrison's records give the maker's stamp on the
   prototype's frame: a yard on Corellia. The Empire has taken over a
@@ -24,10 +24,10 @@ further gone than the last, to the great crane at the end.**
 - **The irony of a prequel, again.** The manifest's last line is a ship's
   name Kyle has never heard: ARC HAMMER. (Dark Forces' last mission is
   aboard it.)
-- **Bossk (optional).** In the cantina he said "This one is mine,
-  hunter." The Guild's contract on Kyle is still open, and Corellia is a
-  hunter's town. He could be the last fight, on the apron where the Crow
-  comes in. He's a monster already.
+- **Bossk.** In the cantina he said "This one is mine, hunter." The
+  Guild's contract on Kyle is still open, and Corellia is a hunter's
+  town. He is the last fight, on the apron where the Crow comes in. He's
+  a monster already.
 
 Sample lines (stand-ins, like every level's):
 
@@ -38,10 +38,11 @@ Sample lines (stand-ins, like every level's):
 >
 > JAN: Imperial. Go round, through the Bottoms.
 
-**To decide (Mark):** where it sits in the story (after the garrison, or
-after the station); Bossk or not; the level's name ("Breakers' Row" is a
-stand-in); whether the yard's workers appear (no sprite yet: droids and
-troopers only for now).
+Decided (Mark, 2026-11-14): the flow, the manifest's Arc Hammer, Bossk
+as the last fight, and the name, Breakers' Row. **Still to decide:**
+where it sits in the story (after the garrison, or after the station);
+whether the yard's workers appear (no sprite yet: droids and troopers
+only for now).
 
 ## What makes it work
 
@@ -132,7 +133,7 @@ blockout, not final.
 | 8 | The crane's cab | 298..308, 92..104 | 12 / 16 | In the south leg of the great gantry. The dock officer (the red keycard), a console, a window north over the dock. Lift (300..304, 88..92), 12 to 0. |
 | 9 | Berth 4: the dry dock | 308..346, 58..102 | rim 0; steps -2.5, -5; floor -7.5 / sky | Long axis north to south. The floor is 320..334, 60..100. West and east sides step down in two terraces 4 wide (-2.5 at 312..316 and 338..342, -5 at 316..320 and 334..338). Flights between them at opposite ends, so the walk down is a zigzag; you can also jump down. The caisson gate at the south end, the sea behind it. Keel blocks down the middle, the sealed crates stacked on them, a shuttle (`lambda-shuttle`) taking them on. The gantry's beam overhead, a hook hanging. The main fight. |
 | 10 | Dispatch office | 320..334, 46..58 | -7.5 / -3 | In the dock's head wall. Red door (325..329, 58). Screens, files, the manifest terminal (sets `manifest`, sounds the alarm). Lift (330..334, 42..46), -7.5 to 0. |
-| 10 | The apron | 314..344, 24..42 | 0 / sky | The pickup spot. The last squad (and Bossk, if Mark wants him). The exit is the marked spot, `if` `manifest`. |
+| 10 | The apron | 314..344, 24..42 | 0 / sky | The pickup spot. The last squad, and Bossk. The exit is the marked spot, `if` `manifest`. |
 
 ## The kit (design language)
 
@@ -233,9 +234,18 @@ in the hauler's cabins, heavy ammo before the dock.
 
 ## Engine notes and risks
 
-- **Seeing the crane from far off.** With haze at 44 the model is gone
-  at 200 tiles. Check early (blockout) what carries it: lights, the sky
-  picture, or a longer haze.
+- **Seeing the crane from far off.** Checked in the first blockout with
+  stand-in blocks: at `half: 44` the hauler (180 tiles from the pier) and
+  the crane's legs (270) are faint shapes close to the haze's colour.
+  The crane needs its beacons as lights and its shape in the sky's
+  picture, or a longer haze. (A ray used to stop after 320 tiles and
+  leave far walls black; the renderer's limit now follows the map's
+  size.)
+- **Under the yard.** The pipe gallery under open ground is the lower
+  storey of the ground's slab (floor -5, the slab from -1.5 to 0), so it
+  is 5 down, not 2; the steps up into the freighter climb from -5.
+- **Doors want solid wall at their jambs**, not a building's raised
+  floor (the validator says so).
 - **Two storeys a tile.** A tile holds a floor and one slab, so the
   hauler never has three decks over one tile: forward it's the hold
   under the crew deck, aft the reactor room under the bridge (and under
