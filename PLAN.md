@@ -28,6 +28,25 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
+- **Mission 1 as a chain** (`?map=m1`, 2026-11-13, after Mark's note that
+  M2 and M4 always move forward and M1 is open-ended; `docs/mission1.md`,
+  "A chain, not a hunt"): three stops instead of six. Kyle lands holding
+  the fob, already pointing: the bay door, the cantina's door, the broker.
+  The broker gives the contract, the pass and Rusk's signal in one talk;
+  the checkpoint's troopers let Kyle through; past the gate the fob tracks
+  Rusk. The junk yard, the back alleys, the informant (a local now) and
+  the customs terminal are out of the story; their gates stay shut (the
+  alleys' nine pickups and the gun shop's secret went). Five yard walls
+  close the south back lane, so the bay door's lane leads only up the
+  square. At the switch Kyle draws his blaster and keeps the fob; it leads
+  round the shut blast doors through the back lane and the cantina, then
+  west to the bay door and the Crow. With the blaster in hand the fob
+  shows as a pip on a strip at the bottom of the screen. To judge: whether
+  it now feels like moving forward; whether the junk yard (the
+  sandcrawler, the trader) should come back as a short detour; the pip
+  (place, size, colours); Jan's and the broker's stand-in lines; and
+  whether the walls read as walls or as the town's end.
+
 - **The rest of Dark Forces' weapons** (`?map=sandbox&god`, 2026-11-11):
   all in the sandbox's start room, in a row east of you (3 rifle, 5
   repeater, 6 fusion cutter, 7 mines, 8 mortar, 0 assault cannon), primary
@@ -915,24 +934,6 @@ These need Mark to try something, or to decide. Don't start them without him.
 ## Next up
 
 In this order unless Mark says otherwise.
-
-### 0. Mission 1, a chain (Mark, 2026-11-13: M2 and M4 always move forward; M1 is open-ended)
-
-Three stops instead of six (broker, trader, informant, Rusk, customs
-terminal, the Crow), the fob from the start pointing at the next one, and
-no streets behind the houses.
-
-- [x] The calm half: the fob from landing, pointing at the bay door, the
-      cantina's door, the broker; the broker gives the contract, the pass
-      and Rusk's signal in one talk. The junk yard, the alleys and the
-      informant are left out (their gates stay shut).
-- [x] The streets: yard walls close the south back lane either side of the
-      bay door, so the only way up is the square.
-- [x] The way home: Kyle draws his blaster at the switch and keeps the
-      fob, which points at the back lane, the cantina's back door, its
-      front door, the bay door and the Crow. No customs terminal.
-- [x] The fob on the HUD while another weapon is held.
-- [ ] docs/mission1.md, snapshots, Waiting on Mark.
 
 ### 0. Stairs' sides hung from one height (Mark, 2026-11-12)
 
