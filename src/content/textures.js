@@ -186,4 +186,5 @@ export default [
   defineTexture({ id: 'sky-night', src: 'assets/textures/sky-night.png', sky: true }),
   defineTexture({ id: 'sky-day', src: 'assets/custom/textures/sky-day.png', sky: true }),
   defineTexture({ id: 'sky-dusk', src: 'assets/custom/textures/sky-dusk.png', sky: true }),
+  defineTexture({ id: 'sky-corellia', src: 'assets/custom/textures/sky-corellia.png', sky: true }),
 ];

@@ -28,6 +28,12 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
+- **Mission 5's textures and sky** (`?map=m5`, 2026-11-14). The
+  blockout now wears Corellia's own concrete, sea wall, water, slag and
+  shack walls, under an overcast sky with a pale sun in the east. To
+  judge: the sky's brightness and colour (the palette draws it in broad
+  grey and olive bands), the far stacks and platforms, the quay's floor
+  up close (blotchy?).
 - **Mission 5's ending** (`?map=m5`, 2026-11-14). Mark played the
   blockout ("everything is great") and asked for this: the level no
   longer ends on the apron's spot once the manifest is taken. Kill
@@ -1757,9 +1763,11 @@ taken. The blockout steps are in order, one session at a time.
       `crane-yellow`, `hull-section`, `sign-bottoms`, `berth-1` to `-4`.
       Running derive.mjs reformats `overrides.json`; restore it (`git
       checkout`) unless DERIVED changed.
-- [ ] (parallel) **The sky**: `sky-corellia`, once round (`skyWrap: 1`):
-      overcast, a dirty yellow glow and a pale sun low in the east, smoke.
-      Far shapes painted in: stacks, yard platforms over the water.
+- [x] **The sky**: `sky-corellia` (derive.mjs, with a new `skyline`
+      step for far shapes): overcast, a glow and a pale sun low in the
+      east, the slum's roofs and five stacks to the north, yard platforms
+      over the water to the south. The great crane isn't in it: decide
+      that with the crane's model (the item above).
 - [ ] (parallel) **Models, the yard's big pieces** (`models/yard5.js` or
       as fits): the great gantry crane (legs, beam, cab, hook, beacons),
       the crane way's trestle and rail, the ribs of Berth 3, keel blocks,

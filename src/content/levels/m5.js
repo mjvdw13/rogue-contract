@@ -47,7 +47,7 @@ const T = {
   switchOff: 'imp-switch',
   switchOn: 'imp-switch-on',
   hull: 'freighter-hull',
-  sky: 'sky-dusk',
+  sky: 'sky-corellia',
 };
 
 const p = new Painter(W, H, { wall: T.seaWall });

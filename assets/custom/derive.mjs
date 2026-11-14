@@ -34,7 +34,9 @@
 // texel u is (360 - azimuth) / 360 of it, the engine's angles running
 // clockwise), `width` its spread, strongest toward the bottom, and darkens
 // the far side by up to `dim`; `suns: [{ at, row, rx, ry, color }]` paints
-// soft discs (`row` their middle, the horizon 6 rows above the bottom). With no `gradient` a texture keeps the source's own
+// soft discs (`row` their middle, the horizon 6 rows above the bottom), and
+// `skyline: { color, smoke, amount, items }` far shapes standing on the
+// horizon (see skylined()). With no `gradient` a texture keeps the source's own
 // colours (the bay's fuel pump panels).
 import fs from 'node:fs';
 import path from 'node:path';
@@ -527,6 +529,21 @@ export const CORELLIA = [
   { out: 'dock-floor', df: 'SPCMENT1', gradient: [[20, 22, 20], [50, 54, 48], [82, 86, 78], [110, 114, 104], [134, 136, 124]], keep: 0.7, contrast: 0.9 },
   // The cranes: yellow paint gone to rust (Nar Shaddaa's streaked plate).
   { out: 'crane-yellow', df: 'NWGREY01', gradient: [[48, 30, 10], [110, 76, 20], [168, 126, 30], [206, 164, 44], [228, 194, 80]], keep: 0, contrast: 1.1, rust: [{ color: [112, 54, 22], amount: 0.85, cell: 16, seed: 531, from: 0.42 }, { color: [26, 18, 12], amount: 0.5, cell: 24, seed: 533 }] },
+  // The sky, going round once (`skyWrap: 1`): the Detention Centre's heavy
+  // cloud as a grey overcast with a dirty yellow in it, smog at the
+  // horizon (the haze's colour), a glow and a pale sun low in the east
+  // (content angle 8). Far off: the slum's roofs climbing to the north,
+  // smokestacks north and east with their smoke carried east, and yard
+  // platforms on their piers over the water to the south.
+  { out: 'sky-corellia', df: 'IEDETSKY', smooth: 1, gradient: [[104, 102, 92], [124, 121, 108], [146, 141, 122], [170, 163, 138], [198, 188, 156]], keep: 0, contrast: 1.4, tile: [2, 1], fade: { color: [150, 142, 112], from: 0.45 },
+    glow: { at: 0.978, width: 0.09, color: [214, 196, 128], amount: 0.6, dim: 0.1 },
+    suns: [{ at: 0.978, row: 212, rx: 5, ry: 5, color: [246, 238, 204] }],
+    skyline: { color: [84, 82, 72], smoke: [70, 68, 62], amount: 0.5, items: [
+      { blocks: [0.66, 0.86], h: 16, seed: 571 },
+      { stack: 0.7, h: 30, w: 2, plume: 60 }, { stack: 0.725, h: 24, w: 2, plume: 46 }, { stack: 0.81, h: 34, w: 3, plume: 70 },
+      { stack: 0.9, h: 22, w: 2, plume: 44 }, { stack: 0.6, h: 20, w: 2, plume: 40 }, { stack: 0.05, h: 18, w: 2, plume: 36 },
+      { platform: 0.2, w: 22, h: 10 }, { platform: 0.29, w: 14, h: 7 }, { platform: 0.36, w: 26, h: 12 }, { platform: 0.13, w: 10, h: 5 },
+    ] } },
   // A ship's cut face: the edges of its decks and frames, dark between
   // them (the Executor's greebled wall, rusted where the torch went).
   { out: 'hull-section', df: 'IWEX1', gradient: [[4, 4, 6], [16, 15, 15], [44, 40, 38], [88, 80, 72], [136, 124, 110]], keep: 0, contrast: 1.6, rust: [{ color: [124, 60, 24], amount: 0.6, cell: 16, seed: 541, from: 0.5 }] },
@@ -833,6 +850,65 @@ function sunned(img, suns) {
   return img;
 }
 
+/**
+ * Far shapes on a sky's horizon, faded into the air: `amount` of the way
+ * to `color` (and `smoke` for the plumes). `items` are `{ stack: at, h, w,
+ * plume }` (a smokestack `h` rows tall, its smoke `plume` rows long,
+ * carried east), `{ platform: at, w, h }` (a deck on legs with a tower)
+ * and `{ blocks: [from, to], h, seed }` (a jagged run of roofs up to `h`
+ * rows). `at`, `from` and `to` are shares of the width.
+ */
+function skylined(img, { color, smoke, amount, items }) {
+  const { width: w, height: h, data: d } = img;
+  const horizon = h - 6;
+  const dot = (x, y, c, t) => {
+    if (y < 0 || y >= h || t <= 0) return;
+    const i = (Math.floor(y) * w + (((Math.floor(x) % w) + w) % w)) * 4;
+    for (let k = 0; k < 3; k++) d[i + k] = Math.round(d[i + k] + (c[k] - d[i + k]) * Math.min(1, t));
+  };
+  const box = (x0, y0, bw, bh, t = amount) => {
+    for (let y = y0; y < y0 + bh; y++) for (let x = x0; x < x0 + bw; x++) dot(x, y, color, t);
+  };
+  for (const it of items) {
+    if (it.stack !== undefined) {
+      const x0 = Math.round(it.stack * w);
+      // The plumes first, so the stack's top is clear of its own smoke.
+      // East is toward the width's end on the north half, its start on the south.
+      const dir = it.stack > 0.5 ? 1 : -1;
+      for (let k = 0; k < it.plume; k++) {
+        const s = k / it.plume;
+        const cx = x0 + it.w / 2 + dir * k ** 1.35 * 0.22;
+        const cy = horizon - it.h - k * 0.75;
+        const r = 1 + k * 0.11;
+        for (let y = Math.floor(cy - r * 1.6); y <= cy + r * 1.6; y++) {
+          for (let x = Math.floor(cx - r); x <= cx + r; x++) {
+            const e = Math.hypot((x + 0.5 - cx) / r, (y + 0.5 - cy) / (r * 1.6));
+            if (e < 1) dot(x, y, smoke, 0.16 * (1 - s) * (1 - e) * (0.6 + 0.8 * hash(x, y, it.plume)));
+          }
+        }
+      }
+      box(x0, horizon - it.h, it.w, it.h + 6);
+    } else if (it.platform !== undefined) {
+      const x0 = Math.round(it.platform * w - it.w / 2);
+      box(x0, horizon - it.h, it.w, 3);
+      box(x0 + 1, horizon - it.h, 1, it.h + 6);
+      box(x0 + it.w - 2, horizon - it.h, 1, it.h + 6);
+      box(x0 + (it.w >> 1), horizon - it.h, 1, it.h + 6);
+      box(x0 + 2, horizon - it.h - 6, Math.max(2, it.w >> 2), 6);
+      box(x0 + it.w - 3, horizon - it.h - 14, 1, 14);
+    } else if (it.blocks) {
+      const [from, to] = it.blocks.map((v) => Math.round(v * w));
+      for (let x = from; x < to; x++) {
+        // Roofs 3 texels wide, climbing toward the run's middle.
+        const mid = 1 - Math.abs((x - from) / (to - from) - 0.5) * 1.4;
+        const bh = Math.round(it.h * mid * (0.45 + 0.55 * hash(Math.floor(x / 3), 0, it.seed)));
+        box(x, horizon - bh, 1, bh + 6);
+      }
+    }
+  }
+  return img;
+}
+
 /** Bands painted down from the top row, one after another (see above). */
 function lipped(img, bands) {
   const d = img.data;
@@ -873,6 +949,7 @@ function worked(img, spec) {
   if (spec.fade) img = faded(img, spec.fade);
   if (spec.glow) img = glowed(img, spec.glow);
   if (spec.suns) img = sunned(img, spec.suns);
+  if (spec.skyline) img = skylined(img, spec.skyline);
   for (const r of [spec.rust ?? []].flat()) img = rusted(img, r);
   if (spec.lip) img = lipped(img, spec.lip);
   if (!spec.holes) for (let i = 3; i < img.data.length; i += 4) img.data[i] = 255;
