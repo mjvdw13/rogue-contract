@@ -562,7 +562,7 @@ dress.push(
   at('junk-heap', 196.6, 67.4), at('scrap', 204.4, 66.6), at('pit-droid', 198, 66.4, { angle: 60 }),
   at('plate-stack', 172, 66, { angle: 20 }), at('plate-stack', 187, 92.5, { angle: 100 }), at('plate-stack', 203, 86, { angle: 75 }),
   at('speeder-engine', 187.5, 65.6, { angle: 40 }), at('power-droid-rust', 175, 65.4, { angle: 270 }),
-  at('cargo-skiff', 178, 96.5, { angle: 0 }), at('cargo-pod', 171, 80.6), at('canister-rust', 172.6, 81.4),
+  at('cargo-skiff', 178, 96.5, { angle: 0 }), at('cargo-pod', 174, 94.6), at('canister-rust', 175.5, 95.3),
 );
 lamps.push({ x: 201.5, y: 65, z: 1.5, radius: 7, light: 96 }, { x: 191, y: 73, z: 1, radius: 5, light: 72 }, { x: 200, y: 73, z: 1, radius: 5, light: 72 });
 pylon(169, 58); pylon(204.6, 99);
@@ -578,7 +578,7 @@ decals.push({ x: 206, y: 65, z: 5.5, face: 'W', tex: 'berth-2', scale: 2 });
 // view runs its whole length (the longest looks were the slowest frames).
 for (const [x0, y0, x1, y1, h, tex] of [
   [62, 92, 70, 99, 5, T.boxA], [94, 97, 102, 104, 6, T.boxB], [122, 92, 130, 98, 5, T.boxB], [148, 97, 156, 104, 5, T.boxA],
-  [214, 92, 224, 98, 6, T.boxA], [232, 98, 240, 104, 5, T.boxB], [318, 92, 326, 97, 5, T.boxB],
+  [214, 92, 224, 98, 6, T.boxA], [232, 98, 240, 104, 5, T.boxB],
 ]) kit.block(x0, y0, x1, y1, { h, wall: tex, roof: T.roof });
 
 // A room indoors (a ceiling, not the sky) inside a building shows from
