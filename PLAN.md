@@ -1748,12 +1748,15 @@ taken. The blockout steps are in order, one session at a time.
       dressing, stand cargo and sheds on it so no view runs its whole
       length, and measure again (`node tools/bench.mjs m5 --res 2
       --worst 5`).
-- [ ] (parallel) **Textures**: a CORELLIA set in
-      `assets/custom/derive.mjs` from the Dark Forces pack (the design
-      lists them: quay concrete, sea wall, shack walls, shutter, harbour
-      water, slag ground, wet dock concrete, crane paint, the hull's cut
-      section, berth numbers 1 to 4 and an Aurebesh sign as decals), with
-      generated stand-ins in `tools/art` so tests see them.
+- [x] **Textures**: the CORELLIA set in `assets/custom/derive.mjs` (14
+      textures and 5 decals), loaded from `assets/custom/textures/`
+      directly as the town's and the station's are (no generated
+      stand-ins). The blockout wears `quay`, `sea-wall`, `harbour-water`,
+      `slag`, `dock-floor`, `dock-wall` and three of the shack walls. For
+      the dressing to place: `quay-edge`, `shack-green`, `shack-shutter`,
+      `crane-yellow`, `hull-section`, `sign-bottoms`, `berth-1` to `-4`.
+      Running derive.mjs reformats `overrides.json`; restore it (`git
+      checkout`) unless DERIVED changed.
 - [ ] (parallel) **The sky**: `sky-corellia`, once round (`skyWrap: 1`):
       overcast, a dirty yellow glow and a pale sun low in the east, smoke.
       Far shapes painted in: stacks, yard platforms over the water.

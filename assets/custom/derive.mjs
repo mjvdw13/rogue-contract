@@ -490,6 +490,58 @@ export const RISING = [
  */
 export const DRIFT_EDGES = { sand: 'street-sand', drift: 'street-drift', out: 'street-drift', amp: 0.7 };
 
+/**
+ * Corellia's breaking yard (m5, docs/mission5.md): concrete gone grey and
+ * stained, scavenged plate in every colour of rust, black slag, oily
+ * water. They go through `worked()` as the town's do.
+ */
+const OILY = [{ color: [40, 36, 30], amount: 0.3, cell: 32, seed: 501, from: 0.55 }, { color: [112, 70, 36], amount: 0.18, cell: 16, seed: 503, from: 0.6 }];
+const RUST_PLATE = [[26, 14, 8], [66, 36, 18], [108, 62, 32], [146, 92, 54], [176, 126, 86]];
+export const CORELLIA = [
+  // The quay and the pier: pale concrete with a joint every 2 m (Detention
+  // Centre's grey slabs), oil and rust soaked in.
+  { out: 'quay', df: 'IWGREYC2', gradient: [[52, 50, 44], [98, 94, 84], [138, 132, 118], [168, 162, 146], [192, 186, 170]], keep: 0, contrast: 0.8, rust: OILY },
+  // The quay's face over the water: Sewers' concrete blocks, darker, the
+  // rust running down them.
+  { out: 'quay-edge', df: 'ZWCMENT1', gradient: [[28, 26, 22], [66, 62, 54], [104, 98, 86], [136, 130, 114], [160, 154, 138]], keep: 0.7, contrast: 1 },
+  // The sea wall: the Sewers' tall stained concrete, rust streaks from
+  // every joint and weed at its foot, nearly as it is.
+  { out: 'sea-wall', df: 'SWPIT4', gradient: [[30, 28, 24], [74, 70, 62], [116, 110, 98], [150, 144, 130], [178, 172, 156]], keep: 0.8, contrast: 0.9 },
+  // The Bottoms' shacks, no two the same: hull plate gone to rust, grey
+  // city plate with rust coming through, corrugated tin, old green paint.
+  { out: 'shack-plate', df: 'NWEXT02', gradient: RUST_PLATE, keep: 0, contrast: 1 },
+  { out: 'shack-grey', df: 'NWEXT01', gradient: [[22, 22, 22], [58, 58, 56], [96, 96, 92], [132, 130, 124], [160, 158, 150]], keep: 0.2, contrast: 1, rust: WORN(32, 511, 0.5) },
+  { out: 'shack-tin', df: 'ZWGRUV1', tile: [2, 1], gradient: [[30, 18, 10], [72, 44, 24], [112, 74, 44], [146, 108, 74], [172, 140, 106]], keep: 0, contrast: 1.5, rust: WORN(32, 513, 0.35) },
+  { out: 'shack-green', df: 'NWGRN09', gradient: [[16, 20, 16], [42, 54, 42], [72, 90, 70], [106, 124, 100], [140, 154, 130]], keep: 0.3, contrast: 1, rust: WORN(32, 515, 0.45) },
+  // A shack's roll-down shutter as a wall: Nar Shaddaa's corrugated door
+  // clear of its sign, blue-grey paint going to rust.
+  { out: 'shack-shutter', df: 'NDCORUG1', crop: [119, 0, 8, 64], scale: [64, 64], gradient: [[20, 24, 28], [50, 60, 68], [84, 98, 108], [118, 132, 140]], keep: 0, contrast: 0.9, rust: WORN(16, 517, 0.7) },
+  // The harbour: runoff, oily and brown-green (the Executor's water).
+  { out: 'harbour-water', df: 'CFWATER4', gradient: [[18, 20, 14], [36, 40, 28], [58, 62, 44], [88, 90, 66], [132, 130, 100]], keep: 0, contrast: 1 },
+  // The cutting floor: ground black with slag, rust in it.
+  { out: 'slag', df: 'TPGREY1', gradient: [[8, 8, 8], [22, 21, 20], [40, 38, 36], [62, 58, 54], [88, 82, 76]], keep: 0, contrast: 1.2, rust: [{ color: [104, 56, 26], amount: 0.45, cell: 8, seed: 521, from: 0.6 }] },
+  // The dry dock: wet dark concrete, weed and rust down the walls (the
+  // Sewers' again), wetter and greener toward the foot; its floor the
+  // Sewers' mossy slab.
+  { out: 'dock-wall', df: 'SWPIT1', gradient: [[18, 20, 18], [48, 52, 46], [80, 84, 76], [110, 114, 102], [138, 140, 126]], keep: 0.8, contrast: 0.9, fade: { color: [30, 40, 30], from: 0.55 } },
+  { out: 'dock-floor', df: 'SPCMENT1', gradient: [[20, 22, 20], [50, 54, 48], [82, 86, 78], [110, 114, 104], [134, 136, 124]], keep: 0.7, contrast: 0.9 },
+  // The cranes: yellow paint gone to rust (Nar Shaddaa's streaked plate).
+  { out: 'crane-yellow', df: 'NWGREY01', gradient: [[48, 30, 10], [110, 76, 20], [168, 126, 30], [206, 164, 44], [228, 194, 80]], keep: 0, contrast: 1.1, rust: [{ color: [112, 54, 22], amount: 0.85, cell: 16, seed: 531, from: 0.42 }, { color: [26, 18, 12], amount: 0.5, cell: 24, seed: 533 }] },
+  // A ship's cut face: the edges of its decks and frames, dark between
+  // them (the Executor's greebled wall, rusted where the torch went).
+  { out: 'hull-section', df: 'IWEX1', gradient: [[4, 4, 6], [16, 15, 15], [44, 40, 38], [88, 80, 72], [136, 124, 110]], keep: 0, contrast: 1.6, rust: [{ color: [124, 60, 24], amount: 0.6, cell: 16, seed: 541, from: 0.5 }] },
+];
+
+/**
+ * Corellia's decals: the Bottoms' sign (Nar Shaddaa's, as it is: it's lit)
+ * and the berths' numbers, 2 tiles by 3 of worn white paint (`paint:
+ * 'digit'`: a stencilled figure, a share of its texels flaked off).
+ */
+export const CORELLIA_DECALS = [
+  { out: 'sign-bottoms', df: 'NSSIGN04', size: [64, 64], mask: 'round', r: 3 },
+  ...[1, 2, 3, 4].map((n) => ({ out: `berth-${n}`, paint: 'digit', digit: n, size: [64, 96], color: [206, 200, 180], worn: 0.3, seed: 550 + n })),
+];
+
 /** Smooth value noise in 0-1 that repeats every `period` texels, over cells of `cell`. */
 function periodicNoise(x, y, cell, period, seed) {
   const n = period / cell;
@@ -856,6 +908,34 @@ const blank = (w, h, color = [0, 0, 0, 0]) => {
 
 /** The station's textures drawn from nothing (`paint` in a STATION entry). */
 const PAINT = {
+  /**
+   * A stencilled figure (1 to 4) in worn paint: 5 by 7 blocks filling the
+   * picture, a gap in each stroke as a stencil leaves, and `worn` of its
+   * texels flaked off in patches.
+   */
+  digit({ size: [w, h], digit, color, worn, seed }) {
+    const rows = {
+      1: ['..#..', '.##..', '..#..', '..#..', '..#..', '..#..', '.###.'],
+      2: ['.###.', '#...#', '....#', '..##.', '.#...', '#....', '#####'],
+      3: ['####.', '....#', '....#', '.###.', '....#', '....#', '####.'],
+      4: ['#...#', '#...#', '#...#', '#####', '....#', '....#', '....#'],
+    }[digit];
+    const img = blank(w, h);
+    const bw = Math.floor(w / 5);
+    const bh = Math.floor(h / 7);
+    for (let y = 0; y < bh * 7; y++) {
+      for (let x = 0; x < bw * 5; x++) {
+        if (rows[Math.floor(y / bh)][Math.floor(x / bw)] !== '#') continue;
+        // The stencil's bridges: a thin gap across the figure, a third and two thirds down.
+        if (Math.abs(y - bh * 2.5) < 1 || Math.abs(y - bh * 4.5) < 1) continue;
+        const flake = periodicNoise(x, y, 6, 64, seed) * 0.7 + hash(x, y, seed) * 0.3;
+        if (flake < worn) continue;
+        const shade = 0.82 + 0.18 * hash(x >> 1, y >> 1, seed + 1);
+        fillRect(img, x + ((w - bw * 5) >> 1), y + ((h - bh * 7) >> 1), 1, 1, color.map((v) => Math.round(v * shade)));
+      }
+    }
+    return img;
+  },
   /** One flat colour. */
   flat: ({ size: [w, h], color }) => blank(w, h, [...color, 255]),
   /**
@@ -954,12 +1034,24 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     fs.writeFileSync(path.join(texDir, `${spec.out}.png`), encodePNG(img.width, img.height, img.data));
     console.log(`${spec.out}.png (${img.width}x${img.height}, the station's)`);
   }
+  for (const spec of CORELLIA) {
+    const img = worked(decodePNG(fs.readFileSync(pack.get(spec.df))), spec);
+    made.set(spec.out, img);
+    fs.writeFileSync(path.join(texDir, `${spec.out}.png`), encodePNG(img.width, img.height, img.data));
+    console.log(`${spec.out}.png from ${spec.df} (${img.width}x${img.height}, Corellia's)`);
+  }
   for (let m = 1; m < 15; m++) {
     const img = driftEdge(made.get(DRIFT_EDGES.sand), made.get(DRIFT_EDGES.drift), m);
     fs.writeFileSync(path.join(texDir, `${DRIFT_EDGES.out}-${m}.png`), encodePNG(img.width, img.height, img.data));
   }
   console.log(`${DRIFT_EDGES.out}-1..14.png, the drifts' edges`);
-  for (const spec of DECALS) {
+  for (const spec of [...DECALS, ...CORELLIA_DECALS]) {
+    if (spec.paint) {
+      const img = PAINT[spec.paint](spec);
+      fs.writeFileSync(path.join(texDir, `${spec.out}.png`), encodePNG(img.width, img.height, img.data));
+      console.log(`${spec.out}.png (${img.width}x${img.height}, a painted decal)`);
+      continue;
+    }
     let img = decodePNG(fs.readFileSync(pack.get(spec.df)));
     if (spec.crop) img = cropped(img, spec.crop);
     img = resized(img, spec.size);

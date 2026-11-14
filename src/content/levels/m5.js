@@ -8,8 +8,9 @@ import { FREIGHTER } from '../models/freighter.js';
 // the fine grid (1 tile = 0.5 m; the player is 1.7 tall and 1 wide).
 //
 // A BLOCKOUT: every area is laid out and the route runs from the pier to
-// the apron (PLAN.md, item 12). Textures are stand-ins from the other
-// levels' sets, and blocks stand in for the great crane's legs.
+// the apron (PLAN.md, item 12). The outdoor textures are Corellia's own
+// (derive.mjs, CORELLIA); the rest are stand-ins from the other levels'
+// sets, and blocks stand in for the great crane's legs.
 
 const W = 352;
 const H = 144;
@@ -20,17 +21,19 @@ const DAY = 168;
 /** The harbour's water: runoff that burns. */
 const SEA = -4;
 
-// ---- Stand-in textures (the kit is docs/mission5.md's; a CORELLIA set is to come).
+// ---- Textures (the kit is docs/mission5.md's).
 const T = {
-  quay: 'duracrete',
-  seaWall: 'derelict-wall',
-  water: 'water-murky',
+  quay: 'quay',
+  seaWall: 'sea-wall',
+  dock: 'dock-floor',
+  dockWall: 'dock-wall',
+  water: 'harbour-water',
   street: 'derelict-floor',
-  shack: 'metal-rust',
-  shackB: 'metal-grey',
-  shackC: 'yard-plate-rust',
+  shack: 'shack-plate',
+  shackB: 'shack-grey',
+  shackC: 'shack-tin',
   roof: 'metal-rust',
-  yard: 'yard-plate',
+  yard: 'slag',
   machine: 'hold-wall',
   guts: 'hold-guts',
   grate: 'hold-floor',
@@ -378,7 +381,7 @@ p.rect(300, 88, 304, 92, ground(RAIL, 'lift-floor', { side: T.step, lift: { stop
 // end, the caisson and the sea at the south. Flights run along the west
 // terraces at opposite ends, so the walk down is a zigzag.
 const DOCK = -7.5;
-const dock = (z) => ground(z, T.quay, { light: 152 });
+const dock = (z) => ground(z, T.dock, { light: 152, side: T.dockWall });
 p.rect(312, 60, 342, 100, dock(-2.5));
 p.rect(316, 60, 338, 100, dock(-5));
 p.rect(320, 60, 334, 100, dock(DOCK));

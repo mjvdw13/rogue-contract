@@ -150,6 +150,14 @@ const STATION_GLOW = [
 ];
 const STATION_FENCES = ['ds-field', 'ds-window', 'ds-railing'];
 
+// Corellia's breaking yard (m5): derive.mjs, CORELLIA. The Bottoms' sign
+// is lit; the berths' numbers are paint.
+const CORELLIA = [
+  'quay', 'quay-edge', 'sea-wall', 'shack-plate', 'shack-grey', 'shack-tin', 'shack-green', 'shack-shutter',
+  'harbour-water', 'slag', 'dock-wall', 'dock-floor', 'crane-yellow', 'hull-section',
+];
+const CORELLIA_DECALS = ['berth-1', 'berth-2', 'berth-3', 'berth-4'];
+
 const ANIMATED = {
   'imp-computer': { frames: 3, fps: 3 },
 };
@@ -171,6 +179,9 @@ export default [
   ...STATION.map((id) => defineTexture({ id, src: `assets/custom/textures/${id}.png`, fullbright: false })),
   ...STATION_GLOW.map((id) => defineTexture({ id, src: `assets/custom/textures/${id}.png` })),
   ...STATION_FENCES.map((id) => defineTexture({ id, src: `assets/custom/textures/${id}.png`, fence: true })),
+  ...CORELLIA.map((id) => defineTexture({ id, src: `assets/custom/textures/${id}.png`, fullbright: false })),
+  ...CORELLIA_DECALS.map((id) => defineTexture({ id, src: `assets/custom/textures/${id}.png`, decal: true, fullbright: false })),
+  defineTexture({ id: 'sign-bottoms', src: 'assets/custom/textures/sign-bottoms.png', decal: true }),
   defineTexture({ id: 'sky-space', src: 'assets/custom/textures/sky-space.png', sky: true }),
   defineTexture({ id: 'sky-night', src: 'assets/textures/sky-night.png', sky: true }),
   defineTexture({ id: 'sky-day', src: 'assets/custom/textures/sky-day.png', sky: true }),
