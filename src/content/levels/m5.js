@@ -330,6 +330,7 @@ p.rect(250, 86, 252, 87, {
     { action: 'spawn', thing: 'stormtrooper', tag: 'hold-squad-2', skill: [3, 4, 5] },
     { action: 'spawn', thing: 'officer', tag: 'hold-squad-3', skill: [4, 5] },
     { action: 'message', text: "REACTOR START. SHIP'S POWER RESTORED: LIGHTING, CARGO LIFT." },
+    { action: 'sound', id: 'reactor-start' },
   ],
 });
 // 6e. The bridge, on the reactor room's roof: its own roof gone, its
@@ -715,6 +716,14 @@ dress.push(
   at('bay-fuel-pump', 336.5, 23.6, { angle: 270 }), at('ds-crate', 336, 37),
 );
 
+// ================================================================ WORDS
+// Where Jan and the yard's speakers talk: a line of tiles across the way
+// at each gate (the triggers are below).
+for (const [tag, x0, y0, x1, y1] of [
+  ['say-bottoms', 22, 89, 28, 90], ['say-sweep', 24, 63, 36, 65], ['say-berth1', 157, 80, 158, 82], ['say-hauler', 206, 68, 207, 84],
+  ['say-bridge', 255, 67, 259, 68], ['say-cab', 298, 96, 299, 100], ['say-office', 330, 39, 334, 40],
+]) p.rect(x0, y0, x1, y1, (x, y, c) => (c.tag ? c : { ...c, tag }));
+
 // A room indoors (a ceiling, not the sky) inside a building shows from
 // outside as a wall up to the sky, wherever something looks over the
 // building's roof into it. So every tile of building next to one becomes
@@ -878,6 +887,14 @@ export default defineLevel({
     // The hauler's cargo lift: dead until the reactor runs.
     { on: 'enter', tag: 'cargo-lift', unless: 'power', once: false, do: [{ action: 'message', text: 'CARGO LIFT: NO POWER.' }] },
     { on: 'enter', tag: 'cargo-lift', if: 'power', once: false, do: [{ action: 'lift', tag: 'cargo-lift' }] },
+    // Jan and the yard's speakers, a line at each gate (stand-ins for Mark).
+    { on: 'enter', tag: 'say-bottoms', do: [{ action: 'message', text: "JAN: THE BOTTOMS. THE PUMP HOUSE AT THE TOP OF THE STREET GETS YOU UNDER THE YARD'S WALL." }] },
+    { on: 'enter', tag: 'say-sweep', do: [{ action: 'message', text: 'YARD CONTROL: UNLOGGED LANDING, PIER TWELVE. SWEEP THE BOTTOMS.' }] },
+    { on: 'enter', tag: 'say-berth1', do: [{ action: 'message', text: "JAN: BERTH ONE. THAT WAS A YT ONCE. THE HAULER'S NEXT: THE ONLY WAY EAST IS THROUGH IT." }] },
+    { on: 'enter', tag: 'say-hauler', unless: 'power', do: [{ action: 'message', text: "JAN: SHE'S DEAD. NO LIGHTS, NO LIFT. FIND THE REACTOR, AFT." }] },
+    { on: 'enter', tag: 'say-bridge', do: [{ action: 'message', text: "JAN: THERE'S YOUR CRANE. THE RAIL RUNS STRAIGHT TO IT. MIND THE GAP." }] },
+    { on: 'enter', tag: 'say-cab', do: [{ action: 'message', text: 'DOCK CONTROL: BERTH FOUR LOADING FOR DEPARTURE. THE OFFICE IS SEALED: RED CLEARANCE ONLY.' }] },
+    { on: 'enter', tag: 'say-office', if: 'manifest', do: [{ action: 'message', text: "JAN: 'ARC HAMMER'. THAT'S ALL WE NEED. I'M COMING IN: HOLD THE APRON." }] },
     { on: 'start', do: [{ action: 'message', text: "JAN: BREAKERS' ROW. FOUR BERTHS, AND THE BIG CRANE OVER THE LAST ONE. THE FRONT GATE'S IMPERIAL: GO ROUND, THROUGH THE BOTTOMS." }] },
   ],
 });

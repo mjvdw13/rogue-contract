@@ -1813,7 +1813,7 @@ taken. The blockout steps are in order, one session at a time.
       repeater and the mortar, the four secrets filled. The table is in
       `docs/mission5.md`. Ammo 14.0 (about 10.5 with the spawned ones).
       Nobody has played the fights: under Waiting on Mark at the end.
-- [ ] **Words and sound**: Jan's lines and the yard's PA at each gate
+- [x] **Words and sound**: Jan's lines and the yard's PA at each gate
       (stand-ins), the dead lift's message, the manifest; a harbour
       ambience (gulls are out: machinery, a horn far off), the reactor's
       start; a song (`corellia`) or a stand-in from the existing ones.

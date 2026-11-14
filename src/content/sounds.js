@@ -165,6 +165,17 @@ export default [
     synth: { wave: 'saw', freq: 120, duration: 0.9, attack: 0.01, release: 0.3, lowpass: 2400, volume: 0.25, vibrato: { rate: 40, depth: 0.4 }, layers: [{ wave: 'noise', duration: 0.9, release: 0.3, highpass: 2500, volume: 0.25, noiseHold: 2 }] },
     pitchVariance: 0.08,
   }),
+  // Mission 5's yard: a works horn far off (two low notes), and a ship's
+  // reactor coming up (a drone climbing for 2.6 s, a thump as it catches).
+  defineSound({
+    id: 'yard-horn',
+    synth: { wave: 'saw', freq: 110, duration: 2.6, attack: 0.15, sustain: 1, release: 0.6, lowpass: 600, volume: 0.3, layers: [{ wave: 'saw', freq: 82, duration: 2.6, attack: 0.5, release: 0.6, lowpass: 500, volume: 0.25 }, { wave: 'sine', freq: 55, duration: 2.6, attack: 0.3, release: 0.6, volume: 0.2 }] },
+    pitchVariance: 0.03,
+  }),
+  defineSound({
+    id: 'reactor-start',
+    synth: { wave: 'saw', freq: 34, freqEnd: 120, duration: 2.6, attack: 0.4, sustain: 1, release: 0.5, lowpass: 700, volume: 0.4, vibrato: { rate: 9, depth: 0.3 }, layers: [{ ...thump(60, 30, 0.5, 0.7) }, { wave: 'sine', freq: 60, freqEnd: 240, duration: 2.6, attack: 0.8, release: 0.5, volume: 0.2 }, { wave: 'noise', duration: 2.6, attack: 1, release: 0.5, lowpass: 900, volume: 0.1 }] },
+  }),
   defineSound({
     id: 'pump-hum',
     synth: { wave: 'saw', freq: 55, duration: 3.9, attack: 0.3, sustain: 1, release: 0.3, lowpass: 300, volume: 0.25, vibrato: { rate: 2, depth: 0.15 }, layers: [{ wave: 'noise', duration: 3.9, attack: 0.3, release: 0.3, lowpass: 400, volume: 0.08 }] },

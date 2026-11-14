@@ -429,7 +429,8 @@ export default [
   // The great gantry crane over Mission 5's dry dock (models/crane.js): the
   // level's tiles are its legs; the model is the girders, boom and hook,
   // all overhead.
-  defineDecoration({ id: 'great-crane', model: 'great-crane', fixed: true }),
+  // The yard's horn sounds from it now and then, heard along the row.
+  defineDecoration({ id: 'great-crane', model: 'great-crane', fixed: true, emit: [{ every: [18, 40], sound: 'yard-horn' }] }),
   // The yard's big pieces (models/yard5.js). The crane way's trestles
   // collide at their feet, under the deck; its spans are overhead.
   defineDecoration({ id: 'crane-way-trestle', model: 'crane-way-trestle', solid: true, height: CRANE_WAY.top - CRANE_WAY.deck - 0.1, fixed: true }),
