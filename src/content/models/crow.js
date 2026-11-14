@@ -17,7 +17,7 @@ const METAL = { color: ['gray', 0.35] };
 const DARK = { color: ['gray', 0.16] };
 
 /** The hull's bottom: how high it hovers (2 once drawn at 0.8, clear of you at 1.7). */
-const G = 2.5;
+export const G = 2.5;
 
 /**
  * A face textured with `tex`, its uv worked out from each point by `uvAt`
@@ -51,14 +51,14 @@ function block(lo, hi, styles) {
 // upright flanks, chamfered again to a narrower deck. Edges from corner i
 // to i + 1: 0 the belly, 1 to 3 the starboard (south) flank, lower
 // chamfer, side and upper chamfer, 4 the deck, 5 to 7 back down to port.
-const SECTION = [[-1.9, 0], [1.9, 0], [2.1, 0.6], [2.1, 2.9], [1.4, 3.6], [-1.4, 3.6], [-2.1, 2.9], [-2.1, 0.6]];
+export const SECTION = [[-1.9, 0], [1.9, 0], [2.1, 0.6], [2.1, 2.9], [1.4, 3.6], [-1.4, 3.6], [-2.1, 2.9], [-2.1, 0.6]];
 /**
  * Where the section is along the hull, and its width and height there: a
  * box at the back, narrowing from x = -1; the deck slopes from 3.6 at x = 1
  * to 2.6 at 12.1, where the bow rakes forward and down to its tip at the
  * bottom, at 13.9.
  */
-const STATIONS = [[-14, 1, 1], [-1, 1, 1], [1, 0.86, 1], [5, 0.72, 0.9], [9, 0.5, 0.8], [12.1, 0.26, 0.72], [13.9, 0.06, 0.06]];
+export const STATIONS = [[-14, 1, 1], [-1, 1, 1], [1, 0.86, 1], [5, 0.72, 0.9], [9, 0.5, 0.8], [12.1, 0.26, 0.72], [13.9, 0.06, 0.06]];
 const NOSE = -1;
 const ring = ([x, kw, kh]) => SECTION.map(([y, z]) => [x, y * kw, G + z * kh]);
 
@@ -103,7 +103,11 @@ textured(ring(STATIONS[STATIONS.length - 1]), 'crow-nose', ([, y, z]) => [0.5 + 
 // ---------------------------------------------------------------- sides and back
 // The arms out of the back, which carry the fins and wings; their fronts
 // the lights off the top of the back's texture, the sponsons' its grille.
-const ARM = { x: [-14, -7.6], y: [2, 3.9], z: [G + 0.9, G + 2.5] };
+export const ARM = { x: [-14, -7.6], y: [2, 3.9], z: [G + 0.9, G + 2.5] };
+/** How high the fins' tops stand over the hull's bottom (G). */
+export const FIN = 7.7;
+/** The wings (starboard; port is its mirror): x, y and z from root to tip, and thickness. */
+export const W = { x: [-15.1, -8.3], y: [3.9, 11.8], z: [G + 1.45, G + 0.3], t: 0.9 };
 for (const s of [-1, 1]) {
   // A sponson either side, where the nose begins.
   const sp = { x: [-4.2, -1], y: [2, 3.05], z: [G + 1, G + 2.4] };
@@ -122,7 +126,6 @@ for (const s of [-1, 1]) {
   });
 
   // The fin: tall and thin on the arm, leaning out a little, its top cut back.
-  const FIN = 7.7;
   const finLo = [[-10.2, s * 3.05, ARM.z[1]], [-10.2, s * 3.55, ARM.z[1]], [-14, s * 3.55, ARM.z[1]], [-14, s * 3.05, ARM.z[1]]];
   const finHi = [[-11.4, s * 3.45, G + FIN], [-11.4, s * 3.85, G + FIN], [-14, s * 3.85, G + FIN], [-14, s * 3.45, G + FIN]];
   const finV = (z) => (G + FIN - z) / (G + FIN - ARM.z[1]);
@@ -136,9 +139,8 @@ for (const s of [-1, 1]) {
       : ['crow-ladder', (p) => [across(p), finV(p[2])]]),
   });
 
-  // The wing: broad and angled down, its leading edge a grille and its
-  // trailing edge the engines, glowing.
-  const W = { x: [-15.1, -8.3], y: [3.9, 11.8], z: [G + 1.45, G + 0.3], t: 0.9 };
+  // The wing: broad and angled down (W), its leading edge a grille and
+  // its trailing edge the engines, glowing.
   const wing = (dz) => [[W.x[1], s * W.y[0], W.z[0] + dz], [W.x[1], s * W.y[1], W.z[1] + dz], [W.x[0], s * W.y[1], W.z[1] + dz], [W.x[0], s * W.y[0], W.z[0] + dz]];
   const span = (y) => (s * y - W.y[0]) / (W.y[1] - W.y[0]);
   const chord = (x) => (W.x[1] - x) / (W.x[1] - W.x[0]);

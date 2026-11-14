@@ -1,4 +1,5 @@
 import { ModelBuilder } from './lib/build.js';
+import { SECTION, STATIONS, G, ARM, FIN, W } from './crow.js';
 
 // The battle station's working gear (levels/m4.js): what the crews use,
 // placed where they'd be using it. All face +x at angle 0, y to the right.
@@ -19,8 +20,8 @@ import { ModelBuilder } from './lib/build.js';
 //
 // `ds-holo-table`: the control room's round plotting table, its top a
 // projector ring; `ds-holo-ship` is what it shows over it (placed at
-// HOLO.over): the captured freighter, a ship drawn in lines of blue
-// light, turning slowly (decor.js spins it).
+// HOLO.over): the captured ship, the Moldy Crow (models/crow.js) drawn
+// small in lines of blue light, turning slowly (decor.js spins it).
 //
 // `ds-holo-station`: what the briefing room's table shows: a sphere drawn
 // in lines of blue light, HOLO_STATION.r across its radius, its rings of
@@ -54,6 +55,8 @@ export const WELD = [0.95, 0, SERVICE.deck + 0.4];
 export const CART = { top: 1 };
 /** The plotting table's radius and top, and the hologram's height over the floor. */
 export const HOLO = { r: 0.95, top: 1, over: 1.35 };
+/** The ship hologram's scale against the Crow itself (29 long, so 1.45 here). */
+export const HOLO_SHIP = { scale: 0.05 };
 /** The station hologram's radius. */
 export const HOLO_STATION = { r: 0.75 };
 /** The hoisted panel's half length and height, and its lifting eyes (y, z). */
@@ -183,20 +186,41 @@ function holoTable() {
 
 function holoShip() {
   const m = new ModelBuilder('ds-holo-ship');
-  // A long flat hull, the cockpit forward, two engines aft: its edges in
-  // thin lines of light, so the table shows through.
-  const line = (a, b) => strut(m, a, b, 0.012, HOLO_BLUE);
-  const deck = [[0.7, 0], [0.35, -0.22], [-0.45, -0.3], [-0.6, -0.15], [-0.6, 0.15], [-0.45, 0.3], [0.35, 0.22]];
-  for (const z of [0, 0.12]) deck.forEach((p, i) => line([...p, z], [...deck[(i + 1) % deck.length], z]));
-  for (const p of deck) line([...p, 0], [...p, 0.12]);
-  // The cockpit's bubble and the engines' rings.
-  line([0.35, -0.08, 0.12], [0.5, 0, 0.22]);
-  line([0.35, 0.08, 0.12], [0.5, 0, 0.22]);
-  line([0.5, 0, 0.22], [0.7, 0, 0.12]);
+  // The Moldy Crow at HOLO_SHIP.scale, in lines of light so the table
+  // shows through: the hull's sections and the lines along its corners,
+  // the arms, the fins, the wings angled down, the gun pod's barrels.
+  // Centred on the turning axis, its gun pod's bottom at its origin.
+  const k = HOLO_SHIP.scale;
+  const P = ([x, y, z]) => [(x + 0.6) * k, y * k, (z - 1.15) * k];
+  const line = (a, b) => ribbon(m, P(a), P(b), 0.008, HOLO_BLUE);
+  const loop = (pts) => pts.forEach((p, i) => line(p, pts[(i + 1) % pts.length]));
+  const ring = ([x, kw, kh]) => SECTION.map(([y, z]) => [x, y * kw, G + z * kh]);
+  const rings = STATIONS.map(ring);
+  rings.slice(0, -1).forEach((r, s) => {
+    loop(r);
+    r.forEach((p, i) => line(p, rings[s + 1][i]));
+  });
   for (const s of [-1, 1]) {
-    line([-0.6, s * 0.18, 0.06], [-0.75, s * 0.18, 0.06]);
-    line([-0.75, s * 0.1, 0.06], [-0.75, s * 0.26, 0.06]);
+    // The arm: its outer face and its top's outer edge.
+    const ax = ARM.x;
+    const ay = s * ARM.y[1];
+    loop([[ax[0], ay, ARM.z[0]], [ax[1], ay, ARM.z[0]], [ax[1], ay, ARM.z[1]], [ax[0], ay, ARM.z[1]]]);
+    line([ax[1], s * ARM.y[0], ARM.z[1]], [ax[1], ay, ARM.z[1]]);
+    // The fin, down its middle.
+    loop([[-10.2, s * 3.3, ARM.z[1]], [-14, s * 3.3, ARM.z[1]], [-14, s * 3.65, G + FIN], [-11.4, s * 3.65, G + FIN]]);
+    // The wing: its top, and its tip and trailing edge down to its bottom.
+    const wing = (dz) => [[W.x[1], s * W.y[0], W.z[0] + dz], [W.x[1], s * W.y[1], W.z[1] + dz], [W.x[0], s * W.y[1], W.z[1] + dz], [W.x[0], s * W.y[0], W.z[0] + dz]];
+    const lo = wing(0);
+    const hi = wing(W.t);
+    loop(hi);
+    line(lo[1], lo[2]);
+    line(lo[2], lo[3]);
+    for (const i of [1, 2]) line(lo[i], hi[i]);
+    // A barrel under the bow.
+    line([1.3, s * 0.55, 1.7], [4.8, s * 0.55, 1.7]);
   }
+  // The gun pod: its outline under the belly.
+  loop([[-1.4, -1.1, 1.7], [1.7, -0.9, 1.7], [1.7, 0.9, 1.7], [-1.4, 1.1, 1.7]]);
   return m.build();
 }
 
@@ -237,7 +261,7 @@ function holoStation() {
 
 function doorPanel() {
   const m = new ModelBuilder('ds-door-panel');
-  m.box([0, -0.22, 1.0], [0.08, 0.22, 1.75], { ...DARK, bottom: false });
+  m.box([0, -0.22, 1.0], [0.08, 0.22, 1.7], { ...DARK, bottom: false });
   m.face([[0.081, -0.16, 1.68], [0.081, 0.16, 1.68], [0.081, 0.16, 1.48], [0.081, -0.16, 1.48]], { tex: 'ds-screen', uv: [[0, 0], [0.5, 0], [0.5, 0.33], [0, 0.33]], glow: true }, [0, 0, 1.5]);
   m.box([0.08, -0.15, 1.18], [0.11, -0.05, 1.28], RED);
   m.box([0.08, 0.05, 1.18], [0.11, 0.15, 1.28], AMBER);
