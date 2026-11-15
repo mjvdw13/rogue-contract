@@ -143,6 +143,7 @@ export default [
   }),
   defineDecoration({ id: 'ds-fuel-socket', model: 'ds-fuel-socket', fixed: true }),
   defineDecoration({ id: 'ds-beacon', model: 'ds-beacon', fixed: true }),
+  defineDecoration({ id: 'ds-alert-lamp', model: 'ds-alert-lamp', fixed: true }),
   // One by a field across an opening to space: the field's hum comes from it.
   defineDecoration({ id: 'ds-beacon-field', model: 'ds-beacon', fixed: true, emit: [{ every: 3.7, sound: 'field-hum' }] }),
   // The troop bay's lockers and benches.

@@ -214,6 +214,13 @@ Indoors there is no haze. 120 reads dark with these textures, 160 normal.
 - The shaft 112, the walks 152, the column's glow pulsing until the beam
   is off, then dim and still.
 - Unfinished sector 120, work lamps +112.
+- **The alert** (2026-11-15), once the beam is off: the bay's deck, the
+  lobby, the ring corridor and the hub pulse slowly (the bay 152, the
+  halls 168, both down to 88), and 18 alert lamps (`ds-alert-lamp`) on
+  the walls of the way back flash together (a source of 112 blinking,
+  radius 6). Light has no colour, so the red is the lamps' lenses, lit
+  only by their own light. The work lamps in the unfinished sector stay
+  as they are, and the detention block keeps its own alarm.
 
 ## Secrets (3)
 

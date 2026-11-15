@@ -150,7 +150,14 @@ export class LightEffects {
         this.min[i] = lowEnd(light, min);
       }
       for (const src of sources) src.fx = code;
-      if (code && (tiles.length || sources.length)) this._addGroup([...tiles], code, [...sources]);
+      if (code && (tiles.length || sources.length)) {
+        this._addGroup([...tiles], code, [...sources]);
+        // Everything switched in the same instant keeps time: a level can
+        // switch several tags to one effect and have them pulse as one.
+        const g = this.groups[this.groups.length - 1];
+        g.phase = Math.PI / 2;
+        g.timer = 0;
+      }
       return;
     }
     for (const i of tiles) {

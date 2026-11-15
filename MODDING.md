@@ -1598,7 +1598,9 @@ Actions:
   tiles keep their effect and its range. With it (`'none'` for still), all
   the tagged tiles change together with the new effect, from `light` down to
   `lightMin`. Light sources with the tag get `light` as their strength (and
-  `lightFx` and `lightMin` as their effect).
+  `lightFx` and `lightMin` as their effect). Tags given an effect in the
+  same instant (one trigger's actions) keep time with each other, so
+  several areas can pulse as one.
 - `lift` `{ tag, to }`: starts the lifts with the tag (to stop index `to`, or
   the next stop)
 - `teleport` `{ tag, angle }`: moves the player to the first tile with the tag

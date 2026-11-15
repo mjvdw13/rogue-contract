@@ -28,6 +28,20 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
+- **Mission 4 brought up to Mission 5** (`?map=m4`, 2026-11-15; four of
+  the ten ideas, picked by Mark). The unfinished sector shows how far the
+  work has got (deck plates laid in patches over the grate, most at the
+  shaft's end; hazard stripes round the gaps; pale panels on in
+  stretches). The compactor, chute, tunnels and pump room are grimy, the
+  compactor's walls bare pipework in stretches. Three side rooms off the
+  ring corridor: a barracks, a droid bay (an interrogation droid waits
+  in it from skill 3), a comm room with a signal log (a stand-in line).
+  The alert once the beam is off: the bay and the corridors pulse slowly
+  down to 88, and red alert lamps on the walls of the way back flash. To
+  judge: how bare or finished the sector looks, whether the grime shows
+  enough on walls that dark, the rooms' contents and fights, and the
+  alert (too dark in the bay's last fight? the lamps' size and rate).
+
 - **Mission 5's rain** (`?map=m5`, 2026-11-15). A drizzle all the
   time and a squall every 20 to 45 s (more drops, more wind, the haze
   closing from 44 to 34). Drops splash on the ground and the water. They
@@ -1868,25 +1882,6 @@ validate, MODDING.md and a test.
       trolley), a drifting second sky layer and lightning, light that
       runs along a corridor, a sound for the rain.
 
-### 14. Mission 4, brought up to Mission 5 (Mark, 2026-11-15)
-
-Four of the ten things Mission 5 does that Mission 4 doesn't, one commit
-each (`docs/mission4.md` takes the details).
-
-- [x] **The unfinished sector's floors and walls**: deck plates laid in
-      patches over the grate, more of them toward the shaft; hazard
-      stripes round the gaps; wall panels on in stretches.
-- [x] **Grime where the station is dirty**: the compactor and the
-      maintenance tunnels (`grimeIndoors`, a second wall in stretches).
-      The corridors stay clean.
-- [x] **Three side rooms off the ring corridor**: a barracks, a droid
-      bay, a comm room; a pickup and something to look at in each.
-- [ ] **A red alert** when the beam goes off: the way back and the
-      hangar pulse, red beacons blink by the doors.
-- [ ] Not picked, left on the list: traffic past the mouth, big
-      lettering, mirror floors, light down the shaft, crew who aren't
-      troopers, the compactor's walls closing.
-
 ## Small fixes and known rough edges
 
 - [ ] A second `Registry` built from the same content pack finds no sprite
@@ -1928,3 +1923,8 @@ Kept so they aren't lost; none is scheduled.
 - `tools/import-texture.mjs` for outside art (resize, snap to the palette,
   check the tiling).
 - Recorded music (a composer or orchestral samples).
+- Mission 4, left from the list of what Mission 5 does (2026-11-15):
+  traffic past the hangar's mouth and the gallery's field, big lettering
+  (BAY 326, AA-19), mirror floors in the corridors, light down the shaft,
+  crew who aren't troopers (a sprite sheet from Mark), the compactor's
+  walls closing (walls that move and crush).

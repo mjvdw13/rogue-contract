@@ -349,6 +349,34 @@ p.rect(204, 77, 205, 79, {
 p.rect(193, 90, 197, 92, door(0, { upper: T.wallDark }));
 p.rect(193, 92, 197, 112, tunnel(0, { light: 136 }));
 
+// ---------------------------------------------------------------- the alert
+// When the beam goes off the station goes to alert (Mark, 2026-11-15: a
+// change of state, as the hauler's power is in Mission 5). The main lights
+// in the bay and the corridors pulse slowly between full and dim (as
+// detention's do in its alarm), and alert lamps on the walls of the way
+// back flash red together. Light has no colour here: the lamps' lenses
+// are lit only by their own light, so they show red while it's on.
+// [x, y] on the wall's face, the way the wall faces, the bracket's height.
+const ALERT_BEACONS = [
+  // The bare deck, the panel yard, the gallery.
+  [154, 118.5, 'W', 6.5], [112, 128.5, 'E', 6.5], [133, 112, 'S', 6.5], [133, 136, 'N', 6.5],
+  [108, 119, 'W', 7], [78, 120, 'E', 14.5], [76, 120, 'W', 14.5], [50, 114, 'S', 14.5], [46, 140, 'N', 14.5],
+  // The bay: over the gantry's door, along the north wall, by the lobby's door.
+  [50, 104, 'N', 13], [40, 56, 'S', 7], [62, 56, 'S', 10], [80, 103.2, 'W', 6.5],
+  // The lobby, the ring corridor and the hub, for anyone who goes back that way.
+  [100, 96.5, 'W', 5], [104, 97, 'S', 5], [157, 77, 'S', 5], [166.5, 70, 'S', 6.5], [173.5, 90, 'N', 6.5],
+];
+const FACING = { E: [1, 0, 0], N: [0, -1, 90], W: [-1, 0, 180], S: [0, 1, 270] };
+for (const [x, y, face, z] of ALERT_BEACONS) {
+  const [dx, dy] = FACING[face];
+  lamps.push({ x: x + dx * 0.5, y: y + dy * 0.5, z, radius: 6, light: 0, tag: 'alert' });
+}
+/** The garrison's spots on the bay's deck (BAY_SQUAD, below). */
+const BAY_TAGS = ['bay-squad', 'bay-squad-2', 'bay-squad-3', 'bay-squad-4', 'bay-officers', 'bay-probes'];
+/** How low the main lights pulse to, and the tiles that pulse (a tile has one tag, so the tagged ones are named too). */
+const ALERT_LOW = 88;
+const ALERT_DIMS = ['alert-bay', 'crow', ...BAY_TAGS, 'alert-halls', 'pa-ring', 'pa-hub'];
+
 // ---------------------------------------------------------------- 8. the tractor beam shaft
 // A round shaft with no bottom you can see, 22 across its radius. A ledge
 // 4 wide round its wall and one 3.5 wide round the column in its middle
@@ -390,6 +418,8 @@ p.rect(177, 126, 179, 127, {
     { action: 'sound', id: 'beam-down' },
     { action: 'setLight', tag: 'beam-lamps', light: 16, lightFx: 'none' },
     { action: 'openDoors', tag: 'out' },
+    ...ALERT_DIMS.map((tag) => ({ action: 'setLight', tag, light: tag === 'alert-halls' || tag.startsWith('pa-') ? 168 : 152, lightFx: 'glow', lightMin: ALERT_LOW })),
+    { action: 'setLight', tag: 'alert', light: 112, lightFx: 'blink', lightMin: 0 },
     { action: 'openDoors', tag: 'troops' },
     // The garrison sent to the bay to stop the Crow leaving: they wait there.
     ...[
@@ -467,6 +497,7 @@ for (let y = 112; y < 140; y++) {
 // the beam goes down: see the terminal's trigger). Spots on the deck in an
 // arc round the Crow, facing the gantry you come in by; more on harder
 // skills. [x, y] tile corners.
+// (Their tags are BAY_TAGS, above.)
 const BAY_SQUAD = {
   'bay-squad': [[28, 88], [33, 92], [50, 92], [54, 88], [32, 72], [48, 72], [62, 72]],
   'bay-squad-2': [[22, 84], [58, 94], [70, 90]],
@@ -478,6 +509,18 @@ const BAY_SQUAD = {
 for (const [tag, spots] of Object.entries(BAY_SQUAD)) for (const [x, y] of spots) p.set(x, y, { ...p.get(x, y), tag });
 // Coming out onto the gantry over the bay.
 p.rect(44, 106, 48, 108, (x, y, old) => ({ ...old, tag: 'bay-sight' }));
+
+// The tiles whose main lights go down in the alert: the bay's deck, the
+// lobby, the ring corridor and the hub.
+const dims = (tag, also = () => true) => (x, y, old) => (
+  (old.wall && !old.diagonal) || old.door || old.lift || old.tag || !also(x, y) ? old : { ...old, tag }
+);
+p.rect(16, 56, 80, 104, dims('alert-bay'));
+p.rect(82, 94, 100, 106, dims('alert-halls'));
+p.rect(102, 97, 126, 103, dims('alert-halls'));
+p.rect(126, 77, 142, 103, dims('alert-halls', (x, y) => x + y >= 221 && x + y <= 230));
+p.rect(142, 77, 158, 83, dims('alert-halls'));
+p.rect(160, 70, 180, 90, dims('alert-halls'));
 
 // The station's PA: an announcement as you come into the ring corridor,
 // the hub and the passage west off the bare deck.
@@ -743,6 +786,8 @@ const list = [
   // up to the gantry, a med kit behind the crates at either end of the deck.
   at('thermal-detonator', 44.8, 108.5), at('thermal-detonator', 47.2, 108.5), at('energy-pack', 46, 112.5),
   at('med-kit', 19.5, 96.5), at('med-kit', 77.5, 97.5, { skill: [1, 2, 3] }),
+  // The alert's beacons.
+  ...ALERT_BEACONS.map(([x, y, face, z]) => at('ds-alert-lamp', x + FACING[face][0] * 0.02, y + FACING[face][1] * 0.02, { angle: FACING[face][2], z })),
   // Beacons at either end of the gallery's field, the north one humming.
   at('ds-beacon-field', 16.02, 115.4, { angle: 0, z: 15 }), at('ds-beacon', 16.02, 138.6, { angle: 0, z: 15 }),
 ];

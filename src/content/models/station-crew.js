@@ -15,6 +15,11 @@ import { SECTION, STATIONS, G, ARM, FIN, W } from './crow.js';
 // `ds-beacon`: a red warning lamp in a cage on a bracket (the origin on the
 // wall's face): one each side of the hangar's mouth, blinking.
 //
+// `ds-alert-lamp`: the station's alert lamp (the origin on the wall's
+// face, +x out of it): a wide housing with a red lens under a grille. The
+// lens isn't self-lit, so it shows red only while the lamp the level puts
+// in front of it is on, and the alert's blink flashes it.
+//
 // `ds-tool-cart`: a tech's cart: a chest of drawers on casters, a tray on
 // top with a few tools, a handle at the back (-x).
 //
@@ -77,6 +82,7 @@ const STRIPE = { tex: 'imp-stripe' };
 const GRATE = { tex: 'ds-floor-grate' };
 const RED = { tex: 'ds-lamp-red', glow: true };
 const AMBER = { tex: 'ds-lamp', glow: true };
+const RED_UNLIT = { tex: 'ds-lamp-red' };
 const HOLO_BLUE = { color: [96, 176, 255], glow: true, twoSided: true };
 
 /** A square of half-width h round (cx, cy). */
@@ -149,6 +155,15 @@ function beacon() {
     strut(m, [0.35 + Math.cos(t) * 0.2, Math.sin(t) * 0.2, -0.42], [0.35 + Math.cos(t) * 0.2, Math.sin(t) * 0.2, -0.04], 0.015, METAL);
   }
   m.cylinder([0.35, 0, -0.46], 0.2, 0.04, { segments: 6, ...IRON });
+  return m.build();
+}
+
+function alertLamp() {
+  const m = new ModelBuilder('ds-alert-lamp');
+  // The housing on the wall, the lens proud of it, a grille of three bars.
+  m.box([0, -0.55, -0.22], [0.16, 0.55, 0.22], IRON);
+  m.box([0.16, -0.45, -0.14], [0.26, 0.45, 0.14], RED_UNLIT);
+  for (const z of [-0.07, 0, 0.07]) m.box([0.26, -0.47, z - 0.012], [0.28, 0.47, z + 0.012], METAL);
   return m.build();
 }
 
@@ -327,4 +342,4 @@ function bunk() {
   return m.build();
 }
 
-export default [serviceStand(), fuelSocket(), beacon(), toolCart(), holoTable(), holoShip(), holoStation(), doorPanel(), panelHoisted(), lockerBank(), bench(), ...PIPE_RUNS.map(pipeRun), bunk()];
+export default [serviceStand(), fuelSocket(), beacon(), alertLamp(), toolCart(), holoTable(), holoShip(), holoStation(), doorPanel(), panelHoisted(), lockerBank(), bench(), ...PIPE_RUNS.map(pipeRun), bunk()];

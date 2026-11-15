@@ -67,6 +67,21 @@ test('the setLight action passes lightFx and lightMin on', () => {
   assert.deepEqual(range(w, 2, 1), [50, 150]);
 });
 
+test('tiles switched to a glow by separate setLight actions at once pulse together', () => {
+  const level = lit({ a: { base: '.', light: 200, tag: 'one' }, b: { base: '.', light: 160, tag: 'two' } });
+  level.triggers = [{ on: 'start', do: [
+    { action: 'setLight', tag: 'one', light: 200, lightFx: 'glow', lightMin: 40 },
+    { action: 'setLight', tag: 'two', light: 200, lightFx: 'glow', lightMin: 40 },
+  ] }];
+  const w = makeWorld(level);
+  run(w, mockInput(), 0.05);
+  const [a, b] = [1 * w.map.w + 2, 1 * w.map.w + 3];
+  for (let k = 0; k < 300; k++) {
+    w.lights.update(1 / 60);
+    assert.equal(w.map.light[a], w.map.light[b], 'the two tags are at the same light at every moment');
+  }
+});
+
 test('a hanging decoration hangs its sprite height below the ceiling', async () => {
   const assets = new Assets(registry, new Palette(registry.paletteDef));
   assets._loadOverrides = async () => {
