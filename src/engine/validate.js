@@ -163,6 +163,16 @@ export function validateContent(reg) {
     for (const id of new Set(m.faces.map((f) => f.tex).filter(Boolean))) {
       if (!reg.textures.has(id)) err(`${owner}: unknown texture "${id}"`);
     }
+    m.faces.forEach((f, k) => {
+      if (f.mirror === undefined) return;
+      if (typeof f.mirror !== 'boolean') return err(`${owner}: face ${k}'s "mirror" must be true or false`);
+      if (!f.mirror) return;
+      // (Its picture is turned over about a level line: it's only right lying level.)
+      const pts = f.v.map((i) => m.vertices[i]);
+      const up = pts.reduce((s, p, i) => s + p[0] * pts[(i + 1) % pts.length][1] - pts[(i + 1) % pts.length][0] * p[1], 0);
+      if (!f.tex) err(`${owner}: face ${k} is a mirror, so it needs a "tex" for its shape`);
+      else if (pts.some((p) => Math.abs(p[2] - pts[0][2]) > 1e-6) || !(up > 0)) err(`${owner}: face ${k} is a mirror, so it must lie level, facing up (a puddle)`);
+    });
     if (m.faces.length > MODEL_BUDGET) warn(`${owner}: ${m.faces.length} faces is over the budget of ${MODEL_BUDGET}`);
   }
 

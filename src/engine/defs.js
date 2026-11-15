@@ -187,12 +187,14 @@ export function defineTexture(def) {
  * fullbright (an animated texture keeps animating); `flat` faces are lit as
  * the walls are, without the shading by the way they face (for a face flush
  * with a wall); `twoSided` faces are
- * drawn from behind too.
+ * drawn from behind too. A `mirror` face (level, facing up, with a `tex`
+ * for its shape: a puddle) shows what's over it upside down where the
+ * texture has a texel, darker the steeper it's looked down at.
  *
  * `lines` ([x0, y0, x1, y1] in model space) are optional wall segments for
  * collision; without them a solid model collides as its thing's cylinder.
  * @param {{id:string, vertices:number[][], faces:{v:number[], color?:any[], tex?:string,
- *   uv?:number[][], uvw?:number[][], glow?:boolean, flat?:boolean, twoSided?:boolean}[], lines?:number[][]}} def
+ *   uv?:number[][], uvw?:number[][], glow?:boolean, flat?:boolean, twoSided?:boolean, mirror?:boolean}[], lines?:number[][]}} def
  */
 export function defineModel(def) {
   requireId(def, 'Model');

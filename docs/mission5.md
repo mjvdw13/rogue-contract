@@ -215,8 +215,9 @@ vent stack, the sign), a smokestack, a hoist.
   and a squall every 20 to 45 s that lasts 10 to 25: all 420 drops, the
   wind 2.2 times as strong, the haze's half distance in from 44 to 34.
   The ground is wet with it: 70 puddles on the open ground (`puddle`,
-  `puddle-small`, `puddle-wide`: Talay's water as pale as the sky, a damp
-  dark rim) and dark damp patches, where oil stains were; a little oil
+  `puddle-small`, `puddle-wide`: a mirror face in a ragged shape, the
+  sky and the skyline upside down in it, on a patch of damp) and dark
+  damp patches, where oil stains were; a little oil
   is left on the cutting floor and the dock's apron.
   Ships cross the sky and the harbour (`traffic`: a freighter, a skiff,
   TIEs, a skyhopper), and the harbour's water drifts east.

@@ -121,6 +121,40 @@ test('a model placed with `lit` takes that light, not the light map where it sta
   assert.deepEqual(errors.filter((e) => e.includes('"lit"')), ['Level "bad": a door-jamb at (3.5, 1.5): "lit" must be a light from 0 to 255']);
 });
 
+test('a mirror face on the floor shows the wall over it upside down, and darker', () => {
+  // A level square on the floor ahead, any texture for its shape; the far
+  // wall is banded, so its rows differ.
+  const pool = (extra = {}) =>
+    new Model(
+      defineModel({
+        id: 'pool',
+        vertices: [[-1, -1, 0.02], [1, -1, 0.02], [1, 1, 0.02], [-1, 1, 0.02]],
+        faces: [{ v: [0, 1, 2, 3], tex: 'imp-floor', uv: [[0, 0], [1, 0], [1, 1], [0, 1]], ...extra }],
+      }),
+      palette,
+      (id) => assets.textureSlot(id),
+      assets.textures,
+    );
+  const empty = frame(open, []);
+  const fb = frame(open, [thing(pool({ mirror: true }), 5, 2.5)]);
+  // The far wall is 7.5 from the camera (x = 9); the middle of the pool 3.5.
+  const y = rowAt(0.02, 3.5);
+  const foot = view.horizon + ((CAM.z - 0.02) * view.fy) / 7.5;
+  const my = Math.floor(2 * foot - y - 0.5);
+  assert.ok(my >= 0 && my < y, 'the row it mirrors is on the screen, over it');
+  assert.notEqual(fb[at(mid, y)], empty[at(mid, y)], 'the floor is covered');
+  const shown = new Set();
+  for (let l = 0; l <= 12; l++) shown.add(palette.colormaps[l * 256 + empty[at(mid, my)]]);
+  assert.ok(shown.has(fb[at(mid, y)]), 'by the row of the wall turned over about its foot, darkened');
+  assert.equal(view.mdepth[at(mid, y)], Infinity, 'and it hides nothing');
+  const bad = (face, vertices = [[-1, -1, 0], [1, -1, 0], [1, 1, 0], [-1, 1, 0]]) => {
+    const m = defineModel({ id: 'bad-mirror', vertices, faces: [{ v: [0, 1, 2, 3], ...face }] });
+    return validateContent(new Registry({ ...content, models: [...content.models, m] })).errors.filter((e) => e.includes('bad-mirror'));
+  };
+  assert.match(bad({ color: ['steel', 0.5], mirror: true })[0], /needs a "tex"/);
+  assert.match(bad({ tex: 'imp-floor', uv: [[0, 0], [1, 0], [1, 1], [0, 1]], mirror: true }, [[-1, -1, 0], [1, -1, 0], [1, 1, 1], [-1, 1, 1]])[0], /must lie level/);
+});
+
 test('walls hide models behind them', () => {
   const walled = room(['##########', '#....#...#', '#....#...#', '#....#...#', '##########'], [], { legend });
   assert.deepEqual(frame(walled, [thing(square(), 7.5, 2.5)]), frame(walled, []));

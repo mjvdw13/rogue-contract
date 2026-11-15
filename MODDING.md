@@ -528,6 +528,14 @@ defineDecoration({ id: 'reactor-ring', model: 'reactor-ring', spin: 0.5 }) // ra
   contrast by the way it faces, their dithering and their haze. So a flat
   face meets the wall beside it at the same light, sun, shadow and lamps
   included. Other faces take one light for the whole model.
+  A `mirror` face is a puddle: it must lie level, facing up, and its
+  `tex` is only its shape. Where the texture has a texel the face shows
+  what's drawn over it upside down (the sky, the skyline, the wall behind
+  it, the models drawn before it; not sprites or particles), 2 colormap
+  levels darker along it and up to 12 looking steeply down. The picture
+  is turned over about the row where the column's far wall would meet the
+  puddle's level, so a wall standing on that level is right and the sky
+  nearly so. Like grime it hides nothing.
   A face in a grime texture (`grime: true`, see Decals) darkens what's
   behind it instead of covering it and hides nothing: a soft shadow on the
   ground (`speeder-shadow`, a grey oval).

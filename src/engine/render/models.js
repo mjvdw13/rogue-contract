@@ -13,6 +13,12 @@ const LIGHT = (() => {
 /** Colormap levels darker for a face turned fully away from the light. */
 export const SHADE = 8;
 const MAX_POLY = 16;
+/** A mirror face darkens what it shows by this many colormap levels looking along it, */
+const MIRROR_DARK = 2;
+/** and by this many more for each unit of slope the eye looks down it at (1: 45 degrees down), */
+const MIRROR_STEEP = 9;
+/** up to this many. */
+const MIRROR_MAX = 12;
 /** 4 x 4 ordered dither thresholds, centred on 0, for grime faces' fractional levels (as columns.js). */
 const DITHER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map((v) => (v + 0.5) / 16 - 0.5);
 
@@ -299,6 +305,16 @@ export function drawModels(view, things, map, textures, fb, fbW, colormaps, skip
       // hides nothing behind it (it writes no depth).
       const grime = f.grime ? tex.shade : null;
       const hazy = outdoor && view.hazeOn;
+      // A mirror (a puddle: level, facing up) shows the rows over it upside
+      // down, as they're drawn already: the world, and the models before
+      // this one. A wall `D` away standing on the mirror's level meets it
+      // at the row `e * fy / D` under the horizon (`e`: the eye over the
+      // mirror), and its picture in the mirror is its own turned over about
+      // that row. D is where this column's ray ends: right for that wall,
+      // and for the sky over it when it's far. Only this column is read (a
+      // column may not depend on another: render/pool.js).
+      const mirror = f.mirror && pix !== null;
+      const mirrorE = mirror ? (camZ - worldZ[v0]) * fy : 0;
 
       for (let x = x0; x < x1; x++) {
         const xc = x + 0.5;
@@ -400,6 +416,19 @@ export function drawModels(view, things, map, textures, fb, fbW, colormaps, skip
             if (!(y >= segTop[sb + k] && y < segBot[sb + k])) continue;
           }
           let ci;
+          if (mirror) {
+            const u = (uA + dU * along) * depth;
+            const v = (vA + dV * along) * depth;
+            if (pix[(Math.floor(v * th) & hm) * tw + (Math.floor(u * tw) & wm)] === TRANSPARENT) continue;
+            let my = Math.floor(2 * (horizon + (wallT < 1e6 ? mirrorE / wallT : 0)) - y - 0.5);
+            if (my >= y) my = y - 1;
+            if (my < 0) my = 0;
+            let l = (MIRROR_DARK + ((y + 0.5 - horizon) / fy) * MIRROR_STEEP + DITHER[(x & 3) + (y & 3) * 4] + 0.5) | 0;
+            if (l < 0) l = 0;
+            else if (l > MIRROR_MAX) l = MIRROR_MAX;
+            fb[o] = colormaps[l * 256 + fb[my * fbW + x]];
+            continue;
+          }
           if (grime) {
             const u = (uA + dU * along) * depth;
             const v = (vA + dV * along) * depth;

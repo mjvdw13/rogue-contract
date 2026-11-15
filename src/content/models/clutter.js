@@ -132,13 +132,27 @@ function heap() {
   return m.build();
 }
 
-/** Litter (or a patch of oil, or a puddle): its texture flat on the ground, `s` across (its gaps see-through). */
+/** Litter (or a patch of oil): its texture flat on the ground, `s` across (its gaps see-through). */
 function litter(id, s, tex = 'litter') {
   const m = new ModelBuilder(id);
   m.face([[-s / 2, -s / 2, 0.02], [s / 2, -s / 2, 0.02], [s / 2, s / 2, 0.02], [-s / 2, s / 2, 0.02]], {
     tex,
     uv: [[0, 0], [1, 0], [1, 1], [0, 1]],
   }, [0, 0, -1]);
+  return m.build();
+}
+
+/**
+ * A puddle `s` across: a mirror in the shape of `tex` (the sky and the
+ * skyline upside down in it), on a patch of damp a little bigger that
+ * darkens the ground round it.
+ */
+function puddle(id, s, tex, damp) {
+  const m = new ModelBuilder(id);
+  const quad = (r, z) => [[-r, -r, z], [r, -r, z], [r, r, z], [-r, r, z]];
+  const uv = [[0, 0], [1, 0], [1, 1], [0, 1]];
+  m.face(quad(s * 0.62, 0.01), { tex: damp, uv }, [0, 0, -1]);
+  m.face(quad(s / 2, 0.02), { tex, uv, mirror: true }, [0, 0, -1]);
   return m.build();
 }
 
@@ -224,9 +238,9 @@ export const CLUTTER = {
   'litter-small': { model: () => litter('litter-small', 1), radius: 0.5, height: 0, depth: 1 },
   oil: { model: () => litter('oil', 1.6, 'oil'), radius: 0.8, height: 0, depth: 1.6 },
   'oil-small': { model: () => litter('oil-small', 1.2, 'oil'), radius: 0.6, height: 0, depth: 1.2 },
-  puddle: { model: () => litter('puddle', 2.4, 'puddle-1'), radius: 1.2, height: 0, depth: 2.4 },
-  'puddle-small': { model: () => litter('puddle-small', 1.4, 'puddle-2'), radius: 0.7, height: 0, depth: 1.4 },
-  'puddle-wide': { model: () => litter('puddle-wide', 3.6, 'puddle-2'), radius: 1.8, height: 0, depth: 3.6 },
+  puddle: { model: () => puddle('puddle', 2.4, 'puddle-1', 'grime-blotch-1'), radius: 1.5, height: 0, depth: 3 },
+  'puddle-small': { model: () => puddle('puddle-small', 1.4, 'puddle-2', 'grime-blotch-2'), radius: 0.9, height: 0, depth: 1.8 },
+  'puddle-wide': { model: () => puddle('puddle-wide', 3.6, 'puddle-2', 'grime-blotch-1'), radius: 2.3, height: 0, depth: 4.5 },
   rubble: { model: rubble, radius: 0.7, height: 0.26, depth: 0.9 },
   scrap: { model: scrap, radius: 0.9, height: 1.6, depth: 0.7 },
   'deck-plate': { model: () => plate('deck-plate', 'yard-plate', [2, 1.5]), radius: 1.25, height: 0.05, depth: 1.5 },

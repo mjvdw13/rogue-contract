@@ -38,13 +38,15 @@ These need Mark to try something, or to decide. Don't start them without him.
   squall 420), the streaks' brightness and length, the squalls' haze,
   and whether the soot should go while it rains.
 - **Mission 5's puddles** (`?map=m5`, 2026-11-15). The open ground has
-  70 puddles in three sizes where the oil stains were, pale with the sky
-  in them and dark with damp at the edge, and dark damp patches; a
-  little oil is left by the cutters and on the dock's apron. They're
-  pictures: nothing mirrors in them and they don't ripple. To judge: how
-  many, how pale, their size, and whether the ground itself should go
-  darker (wet concrete) or the puddles should mirror the sky for real
-  (an engine feature).
+  70 puddles in three sizes where the oil stains were, and dark damp
+  patches; a little oil is left by the cutters and on the dock's apron.
+  The puddles mirror (a model face's `mirror`; the first ones were
+  pictures and looked like slime): the sky, the skyline, walls, lamp
+  posts and models upside down in them, darker the steeper you look
+  down, on a patch of damp. Troopers, rain and shots don't show in them,
+  and they don't ripple. To judge: whether they read as water, how many,
+  their size, how dark (2 to 12 levels), and whether the ground itself
+  should go darker (wet concrete).
 - **Water and sludge that move** (`?map=m5`, `?map=m4`, 2026-11-15).
   The harbour's water drifts east at 0.35 tiles a second (the bilge in
   the hauler stays still); the compactor's sludge creeps at 0.12. It's

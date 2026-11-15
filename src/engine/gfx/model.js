@@ -4,7 +4,8 @@ import { TEXELS_PER_UNIT } from '../config.js';
  * A model definition (defs.js defineModel) made ready for the renderer: flat
  * vertex arrays, colours as palette indices, texture slots, texture
  * coordinates in repeats, and a unit normal per face. A face in a grime
- * texture (`grime`) darkens what's behind it instead of covering it.
+ * texture (`grime`) darkens what's behind it instead of covering it; a
+ * `mirror` face shows what's above it upside down (see render/models.js).
  */
 export class Model {
   /**
@@ -48,6 +49,7 @@ export class Model {
         twoSided: !!f.twoSided,
         flat: !!f.flat,
         grime: !!textures[slot]?.shade,
+        mirror: !!f.mirror,
         nx,
         ny,
         nz,
