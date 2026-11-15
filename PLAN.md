@@ -37,6 +37,14 @@ These need Mark to try something, or to decide. Don't start them without him.
   Corellia should rain at all, how heavy (the drizzle 126 drops, the
   squall 420), the streaks' brightness and length, the squalls' haze,
   and whether the soot should go while it rains.
+- **Mission 5's puddles** (`?map=m5`, 2026-11-15). The open ground has
+  70 puddles in three sizes where the oil stains were, pale with the sky
+  in them and dark with damp at the edge, and dark damp patches; a
+  little oil is left by the cutters and on the dock's apron. They're
+  pictures: nothing mirrors in them and they don't ripple. To judge: how
+  many, how pale, their size, and whether the ground itself should go
+  darker (wet concrete) or the puddles should mirror the sky for real
+  (an engine feature).
 - **Water and sludge that move** (`?map=m5`, `?map=m4`, 2026-11-15).
   The harbour's water drifts east at 0.35 tiles a second (the bilge in
   the hauler stays still); the compactor's sludge creeps at 0.12. It's

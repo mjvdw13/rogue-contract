@@ -875,18 +875,18 @@ for (const [tag, x0, y0, x1, y1] of [
   }
 }
 // Stains and leavings on the ground, scattered by area (none of them is
-// in the way: they lie flat, and you walk over them): oil and spills on
+// in the way: they lie flat, and you walk over them): puddles and damp on
 // the concrete, litter in the Bottoms, burns, scrap and rusty plate where
 // the cutters work (on the black slag only rust and scorch show).
 {
   const rnd = random(97);
   const r2 = (v) => Math.round(v * 100) / 100;
-  /** The tile's floor if it's open ground under the sky, level with all round it. */
-  const flat = (x, y) => {
+  /** The tile's floor if it's open ground under the sky, level with all round it (`reach` tiles each way). */
+  const flat = (x, y, reach = 1) => {
     const c = p.get(Math.floor(x), Math.floor(y));
     if (!c || c.wall || c.door || c.lift || c.slab || c.damage || c.ceiling !== 'sky') return null;
-    for (let dy = -1; dy <= 1; dy++) {
-      for (let dx = -1; dx <= 1; dx++) {
+    for (let dy = -reach; dy <= reach; dy++) {
+      for (let dx = -reach; dx <= reach; dx++) {
         const d = p.get(Math.floor(x) + dx, Math.floor(y) + dy);
         if (!d || d.wall || d.door || d.lift || d.slab || d.floorZ !== c.floorZ) return null;
       }
@@ -898,25 +898,28 @@ for (const [tag, x0, y0, x1, y1] of [
       const [x, y] = [rnd.range(x0, x1), rnd.range(y0, y1)];
       const type = rnd.pick(types);
       const angle = Math.floor(rnd() * 24) * 15;
-      const c = flat(x, y);
+      const c = flat(x, y, type === 'puddle-wide' ? 2 : 1);
       if (c) dress.push(at(type, r2(x), r2(y), { z: c.floorZ, angle }));
     }
   };
-  const OIL = ['oil', 'oil-small', 'oil-small', 'floor-spill-1', 'floor-spill-2'];
+  // (Mark, 2026-11-15: it rains here, so puddles, not oil: pale with the
+  // sky in them, and dark damp patches. A little oil stays where the
+  // cutters and the dock's machines are.)
+  const WET = ['puddle', 'puddle-small', 'puddle-small', 'puddle-wide', 'puddle', 'floor-spill-1', 'floor-spill-2'];
   const LITTER = ['litter', 'litter-small', 'litter-small'];
   const CUT = ['floor-burn-1', 'floor-burn-2', 'floor-burn-1', 'deck-plate-rust', 'deck-plate', 'scrap', 'rubble'];
   // The pier and the quay's west end; the quay along the yard.
-  scatter(OIL, 14, [8, 92, 46, 104]); scatter(OIL, 8, [20, 104, 30, 140]); scatter(LITTER, 6, [8, 92, 46, 104]);
-  scatter(OIL, 40, [46, 92, 300, 104]); scatter(LITTER, 14, [46, 92, 300, 104]); scatter(['floor-burn-1', 'floor-burn-2'], 6, [130, 92, 300, 104]);
+  scatter(WET, 21, [8, 92, 46, 104]); scatter(WET, 12, [20, 104, 30, 140]); scatter(LITTER, 6, [8, 92, 46, 104]);
+  scatter(WET, 60, [46, 92, 300, 104]); scatter(LITTER, 14, [46, 92, 300, 104]); scatter(['floor-burn-1', 'floor-burn-2'], 6, [130, 92, 300, 104]);
   // The Bottoms: the lower street, the bend, the upper street.
-  scatter(LITTER, 10, [20, 62, 30, 88]); scatter(OIL, 6, [20, 62, 30, 88]);
-  scatter(LITTER, 12, [30, 44, 60, 74]); scatter(OIL, 6, [30, 44, 60, 74]); scatter(['rubble'], 3, [30, 44, 60, 74]);
-  scatter(LITTER, 10, [60, 46, 96, 56]); scatter(OIL, 6, [60, 46, 96, 56]);
+  scatter(LITTER, 10, [20, 62, 30, 88]); scatter(WET, 9, [20, 62, 30, 88]);
+  scatter(LITTER, 12, [30, 44, 60, 74]); scatter(WET, 9, [30, 44, 60, 74]); scatter(['rubble'], 3, [30, 44, 60, 74]);
+  scatter(LITTER, 10, [60, 46, 96, 56]); scatter(WET, 9, [60, 46, 96, 56]);
   // Slip 1 and the cutting floor; Berth 3; the dock's rim, its floor, the apron.
-  scatter(CUT, 26, [130, 56, 206, 92]); scatter(OIL, 10, [130, 56, 206, 92]);
+  scatter(CUT, 26, [130, 56, 206, 92]); scatter(WET, 14, [130, 56, 206, 92]); scatter(['oil', 'oil-small'], 4, [130, 56, 206, 92]);
   scatter(CUT, 16, [264, 60, 298, 92]);
-  scatter(OIL, 8, [308, 60, 346, 104]); scatter(OIL, 8, [320, 60, 334, 100]);
-  scatter(['floor-burn-1', 'floor-burn-2', 'oil'], 8, [314, 22, 344, 40]);
+  scatter(WET, 12, [308, 60, 346, 104]); scatter(WET, 12, [320, 60, 334, 100]);
+  scatter(['floor-burn-1', 'floor-burn-2', 'oil', 'puddle', 'puddle-small'], 12, [314, 22, 344, 40]);
 }
 // Patches on the shacks and sheds: sheet metal bolted over what gave way.
 for (const [x, y, z, face, tex, scale = 1] of [

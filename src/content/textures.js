@@ -162,7 +162,8 @@ const CORELLIA = [
 ];
 /** The yard's wall switch, a tile square: lit. */
 const CORELLIA_GLOW = ['yard-switch', 'yard-switch-on'];
-const CORELLIA_DECALS = ['berth-1', 'berth-2', 'berth-3', 'berth-4'];
+// (And puddles of rain: the clutter's `puddle` models wear them.)
+const CORELLIA_DECALS = ['berth-1', 'berth-2', 'berth-3', 'berth-4', 'puddle-1', 'puddle-2'];
 
 const ANIMATED = {
   'imp-computer': { frames: 3, fps: 3 },

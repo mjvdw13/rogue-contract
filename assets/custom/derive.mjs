@@ -579,12 +579,20 @@ export const CORELLIA = [
  * and the berths' numbers, 2 tiles by 3 of worn white paint (`paint:
  * 'digit'`: a stencilled figure, a share of its texels flaked off).
  */
+/** A puddle under Corellia's sky: dark to pale yellow-grey. */
+const PUDDLE = [[92, 92, 78], [122, 120, 100], [148, 144, 120], [172, 166, 140], [198, 190, 162]];
+
 export const CORELLIA_DECALS = [
   { out: 'sign-bottoms', df: 'NSSIGN04', size: [64, 64], mask: 'round', r: 3 },
   ...[1, 2, 3, 4].map((n) => ({ out: `berth-${n}`, paint: 'digit', digit: n, size: [64, 96], color: [206, 200, 180], worn: 0.3, seed: 550 + n })),
   // The freighter's stern hatch, 5 tiles by 3: the Generic barred blast
   // door stretched to fit, in rusty grey (RISING makes its panel).
   { out: 'hull-hatch', df: 'ZDBIGDR3', size: [160, 96], gradient: [[24, 22, 20], [64, 60, 54], [106, 100, 90], [146, 138, 124], [178, 170, 154]], keep: 0, contrast: 1.1, rust: WORN(16, 565, 0.35), mask: 'round', r: 2 },
+  // Puddles of rain on the yard's ground (the `puddle` models lie on it):
+  // Talay's rippled water as pale as the overcast sky it mirrors, cut to a
+  // ragged blob, the ground dark with damp round its edge.
+  { out: 'puddle-1', df: 'CFWATER4', size: [64, 64], gradient: PUDDLE, keep: 0, contrast: 0.6, mask: 'blob', seed: 571, rim: { width: 0.13, color: [24, 23, 19] } },
+  { out: 'puddle-2', df: 'CFWATER4', size: [64, 64], gradient: PUDDLE, keep: 0, contrast: 0.6, mask: 'blob', seed: 577, rim: { width: 0.13, color: [24, 23, 19] } },
 ];
 
 /** Smooth value noise in 0-1 that repeats every `period` texels, over cells of `cell`. */
@@ -739,7 +747,13 @@ function masked(img, { mask, r = 0, rim, seed = 1 }) {
         const i = (y * w + x) * 4;
         const dist = Math.hypot((x + 0.5) / w - 0.5, (y + 0.5) / h - 0.5) * 2;
         const n = periodicNoise(x, y, 8, w, seed) * 0.6 + periodicNoise(x, y, 4, w, seed + 1) * 0.4;
-        d[i + 3] = n * 1.25 - dist * 0.8 > 0.02 ? 255 : 0;
+        const e = n * 1.25 - dist * 0.8 - 0.02;
+        d[i + 3] = e > 0 ? 255 : 0;
+        // (`rim.width` here is in the noise's own units: 0.1 is a margin a few texels wide.)
+        if (rim && e > 0 && e < rim.width) {
+          const t = 1 - e / rim.width;
+          for (let k = 0; k < 3; k++) d[i + k] = Math.round(d[i + k] + (rim.color[k] - d[i + k]) * t);
+        }
       }
     }
     return img;
