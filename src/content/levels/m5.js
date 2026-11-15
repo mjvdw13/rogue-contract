@@ -72,6 +72,8 @@ const kit = new Town(p, {
 });
 const lamps = [];
 const decals = [];
+/** Pickups (the list is in FIGHTS AND ITEMS; the rooms off the street add theirs). */
+const items = [];
 const at = (type, x, y, extra = {}) => ({ type, x, y, ...extra });
 
 /** Open ground under the sky. */
@@ -493,8 +495,37 @@ decals.push({ x: 25, y: 92, z: 5.6, face: 'S', tex: 'sign-bottoms' });
 // Lower street. West side: a door, a lean-to with a flue beside it,
 // windows over. East side: the shuttered droid shop under the lit sign,
 // its power unit, a dead astromech and a dome outside it.
-kit.door(20, 82, 'E', { h: 10, tex: 'door-grey', wall: T.shackB, jamb: false });
-kit.door(30, 85, 'W', { h: 6, tex: 'door-red', wall: T.shack, jamb: false });
+// Two of the street's doors open (Mark, 2026-11-14: a street of locked
+// doors wants some to go through). West, a family's shack: a front room
+// and a sleeping corner behind it, clear of the windows over the street.
+const shackRoom = (x0, y0, x1, y1, h, extra = {}) => kit.room(x0, y0, x1, y1, { h, ceilZ: 3.75, floor: 'yard-plate', ceiling: T.ceiling, light: 120, ...extra });
+shackRoom(11, 80, 19, 87, 10, { wall: T.shackB });
+shackRoom(16, 72, 19, 80, 10, { wall: T.shackB });
+kit.door(20, 82, 'E', { h: 10, tex: 'door-grey', wall: T.shackB, jamb: false, opens: true });
+dress.push(
+  at('bunk', 17.5, 72.55, { angle: 0 }), at('bedroll', 12, 86.2, { angle: 0 }), at('rack-a', 15, 86.55, { angle: 180 }),
+  at('crate-tan', 13.6, 81.4, { angle: 10 }), at('cantina-datapad', 13.6, 81.4, { z: 0.9, angle: 40 }), at('cantina-stool', 14.9, 81.6), at('cantina-stool', 12.4, 82.2),
+  at('canister', 11.6, 80.6), at('canister-rust', 18.4, 79.2), at('ceiling-lamp', 15, 83.5),
+  at('corellian-woman', 14, 84, { angle: 0, wander: 1 }),
+  at('corellian-boy', 17.5, 76.5, { angle: 270, wander: 1 }),
+);
+lamps.push({ x: 15, y: 83.5, z: 3.4, radius: 5, light: 64 });
+items.push(at('med-kit', 11.8, 84.5), at('energy-cell', 17.5, 74.6));
+// East, behind the shuttered droid shop: the mender's workshop. A bench
+// and his pit droid, droids in for repair along the back wall, parts on
+// racks, a power unit.
+shackRoom(31, 81, 45, 87, 6, { ceilZ: 3.5, wall: T.shack });
+kit.door(30, 85, 'W', { h: 6, tex: 'door-red', wall: T.shack, jamb: false, opens: true });
+dress.push(
+  at('workbench', 36, 81.6, { angle: 0 }), at('pit-droid', 37.6, 82.6, { angle: 110 }),
+  at('astromech-rust', 39.5, 86.2, { angle: 90 }), at('astromech-blue', 41.2, 86.1, { angle: 70 }), at('power-droid-rust', 43.2, 86, { angle: 90 }), at('droid-dome', 38, 86.3),
+  at('rack-b', 44.55, 83, { angle: 270 }), at('rack-c', 41.5, 81.45, { angle: 0 }),
+  at('power-unit', 32, 81.7), at('scrap', 33.6, 86.2), at('canister-rust', 31.6, 86.4),
+  at('ceiling-lamp', 35, 84), at('ceiling-lamp', 41.5, 84),
+  at('corellian-mender', 34.5, 83.6, { angle: 180, wander: 1 }),
+);
+lamps.push({ x: 35, y: 84, z: 3.2, radius: 5, light: 64 }, { x: 41.5, y: 84, z: 3.2, radius: 5, light: 64 });
+items.push(at('power-cell', 39.5, 83), at('energy-cell', 42.8, 84.4));
 kit.block(20, 64, 22, 70, { h: 4, wall: T.shackC });
 kit.leanTo(20, 64, 22, 70, { h: 3, face: 'E', floorZ: 1 });
 kit.fixture('vent-stack', 20, 72.5, 'E', { z: 1 });
@@ -520,7 +551,21 @@ pylon(31.2, 61.2, 1);
 // south shacks, a flue, cables across, a tank on the wall; freight under
 // the conveyor (cover when the sweep squad comes down), a power droid.
 kit.door(64, 46, 'S', { h: 10, tex: 'door-grey', wall: T.shackC, jamb: false, floorZ: 2 });
-kit.door(82, 56, 'N', { h: 11, tex: 'door-red', wall: T.shackB, jamb: false, floorZ: 2 });
+// The red door on the upper street opens too: the breakers' bunkhouse, a
+// front room and four bunks behind it under the upper storey.
+shackRoom(78, 57, 90, 60, 11, { floorZ: 2, ceilZ: 5.75, wall: T.shackB });
+shackRoom(79, 60, 89, 66, 16, { floorZ: 2, ceilZ: 5.75, wall: T.shackB });
+kit.door(82, 56, 'N', { h: 11, tex: 'door-red', wall: T.shackB, jamb: false, floorZ: 2, opens: true });
+dress.push(
+  at('bunk', 79.55, 62.1, { z: 2, angle: 90 }), at('bunk-b', 79.55, 64.7, { z: 2, angle: 90 }),
+  at('bunk-b', 88.45, 62.1, { z: 2, angle: 270 }), at('bunk', 88.45, 64.7, { z: 2, angle: 270 }),
+  at('crate-tan', 86.4, 58.4, { z: 2, angle: 15 }), at('cantina-stool', 85.2, 58.6, { z: 2 }), at('cantina-stool', 87.6, 58.2, { z: 2 }), at('cantina-stool', 86.6, 59.5, { z: 2 }),
+  at('rack-a', 78.45, 58.5, { z: 2, angle: 90 }), at('canister', 89.4, 57.6, { z: 2 }), at('canister-rust', 84, 65.4, { z: 2 }),
+  at('ceiling-lamp', 84, 58.5, { z: 2 }), at('ceiling-lamp', 84, 63, { z: 2 }),
+  at('corellian-breaker', 84, 62.5, { z: 2, angle: 90, wander: 1 }),
+);
+lamps.push({ x: 84, y: 58.5, z: 5.4, radius: 5, light: 64 }, { x: 84, y: 63, z: 5.4, radius: 5, light: 64 });
+items.push(at('med-kit', 88.4, 59.2, { z: 2 }), at('energy-cell', 81.6, 63.4, { z: 2 }), at('shield-unit', 85.6, 64.4, { z: 2 }));
 kit.window(88.5, 46, 'S', { z: 5.5 }).window(66.5, 56, 'N', { z: 6, tex: 'window-louvre' }).window(79.5, 46, 'S', { z: 5.5, tex: 'window-louvre' });
 kit.pipe(78, 46, 'S', { floorZ: 2 }).pipe(68, 56, 'N', { floorZ: 2 });
 kit.block(86, 54, 92, 56, { h: 6, wall: T.shackC });
@@ -549,6 +594,10 @@ dress.push(
   at('power-droid', 101.5, 55.5, { angle: 90 }), at('bay-hose-coil', 109.5, 50.2), at('canister', 119.4, 56.6),
 );
 kit.grimeIndoors(98, 40, 124, 58, { amount: 2, seed: 53 });
+// (And the rooms off the Bottoms' streets.)
+kit.grimeIndoors(11, 72, 19, 87, { amount: 2, seed: 83 });
+kit.grimeIndoors(31, 81, 45, 87, { amount: 2.5, seed: 85 });
+kit.grimeIndoors(78, 57, 90, 66, { amount: 2, seed: 87 });
 // The stairs and the gallery: steam off the joints, pipes overhead, one
 // lamp at the corner.
 dress.push(
@@ -950,7 +999,7 @@ const fights = [
   // terminal's spawns.)
   at('officer', 327, 50.5, { angle: 270, skill: NOT_EASIEST }),
 ];
-const items = [
+items.push(
   // First third: the pier to the pump house.
   at('energy-cell', 36.5, 100.5), at('energy-cell', 27, 72.5), at('med-kit', 21.5, 70.5),
   at('energy-cell', 62.5, 54.5), at('energy-cell', 78.5, 47.5), at('med-kit', 100.5, 56.5),
@@ -977,7 +1026,7 @@ const items = [
   at('detonator-belt', 44, 33), at('med-kit', 42, 32.5),
   at('shield-unit', 237, 88.5), at('power-cell', 235.5, 88.5), at('mortar-shells', 238.5, 88.5),
   at('energy-pack', 282, 77, { z: 0.5 }), at('thermal-detonator', 281, 77, { z: 0.5 }),
-];
+);
 
 export default defineLevel({
   id: 'm5',

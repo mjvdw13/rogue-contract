@@ -42,6 +42,19 @@ These need Mark to try something, or to decide. Don't start them without him.
   its half distance of 44, the hauler's open hold fading into it by
   `haze.indoors`); the skyline north of the waterfront; which areas are
   too bare or too busy.
+- **Mission 5 after Mark's notes** (`?map=m5`, 2026-11-14). All seven
+  are in. To judge: the soot (half-blended, 60 flakes: still too
+  much?); the hold's frames in the haze from the cutting floor; the
+  doors and the one-tile switches (pump house, reactor, bridge); Berth
+  3 as a starship's frame (ring frames, stringers, plating, an engine
+  block aft); the hologram over its table; the varied ground, the
+  yard's north wall as sheds, and the grime (enough, or too dirty?);
+  and three rooms off the Bottoms' streets: a family's shack (west
+  door, lower street), the droid mender's workshop (east door) and the
+  breakers' bunkhouse (red door, upper street). Each has someone to
+  talk to with stand-in lines, and a few pickups. The grey door at the
+  top of the upper street, the gatehouse and the winch house stay
+  locked.
 - **Mission 5's fights** (`?map=m5`, 2026-11-14). 16 / 34 / 42 monsters
   by skill, more spawned by the reactor's switch and the manifest. The
   repeater is in the freighter on Berth 1, the mortar in a cabin off the
@@ -1767,9 +1780,10 @@ are (`src/content/levels/m5.js`), playable at `?map=m5`.
   - [x] Berth 3's hull reads as a boat's: make it a starship's frame.
   - [x] Variation and grime on walls and floors, as Mos Eisley has
         (`town.grime()`, patches, stains on the ground).
-  - [ ] The Bottoms: some of the street's doors open, with rooms behind.
-- [ ] **Slow frames**: 19 ms on average and 38 at worst at 640 x 400 on
-      one thread. The worst views are from out in the harbour looking
+  - [x] The Bottoms: some of the street's doors open, with rooms behind.
+- [ ] **Slow frames**: 15 to 21 ms on average and 35 to 49 at worst at
+      640 x 400 on one thread (the bench swings that much from run to
+      run on this machine; the grime and stains add about 1.7 ms). The worst views are from out in the harbour looking
       along the water, not along the quay; the quay's freight boxes
       changed little. It's the open floor to the map's edge. If Mark
       feels it in play: end the water nearer (a breakwater), or look at

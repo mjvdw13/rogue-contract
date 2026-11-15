@@ -18,12 +18,12 @@ const OLD_QUARTER = { if: 'contract', unless: 'loud' }; // through the checkpoin
 const WAY_OUT = { if: 'loud' }; // round the blast doors, through the cantina, to the bay
 const hint = (when, line) => ({ ...when, lines: [line] });
 
-function villager({ id, name, glyph, frameWidth, frameHeight, height, lines }) {
+function villager({ id, sheet = id, name, glyph, frameWidth, frameHeight, height, lines }) {
   return defineNpc({
     id,
     name,
     glyph,
-    sheet: { src: `assets/sprites/npcs/${id}.png`, frameWidth, frameHeight },
+    sheet: { src: `assets/sprites/npcs/${sheet}.png`, frameWidth, frameHeight },
     scale: 0.85,
     radius: 0.5,
     height,
@@ -135,6 +135,64 @@ export default [
       'Tuskens were out past the Dune Sea last night.',
       "Leave me be. I've walked a long way.",
       hint(OLD_QUARTER, 'Someone has been living in the old freighter, in the dead bay. He does not come out by day.'),
+    ],
+  }),
+  // Corellia's own (Mission 5, the Bottoms): the same sheets, with nothing
+  // to say about Mos Eisley.
+  villager({
+    id: 'corellian-woman',
+    sheet: 'villager-woman',
+    name: 'RESIDENT',
+    glyph: 'ƈ',
+    frameWidth: 52,
+    frameHeight: 64,
+    height: 1.64,
+    lines: [
+      'They cut ships here. Lately they cut them for the Empire.',
+      "Stay off the upper street. The sweep's out.",
+      'We want no trouble with the yard.',
+    ],
+  }),
+  villager({
+    id: 'corellian-boy',
+    sheet: 'villager-boy',
+    name: 'BOY',
+    glyph: 'ƀ',
+    frameWidth: 48,
+    frameHeight: 49,
+    height: 1.25,
+    lines: [
+      "Are you a spacer? I'm going to be a spacer.",
+      'The big crane never stops now. Not even at night.',
+      'I saw your ship come in. The black one.',
+    ],
+  }),
+  villager({
+    id: 'corellian-mender',
+    sheet: 'villager-man',
+    name: 'MENDER',
+    glyph: 'ɱ',
+    frameWidth: 58,
+    frameHeight: 69,
+    height: 1.76,
+    lines: [
+      "Droids, I fix. Blasters, I don't see.",
+      'The yard pays in scrip now. Imperial scrip.',
+      "That astromech's been in three hulls. Outlived all of them.",
+    ],
+  }),
+  villager({
+    id: 'corellian-breaker',
+    sheet: 'villager-adventurer',
+    name: 'BREAKER',
+    glyph: 'ƃ',
+    frameWidth: 56,
+    frameHeight: 65,
+    height: 1.68,
+    lines: [
+      "Berth Four's off limits. Navy crates, no manifests.",
+      'Twenty years cutting hulls. Never saw them take the reactors out whole before.',
+      "You didn't hear it from me.",
     ],
   }),
 ];
