@@ -1759,7 +1759,7 @@ are (`src/content/levels/m5.js`), playable at `?map=m5`.
       each:
   - [x] The soot is too heavy: fainter flakes.
   - [x] The Death Star hologram cuts into its table in the office.
-  - [ ] The hold's frames are black from the cutting floor: models and
+  - [x] The hold's frames are black from the cutting floor: models and
         sprites indoors take the haze of the air in front of them, as
         the walls do (`haze.indoors`).
   - [ ] Every door and wall switch: switches tile, doors show pink and

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { Palette, HAZE_ROW, HAZE_STEPS } from '../src/engine/gfx/palette.js';
 import { View } from '../src/engine/render/view.js';
 import { LIGHT_LEVELS } from '../src/engine/config.js';
-import { headlessRenderer, registry, room } from './helpers.js';
+import { headlessRenderer, makeWorld, registry, room } from './helpers.js';
 
 // Distance and haze (PLAN.md Phase 1d step 5): lit spaces read across a
 // room, and outdoors far surfaces fade toward a haze colour, not to black.
@@ -96,4 +96,33 @@ test('with `haze.indoors`, a room seen down a hazy street fades into the haze to
   const plain = mean(roomAtTheEnd(false));
   assert.ok(near(hazed, HAZE) < 20, `the room's back wall through the haze (${hazed})`);
   assert.ok(near(plain, HAZE) > near(hazed, HAZE) + 10, `without it the room is dark, not hazy (${plain})`);
+});
+
+test('with `haze.indoors`, a thing in that room takes the haze of the street in front of it, as its walls do', () => {
+  const row = '#' + '.'.repeat(50) + ','.repeat(9) + '#';
+  const level = (indoors) => room(['#'.repeat(61), row, row, row, '#'.repeat(61)], ['', ' >'], {
+    legend: {
+      '.': { floor: 'imp-floor', ceiling: 'sky', ceilZ: 3, light: 144 },
+      ',': { floor: 'imp-floor', ceiling: 'imp-ceiling', ceilZ: 3, light: 144 },
+    },
+    sky: 'sky-night',
+    haze: { color: HAZE, half: 10, indoors },
+  });
+  const world = makeWorld(level(true));
+  const view = new View();
+  view.setup({ x: 1.5, y: 2.5, angle: 0 }, 0.05, world.haze);
+  // 49.5 of the 54 tiles to it are under the sky.
+  const share = view.skyShare(world.map, 55.5, 2.5);
+  assert.ok(Math.abs(share - 49.5 / 54) < 0.02, `the share of the way under the sky (${share})`);
+  assert.equal(view.skyShare(world.map, 30.5, 2.5) > 0.9, true, 'a spot in the street is all sky (it is hazed as outdoors anyway)');
+  const hazed = view.rowIn(144, 54, 54 * share);
+  assert.ok(hazed >= HAZE_ROW, 'drawn from the haze tables');
+  assert.ok(view.row(144, 54, false) < HAZE_ROW, 'a thing indoors without a run under the sky is not');
+  // Seen from inside the room, nothing changes.
+  view.setup({ x: 52.5, y: 2.5, angle: 0 }, 0.05, world.haze);
+  assert.equal(view.skyShare(world.map, 57.5, 2.5), 0);
+  // Without `indoors` there is no share at all.
+  const plain = makeWorld(level(false));
+  view.setup({ x: 1.5, y: 2.5, angle: 0 }, 0.05, plain.haze);
+  assert.equal(view.skyShare(plain.map, 55.5, 2.5), 0);
 });

@@ -94,10 +94,12 @@ export function drawSprites(view, things, map, fb, fbW, colormaps, skip, writeDe
       const light = tile >= 0 && map.lightmap ? map.lightmap.sample(t.x, t.y, storey) : 128;
       // (Outdoors in haze, fading toward the haze colour.)
       const outdoor = tile >= 0 && (map.flags[tile] & F_SKY) !== 0;
-      lv = view.row(light, depth, outdoor);
+      // (Indoors with the haze reaching in: the haze of the way to it under the sky.)
+      const sky = outdoor ? 0 : depth * view.skyShare(map, t.x, t.y);
+      lv = sky > 0 ? view.rowIn(light, depth, sky) : view.row(light, depth, outdoor);
       if (frame.glint && !fuzz && tile >= 0 && map.glintmap) {
         const g = map.glintmap.sample(t.x, t.y, storey);
-        if (g >= 1) gv = view.row(light + g * GLINT_GAIN, depth, outdoor);
+        if (g >= 1) gv = sky > 0 ? view.rowIn(light + g * GLINT_GAIN, depth, sky) : view.row(light + g * GLINT_GAIN, depth, outdoor);
       }
     }
     const cm = lv * 256;

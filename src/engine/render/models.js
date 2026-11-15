@@ -169,6 +169,9 @@ export function drawModels(view, things, map, textures, fb, fbW, colormaps, skip
     // (A thing may carry its own light: a tarp over the shade it makes.)
     const light = t.fixedLight >= 0 ? t.fixedLight : tile >= 0 && map.lightmap ? map.lightmap.sample(t.x, t.y, map.storeyAt(tile, (t.z ?? 0) + 0.5)) : 128;
     const outdoor = tile >= 0 && (map.flags[tile] & F_SKY) !== 0;
+    // (Indoors with the haze reaching in: the share of the way to it that's
+    // under the sky, so it fades as the walls round it do.)
+    const skyShare = outdoor ? 0 : +view.skyShare(map, t.x, t.y);
     const fixed = view.fixedColormap;
 
     for (const f of model.faces) {
@@ -402,7 +405,7 @@ export function drawModels(view, things, map, textures, fb, fbW, colormaps, skip
             const v = (vA + dV * along) * depth;
             const sh = grime[(Math.floor(u * tw) & wm) * th + (Math.floor(v * th) & hm)];
             if (sh === 0) continue;
-            const g = hazy ? (1 - view.hazeF(depth) / (HAZE_STEPS - 1)) / SHADE_STEP : 1 / SHADE_STEP;
+            const g = hazy ? (1 - view.hazeF(depth) / (HAZE_STEPS - 1)) / SHADE_STEP : skyShare > 0 ? (1 - view.hazeF(depth * skyShare) / (HAZE_STEPS - 1)) / SHADE_STEP : 1 / SHADE_STEP;
             let l = (sh * g + DITHER[(x & 3) + (y & 3) * 4] + 0.5) | 0;
             if (l <= 0) continue;
             if (l >= LIGHT_LEVELS) l = LIGHT_LEVELS - 1;
@@ -421,13 +424,17 @@ export function drawModels(view, things, map, textures, fb, fbW, colormaps, skip
           else if (flatLit) {
             const d = DITHER[(x & 3) + (y & 3) * 4];
             const fl = (lA + dL * (y + 0.5 - yA)) * depth;
-            lv = (view.levelF(fl, depth) + flatContrast - (flatOut ? depth * view.fog : 0) + d) | 0;
+            // (Under the sky the whole way is hazy; indoors, the run under it.)
+            const run = flatOut ? depth : depth * skyShare;
+            lv = (view.levelF(fl, depth) + flatContrast - run * view.fog + d) | 0;
             if (lv < 0) lv = 0;
             else if (lv >= LIGHT_LEVELS) lv = LIGHT_LEVELS - 1;
-            if (flatOut) {
-              const h = (view.hazeF(depth) + d + 0.5) | 0;
+            if (run > 0) {
+              const h = (view.hazeF(run) + d + 0.5) | 0;
               if (h) lv += HAZE_ROW + (h - 1) * LIGHT_LEVELS;
             }
+          } else if (skyShare > 0) {
+            lv = view.rowIn(light, depth, depth * skyShare, shade);
           } else {
             lv = view.row(light, depth, outdoor, shade);
           }

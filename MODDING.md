@@ -897,8 +897,9 @@ hazy street is a black hole in it. `haze: { ..., indoors: true }` fixes
 that: a ray that has run through the open air before it comes indoors
 keeps the haze it came through, and the fog counts only from where it came
 in. A hold seen across a yard fades into the smog; step inside and nothing
-has changed. (Models and sprites indoors stay unhazed.) It costs about 5%
-of the world pass on a level with many such views.
+has changed. Models and sprites in the room fade with it, by the share of
+the way to them that's under the sky. It costs about 5% of the world pass
+on a level with many such views.
 
 The sky's texture goes round the horizon `skyWrap` times, twice by
 default (Dark Forces' skies span 180 degrees). With `skyWrap: 1` it goes

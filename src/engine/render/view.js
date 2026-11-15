@@ -1,6 +1,7 @@
 import { VIEW_W, VIEW_H, PIXEL_ASPECT, FOV_DEG, LIGHT_LEVELS } from '../config.js';
 import { HAZE_STEPS, HAZE_ROW } from '../gfx/palette.js';
 import { shared } from '../core/shared.js';
+import { F_SKY } from '../world/tilemap.js';
 
 /** The haze table's resolution: entries per tile of distance, and its length. */
 export const HAZE_RES = 8;
@@ -158,6 +159,46 @@ export class View {
     if (l >= LIGHT_LEVELS) l = LIGHT_LEVELS - 1;
     if (!out) return l;
     const h = Math.round(this.hazeF(dist));
+    return h ? HAZE_ROW + (h - 1) * LIGHT_LEVELS + l : l;
+  }
+
+  /**
+   * The share (0 to 1) of the line from the camera to (x, y) that runs
+   * through tiles under the sky, sampled twice a tile: with the haze
+   * reaching indoors (`haze.indoors`), a thing in a room takes that much
+   * of the haze in front of it, as the room's walls do. 0 without it.
+   */
+  skyShare(map, x, y) {
+    if (!this.hazeIndoors) return 0;
+    const dx = x - this.x;
+    const dy = y - this.y;
+    const n = Math.ceil(Math.sqrt(dx * dx + dy * dy) * 2);
+    if (n < 2) return 0;
+    const flags = map.flags;
+    const w = map.w;
+    let sky = 0;
+    for (let k = 0; k < n; k++) {
+      const f = (k + 0.5) / n;
+      const tx = (this.x + dx * f) | 0;
+      const ty = (this.y + dy * f) | 0;
+      if (map.inBounds(tx, ty) && (flags[ty * w + tx] & F_SKY) !== 0) sky++;
+    }
+    return sky / n;
+  }
+
+  /**
+   * The colormap row for a surface indoors lit `light` at `dist`, of which
+   * `sky` was under the sky (`haze.indoors`): its level without the fog
+   * of that run, in the tables of the haze it's seen through.
+   */
+  rowIn(light, dist, sky, shade = 0) {
+    if (this.fixedColormap >= 0) return this.fixedColormap;
+    let l = (this.levelF(light, dist) - sky * this.fog) | 0;
+    if (l < 0) l = 0;
+    else if (l >= LIGHT_LEVELS) l = LIGHT_LEVELS - 1;
+    l += shade;
+    if (l >= LIGHT_LEVELS) l = LIGHT_LEVELS - 1;
+    const h = Math.round(this.hazeF(sky));
     return h ? HAZE_ROW + (h - 1) * LIGHT_LEVELS + l : l;
   }
 
