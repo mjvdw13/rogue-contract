@@ -2,7 +2,7 @@ import { ModelBuilder } from './lib/build.js';
 
 // The big pieces of Mission 5's breaking yard (levels/m5.js; the great
 // crane is models/crane.js): the crane way's trestles and girders, the
-// frames of the hull on Berth 3, keel blocks, a smokestack, the hoist.
+// skeleton of the ship on Berth 3, keel blocks, a smokestack, the hoist.
 // Sizes are tiles (0.5 m); x east, y south.
 
 const YELLOW = { tex: 'crane-yellow', texScale: 2 };
@@ -88,39 +88,123 @@ function span(id) {
   return m.build();
 }
 
-// ---------------------------------------------------------------- Berth 3's ribs
-// A hull cut down to its keel and frames. A frame runs out from the keel
-// along the ground, turns up at the bilge and stands to `height`; the keel
-// is the level's. `berth-rib` is whole, `-cut` has its south side burnt
-// off above the bilge, `-stub` is only the floors and one bilge. Built
-// across y, the origin on the keel's line.
+// ---------------------------------------------------------------- Berth 3's hull
+// A starship cut down to its skeleton (Mark, 2026-11-14: curved ribs
+// standing on a keel read as a boat's). Its frames are closed rings, as a
+// fuselage's are: a flat belly, a chine, a straight side, a shoulder and a
+// roof, with a deck beam across at the chine's top. `berth-rib` is a whole
+// ring, `-cut` has its roof and south shoulder burnt off, `-stub` is the
+// belly and one chine. Built across y, the origin on the spine's line (the
+// level's tiles). Between two rings, 4 apart: `berth-stringers` (the
+// longerons at the ring's corners; `-low` only the chines'), and
+// `berth-plating` (the skin still on one side and shoulder, north; turn
+// it for south). At the stern, `berth-engines`: the engine bulkhead and
+// its thrusters, looking +x.
 export const BERTH_RIB = {
-  /** Half the hull's beam at the frames' tops, and their height. */
-  half: 12,
-  height: 9,
-  /** Where the uprights stand, from the keel: they collide. */
-  post: 10.6,
-  /** The frame's line from the keel out, [y, z]. */
-  line: [[0.9, 0.25], [6.5, 0.3], [9.6, 1.5], [11.4, 4.6], [12, 9]],
+  /** Half the hull's beam, and the ring's height. */
+  half: 11,
+  height: 10.5,
+  /** Where the sides stand, from the spine: they collide. */
+  post: 11,
+  /** The ring's line from the spine out and round to the roof's middle, [y, z]. */
+  line: [[0.9, 0.25], [7, 0.3], [11, 3.6], [11, 7.4], [7.5, 10.5], [0, 10.5]],
   /** By id: how many of the line's pieces the north and south sides keep. */
-  kinds: { 'berth-rib': [4, 4], 'berth-rib-cut': [4, 2], 'berth-rib-stub': [2, 1] },
+  kinds: { 'berth-rib': [5, 5], 'berth-rib-cut': [5, 3], 'berth-rib-stub': [2, 1] },
+  /** The rings' spacing: a stringer's and a plate's length. */
+  bay: 4,
 };
+const HULL_SKIN = { tex: 'freighter-hull', texScale: 4 };
+const CUT = { tex: null, color: [150, 140, 120] };
+const DARK = { tex: null, color: [18, 15, 12] };
 
 function berthRib(id) {
   const m = new ModelBuilder(id);
   const { line, post, kinds } = BERTH_RIB;
+  const full = line.length - 1;
   kinds[id].forEach((keep, k) => {
     const s = k ? 1 : -1;
     for (let i = 0; i < keep; i++) {
       const [a, b] = [line[i], line[i + 1]];
       const last = i === keep - 1;
       // The frame, thinner as it climbs; a cut end shows bright metal.
-      const style = { axis: 'x', ...RUST, side: (e) => (e === 3 ? false : e === 1 ? (last && keep < 4 ? { tex: null, color: [150, 140, 120] } : last ? undefined : false) : undefined) };
-      beam(m, [s * a[0], a[1]], [s * b[0], b[1]], 0.5 - i * 0.05, -0.25, 0.25, style);
+      const style = { axis: 'x', ...RUST, side: (e) => (e === 3 ? false : e === 1 ? (last && keep < full ? CUT : last ? undefined : false) : undefined) };
+      beam(m, [s * a[0], a[1]], [s * b[0], b[1]], 0.5 - i * 0.04, -0.25, 0.25, style);
     }
-    // The upright stops you; the floors lie low enough to step over.
-    if (keep > 2) m.outlineLines([[-0.3, s * post - 0.9], [0.3, s * post - 0.9], [0.3, s * post + 0.9], [-0.3, s * post + 0.9]]);
+    // The side stops you; the belly lies low enough to step over.
+    if (keep > 2) m.outlineLines([[-0.3, s * post - 0.5], [0.3, s * post - 0.5], [0.3, s * post + 0.5], [-0.3, s * post + 0.5]]);
   });
+  // The deck beam across at the chine's top, where both sides still stand
+  // (overhead: you walk under it), and a stanchion either side of the spine.
+  if (kinds[id][0] > 2 && kinds[id][1] > 2) {
+    const z = line[2][1];
+    m.box([-0.15, -line[2][0], z - 0.2], [0.15, line[2][0], z + 0.2], { ...STEEL, bottom: STEEL });
+    for (const s of [-1, 1]) m.box([-0.12, s * 4 - 0.12, 0.3], [0.12, s * 4 + 0.12, z - 0.2], { ...STEEL, top: false, bottom: false });
+  }
+  return m.build();
+}
+
+function berthStringers(id, picks) {
+  const m = new ModelBuilder(id);
+  const { line, bay } = BERTH_RIB;
+  for (const s of [-1, 1]) {
+    for (const i of picks) {
+      const [y, z] = line[i];
+      m.box([0.25, s * y - 0.13, z - 0.13], [bay - 0.25, s * y + 0.13, z + 0.13], { ...STEEL, axis: 'z' });
+    }
+  }
+  return m.build();
+}
+
+function berthPlating() {
+  const m = new ModelBuilder('berth-plating');
+  const { line, bay, post } = BERTH_RIB;
+  // The side's skin and the shoulder's, a hair outside the frames, seen
+  // from both sides; its torn edge is the cutters' last line.
+  const out = 0.3;
+  const [a, b, c] = [line[2], line[3], line[4]];
+  m.face([[0, -a[0] - out, a[1] - 1], [bay, -a[0] - out, a[1] - 1], [bay, -b[0] - out, b[1]], [0, -b[0] - out, b[1]]], { ...HULL_SKIN, twoSided: true });
+  m.face([[0, -b[0] - out, b[1]], [bay, -b[0] - out, b[1]], [bay * 0.6, -c[0] - 0.6, c[1] + 0.15], [0, -c[0] - 0.6, c[1] + 0.15]], { ...HULL_SKIN, twoSided: true });
+  m.outlineLines([[0, -post - 0.5], [bay, -post - 0.5], [bay, -post + 0.2], [0, -post + 0.2]]);
+  return m.build();
+}
+
+/** The engine block: the bulkhead's thickness, the thrusters' length, and where the big three sit, [y, z]. */
+export const BERTH_ENGINES = { wall: 0.6, length: 5, radius: 3.1, at: [[-6.6, 6.4], [0, 6.4], [6.6, 6.4]], small: [[-3.3, 2], [3.3, 2]] };
+
+function berthEngines() {
+  const m = new ModelBuilder('berth-engines');
+  const { line, half } = BERTH_RIB;
+  const { wall, length, radius: R, at, small } = BERTH_ENGINES;
+  // The bulkhead: the ring's outline filled, plated aft, the decks' cut
+  // edges forward where the hull was burnt away from it.
+  // (In two halves: a face of more than eight sides isn't filled whole.)
+  for (const s of [-1, 1]) {
+    const halfRing = [[0, line[1][1]], ...line.slice(1).map(([y, z]) => [s * y, z])];
+    m.prism(halfRing, 0, wall, { axis: 'x', ...HULL_SKIN, bottom: { tex: 'hull-section', texScale: 4 }, side: (i) => (i === 5 ? false : undefined) });
+  }
+  const round = (r, n, dy, dz) => Array.from({ length: n }, (_, i) => [dy + Math.cos(((i + 0.5) / n) * Math.PI * 2) * r, dz + Math.sin(((i + 0.5) / n) * Math.PI * 2) * r]);
+  const SKIN = { tex: 'freighter-engine', texScale: 2 };
+  const BAND = { tex: 'band-steel', texScale: 1 };
+  at.forEach(([y, z], k) => {
+    // (The north one is gone: its mount's ring, bright where it was cut,
+    // and the dark hole behind it.)
+    if (k === 0) {
+      m.prism(round(R * 0.8, 8, y, z), wall, wall + 0.5, { axis: 'x', ...BAND, top: DARK, bottom: false, sides: CUT });
+      return;
+    }
+    // A drum out of the bulkhead, a band, then the bell flaring to its
+    // rim; inside the rim it's dark, the injector's cone deep in it.
+    m.prism(round(R * 0.8, 8, y, z), wall, wall + length * 0.45, { axis: 'x', ...SKIN, top: false, bottom: false });
+    m.prism(round(R * 0.86, 8, y, z), wall + length * 0.4, wall + length * 0.5, { axis: 'x', ...BAND, bottom: false });
+    m.loft(round(R * 0.7, 8, y, z), wall + length * 0.5, round(R, 8, y, z), wall + length, { axis: 'x', ...SKIN, top: false, bottom: false, twoSided: true });
+    m.face(round(R * 0.7, 8, y, z).map(([u, v]) => [wall + length * 0.52, u, v]), DARK, [0, y, z]);
+    m.loft(round(R * 0.32, 6, y, z), wall + length * 0.52, round(R * 0.12, 6, y, z), wall + length * 0.8, { axis: 'x', ...BAND, bottom: false });
+  });
+  for (const [y, z] of small) {
+    m.prism(round(1.1, 8, y, z), wall, wall + length * 0.55, { axis: 'x', ...SKIN, top: DARK, bottom: false });
+    m.prism(round(1.2, 8, y, z), wall + length * 0.45, wall + length * 0.55, { axis: 'x', ...BAND, top: false, bottom: false });
+  }
+  m.outlineLines([[0, -half], [wall + length * 0.6, -half], [wall + length * 0.6, half], [0, half]]);
   return m.build();
 }
 
@@ -193,4 +277,5 @@ function hoist() {
   return m.build();
 }
 
-export default [trestle(), ...Object.keys(CRANE_WAY.spans).map(span), ...Object.keys(BERTH_RIB.kinds).map(berthRib), keelBlock(), smokestack(), hoist()];
+export default [trestle(), ...Object.keys(CRANE_WAY.spans).map(span), ...Object.keys(BERTH_RIB.kinds).map(berthRib),
+  berthStringers('berth-stringers', [2, 3, 4]), berthStringers('berth-stringers-low', [2]), berthPlating(), berthEngines(), keelBlock(), smokestack(), hoist()];

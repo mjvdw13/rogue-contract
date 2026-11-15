@@ -763,10 +763,16 @@ const list = [
   ...[254.5, 262.5, 273.5, 281.5, 289.5].map((x) => at('crane-way-trestle', x, 98, { angle: 0, lit: DAY })),
   at('crane-way-span-24', 252, 98, { angle: 0, lit: DAY }), at('crane-way-span-19', 279, 98, { angle: 0, lit: DAY }),
   at('yard-hoist', 268, 101, { angle: 0, lit: DAY }),
-  // Berth 3: the frames of a hull on its keel (the tiles), more of them
-  // burnt off toward the stern; keel blocks left beside it.
-  ...[['berth-rib', 268], ['berth-rib', 272], ['berth-rib-cut', 276], ['berth-rib', 280], ['berth-rib-stub', 284], ['berth-rib-cut', 288, 180], ['berth-rib', 292], ['berth-rib-stub', 296, 180]]
+  // Berth 3: a starship's skeleton on its spine (the tiles), stern east.
+  // Ring frames every 4, more of them burnt off toward the bow; the
+  // longerons between the ones still standing, the skin left on by the
+  // stern, and the engine block: two thrusters of three still on it.
+  ...[['berth-rib-stub', 268], ['berth-rib-cut', 272, 180], ['berth-rib-stub', 276, 180], ['berth-rib-cut', 280], ['berth-rib', 284], ['berth-rib', 288], ['berth-rib', 292]]
     .map(([type, x, angle = 0]) => at(type, x, 77, { angle, lit: DAY })),
+  at('berth-stringers-low', 272, 77, { angle: 0, lit: DAY }), at('berth-stringers-low', 276, 77, { angle: 0, lit: DAY }), at('berth-stringers-low', 280, 77, { angle: 0, lit: DAY }),
+  at('berth-stringers', 284, 77, { angle: 0, lit: DAY }), at('berth-stringers', 288, 77, { angle: 0, lit: DAY }), at('berth-stringers', 292, 77, { angle: 0, lit: DAY }),
+  at('berth-plating', 288, 77, { angle: 0, lit: DAY }), at('berth-plating', 292, 77, { angle: 0, lit: DAY }), at('berth-plating', 296, 77, { angle: 180, lit: DAY }),
+  at('berth-engines', 296, 77, { angle: 0, lit: DAY }),
   at('keel-block', 274, 74.3), at('keel-block', 286, 79.7), at('keel-block', 294, 74.3),
   at('lambda-shuttle', 327, 44 + 36, { angle: 90, z: DOCK }),
 ];

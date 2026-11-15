@@ -1764,7 +1764,7 @@ are (`src/content/levels/m5.js`), playable at `?map=m5`.
         the walls do (`haze.indoors`).
   - [x] Every door and wall switch: switches tile, doors show pink and
         sit off their openings.
-  - [ ] Berth 3's hull reads as a boat's: make it a starship's frame.
+  - [x] Berth 3's hull reads as a boat's: make it a starship's frame.
   - [ ] Variation and grime on walls and floors, as Mos Eisley has
         (`town.grime()`, patches, stains on the ground).
   - [ ] The Bottoms: some of the street's doors open, with rooms behind.

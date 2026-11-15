@@ -437,6 +437,11 @@ export default [
   ...Object.keys(CRANE_WAY.spans).map((id) => defineDecoration({ id, model: id, fixed: true })),
   // Berth 3's frames collide at their uprights; keel blocks all round.
   ...Object.keys(BERTH_RIB.kinds).map((id) => defineDecoration({ id, model: id, solid: true, height: BERTH_RIB.height, fixed: true })),
+  // The rest of Berth 3's ship: the longerons between two rings (overhead
+  // or along the chine: not solid), the skin left on a side, the engines.
+  ...['berth-stringers', 'berth-stringers-low'].map((id) => defineDecoration({ id, model: id, fixed: true })),
+  defineDecoration({ id: 'berth-plating', model: 'berth-plating', solid: true, height: BERTH_RIB.height, fixed: true }),
+  defineDecoration({ id: 'berth-engines', model: 'berth-engines', solid: true, height: BERTH_RIB.height, fixed: true }),
   defineDecoration({ id: 'keel-block', model: 'keel-block', solid: true, height: KEEL_BLOCK.height, fixed: true }),
   // A works chimney, smoke rolling off its mouth downwind (east).
   defineDecoration({

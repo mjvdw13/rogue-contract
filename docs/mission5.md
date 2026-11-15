@@ -57,7 +57,7 @@ only for now).
   player counts their way along.
 - **Each ship is further gone.** Berth 1 is a light freighter, whole but
   gutted (Mission 1's, again). Berth 2 is a bulk hauler cut in half, its
-  decks open like a doll's house. Berth 3 is only ribs and a keel. Berth
+  decks open like a doll's house. Berth 3 is only a skeleton and its engines. Berth
   4 is an empty dry dock: what was in it is in the crates.
 - **In and out, low and high.** Open pier, tight street, tunnel, hold,
   open yard, a ship from the bilge to the bridge, a rail
@@ -80,7 +80,7 @@ only for now).
    -> [6 Berth 2: the bulk hauler] lower hold -> reactor room (power on)
         -> back through the hold to the cargo lift at the cut face
         -> crew deck -> aft stair -> bridge
-   -> gangway -> [7 the crane way, 12 up, over Berth 3's ribs]
+   -> gangway -> [7 the crane way, 12 up, over Berth 3's skeleton]
    -> [8 the great crane's cab: the red keycard] -> lift down
    -> [9 Berth 4: the dry dock, down its steps] -> red door
    -> [10 dispatch office: the manifest] -> lift up -> the apron: Bossk
@@ -131,7 +131,7 @@ blockout, not final.
 | 6e | Bridge | 242..260, 68..86 | 12 / sky | The reactor room's roof. Its own roof is gone (a tile holds two storeys: the reactor room and this deck): a tub of hull walls 5 high, the sills a step high where its windows were, east and south: the crane, the dock, the sun. Dead consoles, wires. In from the landing by an arch (255..259, 66..68); out by an arch in its south wing (252..256, 86..92) onto a gangway to the crane way. |
 | 7 | The crane way | gangway 252..256, 92..96; rail 252..298, 96..100 | a slab, top 12 / sky | A crane rail on trestles along the quay, 2 m wide, the water 16 below on the south. Grate deck: the quay shows through. Railings 0.75 high. A 3-tile gap at 276..279 (a jump). A hoist (266..270, 100..102; 0 to 12) back up from the quay if you fall. Probe droids come in over the water; a trooper on the cab's side of the gap. |
 | 7 | Past the hauler | 206..262, 56..60 and 244..250, 92..104 | buildings | A shed along the hauler's north side and a winch house across the quay at its stern: the only way east is through the ship. |
-| 7a | Berth 3: the ribs | 264..298, 60..92 | 0 / sky | A hull cut down to its keel and frames, seen from above. Reached by falling off the rail, or from the dock's rim. Secret 4: a crate on the keel (280..284, 76..78). A slip into the water at 284..288, 104..112: the way out of the harbour at this end. |
+| 7a | Berth 3: the skeleton | 264..302, 60..92 | 0 / sky | A starship cut down to its frames, stern east, seen from above: closed ring frames 22 across and 10.5 high every 4 (a fuselage's, not a boat's ribs: Mark, 2026-11-14), fewer left toward the bow, longerons between them, skin still on by the stern, and the engine bulkhead with two of its three big thrusters at x 296 (`models/yard5.js`). Reached by falling off the rail, or from the dock's rim. Secret 4: a crate on the keel (280..284, 76..78). A slip into the water at 284..288, 104..112: the way out of the harbour at this end. |
 | 8 | The crane's cab | 299..307, 93..103 | 12 / 16 | In the south leg of the great gantry (298..308, 92..104, 30 high; the north leg 298..308, 54..60). In from the rail by an arch in its west wall. The dock officer (the red keycard), a console, a window east over the dock (sill 1). Lift (300..304, 88..92), 12 to 0, by an arch in its north wall. |
 | 9 | Berth 4: the dry dock | 312..342, 60..100 | rim 0; steps -2.5, -5; floor -7.5 / sky | Long axis north to south. The floor is 320..334. West and east sides step down in two terraces 4 wide (-2.5 at 312..316 and 338..342, -5 at 316..320 and 334..338). Three flights on the west side, each along the terraces so it's walked onto from its end: rim to -2.5 at the south end (312..314, 96..100), -2.5 to -5 at the north end (314..316, 60..66), -5 to the floor at the south end (318..320, 94..100): the walk down is a zigzag, or you jump. The caisson is the quay at the south end, the sea behind it. Keel blocks down the middle (326..328, every 6), the sealed crates between them, a shuttle (`lambda-shuttle`) taking them on. The gantry's beam overhead, a hook hanging. The main fight. |
 | 10 | Dispatch office | 320..334, 46..58 | -7.5 / -3.5 | In the building across the dock's head (308..346, 56..60). Red door (325..329, 58..60). Screens, files, the manifest's terminal in the north wall (325..327): sets `manifest`, sounds the alarm, brings Bossk and the last squad onto the apron (waiting, unseen). Lift (330..334, 42..46), -7.5 to 0. |
@@ -188,7 +188,7 @@ berth numbers and the Aurebesh sign (decals), the sky.
 
 New models: the great gantry crane (legs, beam, cab, hook, beacons),
 the crane way's trestles and rail, a lamp post, a bollard, plate
-stacks, a cutting torch on a stand, the ribs of Berth 3, keel blocks,
+stacks, a cutting torch on a stand, the ring frames and engines of Berth 3, keel blocks,
 the fallen deck's edge, a wide hold rib, shack dressing (a lean-to, a
 vent stack, the sign), a smokestack, a hoist.
 
@@ -219,7 +219,7 @@ vent stack, the sign), a smokestack, a hoist.
 2. The Bottoms: over a crate and an awning to a shack's back room.
 3. The hauler's lower hold: a smuggler's compartment behind a loose
    panel (Corellian freighters have them).
-4. Berth 3: a crate on the keel among the ribs, for anyone who drops
+4. Berth 3: a crate on the spine among the frames, for anyone who drops
    off the crane way.
 
 ## Enemies and items
