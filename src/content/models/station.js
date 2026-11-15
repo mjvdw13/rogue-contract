@@ -152,8 +152,9 @@ function texBox(m, [x0, y0, z0], [x1, y1, z1], side, top = side) {
 /** A panel on a face that looks toward +x, at `x`: from y0 (its left, seen from in front) to y1, z0 up to z1. */
 const facing = (m, x, [y0, y1], [z0, z1], style) => m.face([[x, y0, z1], [x, y1, z1], [x, y1, z0], [x, y0, z0]], style, [x - 1, 0, (z0 + z1) / 2]);
 
-function tieFighter() {
-  const m = new ModelBuilder('tie-fighter');
+/** The TIE parked in its cradle, or (`parked` false) in flight: no cradle, no shadow, nothing to walk into. */
+function tieFighter(id = 'tie-fighter', parked = true) {
+  const m = new ModelBuilder(id);
   const { wing: Y, z: ZC, ball: R } = TIE;
   // A wing (the schematic's side view): a hexagon 11.4 long and 14 tall,
   // flat along its top and bottom and pointed fore and aft. A grey frame
@@ -227,6 +228,7 @@ function tieFighter() {
     m.face([[1.73, y - 0.06, ZC - 1.23], [1.73, y + 0.06, ZC - 1.23], [1.73, y + 0.06, ZC - 1.35], [1.73, y - 0.06, ZC - 1.35]], RED, [0, 0, ZC]);
   }
 
+  if (!parked) return m.build();
   // The cradle: a rail under each wing with two cheeks holding its foot,
   // and a beam between the rails.
   for (const s of [-1, 1]) {
@@ -716,4 +718,5 @@ export default [
   ceilingLampBar(),
   dianogaEye(),
   lambdaShuttle(),
+  tieFighter('tie-fighter-flying', false),
 ];

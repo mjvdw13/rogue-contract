@@ -425,6 +425,12 @@ export default [
   defineDecoration({ id: 'moldy-crow', model: 'moldy-crow', solid: true, height: 8.2, scale: 0.8, fixed: true, bob: { height: 0.04, period: 4, roll: 0.6 } }),
   // The Crow coming in to pick Kyle up: her engines sound from her until she's down (the level's `crow-down`).
   defineDecoration({ id: 'moldy-crow-inbound', model: 'moldy-crow', solid: true, height: 8.2, scale: 0.8, fixed: true, bob: { height: 0.04, period: 4, roll: 0.6 }, emit: [{ every: 1.3, sound: 'crow-engine', unless: 'crow-down' }] }),
+  // Ships passing over Corellia's yard (a level's `traffic`): nothing to
+  // walk into, and each heard while it's near.
+  defineDecoration({ id: 'tie-patrol', model: 'tie-fighter-flying', fixed: true, emit: [{ every: 1.1, sound: 'tie-pass' }] }),
+  defineDecoration({ id: 'skyhopper-passing', model: 'skyhopper', fixed: true, emit: [{ every: 1.1, sound: 'hopper-pass' }] }),
+  defineDecoration({ id: 'cargo-skiff-passing', model: 'cargo-skiff', fixed: true, bob: { height: 0.05, period: 2.8, roll: 1.5 }, emit: [{ every: 1.5, sound: 'skiff-hum' }] }),
+  defineDecoration({ id: 'freighter-passing', model: 'freighter', fixed: true, bob: { height: 0.15, period: 7, roll: 1 }, emit: [{ every: 2.4, sound: 'freighter-drone' }] }),
   // The gutted freighter in the derelict bay (models/freighter.js): the
   // level's tiles are its hold and collide; the model is its outside.
   defineDecoration({ id: 'freighter', model: 'freighter', fixed: true }),

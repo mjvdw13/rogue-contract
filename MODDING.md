@@ -1613,6 +1613,41 @@ Actions:
   { on: 'enter', tag: 'crow', if: 'crow-down', do: ['exit'] },
   ```
 
+### Traffic: ships passing
+
+`traffic` on a level is a list of lanes. Each sends a thing down a path
+every so often, for as long as the level runs, and takes it away at the
+end: ships crossing the sky, a skiff over the water. Mission 5's patrol:
+
+```js
+traffic: [
+  { thing: 'tie-patrol', count: 2, gap: 0.45, first: [20, 40], every: [50, 110], paths: [
+    [[70, 4, 14, 300, 0], [110, 50, 37, 320, 1], [200, 76, 35, 350, 1.8], [349, 140, 38, 310, 3]],
+  ] },
+],
+```
+
+- `thing`: what flies. It mustn't be solid (nothing stops a flight), so
+  give a ship its own decoration: a model, `fixed: true`, and an `emit`
+  with a `sound` so it's heard as it goes by (emitters only run within 32
+  tiles of the player, which makes the pass).
+- `paths`: one or more paths, one picked at random each time. A path is
+  keyframes `[x, y, z, angle, seconds]` as the `fly` action's, but flown
+  at an even pace along a smooth curve through them, with no stop at a
+  keyframe. The angle turns evenly from one keyframe's to the next's: give
+  the way it heads, turned by however the model is built (a model with
+  its nose along -x wants 180 added).
+- `every: [shortest, longest]`: seconds from one arriving to the next
+  setting off. `first` is the same for the first one (`every` if left
+  out).
+- `count` (1) sends that many down the same path one behind the other,
+  `gap` seconds apart (1).
+
+A thing is made where its path starts and vanishes where it ends, so
+start and end out of sight: behind a roofline, inside a raised block, or
+far off in the haze. Traffic is cosmetic and has its own dice: the game
+plays out the same with it or without.
+
 ### Checking a level
 
 - `npm run validate` reports problems such as an unreachable exit, a key that

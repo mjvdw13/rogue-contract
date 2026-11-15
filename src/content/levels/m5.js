@@ -462,6 +462,37 @@ kit.block(110, 128, 150, 138, { h: 5, wall: T.seaWall, roof: T.quay });
 kit.block(220, 130, 270, 140, { h: 7, wall: T.seaWall, roof: T.quay });
 const STACKS = [[100, 14], [150, 37], [192, 36], [236, 40], [286, 42], [246, 135]];
 
+// ---------------------------------------------------------------- traffic
+// Ships over the yard (the level's `traffic`). Each comes up from behind
+// the skyline's roofs or out of the far haze over the water and goes the
+// same way, so none appears or vanishes in plain sight. Angles are the
+// way it heads, turned for how each model is built.
+/** A path of [x, y, z, heading, seconds] for a model whose nose is `nose` degrees off +x. */
+const lane = (nose, keys) => keys.map(([x, y, z, a, s]) => [x, y, z, a + nose, s]);
+const TRAFFIC = [
+  // A light freighter on her repulsors, slow, level with the quay (she
+  // has no belly to show from under): in out of the haze from the east
+  // along the waterfront, round short of the pier and out again.
+  { thing: 'freighter-passing', first: [6, 14], every: [120, 240], paths: [
+    lane(180, [[349, 118, 1, 180, 0], [250, 117, 1, 180, 9], [150, 117, 1, 180, 9], [85, 117, 1, 180, 6], [72, 119, 1, 270, 2.5], [85, 121, 1, 0, 2.5], [150, 121, 1, 0, 6], [250, 121, 1, 0, 9], [349, 122, 1, 0, 9]]),
+  ] },
+  // A pair of TIEs on patrol, fast: along the row and out to sea, or in
+  // off the sea and over the slum.
+  { thing: 'tie-patrol', count: 2, gap: 0.45, first: [20, 40], every: [50, 110], paths: [
+    lane(0, [[70, 4, 14, 300, 0], [110, 50, 37, 320, 1], [200, 76, 35, 350, 1.8], [300, 96, 37, 340, 1.8], [349, 140, 38, 310, 1.2]]),
+    lane(0, [[349, 128, 38, 180, 0], [250, 112, 33, 175, 1.8], [150, 96, 33, 160, 1.8], [60, 40, 35, 120, 1.8], [30, 4, 12, 100, 0.9]]),
+  ] },
+  // A skyhopper out of the works, a loop over the harbour and home.
+  { thing: 'skyhopper-passing', first: [45, 80], every: [70, 150], paths: [
+    lane(90, [[230, 4, 12, 270, 0], [225, 50, 30, 270, 2], [215, 100, 26, 250, 2], [150, 125, 24, 180, 3], [90, 100, 28, 120, 2.4], [70, 40, 30, 95, 2.5], [72, 4, 12, 90, 1.5]]),
+  ] },
+  // A cargo skiff over the water, between the two platforms.
+  { thing: 'cargo-skiff-passing', first: [10, 30], every: [35, 80], paths: [
+    lane(0, [[146, 133, SEA + 0.3, 0, 0], [185, 132, SEA + 0.3, 0, 7], [224, 135, SEA + 0.3, 0, 7]]),
+    lane(0, [[224, 135, SEA + 0.3, 180, 0], [185, 132, SEA + 0.3, 180, 7], [146, 133, SEA + 0.3, 180, 7]]),
+  ] },
+];
+
 // ================================================================ DRESSING
 // Area by area (PLAN.md, item 12). Things with a purpose, and Star Wars:
 // glow rods, landing clamps, droids, pods, repulsor craft, Aurebesh.
@@ -1049,6 +1080,7 @@ export default defineLevel({
   // Soot coming down out of it, on a wind off the water that carries the
   // stacks' smoke east.
   weather: { type: 'soot', count: 60, wind: [0.7, 0.15, 0] },
+  traffic: TRAFFIC,
   par: 660,
   ...p.build(),
   lights: lamps,

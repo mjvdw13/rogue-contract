@@ -649,6 +649,10 @@ export function defineSong(def) {
  * It can be a list of these, a layer per type, with `calm`, `shelter` and
  * the level's `gusts` (MODDING.md, Levels); `haze.gust` is the haze's half
  * distance in a full gust.
+ * `traffic` is a list of lanes `{ thing, paths, every, first?, count?,
+ * gap? }`, each sending a thing that isn't solid down one of its paths
+ * (keyframes, as the fly action's) every `every` seconds (a range) and
+ * taking it away at the end: ships crossing the sky (world/flights.js).
  * `navReach` (steps; the whole map by default) is how far out from the
  * player the monsters plan their way round walls and drops to them; further
  * off, they head straight for the player. A big open map sets it, as
@@ -680,7 +684,7 @@ export function defineSong(def) {
  * @param {{id:string, name:string, tiles:string[], things?:string[], legend?:object,
  *   thingLegend?:object, list?:object[], triggers?:object[], music?:string, sky?:string,
  *   fog?:number, haze?:{color:number[], half?:number, gust?:number, indoors?:boolean}, skyWrap?:number,
- *   weather?:object|object[],
+ *   weather?:object|object[], traffic?:object[],
  *   par?:number, next?:string, holster?:boolean, navReach?:number,
  *   secretNext?:string, defaults?:object}} def
  */

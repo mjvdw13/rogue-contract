@@ -546,10 +546,8 @@ export function validateContent(reg) {
         if (a.action === 'setLight' && a.lightFx !== undefined && LIGHT_FX[a.lightFx] === undefined) err(`${owner}: ${where} sets unknown lightFx "${a.lightFx}"`);
         if (name === 'fly') {
           if (!a.thing) err(`${owner}: ${where}: fly needs a "thing" to fly`);
-          const keys = Array.isArray(a.path) ? a.path : [];
-          const good = (k, i) => Array.isArray(k) && k.length === 5 && k.every((v) => typeof v === 'number' && Number.isFinite(v)) && (i === 0 || k[4] > 0);
-          if (keys.length < 2 || !keys.every(good)) err(`${owner}: ${where}: fly "path" is two or more keyframes [x, y, z, angle, seconds], seconds over 0 after the first`);
-          else if (keys.some(([x, y]) => x < 0 || y < 0 || x >= map.w || y >= map.h)) err(`${owner}: ${where}: fly "path" leaves the map`);
+          const bad = badPath(a.path, map);
+          if (bad) err(`${owner}: ${where}: fly "path" ${bad}`);
           if (a.then !== undefined) checkActions(`${where}, fly's "then"`, a.then);
         }
         if (name === 'setFlag') {
@@ -604,6 +602,7 @@ export function validateContent(reg) {
       const types = layers.map((w) => w.type);
       if (new Set(types).size < types.length) err(`${owner}: weather has a particle type in more than one layer`);
     }
+    if (level.traffic !== undefined) checkTraffic(reg, level.traffic, map, owner, err);
     if (level.navReach !== undefined && !(typeof level.navReach === 'number' && level.navReach >= 1)) err(`${owner}: "navReach" (how many steps out the monsters plan their way to the player) must be a number, 1 or more`);
     if (typeof level.holster !== 'boolean') err(`${owner}: "holster" must be true or false`);
     else if (level.holster) {
@@ -624,6 +623,35 @@ export function validateContent(reg) {
   checkHangingTypes(reg, err);
 
   return { errors, warnings };
+}
+
+/** What's wrong with a flight's path (the fly action's, a traffic lane's), or null. */
+function badPath(path, map) {
+  const keys = Array.isArray(path) ? path : [];
+  const good = (k, i) => Array.isArray(k) && k.length === 5 && k.every((v) => typeof v === 'number' && Number.isFinite(v)) && (i === 0 || k[4] > 0);
+  if (keys.length < 2 || !keys.every(good)) return 'is two or more keyframes [x, y, z, angle, seconds], seconds over 0 after the first';
+  if (keys.some(([x, y]) => x < 0 || y < 0 || x >= map.w || y >= map.h)) return 'leaves the map';
+  return null;
+}
+
+/** A level's traffic: lanes of a known thing, good paths and times. */
+function checkTraffic(reg, traffic, map, owner, err) {
+  if (!Array.isArray(traffic)) return err(`${owner}: "traffic" must be a list of lanes { thing, paths, every }`);
+  const span = (v, low) => Array.isArray(v) && v.length === 2 && v.every((n) => typeof n === 'number' && Number.isFinite(n)) && v[0] >= low && v[1] >= v[0];
+  traffic.forEach((l, i) => {
+    const where = `${owner}: traffic lane #${i + 1}`;
+    if (!l || typeof l !== 'object') return err(`${where} must be { thing, paths, every }`);
+    for (const k of Object.keys(l)) if (!['thing', 'paths', 'every', 'first', 'count', 'gap'].includes(k)) err(`${where} has unknown field "${k}" (it takes thing, paths, every, first, count, gap)`);
+    const def = reg.things.get(l.thing);
+    if (!def) err(`${where} flies unknown thing "${l.thing}"`);
+    else if (def.solid) err(`${where} flies "${l.thing}", which is solid: traffic stops for nothing, so give it a thing that isn't`);
+    if (!Array.isArray(l.paths) || l.paths.length === 0) err(`${where} needs "paths": a list of one or more paths of keyframes [x, y, z, angle, seconds]`);
+    else l.paths.forEach((p, k) => { const bad = badPath(p, map); if (bad) err(`${where}: path #${k + 1} ${bad}`); });
+    if (!span(l.every, 0) || !(l.every[0] > 0)) err(`${where}: "every" must be [shortest, longest] seconds between one and the next, above 0`);
+    if (l.first !== undefined && !span(l.first, 0)) err(`${where}: "first" must be [shortest, longest] seconds before its first, 0 or more`);
+    if (l.count !== undefined && !(Number.isInteger(l.count) && l.count >= 1 && l.count <= 8)) err(`${where}: "count" (how many go down the path together) must be a whole number, 1 to 8`);
+    if (l.gap !== undefined && !(typeof l.gap === 'number' && l.gap > 0)) err(`${where}: "gap" (seconds between one of a group and the next) must be above 0`);
+  });
 }
 
 /** A level's weather: a particle type it can keep that many of, and numbers in range. */

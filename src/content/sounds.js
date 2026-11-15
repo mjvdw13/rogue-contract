@@ -200,6 +200,27 @@ export default [
     id: 'crow-land',
     synth: { wave: 'saw', freq: 92, freqEnd: 30, duration: 2.2, attack: 0.05, release: 1.6, lowpass: [1100, 200], volume: 0.3, layers: [{ ...thump(70, 30, 0.4, 0.5), delay: 0.5 }, { ...hiss(1.2, 0.3), delay: 0.7 }] },
   }),
+  // Ships passing over the yard (the level's traffic), each repeated by the
+  // ship while it's near: a TIE's howl falling as it goes by, a skyhopper's
+  // whine, a skiff's repulsor hum, a freighter's heavy drone.
+  defineSound({
+    id: 'tie-pass',
+    synth: { wave: 'saw', freq: 520, freqEnd: 190, duration: 1.5, attack: 0.25, sustain: 1, release: 0.7, lowpass: [2600, 700], volume: 0.3, vibrato: { rate: 38, depth: 0.5 }, layers: [{ wave: 'square', freq: 260, freqEnd: 95, duration: 1.5, attack: 0.25, release: 0.7, lowpass: [1800, 500], volume: 0.12, vibrato: { rate: 38, depth: 0.5 } }, { wave: 'noise', duration: 1.5, attack: 0.3, release: 0.8, lowpass: [3000, 600], volume: 0.14 }] },
+    pitchVariance: 0.04,
+  }),
+  defineSound({
+    id: 'hopper-pass',
+    synth: { wave: 'saw', freq: 240, freqEnd: 170, duration: 1.4, attack: 0.3, sustain: 1, release: 0.4, lowpass: [1600, 900], volume: 0.24, vibrato: { rate: 14, depth: 0.2 }, layers: [{ wave: 'noise', duration: 1.4, attack: 0.3, release: 0.4, lowpass: 1400, volume: 0.14 }] },
+    pitchVariance: 0.03,
+  }),
+  defineSound({
+    id: 'skiff-hum',
+    synth: { wave: 'sine', freq: 118, duration: 1.8, attack: 0.3, sustain: 1, release: 0.3, volume: 0.16, vibrato: { rate: 9, depth: 0.25 }, layers: [{ wave: 'saw', freq: 59, duration: 1.8, attack: 0.3, release: 0.3, lowpass: 400, volume: 0.1 }] },
+  }),
+  defineSound({
+    id: 'freighter-drone',
+    synth: { wave: 'saw', freq: 52, duration: 2.8, attack: 0.4, sustain: 1, release: 0.4, lowpass: 420, volume: 0.34, vibrato: { rate: 5, depth: 0.2 }, layers: [{ wave: 'noise', duration: 2.8, attack: 0.4, release: 0.4, lowpass: 600, volume: 0.2 }, { wave: 'sine', freq: 104, duration: 2.8, attack: 0.4, release: 0.4, volume: 0.1, vibrato: { rate: 2, depth: 0.3 } }] },
+  }),
   defineSound({
     id: 'reactor-start',
     synth: { wave: 'saw', freq: 34, freqEnd: 120, duration: 2.6, attack: 0.4, sustain: 1, release: 0.5, lowpass: 700, volume: 0.4, vibrato: { rate: 9, depth: 0.3 }, layers: [{ ...thump(60, 30, 0.5, 0.7) }, { wave: 'sine', freq: 60, freqEnd: 240, duration: 2.6, attack: 0.8, release: 0.5, volume: 0.2 }, { wave: 'noise', duration: 2.6, attack: 1, release: 0.5, lowpass: 900, volume: 0.1 }] },

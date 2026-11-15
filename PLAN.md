@@ -28,6 +28,15 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
+- **Mission 5's traffic** (`?map=m5`, 2026-11-15). Four lanes: a light
+  freighter slow along the waterfront and back (the first within 15 s
+  of the start), a skiff between the two platforms out on the water, a
+  pair of TIEs fast over the row, a skyhopper looping over the harbour.
+  Checked in snapshots only; nobody has seen them move or heard them
+  (`tie-pass`, `hopper-pass`, `skiff-hum`, `freighter-drone`). To
+  judge: how often, how fast, how near (the freighter is 13 tiles off
+  the quay), the sounds, and whether the freighter's open stern shows
+  (it's Mission 1's gutted one, flying).
 - **Mission 5's textures and sky** (`?map=m5`, 2026-11-14). The
   blockout now wears Corellia's own concrete, sea wall, water, slag and
   shack walls, under an overcast sky with a pale sun in the east. To
@@ -1812,6 +1821,20 @@ are (`src/content/levels/m5.js`), playable at `?map=m5`.
       it plays `station` now), the great crane in the sky's picture.
 - [ ] Waiting on Mark: the look, the fights (nobody has played them),
       the words, the song (the entries at the top).
+
+### 13. Life in Missions 4 and 5 (Mark, 2026-11-15)
+
+Three engine features, one commit each. Each goes through defs,
+validate, MODDING.md and a test.
+
+- [x] **Traffic** (Mission 5 only for now): a level's `traffic` flies
+      things down set paths at random intervals and takes them away at
+      the end. Ships over the yard and the water. Not in Mission 4 yet
+      (Mark, 2026-11-15).
+- [ ] **Scrolling flats**: a texture's `scroll` moves it across floors
+      and ceilings. Mission 5's harbour water, Mission 4's sludge.
+- [ ] **Rain** for Mission 5: streaks that splash where they land (a
+      particle's `onFloor` burst), as a weather layer.
 
 ## Small fixes and known rough edges
 
