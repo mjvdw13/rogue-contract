@@ -54,7 +54,9 @@ These need Mark to try something, or to decide. Don't start them without him.
   breakers' bunkhouse (red door, upper street). Each has someone to
   talk to with stand-in lines, and a few pickups. The grey door at the
   top of the upper street, the gatehouse and the winch house stay
-  locked.
+  locked. Seven yard workers stroll the two streets and the bend
+  (enough? their lines are stand-ins; they run when the shooting
+  starts).
 - **Mission 5's fights** (`?map=m5`, 2026-11-14). 16 / 34 / 42 monsters
   by skill, more spawned by the reactor's switch and the manifest. The
   repeater is in the freighter on Berth 1, the mortar in a cabin off the
@@ -1781,6 +1783,7 @@ are (`src/content/levels/m5.js`), playable at `?map=m5`.
   - [x] Variation and grime on walls and floors, as Mos Eisley has
         (`town.grime()`, patches, stains on the ground).
   - [x] The Bottoms: some of the street's doors open, with rooms behind.
+  - [x] The Bottoms' streets are empty: yard workers strolling them.
 - [ ] **Slow frames**: 15 to 21 ms on average and 35 to 49 at worst at
       640 x 400 on one thread (the bench swings that much from run to
       run on this machine; the grime and stains add about 1.7 ms). The worst views are from out in the harbour looking

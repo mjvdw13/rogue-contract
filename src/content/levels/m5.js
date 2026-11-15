@@ -544,6 +544,15 @@ kit.hangings.push(
   { type: 'cable', from: [20.05, 84, 7.2], to: [29.95, 86, 5.6], sag: 1 },
   { type: 'cable', from: [20.05, 66, 8.5], to: [29.95, 74, 9], sag: 1.6 },
 );
+// Yard hands and cutters about the streets between shifts (Mark,
+// 2026-11-14: the streets were empty). They stroll, and run when the
+// sweep squad's shooting starts.
+dress.push(
+  at('corellian-hand', 24.5, 88.5, { angle: 90, wander: 6 }), at('corellian-cutter', 26.5, 76.5, { angle: 270, wander: 7 }),
+  at('corellian-woman', 23, 71.5, { angle: 0, wander: 5 }),
+  at('corellian-hand', 41.5, 61, { angle: 180, wander: 6 }), at('corellian-cutter', 54.5, 52.5, { angle: 200, wander: 6 }),
+  at('corellian-hand', 70.5, 50.5, { angle: 180, wander: 7 }), at('corellian-breaker', 77.5, 52.5, { angle: 0, wander: 6 }),
+);
 // The bend: a landspeeder parked along its south side, scrap by it.
 dress.push(at('landspeeder', 50, 59.2, { angle: 28 }), at('scrap', 44.5, 62.6), at('canister-rust', 37, 59.2));
 pylon(31.2, 61.2, 1);

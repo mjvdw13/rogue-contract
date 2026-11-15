@@ -195,4 +195,35 @@ export default [
       "You didn't hear it from me.",
     ],
   }),
+  // Yard hands on the Bottoms' streets, between shifts.
+  villager({
+    id: 'corellian-hand',
+    sheet: 'villager-man',
+    name: 'YARD HAND',
+    glyph: 'ɗ',
+    frameWidth: 58,
+    frameHeight: 69,
+    height: 1.76,
+    lines: [
+      'Double shifts since the Navy came. Same pay.',
+      "Shift's over. I saw nothing, I'm going home.",
+      'They search us at the gate now. Going in and coming out.',
+      'Mind the upper street. Troopers are turning out the shacks.',
+    ],
+  }),
+  villager({
+    id: 'corellian-cutter',
+    sheet: 'villager-adventurer',
+    name: 'CUTTER',
+    glyph: 'ƙ',
+    frameWidth: 56,
+    frameHeight: 65,
+    height: 1.68,
+    lines: [
+      'A torch in your hands all day, you stop feeling them.',
+      'That hauler on Berth Two came in under guard. Nobody on our crew gets near it.',
+      "Smog's bad today. It's bad every day.",
+      'You want the yard? Up the street and through the pump house. Not that I told you.',
+    ],
+  }),
 ];

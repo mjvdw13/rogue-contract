@@ -163,7 +163,8 @@ edge (bent plate and broken frames), a bulkhead door.
   doors open: a family's shack and the droid mender's workshop on the
   lower street, the breakers' bunkhouse behind the red door on the
   upper street. Someone to talk to in each (`npcs/villagers.js`, the
-  Corellians), a few pickups, nothing the route needs.
+  Corellians), a few pickups, nothing the route needs. Seven yard workers stroll
+  the streets between shifts.
 - **Pump house and gallery:** green-grey machine walls, grate floors,
   steam (`steam`, `steam-hiss`), the pumps' hum, runoff under the grates.
 - **The cutting floor:** bare ground black with slag, plates in stacks,
