@@ -152,6 +152,10 @@ export function validateContent(reg) {
     if (!t.src) err(`Texture "${t.id}": missing src`);
     if (typeof t.grime !== 'boolean') err(`Texture "${t.id}": "grime" must be true or false`);
     else if (t.grime && (t.sky || t.fence || t.frames !== 1)) err(`Texture "${t.id}": grime is a still decal, not a sky, a fence or animated`);
+    if (t.scroll !== undefined) {
+      if (!(Array.isArray(t.scroll) && t.scroll.length === 2 && t.scroll.every((v) => typeof v === 'number' && Number.isFinite(v) && Math.abs(v) <= 16))) err(`Texture "${t.id}": "scroll" must be [x, y] in tiles a second, each 16 at most, like [0.3, 0]`);
+      else if (t.sky || t.fence || t.decal) err(`Texture "${t.id}": only a floor's or a ceiling's texture scrolls, not a sky, a fence or a decal`);
+    }
   }
 
   for (const m of reg.models?.values() ?? []) {

@@ -2,7 +2,7 @@ import { IndexedImage, quantize, loadImageElement, readPixels } from './gfx/imag
 import { Sheet } from './gfx/sheet.js';
 import { BitmapFont } from './gfx/font.js';
 import { Model } from './gfx/model.js';
-import { LIGHT_LEVELS, SHADE_STEP } from './config.js';
+import { LIGHT_LEVELS, SHADE_STEP, TEXELS_PER_UNIT } from './config.js';
 import { shared } from './core/shared.js';
 
 /**
@@ -10,13 +10,18 @@ import { shared } from './core/shared.js';
  * frames. A grime texture (`grime: true`) also has `shade`, from its
  * picture's own pixels (`raw`, before the palette): per texel, column-major
  * like `curCM`, how many light levels (times SHADE_STEP) it darkens the wall
- * under it, 0 for none.
+ * under it, 0 for none. A texture with `scroll` ([x, y], tiles a second)
+ * moves across the floors and ceilings it's on: `off` is how far it has
+ * gone (world units, kept within the picture's size), in shared memory so
+ * the renderer's worker threads read the same.
  */
 export class Texture {
-  constructor(id, image, { frames = 1, fps = 4, sky = false, grime = false } = {}, raw = null) {
+  constructor(id, image, { frames = 1, fps = 4, sky = false, grime = false, scroll = null } = {}, raw = null) {
     this.id = id;
     this.sky = sky;
     this.fps = fps;
+    this.scroll = scroll;
+    this.off = shared(Float64Array, 2);
     const fw = Math.floor(image.width / Math.max(1, frames));
     this.w = fw;
     this.h = image.height;
@@ -45,6 +50,13 @@ export class Texture {
   }
 
   animate(time) {
+    if (this.scroll) {
+      // (The picture goes the way `scroll` points, so it's read from behind.)
+      const w = this.w / TEXELS_PER_UNIT;
+      const h = this.h / TEXELS_PER_UNIT;
+      this.off[0] = ((-this.scroll[0] * time) % w + w) % w;
+      this.off[1] = ((-this.scroll[1] * time) % h + h) % h;
+    }
     const n = this.frames.length;
     if (n < 2) return;
     const f = this.frames[Math.floor(time * this.fps) % n];
@@ -223,7 +235,7 @@ export class Assets {
       }
       this.textureSlots.set(t.id, this.textures.length);
       this.textures.push(tex);
-      if (tex.frames.length > 1) this.animated.push(tex);
+      if (tex.frames.length > 1 || tex.scroll) this.animated.push(tex);
     }
     for (const s of reg.sheets.values()) {
       const o = { ...s, ...this.overrides?.[s.src] };
@@ -268,7 +280,7 @@ export class Assets {
     return this.ui.get(id) ?? null;
   }
 
-  /** Advance animated textures. */
+  /** Advance animated and scrolling textures. */
   animate(time) {
     for (const t of this.animated) t.animate(time);
   }

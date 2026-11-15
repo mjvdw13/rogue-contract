@@ -299,7 +299,7 @@ p.rect(206, 68, 208, 84, ground(0, T.grate, { ceilZ: 11.25, light: 120, side: T.
 p.rect(222, 68, 232, 76, room(0, DECK_CEIL, { light: 88 }));
 // Deck plates gone over the bilge: runoff 2.25 down, two steps out.
 for (const [x0, y0, x1, y1] of [[214, 78, 220, 82], [228, 70, 234, 73]]) {
-  p.rect(x0, y0, x1, y1, (x, y, c) => ({ ...c, floorZ: -2.25, floor: T.water, side: T.guts }));
+  p.rect(x0, y0, x1, y1, (x, y, c) => ({ ...c, floorZ: -2.25, floor: 'bilge-water', side: T.guts }));
   p.rect(x0, y0, x0 + 1, y1, (x, y, c) => ({ ...c, floorZ: -0.75, floor: T.step }));
   p.rect(x0 + 1, y0, x0 + 2, y1, (x, y, c) => ({ ...c, floorZ: -1.5, floor: T.step }));
 }

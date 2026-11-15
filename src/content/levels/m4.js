@@ -30,7 +30,7 @@ const T = {
   grate: 'ds-floor-grate',
   detFloor: 'ds-floor',
   detFloorLight: 'ds-det-floor-light',
-  sludge: 'water-murky',
+  sludge: 'sludge',
   ceiling: 'ds-ceiling',
   ceilingLight: 'ds-ceiling-light',
   liftFloor: 'lift-floor',

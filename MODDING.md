@@ -1704,6 +1704,18 @@ is 2 units wide and 0.75 tall. Textures that should never glow (the
 `DESERT` list: sandstone, sand, gravel) are defined with `fullbright:
 false`.
 
+A texture with `scroll: [x, y]` moves across the floors and ceilings it's
+on, that many tiles a second toward the map's east and south (negative
+for west and north): water with a current, sludge creeping, a belt.
+Walls and models show it still, and it carries nothing along. To have
+the same picture both moving and still, define it twice under two ids
+with the same `src`:
+
+```js
+defineTexture({ id: 'harbour-water', src: 'assets/custom/textures/harbour-water.png', scroll: [0.35, 0.1] }),
+defineTexture({ id: 'bilge-water', src: 'assets/custom/textures/harbour-water.png' }),
+```
+
 ## Sounds
 
 Sounds are defined in `src/content/sounds.js`. Each one is either synthesized

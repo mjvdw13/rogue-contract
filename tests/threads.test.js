@@ -51,6 +51,8 @@ test('the world and its models drawn on worker threads are the same, to the byte
     assert.ok(pool.workerChunks > 0, 'the workers drew some columns');
     for (const level of registry.levels.values()) {
       tour(assets, level.id, 24, (world, cam, k) => {
+        // (Scrolling and animated textures somewhere new each view.)
+        assets.animate(k * 0.37);
         const one = draw(renderer, world, cam);
         const many = draw(threaded, world, cam);
         assert.ok(Buffer.compare(one, many) === 0, `${level.id}, view ${k} at ${cam.x},${cam.y}`);

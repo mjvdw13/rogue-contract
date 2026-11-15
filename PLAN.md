@@ -28,6 +28,12 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
+- **Water and sludge that move** (`?map=m5`, `?map=m4`, 2026-11-15).
+  The harbour's water drifts east at 0.35 tiles a second (the bilge in
+  the hauler stays still); the compactor's sludge creeps at 0.12. It's
+  the whole picture sliding, so it can't be judged in a snapshot. To
+  judge: the speeds and directions, and whether a plain slide reads as
+  water or wants more (a second layer, a wobble).
 - **Mission 5's traffic** (`?map=m5`, 2026-11-15). Four lanes: a light
   freighter slow along the waterfront and back (the first within 15 s
   of the start), a skiff between the two platforms out on the water, a
@@ -1831,7 +1837,7 @@ validate, MODDING.md and a test.
       things down set paths at random intervals and takes them away at
       the end. Ships over the yard and the water. Not in Mission 4 yet
       (Mark, 2026-11-15).
-- [ ] **Scrolling flats**: a texture's `scroll` moves it across floors
+- [x] **Scrolling flats**: a texture's `scroll` moves it across floors
       and ceilings. Mission 5's harbour water, Mission 4's sludge.
 - [ ] **Rain** for Mission 5: streaks that splash where they land (a
       particle's `onFloor` burst), as a weather layer.

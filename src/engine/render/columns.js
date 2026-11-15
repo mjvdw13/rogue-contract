@@ -461,12 +461,15 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
     const wm = tex.wMask;
     const hm = tex.hMask;
     const pix = tex.cur;
+    // (A scrolling texture is read from where it has got to.)
+    const fx = px + tex.off[0];
+    const fy = py + tex.off[1];
     let o = a * fbW + x;
     if (fixed >= 0) {
       const cm = fixed * 256;
       for (let y = a; y < b; y++, o += fbW) {
         const dist = kk * rowInv[y];
-        fb[o] = colormaps[cm + pix[(((py + rdy * dist) * TPU) & hm) * tw + (((px + rdx * dist) * TPU) & wm)]];
+        fb[o] = colormaps[cm + pix[(((fy + rdy * dist) * TPU) & hm) * tw + (((fx + rdx * dist) * TPU) & wm)]];
       }
       return;
     }
@@ -484,8 +487,8 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
     const maxBr = +MAX_BRIGHTEN;
     for (let y = a; y < b; y++, o += fbW) {
       const dist = kk * rowInv[y];
-      const tx = ((px + rdx * dist) * TPU) & wm;
-      const ty = ((py + rdy * dist) * TPU) & hm;
+      const tx = ((fx + rdx * dist) * TPU) & wm;
+      const ty = ((fy + rdy * dist) * TPU) & hm;
       let br = dk * (y + 0.5 - horizon);
       if (br > maxBr) br = maxBr;
       const d = thr[y & 3];

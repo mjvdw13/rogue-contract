@@ -160,7 +160,10 @@ export function normalizeAttack(spec) {
  * covering the wall, it darkens what's under it. A texel's brightness is the
  * share of light it leaves, white (the palette's brightest lit colour)
  * leaving it all, so one grime picture dirties any wall in its own colour.
- * @param {{id:string, src:string, frames?:number, fps?:number, sky?:boolean, fence?:boolean, decal?:boolean, grime?:boolean}} def
+ * `scroll: [x, y]` (tiles a second, toward the map's east and south) moves
+ * the picture across the floors and ceilings it's on: water with a
+ * current, sludge creeping. Walls and models show it still.
+ * @param {{id:string, src:string, frames?:number, fps?:number, sky?:boolean, fence?:boolean, decal?:boolean, grime?:boolean, scroll?:[number,number]}} def
  */
 export function defineTexture(def) {
   requireId(def, 'Texture');
