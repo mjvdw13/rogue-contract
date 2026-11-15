@@ -151,7 +151,11 @@ black decks, white light**, clean and new. Each area changes one thing.
   sludge (`water-murky`), pipes (`ds-wall-greeble`), `ds-floor-grate`.
   Dim, a flickering lamp. Pipes up the walls and the pumps leak steam
   (`ds-steam-pipe`: a thin plume, a hiss every few seconds); the
-  compactor's walls are streaked with grime.
+  compactor's walls are streaked with grime. Dirtier since 2026-11-15:
+  stretches of the compactor's walls are bare pipework where plates
+  have rusted off, and `grimeIndoors` runs soot, stains and dirt down
+  the walls of the compactor (3), the chute (2), the tunnels (2.5) and
+  the pump room (1.5). It's faint on walls this dark.
 - **The shaft:** round (the town kit's `circle()`), `ds-wall-dark`
   falling out of sight, eight light columns round it, the column glowing
   with lit rings.

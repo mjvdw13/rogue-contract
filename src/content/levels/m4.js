@@ -488,6 +488,23 @@ for (const [x0, y0, x1, y1, wall] of [
   [112, 111, 118, 112, T.wall8], [108, 126, 109, 141, T.wall], [96, 140, 108, 141, T.wall],
 ]) p.rect(x0, y0, x1, y1, (x, y, old) => (old.wall === T.girder ? { ...old, wall } : old));
 
+// The station's guts are dirty (Mark, 2026-11-15: grime, as Mission 5 has;
+// the corridors stay clean). The compactor's walls aren't one plate all
+// round: stretches of pipework show where plates have rusted off, and
+// soot, stains and dirt run down every wall of it, the chute, the
+// maintenance tunnels and the pump room.
+for (let y = 3; y <= 28; y++) {
+  for (let x = 185; x <= 202; x++) {
+    const c = p.get(x, y);
+    if (c?.wall === T.compactorWall && valueNoise(x + 2 * y, 0, 3, 431) > 0.62) p.set(x, y, { ...c, wall: T.pipes });
+  }
+}
+kit.grimeIndoors(185, 3, 203, 29, { amount: 3, seed: 433 });
+kit.grimeIndoors(168, 3, 187, 11, { amount: 2, seed: 435 });
+kit.grimeIndoors(194, 29, 200, 65, { amount: 2.5, seed: 437 });
+kit.grimeIndoors(185, 65, 205, 91, { amount: 1.5, seed: 439 });
+kit.grimeIndoors(192, 91, 198, 101, { amount: 2.5, seed: 441 });
+
 // ---------------------------------------------------------------- things
 const at = (type, x, y, extra = {}) => ({ type, x, y, ...extra });
 // `n` cargo containers one on another (each 2.2 tall), the bottom one on the floor.
@@ -693,7 +710,7 @@ export default defineLevel({
   par: 600,
   ...p.build(),
   lights: lamps,
-  decals,
+  decals: [...kit.decals, ...decals],
   hangings: [
     // Fuel hoses from the wall to the two west TIEs' balls.
     ...[25, 55].map((x) => ({ type: 'hose', from: [x + 2.75, 56.45, 0.6], to: [x + 0.3, 62.6, 5.65], sag: 1.6 })),

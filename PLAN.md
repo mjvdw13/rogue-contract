@@ -1876,7 +1876,7 @@ each (`docs/mission4.md` takes the details).
 - [x] **The unfinished sector's floors and walls**: deck plates laid in
       patches over the grate, more of them toward the shaft; hazard
       stripes round the gaps; wall panels on in stretches.
-- [ ] **Grime where the station is dirty**: the compactor and the
+- [x] **Grime where the station is dirty**: the compactor and the
       maintenance tunnels (`grimeIndoors`, a second wall in stretches).
       The corridors stay clean.
 - [ ] **Three side rooms off the ring corridor**: a barracks, a droid
