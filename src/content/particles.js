@@ -590,6 +590,36 @@ export default [
     onFloor: 'die',
     cap: 400,
   }),
+  // Rain over Corellia's yard (a level's `weather`, Mission 5): thin
+  // streaks that lighten what's behind them, falling at about 11 units a
+  // second and leaning with the wind. Each leaves a splash where it lands: two pale specks
+  // that hop and are gone.
+  defineParticle({
+    id: 'rain',
+    colors: [['steel', 10]],
+    life: [1.3, 1.7],
+    size: 0.015,
+    maxPx: 1,
+    streak: 0.05,
+    blend: 'add',
+    gravity: 33,
+    drag: 3,
+    wind: 1,
+    onFloor: 'die',
+    splash: { type: 'rain-splash', count: 2, speed: [0.6, 1.5] },
+    cap: 500,
+  }),
+  defineParticle({
+    id: 'rain-splash',
+    colors: [{ ramp: 'steel', from: 26, to: 20 }],
+    life: [0.12, 0.25],
+    size: 0.02,
+    maxPx: 2,
+    blend: 'half',
+    gravity: 9,
+    onFloor: 'die',
+    cap: 300,
+  }),
   // Soot in the air over a works (a level's `weather`, Mission 5): dark
   // flakes a little bigger than dust, sinking at 0.1 units a second.
   // See-through (Mark, 2026-11-14: solid black was heavy-handed): each

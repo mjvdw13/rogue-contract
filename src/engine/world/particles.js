@@ -103,6 +103,10 @@ export function particleType(def, ramps) {
     trail: def.trail ? { type: def.trail.type, every: def.trail.every ?? 0.05, for: def.trail.for ?? Infinity } : null,
     /** The trail's type index (set by the pool). */
     trailTi: -1,
+    /** Where it dies on a floor it leaves a burst of `splash.type` going up (a raindrop's splash); the burst's options. */
+    splash: def.splash ? { type: def.splash.type, count: def.splash.count ?? 1, dir: [0, 0, 1], spread: def.splash.spread ?? 1, speed: def.splash.speed ?? [0.5, 1.5] } : null,
+    /** The splash's type index (set by the pool). */
+    splashTi: -1,
     cap: def.cap ?? Infinity,
     /** Live count (kept by the pool). */
     live: 0,
@@ -164,7 +168,10 @@ export class Particles {
     const t = particleType(def, this.ramps);
     this.types.push(t);
     this.byId.set(t.id, this.types.length - 1);
-    for (const u of this.types) if (u.trail) u.trailTi = this.typeIndex(u.trail.type);
+    for (const u of this.types) {
+      if (u.trail) u.trailTi = this.typeIndex(u.trail.type);
+      if (u.splash) u.splashTi = this.typeIndex(u.splash.type);
+    }
     return this.types.length - 1;
   }
 
@@ -435,6 +442,8 @@ export class Particles {
       if (nz < floor[i]) {
         const f = t.onFloor;
         if (f === FLOOR_DIE) {
+          // (Its splash goes on the end of the list; the kill may move one of it here, to be moved this tick.)
+          if (t.splashTi >= 0) this.burst(t.splashTi, x[i], y[i], floor[i] + 0.02, t.splash);
           this._kill(i);
           continue;
         }

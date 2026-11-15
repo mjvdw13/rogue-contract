@@ -210,7 +210,12 @@ vent stack, the sign), a smokestack, a hoist.
   does reach in. If Mark wants real haze indoors, that's an engine
   capability to add (a level's `hazeIndoors`), not planned.
 - **Weather:** soot flakes drifting down outdoors (a light `weather`
-  layer), a wind off the water that carries the smoke east.
+  layer), a wind off the water that carries the smoke east. Rain
+  (2026-11-15): a drizzle of 126 drops round you, each leaving a splash,
+  and a squall every 20 to 45 s that lasts 10 to 25: all 420 drops, the
+  wind 2.2 times as strong, the haze's half distance in from 44 to 34.
+  Ships cross the sky and the harbour (`traffic`: a freighter, a skiff,
+  TIEs, a skyhopper), and the harbour's water drifts east.
 - Outdoors 168 (overcast: flatter than Tatooine's 200+). The Bottoms'
   street 144, alleys 120, a pool under the sign. Pump house 136, the
   gallery 112 with lamps. Freighter 96, a flickering lamp. Cutting floor

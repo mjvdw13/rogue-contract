@@ -668,6 +668,7 @@ function checkWeather(reg, w, owner, err) {
   if (w.range !== undefined && !(typeof w.range === 'number' && w.range >= 1 && w.range <= 64)) err(`${owner}: weather "range" (tiles each way round the camera) must be 1 to 64`);
   if (w.z !== undefined && !(nums(w.z, 2, 0) && w.z[1] > w.z[0])) err(`${owner}: weather "z" must be [low, high] heights above the floor, like [0.05, 2.5]`);
   if (w.drift !== undefined && !nums(w.drift, 2, 0)) err(`${owner}: weather "drift" must be [across, up or down] speeds of 0 or more, like [0.3, 0.1]`);
+  if (w.fall !== undefined && !(typeof w.fall === 'number' && w.fall >= 0 && w.fall <= 60)) err(`${owner}: weather "fall" (the speed they're made going down at) must be 0 to 60 units a second`);
   if (w.wind !== undefined && !nums(w.wind, 3, -Infinity)) err(`${owner}: weather "wind" must be [x, y, z] in units per second, like [3, 1, 0]`);
   if (w.calm !== undefined && !(typeof w.calm === 'number' && w.calm >= 0 && w.calm <= 1)) err(`${owner}: weather "calm" (the share of its count in the air in a lull) must be 0 to 1`);
   if (w.shelter !== undefined && !(typeof w.shelter === 'number' && w.shelter >= 0)) err(`${owner}: weather "shelter" (how much higher something upwind keeps it off a tile) must be a height, 0 or more`);
@@ -809,6 +810,15 @@ function checkParticles(reg, err, warn) {
       else if (reg.particles.get(tr.type).trail) warn(`${owner}: its trail's type "${tr.type}" leaves a trail too`);
       if (tr?.every !== undefined && !num(tr.every, 0.001, 60)) err(`${owner}: trail.every is seconds between, above 0`);
       if (tr?.for !== undefined && !num(tr.for, 0, 600)) err(`${owner}: trail.for is seconds, 0 or more`);
+    }
+    if (p.splash !== undefined) {
+      const sp = p.splash;
+      if (!reg.particles.has(sp?.type)) err(`${owner}: its splash has unknown particle type "${sp?.type}"`);
+      else if (reg.particles.get(sp.type).splash) err(`${owner}: its splash's type "${sp.type}" splashes too`);
+      if ((p.onFloor ?? 'die') !== 'die') err(`${owner}: a splash is left where it dies on a floor, so it needs onFloor 'die'`);
+      if (sp?.count !== undefined && !(Number.isInteger(sp.count) && sp.count >= 1 && sp.count <= 16)) err(`${owner}: splash.count must be a whole number, 1 to 16`);
+      if (sp?.speed !== undefined && !(Array.isArray(sp.speed) && sp.speed.length === 2 && sp.speed.every((v) => typeof v === 'number' && v >= 0) && sp.speed[1] >= sp.speed[0])) err(`${owner}: splash.speed must be [slowest, fastest] in units per second`);
+      if (sp?.spread !== undefined && !num(sp.spread, 0, 2)) err(`${owner}: splash.spread is 0 (straight up) to 2 (all round)`);
     }
     const classCap = p.shape === 'disc' ? DISC_CAP : POINT_CAP;
     if (p.cap !== undefined && !(p.cap >= 1)) err(`${owner}: cap must be at least 1`);

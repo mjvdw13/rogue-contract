@@ -28,6 +28,13 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
+- **Mission 5's rain** (`?map=m5`, 2026-11-15). A drizzle all the
+  time and a squall every 20 to 45 s (more drops, more wind, the haze
+  closing from 44 to 34). Drops splash on the ground and the water. The
+  soot still falls with it. It has no sound yet. To judge: whether
+  Corellia should rain at all, how heavy (the drizzle 126 drops, the
+  squall 420), the streaks' brightness and length, the squalls' haze,
+  and whether the soot should go while it rains.
 - **Water and sludge that move** (`?map=m5`, `?map=m4`, 2026-11-15).
   The harbour's water drifts east at 0.35 tiles a second (the bilge in
   the hauler stays still); the compactor's sludge creeps at 0.12. It's
@@ -1839,8 +1846,14 @@ validate, MODDING.md and a test.
       (Mark, 2026-11-15).
 - [x] **Scrolling flats**: a texture's `scroll` moves it across floors
       and ceilings. Mission 5's harbour water, Mission 4's sludge.
-- [ ] **Rain** for Mission 5: streaks that splash where they land (a
-      particle's `onFloor` burst), as a weather layer.
+- [x] **Rain** for Mission 5: streaks that splash where they land (a
+      particle's `splash`), as a weather layer made already falling
+      (`fall`), in squalls on the weather's gusts.
+- [ ] Waiting on Mark (the three entries at the top). Ideas left from
+      the same list, not started: traffic for Mission 4 (TIEs past the
+      hangar's mouth), looping paths for machinery (the crane's
+      trolley), a drifting second sky layer and lightning, light that
+      runs along a corridor, a sound for the rain.
 
 ## Small fixes and known rough edges
 

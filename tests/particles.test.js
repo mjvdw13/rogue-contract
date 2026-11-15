@@ -491,3 +491,32 @@ test('the validator checks emit', () => {
   has('emit: radius');
   assert.ok(warnings.some((e) => e.includes('emit: unknown sound "no-such-sound"')));
 });
+
+test('a drop that dies on the floor leaves its splash there, going up', () => {
+  const ps = pool([
+    { id: 'drop', gravity: 10, onFloor: 'die', splash: { type: 'spray', count: 3, speed: [1, 2] } },
+    { id: 'spray', life: 5 },
+    { id: 'dry', gravity: 10, onFloor: 'die' },
+  ]);
+  const drop = ps.types[ps.typeIndex('drop')];
+  const spray = ps.types[ps.typeIndex('spray')];
+  ps.spawn('drop', 5.5, 3.5, 0.5);
+  ps.spawn('dry', 8.5, 3.5, 0.5);
+  step(ps, 0.2);
+  assert.equal(spray.live, 0, 'none while it falls');
+  step(ps, 0.3);
+  assert.equal(drop.live, 0, 'the drop is gone');
+  assert.equal(spray.live, 3, 'and its splash is there (the dry one left none)');
+  for (let i = 0; i < ps.n; i++) {
+    assert.ok(Math.hypot(ps.x[i] - 5.5, ps.y[i] - 3.5) < 0.6, 'where the drop landed');
+    assert.ok(ps.vz[i] > 0 && ps.z[i] > 0, 'going up off the floor');
+  }
+});
+
+test('the validator rejects a splash of an unknown type, or on a particle that does not die on the floor', () => {
+  const check = (extra) => validateContent(new Registry({ ...content, levels: [{ ...room(OPEN, ['', ' >'], { legend: { '.': ROOM } }), id: 'splash-check' }], particles: [...content.particles, defineParticle({ id: 'splash-check', colors: [1], ...extra })] })).errors.filter((e) => e.includes('splash'));
+  assert.deepEqual(check({ splash: { type: 'spark' } }), []);
+  assert.match(check({ splash: { type: 'no-such' } })[0], /unknown particle type/);
+  assert.match(check({ onFloor: 'bounce', splash: { type: 'spark' } })[0], /onFloor 'die'/);
+  assert.match(check({ splash: { type: 'spark', count: 0 } })[0], /count/);
+});

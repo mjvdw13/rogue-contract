@@ -549,7 +549,8 @@ export function defineEffect(def) {
  *   shape?:'square'|'disc', streak?:number, gravity?:number, drag?:number, bounce?:number,
  *   onFloor?:'die'|'bounce'|'stick', walls?:'die'|'bounce', wind?:number,
  *   blend?:'solid'|'add'|'half'|'dither', alpha?:number, fadeIn?:number, fadeOut?:number, fade?:boolean, fullbright?:boolean,
- *   grow?:number, trail?:{type:string, every?:number, for?:number}, cap?:number}} def
+ *   grow?:number, trail?:{type:string, every?:number, for?:number},
+ *   splash?:{type:string, count?:number, speed?:[number,number], spread?:number}, cap?:number}} def
  */
 export function defineParticle(def) {
   requireId(def, 'Particle');
@@ -648,7 +649,8 @@ export function defineSong(def) {
  * keeps `count` particles of `type` in the air round the camera, `range`
  * tiles each way (10), under the sky only: made `z` ([0.05, 2.5]) above the
  * floor with a random speed of up to `drift` ([0.3, 0.1]: across, up or
- * down), carried by `wind` ([x, y, z] units per second; still by default).
+ * down), going down at `fall` (0; rain's falling speed), carried by `wind`
+ * ([x, y, z] units per second; still by default).
  * It can be a list of these, a layer per type, with `calm`, `shelter` and
  * the level's `gusts` (MODDING.md, Levels); `haze.gust` is the haze's half
  * distance in a full gust.

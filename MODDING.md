@@ -597,6 +597,11 @@ defineParticle({
 - `onFloor`: `'die'` (the default), `'bounce'` or `'stick'` (lies there
   until its life is up; it still bounces off a hard landing). `walls`:
   `'die'` (the default) or `'bounce'`. Particles stop at ceilings.
+- `splash: { type: 'rain-splash', count: 2, speed: [0.6, 1.5] }`: where
+  it dies on a floor it leaves `count` (1) particles of `type`, thrown up
+  at `speed` within `spread` of straight up (1, a hemisphere; 0 straight
+  up). A raindrop's splash. It needs `onFloor: 'die'`, and the splash's
+  type can't splash too. Splashes count against their own type's cap.
 - **Caps:** at most 1000 points and 150 discs live at once (discs cost by
   the pixels they cover); past that, new ones aren't made. `cap` limits one
   type within those, so smoke can't crowd out sparks.
@@ -925,6 +930,9 @@ it walks straight into the walls.
 round the player, in a square `range` tiles each way (10), and only in
 tiles under the sky. Each is made `z` above the floor (`[0.05, 2.5]`) with
 a random speed of up to `drift` (`[0.3, 0.1]`: across, and up or down).
+`fall` (units per second, 0 by default) makes them already going down at
+that speed: rain, which would otherwise start still and speed up. Give it
+the speed the type settles at (its `gravity` over its `drag`).
 `wind: [x, y, z]` (units per second) is the level's wind, which carries
 every particle type with `wind`, smoke included. Ones the player leaves
 behind come round to the far side of the square; ones that die are made

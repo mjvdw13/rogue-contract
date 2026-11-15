@@ -31,7 +31,7 @@ export class Weather {
   /**
    * @param {import('./particles.js').Particles} particles
    * @param {import('./tilemap.js').TileMap} map
-   * @param {object|object[]} def one layer `{ type, count, range?, z?, drift?, calm?, shelter?, wind?, gusts? }`, or a list
+   * @param {object|object[]} def one layer `{ type, count, range?, z?, drift?, fall?, calm?, shelter?, wind?, gusts? }`, or a list
    */
   constructor(particles, map, def) {
     this.ps = particles;
@@ -47,6 +47,8 @@ export class Weather {
       z: d.z ?? [0.05, 2.5],
       /** Random speed each is made with: across, and up or down. */
       drift: d.drift ?? [0.3, 0.1],
+      /** They're made going down at this speed (rain, already falling). */
+      fall: d.fall ?? 0,
       /** Not made where the wind is kept off by more than this (see above). */
       shelter: d.shelter ?? null,
       sheltered: null,
@@ -218,6 +220,6 @@ export class Weather {
     if (top <= z0) return -1;
     const [h, v] = l.drift;
     const z = floor + z0 + (top - z0) * rng.next();
-    return ps.spawn(l.ti, x, y, z, (rng.next() * 2 - 1) * h, (rng.next() * 2 - 1) * h, (rng.next() * 2 - 1) * v);
+    return ps.spawn(l.ti, x, y, z, (rng.next() * 2 - 1) * h, (rng.next() * 2 - 1) * h, (rng.next() * 2 - 1) * v - l.fall);
   }
 }

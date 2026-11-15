@@ -169,3 +169,13 @@ test('the validator checks blowing sand\'s fields', () => {
     assert.ok(ours.some((e) => e.includes(what)), `${what}:\n${ours.join('\n')}`);
   }
 });
+
+test('a layer with a fall is made already going down', () => {
+  const world = open({ type: 'dust', count: 40, drift: [0, 0], fall: 5 });
+  world.weather.fill(world.player.x, world.player.y);
+  const ps = world.particles;
+  assert.ok(count(world, 'dust') > 0);
+  for (let i = 0; i < ps.n; i++) assert.equal(ps.vz[i], -5);
+  const bad = validateContent(new Registry({ ...content, levels: [room(OPEN, START, { id: 'fall-check', weather: { type: 'dust', count: 40, fall: -1 } })] })).errors.filter((e) => e.includes('fall'));
+  assert.equal(bad.length, 1, 'and the validator rejects one going up');
+});
