@@ -109,9 +109,10 @@ export class Town {
    * @param {{sky?:number, light?:number, wall?:string, roof?:string, floor?:string}} opts
    *   `sky`: the height of the open sky over walkable ground; `light`: sunlight.
    *   `skirt`: the foot of a building's walls unless it says otherwise (see
-   *   `SKIRTS`; null for none).
+   *   `SKIRTS`; null for none). `dusty`: the floors whose walls `grime()`
+   *   dirties along the foot (the street's own, unless given).
    */
-  constructor(p, { sky = 24, light = 216, wall = 'adobe', roof = 'adobe-roof', floor = 'street-sand', skirt = 'dirt' } = {}) {
+  constructor(p, { sky = 24, light = 216, wall = 'adobe', roof = 'adobe-roof', floor = 'street-sand', skirt = 'dirt', dusty = [floor] } = {}) {
     this.p = p;
     this.sky = sky;
     this.light = light;
@@ -119,6 +120,7 @@ export class Town {
     this.roof = roof;
     this.floor = floor;
     this.skirt = skirt;
+    this.dusty = new Set(dusty);
     /** Round props that cast shadows (domes): [x, y, radius, base, height]. */
     this.casters = [];
     /** Things the kit places (domes), for the level's list. */
@@ -1047,7 +1049,7 @@ export class Town {
           const b = a < length ? p.get(...back) : null;
           const f = a < length ? p.get(...before(face, line, a)) : null;
           if (open(f) && building(b) && height(b) - (f.floorZ ?? 0) >= 2) {
-            edge = { bot: f.floorZ ?? 0, top: height(b), g: levelAt(back), street: f.floor === this.floor, skirt: b.bands?.[0]?.to ?? 0 };
+            edge = { bot: f.floorZ ?? 0, top: height(b), g: levelAt(back), street: this.dusty.has(f.floor), skirt: b.bands?.[0]?.to ?? 0 };
           }
           const same = run && edge && edge.bot === run.bot && edge.top === run.top && edge.g === run.g && edge.street === run.street;
           if (same) run.a1 = a + 1;
@@ -1067,7 +1069,7 @@ export class Town {
       const step = (k) => [Math.floor(mid[0] + ((s.inward[0] - mid[0]) / d) * k), Math.floor(mid[1] + ((s.inward[1] - mid[1]) / d) * k)];
       const front = p.get(...step(-0.7));
       if (!open(front)) continue;
-      runs.push({ face: 'angled', line: { ...s, len }, a0: 0, a1: len, bot: front.floorZ ?? 0, top: s.top, g: levelAt(step(0.7)), street: front.floor === this.floor, skirt: s.skirt });
+      runs.push({ face: 'angled', line: { ...s, len }, a0: 0, a1: len, bot: front.floorZ ?? 0, top: s.top, g: levelAt(step(0.7)), street: this.dusty.has(front.floor), skirt: s.skirt });
     }
 
     for (const { face, line, a0, a1, bot, top, g, street, skirt } of runs) {

@@ -1765,7 +1765,7 @@ are (`src/content/levels/m5.js`), playable at `?map=m5`.
   - [x] Every door and wall switch: switches tile, doors show pink and
         sit off their openings.
   - [x] Berth 3's hull reads as a boat's: make it a starship's frame.
-  - [ ] Variation and grime on walls and floors, as Mos Eisley has
+  - [x] Variation and grime on walls and floors, as Mos Eisley has
         (`town.grime()`, patches, stains on the ground).
   - [ ] The Bottoms: some of the street's doors open, with rooms behind.
 - [ ] **Slow frames**: 19 ms on average and 38 at worst at 640 x 400 on

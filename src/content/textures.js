@@ -155,6 +155,8 @@ const STATION_FENCES = ['ds-field', 'ds-window', 'ds-railing'];
 const CORELLIA = [
   'quay', 'quay-edge', 'sea-wall', 'shack-plate', 'shack-grey', 'shack-tin', 'shack-green', 'shack-shutter',
   'harbour-water', 'slag', 'dock-wall', 'dock-floor', 'crane-yellow', 'hull-section',
+  // The ground's other slabs, laid in patches (m5.js).
+  'quay-dark', 'quay-pale', 'slag-rust', 'slag-ash', 'street-wet', 'sea-wall-b',
   // Doors, each one picture across its doorway (4 by 4; the hatch 5 by 3).
   'yard-door-rising', 'yard-door-red-rising', 'hull-door-rising', 'hull-hatch-rising',
 ];

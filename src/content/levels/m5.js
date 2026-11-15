@@ -1,6 +1,7 @@
 import { defineLevel } from '../../engine/defs.js';
 import { Painter } from './lib/painter.js';
 import { Town } from './lib/town.js';
+import { valueNoise, random } from './lib/noise.js';
 import { FREIGHTER } from '../models/freighter.js';
 
 // MISSION 5: BREAKERS' ROW, CORELLIA. The layout, route and numbers are in
@@ -62,7 +63,13 @@ const T = {
 };
 
 const p = new Painter(W, H, { wall: T.seaWall });
-const kit = new Town(p, { sky: SKY, light: DAY, wall: T.shack, roof: T.roof, floor: T.street, skirt: null });
+/** The ground's other slabs, laid in patches at the end (the ground, varied): [darker, paler]. */
+const SLABS = { [T.quay]: ['quay-dark', 'quay-pale'], [T.yard]: ['slag-rust', 'slag-ash'], [T.street]: ['street-wet', null] };
+const kit = new Town(p, {
+  sky: SKY, light: DAY, wall: T.shack, roof: T.roof, floor: T.street, skirt: null,
+  // (grime() dirties the foot of every wall along these.)
+  dusty: [T.street, T.quay, T.yard, T.dock, ...Object.values(SLABS).flat().filter(Boolean)],
+});
 const lamps = [];
 const decals = [];
 const at = (type, x, y, extra = {}) => ({ type, x, y, ...extra });
@@ -730,6 +737,108 @@ for (const [tag, x0, y0, x1, y1] of [
   ['say-bridge', 255, 67, 259, 68], ['say-cab', 298, 96, 299, 100], ['say-office', 330, 39, 334, 40],
 ]) p.rect(x0, y0, x1, y1, (x, y, c) => (c.tag ? c : { ...c, tag }));
 
+// ================================================================ VARIATION AND GRIME
+// (Mark, 2026-11-14: the textures wanted variation and grime, as Mos
+// Eisley's have.) The ground, varied: the quay, the yard's slag and the
+// Bottoms' street aren't one slab repeated. By the slab (the texture's
+// own size, so the joints stay), in patches from a noise: some darker
+// (oil soaked in, rust, wet), some paler (a slab relaid, ash).
+{
+  const SIZE = { [T.quay]: 4, [T.yard]: 2, [T.street]: 4 };
+  for (let y = 1; y < H - 1; y++) {
+    for (let x = 1; x < W - 1; x++) {
+      const c = p.get(x, y);
+      const pair = c && !c.wall && SLABS[c.floor];
+      if (!pair) continue;
+      const size = SIZE[c.floor];
+      const [bx, by] = [Math.floor(x / size), Math.floor(y / size)];
+      const n = 0.65 * valueNoise(bx, by, 3, 211) + 0.35 * valueNoise(bx, by, 1, 223);
+      const floor = n < 0.4 ? pair[0] : n > 0.62 ? pair[1] : null;
+      if (floor) p.set(x, y, { ...c, floor });
+    }
+  }
+}
+// The walls, varied. The sea wall and the yard's concrete were poured a
+// stretch at a time: two pours' textures by turns. (A band of bared rebar
+// along the sea wall's foot was tried: bands on that much wall cost 1.4 ms
+// a frame and 2 MB of garbage over the bench's views.) The yard's north side
+// was one wall of one plate 170 tiles long: it's a row of sheds now, each
+// its own plate and height (10 to 14).
+{
+  for (let y = 1; y < H - 1; y++) {
+    for (let x = 1; x < W - 1; x++) {
+      const c = p.get(x, y);
+      if (!c || c.wall || c.door || c.slab || c.side !== T.seaWall || c.ceiling !== 'sky') continue;
+      if (valueNoise(x + y, 0, 9, 231) > 0.52) p.set(x, y, { ...c, side: 'sea-wall-b' });
+    }
+  }
+  const rnd = random(241);
+  const PLATES = [T.shack, T.shackB, T.shackC, T.boxA, T.seaWall, T.shackB, T.shack];
+  let last = null;
+  for (let x0 = 130; x0 < 298;) {
+    const x1 = Math.min(298, x0 + 10 + Math.floor(rnd() * 7) * 2);
+    let wall = rnd.pick(PLATES);
+    if (wall === last) wall = PLATES[(PLATES.indexOf(wall) + 1) % PLATES.length];
+    last = wall;
+    const h = 10 + Math.floor(rnd() * 5);
+    p.rect(x0, 50, x1, 56, (x, y, c) => (c && !c.wall && !c.slab && c.floorZ === 12 && c.side === T.shack ? { ...c, floorZ: h, side: wall } : c));
+    x0 = x1;
+  }
+}
+// Stains and leavings on the ground, scattered by area (none of them is
+// in the way: they lie flat, and you walk over them): oil and spills on
+// the concrete, litter in the Bottoms, burns, scrap and rusty plate where
+// the cutters work (on the black slag only rust and scorch show).
+{
+  const rnd = random(97);
+  const r2 = (v) => Math.round(v * 100) / 100;
+  /** The tile's floor if it's open ground under the sky, level with all round it. */
+  const flat = (x, y) => {
+    const c = p.get(Math.floor(x), Math.floor(y));
+    if (!c || c.wall || c.door || c.lift || c.slab || c.damage || c.ceiling !== 'sky') return null;
+    for (let dy = -1; dy <= 1; dy++) {
+      for (let dx = -1; dx <= 1; dx++) {
+        const d = p.get(Math.floor(x) + dx, Math.floor(y) + dy);
+        if (!d || d.wall || d.door || d.lift || d.slab || d.floorZ !== c.floorZ) return null;
+      }
+    }
+    return c;
+  };
+  const scatter = (types, n, [x0, y0, x1, y1]) => {
+    for (let k = 0; k < n; k++) {
+      const [x, y] = [rnd.range(x0, x1), rnd.range(y0, y1)];
+      const type = rnd.pick(types);
+      const angle = Math.floor(rnd() * 24) * 15;
+      const c = flat(x, y);
+      if (c) dress.push(at(type, r2(x), r2(y), { z: c.floorZ, angle }));
+    }
+  };
+  const OIL = ['oil', 'oil-small', 'oil-small', 'floor-spill-1', 'floor-spill-2'];
+  const LITTER = ['litter', 'litter-small', 'litter-small'];
+  const CUT = ['floor-burn-1', 'floor-burn-2', 'floor-burn-1', 'deck-plate-rust', 'deck-plate', 'scrap', 'rubble'];
+  // The pier and the quay's west end; the quay along the yard.
+  scatter(OIL, 14, [8, 92, 46, 104]); scatter(OIL, 8, [20, 104, 30, 140]); scatter(LITTER, 6, [8, 92, 46, 104]);
+  scatter(OIL, 40, [46, 92, 300, 104]); scatter(LITTER, 14, [46, 92, 300, 104]); scatter(['floor-burn-1', 'floor-burn-2'], 6, [130, 92, 300, 104]);
+  // The Bottoms: the lower street, the bend, the upper street.
+  scatter(LITTER, 10, [20, 62, 30, 88]); scatter(OIL, 6, [20, 62, 30, 88]);
+  scatter(LITTER, 12, [30, 44, 60, 74]); scatter(OIL, 6, [30, 44, 60, 74]); scatter(['rubble'], 3, [30, 44, 60, 74]);
+  scatter(LITTER, 10, [60, 46, 96, 56]); scatter(OIL, 6, [60, 46, 96, 56]);
+  // Slip 1 and the cutting floor; Berth 3; the dock's rim, its floor, the apron.
+  scatter(CUT, 26, [130, 56, 206, 92]); scatter(OIL, 10, [130, 56, 206, 92]);
+  scatter(CUT, 16, [264, 60, 298, 92]);
+  scatter(OIL, 8, [308, 60, 346, 104]); scatter(OIL, 8, [320, 60, 334, 100]);
+  scatter(['floor-burn-1', 'floor-burn-2', 'oil'], 8, [314, 22, 344, 40]);
+}
+// Patches on the shacks and sheds: sheet metal bolted over what gave way.
+for (const [x, y, z, face, tex, scale = 1] of [
+  [20, 73.5, 4.2, 'E', 'patch-tin'], [20, 86.9, 2.6, 'E', 'patch-plate'], [20, 79.5, 6.8, 'E', 'patch-rust', 1.2],
+  [30, 87, 4.4, 'W', 'patch-tin', 0.8], [30, 82, 4.6, 'W', 'patch-plate'],
+  [62, 46, 5, 'S', 'patch-tin'], [81.5, 46, 2.4, 'S', 'patch-plate'], [86.5, 46, 6.6, 'S', 'patch-rust', 1.2], [93.5, 46, 3, 'S', 'patch-tin'],
+  [64.5, 56, 3, 'N', 'patch-plate'], [78, 56, 6, 'N', 'patch-tin'], [80, 56, 2.2, 'N', 'patch-rust'], [84.5, 56, 8, 'N', 'patch-plate', 1.2],
+  [178, 64, 2.6, 'S', 'patch-tin', 0.8], [176, 60, 3, 'W', 'patch-plate'], [244, 96, 4.5, 'W', 'patch-tin'], [244, 101, 2.5, 'W', 'patch-rust'],
+  [8, 97, 4, 'E', 'patch-tin'], [8, 101.5, 2.4, 'E', 'patch-plate'],
+]) decals.push({ x, y, z, face, tex, ...(scale !== 1 && { scale }) });
+
 // A room indoors (a ceiling, not the sky) inside a building shows from
 // outside as a wall up to the sky, wherever something looks over the
 // building's roof into it. So every tile of building next to one becomes
@@ -751,6 +860,10 @@ for (const [tag, x0, y0, x1, y1] of [
 // The sky comes down to the roofline beside every solid wall (and the
 // map's edge). No shadows: the day is overcast.
 kit.seal();
+// Weather on every straight wall under the sky, as Mos Eisley's: streaks
+// off the rooflines, stains and cracks (Mark, 2026-11-14: the walls
+// wanted grime). A works town in the wet: more of it than the desert's.
+kit.grime({ amount: 1.3, seed: 91 });
 
 const list = [
   // 1. The pier's seaward end, facing the sea wall.

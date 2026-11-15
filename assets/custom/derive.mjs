@@ -509,6 +509,8 @@ export const CORELLIA = [
   { out: 'quay-edge', df: 'ZWCMENT1', gradient: [[28, 26, 22], [66, 62, 54], [104, 98, 86], [136, 130, 114], [160, 154, 138]], keep: 0.7, contrast: 1 },
   // The sea wall: the Sewers' tall stained concrete, rust streaks from
   // every joint and weed at its foot, nearly as it is.
+  // Another pour of it, one rust line where that has two.
+  { out: 'sea-wall-b', df: 'SWPIT2', gradient: [[30, 28, 24], [74, 70, 62], [116, 110, 98], [150, 144, 130], [178, 172, 156]], keep: 0.8, contrast: 0.9 },
   { out: 'sea-wall', df: 'SWPIT4', gradient: [[30, 28, 24], [74, 70, 62], [116, 110, 98], [150, 144, 130], [178, 172, 156]], keep: 0.8, contrast: 0.9 },
   // The Bottoms' shacks, no two the same: hull plate gone to rust, grey
   // city plate with rust coming through, corrugated tin, old green paint.
@@ -548,6 +550,15 @@ export const CORELLIA = [
   // A ship's cut face: the edges of its decks and frames, dark between
   // them (the Executor's greebled wall, rusted where the torch went).
   { out: 'hull-section', df: 'IWEX1', gradient: [[4, 4, 6], [16, 15, 15], [44, 40, 38], [88, 80, 72], [136, 124, 110]], keep: 0, contrast: 1.6, rust: [{ color: [124, 60, 24], amount: 0.6, cell: 16, seed: 541, from: 0.5 }] },
+  // The ground isn't one slab repeated (Mark, 2026-11-14: variation and
+  // grime): m5.js lays these by the slab, in patches. The quay darker
+  // where oil has soaked in, and paler where a slab was relaid; the slag
+  // rustier, and grey with ash; the Bottoms' street darker where it's wet.
+  { out: 'quay-dark', df: 'IWGREYC2', gradient: [[44, 42, 37], [84, 80, 71], [120, 114, 101], [148, 142, 127], [172, 166, 151]], keep: 0, contrast: 0.85, rust: [{ color: [28, 26, 22], amount: 0.5, cell: 32, seed: 571, from: 0.45 }, { color: [112, 70, 36], amount: 0.3, cell: 16, seed: 573, from: 0.55 }] },
+  { out: 'quay-pale', df: 'IWGREYC2', gradient: [[70, 68, 62], [118, 114, 104], [156, 150, 136], [184, 178, 162], [206, 200, 184]], keep: 0, contrast: 0.6, rust: [{ color: [40, 36, 30], amount: 0.2, cell: 32, seed: 575, from: 0.6 }] },
+  { out: 'slag-rust', df: 'TPGREY1', gradient: [[10, 8, 7], [30, 22, 18], [58, 40, 30], [88, 62, 46], [112, 86, 68]], keep: 0, contrast: 1.2, rust: [{ color: [124, 62, 26], amount: 0.6, cell: 8, seed: 577, from: 0.5 }] },
+  { out: 'slag-ash', df: 'TPGREY1', gradient: [[20, 20, 20], [42, 41, 40], [66, 64, 62], [92, 88, 84], [118, 112, 106]], keep: 0, contrast: 1, rust: [{ color: [104, 56, 26], amount: 0.25, cell: 8, seed: 579, from: 0.65 }] },
+  { out: 'street-wet', df: 'ZPCMENT2', scale: [128, 128], gradient: [[30, 24, 18], [66, 54, 40], [98, 82, 62], [126, 108, 84], [150, 132, 106]], keep: 0.1, contrast: 0.7, rust: [{ color: [12, 10, 8], amount: 0.8, cell: 32, seed: 581, from: 0.45 }, { color: [96, 56, 30], amount: 0.35, cell: 16, seed: 583 }] },
   // Doors, one picture across each doorway (a rising door's panel is
   // centred in it and hangs from its foot). The yard's, 4 tiles by 4: Nar
   // Shaddaa's hazard-striped door, its own colours, rusted; with a red
