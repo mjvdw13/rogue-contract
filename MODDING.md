@@ -928,7 +928,9 @@ it walks straight into the walls.
 
 `weather` keeps `count` particles of one type (see Particles) in the air
 round the player, in a square `range` tiles each way (10), and only in
-tiles under the sky. Each is made `z` above the floor (`[0.05, 2.5]`) with
+tiles under the sky. Each is made `z` above the floor (`[0.05, 2.5]`), or
+above the slab's top where the tile has one (a roof with a room under it:
+nothing is made in the room, and what blows in is taken away), with
 a random speed of up to `drift` (`[0.3, 0.1]`: across, and up or down).
 `fall` (units per second, 0 by default) makes them already going down at
 that speed: rain, which would otherwise start still and speed up. Give it

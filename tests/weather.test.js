@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import content from '../src/content/index.js';
 import { Registry } from '../src/engine/registry.js';
 import { validateContent } from '../src/engine/validate.js';
-import { F_SKY } from '../src/engine/world/tilemap.js';
+import { F_SKY, F_SLAB } from '../src/engine/world/tilemap.js';
 import { View } from '../src/engine/render/view.js';
 import { makeWorld, mockInput, room, run } from './helpers.js';
 
@@ -40,6 +40,27 @@ test('dust fills the air round the player, and none drifts indoors', () => {
     assert.ok(world.map.flags[tile] & F_SKY, `a mote at ${x.toFixed(1)}, ${y.toFixed(1)} is under the sky`);
     assert.ok(Math.abs(x - pt.x) <= WEATHER.range && Math.abs(y - pt.y) <= WEATHER.range, 'within range of the player');
   }
+});
+
+test('none is made in a room under a slab roof, only over the roof', () => {
+  // The yard's east half is roofed: a slab from 3 to 3.5 under the sky, a room under it.
+  const roof = { ceiling: 'sky', ceilZ: 12, slab: { bottom: 3, top: 3.5, floor: 'imp-floor', ceiling: 'imp-ceiling', side: 'imp-panel', light: 160 } };
+  const tiles = ['#'.repeat(40), ...Array.from({ length: 30 }, () => '#' + '_'.repeat(19) + 'R'.repeat(19) + '#'), '#'.repeat(40)];
+  const world = makeWorld(room(tiles, ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '  >'], { weather: { ...WEATHER, wind: [3, 0, 0] }, legend: { R: roof } }));
+  const pt = world.player;
+  pt.x = 24;
+  pt.y = 16;
+  const ps = world.particles;
+  let over = 0;
+  for (let k = 0; k < 40; k++) {
+    run(world, mockInput(), 0.1);
+    for (let i = 0; i < ps.n; i++) {
+      if (!(world.map.flags[ps.tile[i]] & F_SLAB)) continue;
+      assert.ok(ps.z[i] >= 3.5, `a mote at ${ps.x[i].toFixed(1)}, ${ps.y[i].toFixed(1)} is over the roof, not in the room (z ${ps.z[i].toFixed(2)})`);
+      over++;
+    }
+  }
+  assert.ok(over > 0, 'there is dust over the roof');
 });
 
 test('dust the player leaves behind comes round ahead of them', () => {

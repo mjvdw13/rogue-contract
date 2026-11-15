@@ -591,9 +591,10 @@ export default [
     cap: 400,
   }),
   // Rain over Corellia's yard (a level's `weather`, Mission 5): thin
-  // streaks that lighten what's behind them, falling at about 11 units a
-  // second and leaning with the wind. Each leaves a splash where it lands: two pale specks
-  // that hop and are gone.
+  // streaks that lighten what's behind them, falling at 18 units a second
+  // (9 m/s, what the big drops of heavy rain reach; Mark, 2026-11-15: 11
+  // felt slow) and leaning with the wind. Each leaves a splash where it
+  // lands: two pale specks that hop and are gone.
   defineParticle({
     id: 'rain',
     colors: [['steel', 10]],
@@ -602,7 +603,7 @@ export default [
     maxPx: 1,
     streak: 0.05,
     blend: 'add',
-    gravity: 33,
+    gravity: 54,
     drag: 3,
     wind: 1,
     onFloor: 'die',

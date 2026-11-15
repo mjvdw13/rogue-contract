@@ -1083,7 +1083,7 @@ export default defineLevel({
   // squall every half minute or so, the wind getting up with it.
   weather: [
     { type: 'soot', count: 60, wind: [0.7, 0.15, 0], gusts: { every: [20, 45], hold: [10, 25], rise: 5, fall: 8, strength: 2.2 } },
-    { type: 'rain', count: 420, calm: 0.3, range: 9, z: [3, 9], drift: [0.2, 0.5], fall: 10.5 },
+    { type: 'rain', count: 420, calm: 0.3, range: 9, z: [3, 9], drift: [0.2, 0.5], fall: 17.5 },
   ],
   traffic: TRAFFIC,
   par: 660,

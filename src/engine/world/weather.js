@@ -7,7 +7,9 @@ const LEE_MAX = 32;
 
 /**
  * Weather: particles of one or more types (layers) kept alive in a square
- * round the camera, `range` tiles each way, only in tiles under the sky.
+ * round the camera, `range` tiles each way, only in tiles under the sky,
+ * and over a slab where there is one: a roof's slab has a room under it,
+ * and nothing is made in there or stays that blows in.
  * One the camera leaves behind comes round to the far side of the square
  * (it wraps), so moving doesn't empty the air ahead; ones that die (of age,
  * or on the floor) are made again at a random spot in the square.
@@ -160,8 +162,8 @@ export class Weather {
         const ny = cy - r + (((oy % side) + side) % side);
         const above = ps.z[i] - ps.floor[i];
         const tile = this.map.inBounds(nx | 0, ny | 0) ? (ny | 0) * this.map.w + (nx | 0) : -1;
-        if (tile < 0 || !(flags[tile] & F_SKY) || (l.sheltered && l.sheltered[tile]) || !ps.move(i, nx, ny, this.map.floorZ[tile] + above)) ps.remove(i);
-      } else if (!(flags[ps.tile[i]] & F_SKY)) ps.remove(i);
+        if (tile < 0 || !(flags[tile] & F_SKY) || (l.sheltered && l.sheltered[tile]) || !ps.move(i, nx, ny, this._ground(tile) + above)) ps.remove(i);
+      } else if (!(flags[ps.tile[i]] & F_SKY) || ps.floor[i] < this._ground(ps.tile[i])) ps.remove(i);
     }
     const want = this._want(l);
     let tries = (want - this._live(l)) * 2;
@@ -199,6 +201,12 @@ export class Weather {
     return out;
   }
 
+  /** The floor under the sky in a tile: a slab's top where there is one (a roof, with a room under it), or the floor. */
+  _ground(tile) {
+    const map = this.map;
+    return map.flags[tile] & F_SLAB ? Math.max(map.slabTop[tile], map.floorZ[tile]) : map.floorZ[tile];
+  }
+
   _live(l) {
     return this.ps.types[l.ti].live;
   }
@@ -214,7 +222,7 @@ export class Weather {
     const tile = (y | 0) * map.w + (x | 0);
     if (!(map.flags[tile] & F_SKY)) return -1;
     if (l.shelter !== null && (l.sheltered ??= this._shelter(l.shelter))[tile]) return -1;
-    const floor = map.floorZ[tile];
+    const floor = this._ground(tile);
     const [z0, z1] = l.z;
     const top = Math.min(z1, map.ceilZ[tile] - floor - 0.05);
     if (top <= z0) return -1;

@@ -30,7 +30,9 @@ These need Mark to try something, or to decide. Don't start them without him.
 
 - **Mission 5's rain** (`?map=m5`, 2026-11-15). A drizzle all the
   time and a squall every 20 to 45 s (more drops, more wind, the haze
-  closing from 44 to 34). Drops splash on the ground and the water. The
+  closing from 44 to 34). Drops splash on the ground and the water. They
+  fall at 18 units a second now (9 m/s, heavy rain's big drops; it was
+  11), and none falls in the rooms under the roofs. The
   soot still falls with it. It has no sound yet. To judge: whether
   Corellia should rain at all, how heavy (the drizzle 126 drops, the
   squall 420), the streaks' brightness and length, the squalls' haze,
