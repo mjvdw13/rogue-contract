@@ -38,7 +38,8 @@ These need Mark to try something, or to decide. Don't start them without him.
   squall 420), the streaks' brightness and length, the squalls' haze,
   and whether the soot should go while it rains.
 - **Mission 5's puddles** (`?map=m5`, 2026-11-15). The open ground has
-  70 puddles in three sizes where the oil stains were, and dark damp
+  300 puddles in three sizes (one at least in every 8 by 8 patch of
+  open ground you walk), and dark damp
   patches; a little oil is left by the cutters and on the dock's apron.
   The puddles mirror (a model face's `mirror`; the first ones were
   pictures and looked like slime): the sky, the skyline, walls, lamp

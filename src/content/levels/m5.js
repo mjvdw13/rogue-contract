@@ -920,6 +920,51 @@ for (const [tag, x0, y0, x1, y1] of [
   scatter(CUT, 16, [264, 60, 298, 92]);
   scatter(WET, 12, [308, 60, 346, 104]); scatter(WET, 12, [320, 60, 334, 100]);
   scatter(['floor-burn-1', 'floor-burn-2', 'oil', 'puddle', 'puddle-small'], 12, [314, 22, 344, 40]);
+  // Every stretch of open ground gets a puddle (Mark, 2026-11-15: some
+  // areas had none: the scatter above is thin over the big ones, and
+  // skips the yard over the gallery, which is a slab). By the patch of 8
+  // by 8 tiles, in the areas you walk (not the roofs: each box has a
+  // highest floor): one where a patch has none and room for it, sometimes
+  // two. Not on grates or in the water.
+  const wet = random(331);
+  const DRY = new Set([T.grate, T.water, 'bilge-water']);
+  /** The height of the ground under the sky at a tile, or null: its floor, or the yard laid over the gallery. */
+  const top = (x, y) => {
+    const c = p.get(x, y);
+    if (!c || c.wall || c.door || c.lift || c.damage || c.ceiling !== 'sky') return null;
+    if (c.slab) return c.slab.floor === T.yard ? c.slab.top : null;
+    return DRY.has(c.floor) ? null : c.floorZ;
+  };
+  /** The ground's height at (x, y) if it's level `reach` tiles each way, or null. */
+  const level = (x, y, reach) => {
+    const z = top(Math.floor(x), Math.floor(y));
+    if (z === null) return null;
+    for (let dy = -reach; dy <= reach; dy++) {
+      for (let dx = -reach; dx <= reach; dx++) if (top(Math.floor(x) + dx, Math.floor(y) + dy) !== z) return null;
+    }
+    return z;
+  };
+  const PATCH = 8;
+  const SIZES = [['puddle', 1], ['puddle-small', 1], ['puddle-small', 1], ['puddle-wide', 2]];
+  for (const [x0, y0, x1, y1, zMax] of [
+    [8, 62, 130, 140, 1], [20, 22, 98, 62, 6], [128, 56, 304, 104, 0.5], [232, 56, 264, 104, 11.5], [304, 14, 350, 104, 0.5],
+  ]) {
+    for (let by = y0; by < y1; by += PATCH) {
+      for (let bx = x0; bx < x1; bx += PATCH) {
+        const [ex, ey] = [Math.min(bx + PATCH, x1), Math.min(by + PATCH, y1)];
+        if (dress.some((d) => d.type.startsWith('puddle') && d.x >= bx && d.x < ex && d.y >= by && d.y < ey)) continue;
+        let want = wet() < 0.35 ? 2 : 1;
+        for (let tries = 0; tries < 24 && want > 0; tries++) {
+          const [x, y] = [wet.range(bx, ex), wet.range(by, ey)];
+          const [type, reach] = wet.pick(SIZES);
+          const z = level(x, y, reach);
+          if (z === null || z > zMax) continue;
+          dress.push(at(type, r2(x), r2(y), { z, angle: Math.floor(wet() * 24) * 15 }));
+          want--;
+        }
+      }
+    }
+  }
 }
 // Patches on the shacks and sheds: sheet metal bolted over what gave way.
 for (const [x, y, z, face, tex, scale = 1] of [
