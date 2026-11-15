@@ -104,10 +104,13 @@ const decals = [
   // (None at x 113 on the north side: the blue door is there.)
   { x: 123, y: 97, z: 1.1, face: 'S', tex: 'decal-vent' },
   ...[113, 123].map((x) => ({ x, y: 103, z: 1.1, face: 'N', tex: 'decal-vent' })),
-  ...[145, 152].flatMap((x) => [{ x, y: 77, z: 1.1, face: 'S', tex: 'decal-vent' }, { x, y: 83, z: 1.1, face: 'N', tex: 'decal-vent' }]),
+  ...[145].flatMap((x) => [{ x, y: 77, z: 1.1, face: 'S', tex: 'decal-vent' }, { x, y: 83, z: 1.1, face: 'N', tex: 'decal-vent' }]),
   { x: 92, y: 94, z: 1.1, face: 'S', tex: 'decal-vent' }, { x: 91, y: 106, z: 1.1, face: 'N', tex: 'decal-vent' },
   { x: 167, y: 90, z: 1.1, face: 'N', tex: 'decal-vent' }, { x: 173, y: 90, z: 1.1, face: 'N', tex: 'decal-vent' },
   { x: 170, y: 90, z: 2.4, face: 'N', tex: 'decal-sign' },
+  // Signs by the side rooms' doors.
+  { x: 109.5, y: 103, z: 2.4, face: 'N', tex: 'decal-sign' }, { x: 153.5, y: 83, z: 2.4, face: 'N', tex: 'decal-sign' },
+  { x: 150.5, y: 77, z: 2.4, face: 'S', tex: 'decal-sign' },
   // The compactor's walls, streaked and stained down to the sludge.
   ...[[190, 'grime-drip-1'], [194.5, 'grime-streaks-2'], [199, 'grime-drip-2']].flatMap(([x, tex]) => [
     { x, y: 4, z: 1, face: 'S', tex, scale: 2 }, { x: x - 1.5, y: 28, z: 1, face: 'N', tex, scale: 2, flip: true },
@@ -248,6 +251,28 @@ p.rect(112, 96, 114, 97, narrow(0, { door: T.doorBlue, lock: 'blue' }));
 p.rect(108, 77, 118, 78, { wall: T.screen });
 p.rect(112, 77, 114, 78, { door: T.screen, secret: true, floor: T.floor, ceiling: T.ceiling, floorZ: 0, ceilZ: 6, light: 120 });
 p.rect(110, 73, 116, 77, room(0, 4, { light: 120, secret: true }));
+
+// 3c. Three side rooms off the corridor (Mark, 2026-11-15: rooms behind
+// doors, as the Bottoms has). None is on the route: a pickup or two and
+// something to look at in each.
+const sideRoom = (x0, y0, x1, y1, light) => {
+  p.rect(x0, y0, x1, y1, room(0, 6, { light }));
+  p.chamfer(x0, y0, x1, y1, 2, { wall: T.wall6 });
+};
+// The barracks, south of the first straight: bunks down the long wall.
+sideRoom(104, 104, 124, 110, 120);
+p.rect(110, 103, 112, 104, narrow(0));
+p.rect(112, 106, 116, 108, room(0, 6, { ceiling: T.ceilingLight, light: 176 }));
+// The droid bay, south of the last straight: droids on charge.
+sideRoom(149, 84, 158, 98, 128);
+p.rect(151, 83, 153, 84, narrow(0));
+p.pool(153.5, 91, 4, 184);
+// The comm room, north of it: a wall of screens, read as you come up to them.
+sideRoom(146, 66, 158, 76, 128);
+p.rect(151, 76, 153, 77, narrow(0));
+p.rect(148, 66, 156, 67, room(0, 6, { light: 176, lightFx: 'glow', lightMin: 136 }));
+p.rect(148, 65, 156, 66, { wall: T.screen });
+p.rect(148, 67, 156, 69, (x, y, old) => (old.wall ? old : { ...old, tag: 'comm-log' }));
 
 // ---------------------------------------------------------------- 4. the lift hub
 p.rect(160, 70, 180, 90, room(0, 8, { light: 168 }));
@@ -595,6 +620,28 @@ const list = [
   ...Array.from({ length: 8 }, (_, k) => at('ds-chair', 113 + 4.3 * Math.cos((k * Math.PI) / 4), 87 + 4.3 * Math.sin((k * Math.PI) / 4), { angle: 180 - k * 45 })),
   at('shield-unit', 119, 81), at('med-kit', 107, 92.5, { skill: [1, 2, 3] }),
   at('concussion-rifle', 113, 75), at('power-cell', 111, 74.5), at('power-cell', 115, 74.5),
+  // 3c. The barracks: four bunks, lockers, a bench; a trooper off watch.
+  ...[107, 111, 115, 119].map((x) => at('ds-bunk', x, 109.98, { angle: 90 })),
+  at('ds-locker-bank', 123.98, 107, { angle: 180 }), at('ds-bench', 107, 105.2, { angle: 0 }),
+  at('ds-door-panel', 112.6, 102.98, { angle: 90 }),
+  at('stormtrooper', 118.5, 106.5, { angle: 180, skill: NOT_EASIEST }), at('stormtrooper', 106.5, 107.5, { angle: 0, skill: NORMAL_UP }),
+  at('med-kit', 121.5, 105.5), at('energy-cell', 105.5, 108.5),
+  // The droid bay: power droids and mouse droids on charge at the wall,
+  // one opened up on the bench, a cart of tools.
+  at('ds-console-wall', 157.9, 88, { angle: 180 }), at('ds-console-wall', 157.9, 94, { angle: 180 }),
+  at('power-droid', 156.2, 88, { angle: 180 }), at('power-droid', 156.2, 94, { angle: 180 }),
+  at('mouse-droid', 150.5, 88.5), at('mouse-droid', 150.5, 91.5), at('mouse-droid', 150.5, 94.5),
+  at('ds-tool-cart', 153.5, 96.4, { angle: 90 }), at('ds-crate', 150.4, 96.6, { angle: 10 }),
+  at('ds-door-panel', 153.6, 82.98, { angle: 90 }),
+  at('interrogation-droid', 154, 92, { ambush: true, skill: NORMAL_UP }),
+  at('energy-pack', 156.5, 96.5), at('power-cell', 150.5, 85.5),
+  // The comm room: consoles under the screens, the signals officer.
+  at('ds-console', 150, 68.6, { angle: 90 }), at('ds-console', 154, 68.6, { angle: 90 }),
+  at('ds-console-wall', 146.1, 72, { angle: 0 }), at('ds-console-wall', 157.9, 72, { angle: 180 }),
+  at('ds-desk', 152, 72.5, { angle: 0 }),
+  at('ds-door-panel', 150.4, 77.02, { angle: 270 }),
+  at('officer', 152.5, 70.5, { angle: 90 }), at('stormtrooper', 148.5, 73.5, { angle: 270, skill: NORMAL_UP }),
+  at('energy-cell', 156.5, 74.5), at('med-kit', 147.5, 68.5, { skill: [1, 2, 3] }),
   // 4. The hub.
   // One walks round the column.
   at('stormtrooper', 166.5, 74.5, { angle: 0, beat: { patrol: [[164.5, 74.5], [175.5, 74.5], [175.5, 85.5], [164.5, 85.5]], loop: true, idleTime: [1, 2] } }),
@@ -749,6 +796,7 @@ export default defineLevel({
       { action: 'sound', id: 'alarm-klaxon' },
       { action: 'message', text: "JAN: KYLE, THE WHOLE DECK'S FULL OF THEM, OFFICERS AND ALL. THEY'RE WAITING FOR YOU. GET TO THE RAMP: I'LL HAVE HER LIFTING THE MOMENT YOU'RE ABOARD." },
     ] },
+    { on: 'enter', tag: 'comm-log', do: [{ action: 'message', text: "SIGNAL LOG: 'FREIGHTER, CORELLIAN, NO REGISTRY. HELD IN BAY 326 FOR IDENTIFICATION. THE GENERAL'S SHUTTLE IS EXPECTED AT THE NEXT WATCH.'" }] },
     { on: 'enter', tag: 'file', do: [{ action: 'message', text: "ON THE TABLE: 'DARK TROOPER PROJECT, PHASE ONE. APPROVED. FIELD TRIALS TO FOLLOW THE TEST OF THIS STATION'S PRIMARY WEAPON.'" }] },
     { on: 'enter', tag: 'crow', unless: 'beam-off', once: false, do: [{ action: 'message', text: "JAN: NOT WHILE THAT BEAM'S ON US." }] },
     { on: 'enter', tag: 'crow', if: 'beam-off', do: [{ action: 'message', text: 'JAN: RUSK IS ABOARD. HOLD ON TO SOMETHING.' }, { action: 'exit' }] },

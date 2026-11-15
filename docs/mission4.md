@@ -105,6 +105,7 @@ As built (`m4.js`).
 | 2 | Control room | 82..98, 64..90 | 8 / 14 | The window (80..82, 66..88, from 9 to 12) over the hangar. Consoles, the deck officer (blue keycard), the terminal in the east wall. |
 | 3 | Ring corridor | 102..158 | 0 / 6 | 6 wide. East (y 97..103), then north-east at 45 degrees (x + y from 222 to 230), then east into the hub (y 77..83). Light columns and lit ceiling panels. |
 | 3b | Briefing room | 104..122, 78..96 | 0 / 6 | Blue door (2 wide) in its south wall. The round table and eight chairs; what's on the table is read as you come up to it. Secret 2 behind its screen wall (110..116, 73..77). |
+| 3c | Side rooms (2026-11-15) | barracks 104..124, 104..110; droid bay 149..158, 84..98; comm room 146..158, 66..76 | 0 / 6 | Off the route, each behind a 2-wide door with a sign and a panel. The barracks, south of the first straight: four bunks, lockers, a bench. The droid bay, south of the last straight: power droids and mouse droids on charge, a tool cart. The comm room, north of it: a wall of screens over two consoles, the signals officer's desk; the signal log is read as you come up to the screens. |
 | 4 | Lift hub | 160..180, 70..90 | 0 / 8 | An octagon, a light column in its middle (168..172, 78..82) so no door looks straight at another. North: the detention lift (168..172, 64..68), 0 to 12. East: the pump room's door (shut from this side). |
 | 5 | Detention control | 160..180, 44..62 | 12 / 17 | The desk, cameras, the officer (red keycard). The alarm's squad comes in by the lift door, which the alarm seals. |
 | 5 | Cell corridor | 167..173, 12..43 | lane 11, kerbs 11.5 / 16 | Red door (2 wide). Five cells a side (5 x 4). Rusk in the last on the west. Secret 3: a loose panel in the second cell on the east. |
@@ -225,7 +226,7 @@ Indoors there is no haze. 120 reads dark with these textures, 160 normal.
 Skill 1 thins every fight; 2 adds a trooper or an officer to most areas;
 3 adds droids and a third wave; 4 and 5 are the same placement (skill 5
 also makes monsters faster and doubles ammo pickups, set in the engine).
-Totals: 22 monsters on skill 1, 33 on 2, 46 on 3, 55 on 4 and 5, plus the
+Totals: 23 monsters on skill 1, 35 on 2, 51 on 3, 60 on 4 and 5, plus the
 alarm's two troopers on every skill.
 
 | Area | Every skill | 2+ | 3+ | 4+ |
@@ -237,6 +238,9 @@ alarm's two troopers on every skill.
 | Control room | the deck officer (blue keycard), a trooper | | a trooper at the screens | |
 | Ring corridor | 2 troopers, 2 mouse droids | a trooper on the slant | an officer by the hub door | a 2nd trooper on the slant |
 | Briefing room | an officer | a 2nd officer | a trooper | |
+| Barracks | | a trooper | a 2nd trooper | |
+| Droid bay | 3 mouse droids | | an interrogation droid (ambush) | |
+| Comm room | the signals officer | | a trooper | |
 | Hub | 2 troopers | | a trooper by the lift | a probe droid |
 | Detention control | the officer at the desk (red keycard), 2 troopers; the alarm's 2 troopers | an interrogation droid | a 3rd trooper | |
 | Cell corridor | Rusk, a prisoner | | an interrogation droid in the lane | a trooper at the far end, an interrogation droid in a cell (ambush) |
@@ -270,9 +274,11 @@ detonator among the hangar's cargo; med kits in the control room, the
 hub, detention control, the compactor, the pump room, the shaft's north
 ledge, the panel yard and the gantry passage on every skill. Extra med
 kits in the briefing room and a shield unit at the gallery's end (skills
-1-3), and a med kit in a cell (skills 1-2). The ammo budget is 11.8
+1-3), and a med kit in a cell (skills 1-2). The side rooms hold a med
+kit and a cell (barracks), an energy pack and a power cell (droid bay),
+a cell and a med kit on skills 1-3 (comm room). The ammo budget is 13.1
 times what the monsters need (the validator's figure; Mission 3 has
-12.6).
+13.3).
 
 ## Engine notes
 

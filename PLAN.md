@@ -1879,7 +1879,7 @@ each (`docs/mission4.md` takes the details).
 - [x] **Grime where the station is dirty**: the compactor and the
       maintenance tunnels (`grimeIndoors`, a second wall in stretches).
       The corridors stay clean.
-- [ ] **Three side rooms off the ring corridor**: a barracks, a droid
+- [x] **Three side rooms off the ring corridor**: a barracks, a droid
       bay, a comm room; a pickup and something to look at in each.
 - [ ] **A red alert** when the beam goes off: the way back and the
       hangar pulse, red beacons blink by the doors.
