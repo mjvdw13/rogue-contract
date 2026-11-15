@@ -1085,7 +1085,7 @@ for (const [x0, x1, z0, , s] of FREIGHTER.windows) {
 }
 for (const x of [175.5, 178, 180.6, 183, 185.5, 187.6]) list.push(at('hold-rib', x, 134.5, { z: DERELICT.floorZ, angle: 0, lit: 96 }));
 town.arch(188, 132, 189, 137, { h: DERELICT.floorZ + 5, lintel: 3, floorZ: DERELICT.floorZ, wall: 'hold-wall', floor: 'hold-floor' });
-town.door(190, 134.5, 'E', { h: DERELICT.floorZ + 5, tex: 'door-grey', width: 5, jamb: false, sign: false, panel: false, step: false, floorZ: DERELICT.floorZ, wall: 'freighter-hull' });
+town.door(190, 134.5, 'E', { h: DERELICT.floorZ + 5, tex: 'hull-hatch', width: 5, jamb: false, sign: false, panel: false, step: false, floorZ: DERELICT.floorZ, wall: 'freighter-hull' });
 p.rect(189, 132, 190, 137, (_, __, c) => ({ ...c, floor: 'hold-floor', tag: 'hold-door', stayOpen: true }));
 p.rect(174, 131, 188, 138, (_, __, c) => ({ ...c, tag: 'hold' }));
 // Fitted out as Bay 87 was, and left: its ribs up the wall every 30

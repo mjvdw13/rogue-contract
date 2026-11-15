@@ -479,6 +479,7 @@ export const RISING = [
   { out: 'shutter-rising', from: 'shutter', size: [128, 128], fill: [52, 38, 26] },
   { out: 'door-planks-rising', from: 'door-planks', size: [128, 128], fill: [24, 16, 10] },
   { out: 'door-bay-rising', from: 'door-bay', size: [128, 128], fill: [24, 16, 10] },
+  { out: 'hull-hatch-rising', from: 'hull-hatch', size: [256, 128], fill: [24, 16, 10] },
 ];
 
 /**
@@ -547,6 +548,19 @@ export const CORELLIA = [
   // A ship's cut face: the edges of its decks and frames, dark between
   // them (the Executor's greebled wall, rusted where the torch went).
   { out: 'hull-section', df: 'IWEX1', gradient: [[4, 4, 6], [16, 15, 15], [44, 40, 38], [88, 80, 72], [136, 124, 110]], keep: 0, contrast: 1.6, rust: [{ color: [124, 60, 24], amount: 0.6, cell: 16, seed: 541, from: 0.5 }] },
+  // Doors, one picture across each doorway (a rising door's panel is
+  // centred in it and hangs from its foot). The yard's, 4 tiles by 4: Nar
+  // Shaddaa's hazard-striped door, its own colours, rusted; with a red
+  // lock bar for the dispatch office. A ship's bulkhead door, 4 by 4: the
+  // Generic ribbed blast door in rusty grey.
+  { out: 'yard-door-rising', df: 'NDWARN7', rust: WORN(16, 561, 0.3) },
+  { out: 'yard-door-red-rising', df: 'NDWARN7', rust: WORN(16, 561, 0.3), rects: [[40, 60, 48, 6, [40, 8, 6]], [42, 61, 44, 4, RED]] },
+  { out: 'hull-door-rising', df: 'ZDBIGDR1', gradient: [[20, 18, 16], [54, 50, 44], [92, 86, 76], [128, 120, 106], [156, 148, 132]], keep: 0, contrast: 1, rust: WORN(16, 563, 0.45) },
+  // The switch: a Generic wall panel a tile square, a red cross that goes
+  // to a green tick, as it is (it's lit). The wall's own texture runs
+  // above and below it (bands), so it's never repeated up the wall.
+  { out: 'yard-switch', df: 'ZASWIT06_0' },
+  { out: 'yard-switch-on', df: 'ZASWIT06_1' },
 ];
 
 /**
@@ -557,6 +571,9 @@ export const CORELLIA = [
 export const CORELLIA_DECALS = [
   { out: 'sign-bottoms', df: 'NSSIGN04', size: [64, 64], mask: 'round', r: 3 },
   ...[1, 2, 3, 4].map((n) => ({ out: `berth-${n}`, paint: 'digit', digit: n, size: [64, 96], color: [206, 200, 180], worn: 0.3, seed: 550 + n })),
+  // The freighter's stern hatch, 5 tiles by 3: the Generic barred blast
+  // door stretched to fit, in rusty grey (RISING makes its panel).
+  { out: 'hull-hatch', df: 'ZDBIGDR3', size: [160, 96], gradient: [[24, 22, 20], [64, 60, 54], [106, 100, 90], [146, 138, 124], [178, 170, 154]], keep: 0, contrast: 1.1, rust: WORN(16, 565, 0.35), mask: 'round', r: 2 },
 ];
 
 /** Smooth value noise in 0-1 that repeats every `period` texels, over cells of `cell`. */

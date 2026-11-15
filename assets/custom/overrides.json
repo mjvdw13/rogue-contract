@@ -4,7 +4,13 @@
     "frameWidth": 50,
     "frameHeight": 67,
     "scale": 0.85,
-    "glint": [[252, 252, 252]]
+    "glint": [
+      [
+        252,
+        252,
+        252
+      ]
+    ]
   },
   "assets/sprites/monsters/officer.png": {
     "src": "assets/custom/officer.png",
@@ -17,7 +23,13 @@
     "frameWidth": 88,
     "frameHeight": 89,
     "scale": 0.85,
-    "glow": [[252, 252, 252]]
+    "glow": [
+      [
+        252,
+        252,
+        252
+      ]
+    ]
   },
   "assets/sprites/weapons/fists.png": {
     "src": "assets/custom/fists.png",

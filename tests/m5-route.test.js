@@ -22,7 +22,7 @@ const ROUTE = [
   // Up through the freighter's deck and out of its stern hatch.
   [151, 79.5], [150.6, 81], [161, 81], [163, 83.5], [168.5, 83.5, 'use'],
   // The cutting floor, the hauler's hold, the bulkhead, the reactor's switch.
-  [172, 78], [204, 78], [210, 76], [213, 76], [239, 76], [243.5, 76, 'use'], [243.5, 84.5], [251, 85.2, 'face=270'],
+  [172, 78], [204, 78], [210, 76], [213, 76], [239, 76], [243.5, 76, 'use'], [243.5, 84.5], [251.5, 85.2, 'face=270'],
   // Back through the hold to the lift, the crew deck, the way aft, the stair, the bridge.
   [243.5, 84.5], [243.5, 76], [238, 76, 'use'], [213, 76], [210, 76, 'z=6'], [214, 78.5], [233.5, 78.5], [236, 70],
   [236, 64, 'use'], [244, 64, 'use'], [257, 64], [257, 70, 'use'], [254, 80],
@@ -32,7 +32,7 @@ const ROUTE = [
   [310, 101], [313, 101], [313, 95], [313, 67], [315, 66.5], [315, 60.8], [317, 61], [317, 93], [319, 93.5], [319, 99],
   [322.5, 99], [323, 62], [327, 61.5], [327, 56, 'use'],
   // The manifest, the lift, the apron, the Crow's spot.
-  [326, 46.7, 'face=90'], [332, 44, 'z=0'], [332, 38, 'bossk'], [331, 32.5],
+  [326.5, 46.7, 'face=90'], [332, 44, 'z=0'], [332, 38, 'bossk'], [331, 32.5],
 ];
 
 test('Mission 5 can be walked from the pier to the manifest and the apron', () => {

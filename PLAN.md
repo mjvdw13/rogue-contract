@@ -1762,7 +1762,7 @@ are (`src/content/levels/m5.js`), playable at `?map=m5`.
   - [x] The hold's frames are black from the cutting floor: models and
         sprites indoors take the haze of the air in front of them, as
         the walls do (`haze.indoors`).
-  - [ ] Every door and wall switch: switches tile, doors show pink and
+  - [x] Every door and wall switch: switches tile, doors show pink and
         sit off their openings.
   - [ ] Berth 3's hull reads as a boat's: make it a starship's frame.
   - [ ] Variation and grime on walls and floors, as Mos Eisley has

@@ -44,12 +44,19 @@ const T = {
   hullCut: 'hull-section',
   boxA: 'shack-green',
   boxB: 'shack-shutter',
-  door: 'door-grey',
+  // Doors, one picture across each doorway: the yard's (4 by 4), its red-
+  // locked one, a ship's bulkhead (4 by 4), a cabin's (2 by 3) and the
+  // freighter's stern hatch (5 by 3; the town kit adds `-rising`).
+  door: 'yard-door-rising',
+  doorRed: 'yard-door-red-rising',
+  hullDoor: 'hull-door-rising',
+  cabinDoor: 'door-grey-rising',
+  hatch: 'hull-hatch',
   jamb: 'imp-jamb',
   bars: 'imp-bars',
   railing: 'rail-rust',
-  switchOff: 'imp-switch',
-  switchOn: 'imp-switch-on',
+  switchOff: 'yard-switch',
+  switchOn: 'yard-switch-on',
   hull: 'freighter-hull',
   sky: 'sky-corellia',
 };
@@ -66,7 +73,7 @@ const ground = (floorZ, floor = T.quay, extra = {}) => kit.street(floorZ, { floo
 const room = (floorZ, ceilZ, extra = {}) => ({
   floor: T.grate, ceiling: T.ceiling, floorZ, ceilZ, light: 136, side: T.machine, upper: T.machine, ...extra,
 });
-/** A door, 4 wide, in a wall 2 thick. */
+/** A door, 4 wide and 4 tall, in a wall 2 thick. */
 const door = (floorZ, extra = {}) => ({
   door: T.door, jamb: T.jamb, style: 'rise', floor: T.grate, ceiling: T.ceiling, upper: T.machine,
   floorZ, ceilZ: floorZ + 4, light: 136, ...extra,
@@ -77,8 +84,17 @@ const door = (floorZ, extra = {}) => ({
  * seal(), which brings the sky down to the floor beside it.)
  */
 const skyDoor = (floorZ, top, extra = {}) => kit.street(floorZ, {
-  floor: T.grate, side: T.machine, door: `${T.door}-rising`, style: 'rise',
+  floor: T.grate, side: T.machine, door: T.door, style: 'rise',
   slab: { bottom: floorZ + 4, top, floor: T.roof, ceiling: T.machine, side: T.machine, light: 136 }, ...extra,
+});
+/**
+ * A wall switch: a panel a tile square, its foot `floorZ + 1` up, in one
+ * tile of `wall` (the wall's texture above and below it, as bands, so the
+ * panel isn't repeated up the wall).
+ */
+const wallSwitch = (floorZ, use, wall = T.machine) => ({
+  wall: T.switchOff, switchTo: T.switchOn, use,
+  bands: [{ from: floorZ + 2, tex: wall }, { to: floorZ + 1, tex: wall }],
 });
 
 // ---------------------------------------------------------------- the ground plan
@@ -179,18 +195,14 @@ p.stairs(98, 43, 101, 49, 'N', PUMP + 0.5, 0.5, (z) => room(z, PUMP + 6, { side:
 p.rect(98, 40, 124, 43, walk).rect(121, 43, 124, 54, walk);
 p.rect(121, 54, 124, 58, room(PUMP + 3, PUMP + 6, { side: T.machine }));
 p.fence(101, 42, 121, 43, 'S', { tex: T.railing, height: 1 }).fence(121, 43, 122, 54, 'W', { tex: T.railing, height: 1 });
-p.rect(122, 58, 123, 59, {
-  wall: T.switchOff,
-  switchTo: T.switchOn,
-  use: [{ action: 'openDoors', tag: 'sluice' }, { action: 'message', text: 'SLUICE GATE OPEN. PIPE GALLERY DRAINED.' }],
-});
+p.rect(122, 58, 123, 59, wallSwitch(PUMP + 3, [{ action: 'openDoors', tag: 'sluice' }, { action: 'message', text: 'SLUICE GATE OPEN. PIPE GALLERY DRAINED.' }]));
 // The stairs down: 16 steps of 0.5 from the pump floor to the gallery,
 // 5 under the yard, the roof stepping down with them.
 const GALLERY = -5;
 p.rect(124, 47, 126, 51, room(PUMP, PUMP + 4));
 p.stairs(126, 47, 142, 51, 'E', PUMP - 0.5, -0.5, (z) => room(z, z + 4.5, { light: 112, side: T.step }));
 p.rect(142, 46, 144, 52, { wall: T.machine });
-p.rect(142, 47, 144, 51, door(GALLERY, { lock: 'remote', tag: 'sluice', stayOpen: true, ceilZ: GALLERY + 3.5, light: 112 }));
+p.rect(142, 47, 144, 51, door(GALLERY, { lock: 'remote', tag: 'sluice', stayOpen: true, light: 112 }));
 // The gallery: east, then south under the yard to Berth 1's slip. Under
 // the open yard it's the lower storey of the ground (a slab).
 const gallery = (extra = {}) => room(GALLERY, GALLERY + 3.5, { light: 112, ceiling: T.pipes, ...extra });
@@ -228,7 +240,7 @@ p.rect(148, 79, 167, 88, (x, y, c) => (c.side === T.hull && c.floorZ > 0 ? { ...
   p.rect(HOLD.x + sx0, HOLD.y + sy0, HOLD.x + sx1, HOLD.y + sy1, (x, y, c) => ({ ...c, slab: undefined, ceilZ: SKY, light: 140 }));
 }
 kit.arch(164, 81, 165, 86, { h: HOLD.h, lintel: 3, wall: T.machine, floor: T.grate });
-kit.door(166, 83.5, 'E', { h: HOLD.h, tex: T.door, width: 5, opens: true, jamb: false, sign: false, panel: false, step: false, wall: T.hull });
+kit.door(166, 83.5, 'E', { h: HOLD.h, tex: T.hatch, width: 5, opens: true, jamb: false, sign: false, panel: false, step: false, wall: T.hull });
 p.rect(165, 81, 166, 86, (x, y, c) => ({ ...c, floor: T.grate }));
 // The gallery's end under the freighter's nose, and ten steps up through
 // the hold's deck along its north side.
@@ -289,22 +301,23 @@ p.rect(208, 74, 212, 78, room(0, DECK_CEIL, { floor: 'lift-floor', light: 104, s
 for (const [x, y, tag] of [[214, 70, 'hold-squad'], [226, 80, 'hold-squad'], [218, 82, 'hold-squad-2'], [236, 70, 'hold-squad-2'], [229, 78, 'hold-squad-3']]) p.set(x, y, { ...p.get(x, y), tag });
 // Secret 3: a smuggler's hold behind a loose panel in the south wall.
 p.rect(234, 86, 240, 90, room(0, 2.5, { light: 96, secret: true }));
-p.rect(236, 84, 238, 86, door(0, { door: T.guts, jamb: T.machine, ceilZ: 2.5, light: 96 }));
+// (The panel is the hold's own wall with its guts showing, 2 by 2.)
+p.rect(236, 84, 238, 86, door(0, { door: T.guts, jamb: T.machine, ceilZ: 2, light: 96 }));
 // Cabins off the crew deck: two a side, a door each in the hold's walls.
 for (const [x0, x1] of [[210, 220], [222, 230]]) {
   for (const [y0, y1, wy] of [[62, 66, 66], [86, 90, 84]]) {
     if (y0 === 86 && x0 === 222) continue; // (the smuggler's hold is under this one's place)
     p.rect(x0, y0, x1, y1, room(DECK, DECK_CEIL, { light: 120 }));
-    p.rect(x0 + 3, wy, x0 + 5, wy + 2, door(DECK, { ceilZ: DECK + 2.5, light: 120 }));
+    p.rect(x0 + 3, wy, x0 + 5, wy + 2, door(DECK, { door: T.cabinDoor, ceilZ: DECK + 3, light: 120 }));
   }
 }
 // 6d. The way aft: a passage in the last cabin's place on the north
 // side, a door through the bulkhead, and the stair up the hull's side
 // to the bridge deck, the plating gone beside it.
 p.rect(232, 62, 240, 66, room(DECK, DECK_CEIL, { light: 120 }));
-p.rect(234, 66, 238, 68, door(DECK, { ceilZ: DECK + 3, light: 120 }));
+p.rect(234, 66, 238, 68, door(DECK, { door: T.hullDoor, ceilZ: DECK + 3.5, light: 120 }));
 p.rect(240, 61, 242, 67, { wall: T.machine });
-p.rect(240, 62, 242, 66, skyDoor(DECK, 17));
+p.rect(240, 62, 242, 66, skyDoor(DECK, 17, { door: T.hullDoor }));
 kit.stair(242, 62, 260, 66, { up: 'E', top: BRIDGE, from: DECK, floor: T.grate, side: T.machine });
 // (3 over each step: the sky comes down to the roofline beside the
 // bulkhead's walls, and a body needs its head room under it.)
@@ -313,17 +326,14 @@ p.rect(242, 60, 254, 62, (x) => kit.roofCell({ h: Math.min(17, DECK + (x - 241) 
 // pit 2 deep, the reactor in it (to come), the start switch in the south
 // wall. Its roof is the bridge's deck.
 p.rect(240, 67, 242, 92, { wall: T.machine });
-p.rect(240, 74, 242, 78, door(0, { light: 96 }));
+p.rect(240, 74, 242, 78, door(0, { door: T.hullDoor, light: 96 }));
 // (Its north wall is a run of the hull, not solid wall: the stair's
 // landing is beside it, and the sky would come down on it.)
 kit.room(242, 68, 260, 86, { h: BRIDGE, floorZ: 0, ceilZ: 11, floor: T.grate, ceiling: T.pipes, wall: T.machine, roof: T.grate, light: 96 });
 p.rect(245, 71, 257, 83, (x, y, c) => ({ ...c, floorZ: -2, side: T.guts }));
 // Four steps down into the pit from the walk's west side.
 p.rect(245, 75, 249, 79, (x, y, c) => ({ ...c, floorZ: -0.5 * (x - 244), floor: T.step }));
-p.rect(250, 86, 252, 87, {
-  wall: T.switchOff,
-  switchTo: T.switchOn,
-  use: [
+p.rect(251, 86, 252, 87, wallSwitch(0, [
     { action: 'setFlag', flag: 'power' },
     { action: 'setLight', tag: 'hauler-lamps', light: 80, lightFx: 'flicker', lightMin: 24 },
     { action: 'spawn', thing: 'stormtrooper', tag: 'hold-squad' },
@@ -331,8 +341,7 @@ p.rect(250, 86, 252, 87, {
     { action: 'spawn', thing: 'officer', tag: 'hold-squad-3', skill: [4, 5] },
     { action: 'message', text: "REACTOR START. SHIP'S POWER RESTORED: LIGHTING, CARGO LIFT." },
     { action: 'sound', id: 'reactor-start' },
-  ],
-});
+]));
 // 6e. The bridge, on the reactor room's roof: its own roof gone, its
 // windows gone east and south (sills a step high in the hull's wall).
 kit.arch(255, 66, 259, 68, { h: 17, lintel: 3, floorZ: BRIDGE, wall: T.hull, roof: T.hull, floor: T.grate });
@@ -407,13 +416,10 @@ kit.block(308, 56, 346, 60, { h: 6, wall: T.seaWall });
 
 // ---------------------------------------------------------------- 10. dispatch office and the apron
 p.rect(324, 58, 330, 60, { wall: T.machine });
-p.rect(325, 58, 329, 60, skyDoor(DOCK, 6, { lock: 'red' }));
+p.rect(325, 58, 329, 60, skyDoor(DOCK, 6, { lock: 'red', door: T.doorRed }));
 p.rect(320, 46, 334, 58, room(DOCK, DOCK + 4, { light: 144 }));
 // The manifest's terminal, in the north wall.
-p.rect(325, 45, 327, 46, {
-  wall: T.switchOff,
-  switchTo: T.switchOn,
-  use: [
+p.rect(326, 45, 327, 46, wallSwitch(DOCK, [
     { action: 'setFlag', flag: 'manifest' },
     { action: 'message', text: "MANIFEST: REACTOR CORES, 40. HULL ALLOY, 600 TONNES. CONSIGNEE: 'ARC HAMMER'. NO PORT GIVEN." },
     { action: 'sound', id: 'alarm-klaxon' },
@@ -421,8 +427,7 @@ p.rect(325, 45, 327, 46, {
     { action: 'spawn', thing: 'stormtrooper', tag: 'apron-squad', wake: false, fog: false, angle: 270 },
     { action: 'spawn', thing: 'stormtrooper', tag: 'apron-squad-2', wake: false, fog: false, angle: 270, skill: [3, 4, 5] },
     { action: 'spawn', thing: 'probe-droid', tag: 'apron-squad-3', wake: false, fog: false, angle: 270, skill: [4, 5] },
-  ],
-});
+]));
 // Its lift up to the apron, and the apron: the pickup spot.
 p.rect(330, 42, 334, 46, room(DOCK, 4, { floor: 'lift-floor', side: T.step, lift: { stops: [DOCK, 0], wait: 3 } }));
 kit.arch(330, 40, 334, 42, { h: 12, lintel: 4, floor: T.quay });

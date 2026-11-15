@@ -155,7 +155,11 @@ const STATION_FENCES = ['ds-field', 'ds-window', 'ds-railing'];
 const CORELLIA = [
   'quay', 'quay-edge', 'sea-wall', 'shack-plate', 'shack-grey', 'shack-tin', 'shack-green', 'shack-shutter',
   'harbour-water', 'slag', 'dock-wall', 'dock-floor', 'crane-yellow', 'hull-section',
+  // Doors, each one picture across its doorway (4 by 4; the hatch 5 by 3).
+  'yard-door-rising', 'yard-door-red-rising', 'hull-door-rising', 'hull-hatch-rising',
 ];
+/** The yard's wall switch, a tile square: lit. */
+const CORELLIA_GLOW = ['yard-switch', 'yard-switch-on'];
 const CORELLIA_DECALS = ['berth-1', 'berth-2', 'berth-3', 'berth-4'];
 
 const ANIMATED = {
@@ -180,6 +184,7 @@ export default [
   ...STATION_GLOW.map((id) => defineTexture({ id, src: `assets/custom/textures/${id}.png` })),
   ...STATION_FENCES.map((id) => defineTexture({ id, src: `assets/custom/textures/${id}.png`, fence: true })),
   ...CORELLIA.map((id) => defineTexture({ id, src: `assets/custom/textures/${id}.png`, fullbright: false })),
+  ...CORELLIA_GLOW.map((id) => defineTexture({ id, src: `assets/custom/textures/${id}.png` })),
   ...CORELLIA_DECALS.map((id) => defineTexture({ id, src: `assets/custom/textures/${id}.png`, decal: true, fullbright: false })),
   defineTexture({ id: 'sign-bottoms', src: 'assets/custom/textures/sign-bottoms.png', decal: true }),
   defineTexture({ id: 'sky-space', src: 'assets/custom/textures/sky-space.png', sky: true }),
