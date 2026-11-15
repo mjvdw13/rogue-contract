@@ -160,6 +160,12 @@ black decks, white light**, clean and new. Each area changes one thing.
   Cut cables hang from the ceilings (`ds-cables`); the live ones
   (`ds-cables-live`) spit sparks, a flickering light at each. A beam
   across the top of each girder post; one work lamp on the blink.
+  How far the work has got shows (2026-11-15): glossy deck plates laid
+  over the grate in patches (by the plate, 2 by 2 tiles, from a noise),
+  most of them at the shaft's end of the bare deck and fewer going west;
+  hazard stripes round the two gaps; pale wall panels on in stretches
+  between girder posts (the bare deck's east end, a few bays west, a
+  corner of the panel yard, none in the gallery).
 - **Outside:** `sky-space`, only stars. No backdrop.
 
 Models (`models/station.js`): `tie-fighter`, `tie-rack`, `lambda-shuttle`,

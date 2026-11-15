@@ -1,6 +1,7 @@
 import { defineLevel } from '../../engine/defs.js';
 import { Painter } from './lib/painter.js';
 import { Town } from './lib/town.js';
+import { valueNoise } from './lib/noise.js';
 
 // MISSION 4: THE BATTLE STATION. The layout, route and numbers are in
 // docs/mission4.md (area numbers below match its table). Painted in code on
@@ -414,6 +415,29 @@ for (const x of [28, 44, 60]) lamps.push({ x, y: 128, radius: 10, light: 112 });
 p.rect(44, 106, 48, 114, bare(8, 12));
 p.rect(44, 104, 48, 106, door(8, { upper: T.hangarWall }));
 
+// How far the work has got (Mark, 2026-11-15: varied, as Mission 5's
+// ground is). The glossy deck plates go on over the grate from the shaft's
+// end westward: most of the bare deck's east end is laid, the panel yard
+// has patches, the gallery a few by its door. By the plate (2 by 2 tiles),
+// in patches from a noise. Hazard stripes round the two gaps.
+for (let y = 112; y < 140; y++) {
+  for (let x = 16; x < 154; x++) {
+    const c = p.get(x, y);
+    if (!c || c.wall || c.door || c.floor !== T.grate || c.upper !== T.girder) continue;
+    const flat = (dx, dy) => p.get(x + dx, y + dy)?.floorZ === c.floorZ || p.get(x + dx, y + dy)?.wall;
+    if (c.floorZ < 0) continue;
+    if (x >= 112 && ![[1, 0], [-1, 0], [0, 1], [0, -1]].every(([dx, dy]) => flat(dx, dy) || p.get(x + dx, y + dy)?.door)) {
+      if (c.floorZ === 0) p.set(x, y, { ...c, floor: T.hazard });
+      continue;
+    }
+    if (c.floorZ !== 0 && c.floorZ !== 8) continue; // (not the yard's stairs)
+    const [bx, by] = [x >> 1, y >> 1];
+    const n = 0.7 * valueNoise(bx, by, 4, 411) + 0.3 * valueNoise(bx, by, 1, 419);
+    const done = x >= 112 ? 0.3 + 0.5 * ((x - 112) / 42) : x >= 78 ? 0.42 : 0.26 + 0.14 * Math.max(0, (x - 46) / 30);
+    if (n < done) p.set(x, y, { ...c, floor: T.floor });
+  }
+}
+
 // The squad waiting in the bay for the way back (they're sent there when
 // the beam goes down: see the terminal's trigger). Spots on the deck in an
 // arc round the Crow, facing the gantry you come in by; more on harder
@@ -456,6 +480,13 @@ for (let y = 0; y < H; y++) {
   }
 }
 for (const [x, y, c] of lining) p.set(x, y, c);
+// The unfinished sector's wall panels, on in stretches: the bare deck's
+// east end is nearly done, a few bays stand panelled further west, and the
+// gallery has none. (Each stretch runs between two girder posts.)
+for (const [x0, y0, x1, y1, wall] of [
+  [154, 111, 155, 137, T.wall8], [132, 111, 154, 112, T.wall8], [146, 136, 154, 137, T.wall8], [118, 136, 130, 137, T.wall8],
+  [112, 111, 118, 112, T.wall8], [108, 126, 109, 141, T.wall], [96, 140, 108, 141, T.wall],
+]) p.rect(x0, y0, x1, y1, (x, y, old) => (old.wall === T.girder ? { ...old, wall } : old));
 
 // ---------------------------------------------------------------- things
 const at = (type, x, y, extra = {}) => ({ type, x, y, ...extra });

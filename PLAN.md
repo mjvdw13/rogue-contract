@@ -1868,6 +1868,25 @@ validate, MODDING.md and a test.
       trolley), a drifting second sky layer and lightning, light that
       runs along a corridor, a sound for the rain.
 
+### 14. Mission 4, brought up to Mission 5 (Mark, 2026-11-15)
+
+Four of the ten things Mission 5 does that Mission 4 doesn't, one commit
+each (`docs/mission4.md` takes the details).
+
+- [x] **The unfinished sector's floors and walls**: deck plates laid in
+      patches over the grate, more of them toward the shaft; hazard
+      stripes round the gaps; wall panels on in stretches.
+- [ ] **Grime where the station is dirty**: the compactor and the
+      maintenance tunnels (`grimeIndoors`, a second wall in stretches).
+      The corridors stay clean.
+- [ ] **Three side rooms off the ring corridor**: a barracks, a droid
+      bay, a comm room; a pickup and something to look at in each.
+- [ ] **A red alert** when the beam goes off: the way back and the
+      hangar pulse, red beacons blink by the doors.
+- [ ] Not picked, left on the list: traffic past the mouth, big
+      lettering, mirror floors, light down the shaft, crew who aren't
+      troopers, the compactor's walls closing.
+
 ## Small fixes and known rough edges
 
 - [ ] A second `Registry` built from the same content pack finds no sprite
