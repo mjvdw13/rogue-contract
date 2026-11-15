@@ -423,6 +423,8 @@ export default [
   // canon size: only its gun pod is low enough to collide (as its outline);
   // you walk under the rest.
   defineDecoration({ id: 'moldy-crow', model: 'moldy-crow', solid: true, height: 8.2, scale: 0.8, fixed: true, bob: { height: 0.04, period: 4, roll: 0.6 } }),
+  // The Crow coming in to pick Kyle up: her engines sound from her until she's down (the level's `crow-down`).
+  defineDecoration({ id: 'moldy-crow-inbound', model: 'moldy-crow', solid: true, height: 8.2, scale: 0.8, fixed: true, bob: { height: 0.04, period: 4, roll: 0.6 }, emit: [{ every: 1.3, sound: 'crow-engine', unless: 'crow-down' }] }),
   // The gutted freighter in the derelict bay (models/freighter.js): the
   // level's tiles are its hold and collide; the model is its outside.
   defineDecoration({ id: 'freighter', model: 'freighter', fixed: true }),
@@ -430,7 +432,7 @@ export default [
   // level's tiles are its legs; the model is the girders, boom and hook,
   // all overhead.
   // The yard's horn sounds from it now and then, heard along the row.
-  defineDecoration({ id: 'great-crane', model: 'great-crane', fixed: true, emit: [{ every: [18, 40], sound: 'yard-horn' }] }),
+  defineDecoration({ id: 'great-crane', model: 'great-crane', fixed: true, emit: [{ every: [18, 40], sound: 'yard-horn' }, { every: 4.1, sound: 'crane-motor' }] }),
   // The yard's big pieces (models/yard5.js). The crane way's trestles
   // collide at their feet, under the deck; its spans are overhead.
   defineDecoration({ id: 'crane-way-trestle', model: 'crane-way-trestle', solid: true, height: CRANE_WAY.top - CRANE_WAY.deck - 0.1, fixed: true }),
@@ -450,7 +452,7 @@ export default [
     solid: true,
     height: STACK.height,
     fixed: true,
-    emit: [{ type: 'smoke-cloud', count: 1, every: [0.25, 0.5], at: [0, 0, STACK.height + 0.5], radius: STACK.mouth * 0.6, dir: [0.5, 0, 1], spread: 0.3, speed: [1.2, 2.2] }],
+    emit: [{ type: 'smoke-cloud', count: 1, every: [0.25, 0.5], at: [0, 0, STACK.height + 0.5], radius: STACK.mouth * 0.6, dir: [0.5, 0, 1], spread: 0.3, speed: [1.2, 2.2] }, { every: 4.4, sound: 'works-rumble' }],
   }),
   defineDecoration({ id: 'yard-hoist', model: 'yard-hoist', solid: true, height: YARD_HOIST.top, fixed: true }),
   // The yard's small pieces (models/breakers.js, models/hold.js). The
@@ -520,6 +522,7 @@ export default [
       ...[-1.1, 0.4].map((x) => ({ type: 'ember', count: 2, every: [0.1, 0.25], at: [x, 0, FURNACE.melt + 0.1], radius: 0.6, dir: [0, 0, 1], spread: 0.5, speed: [0.4, 1.2] })),
       { type: 'spark', count: 6, every: [1.5, 4], at: [0, 0, FURNACE.melt + 0.1], radius: 0.8, dir: [0, 0, 1], spread: 0.7, speed: [1.5, 3] },
       { type: 'ember', count: 1, every: [0.2, 0.5], at: [FURNACE.spout[0], 0, 0.25], radius: 0.1, dir: [0, 0, 1], spread: 0.8, speed: [0.3, 0.8] },
+      { every: 3.6, sound: 'furnace-roar' },
     ],
   }),
   // The Jawas' cargo skiff parked in the court (models/skiff.js), hovering

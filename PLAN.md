@@ -57,6 +57,17 @@ These need Mark to try something, or to decide. Don't start them without him.
   locked. Seven yard workers stroll the two streets and the bend
   (enough? their lines are stand-ins; they run when the shooting
   starts).
+- **Mission 5's machinery and the Crow's engines** (`?map=m5`,
+  2026-11-14). Nobody has heard these: they were checked by level
+  only, against the pump hum. A low rumble from each smokestack
+  (`works-rumble`), a roar from the furnace on the cutting floor
+  (`furnace-roar`; Mos Eisley's smelter is the same furnace, so it
+  roars there too), the great crane's motors (`crane-motor`), the
+  Crow's engines as she comes in after Bossk (`crow-engine`) and her
+  landing (`crow-land`). To judge: each one's tone and level, whether
+  the loops' joins can be heard, and whether the yard between the
+  stacks and the crane is still too quiet. `tools/soundboard.html`
+  plays each alone.
 - **Mission 5's fights** (`?map=m5`, 2026-11-14). 16 / 34 / 42 monsters
   by skill, more spawned by the reactor's switch and the manifest. The
   repeater is in the freighter on Berth 1, the mortar in a cabin off the
@@ -1798,10 +1809,7 @@ are (`src/content/levels/m5.js`), playable at `?map=m5`.
       Aurebesh, ship parts you'd know. No gas bottles, timber, hooks,
       street lamps.
 - [ ] Still to make, if Mark wants them: a song of its own (`corellia`;
-      it plays `station` now), an engine sound for the Crow coming in, a
-      low machinery bed for the yard (there is the horn, the cutters and
-      the pumps, but no steady background), the great crane in the sky's
-      picture.
+      it plays `station` now), the great crane in the sky's picture.
 - [ ] Waiting on Mark: the look, the fights (nobody has played them),
       the words, the song (the entries at the top).
 

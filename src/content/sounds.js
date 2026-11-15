@@ -172,6 +172,34 @@ export default [
     synth: { wave: 'saw', freq: 110, duration: 2.6, attack: 0.15, sustain: 1, release: 0.6, lowpass: 600, volume: 0.3, layers: [{ wave: 'saw', freq: 82, duration: 2.6, attack: 0.5, release: 0.6, lowpass: 500, volume: 0.25 }, { wave: 'sine', freq: 55, duration: 2.6, attack: 0.3, release: 0.6, volume: 0.2 }] },
     pitchVariance: 0.03,
   }),
+  // The yard's steady background, each from the machine that makes it and
+  // repeated by its emitter without a gap: the works under a smokestack (a
+  // low rumble with a slow beat), the furnace's roar, the great crane's
+  // motors (a drone with a whine over it).
+  defineSound({
+    id: 'works-rumble',
+    synth: { wave: 'saw', freq: 41, duration: 4.4, attack: 0.4, sustain: 1, release: 0.4, lowpass: 220, volume: 0.2, vibrato: { rate: 1.5, depth: 0.25 }, layers: [{ wave: 'noise', duration: 4.4, attack: 0.4, release: 0.4, lowpass: 300, noiseHold: 3, volume: 0.1 }, { wave: 'sine', freq: 62, duration: 4.4, attack: 0.4, release: 0.4, volume: 0.1, vibrato: { rate: 0.7, depth: 0.3 } }] },
+  }),
+  defineSound({
+    id: 'furnace-roar',
+    synth: { wave: 'noise', duration: 3.6, attack: 0.35, sustain: 1, release: 0.35, lowpass: 700, volume: 0.3, layers: [{ wave: 'saw', freq: 48, duration: 3.6, attack: 0.35, release: 0.35, lowpass: 260, volume: 0.18, vibrato: { rate: 3, depth: 0.3 } }, { wave: 'noise', duration: 3.6, attack: 0.35, release: 0.35, highpass: 2500, volume: 0.04 }] },
+  }),
+  defineSound({
+    id: 'crane-motor',
+    synth: { wave: 'saw', freq: 73, duration: 4.1, attack: 0.35, sustain: 1, release: 0.35, lowpass: 420, volume: 0.22, vibrato: { rate: 6, depth: 0.12 }, layers: [{ wave: 'square', freq: 438, duration: 4.1, attack: 0.5, release: 0.5, lowpass: 900, volume: 0.03, vibrato: { rate: 0.5, depth: 0.5 } }, { wave: 'noise', duration: 4.1, attack: 0.35, release: 0.35, lowpass: 350, volume: 0.08 }] },
+  }),
+  // The Moldy Crow on her repulsors, coming in (repeated by the ship while
+  // she flies), and her landing: the engines winding down, the gear's thump
+  // and a hiss of vented gas.
+  defineSound({
+    id: 'crow-engine',
+    synth: { wave: 'saw', freq: 92, duration: 1.6, attack: 0.25, sustain: 1, release: 0.3, lowpass: 1100, volume: 0.42, vibrato: { rate: 11, depth: 0.2 }, layers: [{ wave: 'saw', freq: 276, duration: 1.6, attack: 0.25, release: 0.3, lowpass: 1600, volume: 0.12, vibrato: { rate: 7, depth: 0.4 } }, { wave: 'noise', duration: 1.6, attack: 0.25, release: 0.3, lowpass: [1800, 900], volume: 0.22 }] },
+    pitchVariance: 0.03,
+  }),
+  defineSound({
+    id: 'crow-land',
+    synth: { wave: 'saw', freq: 92, freqEnd: 30, duration: 2.2, attack: 0.05, release: 1.6, lowpass: [1100, 200], volume: 0.3, layers: [{ ...thump(70, 30, 0.4, 0.5), delay: 0.5 }, { ...hiss(1.2, 0.3), delay: 0.7 }] },
+  }),
   defineSound({
     id: 'reactor-start',
     synth: { wave: 'saw', freq: 34, freqEnd: 120, duration: 2.6, attack: 0.4, sustain: 1, release: 0.5, lowpass: 700, volume: 0.4, vibrato: { rate: 9, depth: 0.3 }, layers: [{ ...thump(60, 30, 0.5, 0.7) }, { wave: 'sine', freq: 60, freqEnd: 240, duration: 2.6, attack: 0.8, release: 0.5, volume: 0.2 }, { wave: 'noise', duration: 2.6, attack: 1, release: 0.5, lowpass: 900, volume: 0.1 }] },

@@ -1061,8 +1061,10 @@ export default defineLevel({
     // over the dock and sets down on the apron; reach it and the level ends.
     { on: 'killed', thing: 'bossk', do: [
       { action: 'message', text: "JAN: THAT'S HIM DOWN. I'M COMING IN." },
-      { action: 'fly', thing: 'moldy-crow', path: CROW_IN, then: [
+      { action: 'sound', id: 'crow-engine' },
+      { action: 'fly', thing: 'moldy-crow-inbound', path: CROW_IN, then: [
         { action: 'setFlag', flag: 'crow-down' },
+        { action: 'sound', id: 'crow-land' },
         { action: 'message', text: 'JAN: RAMP IS DOWN. MOVE.' },
       ] },
     ] },
