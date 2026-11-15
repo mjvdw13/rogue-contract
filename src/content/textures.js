@@ -187,11 +187,11 @@ export default [
   ...STATION_GLOW.map((id) => defineTexture({ id, src: `assets/custom/textures/${id}.png` })),
   ...STATION_FENCES.map((id) => defineTexture({ id, src: `assets/custom/textures/${id}.png`, fence: true })),
   // The harbour's water goes east on the wind; the same picture lies still
-  // in a ship's bilge. The compactor's sludge is the town's murky water,
-  // creeping.
+  // in a ship's bilge. The compactor's sludge (derive.mjs, ds-sludge)
+  // creeps.
   ...CORELLIA.map((id) => defineTexture({ id, src: `assets/custom/textures/${id}.png`, fullbright: false, ...(id === 'harbour-water' && { scroll: [0.35, 0.1] }) })),
   defineTexture({ id: 'bilge-water', src: 'assets/custom/textures/harbour-water.png', fullbright: false }),
-  defineTexture({ id: 'sludge', src: 'assets/custom/textures/water-murky.png', fullbright: false, scroll: [0.12, 0.05] }),
+  defineTexture({ id: 'sludge', src: 'assets/custom/textures/ds-sludge.png', fullbright: false, scroll: [0.12, 0.05] }),
   ...CORELLIA_GLOW.map((id) => defineTexture({ id, src: `assets/custom/textures/${id}.png` })),
   ...CORELLIA_DECALS.map((id) => defineTexture({ id, src: `assets/custom/textures/${id}.png`, decal: true, fullbright: false })),
   defineTexture({ id: 'sign-bottoms', src: 'assets/custom/textures/sign-bottoms.png', decal: true }),

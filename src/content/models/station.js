@@ -52,9 +52,6 @@ import { ModelBuilder } from './lib/build.js';
 // ceiling), looking toward +x and down. `ds-ceiling-lamp-bar`: a light bar
 // along y under a ceiling (the origin at the ceiling).
 //
-// `dianoga-eye`: the thing in the trash compactor: an eye on a stalk, up
-// out of the water, looking toward +x.
-//
 // `lambda-shuttle`: a Lambda-class shuttle landed on its gear, at about
 // 0.43 of canon (17 long, LAMBDA.top tall): the wide body with the drive
 // across its stern, the long wedge of the cockpit out front, the swept fin
@@ -578,30 +575,6 @@ function ceilingLampBar() {
   return m.build();
 }
 
-function dianogaEye() {
-  const m = new ModelBuilder('dianoga-eye');
-  const STALK = { color: ['olive', 0.5] };
-  const LID = { color: ['rust', 0.34] };
-  const EYE = { color: ['beige', 0.92] };
-  // The stalk, bending a little as it rises (it starts under the water, so
-  // its foot stays hidden as it bobs).
-  const round = (cx, r) => Array.from({ length: 6 }, (_, i) => [cx + Math.cos((i / 6) * Math.PI * 2) * r, Math.sin((i / 6) * Math.PI * 2) * r]);
-  const UP = [[-0.3, 0, 0.1], [0.3, 0.03, 0.085], [0.65, 0.08, 0.07], [0.92, 0.05, 0.06]];
-  for (let i = 0; i + 1 < UP.length; i++) {
-    m.loft(round(UP[i][1], UP[i][2]), UP[i][0], round(UP[i + 1][1], UP[i + 1][2]), UP[i + 1][0], { ...STALK, top: false, bottom: false });
-  }
-  // The eye: a fleshy socket and lid behind, the pale ball forward, its
-  // pupil and a glint.
-  const [X, Z] = [0.05, 0.98];
-  const ring = (r) => Array.from({ length: 6 }, (_, i) => [Math.cos((i / 6) * Math.PI * 2) * r, Z + Math.sin((i / 6) * Math.PI * 2) * r]);
-  m.loft(ring(0.07), X - 0.14, ring(0.15), X - 0.05, { axis: 'x', ...LID, top: false });
-  m.loft(ring(0.15), X - 0.05, ring(0.15), X + 0.05, { axis: 'x', ...LID, top: false, bottom: false });
-  m.loft(ring(0.15), X + 0.05, ring(0.09), X + 0.15, { axis: 'x', ...EYE, bottom: false });
-  m.face(ring(0.05).map(([y, z]) => [X + 0.155, y, z]), { color: ['gray', 0.04] }, [0, 0, Z]);
-  m.face([[X + 0.16, -0.035, Z + 0.035], [X + 0.16, -0.012, Z + 0.035], [X + 0.16, -0.012, Z + 0.012], [X + 0.16, -0.035, Z + 0.012]], { color: [255, 255, 255], glow: true }, [0, 0, Z]);
-  return m.build();
-}
-
 function lambdaShuttle() {
   const m = new ModelBuilder('lambda-shuttle');
   const GLASS = { color: [14, 18, 28] };
@@ -716,7 +689,6 @@ export default [
   beamRing(),
   camera(),
   ceilingLampBar(),
-  dianogaEye(),
   lambdaShuttle(),
   tieFighter('tie-fighter-flying', false),
 ];

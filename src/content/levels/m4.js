@@ -723,7 +723,6 @@ const list = [
   at('energy-pack', 181.5, 22), at('thermal-detonator', 181.5, 21), at('thermal-detonator', 181.5, 23),
   at('med-kit', 176.5, 28, { skill: EASY }),
   // 6. The compactor.
-  at('dianoga-eye', 194.5, 19.5, { angle: 100 }),
   at('ds-crate', 190, 9, { angle: 30 }), at('ds-panel-stack', 198, 22, { angle: 70 }), at('ds-cable-reel', 191, 20),
   at('ds-girder-beam', 196, 9, { angle: 40, z: -5.8 }), at('ds-panel-stack', 189, 14, { angle: 10 }),
   at('energy-cell', 199.5, 8.5), at('med-kit', 189, 24.5),

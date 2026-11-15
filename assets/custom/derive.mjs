@@ -341,6 +341,9 @@ export const STATION = [
   { out: 'ds-det-wall', df: 'IWADARK1', gradient: BLACK, keep: 0, contrast: 1.1, rects: [[8, 40, 20, 3, RED], [36, 40, 20, 3, RED], [8, 104, 20, 3, RED], [36, 104, 20, 3, RED], [8, 43, 20, 1, DIM_RED], [36, 43, 20, 1, DIM_RED], [8, 107, 20, 1, DIM_RED], [36, 107, 20, 1, DIM_RED]] },
   // The compactor: the Detention Centre's stained wall, wetter and rustier.
   { out: 'ds-compactor-wall', df: 'IWCMPCTR', gradient: [[10, 10, 8], [36, 34, 28], [66, 62, 52], [96, 90, 76], [124, 116, 98]], keep: 0.5, contrast: 1, rust: [{ color: [96, 50, 22], amount: 0.5, cell: 32, seed: 301 }, { color: [10, 14, 10], amount: 0.5, cell: 16, seed: 303 }] },
+  // The compactor's floor: thick sludge, not water. Talay's ripples softened
+  // and pressed dark, olive and brown, blotched with black oil and scum.
+  { out: 'ds-sludge', df: 'CFWATER4', smooth: 1, gradient: [[14, 14, 8], [32, 32, 18], [52, 50, 28], [74, 70, 40], [104, 98, 62]], keep: 0, contrast: 0.8, rust: [{ color: [8, 8, 6], amount: 0.55, cell: 16, seed: 305 }, { color: [70, 76, 30], amount: 0.4, cell: 32, seed: 307 }] },
   // A wall of displays (the control room, the briefing room).
   { out: 'ds-screen', df: 'IWPANEL2' },
   // Decks: glossy near-black plates; the hangar's, and its painted line.

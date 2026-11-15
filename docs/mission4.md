@@ -149,7 +149,7 @@ black decks, white light**, clean and new. Each area changes one thing.
   a red light grid (`ds-det-floor-light`), a low ceiling. The only red
   on the station.
 - **Compactor and maintenance:** the station's guts: `ds-compactor-wall`,
-  sludge (`water-murky`), pipes (`ds-wall-greeble`), `ds-floor-grate`.
+  sludge (`ds-sludge`), pipes (`ds-wall-greeble`), `ds-floor-grate`.
   Dim, a flickering lamp. Pipes up the walls and the pumps leak steam
   (`ds-steam-pipe`: a thin plume, a hiss every few seconds); the
   compactor's walls are streaked with grime. Dirtier since 2026-11-15:
@@ -177,8 +177,8 @@ Models (`models/station.js`): `tie-fighter`, `tie-rack`, `lambda-shuttle`,
 `ds-console`, `ds-console-wall`, `ds-desk`, `ds-table`, `ds-chair`,
 `ds-crate`, `ds-crate-tall`, `ds-container`, `ds-doorframe`,
 `tractor-terminal`, `ds-girder-post`, `ds-girder-beam`, `ds-panel-stack`,
-`ds-cable-reel`, `work-lamp`, `ds-cables`, `ds-cables-live`, `ds-steam-pipe`, `ds-beam-ring`, `ds-camera`, `ds-ceiling-lamp-bar`,
-`dianoga-eye`. The crews' gear (`models/station-crew.js`):
+`ds-cable-reel`, `work-lamp`, `ds-cables`, `ds-cables-live`, `ds-steam-pipe`, `ds-beam-ring`, `ds-camera`, `ds-ceiling-lamp-bar`.
+The crews' gear (`models/station-crew.js`):
 `ds-service-stand` (the welding one spits sparks), `ds-fuel-socket`
 (a `hose` hanging to the TIE), `ds-beacon`, `ds-tool-cart`.
 

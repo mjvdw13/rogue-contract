@@ -306,7 +306,7 @@ These need Mark to try something, or to decide. Don't start them without him.
   bursts may play sounds, so cables crackle, pipes hiss, the welder buzzes
   (DF's WELD-1), the pump room hums (MACHINE2), the fields hum (RUMBLE1),
   the beam's coupling hums (ELECTRIC) and arcs until it's off (emitters
-  wait on story flags), the compactor's eye bubbles and gurgles (CREATUR1),
+  wait on story flags),
   the turbolifts whine (ELEV3), and the PA speaks three times. To judge:
   whether the patrols make the fights better or worse (they see you
   sooner), the holograms' blue and size, the volumes of the new sounds
