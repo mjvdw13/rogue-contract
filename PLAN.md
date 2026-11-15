@@ -1755,6 +1755,19 @@ are (`src/content/levels/m5.js`), playable at `?map=m5`.
       the fights and items by skill, Jan's lines and the yard's sounds.
 - [x] The route walked by a test (`tests/m5-route.test.js`); frame time
       measured (`docs/mission5.md`, Checked).
+- [ ] **Mark's notes on the finished level** (2026-11-14), one commit
+      each:
+  - [x] The soot is too heavy: fainter flakes.
+  - [x] The Death Star hologram cuts into its table in the office.
+  - [ ] The hold's frames are black from the cutting floor: models and
+        sprites indoors take the haze of the air in front of them, as
+        the walls do (`haze.indoors`).
+  - [ ] Every door and wall switch: switches tile, doors show pink and
+        sit off their openings.
+  - [ ] Berth 3's hull reads as a boat's: make it a starship's frame.
+  - [ ] Variation and grime on walls and floors, as Mos Eisley has
+        (`town.grime()`, patches, stains on the ground).
+  - [ ] The Bottoms: some of the street's doors open, with rooms behind.
 - [ ] **Slow frames**: 19 ms on average and 38 at worst at 640 x 400 on
       one thread. The worst views are from out in the harbour looking
       along the water, not along the quay; the quay's freight boxes

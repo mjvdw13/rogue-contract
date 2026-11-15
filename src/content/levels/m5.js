@@ -700,11 +700,12 @@ lamps.push({ x: 327, y: 61.5, z: DOCK + 3, radius: 5, light: 110 }, { x: 314, y:
 
 // ---------------------------------------------------------------- 10. the office and the apron
 // Dispatch: consoles along the west wall, the clerk's desk and seat,
-// lockers, a holo table showing what's being shipped.
+// lockers, a holo table showing what's being shipped (the sphere is 0.75
+// in radius: its foot a quarter over the table's top at 1).
 dress.push(
   at('ds-console-wall', 320.1, 50, { z: DOCK, angle: 0 }), at('ds-console-wall', 320.1, 54, { z: DOCK, angle: 0 }),
   at('ds-locker-bank', 333.98, 54, { z: DOCK, angle: 180 }),
-  at('ds-holo-table', 330, 53, { z: DOCK }), at('ds-holo-station', 330, 53, { z: DOCK + 1.35 }),
+  at('ds-holo-table', 330, 53, { z: DOCK }), at('ds-holo-station', 330, 53, { z: DOCK + 2 }),
   at('ds-chair', 324.6, 51, { z: DOCK, angle: 180 }), at('ceiling-lamp', 327, 52),
 );
 // The apron: a landing pad. Clamps at the spot's corners, pylons and a
@@ -865,7 +866,7 @@ export default defineLevel({
   haze: { color: [150, 142, 112], half: 44, indoors: true },
   // Soot coming down out of it, on a wind off the water that carries the
   // stacks' smoke east.
-  weather: { type: 'soot', count: 80, wind: [0.7, 0.15, 0] },
+  weather: { type: 'soot', count: 60, wind: [0.7, 0.15, 0] },
   par: 660,
   ...p.build(),
   lights: lamps,
