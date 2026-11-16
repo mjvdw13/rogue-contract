@@ -86,21 +86,26 @@ export default [
     onFloor: 'die',
     cap: 70,
   }),
-  // Steam: pale, dithered puffs that rise fast and vanish.
+  // Steam: many small, faint puffs that overlap into a plume, each swelling
+  // and thinning out as it rises, so no one puff reads as a disc.
   defineParticle({
     id: 'steam',
-    colors: [{ ramp: 'steel', from: 27, to: 22 }],
-    life: [1, 2.5],
-    size: 0.4,
-    maxPx: 16,
+    colors: [{ ramp: 'steel', from: 27, to: 25 }],
+    life: [0.8, 1.8],
+    size: 0.25,
+    grow: 3.5,
+    maxPx: 20,
     shape: 'disc',
-    blend: 'dither',
-    alpha: 0.9,
+    blend: 'half',
+    fade: true,
+    alpha: 0.85,
+    fadeIn: 0.1,
+    fadeOut: 0.6,
     gravity: -1,
-    drag: 0.6,
-    wind: 0.4,
+    drag: 0.8,
+    wind: 0.5,
     onFloor: 'die',
-    cap: 100,
+    cap: 120,
   }),
   // Where a red blaster bolt hits: orange-red sparks, quicker to cool than
   // a broken panel's.

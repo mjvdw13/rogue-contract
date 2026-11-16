@@ -122,8 +122,8 @@ export default [
     model: 'ds-steam-pipe',
     fixed: true,
     emit: [
-      { type: 'steam', count: 2, every: [0.25, 0.6], at: STEAM_PIPE.leak, radius: 0.05, dir: [1, 0, 0.5], spread: 0.25, speed: [0.6, 1.4] },
-      { type: 'steam', count: 7, every: [4, 9], at: STEAM_PIPE.leak, radius: 0.08, dir: [1, 0, 0.3], spread: 0.35, speed: [1.5, 3], sound: 'steam-hiss' },
+      { type: 'steam', count: 3, every: [0.15, 0.35], at: STEAM_PIPE.leak, radius: 0.05, dir: [1, 0, 0.5], spread: 0.25, speed: [0.6, 1.4] },
+      { type: 'steam', count: 14, every: [4, 9], at: STEAM_PIPE.leak, radius: 0.08, dir: [1, 0, 0.3], spread: 0.35, speed: [1.5, 3], sound: 'steam-hiss' },
     ],
   }),
   // The crews' gear (models/station-crew.js): a service stand at a TIE (the
@@ -485,8 +485,8 @@ export default [
     emit: CRAWLER.vents.flatMap(([x, z]) => {
       const at = [x, CRAWLER.half + 0.2, z];
       return [
-        { type: 'steam', count: 2, every: [0.2, 0.4], at, radius: 0.15, dir: [0, 1, 0.5], spread: 0.4, speed: [0.4, 0.8] },
-        { type: 'steam', count: 16, every: [3, 8], at, radius: 0.1, dir: [0, 1, 0.15], spread: 0.35, speed: [2, 3.5] },
+        { type: 'steam', count: 3, every: [0.12, 0.25], at, radius: 0.15, dir: [0, 1, 0.5], spread: 0.4, speed: [0.4, 0.8] },
+        { type: 'steam', count: 28, every: [3, 8], at, radius: 0.1, dir: [0, 1, 0.15], spread: 0.35, speed: [2, 3.5] },
       ];
     }),
   }),
