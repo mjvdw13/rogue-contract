@@ -26,7 +26,7 @@ const ROUTE = [
   // The vent, crouching, into maintenance and up lift L1.
   [121, 62, 'crouch'], [121, 51, 'crouch'], [122, 46], [132, 42, 'z=6'],
   // Up the cut, through the excavation and the mess, the bunk room, the corridor.
-  [132, 30], [132, 21], [130, 15], [137, 15, 'use'], [142, 20], [142, 24], [142, 30, 'use'], [142, 36], [142, 41.5, 'use'],
+  [132, 30], [132, 21], [130, 15], [137, 15, 'use'], [137.5, 22], [142, 24.5], [142, 30, 'use'], [142, 36], [142, 41.5, 'use'],
   // The general through the barred window, back to the office (the red key),
   // the red door, the vault's records, detention, Rusk.
   [159, 42], [154, 41.5], [154, 36, 'use'], [154, 41.5], [164.5, 42], [168, 42, 'use'], [170, 38], [172.5, 38.6], [173, 36],
