@@ -175,6 +175,21 @@ export default [
       { every: 3.4, sound: 'beam-hum', unless: 'beam-off' },
     ],
   }),
+  // Mission 3's generator: the same ring round its column, quiet until the
+  // overload (the level's `overload` flag), then arcing and crackling.
+  defineDecoration({
+    id: 'gen-ring',
+    model: 'ds-beam-ring',
+    fixed: true,
+    emit: [
+      ...[0, 1, 2, 3, 4, 5].map((k) => {
+        const a = (k * Math.PI) / 3 + 0.5;
+        const [c, s] = [Math.cos(a), Math.sin(a)];
+        return { type: 'beam-arc', count: 8, every: [0.3, 1.2], at: [c * (BEAM_RING.r + 1), s * (BEAM_RING.r + 1), BEAM_RING.h / 2], radius: 0.15, dir: [c, s, 0], spread: 1, speed: [1, 3], if: 'overload' };
+      }),
+      { every: 2.2, sound: 'spark-crackle', if: 'overload' },
+    ],
+  }),
   defineDecoration({ id: 'ds-camera', model: 'ds-camera', fixed: true }),
   defineDecoration({ id: 'ds-ceiling-lamp-bar', model: 'ds-ceiling-lamp-bar', fixed: true }),
   defineDecoration({ id: 'barricade', model: 'barricade', solid: true, height: 1.15 }),

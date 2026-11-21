@@ -369,7 +369,13 @@ p.rect(160, 50, 196, 53, catwalk);
 p.rect(160, 83, 196, 86, catwalk);
 p.rect(160, 50, 163, 86, catwalk);
 p.rect(193, 50, 196, 86, catwalk);
-p.pillar(174, 64, 182, 72, 2, lights, genFloor);
+// The column in bands: a hazard band at its foot and where the catwalks
+// meet it, its lit core between, dark plates up into the dark.
+const column = {
+  wall: 'imp-lights',
+  bands: [{ to: -4.5, tex: 'imp-stripe' }, { from: 5, to: 6.5, tex: 'imp-stripe' }, { from: 15, tex: 'imp-panel-dark' }],
+};
+p.pillar(174, 64, 182, 72, 2, column, genFloor);
 // The column lights the shaft floor round it with a slow pulse.
 p.light(172, 62, 184, 74, 200, { lightFx: 'glow', lightMin: 136 });
 // Light strips on the chamber walls, lighting the catwalk in front of them,
@@ -411,6 +417,8 @@ p.rect(181, 67, 182, 69, {
     { action: 'setLight', tag: 'testbay', light: 168, lightFx: 'glow', lightMin: 64 },
     { action: 'setLight', tag: 'bay-squad', light: 168, lightFx: 'glow', lightMin: 64 },
     { action: 'sound', id: 'alarm-klaxon' },
+    // Bursts of sparks round the column's foot as it goes.
+    { action: 'explode', explosion: 'sparks', tag: 'gen-burst', z: 1 },
     { action: 'message', text: "GENERATOR OVERLOADED. JAN: THE WHOLE CLIFF'S LIGHTING UP. GET OUT: THE HATCH EAST, THEN UP TO THE PAD." },
     // Rusk is behind Kyle from here (and aboard at the end).
     { action: 'remove', tag: 'rusk' },
@@ -751,6 +759,24 @@ for (const [y, z, tex] of [[60, 9, 'grime-scorch-1'], [65, 12, 'grime-scorch-2']
   decals.push({ x: 226, y, z, face: 'W', tex });
 }
 
+// The generator: rings glowing round the column at its foot (arcs crackle
+// off them once it's overloaded), live cables and leaking pipes on the
+// floor's walls, conduits from the walls to the column, girders holding
+// up the catwalk ring.
+placed.push(
+  at('gen-ring', 178, 68, { z: -5 }), at('gen-ring', 178, 68, { z: -2.5 }), at('gen-ring', 178, 68, { z: 16 }),
+  at('ds-steam-pipe', 160.02, 70, { angle: 0, z: -6 }), at('ds-steam-pipe', 195.98, 62, { angle: 180, z: -6 }),
+  at('ds-cables-live', 170, 76, { z: 18 }), at('ds-cables-live', 188, 58, { z: 18 }),
+  ...[[165, 66], [165, 74], [191, 64], [191, 72], [170, 55], [186, 55], [170, 81], [186, 81]].map(([x, y]) => at('ds-girder-post', x, y, { z: -6 })),
+);
+hangings.push(
+  { type: 'hose', from: [160.05, 64, 15], to: [173.95, 66, 13], sag: 2.5 },
+  { type: 'hose', from: [195.95, 70, 15.5], to: [182.05, 69, 12.5], sag: 2.5 },
+  { type: 'cable', from: [178, 50.05, 16], to: [178, 63.95, 14], sag: 2 },
+  { type: 'cable', from: [176, 85.95, 16.5], to: [176.5, 72.05, 13.5], sag: 2.2 },
+);
+for (const [x, y] of [[172, 66], [184, 70], [176, 74], [180, 62]]) p.set(x, y, { ...p.get(x, y), tag: 'gen-burst' });
+
 const list = [
   ...placed,
   // The drop-off, facing north-west up the reach to the garrison.
@@ -837,7 +863,7 @@ const list = [
   // catwalk, and coolant tanks on the shaft floor. Things on the catwalks
   // stand on them (z 6); the rest are on the shaft floor, under them.
   at('reactor-ring', 178, 68, { z: 9, angle: 0 }), at('reactor-ring', 178, 68, { z: 13, angle: 45 }),
-  at('coolant-tank', 166.5, 56.5), at('coolant-tank', 166.5, 60),
+  at('coolant-tank-running', 166.5, 56.5), at('coolant-tank', 166.5, 60),
   at('coolant-tank', 189.5, 79.5), at('coolant-tank', 189.5, 76),
   at('probe-droid', 178, 58.5, { z: 6.9 }), // over the north bridge
   at('probe-droid', 168.5, 64.5, { skill: [5] }), // down in the west half

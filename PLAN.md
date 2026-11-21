@@ -1603,7 +1603,7 @@ before and after; check in with Mark after each):
       tunnels, steam off valves, a live cable sparking, hum, the barracks'
       mess and lockers, cells, the vault's racks, the test bay's cradle and
       scorch marks; `grimeIndoors`.
-- [ ] **The generator** (the showpiece, the old list's ideas): the column
+- [x] **The generator** (the showpiece, the old list's ideas): the column
       in bands with a glowing, scrolling core and the turning rings,
       conduits hanging in the cavern, struts under the catwalks, steam and
       sparks, a deep hum; the overload's change of state.
