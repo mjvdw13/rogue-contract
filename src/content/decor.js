@@ -190,6 +190,8 @@ export default [
   // power line's poles (models/canyon.js).
   defineDecoration({ id: 'comm-mast', model: 'comm-mast', solid: true, radius: 1.5, height: 24, fixed: true }),
   defineDecoration({ id: 'power-pole', model: 'power-pole', solid: true, radius: 0.3, height: 7, fixed: true }),
+  // The prototype's cradle in the test bay, empty.
+  defineDecoration({ id: 'test-cradle', model: 'test-cradle', solid: true, fixed: true, height: 7.5 }),
   // The burned Tusken camp: huts burned to their frames, and ash heaps
   // still smouldering, embers lifting off them on the breeze.
   defineDecoration({ id: 'tent-frame-burnt', model: 'tent-frame-burnt', fixed: true }),

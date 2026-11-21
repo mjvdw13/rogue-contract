@@ -694,6 +694,63 @@ placed.push(at('skyhopper', 128, 161, { angle: 30 }), at('bay-crate-open-tan', 1
 // The scout post's bunker: its console and terminal by the switch.
 placed.push(at('console', 50.5, 100.5), at('terminal', 51.4, 106.5, { angle: 180 }), at('supply-crate', 42, 108.5));
 
+// ---- The garrison inside.
+// The cut: ribs of girder against its rock walls, work lamps, a cable run
+// along the west wall.
+for (const y of [23, 29, 35]) placed.push(at('ds-girder-post', 130.35, y), at('ds-girder-post', 133.65, y));
+placed.push(at('work-lamp', 133.4, 32, { angle: 180, z: 6 }), at('work-lamp', 130.6, 26, { angle: 0, z: 6 }));
+hangings.push({ type: 'cable', from: [130.05, 21, 9.6], to: [130.05, 39, 9.5], sag: 0.5 }, { type: 'hose', from: [133.95, 22, 9.7], to: [133.95, 38, 9.6], sag: 0.7 });
+// The excavation: the rock face they're cutting back, a cave-in in the far
+// corner (sand still trickling), girders up, panels and a reel waiting,
+// rubble, work lamps.
+placed.push(
+  at('cave-in', 115.5, 9.5, { angle: 45, z: 6 }),
+  at('ds-girder-post', 122, 8, { z: 6 }), at('ds-girder-post', 122, 16, { z: 6 }), at('ds-girder-post', 128, 8, { z: 6 }), at('ds-girder-post', 128, 16, { z: 6 }),
+  at('ds-panel-stack', 125, 18, { angle: 80, z: 6 }), at('ds-panel-stack', 118.5, 17.5, { angle: 10, z: 6 }), at('ds-cable-reel', 131.5, 6.5, { z: 6 }),
+  at('boulder-small', 114.5, 14.5, { angle: 60, z: 6 }), at('boulder-small', 119, 6, { angle: 200, z: 6 }),
+  at('work-lamp', 126, 12, { angle: 225, z: 6 }), at('work-lamp', 117, 13, { angle: 45, z: 6 }),
+  at('ds-crate', 132, 18.5, { angle: 15, z: 6 }),
+);
+// The mess: two round tables with their chairs, a counter along the west
+// wall, lockers by the door to the bunks.
+for (const [tx, ty] of [[143, 16], [153, 16]]) {
+  placed.push(at('ds-table', tx, ty, { z: 6 }));
+  for (let k = 0; k < 6; k++) {
+    const a = (k / 6) * Math.PI * 2 + 0.3;
+    placed.push(at('ds-chair', tx + Math.cos(a) * 3.9, ty - Math.sin(a) * 3.9, { angle: (a * 180) / Math.PI + 180, z: 6 }));
+  }
+}
+placed.push(
+  ...[9, 13, 21].map((y) => at('ds-console-wall', 135.02, y, { angle: 0, z: 6 })),
+  at('ds-locker-bank', 138, 26.98, { angle: 90, z: 6 }), at('ds-locker-bank', 146, 26.98, { angle: 90, z: 6 }),
+);
+// The bunks, two on each side wall.
+for (const y of [32.5, 36.5]) placed.push(at('ds-bunk', 136.02, y, { angle: 0, z: 6 }), at('ds-bunk', 147.98, y, { angle: 180, z: 6 }));
+// The office: the general's desk.
+placed.push(at('ds-desk', 155, 31, { angle: 270, z: 6 }), at('ds-chair', 155, 29.6, { angle: 270, z: 6 }));
+// Detention: a bunk in each cell, the desk in the control room.
+for (let k = 0; k < 6; k++) placed.push(at('ds-bunk', 164 + k * 5, 11.02, { angle: 270, z: 6 }));
+placed.push(at('ds-desk', 173, 27.5, { angle: 90, z: 6 }), at('ds-console-wall', 166.02, 29, { angle: 0, z: 6 }), at('ds-console-wall', 179.98, 29, { angle: 180, z: 6 }));
+// The test bay: the prototype's empty cradle, scorch marks where it was
+// tried, cables and hoses hanging from the rock over it, a pipe leaking
+// steam by the hatch and a live cable spitting sparks.
+placed.push(
+  at('test-cradle', 211.5, 68, { angle: 90, z: 6 }),
+  at('floor-burn-2', 211.5, 68), at('floor-burn-2', 218, 74, { angle: 60 }), at('floor-burn-1', 205, 62, { angle: 140 }), at('floor-burn-1', 221, 61),
+  at('ds-steam-pipe', 197.02, 63, { angle: 0, z: 6 }),
+  at('ds-cables-live', 218, 76, { z: 20 }),
+  at('ds-console-wall', 211.5, 52.02, { angle: 270, z: 6 }), at('ds-console-wall', 207, 52.02, { angle: 270, z: 6 }),
+);
+hangings.push(
+  { type: 'hose', from: [210.6, 67, 19.9], length: 9 },
+  { type: 'hose', from: [212.4, 69, 19.9], length: 10 },
+  { type: 'cable', from: [205, 60, 19.9], to: [218, 76, 19.9], sag: 3 },
+);
+// The target wall at the bay's east end, scorched and pocked.
+for (const [y, z, tex] of [[60, 9, 'grime-scorch-1'], [65, 12, 'grime-scorch-2'], [70, 8.5, 'grime-scorch-1'], [74, 11, 'grime-scorch-2'], [77, 9.5, 'grime-scorch-1']]) {
+  decals.push({ x: 226, y, z, face: 'W', tex });
+}
+
 const list = [
   ...placed,
   // The drop-off, facing north-west up the reach to the garrison.
@@ -756,7 +813,6 @@ const list = [
   at('stormtrooper', 139.5, 31.5, { angle: 270 }),
   at('stormtrooper', 145.5, 34.5, { angle: 270, skill: NOT_EASIEST }),
   at('stormtrooper', 142.5, 30.5, { angle: 270, skill: HARD }),
-  at('supply-crate', 138.5, 35.5), at('supply-crate', 144, 36),
   at('med-kit', 146.5, 30),
   at('officer', 154.5, 32.5, { angle: 270, drops: ['keycard-red'] }),
   // The general, by his own door (an officer's sprite for now: Mark).

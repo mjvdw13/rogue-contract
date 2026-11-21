@@ -1,8 +1,8 @@
 import { ModelBuilder } from './lib/build.js';
 
-// Mission 3's canyon (docs/mission3.md): the garrison's comm mast, the
-// landmark seen up the canyon, and the poles of the power line that runs
-// out from the garrison along the way.
+// Mission 3 (docs/mission3.md): the garrison's comm mast, the landmark
+// seen up the canyon; the poles of the power line that runs out from the
+// garrison along the way; the burned Tusken camp; the prototype's cradle.
 
 /**
  * A straight bar of square section `r` (half its width) from `a` to `b`
@@ -109,4 +109,24 @@ ash.loft(blob(0.95, 0), 0, blob(0.7, 0.4), 0.12, { color: ['gray', 0.22], top: f
 ash.loft(blob(0.7, 0.4), 0.12, blob(0.35, 0.9), 0.22, { color: ['gray', 0.27], top: { color: ['gray', 0.3] }, bottom: false });
 for (const [x, y] of [[-0.2, 0.05], [0.18, -0.1], [0.05, 0.18]]) ash.box([x - 0.06, y - 0.06, 0.21], [x + 0.06, y + 0.06, 0.24], { color: [255, 110, 20], glow: true, bottom: false });
 
-export default [mast.build(), pole.build(), tent.build(), ash.build()];
+// The prototype's cradle in the test bay, empty: a base plate, two towers
+// either side joined by a beam 7 up, the yoke that held its shoulders
+// hanging from the beam, arm clamps open on the towers, a red light on
+// each tower. Scorched where it stood.
+const cradle = new ModelBuilder('test-cradle');
+const dark = { color: ['steel', 0.25] };
+cradle.box([-3, -2.2, 0], [3, 2.2, 0.3], { color: ['steel', 0.3], top: { color: ['gray', 0.12] }, bottom: false });
+for (const sx of [-1, 1]) {
+  const x = sx * 2.6;
+  for (const sy of [-1, 1]) bar(cradle, [x, sy * 1.6, 0.3], [x, sy * 1.6, 7.2], 0.18, dark);
+  for (const z of [1.5, 3.5, 5.5]) bar(cradle, [x, -1.6, z], [x, 1.6, z], 0.1, dark);
+  // The arm clamp, swung open toward the middle.
+  cradle.box([x - sx * 1.1, -0.35, 3.3], [x - sx * 0.2, 0.35, 3.7], { color: ['steel', 0.4] });
+  cradle.box([x - 0.15, -0.15, 6.4], [x + 0.15, 0.15, 6.7], { color: [255, 40, 30], glow: true });
+}
+bar(cradle, [-2.8, 0, 7.2], [2.8, 0, 7.2], 0.25, dark);
+cradle.box([-0.9, -0.5, 5.2], [0.9, 0.5, 5.6], { color: ['steel', 0.35] });
+bar(cradle, [0, 0, 5.6], [0, 0, 7], 0.08, { color: ['gray', 0.2] });
+cradle.outlineLines([[-3, -2.2], [3, -2.2], [3, 2.2], [-3, 2.2]]);
+
+export default [mast.build(), pole.build(), tent.build(), ash.build(), cradle.build()];

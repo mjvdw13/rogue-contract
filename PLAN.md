@@ -1599,7 +1599,7 @@ before and after; check in with Mark after each):
       cloth, embers, smoke), the range's targets and scars, the scout post;
       thin dust with a breeze (wind for the banners, not a storm); a TIE
       patrol across the sky now and then; grime on the Imperial walls.
-- [ ] **Dress the base:** the rock-cut kit, cables and hoses along the
+- [x] **Dress the base:** the rock-cut kit, cables and hoses along the
       tunnels, steam off valves, a live cable sparking, hum, the barracks'
       mess and lockers, cells, the vault's racks, the test bay's cradle and
       scorch marks; `grimeIndoors`.
