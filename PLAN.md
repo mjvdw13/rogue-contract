@@ -1573,7 +1573,7 @@ before and after; check in with Mark after each):
 - [x] **Blockout, the canyon** (areas 1-7): the map enlarged, today's
       bowl and gate kept as they are and moved; stand-in props; the route
       test extended; bench the open stretches before dressing.
-- [ ] **Blockout, the base** (8-17): the rock-cut rooms round today's
+- [x] **Blockout, the base** (8-17): the rock-cut rooms round today's
       maintenance, barracks, vault and generator, the new detention block,
       test bay and cliff-face gantry; the route test to the pad.
 - [ ] **Story and state:** the drop-off (`fly`), Jan's lines, the PA, Rusk

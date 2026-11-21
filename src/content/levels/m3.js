@@ -251,12 +251,34 @@ p.chamfer(114, 38, 130, 50, 2, darkPanel, ['NW', 'SW']);
 // A storage cage round the crates in the north-west.
 p.fence(116, 38, 117, 41, 'W', cage).fence(118, 38, 119, 41, 'E', cage).fence(116, 40, 119, 41, 'S', cage);
 
-// Lift L1: from maintenance (0) up to the barracks (6).
+// Lift L1: from maintenance (0) up to the cut (6).
 p.rect(130, 40, 134, 44, lift([0, 6], 12));
+
+// 11. The cut: a tunnel north in raw rock from the top of L1, and the
+// excavation it opens into, unfinished. A door east into the mess.
+/** A room cut in the rock: sandstone walls and ceiling, a grate floor. */
+const cut = (floorZ, ceilZ, extra = {}) => ({
+  floor: 'imp-grate', ceiling: 'sandstone-dark', floorZ, ceilZ, light: 120, side: 'sandstone', upper: 'sandstone', ...extra,
+});
+p.rect(128, 2, 136, 40, rock);
+p.rect(110, 2, 136, 22, rock);
+p.rect(130, 20, 134, 40, cut(6, 10));
+p.rect(112, 4, 134, 20, cut(6, 12, { floor: 'desert-gravel', light: 112 }));
+p.chamfer(112, 4, 134, 20, 4, rock, ['NW', 'SW']);
+// Work lamps in pools along the tunnel and in the excavation.
+for (const [x, y] of [[132, 34], [132, 25], [126, 12], [117, 9]]) p.pool(x, y, 4, 168);
+
+// 12. The mess hall, over the bunk room and the office.
+p.rect(134, 4, 162, 28, panel);
+p.rect(135, 6, 160, 27, room(6, 10, { light: 152 }));
+for (const x of [140, 148, 155]) p.rect(x, 12, x + 2, 20, room(6, 10, { ceiling: 'imp-ceiling-light', light: 192 }));
+p.chamfer(135, 6, 160, 27, 2, darkPanel, ['NE', 'SE']);
+p.rect(141, 27, 143, 28, door(6));
+p.rect(134, 14, 135, 16, door(6));
 
 // The barracks corridor, with light strips along its walls: pools of
 // light under the ceiling panels, the strips and the hanging lamps.
-p.rect(134, 40, 164, 44, room(6, 10, { light: 144 }));
+p.rect(135, 40, 164, 44, room(6, 10, { light: 144 }));
 for (const x of [138, 146, 154]) p.rect(x, 41, x + 2, 43, room(6, 10, { ceiling: 'imp-ceiling-light', light: 208 }));
 for (const x of [136, 150, 160]) {
   p.rect(x, 39, x + 2, 40, lights);
@@ -283,6 +305,10 @@ p.rect(153, 39, 155, 40, door(6));
 // A barred window from the corridor into the office, over a sill.
 p.rect(157, 39, 159, 40, room(7, 8.5, { light: 144, side: 'imp-panel', upper: 'imp-panel' }));
 p.fence(157, 39, 159, 40, 'S', bars);
+// The general's door in the east wall, to his own way out (it never opens
+// for Kyle).
+p.rect(160, 31, 161, 33, door(6, { lock: 'remote', tag: 'mohc-door', ...tallSide }));
+p.rect(161, 30, 164, 34, room(6, 9, { light: 128 }));
 
 // The red door, and the data vault behind it: dark, walled in computer banks.
 p.rect(164, 32, 182, 50, computer);
@@ -299,9 +325,29 @@ p.chamfer(166, 34, 180, 49, 2, darkPanel);
 // The secret niche behind a computer bank.
 p.rect(180, 38, 182, 42, { door: 'imp-computer', secret: true, floor: 'imp-floor', ceiling: 'imp-ceiling', floorZ: 6, ceilZ: 9, light: 112 });
 p.rect(182, 37, 186, 43, room(6, 9, { light: 120, secret: true }));
-// The south door onto the generator catwalk.
-// (Above it on both sides: the computer banks, as the generator side is too tall for the lit lintel.)
-p.rect(172, 49, 174, 50, door(6, { upper: 'imp-computer' }));
+// 14. Detention, over the vault: its control room, a door north into the
+// lane of cells, Rusk's at the far end, and a passage down the back to the
+// generator's north catwalk.
+p.rect(160, 8, 194, 26, panel);
+p.rect(166, 24, 180, 33, room(6, 10, { light: 144 }));
+p.chamfer(166, 24, 180, 33, 2, darkPanel, ['NW', 'NE']);
+p.rect(172, 33, 174, 34, door(6, { upper: 'imp-computer' }));
+p.rect(162, 18, 192, 23, room(6, 10, { light: 128 }));
+p.rect(172, 23, 174, 24, door(6));
+// Six cells north of the lane, 4 wide, bars on their fronts; Rusk's, the
+// last, has a door.
+for (let k = 0; k < 6; k++) {
+  const x0 = 162 + k * 5;
+  if (k < 5) {
+    p.rect(x0, 11, x0 + 4, 18, room(6, 10, { light: 112 }));
+    p.fence(x0, 17, x0 + 4, 18, 'S', bars);
+  } else p.rect(x0, 11, x0 + 4, 17, room(6, 10, { light: 120 }));
+}
+p.rect(188, 17, 190, 18, door(6));
+// Red light over the cells: the only red before the alarm.
+for (let k = 0; k < 6; k++) lamps.push({ x: 164 + k * 5, y: 14, z: 9, radius: 3, light: 40 });
+p.rect(188, 23, 192, 49, room(6, 10, { light: 136 }));
+p.rect(189, 49, 191, 50, door(6, { ...tallSide }));
 
 // The generator chamber: a deep shaft round the reactor column, with a
 // catwalk ring and two bridges 6 up. The catwalks are grate slabs (two
@@ -329,7 +375,7 @@ for (const y of [57, 75]) {
   strip(159, y, 160, y + 3, 160.3, y + 1.5);
   strip(196, y, 197, y + 3, 195.7, y + 1.5);
 }
-for (const x of [184, 190]) strip(x, 49, x + 3, 50, x + 1.5, 50.3);
+for (const x of [168, 182]) strip(x, 49, x + 3, 50, x + 1.5, 50.3);
 for (const x of [168, 184]) strip(x, 86, x + 3, 87, x + 1.5, 85.7);
 p.rect(176, 53, 180, 64, catwalk);
 p.rect(176, 72, 180, 83, catwalk);
@@ -362,20 +408,37 @@ p.rect(181, 67, 182, 69, {
 p.rect(196, 67, 197, 69, door(6, { lock: 'remote', tag: 'escape', stayOpen: true, ...tallSide }));
 
 // ---------------------------------------------------------------- the way out
-// The gantry: stairs up to 8, out under the sky.
+// 16. The test bay, cut in the rock east of the generator: the prototype's
+// cradle in the middle, its blast door south onto the cliff.
+p.rect(197, 50, 230, 88, rock);
+p.rect(197, 52, 226, 84, cut(6, 20, { floor: 'imp-floor', light: 128, tag: 'testbay' }));
+p.chamfer(197, 52, 226, 84, 5, rock, ['NE', 'SE']);
+p.pool(211.5, 68, 7, 192, { tag: 'testbay' });
+p.rect(209, 84, 213, 86, gate(6, { lock: 'remote', tag: 'escape', stayOpen: true, ...tallSide }));
+
+// 17. The cliff gantry: grate on the cliff face, down from the blast door
+// and up in a flight to 10, railings on the drop. Below, a bay of the wash.
 const gantry = (z) => sand(z, { floor: 'imp-grate', side: 'imp-panel-dark', light: 160 });
-p.stairs(198, 66, 202, 70, 'E', 6.5, 0.5, gantry);
-p.rect(202, 66, 206, 70, gantry(8));
-p.rect(197, 66, 198, 70, gantry(6)); // a landing outside the escape hatch
+carve([[206, 108, 6], [204, 120, 8]], (z) => sand(z, { light: 128 }), { z0: -6 });
+p.rect(207, 86, 215, 92, gantry(6));
+p.stairs(207, 92, 215, 100, 'S', 6.5, 0.5, gantry);
+p.rect(207, 100, 215, 104, gantry(10));
+p.fence(207, 92, 208, 104, 'W', railing).fence(207, 103, 215, 104, 'S', railing);
+lamps.push({ x: 211, y: 86.3, z: 5, radius: 6, light: 72 });
 
-// The chasm (3 tiles), with lift L3 back up if you fall.
-p.rect(206, 58, 209, 84, sand(-2, { light: 104 }));
-p.rect(206, 80, 209, 84, lift([-2, 8], SKY, { ceiling: 'sky', light: 104 }));
+// 17a. The chasm (3 tiles) between the gantry and the pad, with lift L3
+// back up if you fall.
+p.rect(215, 86, 218, 116, sand(-6, { light: 104 }));
+p.rect(215, 110, 218, 116, lift([-6, 10], SKY, { ceiling: 'sky', light: 104 }));
 
-// The landing pad, floodlit. Stepping onto the marked pickup spot (it
-// pulses) ends the mission.
-p.rect(209, 58, 214, 84, sand(8, { floor: 'imp-floor', side: 'imp-panel-dark', light: 184 }));
-p.rect(210, 67, 214, 71, sand(8, { floor: 'lift-floor', side: 'imp-panel-dark', light: 224, lightFx: 'glow', lightMin: 168, exit: true }));
+// 18. The landing pad on its cliff over the wash, floodlit, a railing on
+// its south edge. Stepping onto the marked pickup spot (it pulses) ends
+// the mission.
+const pad = (extra = {}) => sand(10, { floor: 'imp-floor', side: 'imp-panel-dark', light: 184, ...extra });
+p.rect(218, 86, 236, 124, pad());
+p.chamfer(218, 86, 236, 124, 4, rock, ['NE', 'SE']);
+p.fence(222, 123, 232, 124, 'S', railing);
+p.rect(225, 100, 229, 104, pad({ floor: 'lift-floor', light: 224, lightFx: 'glow', lightMin: 168, exit: true }));
 
 // ---------------------------------------------------------------- the canyon's edges
 // The carved canyons' stepped rock edges, cut to 45 degrees: a rock tile
@@ -615,13 +678,13 @@ const list = [
   at('energy-cell', 161.5, 51.5), // in the dark under the north-west corner of the ring
   // The gantry: a sandtrooper at the top of the stairs, and a med kit before
   // the last fight.
-  at('sandtrooper', 205.2, 67, { angle: 180, skill: NORMAL_UP }),
-  at('med-kit', 203.5, 68, { skill: [1, 2, 3] }),
-  // The landing pad, with the pickup shuttle north of the marked spot.
-  at('shuttle', 211.5, 62.5, { angle: 270 }),
-  at('stormtrooper', 211.5, 73.5, { angle: 180 }),
-  at('sandtrooper', 211.5, 78.5, { angle: 180, skill: NOT_EASIEST }),
-  at('stormtrooper', 213, 76.5, { angle: 180, skill: HARD }),
+  at('sandtrooper', 211, 101.5, { angle: 90, skill: NORMAL_UP }),
+  at('med-kit', 213, 90, { skill: [1, 2, 3] }),
+  // The landing pad, with the general's shuttle north of the marked spot.
+  at('shuttle', 227, 92, { angle: 270 }),
+  at('stormtrooper', 224, 108, { angle: 180 }),
+  at('sandtrooper', 230, 110, { angle: 180, skill: NOT_EASIEST }),
+  at('stormtrooper', 222, 98, { angle: 180, skill: HARD }),
 ];
 
 export default defineLevel({
