@@ -64,8 +64,10 @@ const carved = new Set();
  * within `r` (eased between points) of the line becomes `cell(z)`, its floor
  * running from `z0` at the first point to `z1` at the last by the distance
  * along the line, in steps of `step` (rock steps; 0 for a smooth slope).
+ * With `profile`, the floor is `profile(x, y, along)` instead (along: 0 at
+ * the first point, 1 at the last).
  */
-function carve(points, cell, { z0 = 0, z1 = z0, step = 0.5 } = {}) {
+function carve(points, cell, { z0 = 0, z1 = z0, step = 0.5, profile = null } = {}) {
   const lens = [0];
   for (let i = 1; i < points.length; i++) lens.push(lens[i - 1] + Math.hypot(points[i][0] - points[i - 1][0], points[i][1] - points[i - 1][1]));
   const total = lens[lens.length - 1] || 1;
@@ -94,7 +96,8 @@ function carve(points, cell, { z0 = 0, z1 = z0, step = 0.5 } = {}) {
     const old = p.get(x, y);
     if (!old || !(old.wall === 'sandstone' && !old.diagonal)) continue;
     let z = z0 + (z1 - z0) * along;
-    if (step) z = z0 < z1 ? Math.min(z1, Math.floor((z - z0) / step) * step + z0) : Math.max(z1, z0 - Math.floor((z0 - z) / step) * step);
+    if (profile) z = profile(x, y, along);
+    else if (step) z = z0 < z1 ? Math.min(z1, Math.floor((z - z0) / step) * step + z0) : Math.max(z1, z0 - Math.floor((z0 - z) / step) * step);
     p.set(x, y, cell(z));
     carved.add(k);
   }
@@ -154,7 +157,16 @@ carve([[68, 128, 7], [54, 131, 11], [40, 127, 10], [36, 117, 6]], (z) => sand(z)
 
 // 7. The climb out of the camp's north end, and the high ledge east along
 // a dry gorge to the notch over the arch.
-carve([[36, 113, 1.8], [34, 104, 1.8], [38, 96, 1.8]], (z) => sand(z, { light: 140 }), { z0: -2, z1: 5 });
+// Rock steps of uneven rise (a quarter to three quarters of a tile, never
+// more than you walk up), their edges ragged across the way, narrowing and
+// widening, with a landing halfway where it turns.
+const climbZ = (x, y, along) => {
+  // The landing from 0.42 to 0.58 of the way, at 1.5; steeper either side.
+  const lin = along < 0.42 ? -2 + (3.5 * along) / 0.42 : along < 0.58 ? 1.5 : 1.5 + (3.5 * (along - 0.58)) / 0.42;
+  const z = Math.floor((lin + (valueNoise(x, y, 2, 51) - 0.5) * 0.3) * 4) / 4;
+  return Math.max(-2, Math.min(5, z));
+};
+carve([[36, 111, 2.2], [35, 107.5, 1.5], [34, 104, 2.4], [35.5, 100, 1.5], [38, 96, 1.8]], (z) => sand(z, { light: 140 }), { profile: climbZ });
 carve([[38, 96, 1.7], [52, 94, 1.6], [66, 95, 1.6], [80, 93, 1.7], [92, 89.5, 1.6]], (z) => sand(z, { light: 144 }), { z0: 5 });
 carve([[45, 114, 3], [44, 108, 3], [52, 101, 4.5], [64, 99, 4.5], [76, 97.5, 4], [86, 95, 2.5]], (z) => sand(z, { light: 120 }), { z0: -2 });
 p.rect(92, 88, 102, 91, sand(5, { tag: 'notch' }));

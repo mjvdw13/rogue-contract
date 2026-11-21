@@ -43,7 +43,12 @@ These need Mark to try something, or to decide. Don't start them without him.
   only campaign weapons. To judge: whether the canyon now reads as
   exploring, the beacons as a hint, the fights (25/45/55 on skills
   1/3/5, nobody has played them), the length, Jan's and the PA's lines.
-  Not checked: anything by eye in a browser, the sounds.
+  Not checked: anything by eye in a browser, the sounds. Since then
+  (2026-11-20) the canyon's rock refined before any more dressing: no
+  thin fins between carves, the cave's walls and the slot's chockstones
+  shaped, shelves at the foot of the wide places' walls, the climb in
+  uneven steps with a landing, and the backdrop no longer covers the
+  view out of the cave and the vent. To judge: the shelves' look.
 
 - **Mission 4 brought up to Mission 5** (`?map=m4`, 2026-11-15; four of
   the ten ideas, picked by Mark). The unfinished sector shows how far the
@@ -1856,29 +1861,6 @@ validate, MODDING.md and a test.
       hangar's mouth), looping paths for machinery (the crane's
       trolley), a drifting second sky layer and lightning, light that
       runs along a corridor, a sound for the rain.
-
-### 14. Mission 3: the canyon's rock, refined (Mark, 2026-11-20)
-
-Before any more dressing. Found by height dumps and snapshots; one
-commit each, checked by snapshot.
-
-- [x] **Fins:** blades of rock 1 or 2 tiles thick left between two
-      carves (the gulch ledge and the gulch floor, the steps off its
-      west end, the camp and the dry gorge's head) become floor: the
-      higher side's, so the ledge reads as the gulch's own cliff edge.
-- [x] **The rim over the gap** dips 6 tiles because the gap's floor is
-      the gulch's: the rim takes its height from the higher floors near
-      it, so a gap or a step down doesn't notch the skyline.
-- [x] **The cave's walls** are tile-stepped zig-zags: cut to 45 degrees
-      like the open canyon's.
-- [x] **Chockstones:** a square slab each, flat underneath; make them
-      rocks wedged across the slot (narrower, at an angle, uneven).
-- [x] **Wall profile:** every canyon wall is one sheer face from floor
-      to rim, so the wide places (the hollow, the gulch, the camp) read
-      as walled pens. Benches and fallen blocks at the foot of the
-      walls, a step part way up.
-- [ ] **The climb** is an even 0.5 staircase 4 wide: uneven rock steps,
-      some wider, a landing.
 
 ## Small fixes and known rough edges
 
