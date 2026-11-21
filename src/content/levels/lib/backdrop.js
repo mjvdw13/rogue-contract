@@ -8,11 +8,18 @@ import { valueNoise, smoothstep } from './noise.js';
  * ridges so they stand apart in layers.
  *
  * @param {import('./painter.js').Painter} p the painted level
- * @param {{margin?:number, cell?:number, seed?:number, rim:(x:number, y:number, base:number)=>number,
+ * With `low`, it stays a tile under the rim over the level's own rock and
+ * only climbs past the map's edge (3 for each tile out): a level whose
+ * passages wind through big masses of rock would otherwise grow hills a
+ * few tiles from the player, and since the backdrop only replaces sky
+ * (it never hides the level's walls), a taller wall further off shows in
+ * front of a nearer hill, the edge between them shifting as you move.
+ *
+ * @param {{margin?:number, cell?:number, seed?:number, low?:boolean, rim:(x:number, y:number, base:number)=>number,
  *   tex:string, light?:number, moon?:number[], far?:number}} opts `rim` gives the
  *   rim's height next to the open floor at `base` (the level's own rim tiles)
  */
-export function canyonBackdrop(p, { margin = 96, cell = 1, seed = 1, rim, ...look }) {
+export function canyonBackdrop(p, { margin = 96, cell = 1, seed = 1, low = false, rim, ...look }) {
   const W = p.w + 2 * margin;
   const H = p.h + 2 * margin;
   // Distance from the open sky (a chamfer distance transform), carrying the
@@ -75,6 +82,13 @@ export function canyonBackdrop(p, { margin = 96, cell = 1, seed = 1, rim, ...loo
         const relief = (valueNoise(x, y, 13, seed + 2) - 0.5) * 10 * smoothstep(1, 6, s) + (valueNoise(x, y, 4, seed + 3) - 0.5) * 3 * smoothstep(0, 3, s);
         const valley = 30 * (1 - smoothstep(0.03, 0.16, Math.abs(valueNoise(x, y, 34, seed + 1) - 0.5))) * smoothstep(10, 24, s);
         z = r + Math.max(0, climb + relief - valley) * smoothstep(0, 1.5, s) + Math.min(0, climb + relief - valley) * smoothstep(8, 16, s);
+        if (low) {
+          // (Under the lowest rim of the four tiles round this corner, or a
+          // corner by a tall rim tile pokes up over the low one beside it.)
+          const r4 = Math.min(r, rim(x - 1, y, b), rim(x, y - 1, b), rim(x - 1, y - 1, b));
+          const out = Math.max(0, -x, -y, x - (p.w - 1), y - (p.h - 1));
+          z = Math.min(z, r4 - 1 + out * 3);
+        }
       }
       heights[j * (w + 1) + i] = z;
     }

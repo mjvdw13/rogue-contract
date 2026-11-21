@@ -565,14 +565,17 @@ for (const t of rim.values()) {
   t.h = Math.round(Math.min(SKY - 1, h) * 4) / 4;
   p.set(t.x, t.y, { floor: 'desert-gravel', ceiling: 'sky', floorZ: t.h, ceilZ: t.h + 0.25, side: 'sandstone', light: 144, scenery: true });
 }
-// Angled rock corners stop at the rim beside them.
+// Angled rock corners stop at the lowest rim beside them (at the highest,
+// each stood up as a thin spike on the skyline), or with none beside them
+// where a rim there would.
 for (let y = 1; y < H - 1; y++) {
   for (let x = 1; x < W - 1; x++) {
     const c = p.get(x, y);
-    if (c.wall !== 'sandstone' || !c.diagonal) continue;
-    let top = -Infinity;
-    for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) top = Math.max(top, rim.get((y + dy) * W + x + dx)?.h ?? -Infinity);
-    if (top > -Infinity) p.set(x, y, { ...c, ceilZ: top + 0.25 });
+    if (c.wall !== 'sandstone' || !c.diagonal || c.ceiling !== 'sky') continue;
+    let top = Infinity;
+    for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) top = Math.min(top, rim.get((y + dy) * W + x + dx)?.h ?? Infinity);
+    if (top === Infinity) top = Math.min(SKY - 1, rimHeight(x, y, c.floorZ ?? 0));
+    p.set(x, y, { ...c, ceilZ: top + 0.25 });
   }
 }
 /** The rim's height near (x, y) for the backdrop: the rim tile's there, else the formula. */
@@ -933,7 +936,10 @@ export default defineLevel({
   decals,
   // Above and behind the rim, rock climbs into slopes and ridges out to
   // 48 m past the map, fading into the haze: the skyline in depth.
+  // Low over the level's own rock (its passages wind through big masses of
+  // it), climbing only past the map's edge.
   backdrop: canyonBackdrop(p, {
+    low: true,
     rim: rimAt,
     tex: 'sandstone',
     light: 168,

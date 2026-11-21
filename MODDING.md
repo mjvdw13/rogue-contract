@@ -1126,7 +1126,13 @@ the middle of a canyon would show above the canyon's rims.
 `canyonBackdrop(p, { rim, tex, light })` (`src/content/levels/lib/backdrop.js`)
 makes one for a painted level: low over its open sky, starting at the
 canyon's rim (`rim(x, y, floor)` gives its height) and climbing away in
-smooth slopes and ridges, out to 96 tiles past the map. Mission 3 ends its
+smooth slopes and ridges, out to 96 tiles past the map. With `low: true`
+it stays a tile under the rim over the level's own rock and climbs only
+past the map's edge: use it when the passages wind through big masses of
+rock, where the backdrop would otherwise grow hills a few tiles from the
+player. The backdrop only replaces sky, so a taller wall further off
+would show in front of such a hill, the edge between them shifting as
+you move (Mission 3's first cut). Mission 3 ends its
 canyon walls in a low rim of rock (one tile out of reach, with its sky just
 above it so the view ends there) and lets the backdrop take over above it.
 
