@@ -8,6 +8,7 @@ import barricades from './barricade.js';
 import { boulderLarge, boulderSmall } from './boulder.js';
 import floodlightTowers from './floodlight-tower.js';
 import { sensorMast, sensorDish } from './sensor-mast.js';
+import canyon from './canyon.js';
 import domes from './dome.js';
 import doorJamb, { doorLips } from './door-jamb.js';
 import arches from './arch.js';
@@ -50,4 +51,4 @@ import crane from './crane.js';
 import yard5 from './yard5.js';
 import breakers from './breakers.js';
 
-export default [terminal, reactorRing, coolantTank, shuttle, ...barricades, boulderLarge, boulderSmall, ...floodlightTowers, sensorMast, sensorDish, ...domes, doorJamb, ...doorLips, ...arches, ...buttresses, ...awnings, ...tin, ...pipes, ...clutter, landspeeder, ...bay, moldyCrow, ...market, ...cantina, ...hitching, ...pod, ...stains, ...sandcrawler, ...junkPiles, ...furnace, ...skiff, ...droids, ...racks, ...freighter, ...scaffolds, ...balcony, ...hold, ...garage, ...hostel, ...quarter, ...stable, ...vaporators, ...farm, ...garden, ...reservoir, ...workshop, ...yard, ...station, ...stationCrew, ...crane, ...yard5, ...breakers];
+export default [terminal, reactorRing, coolantTank, shuttle, ...barricades, boulderLarge, boulderSmall, ...floodlightTowers, sensorMast, sensorDish, ...canyon, ...domes, doorJamb, ...doorLips, ...arches, ...buttresses, ...awnings, ...tin, ...pipes, ...clutter, landspeeder, ...bay, moldyCrow, ...market, ...cantina, ...hitching, ...pod, ...stains, ...sandcrawler, ...junkPiles, ...furnace, ...skiff, ...droids, ...racks, ...freighter, ...scaffolds, ...balcony, ...hold, ...garage, ...hostel, ...quarter, ...stable, ...vaporators, ...farm, ...garden, ...reservoir, ...workshop, ...yard, ...station, ...stationCrew, ...crane, ...yard5, ...breakers];

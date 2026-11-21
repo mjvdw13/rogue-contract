@@ -66,9 +66,10 @@ for (const level of registry.levels.values()) {
 
 test('m3: the overload opens the escape hatch for good', () => {
   const w = makeWorld('m3', { noMonsters: true });
-  const i = 43 * w.map.w + 93; // the overload switch
-  assert.ok(w.map.uses.has(i));
-  w._useSwitch(i, 93, 43);
+  // The overload switch: the one that opens the hatch.
+  const [i] = [...w.map.uses].find(([, u]) => u.actions.some((a) => a.action === 'openDoors' && a.tag === 'escape')) ?? [];
+  assert.ok(i !== undefined);
+  w._useSwitch(i, i % w.map.w, Math.floor(i / w.map.w));
   run(w, mockInput(), 30);
   const hatch = w.map.doors.filter((d) => d.tag === 'escape');
   assert.ok(hatch.length);

@@ -14,19 +14,25 @@ import { makeWorld, mockInput } from './helpers.js';
 // there crouching; 'jump' jumps on setting off; 'call' stands there
 // pressing use until the lift in front of it has come up.
 const ROUTE = [
-  // The start bowl, the gorge under the arch, the bowl under the garrison.
-  [18, 82], [23, 72], [24, 62], [30, 51], [33, 42.5],
+  // The drop-off, west along the wash, up the slot canyon to the burned camp.
+  [176, 138], [156, 152], [134, 160], [114, 158], [100, 155.5], [88, 147], [90, 137], [80, 129], [68, 127],
+  [54, 131], [40, 124], [36, 116],
+  // The scout post: up the neck, into the bunker, its switch, out through the gate.
+  [35, 108], [37.5, 104], [42, 104, 'use'], [51, 104, 'face=0'], [42, 104], [37, 104], [35, 100], [35, 93],
+  // Across the range, up the ledge path, over the arch, down into the bowl.
+  [86, 37], [90, 38], [90, 47], [90, 61], [90, 89.5], [101, 89.5], [121, 89.5], [125, 89.5], [128, 88], [128, 80],
+  [132, 79], [132, 70], [121, 66],
   // The vent, crouching, into maintenance and up lift L1.
-  [33, 38, 'crouch'], [33, 27, 'crouch'], [34, 22], [44, 18, 'z=6'],
+  [121, 62, 'crouch'], [121, 51, 'crouch'], [122, 46], [132, 42, 'z=6'],
   // The barracks corridor, the office (the red key), the red door, the vault.
-  [48, 17.5], [66, 17.5], [66, 12, 'use'], [66, 17.5], [76.5, 18], [80, 18, 'use'], [83, 20],
+  [136, 41.5], [154, 41.5], [154, 36, 'use'], [154, 41.5], [164.5, 42], [168, 42, 'use'], [171, 44],
   // Out onto the generator's catwalk, down lift L2b, the overload switch.
-  [85, 27.5, 'use'], [103, 27.5], [103, 28.6, 'call'], [103, 31, 'z=-6'], [100, 38], [95.6, 42.5], [95.6, 44, 'face=180'],
+  [173, 51.5, 'use'], [191, 51.5], [191, 52.6, 'call'], [191, 55, 'z=-6'], [188, 62], [183.6, 66.5], [183.6, 68, 'face=180'],
   // Back up, round the ring to the escape hatch, the gantry, the jump, the pad.
-  [100, 38], [103, 31, 'z=6'], [106.5, 31], [106.5, 44], [109.5, 44, 'use'], [117.6, 44], [124, 45, 'jump'],
+  [188, 62], [191, 55, 'z=6'], [194.5, 55], [194.5, 68], [197.5, 68, 'use'], [205.6, 68], [212, 69, 'jump'],
 ];
 
-test('Mission 3 can be walked from the canyon to the overload and the pad', (t) => {
+test('Mission 3 can be walked from the drop-off to the overload and the pad', (t) => {
   const world = makeWorld('m3', { noMonsters: true });
   const input = mockInput();
   const pt = world.player;

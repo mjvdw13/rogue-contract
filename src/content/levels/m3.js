@@ -5,10 +5,12 @@ import { canyonBackdrop } from './lib/backdrop.js';
 
 // MISSION 3: THE CANYON GARRISON. The layout, route and numbers are in
 // docs/mission3.md (area numbers below match its table). Painted in code on
-// the fine grid (1 tile = 0.5 m; the player is 1.7 tall and 1 wide).
+// the fine grid (1 tile = 0.5 m; the player is 1.7 tall and 1 wide). The
+// first map's areas (the gorge, the bowl, the garrison) are where they were,
+// moved 88 east and 24 south; the canyon before them is new.
 
-const W = 128;
-const H = 100;
+const W = 240;
+const H = 176;
 const SKY = 24;
 
 // ---- Cells
@@ -38,6 +40,8 @@ const door = (floorZ, extra = {}) => ({
   door: 'imp-door', jamb: 'imp-jamb', style: 'rise', floor: 'imp-floor', ceiling: 'imp-ceiling', upper: 'imp-lintel',
   floorZ, ceilZ: floorZ + 2, light: 160, ...extra,
 });
+/** A blast gate: one 4x4 door (the main gate's, the scout post's). */
+const gate = (floorZ, extra = {}) => door(floorZ, { door: 'imp-gate', jamb: 'imp-gate-jamb', ceilZ: floorZ + 4, ...extra });
 /** The wall above a door on a side where the room is too tall for the lit lintel (it would repeat up the wall). */
 const tallSide = { upper: 'imp-panel' };
 /** A lift platform between `stops`. */
@@ -50,150 +54,270 @@ const p = new Painter(W, H, rock);
 const lamps = [];
 /** Decals (signs, the crest, hazard stripes, vents) on wall faces, area by area. */
 const decals = [];
+/** Tiles carved by `carve()`, whose stepped rock edges are cut to 45 degrees at the end. */
+const carved = new Set();
 
-// ---------------------------------------------------------------- the canyon
-// 1. Start bowl, with a secret alcove behind a rock door in its west wall.
-p.rect(6, 76, 30, 96, sand(0, { light: 152 }));
-p.chamfer(6, 76, 30, 96, 4, rock, ['SW', 'SE', 'NW']);
-p.rect(2, 80, 5, 84, sand(0, { secret: true, light: 112 }));
-p.rect(5, 80, 6, 84, { door: 'sandstone', secret: true, floor: 'desert-sand', ceiling: 'sky', floorZ: 0, ceilZ: 8, light: 112 });
+/**
+ * Carve a winding canyon along a line of points `[x, y, r]`: every rock tile
+ * within `r` (eased between points) of the line becomes `cell(z)`, its floor
+ * running from `z0` at the first point to `z1` at the last by the distance
+ * along the line, in steps of `step` (rock steps; 0 for a smooth slope).
+ */
+function carve(points, cell, { z0 = 0, z1 = z0, step = 0.5 } = {}) {
+  const lens = [0];
+  for (let i = 1; i < points.length; i++) lens.push(lens[i - 1] + Math.hypot(points[i][0] - points[i - 1][0], points[i][1] - points[i - 1][1]));
+  const total = lens[lens.length - 1] || 1;
+  const best = new Map(); // tile -> [distance from the line, its share of the way along]
+  for (let i = 1; i < points.length; i++) {
+    const [ax, ay, ar] = points[i - 1];
+    const [bx, by, br] = points[i];
+    const dx = bx - ax;
+    const dy = by - ay;
+    const len2 = dx * dx + dy * dy || 1;
+    const r = Math.max(ar, br);
+    for (let y = Math.floor(Math.min(ay, by) - r); y <= Math.ceil(Math.max(ay, by) + r); y++) {
+      for (let x = Math.floor(Math.min(ax, bx) - r); x <= Math.ceil(Math.max(ax, bx) + r); x++) {
+        const t = Math.max(0, Math.min(1, ((x + 0.5 - ax) * dx + (y + 0.5 - ay) * dy) / len2));
+        const d = Math.hypot(x + 0.5 - ax - dx * t, y + 0.5 - ay - dy * t);
+        if (d > ar + (br - ar) * t) continue;
+        const k = y * W + x;
+        const along = (lens[i - 1] + t * (lens[i] - lens[i - 1])) / total;
+        if (!best.has(k) || best.get(k)[0] > d) best.set(k, [d, along]);
+      }
+    }
+  }
+  for (const [k, [, along]] of best) {
+    const x = k % W;
+    const y = (k / W) | 0;
+    const old = p.get(x, y);
+    if (!old || !(old.wall === 'sandstone' && !old.diagonal)) continue;
+    let z = z0 + (z1 - z0) * along;
+    if (step) z = z0 < z1 ? Math.min(z1, Math.floor((z - z0) / step) * step + z0) : Math.max(z1, z0 - Math.floor((z0 - z) / step) * step);
+    p.set(x, y, cell(z));
+    carved.add(k);
+  }
+}
 
-// 2. The gorge, winding north-east: narrow, so the moon barely reaches in.
-p.rect(14, 60, 34, 76, sand(0, { light: 136 }));
-p.chamfer(14, 60, 34, 76, 5, rock, ['NW', 'SE']);
-p.rect(30, 70, 38, 76, sand(0, { light: 136 }));
-p.chamfer(30, 70, 38, 76, 3, rock, ['NE', 'SE']);
+// ---------------------------------------------------------------- the canyon, before the garrison
+// 1. The wash where the Crow sets Kyle down, south-east of the garrison, and
+// 2. the dry wash running on west from it.
+carve([[226, 130, 8], [204, 126, 9], [186, 130, 10], [170, 142, 10], [152, 154, 10], [132, 160, 9], [112, 158, 8]], (z) => sand(z), { z0: -6 });
+// 1a. The reach: a dead end running north-west from the drop-off to a
+// cliff under the bowl's lip, with the garrison and its mast in view.
+// The bowl's lip over it (painted first, so the reach stops at it): rock a
+// metre over the bowl, 4 m over the reach.
+p.rect(133, 84, 147, 86, sand(2, { floor: 'desert-gravel', light: 120, scenery: true }));
+carve([[184, 122, 8], [166, 107, 8], [152, 97, 8], [140, 92, 7.5]], (z) => sand(z, { light: 128 }), { z0: -6 });
+
+// 3. The slot canyon, winding north-west out of the wash and climbing in
+// rock steps to the camp.
+carve([[112, 158, 3], [97, 155, 2.5], [87, 147, 2.5], [90, 137, 2.5], [80, 129, 2.5], [68, 126, 3]], (z) => sand(z, { light: 124 }), { z0: -6, z1: -2 });
+
+// 4. The burned camp: a hollow in the rock.
+carve([[68, 128, 7], [54, 131, 11], [40, 127, 10], [36, 117, 6]], (z) => sand(z), { z0: -2 });
+
+// 5. The scout post: the canyon narrows to a neck climbing to the range,
+// shut at its head by a wall with a blast gate. The bunker in the rock on
+// its east side opens it.
+carve([[36, 111, 4], [35, 104, 3.5]], (z) => sand(z, { light: 136 }), { z0: -1.5, z1: 0 });
+carve([[35, 104, 3.5], [35, 98, 3.5]], (z) => sand(z, { light: 136 }));
+p.rect(29, 96, 42, 98, panel);
+p.rect(33, 96, 37, 98, gate(0, { lock: 'remote', tag: 'postgate', stayOpen: true, ...tallSide }));
+p.rect(40, 98, 52, 110, room(0, 4, { light: 160 }));
+p.chamfer(40, 98, 52, 110, 2, darkPanel, ['NE', 'SE']);
+p.rect(39, 103, 40, 105, door(0));
+// A barred window over the neck, its sill a metre up.
+p.rect(39, 99, 40, 101, room(1, 3, { side: 'imp-panel', upper: 'imp-panel' }));
+p.fence(39, 99, 40, 101, 'W', bars);
+// The switch that opens the gate, in the bunker's east wall.
+p.rect(52, 103, 53, 105, {
+  wall: 'imp-switch',
+  switchTo: 'imp-switch-on',
+  use: [
+    { action: 'openDoors', tag: 'postgate' },
+    { action: 'message', text: 'THE POST GATE IS OPEN.' },
+  ],
+});
+lamps.push({ x: 38.6, y: 104, z: 3, radius: 4, light: 48 }, { x: 35, y: 98.3, z: 4.5, radius: 5, light: 56 });
+
+// 6. The test range: broad and flat, walled in by rock, with outcrops for
+// cover and a sniper tower in the middle (no way up).
+p.rect(14, 30, 88, 96, sand(0, { light: 152 }));
+p.chamfer(14, 30, 88, 96, 10, rock, ['NW']);
+p.chamfer(14, 30, 88, 96, 6, rock, ['SW', 'NE']);
+p.chamfer(14, 30, 88, 96, 8, rock, ['SE']);
+p.pillar(36, 52, 42, 58, 2, rock, sand(0, { light: 152 }));
+p.pillar(62, 74, 68, 80, 2, rock, sand(0, { light: 152 }));
+p.rect(56, 42, 60, 46, sand(6, { floor: 'imp-grate', side: 'imp-panel-dark', light: 152 }));
+lamps.push({ x: 58, y: 44, z: 7.5, radius: 9, light: 64 });
+
+// 7. The ledge path: cut up the range's east wall in flights, a railing on
+// the drop, then east through a notch to 8. the arch.
+const road = (z) => sand(z, { floor: 'imp-grate', side: 'imp-panel-dark', light: 144 });
+p.rect(88, 34, 92, 40, road(0));
+p.stairs(88, 40, 92, 46, 'S', 0.5, 0.5, road);
+p.rect(88, 46, 92, 60, road(3));
+p.stairs(88, 60, 92, 63, 'S', 3.5, 0.5, road);
+p.rect(88, 63, 92, 91, road(5));
+p.rect(92, 88, 102, 91, road(5));
+p.fence(88, 46, 89, 91, 'W', railing);
+
+// ---------------------------------------------------------------- the gorge and the bowl (the first map's)
+// The old start bowl, now a pocket under the arch, with a secret alcove
+// behind a rock door in its west wall.
+p.rect(94, 100, 118, 120, sand(0, { light: 152 }));
+p.chamfer(94, 100, 118, 120, 4, rock, ['SW', 'SE', 'NW']);
+p.rect(90, 104, 93, 108, sand(0, { secret: true, light: 112 }));
+p.rect(93, 104, 94, 108, { door: 'sandstone', secret: true, floor: 'desert-sand', ceiling: 'sky', floorZ: 0, ceilZ: 8, light: 112 });
+
+// The gorge, winding north-east: narrow, so the moon barely reaches in.
+p.rect(102, 84, 122, 100, sand(0, { light: 136 }));
+p.chamfer(102, 84, 122, 100, 5, rock, ['NW', 'SE']);
+p.rect(118, 94, 126, 100, sand(0, { light: 136 }));
+p.chamfer(118, 94, 126, 100, 3, rock, ['NE', 'SE']);
 // The rock arch: a natural stone bridge across the gorge, 2 m up (a slab:
-// you walk under it), moonlit on top, in its own shadow underneath. A sniper
-// on top watches the way in from the start bowl; there's no way up.
+// you walk under it, or over it from the ledge path), moonlit on top, in
+// its own shadow underneath.
 const arch = { bottom: 4, top: 5, floor: 'desert-sand', ceiling: 'sandstone-dark', side: 'sandstone', light: 112 };
-p.rect(14, 64, 34, 67, (x, y, old) => (old.wall ? old : { ...old, light: 152, slab: arch }));
+p.rect(102, 88, 122, 91, (x, y, old) => (old.wall ? old : { ...old, light: 152, slab: arch }));
 
-// 3. The bowl under the garrison: a rock spire in the middle, sniper ledges.
-p.rect(20, 44, 62, 60, sand());
-p.chamfer(20, 44, 62, 60, 4, rock, ['SE']);
-p.pillar(35, 49, 41, 55, 2, rock, sand());
-p.light(35, 46, 41, 49, 128); // the spire's moon shadow
+// 9. The bowl under the garrison: a rock mesa in the middle with the comm
+// mast on it, sniper ledges.
+p.rect(108, 68, 150, 84, sand());
+p.chamfer(108, 68, 150, 84, 4, rock, ['SE']);
+const mesa = sand(14, { floor: 'desert-gravel', light: 152, scenery: true });
+p.rect(124, 73, 128, 79, mesa).rect(123, 74, 129, 78, mesa);
+p.light(123, 70, 129, 73, 128); // the mesa's moon shadow
 // Ledge A (west, 2.5 m up): no way up; a sniper's post.
-p.rect(20, 44, 24, 58, sand(5, { light: 136 }));
+p.rect(108, 68, 112, 82, sand(5, { light: 136 }));
 // Ledge B (east, 1.5 m up), with rock steps down its south end. A secret.
-p.rect(57, 44, 62, 54, sand(3, { secret: true, light: 136 }));
-p.stairs(57, 54, 62, 59, 'N', 0.5, 0.5, (z) => sand(z));
+p.rect(145, 68, 150, 78, sand(3, { secret: true, light: 136 }));
+p.stairs(145, 78, 150, 83, 'N', 0.5, 0.5, (z) => sand(z));
+
+// Off the arch's east end, a landing and rock steps down north into the bowl.
+p.rect(122, 87, 130, 92, sand(4.5));
+p.stairs(126, 79, 130, 87, 'S', 0.5, 0.5, (z) => sand(z));
 
 // The strip along the garrison's face, in its shadow.
-p.rect(26, 40, 70, 44, sand(0, { light: 120 }));
+p.rect(114, 64, 158, 68, sand(0, { light: 120 }));
 // Floodlight towers on the bowl's north corners (things below) light it
 // from above the strip: each throws a pool of light out into the bowl.
-lamps.push({ x: 34.5, y: 48.5, z: 3, radius: 8, light: 64 }, { x: 52.5, y: 48, z: 3, radius: 8, light: 64 });
+lamps.push({ x: 122.5, y: 72.5, z: 3, radius: 8, light: 64 }, { x: 140.5, y: 72, z: 3, radius: 8, light: 64 });
 // A sensor mast on ledge B (things below), its dish turning, a beacon
-// blinking beside it.
-lamps.push({ x: 61, y: 52, z: 11.6, radius: 4, light: 56, fx: 'blink' });
+// blinking beside it; the comm mast's beacons on the mesa.
+lamps.push({ x: 149, y: 76, z: 11.6, radius: 4, light: 56, fx: 'blink' });
+lamps.push({ x: 126, y: 76, z: 27.5, radius: 6, light: 48, fx: 'blink' });
+
+// Over the bowl, its strip and the lip, the sky starts higher (40, not 24),
+// so the mast (34 at its tip) is drawn whole: things in a tile are cut off
+// at its ceiling. The garrison's face is drawn up to it too, a taller cliff.
+p.rect(108, 60, 151, 87, (x, y, old) => (!old.wall && !old.door && old.ceiling === 'sky' ? { ...old, ceilZ: 40 } : old));
 
 // ---------------------------------------------------------------- the garrison
 // Everything inside is Imperial wall until carved out.
-p.rect(24, 2, 112, 40, panel);
-p.rect(70, 24, 112, 66, panel);
+p.rect(112, 26, 200, 64, panel);
+p.rect(158, 48, 200, 90, panel);
 
-// 4. The face: a locked main gate (one 4x4 blast door) between light strips.
-p.rect(46, 36, 50, 40, door(0, { door: 'imp-gate', jamb: 'imp-gate-jamb', ceilZ: 4, lock: 'remote', tag: 'maingate', ...tallSide }));
-p.rect(40, 39, 44, 40, lights);
-p.rect(52, 39, 56, 40, lights);
+// The face: a locked main gate (one 4x4 blast door) between light strips.
+p.rect(134, 60, 138, 64, gate(0, { lock: 'remote', tag: 'maingate', ...tallSide }));
+p.rect(128, 63, 132, 64, lights);
+p.rect(140, 63, 144, 64, lights);
 // Floodlights in the strips, throwing pools of light on the sand, and a
 // weaker light over the gate between them.
-lamps.push({ x: 42, y: 40.3, radius: 6, light: 96 }, { x: 54, y: 40.3, radius: 6, light: 96 }, { x: 48, y: 40.3, radius: 5, light: 40 });
+lamps.push({ x: 130, y: 64.3, radius: 6, light: 96 }, { x: 142, y: 64.3, radius: 6, light: 96 }, { x: 136, y: 64.3, radius: 5, light: 40 });
 // The Empire's crest over the gate, and hazard stripes along its lintel.
 decals.push(
-  { x: 48, y: 40, z: 6.1, face: 'S', tex: 'decal-crest', scale: 1.5 },
-  { x: 47, y: 40, z: 4.25, face: 'S', tex: 'decal-hazard' },
-  { x: 49, y: 40, z: 4.25, face: 'S', tex: 'decal-hazard' },
+  { x: 136, y: 64, z: 6.1, face: 'S', tex: 'decal-crest', scale: 1.5 },
+  { x: 135, y: 64, z: 4.25, face: 'S', tex: 'decal-hazard' },
+  { x: 137, y: 64, z: 4.25, face: 'S', tex: 'decal-hazard' },
 );
 
-// 5. The crawl vent through the face (crouch: 1.2 clear).
-p.rect(32, 26, 34, 40, {
+// 10. The crawl vent through the face (crouch: 1.2 clear).
+p.rect(120, 50, 122, 64, {
   floor: 'imp-grate', ceiling: 'imp-grate', floorZ: 0.5, ceilZ: 1.7, light: 112, side: 'imp-vent', upper: 'imp-vent',
 });
-p.light(32, 31, 34, 34, 144); // light falling through a grate halfway
+p.light(120, 55, 122, 58, 144); // light falling through a grate halfway
 
-// 6. Maintenance: dim, with a lit panel in the middle, dark corners and a
+// Maintenance: dim, with a lit panel in the middle, dark corners and a
 // broken light flickering in the south-east.
-p.rect(26, 14, 42, 26, room(0, 5, { floor: 'imp-grate', light: 128 }));
-p.rect(32, 18, 36, 22, room(0, 5, { floor: 'imp-grate', ceiling: 'imp-ceiling-light', light: 192 }));
-p.rect(38, 22, 40, 24, room(0, 5, { floor: 'imp-grate', ceiling: 'imp-ceiling-light', light: 176, lightFx: 'flicker', lightMin: 96 }));
-p.light(26, 14, 29, 17, 120);
-p.light(26, 23, 29, 26, 120);
+p.rect(114, 38, 130, 50, room(0, 5, { floor: 'imp-grate', light: 128 }));
+p.rect(120, 42, 124, 46, room(0, 5, { floor: 'imp-grate', ceiling: 'imp-ceiling-light', light: 192 }));
+p.rect(126, 46, 128, 48, room(0, 5, { floor: 'imp-grate', ceiling: 'imp-ceiling-light', light: 176, lightFx: 'flicker', lightMin: 96 }));
+p.light(114, 38, 117, 41, 120);
+p.light(114, 47, 117, 50, 120);
 // Vents high on the north wall.
-decals.push({ x: 37.5, y: 14, z: 4.2, face: 'S', tex: 'decal-vent' }, { x: 40.5, y: 14, z: 4.2, face: 'S', tex: 'decal-vent' });
-p.chamfer(26, 14, 42, 26, 2, darkPanel, ['NW', 'SW']);
+decals.push({ x: 125.5, y: 38, z: 4.2, face: 'S', tex: 'decal-vent' }, { x: 128.5, y: 38, z: 4.2, face: 'S', tex: 'decal-vent' });
+p.chamfer(114, 38, 130, 50, 2, darkPanel, ['NW', 'SW']);
 // A storage cage round the crates in the north-west.
-p.fence(28, 14, 29, 17, 'W', cage).fence(30, 14, 31, 17, 'E', cage).fence(28, 16, 31, 17, 'S', cage);
+p.fence(116, 38, 117, 41, 'W', cage).fence(118, 38, 119, 41, 'E', cage).fence(116, 40, 119, 41, 'S', cage);
 
-// 7. Lift L1: from maintenance (0) up to the barracks (6).
-p.rect(42, 16, 46, 20, lift([0, 6], 12));
+// Lift L1: from maintenance (0) up to the barracks (6).
+p.rect(130, 40, 134, 44, lift([0, 6], 12));
 
-// 8. The barracks corridor, with light strips along its walls: pools of
+// The barracks corridor, with light strips along its walls: pools of
 // light under the ceiling panels, the strips and the hanging lamps.
-p.rect(46, 16, 76, 20, room(6, 10, { light: 144 }));
-for (const x of [50, 58, 66]) p.rect(x, 17, x + 2, 19, room(6, 10, { ceiling: 'imp-ceiling-light', light: 208 }));
-for (const x of [48, 62, 72]) {
-  p.rect(x, 15, x + 2, 16, lights);
-  p.rect(x, 20, x + 2, 21, lights);
-  lamps.push({ x: x + 1, y: 16.3, radius: 3, light: 48 }, { x: x + 1, y: 19.7, radius: 3, light: 48 });
+p.rect(134, 40, 164, 44, room(6, 10, { light: 144 }));
+for (const x of [138, 146, 154]) p.rect(x, 41, x + 2, 43, room(6, 10, { ceiling: 'imp-ceiling-light', light: 208 }));
+for (const x of [136, 150, 160]) {
+  p.rect(x, 39, x + 2, 40, lights);
+  p.rect(x, 44, x + 2, 45, lights);
+  lamps.push({ x: x + 1, y: 40.3, radius: 3, light: 48 }, { x: x + 1, y: 43.7, radius: 3, light: 48 });
 }
-for (const x of [53, 69]) lamps.push({ x: x + 1, y: 18, radius: 4, light: 48 });
+for (const x of [141, 157]) lamps.push({ x: x + 1, y: 42, radius: 4, light: 48 });
 // Sector signs on the walls.
-decals.push({ x: 56, y: 16, z: 8.4, face: 'S', tex: 'decal-sign' }, { x: 67, y: 20, z: 8.4, face: 'N', tex: 'decal-sign' });
+decals.push({ x: 144, y: 40, z: 8.4, face: 'S', tex: 'decal-sign' }, { x: 155, y: 44, z: 8.4, face: 'N', tex: 'decal-sign' });
 
-// 9. The bunk room.
-p.rect(48, 4, 60, 15, room(6, 10, { light: 128 }));
-p.rect(53, 8, 55, 10, room(6, 10, { ceiling: 'imp-ceiling-light', light: 184 }));
-p.light(48, 4, 51, 7, 120);
-p.light(57, 4, 60, 7, 120);
-p.chamfer(48, 4, 60, 15, 2, darkPanel, ['NW', 'NE']);
-p.rect(53, 15, 55, 16, door(6));
+// The bunk room.
+p.rect(136, 28, 148, 39, room(6, 10, { light: 128 }));
+p.rect(141, 32, 143, 34, room(6, 10, { ceiling: 'imp-ceiling-light', light: 184 }));
+p.light(136, 28, 139, 31, 120);
+p.light(145, 28, 148, 31, 120);
+p.chamfer(136, 28, 148, 39, 2, darkPanel, ['NW', 'NE']);
+p.rect(141, 39, 143, 40, door(6));
 
-// 10. The officer's office.
-p.rect(62, 4, 72, 15, room(6, 9, { light: 144 }));
-p.rect(63, 5, 66, 8, room(6, 9, { ceiling: 'imp-ceiling-light', light: 192 })); // over the desk
-p.chamfer(62, 4, 72, 15, 2, darkPanel, ['NE']);
-p.rect(65, 15, 67, 16, door(6));
+// The officer's office.
+p.rect(150, 28, 160, 39, room(6, 9, { light: 144 }));
+p.rect(151, 29, 154, 32, room(6, 9, { ceiling: 'imp-ceiling-light', light: 192 })); // over the desk
+p.chamfer(150, 28, 160, 39, 2, darkPanel, ['NE']);
+p.rect(153, 39, 155, 40, door(6));
 // A barred window from the corridor into the office, over a sill.
-p.rect(69, 15, 71, 16, room(7, 8.5, { light: 144, side: 'imp-panel', upper: 'imp-panel' }));
-p.fence(69, 15, 71, 16, 'S', bars);
+p.rect(157, 39, 159, 40, room(7, 8.5, { light: 144, side: 'imp-panel', upper: 'imp-panel' }));
+p.fence(157, 39, 159, 40, 'S', bars);
 
-// 11. The red door, and 12. the data vault behind it: dark, walled in computer banks.
-p.rect(76, 8, 94, 26, computer);
-p.rect(76, 16, 77, 20, room(6, 10, { light: 144 })); // the corridor's end, up to the vault's wall
-p.rect(77, 17, 78, 19, door(6, { door: 'imp-door-red', lock: 'red' }));
+// The red door, and the data vault behind it: dark, walled in computer banks.
+p.rect(164, 32, 182, 50, computer);
+p.rect(164, 40, 165, 44, room(6, 10, { light: 144 })); // the corridor's end, up to the vault's wall
+p.rect(165, 41, 166, 43, door(6, { door: 'imp-door-red', lock: 'red' }));
 // The screens' glow pulses along the banks.
-p.rect(78, 10, 92, 25, room(6, 9, { light: 112 }));
+p.rect(166, 34, 180, 49, room(6, 9, { light: 112 }));
 const screens = { lightFx: 'glow', lightMin: 104 };
-p.light(78, 10, 92, 11, 152, screens);
-p.light(78, 24, 92, 25, 152, screens);
-p.light(78, 11, 79, 24, 152, screens);
-p.light(91, 11, 92, 24, 152, screens);
-p.chamfer(78, 10, 92, 25, 2, darkPanel);
+p.light(166, 34, 180, 35, 152, screens);
+p.light(166, 48, 180, 49, 152, screens);
+p.light(166, 35, 167, 48, 152, screens);
+p.light(179, 35, 180, 48, 152, screens);
+p.chamfer(166, 34, 180, 49, 2, darkPanel);
 // The secret niche behind a computer bank.
-p.rect(92, 14, 94, 18, { door: 'imp-computer', secret: true, floor: 'imp-floor', ceiling: 'imp-ceiling', floorZ: 6, ceilZ: 9, light: 112 });
-p.rect(94, 13, 98, 19, room(6, 9, { light: 120, secret: true }));
+p.rect(180, 38, 182, 42, { door: 'imp-computer', secret: true, floor: 'imp-floor', ceiling: 'imp-ceiling', floorZ: 6, ceilZ: 9, light: 112 });
+p.rect(182, 37, 186, 43, room(6, 9, { light: 120, secret: true }));
 // The south door onto the generator catwalk.
 // (Above it on both sides: the computer banks, as the generator side is too tall for the lit lintel.)
-p.rect(84, 25, 86, 26, door(6, { upper: 'imp-computer' }));
+p.rect(172, 49, 174, 50, door(6, { upper: 'imp-computer' }));
 
-// 13. The generator chamber: a deep shaft round the reactor column, with a
+// The generator chamber: a deep shaft round the reactor column, with a
 // catwalk ring and two bridges 6 up. The catwalks are grate slabs (two
 // storeys), so the shaft floor runs on underneath them, dark, all the way
 // round the column and to the walls.
 const genFloor = room(-6, 18, { floor: 'imp-grate', light: 128, tag: 'generator' });
 const grate = { bottom: 5.5, top: 6, floor: 'imp-grate', ceiling: 'imp-grate', side: 'imp-stripe', light: 120 };
 const catwalk = { ...genFloor, light: 152, slab: grate };
-p.rect(72, 26, 108, 62, genFloor);
-p.rect(72, 26, 108, 29, catwalk);
-p.rect(72, 59, 108, 62, catwalk);
-p.rect(72, 26, 75, 62, catwalk);
-p.rect(105, 26, 108, 62, catwalk);
-p.pillar(86, 40, 94, 48, 2, lights, genFloor);
+p.rect(160, 50, 196, 86, genFloor);
+p.rect(160, 50, 196, 53, catwalk);
+p.rect(160, 83, 196, 86, catwalk);
+p.rect(160, 50, 163, 86, catwalk);
+p.rect(193, 50, 196, 86, catwalk);
+p.pillar(174, 64, 182, 72, 2, lights, genFloor);
 // The column lights the shaft floor round it with a slow pulse.
-p.light(84, 38, 96, 50, 200, { lightFx: 'glow', lightMin: 136 });
+p.light(172, 62, 184, 74, 200, { lightFx: 'glow', lightMin: 136 });
 // Light strips on the chamber walls, lighting the catwalk in front of them,
 // and lamps under it lighting the floor below. The overload breaks them.
 /** A light strip on the wall over (x0, y0)-(x1, y1), and its two lamps at (lx, ly): one over the catwalk, one under it. */
@@ -201,28 +325,28 @@ const strip = (x0, y0, x1, y1, lx, ly) => {
   p.rect(x0, y0, x1, y1, lights);
   lamps.push({ x: lx, y: ly, z: 7, radius: 4, light: 48, tag: 'gen-lamps' }, { x: lx, y: ly, radius: 4, light: 56, tag: 'gen-lamps' });
 };
-for (const y of [33, 51]) {
-  strip(71, y, 72, y + 3, 72.3, y + 1.5);
-  strip(108, y, 109, y + 3, 107.7, y + 1.5);
+for (const y of [57, 75]) {
+  strip(159, y, 160, y + 3, 160.3, y + 1.5);
+  strip(196, y, 197, y + 3, 195.7, y + 1.5);
 }
-for (const x of [96, 102]) strip(x, 25, x + 3, 26, x + 1.5, 26.3);
-for (const x of [80, 96]) strip(x, 62, x + 3, 63, x + 1.5, 61.7);
-p.rect(88, 29, 92, 40, catwalk);
-p.rect(88, 48, 92, 59, catwalk);
+for (const x of [184, 190]) strip(x, 49, x + 3, 50, x + 1.5, 50.3);
+for (const x of [168, 184]) strip(x, 86, x + 3, 87, x + 1.5, 85.7);
+p.rect(176, 53, 180, 64, catwalk);
+p.rect(176, 72, 180, 83, catwalk);
 // Railings along the catwalk ring's inner edge and both sides of the
 // bridges, open where the lifts and bridges join the ring.
-p.fence(74, 29, 75, 55, 'E', railing);
-p.fence(105, 33, 106, 59, 'W', railing);
-p.fence(75, 28, 88, 29, 'S', railing).fence(92, 28, 101, 29, 'S', railing);
-p.fence(79, 59, 88, 60, 'N', railing).fence(92, 59, 105, 60, 'N', railing);
-for (const [y0, y1] of [[29, 40], [48, 59]]) p.fence(88, y0, 89, y1, 'W', railing).fence(91, y0, 92, y1, 'E', railing);
+p.fence(162, 53, 163, 79, 'E', railing);
+p.fence(193, 57, 194, 83, 'W', railing);
+p.fence(163, 52, 176, 53, 'S', railing).fence(180, 52, 189, 53, 'S', railing);
+p.fence(167, 83, 176, 84, 'N', railing).fence(180, 83, 193, 84, 'N', railing);
+for (const [y0, y1] of [[53, 64], [72, 83]]) p.fence(176, y0, 177, y1, 'W', railing).fence(179, y0, 180, y1, 'E', railing);
 // Lifts L2 (south-west) and L2b (north-east) run between the floor and the ring.
-p.rect(75, 55, 79, 59, lift([-6, 6], 18, { tag: 'generator' }));
-p.rect(101, 29, 105, 33, lift([-6, 6], 18, { tag: 'generator' }));
+p.rect(163, 79, 167, 83, lift([-6, 6], 18, { tag: 'generator' }));
+p.rect(189, 53, 193, 57, lift([-6, 6], 18, { tag: 'generator' }));
 // The overload switch on the column's east face, at the bottom, under
 // hazard stripes.
-decals.push({ x: 94, y: 44, z: -3.6, face: 'E', tex: 'decal-hazard' });
-p.rect(93, 43, 94, 45, {
+decals.push({ x: 182, y: 68, z: -3.6, face: 'E', tex: 'decal-hazard' });
+p.rect(181, 67, 182, 69, {
   wall: 'imp-switch',
   switchTo: 'imp-switch-on',
   use: [
@@ -233,25 +357,52 @@ p.rect(93, 43, 94, 45, {
   ],
 });
 
-// 14. The escape hatch in the east wall, opened by the overload switch
+// The escape hatch in the east wall, opened by the overload switch
 // (once, so it stays open: shut, the way out would be sealed).
-p.rect(108, 43, 109, 45, door(6, { lock: 'remote', tag: 'escape', stayOpen: true, ...tallSide }));
+p.rect(196, 67, 197, 69, door(6, { lock: 'remote', tag: 'escape', stayOpen: true, ...tallSide }));
 
 // ---------------------------------------------------------------- the way out
-// 15. The gantry: stairs up to 8, out under the sky.
+// The gantry: stairs up to 8, out under the sky.
 const gantry = (z) => sand(z, { floor: 'imp-grate', side: 'imp-panel-dark', light: 160 });
-p.stairs(110, 42, 114, 46, 'E', 6.5, 0.5, gantry);
-p.rect(114, 42, 118, 46, gantry(8));
-p.rect(109, 42, 110, 46, gantry(6)); // a landing outside the escape hatch
+p.stairs(198, 66, 202, 70, 'E', 6.5, 0.5, gantry);
+p.rect(202, 66, 206, 70, gantry(8));
+p.rect(197, 66, 198, 70, gantry(6)); // a landing outside the escape hatch
 
-// 16. The chasm (3 tiles), with lift L3 back up if you fall.
-p.rect(118, 34, 121, 60, sand(-2, { light: 104 }));
-p.rect(118, 56, 121, 60, lift([-2, 8], SKY, { ceiling: 'sky', light: 104 }));
+// The chasm (3 tiles), with lift L3 back up if you fall.
+p.rect(206, 58, 209, 84, sand(-2, { light: 104 }));
+p.rect(206, 80, 209, 84, lift([-2, 8], SKY, { ceiling: 'sky', light: 104 }));
 
-// 17. The landing pad, floodlit. Stepping onto the marked pickup spot (it
+// The landing pad, floodlit. Stepping onto the marked pickup spot (it
 // pulses) ends the mission.
-p.rect(121, 34, 126, 60, sand(8, { floor: 'imp-floor', side: 'imp-panel-dark', light: 184 }));
-p.rect(122, 43, 126, 47, sand(8, { floor: 'lift-floor', side: 'imp-panel-dark', light: 224, lightFx: 'glow', lightMin: 168, exit: true }));
+p.rect(209, 58, 214, 84, sand(8, { floor: 'imp-floor', side: 'imp-panel-dark', light: 184 }));
+p.rect(210, 67, 214, 71, sand(8, { floor: 'lift-floor', side: 'imp-panel-dark', light: 224, lightFx: 'glow', lightMin: 168, exit: true }));
+
+// ---------------------------------------------------------------- the canyon's edges
+// The carved canyons' stepped rock edges, cut to 45 degrees: a rock tile
+// with open ground on two sides that meet at a corner (and rock on the
+// other two) becomes an angled wall standing on that ground.
+const OPEN = (c) => c && !c.wall && !c.door && c.ceiling === 'sky';
+const cuts = [];
+for (const k of carved) {
+  const x0 = k % W;
+  const y0 = (k / W) | 0;
+  for (const [x, y] of [[x0 + 1, y0], [x0 - 1, y0], [x0, y0 + 1], [x0, y0 - 1]]) {
+    const c = p.get(x, y);
+    if (!c || c.wall !== 'sandstone' || c.diagonal) continue;
+    const n = p.get(x, y - 1);
+    const s = p.get(x, y + 1);
+    const e = p.get(x + 1, y);
+    const w = p.get(x - 1, y);
+    for (const [a, b, solid] of [[n, e, 'SW'], [n, w, 'SE'], [s, e, 'NW'], [s, w, 'NE']]) {
+      const opp = { SW: [s, w], SE: [s, e], NW: [n, w], NE: [n, e] }[solid];
+      if (OPEN(a) && OPEN(b) && a.floorZ === b.floorZ && !a.slab && !b.slab && opp.every((o) => o?.wall === 'sandstone')) {
+        cuts.push([x, y, { ...a, ...rock, diagonal: solid }]);
+        break;
+      }
+    }
+  }
+}
+for (const [x, y, c] of cuts) p.set(x, y, c);
 
 // ---------------------------------------------------------------- the skyline
 // The canyon's rock walls end 4.5 to 6 m up at a rim: one tile of rock out
@@ -372,105 +523,105 @@ const NOT_EASIEST = [2, 3, 4, 5];
 const NORMAL_UP = [3, 4, 5];
 const HARD = [4, 5];
 const list = [
-  at('player', 14.5, 90.5, { angle: 90 }),
-  at('detonator-belt', 17.5, 88.5), // thermal detonators, to try them out
-  at('concussion-rifle', 19.5, 88.5), // and the concussion rifle (Bossk's)
-  at('power-cell', 19, 87.5), at('power-cell', 20, 87.5), // with power cells for it
+  // The drop-off, facing north-west up the reach to the garrison.
+  at('player', 186.5, 124.5, { angle: 141 }),
   // The canyon: snipers on both ledges and the rock arch, two gate guards and
-  // their commanders, a probe droid round the spire, and a band of Jawas
+  // their commanders, a probe droid round the mesa, and a band of Jawas
   // scavenging in the gorge.
-  at('stormtrooper', 24.5, 65.5, { angle: 270, z: 5, skill: NOT_EASIEST }), // sniper, on the arch
-  at('stormtrooper', 22, 50.5, { angle: 0 }), // sniper, ledge A
-  at('stormtrooper', 59.5, 48.5, { angle: 180 }), // sniper, ledge B
-  at('sandtrooper', 40.5, 42, { angle: 270 }),
-  at('sandtrooper', 56.5, 42, { angle: 270, skill: NOT_EASIEST }),
-  at('sandtrooper', 30.5, 52.5, { angle: 270, skill: HARD }), // under ledge A
-  at('sandtrooper', 53.5, 55.5, { angle: 200, skill: NOT_EASIEST }), // by the big boulder, facing the gorge
+  at('stormtrooper', 112.5, 89.5, { angle: 270, z: 5, skill: NOT_EASIEST }), // sniper, on the arch
+  at('stormtrooper', 110, 74.5, { angle: 0 }), // sniper, ledge A
+  at('stormtrooper', 147.5, 72.5, { angle: 180 }), // sniper, ledge B
+  at('sandtrooper', 128.5, 66, { angle: 270 }),
+  at('sandtrooper', 144.5, 66, { angle: 270, skill: NOT_EASIEST }),
+  at('sandtrooper', 118.5, 76.5, { angle: 270, skill: HARD }), // under ledge A
+  at('sandtrooper', 141.5, 79.5, { angle: 200, skill: NOT_EASIEST }), // by the big boulder, facing the gorge
   // Sandtrooper commanders: one at the gate between its guards, one by the
   // vent mouth, the way in once the gate holds.
-  at('sandtrooper-commander', 48.5, 42.5, { angle: 270, skill: NOT_EASIEST }),
-  at('sandtrooper-commander', 33.5, 43.5, { angle: 270, skill: NORMAL_UP }),
-  at('probe-droid', 44.5, 56.5, { skill: NORMAL_UP }),
+  at('sandtrooper-commander', 136.5, 66.5, { angle: 270, skill: NOT_EASIEST }),
+  at('sandtrooper-commander', 121.5, 67.5, { angle: 270, skill: NORMAL_UP }),
+  at('probe-droid', 132.5, 82, { skill: NORMAL_UP }),
   // Barricades across the approach to the gate, angled out, the guards
   // behind them, and supply crates stacked against the face by the strips
   // (one half hides the vent mouth).
-  at('barricade', 43, 46, { angle: 250 }), at('barricade', 53, 46, { angle: 290 }),
-  at('barricade', 37.5, 47.5, { angle: 270 }),
-  at('floodlight-tower', 31.5, 45.5, { angle: 315 }), at('floodlight-tower', 56, 44.8, { angle: 225 }),
-  at('sensor-mast', 61, 52), at('sensor-dish', 61, 52, { z: 11.1 }),
-  at('supply-crate', 58.5, 41.2), at('supply-crate', 59.9, 41.4), at('supply-crate', 59, 42.6),
-  at('supply-crate', 38.2, 41.2), at('supply-crate', 35.3, 41),
+  at('barricade', 131, 70, { angle: 250 }), at('barricade', 141, 70, { angle: 290 }),
+  at('barricade', 125.5, 71.5, { angle: 270 }),
+  at('floodlight-tower', 119.5, 69.5, { angle: 315 }), at('floodlight-tower', 144, 68.8, { angle: 225 }),
+  at('sensor-mast', 149, 76), at('sensor-dish', 149, 76, { z: 11.1 }),
+  // The comm mast on the mesa: the landmark.
+  at('comm-mast', 126, 76, { z: 14, angle: 20 }),
+  at('supply-crate', 146.5, 65.2), at('supply-crate', 147.9, 65.4), at('supply-crate', 147, 66.6),
+  at('supply-crate', 126.2, 65.2), at('supply-crate', 123.3, 65),
   // Boulders fallen from the walls, along their feet and off the way through.
-  at('boulder-large', 9, 87.5, { angle: 30 }), at('boulder-small', 7.8, 85.2, { angle: 200 }),
-  at('boulder-large', 26.5, 92.5, { angle: 140 }), at('boulder-small', 11, 79.5, { angle: 80 }),
-  at('boulder-small', 16.5, 72, { angle: 310 }), at('boulder-large', 31.5, 62.5, { angle: 250 }),
-  at('boulder-large', 27, 57.5, { angle: 100 }), at('boulder-small', 29.6, 58.6, { angle: 20 }),
-  at('boulder-small', 42.4, 53.5, { angle: 160 }), at('boulder-large', 51, 58, { angle: 300 }),
-  at('jawa', 24, 76, { angle: 270 }), at('jawa', 30, 72, { angle: 225 }),
-  at('jawa', 28, 62, { angle: 270, skill: NORMAL_UP }),
-  at('jawa', 18.5, 66.5, { angle: 315, skill: HARD }),
-  at('energy-cell', 24.5, 68.5),
-  at('med-kit', 29.5, 42.5, { skill: [1, 2, 3] }), // after the gate guards, by the vent
-  at('thermal-detonator', 30.5, 42.5),
-  at('energy-pack', 59.5, 45.5), // secret: ledge B
-  at('shield-unit', 3.5, 82), // secret: the rock alcove
+  at('boulder-large', 97, 111.5, { angle: 30 }), at('boulder-small', 95.8, 109.2, { angle: 200 }),
+  at('boulder-large', 114.5, 116.5, { angle: 140 }), at('boulder-small', 99, 103.5, { angle: 80 }),
+  at('boulder-small', 104.5, 96, { angle: 310 }), at('boulder-large', 119.5, 86.5, { angle: 250 }),
+  at('boulder-large', 115, 81.5, { angle: 100 }), at('boulder-small', 117.6, 82.6, { angle: 20 }),
+  at('boulder-small', 133.4, 77.5, { angle: 160 }), at('boulder-large', 139, 82, { angle: 300 }),
+  at('jawa', 112, 100, { angle: 270 }), at('jawa', 118, 96, { angle: 225 }),
+  at('jawa', 116, 86, { angle: 270, skill: NORMAL_UP }),
+  at('jawa', 106.5, 90.5, { angle: 315, skill: HARD }),
+  at('energy-cell', 112.5, 92.5),
+  at('med-kit', 117.5, 66.5, { skill: [1, 2, 3] }), // after the gate guards, by the vent
+  at('thermal-detonator', 118.5, 66.5),
+  at('energy-pack', 147.5, 69.5), // secret: ledge B
+  at('shield-unit', 91.5, 106), // secret: the rock alcove
   // The vent: an energy cell where light falls through the grate.
-  at('energy-cell', 33, 32.5),
+  at('energy-cell', 121, 56.5),
   // Maintenance: an ambush by the lift (two on the hard skills).
-  at('stormtrooper', 36.5, 16.5, { angle: 270, ambush: true }),
-  at('stormtrooper', 27.5, 20.5, { angle: 0, ambush: true, skill: HARD }),
-  at('supply-crate', 28.5, 16), at('supply-crate', 30, 16),
-  at('console', 39.5, 15.5),
-  at('terminal', 34, 14.6, { angle: 270 }), at('terminal', 35.4, 14.6, { angle: 270 }),
-  at('energy-pack', 28.5, 24.5),
-  at('thermal-detonator', 29.5, 24.5),
-  at('energy-cell', 40.5, 24.5),
+  at('stormtrooper', 124.5, 40.5, { angle: 270, ambush: true }),
+  at('stormtrooper', 115.5, 44.5, { angle: 0, ambush: true, skill: HARD }),
+  at('supply-crate', 116.5, 40), at('supply-crate', 118, 40),
+  at('console', 127.5, 39.5),
+  at('terminal', 122, 38.6, { angle: 270 }), at('terminal', 123.4, 38.6, { angle: 270 }),
+  at('energy-pack', 116.5, 48.5),
+  at('thermal-detonator', 117.5, 48.5),
+  at('energy-cell', 128.5, 48.5),
   // The barracks: the officer carries the red keycard.
-  at('stormtrooper', 68.5, 18, { angle: 180 }),
-  at('stormtrooper', 74.5, 18, { angle: 180, skill: NORMAL_UP }), // by the red door
-  at('ceiling-lamp', 54, 18), at('ceiling-lamp', 70, 18),
-  at('stormtrooper', 51.5, 7.5, { angle: 270 }),
-  at('stormtrooper', 57.5, 10.5, { angle: 270, skill: NOT_EASIEST }),
-  at('stormtrooper', 54.5, 6.5, { angle: 270, skill: HARD }),
-  at('supply-crate', 50.5, 11.5), at('supply-crate', 56, 12),
-  at('med-kit', 58.5, 6),
-  at('officer', 66.5, 8.5, { angle: 270, drops: ['keycard-red'] }),
-  at('med-kit', 70.5, 6, { skill: EASY }),
-  at('console', 63.5, 6),
+  at('stormtrooper', 156.5, 42, { angle: 180 }),
+  at('stormtrooper', 162.5, 42, { angle: 180, skill: NORMAL_UP }), // by the red door
+  at('ceiling-lamp', 142, 42), at('ceiling-lamp', 158, 42),
+  at('stormtrooper', 139.5, 31.5, { angle: 270 }),
+  at('stormtrooper', 145.5, 34.5, { angle: 270, skill: NOT_EASIEST }),
+  at('stormtrooper', 142.5, 30.5, { angle: 270, skill: HARD }),
+  at('supply-crate', 138.5, 35.5), at('supply-crate', 144, 36),
+  at('med-kit', 146.5, 30),
+  at('officer', 154.5, 32.5, { angle: 270, drops: ['keycard-red'] }),
+  at('med-kit', 158.5, 30, { skill: EASY }),
+  at('console', 151.5, 30),
   // The vault: guards against the far computer banks, lit by the screens'
   // glow, facing the red door.
-  at('stormtrooper', 91.4, 14.5, { angle: 180 }),
-  at('stormtrooper', 91.4, 20.5, { angle: 180, skill: NORMAL_UP }),
-  at('officer', 83.5, 22.5, { angle: 90, skill: HARD }),
-  at('terminal', 85, 16.4, { angle: 90 }), at('terminal', 85, 17.6, { angle: 270 }),
-  at('energy-pack', 85, 13.5),
-  at('energy-cell', 80.5, 21.5), at('energy-cell', 89.5, 21.5),
-  at('shield-unit', 96, 16), // secret: the niche
+  at('stormtrooper', 179.4, 38.5, { angle: 180 }),
+  at('stormtrooper', 179.4, 44.5, { angle: 180, skill: NORMAL_UP }),
+  at('officer', 171.5, 46.5, { angle: 90, skill: HARD }),
+  at('terminal', 173, 40.4, { angle: 90 }), at('terminal', 173, 41.6, { angle: 270 }),
+  at('energy-pack', 173, 37.5),
+  at('energy-cell', 168.5, 45.5), at('energy-cell', 177.5, 45.5),
+  at('shield-unit', 184, 40), // secret: the niche
   // The generator: containment rings turning round the column above the
   // catwalk, and coolant tanks on the shaft floor. Things on the catwalks
   // stand on them (z 6); the rest are on the shaft floor, under them.
-  at('reactor-ring', 90, 44, { z: 9, angle: 0 }), at('reactor-ring', 90, 44, { z: 13, angle: 45 }),
-  at('coolant-tank', 78.5, 32.5), at('coolant-tank', 78.5, 36),
-  at('coolant-tank', 101.5, 55.5), at('coolant-tank', 101.5, 52),
-  at('probe-droid', 90, 34.5, { z: 6.9 }), // over the north bridge
-  at('probe-droid', 80.5, 40.5, { skill: [5] }), // down in the west half
-  at('stormtrooper', 80.5, 27.5, { angle: 270, z: 6 }),
-  at('stormtrooper', 106.5, 50.5, { angle: 180, z: 6, skill: NOT_EASIEST }),
-  at('stormtrooper', 96.5, 60.5, { angle: 90, z: 6, skill: HARD }),
-  at('stormtrooper', 80.5, 48.5, { angle: 0 }),
-  at('fuel-barrel', 98.5, 44.5), at('fuel-barrel', 99.5, 46.5),
-  at('med-kit', 97.5, 56.5),
-  at('energy-pack', 73.5, 40.5, { z: 6 }),
-  at('energy-cell', 73.5, 27.5), // in the dark under the north-west corner of the ring
+  at('reactor-ring', 178, 68, { z: 9, angle: 0 }), at('reactor-ring', 178, 68, { z: 13, angle: 45 }),
+  at('coolant-tank', 166.5, 56.5), at('coolant-tank', 166.5, 60),
+  at('coolant-tank', 189.5, 79.5), at('coolant-tank', 189.5, 76),
+  at('probe-droid', 178, 58.5, { z: 6.9 }), // over the north bridge
+  at('probe-droid', 168.5, 64.5, { skill: [5] }), // down in the west half
+  at('stormtrooper', 168.5, 51.5, { angle: 270, z: 6 }),
+  at('stormtrooper', 194.5, 74.5, { angle: 180, z: 6, skill: NOT_EASIEST }),
+  at('stormtrooper', 184.5, 84.5, { angle: 90, z: 6, skill: HARD }),
+  at('stormtrooper', 168.5, 72.5, { angle: 0 }),
+  at('fuel-barrel', 186.5, 68.5), at('fuel-barrel', 187.5, 70.5),
+  at('med-kit', 185.5, 80.5),
+  at('energy-pack', 161.5, 64.5, { z: 6 }),
+  at('energy-cell', 161.5, 51.5), // in the dark under the north-west corner of the ring
   // The gantry: a sandtrooper at the top of the stairs, and a med kit before
   // the last fight.
-  at('sandtrooper', 117.2, 43, { angle: 180, skill: NORMAL_UP }),
-  at('med-kit', 115.5, 44, { skill: [1, 2, 3] }),
+  at('sandtrooper', 205.2, 67, { angle: 180, skill: NORMAL_UP }),
+  at('med-kit', 203.5, 68, { skill: [1, 2, 3] }),
   // The landing pad, with the pickup shuttle north of the marked spot.
-  at('shuttle', 123.5, 38.5, { angle: 270 }),
-  at('stormtrooper', 123.5, 49.5, { angle: 180 }),
-  at('sandtrooper', 123.5, 54.5, { angle: 180, skill: NOT_EASIEST }),
-  at('stormtrooper', 125, 52.5, { angle: 180, skill: HARD }),
+  at('shuttle', 211.5, 62.5, { angle: 270 }),
+  at('stormtrooper', 211.5, 73.5, { angle: 180 }),
+  at('sandtrooper', 211.5, 78.5, { angle: 180, skill: NOT_EASIEST }),
+  at('stormtrooper', 213, 76.5, { angle: 180, skill: HARD }),
 ];
 
 export default defineLevel({
@@ -482,7 +633,7 @@ export default defineLevel({
   // Outdoors, the canyon fades into the night's purple haze (the colour of
   // the sky low down), halfway at 20 m.
   haze: { color: [32, 24, 64], half: 40 },
-  par: 300,
+  par: 600,
   ...p.build(),
   lights: lamps,
   decals,

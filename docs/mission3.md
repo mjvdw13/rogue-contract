@@ -103,8 +103,8 @@ garrison's structure (inside). Kept areas are the first map's, moved by
 
 | # | Area | Box (x0..x1, y0..y1) | Floor / ceiling | Notes |
 |---|------|----------------------|-----------------|-------|
-| 1 | The wash, drop-off | 172..236, 124..172 | -6 / sky | Wide, sandy, gravel channels. Start (204.5, 150.5) facing north-west. The Crow sets down beside and leaves. |
-| 1a | The reach | a band 12 wide from (196, 130) to (150, 92) | -6 / sky | Ends at a cliff under the bowl's south-east lip (a rock lip at +2 along the bowl's edge, 8 over the reach). The view: the bowl, the face, the mast. |
+| 1 | The wash, drop-off | 176..236, 118..170 | -6 / sky | Wide, sandy, gravel channels. Start (186.5, 124.5) facing north-west up the reach. The Crow sets down beside and leaves. |
+| 1a | The reach | a band 16 wide from (184, 122) to (140, 92) | -6 / sky | Ends at a cliff under the bowl's south lip (133..147, 84..86: rock at +2 along the bowl's edge, 8 over the reach). The view: the face, the mesa and the mast. |
 | 1b | The pad's cliff | 218..236, 86..124 | (the pad, 10) | Seen from the wash: its edge 16 over the wash floor, the shuttle on it, its landing lights. |
 | 2 | The dry wash | 104..176, 146..172 | -6 / sky | West from the drop-off. Jawas stripping a wrecked skyhopper (128, 160). Boulders. |
 | 3 | The slot canyon | from (106, 158) north-west to (68, 126), 4 to 6 wide | -6 up to -2 | Winding, its walls close; two short flights of rock steps. |
@@ -195,7 +195,11 @@ no try-out pile at the start: Mark, 2026-11-20), E-11s from the troopers.
 - **The landmark.** A model shows over the rim only if the 2D line to it
   runs through open tiles (checked 2026-11-20): behind solid rock it's
   hidden. So the mast stands in the open (on the spire's mesa, a raised
-  floor) and the reach and the range are laid out to look at it.
+  floor) and the reach and the range are laid out to look at it. A thing
+  is also cut off at its tile's ceiling, and an open tile's sky starts at
+  24: over the bowl it starts at 40, so the mast (34 at its tip) stands
+  whole. Through 37 m of haze its steel has to be pale and heavy and its
+  beacons big (fullbright faces take the haze too).
 - **The drop.** Monsters in the bowl can see down into the reach; it's
   out of their reach both ways (the lip is 8 over the reach floor).
 - **Shortcuts.** The chasm under the pad doesn't open into the wash, so

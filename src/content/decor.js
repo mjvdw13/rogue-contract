@@ -186,6 +186,10 @@ export default [
   defineDecoration({ id: 'floodlight-tower-worn', model: 'floodlight-tower-worn', solid: true, radius: 0.5, height: 7 }), // Mos Eisley's
   defineDecoration({ id: 'sensor-mast', model: 'sensor-mast', solid: true, radius: 0.45, height: 8.1 }),
   defineDecoration({ id: 'sensor-dish', model: 'sensor-dish', spin: 0.9 }),
+  // Mission 3's comm mast (the landmark, on the mesa in the bowl) and the
+  // power line's poles (models/canyon.js).
+  defineDecoration({ id: 'comm-mast', model: 'comm-mast', solid: true, radius: 1.5, height: 24, fixed: true }),
+  defineDecoration({ id: 'power-pole', model: 'power-pole', solid: true, radius: 0.3, height: 7, fixed: true }),
   // Mos Eisley's domes, on roofs and over round buildings.
   ...DOMES.map((d) => defineDecoration({ id: d.id, model: d.id, solid: true, radius: d.radius, height: d.height })),
   // Fallen in, in the old quarter.

@@ -1570,7 +1570,7 @@ before and after; check in with Mark after each):
       (flow, areas with boxes and heights, the kit, light and air,
       secrets, enemies and items by skill, engine notes). Mark reads it
       before the blockout.
-- [ ] **Blockout, the canyon** (areas 1-7): the map enlarged, today's
+- [x] **Blockout, the canyon** (areas 1-7): the map enlarged, today's
       bowl and gate kept as they are and moved; stand-in props; the route
       test extended; bench the open stretches before dressing.
 - [ ] **Blockout, the base** (8-17): the rock-cut rooms round today's
