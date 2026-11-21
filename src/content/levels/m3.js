@@ -400,13 +400,20 @@ p.rect(188, 17, 190, 18, door(6));
 for (let k = 0; k < 6; k++) lamps.push({ x: 164 + k * 5, y: 14, z: 9, radius: 3, light: 40 });
 p.rect(189, 23, 191, 24, door(6, { lock: 'remote', tag: 'backstairs' }));
 p.rect(188, 24, 192, 49, room(6, 10, { light: 136 }));
+// A service way: pipework along both walls, a light strip every 8 tiles
+// on alternate sides, pools of light under them.
+p.rect(187, 24, 193, 49, (x, y, old) => (old.wall === 'imp-panel' && (x === 187 || x === 192) ? { ...old, wall: 'gar-pipes-b' } : old));
+for (const [x, y] of [[187, 28], [192, 36], [187, 44]]) {
+  p.rect(x, y, x + 1, y + 2, lights);
+  p.pool(x === 187 ? 188.5 : 191.5, y + 1, 3, 176);
+}
 p.rect(189, 49, 191, 50, door(6, { ...tallSide }));
 
 // The generator chamber: a deep shaft round the reactor column, with a
 // catwalk ring and two bridges 6 up. The catwalks are grate slabs (two
 // storeys), so the shaft floor runs on underneath them, dark, all the way
 // round the column and to the walls.
-const genFloor = room(-6, 18, { floor: 'imp-grate', light: 128, tag: 'generator' });
+const genFloor = room(-6, 18, { floor: 'imp-grate', ceiling: 'gar-pit', light: 128, tag: 'generator' });
 const grate = { bottom: 5.5, top: 6, floor: 'imp-grate', ceiling: 'imp-grate', side: 'gar-trim', light: 120 };
 const catwalk = { ...genFloor, light: 152, slab: grate };
 p.rect(160, 50, 196, 86, genFloor);
