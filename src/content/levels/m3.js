@@ -123,8 +123,6 @@ for (const [x, y] of [[184, 123], [172, 134]]) p.rect(x - 2, y - 2, x + 3, y + 3
 // with a gap to jump; the Jawas below and on the far side.
 carve([[166, 140, 1.7], [152, 142, 1.6], [136, 141, 1.6], [126, 139, 1.7]], (z) => sand(z, { light: 136 }), { z0: -4 });
 carve([[166, 150, 6], [150, 151, 8], [134, 150, 7], [122, 148, 5]], (z) => sand(z, { light: 136 }), { z0: -10 });
-// The gap: the ledge has fallen away for 3 tiles.
-p.rect(146, 140, 149, 145, (x, y, old) => (!old.wall && old.floorZ === -4 ? { ...old, floorZ: -10 } : old));
 // Rock steps down off the ledge's west end to the gulch floor.
 carve([[126, 139, 1.6], [120, 140, 1.6], [116, 145, 1.6]], (z) => sand(z, { light: 128 }), { z0: -4.5, z1: -10 });
 
@@ -145,6 +143,44 @@ carve([[36, 113, 1.8], [34, 104, 1.8], [38, 96, 1.8]], (z) => sand(z, { light: 1
 carve([[38, 96, 1.7], [52, 94, 1.6], [66, 95, 1.6], [80, 93, 1.7], [92, 89.5, 1.6]], (z) => sand(z, { light: 144 }), { z0: 5 });
 carve([[45, 114, 3], [44, 108, 3], [52, 101, 4.5], [64, 99, 4.5], [76, 97.5, 4], [86, 95, 2.5]], (z) => sand(z, { light: 120 }), { z0: -2 });
 p.rect(92, 88, 102, 91, sand(5, { tag: 'notch' }));
+
+// Blades of rock 1 or 2 tiles thick left standing between two carves (the
+// gulch ledge and the gulch floor, the camp and the dry gorge's head)
+// become floor, the higher side's: a ledge ends at its own cliff edge, not
+// behind a thin wall, and no knife of rock stands 5 m tall in the open.
+{
+  const open = (x, y) => {
+    const c = p.get(x, y);
+    return carved.has(y * W + x) && c && !c.wall && !c.door && c.ceiling === 'sky' ? c : null;
+  };
+  const fill = [];
+  for (const k of carved) {
+    const x0 = k % W;
+    const y0 = (k / W) | 0;
+    const a = open(x0, y0);
+    if (!a) continue;
+    for (const [dx, dy] of [[1, 0], [0, 1]]) {
+      for (let t = 1; t <= 2; t++) {
+        const run = [];
+        for (let i = 1; i <= t; i++) run.push([x0 + dx * i, y0 + dy * i]);
+        if (!run.every(([x, y]) => p.get(x, y)?.wall === 'sandstone' && !p.get(x, y).diagonal)) break;
+        const b = open(x0 + dx * (t + 1), y0 + dy * (t + 1));
+        if (!b) continue;
+        const hi = (a.floorZ ?? 0) >= (b.floorZ ?? 0) ? a : b;
+        for (const [x, y] of run) fill.push([x, y, hi]);
+      }
+    }
+  }
+  for (const [x, y, c] of fill) {
+    const old = p.get(x, y);
+    if (old.wall || (old.floorZ ?? 0) < (c.floorZ ?? 0)) {
+      p.set(x, y, c);
+      carved.add(y * W + x);
+    }
+  }
+}
+// The gap: the ledge has fallen away for 3 tiles.
+p.rect(146, 140, 149, 145, (x, y, old) => (!old.wall && old.floorZ === -4 ? { ...old, floorZ: -10 } : old));
 
 // ---------------------------------------------------------------- the gorge and the bowl (the first map's)
 // The old start bowl, now a pocket under the arch, with a secret alcove
@@ -645,7 +681,7 @@ function wallSpot(x, y) {
 }
 // The Empire's perimeter beacons, set in the rock along the way: blinking
 // red, a little above head height. The first signs of the garrison.
-for (const [x, y] of [[181, 125], [158, 140], [130, 147], [76, 128], [34, 108], [58, 93], [84, 92]]) {
+for (const [x, y] of [[181, 125], [158, 140], [132, 139], [76, 128], [34, 108], [58, 93], [84, 92]]) {
   const w = wallSpot(x, y);
   placed.push(at('rock-beacon', w.x, w.y, { angle: w.out, z: w.floor + 2.4 }));
   lamps.push({ x: w.x, y: w.y, z: w.floor + 2.4, radius: 2.5, light: 40, fx: 'blink' });

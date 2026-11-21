@@ -1857,6 +1857,29 @@ validate, MODDING.md and a test.
       trolley), a drifting second sky layer and lightning, light that
       runs along a corridor, a sound for the rain.
 
+### 14. Mission 3: the canyon's rock, refined (Mark, 2026-11-20)
+
+Before any more dressing. Found by height dumps and snapshots; one
+commit each, checked by snapshot.
+
+- [x] **Fins:** blades of rock 1 or 2 tiles thick left between two
+      carves (the gulch ledge and the gulch floor, the steps off its
+      west end, the camp and the dry gorge's head) become floor: the
+      higher side's, so the ledge reads as the gulch's own cliff edge.
+- [ ] **The rim over the gap** dips 6 tiles because the gap's floor is
+      the gulch's: the rim takes its height from the higher floors near
+      it, so a gap or a step down doesn't notch the skyline.
+- [ ] **The cave's walls** are tile-stepped zig-zags: cut to 45 degrees
+      like the open canyon's.
+- [ ] **Chockstones:** a square slab each, flat underneath; make them
+      rocks wedged across the slot (narrower, at an angle, uneven).
+- [ ] **Wall profile:** every canyon wall is one sheer face from floor
+      to rim, so the wide places (the hollow, the gulch, the camp) read
+      as walled pens. Benches and fallen blocks at the foot of the
+      walls, a step part way up.
+- [ ] **The climb** is an even 0.5 staircase 4 wide: uneven rock steps,
+      some wider, a landing.
+
 ## Small fixes and known rough edges
 
 - [ ] A second `Registry` built from the same content pack finds no sprite
