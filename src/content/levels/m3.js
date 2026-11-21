@@ -584,6 +584,17 @@ for (let y = 1; y < H - 1; y++) {
     }
   }
 }
+// Each rim stands on the highest floor within 2 of it, so a gap in a ledge
+// (the gulch's, 3 tiles of the floor 3 m below) or a drop at a step doesn't
+// notch the skyline over it.
+{
+  const raised = [...rim.values()].map((t) => {
+    let base = t.base;
+    for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) base = Math.max(base, rim.get((t.y + dy) * W + t.x + dx)?.base ?? -Infinity);
+    return base;
+  });
+  [...rim.values()].forEach((t, i) => { t.base = raised[i]; });
+}
 // The tall rock left standing (round the garrison and doors) beside open
 // sky: the rim climbs to meet it.
 const tall = [];

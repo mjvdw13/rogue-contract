@@ -1866,7 +1866,7 @@ commit each, checked by snapshot.
       carves (the gulch ledge and the gulch floor, the steps off its
       west end, the camp and the dry gorge's head) become floor: the
       higher side's, so the ledge reads as the gulch's own cliff edge.
-- [ ] **The rim over the gap** dips 6 tiles because the gap's floor is
+- [x] **The rim over the gap** dips 6 tiles because the gap's floor is
       the gulch's: the rim takes its height from the higher floors near
       it, so a gap or a step down doesn't notch the skyline.
 - [ ] **The cave's walls** are tile-stepped zig-zags: cut to 45 degrees
