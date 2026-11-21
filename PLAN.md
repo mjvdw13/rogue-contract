@@ -1562,9 +1562,10 @@ on four things:
 Steps (one commit each, playable at `?map=m3`; snapshots of every area
 before and after; check in with Mark after each):
 
-- [ ] **Measure today:** `tests/m3-route.test.js` walks today's route
-      (the time to beat), a bench of m3 (`tools/bench.mjs m3 --res 2`),
-      and snapshots of each area as the "before".
+- [x] **Measure today:** `tests/m3-route.test.js` walks today's route:
+      61 s at a walk. Bench (`tools/bench.mjs m3 --res 2`, headless, one
+      thread): 8.6 ms on average, 16.2 at the 90th percentile, 18.7 at
+      worst.
 - [ ] **Design:** rewrite `docs/mission3.md` as Missions 4 and 5's docs
       (flow, areas with boxes and heights, the kit, light and air,
       secrets, enemies and items by skill, engine notes). Mark reads it
