@@ -1,5 +1,8 @@
 import { valueNoise, smoothstep } from './noise.js';
 
+/** The four tiles round a corner of the backdrop's grid (one it is the top-left corner of, and those west and north). */
+const CORNER = [[0, 0], [-1, 0], [0, -1], [-1, -1]];
+
 /**
  * A backdrop for a painted canyon level (see world/backdrop.js): rock that
  * starts at the canyon's rim and climbs away from the level's open sky, out
@@ -82,13 +85,21 @@ export function canyonBackdrop(p, { margin = 96, cell = 1, seed = 1, low = false
         const relief = (valueNoise(x, y, 13, seed + 2) - 0.5) * 10 * smoothstep(1, 6, s) + (valueNoise(x, y, 4, seed + 3) - 0.5) * 3 * smoothstep(0, 3, s);
         const valley = 30 * (1 - smoothstep(0.03, 0.16, Math.abs(valueNoise(x, y, 34, seed + 1) - 0.5))) * smoothstep(10, 24, s);
         z = r + Math.max(0, climb + relief - valley) * smoothstep(0, 1.5, s) + Math.min(0, climb + relief - valley) * smoothstep(8, 16, s);
-        if (low) {
-          // (Under the lowest rim of the four tiles round this corner, or a
-          // corner by a tall rim tile pokes up over the low one beside it.)
-          const r4 = Math.min(r, rim(x - 1, y, b), rim(x, y - 1, b), rim(x - 1, y - 1, b));
-          const out = Math.max(0, -x, -y, x - (p.w - 1), y - (p.h - 1));
-          z = Math.min(z, r4 - 1 + out * 3);
+      }
+      if (low) {
+        // Under the lowest of the four tiles round this corner: a rock
+        // tile's rim less 1, an open tile's floor less 2. Taking only this
+        // corner's own tile, a corner on rock beside open air stood a tile
+        // under the rim, and the slope from it rose as a face over the open
+        // tile, right by a rock's end (Mission 3's pad railing).
+        let r4 = Infinity;
+        for (const [dx, dy] of CORNER) {
+          const k = (ty + dy) * W + tx + dx;
+          if (tx + dx < 0 || ty + dy < 0) continue;
+          r4 = Math.min(r4, dist[k] < 0.5 ? base[k] - 1 : rim(x + dx, y + dy, b));
         }
+        const out = Math.max(0, -x, -y, x - (p.w - 1), y - (p.h - 1));
+        z = Math.min(z, r4 - 1 + out * 3);
       }
       heights[j * (w + 1) + i] = z;
     }

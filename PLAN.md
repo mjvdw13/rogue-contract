@@ -48,7 +48,10 @@ These need Mark to try something, or to decide. Don't start them without him.
   thin fins between carves, the cave's walls and the slot's chockstones
   shaped, shelves at the foot of the wide places' walls, the climb in
   uneven steps with a landing, and the backdrop no longer covers the
-  view out of the cave and the vent. To judge: the shelves' look.
+  view out of the cave and the vent. On 2026-11-21 the backdrop stopped
+  standing up as a tan strip past the rock's end by the pad's railing:
+  check there, and anywhere else a rock ends against open air. To
+  judge: the shelves' look.
 
 - **Mission 4 brought up to Mission 5** (`?map=m4`, 2026-11-15; four of
   the ten ideas, picked by Mark). The unfinished sector shows how far the
