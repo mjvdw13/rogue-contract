@@ -15,13 +15,14 @@ import { makeWorld, mockInput } from './helpers.js';
 // pressing use until the lift in front of it has come up; 'talk' talks to
 // whoever is in front; 'flag=F' waits there until the story flag is set.
 const ROUTE = [
-  // The drop-off, west along the wash, up the slot canyon to the burned camp.
-  [176, 138], [156, 152], [134, 160], [114, 158], [100, 155.5], [88, 147], [90, 137], [80, 129], [68, 127],
-  [54, 131], [40, 124], [36, 116],
-  // The scout post: up the neck, into the bunker, its switch, out through the gate.
-  [35, 108], [37.5, 104], [42, 104, 'use'], [51, 104, 'face=0'], [42, 104], [37, 104], [35, 100], [35, 93],
-  // Across the range, up the ledge path, over the arch, down into the bowl.
-  [86, 37], [90, 38], [90, 47], [90, 61], [90, 89.5], [101, 89.5], [121, 89.5], [125, 89.5], [128, 88], [128, 80],
+  // The hollow, the slot, the ledge over the gulch (jumping its gap), down
+  // the steps into the Jawas' scrapyard.
+  [196, 126], [184, 123], [177, 128], [172, 134], [166, 139.5], [155, 142], [149.6, 142], [144, 142, 'jump'],
+  [136, 141], [126, 139], [120, 140.5], [117, 146], [117, 150],
+  // The cave, the squeeze (crouching), out into the burned camp.
+  [108, 152], [101, 149.5], [96, 146, 'crouch'], [94, 143], [92, 140], [84, 134], [74, 130], [64, 130], [52, 124], [40, 121], [37, 116],
+  // The climb, the high ledge to the notch, over the arch, down into the bowl.
+  [36, 112], [34, 104], [38, 96], [52, 94], [66, 95], [80, 93], [92, 89.5], [101, 89.5], [121, 89.5], [125, 89.5], [128, 88], [128, 80],
   [132, 79], [132, 70], [121, 66],
   // The vent, crouching, into maintenance and up lift L1.
   [121, 62, 'crouch'], [121, 51, 'crouch'], [122, 46], [132, 42, 'z=6'],

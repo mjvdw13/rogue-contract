@@ -202,9 +202,9 @@ export default [
   defineDecoration({ id: 'sensor-mast', model: 'sensor-mast', solid: true, radius: 0.45, height: 8.1 }),
   defineDecoration({ id: 'sensor-dish', model: 'sensor-dish', spin: 0.9 }),
   // Mission 3's comm mast (the landmark, on the mesa in the bowl) and the
-  // power line's poles (models/canyon.js).
+  // beacons set in the canyon's rock (models/canyon.js).
   defineDecoration({ id: 'comm-mast', model: 'comm-mast', solid: true, radius: 1.5, height: 24, fixed: true }),
-  defineDecoration({ id: 'power-pole', model: 'power-pole', solid: true, radius: 0.3, height: 7, fixed: true }),
+  defineDecoration({ id: 'rock-beacon', model: 'rock-beacon', fixed: true }),
   // The prototype's cradle in the test bay, empty.
   defineDecoration({ id: 'test-cradle', model: 'test-cradle', solid: true, fixed: true, height: 7.5 }),
   // The burned Tusken camp: huts burned to their frames, and ash heaps

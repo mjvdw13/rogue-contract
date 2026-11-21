@@ -40,7 +40,7 @@ const door = (floorZ, extra = {}) => ({
   door: 'imp-door', jamb: 'imp-jamb', style: 'rise', floor: 'imp-floor', ceiling: 'imp-ceiling', upper: 'imp-lintel',
   floorZ, ceilZ: floorZ + 2, light: 160, ...extra,
 });
-/** A blast gate: one 4x4 door (the main gate's, the scout post's). */
+/** A blast gate: one 4x4 door (the main gate's, the test bay's). */
 const gate = (floorZ, extra = {}) => door(floorZ, { door: 'imp-gate', jamb: 'imp-gate-jamb', ceilZ: floorZ + 4, ...extra });
 /** The wall above a door on a side where the room is too tall for the lit lintel (it would repeat up the wall). */
 const tallSide = { upper: 'imp-panel' };
@@ -101,68 +101,50 @@ function carve(points, cell, { z0 = 0, z1 = z0, step = 0.5 } = {}) {
 }
 
 // ---------------------------------------------------------------- the canyon, before the garrison
-// 1. The wash where the Crow sets Kyle down, south-east of the garrison, and
-// 2. the dry wash running on west from it.
-carve([[226, 130, 8], [204, 126, 9], [186, 130, 10], [170, 142, 10], [152, 154, 10], [132, 160, 9], [112, 158, 8]], (z) => sand(z), { z0: -6 });
-// 1a. The reach: a dead end running north-west from the drop-off to a
-// cliff under the bowl's lip, with the garrison and its mast in view.
-// The bowl's lip over it (painted first, so the reach stops at it): rock a
-// metre over the bowl, 4 m over the reach.
-p.rect(133, 84, 147, 86, sand(2, { floor: 'desert-gravel', light: 120, scenery: true }));
-carve([[184, 122, 8], [166, 107, 8], [152, 97, 8], [140, 92, 7.5]], (z) => sand(z, { light: 128 }), { z0: -6 });
+// Canyon country, explored rather than crossed: a slot, a ledge over a
+// gulch full of Jawas, their scrapyard, a cave, the burned camp, a climb
+// and a high ledge to the arch. No Imperial building before the garrison;
+// only their beacons, set in the rock along the way (things below).
 
-// 3. The slot canyon, winding north-west out of the wash and climbing in
-// rock steps to the camp.
-carve([[112, 158, 3], [97, 155, 2.5], [87, 147, 2.5], [90, 137, 2.5], [80, 129, 2.5], [68, 126, 3]], (z) => sand(z, { light: 124 }), { z0: -6, z1: -2 });
+/** Under a rock overhang or a chockstone wedged across a slot: a slab of rock you walk under. */
+const chock = (bottom) => ({ bottom, top: bottom + 1.5, floor: 'desert-gravel', ceiling: 'sandstone-dark', side: 'sandstone', light: 112 });
+/** A cave: gravel underfoot, rock overhead `head` above the floor, dark. */
+const cave = (head = 4) => (z) => ({ floor: 'desert-gravel', ceiling: 'sandstone-dark', floorZ: z, ceilZ: z + head, light: 104, side: 'sandstone', upper: 'sandstone' });
 
-// 4. The burned camp: a hollow in the rock.
+// 1. The hollow where the Crow sets Kyle down, facing west into the rock.
+carve([[216, 128, 6], [204, 126, 8], [194, 126, 4]], (z) => sand(z), { z0: -6 });
+
+// 2. The slot: a crack 3 wide winding west, rising a little, two
+// chockstones wedged across it overhead.
+carve([[194, 126, 1.8], [184, 123, 1.6], [177, 128, 1.6], [172, 134, 1.6], [166, 139, 1.8]], (z) => sand(z, { light: 124 }), { z0: -6, z1: -4 });
+for (const [x, y] of [[184, 123], [172, 134]]) p.rect(x - 2, y - 2, x + 3, y + 3, (x1, y1, old) => (!old.wall && old.ceiling === 'sky' && old.floorZ <= -4 ? { ...old, light: 104, slab: chock(old.floorZ + 3.5) } : old));
+
+// 3. The Jawa gulch: a ledge along its north wall, 3 m over its floor,
+// with a gap to jump; the Jawas below and on the far side.
+carve([[166, 140, 1.7], [152, 142, 1.6], [136, 141, 1.6], [126, 139, 1.7]], (z) => sand(z, { light: 136 }), { z0: -4 });
+carve([[166, 150, 6], [150, 151, 8], [134, 150, 7], [122, 148, 5]], (z) => sand(z, { light: 136 }), { z0: -10 });
+// The gap: the ledge has fallen away for 3 tiles.
+p.rect(146, 140, 149, 145, (x, y, old) => (!old.wall && old.floorZ === -4 ? { ...old, floorZ: -10 } : old));
+// Rock steps down off the ledge's west end to the gulch floor.
+carve([[126, 139, 1.6], [120, 140, 1.6], [116, 145, 1.6]], (z) => sand(z, { light: 128 }), { z0: -4.5, z1: -10 });
+
+// 4. The scrapyard at the gulch's west end (things below), and 5. the cave
+// out of it: west, a squeeze where the roof comes down (crouch), then up
+// north-west to the camp. Moonlight through cracks in its roof.
+carve([[116, 150, 1.6], [108, 152, 2], [100, 149, 1.4]], cave(4), { z0: -10, z1: -8 });
+carve([[100, 149, 1.4], [96, 146, 1.4]], cave(1.3), { z0: -8 });
+carve([[96, 146, 1.6], [92, 140, 2.5], [84, 134, 1.6], [74, 130, 1.8]], cave(4), { z0: -8, z1: -2.5 });
+for (const [x, y] of [[108, 152], [92, 140]]) p.pool(x + 0.5, y + 0.5, 3, 144);
+
+// 6. The burned camp: a hollow in the rock open to the sky.
 carve([[68, 128, 7], [54, 131, 11], [40, 127, 10], [36, 117, 6]], (z) => sand(z), { z0: -2 });
 
-// 5. The scout post: the canyon narrows to a neck climbing to the range,
-// shut at its head by a wall with a blast gate. The bunker in the rock on
-// its east side opens it.
-carve([[36, 111, 4], [35, 104, 3.5]], (z) => sand(z, { light: 136 }), { z0: -1.5, z1: 0 });
-carve([[35, 104, 3.5], [35, 98, 3.5]], (z) => sand(z, { light: 136 }));
-p.rect(29, 96, 42, 98, panel);
-p.rect(33, 96, 37, 98, gate(0, { lock: 'remote', tag: 'postgate', stayOpen: true, ...tallSide }));
-p.rect(40, 98, 52, 110, room(0, 4, { light: 160 }));
-p.chamfer(40, 98, 52, 110, 2, darkPanel, ['NE', 'SE']);
-p.rect(39, 103, 40, 105, door(0));
-// A barred window over the neck, its sill a metre up.
-p.rect(39, 99, 40, 101, room(1, 3, { side: 'imp-panel', upper: 'imp-panel' }));
-p.fence(39, 99, 40, 101, 'W', bars);
-// The switch that opens the gate, in the bunker's east wall.
-p.rect(52, 103, 53, 105, {
-  wall: 'imp-switch',
-  switchTo: 'imp-switch-on',
-  use: [
-    { action: 'openDoors', tag: 'postgate' },
-    { action: 'message', text: 'THE POST GATE IS OPEN.' },
-  ],
-});
-lamps.push({ x: 38.6, y: 104, z: 3, radius: 4, light: 48 }, { x: 35, y: 98.3, z: 4.5, radius: 5, light: 56 });
-
-// 6. The test range: broad and flat, walled in by rock, with outcrops for
-// cover and a sniper tower in the middle (no way up).
-p.rect(14, 30, 88, 96, sand(0, { light: 152 }));
-p.chamfer(14, 30, 88, 96, 10, rock, ['NW']);
-p.chamfer(14, 30, 88, 96, 6, rock, ['SW', 'NE']);
-p.chamfer(14, 30, 88, 96, 8, rock, ['SE']);
-p.pillar(36, 52, 42, 58, 2, rock, sand(0, { light: 152 }));
-p.pillar(62, 74, 68, 80, 2, rock, sand(0, { light: 152 }));
-p.rect(56, 42, 60, 46, sand(6, { floor: 'imp-grate', side: 'imp-panel-dark', light: 152 }));
-lamps.push({ x: 58, y: 44, z: 7.5, radius: 9, light: 64 });
-
-// 7. The ledge path: cut up the range's east wall in flights, a railing on
-// the drop, then east through a notch to 8. the arch.
-const road = (z, extra = {}) => sand(z, { floor: 'imp-grate', side: 'imp-panel-dark', light: 144, ...extra });
-p.rect(88, 34, 92, 40, road(0));
-p.stairs(88, 40, 92, 46, 'S', 0.5, 0.5, road);
-p.rect(88, 46, 92, 60, road(3));
-p.stairs(88, 60, 92, 63, 'S', 3.5, 0.5, road);
-p.rect(88, 63, 92, 91, road(5));
-p.rect(92, 88, 102, 91, road(5, { tag: 'notch' }));
-p.fence(88, 46, 89, 91, 'W', railing);
+// 7. The climb out of the camp's north end, and the high ledge east along
+// a dry gorge to the notch over the arch.
+carve([[36, 113, 1.8], [34, 104, 1.8], [38, 96, 1.8]], (z) => sand(z, { light: 140 }), { z0: -2, z1: 5 });
+carve([[38, 96, 1.7], [52, 94, 1.6], [66, 95, 1.6], [80, 93, 1.7], [92, 89.5, 1.6]], (z) => sand(z, { light: 144 }), { z0: 5 });
+carve([[45, 114, 3], [44, 108, 3], [52, 101, 4.5], [64, 99, 4.5], [76, 97.5, 4], [86, 95, 2.5]], (z) => sand(z, { light: 120 }), { z0: -2 });
+p.rect(92, 88, 102, 91, sand(5, { tag: 'notch' }));
 
 // ---------------------------------------------------------------- the gorge and the bowl (the first map's)
 // The old start bowl, now a pocket under the arch, with a secret alcove
@@ -210,7 +192,7 @@ lamps.push({ x: 122.5, y: 72.5, z: 3, radius: 8, light: 64 }, { x: 140.5, y: 72,
 lamps.push({ x: 149, y: 76, z: 11.6, radius: 4, light: 56, fx: 'blink' });
 lamps.push({ x: 126, y: 76, z: 27.5, radius: 6, light: 48, fx: 'blink' });
 
-// Over the bowl, its strip and the lip, the sky starts higher (40, not 24),
+// Over the bowl and its strip, the sky starts higher (40, not 24),
 // so the mast (34 at its tip) is drawn whole: things in a tile are cut off
 // at its ceiling. The garrison's face is drawn up to it too, a taller cliff.
 p.rect(108, 60, 151, 87, (x, y, old) => (!old.wall && !old.door && old.ceiling === 'sky' ? { ...old, ceilZ: 40 } : old));
@@ -478,7 +460,6 @@ tagTiles('pad-more', [[229, 118]]);
 // ---------------------------------------------------------------- story tiles
 /** Tag the open tiles of a box that have no tag yet (where a line is said, a door opens). */
 const tagBox = (x0, y0, x1, y1, tag) => p.rect(x0, y0, x1, y1, (x, y, old) => (old.wall || old.door || old.tag ? old : { ...old, tag }));
-tagBox(134, 86, 149, 91, 'reach-end'); // under the lip
 tagBox(48, 125, 60, 137, 'camp');
 tagBox(156, 40, 162, 44, 'window'); // the corridor by the office's barred window
 tagBox(146, 40, 156, 44, 'office-near'); // and by its door
@@ -634,39 +615,44 @@ const placed = [];
 // The Empire's banners, 1 x 2 m, hung from the top of an Imperial wall:
 // (x0, y0)-(x1, y1) along the face, `z` where they're tied.
 const banner = (x0, y0, x1, y1, z) => hangings.push({ type: 'imp-banner', from: [x0, y0, z], to: [x1, y1, z], length: 4 });
-// Either side of the main gate, outside the light strips, and one over the
-// scout post's gate on the neck.
+// Either side of the main gate, outside the light strips.
 banner(125, 64.05, 127, 64.05, 7.8);
 banner(145, 64.05, 147, 64.05, 7.8);
-banner(34, 98.05, 36, 98.05, 8.4);
 
-// The power line: poles from the scout post across the range, up the
-// ledge path, and from the arch's far end to the garrison's face, two
-// cables between each pair (tied to the insulators 0.95 either side of a
-// pole, 6.55 up). Follow it to the garrison.
-const TIE = 6.55;
-const powerLine = (poles, sag = 0.7) => {
-  let last = null;
-  for (let i = 0; i < poles.length; i++) {
-    const [x, y] = poles[i];
-    const [nx, ny] = poles[Math.min(i + 1, poles.length - 1)];
-    const [px, py] = poles[Math.max(i - 1, 0)];
-    const a = Math.atan2(-(ny - py), nx - px); // content angle along the line
-    const z = p.get(Math.floor(x), Math.floor(y)).floorZ ?? 0;
-    placed.push(at('power-pole', x, y, { angle: (a * 180) / Math.PI }));
-    // The insulators, either side across the line.
-    const ends = [-1, 1].map((k) => [x + k * 0.95 * Math.sin(a), y + k * 0.95 * Math.cos(a), z + TIE]);
-    if (last) for (const k of [0, 1]) hangings.push({ type: 'cable', from: last[k], to: ends[k], sag });
-    last = ends;
+/**
+ * The open tile nearest (x, y), within 5, with rock (a wall, or a cliff
+ * standing 4 over it) on one side: where something set in the rock face
+ * goes. Gives the point on the face, the way out of it and the floor.
+ */
+function wallSpot(x, y) {
+  let best = null;
+  for (let ty = Math.floor(y - 5); ty <= y + 5; ty++) {
+    for (let tx = Math.floor(x - 5); tx <= x + 5; tx++) {
+      const c = p.get(tx, ty);
+      if (!c || c.wall || c.door || c.scenery) continue;
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const n = p.get(tx + dx, ty + dy);
+        if (!n || !((n.wall === 'sandstone' && !n.diagonal) || (n.scenery && n.floorZ > (c.floorZ ?? 0) + 4))) continue;
+        const d = Math.hypot(tx + 0.5 - x, ty + 0.5 - y);
+        if (!best || d < best.d) best = { d, x: tx + 0.5 + dx * 0.49, y: ty + 0.5 + dy * 0.49, out: Math.atan2(dy, -dx) * (180 / Math.PI), floor: c.floorZ ?? 0 };
+      }
+    }
   }
-};
-powerLine([[41, 94], [46, 82], [56, 70], [68, 58], [79, 46], [86.5, 36.5], [90.4, 50], [90.4, 66], [90.4, 82]]);
-powerLine([[129.6, 80.5], [131.5, 72.5], [130.5, 66.5]], 0.5);
+  return best;
+}
+// The Empire's perimeter beacons, set in the rock along the way: blinking
+// red, a little above head height. The first signs of the garrison.
+for (const [x, y] of [[181, 125], [158, 140], [130, 147], [76, 128], [34, 108], [58, 93], [84, 92]]) {
+  const w = wallSpot(x, y);
+  placed.push(at('rock-beacon', w.x, w.y, { angle: w.out, z: w.floor + 2.4 }));
+  lamps.push({ x: w.x, y: w.y, z: w.floor + 2.4, radius: 2.5, light: 40, fx: 'blink' });
+}
+
 // From the face to the floodlight towers and up to the mast on the mesa.
 hangings.push(
   { type: 'cable', from: [124.5, 64.05, 7.4], to: [119.8, 69.2, 6.6], sag: 0.8 },
   { type: 'cable', from: [146.5, 64.05, 7.4], to: [143.8, 68.6, 6.6], sag: 0.6 },
-  { type: 'cable', from: [131, 66.6, TIE], to: [128.6, 74.4, 14.6], sag: 0.9 },
+  { type: 'cable', from: [131, 66.6, 6.5], to: [128.6, 74.4, 14.6], sag: 0.9 },
 );
 // Skills (docs/mission3.md has the table): 1-2 thin out the fights and add
 // med kits; 4-5 add a trooper or two to most areas.
@@ -688,19 +674,14 @@ hangings.push(
   { type: 'rag', from: [49.3, 127.4, -0.1], to: [50.9, 128.3, 0], length: 1.2 },
   { type: 'rag', from: [57.8, 133.2, -0.3], to: [59.3, 134.4, -0.2], length: 0.9 },
 );
-// The test range: what the prototype was tried on. Wrecks still burning,
-// worn barricades shot up, scorch marks, and a floodlight on the tower.
+// The Jawas' scrapyard at the gulch's west end: a skyhopper that came down
+// in the canyon, stripped; crates of what they've taken; their fire.
 placed.push(
-  at('speeder-wreck', 60, 62, { angle: 30 }), at('speeder-wreck', 30, 50, { angle: 200 }),
-  at('barricade-worn', 48, 40, { angle: 80 }), at('barricade-worn', 72, 86, { angle: 10 }), at('barricade-worn', 26, 72, { angle: 120 }),
-  at('floor-burn-2', 60, 62), at('floor-burn-2', 30, 50, { angle: 90 }), at('floor-burn-1', 47, 44), at('floor-burn-1', 74, 82, { angle: 45 }),
-  at('floor-burn-2', 40, 76, { angle: 200 }), at('floor-burn-1', 66, 46, { angle: 120 }),
-  at('floodlight-tower', 58.5, 44.5, { angle: 225, z: 6 }),
+  at('skyhopper', 129, 152, { angle: 30, z: -10 }), at('floor-burn-1', 129, 152, { z: -10 }),
+  at('bay-crate-open-tan', 123, 147.5, { angle: 15, z: -10 }), at('bay-crate-tan', 125, 155, { angle: 80, z: -10 }),
+  at('fire-drum', 120.5, 152.5, { z: -10 }),
 );
-// The wash: Jawas stripping a skyhopper that came down there.
-placed.push(at('skyhopper', 128, 161, { angle: 30 }), at('bay-crate-open-tan', 124.5, 164, { angle: 15 }), at('floor-burn-1', 128, 161));
-// The scout post's bunker: its console and terminal by the switch.
-placed.push(at('console', 50.5, 100.5), at('terminal', 51.4, 106.5, { angle: 180 }), at('supply-crate', 42, 108.5));
+lamps.push({ x: 120.5, y: 152.5, z: -8.8, radius: 4, light: 56, fx: 'fire' });
 
 // ---- The garrison inside.
 // The cut: ribs of girder against its rock walls, work lamps, a cable run
@@ -777,10 +758,52 @@ hangings.push(
 );
 for (const [x, y] of [[172, 66], [184, 70], [176, 74], [180, 62]]) p.set(x, y, { ...p.get(x, y), tag: 'gen-burst' });
 
+// ---- The fights and finds in the new canyon and rooms (docs/mission3.md,
+// Enemies and items by skill).
+const SKILL = { EASY: [1, 2], NOT_EASIEST: [2, 3, 4, 5], NORMAL_UP: [3, 4, 5], HARD: [4, 5] };
+const fights = [
+  // The gulch: Jawas on its floor, shooting up at the ledge.
+  at('jawa', 154, 152, { angle: 90 }), at('jawa', 140, 154, { angle: 90 }), at('jawa', 160, 155, { angle: 120 }),
+  at('jawa', 136, 149, { angle: 60, skill: SKILL.NORMAL_UP }), at('jawa', 146, 156, { angle: 90, skill: SKILL.HARD }),
+  // Their scrapyard at its west end, and two in the cave.
+  at('jawa', 122, 150, { angle: 0 }), at('jawa', 126.5, 148, { angle: 30 }), at('jawa', 124, 153.5, { angle: 0, skill: SKILL.NOT_EASIEST }),
+  at('jawa', 104, 151.5, { angle: 0, skill: SKILL.NORMAL_UP }), at('jawa', 88, 137, { angle: 315 }),
+  // The camp: two picking over what the fire left.
+  at('jawa', 52, 133, { angle: 0, skill: SKILL.NOT_EASIEST }), at('jawa', 45, 126, { angle: 300 }),
+  // Over the dry gorge, a probe droid: the first Imperial Kyle meets.
+  at('probe-droid', 66, 100, { skill: SKILL.NOT_EASIEST }),
+  // The notch: a trooper watching the way over the arch.
+  at('stormtrooper', 96, 89.5, { angle: 180, z: 5, skill: SKILL.NOT_EASIEST }),
+  // The cut: one at the top of the tunnel; the excavation's crew.
+  at('stormtrooper', 132, 22, { angle: 270, z: 6 }),
+  at('stormtrooper', 124, 9, { angle: 315, z: 6 }), at('stormtrooper', 118, 14, { angle: 0, z: 6, skill: SKILL.NORMAL_UP }),
+  at('officer', 129, 15, { angle: 180, z: 6, skill: SKILL.HARD }),
+  // The mess: at the tables, and one by the counter.
+  at('stormtrooper', 148, 11, { angle: 180, z: 6 }), at('stormtrooper', 157, 21, { angle: 180, z: 6 }),
+  at('stormtrooper', 138, 10, { angle: 0, z: 6, skill: SKILL.NORMAL_UP }),
+  at('stormtrooper', 150, 23, { angle: 90, z: 6, skill: [5] }),
+  // Detention: the desk's officer and a guard on the lane.
+  at('officer', 173, 30, { angle: 270, z: 6 }),
+  at('stormtrooper', 182, 20, { angle: 180, z: 6, skill: SKILL.NORMAL_UP }),
+];
+const finds = [
+  at('energy-cell', 176, 129), // the slot
+  at('thermal-detonator', 138, 141), at('med-kit', 150, 152, { skill: [1, 2, 3] }), // the gulch
+  at('energy-pack', 124, 150), at('energy-cell', 92, 140), // the scrapyard, the cave
+  at('med-kit', 58, 138), at('energy-pack', 38, 132), // the camp
+  at('energy-pack', 70, 94.5), at('energy-cell', 60, 100), // the high ledge, the dry gorge under it
+  at('energy-cell', 131, 38.5), at('thermal-detonator', 114, 18), at('med-kit', 132, 6, { skill: [1, 2, 3] }), // the cut, the excavation
+  at('energy-pack', 158, 8.5), at('med-kit', 136.5, 25), // the mess
+  at('med-kit', 177, 31, { skill: [1, 2, 3] }), at('energy-cell', 191, 21), // detention
+  at('thermal-detonator', 200, 56), at('thermal-detonator', 201, 57), at('energy-pack', 223, 54.5), // the test bay
+];
+
 const list = [
   ...placed,
+  ...fights,
+  ...finds,
   // The drop-off, facing north-west up the reach to the garrison.
-  at('player', 186.5, 124.5, { angle: 141 }),
+  at('player', 205.5, 126.5, { angle: 180 }),
   // The canyon: snipers on both ledges and the rock arch, two gate guards and
   // their commanders, a probe droid round the mesa, and a band of Jawas
   // scavenging in the gorge.
@@ -875,15 +898,11 @@ const list = [
   at('med-kit', 185.5, 80.5),
   at('energy-pack', 161.5, 64.5, { z: 6 }),
   at('energy-cell', 161.5, 51.5), // in the dark under the north-west corner of the ring
-  // The gantry: a sandtrooper at the top of the stairs, and a med kit before
-  // the last fight.
-  at('sandtrooper', 211, 101.5, { angle: 90, skill: NORMAL_UP }),
+  // The gantry: a med kit before the last fight (the pad's squad comes
+  // with the overload).
   at('med-kit', 213, 90, { skill: [1, 2, 3] }),
   // The landing pad, with the general's shuttle north of the marked spot.
   at('lambda-shuttle', 227, 93, { angle: 90 }),
-  at('stormtrooper', 224, 108, { angle: 180 }),
-  at('sandtrooper', 230, 110, { angle: 180, skill: NOT_EASIEST }),
-  at('stormtrooper', 222, 98, { angle: 180, skill: HARD }),
 ];
 
 export default defineLevel({
@@ -923,10 +942,9 @@ export default defineLevel({
   triggers: [
     // The drop-off: the Crow lifts off and goes south-east, low over the wash.
     { on: 'start', do: [
-      { action: 'fly', thing: 'moldy-crow-inbound', path: [[200, 134, 0, 150, 0], [201, 135, 6, 150, 2.5], [218, 150, 26, 130, 4], [236, 172, 36, 120, 4]] },
-      { action: 'message', text: "JAN: THE GARRISON'S IN THE CLIFF AT THE HEAD OF THE CANYON. SEE THE MAST? THEIR PAD'S ON THE CLIFF EAST OF HERE: I'LL PICK YOU UP THERE." },
+      { action: 'fly', thing: 'moldy-crow-inbound', path: [[213, 129, 0, 180, 0], [214, 130, 6, 180, 2.5], [226, 150, 26, 130, 4], [236, 172, 36, 120, 4]] },
+      { action: 'message', text: "JAN: THE GARRISON'S IN THE CLIFFS NORTH-WEST OF HERE. THESE CANYONS ARE JAWA COUNTRY: WATCH THE LEDGES. I'LL PICK YOU UP ON THEIR PAD." },
     ] },
-    { on: 'enter', tag: 'reach-end', do: [{ action: 'message', text: "JAN: YOU WON'T CLIMB THAT. THE WASH RUNS ON WEST: THERE'S AN OLD RANGE ROAD ROUND THE BACK." }] },
     { on: 'enter', tag: 'camp', do: [{ action: 'message', text: "JAN: A TUSKEN CAMP. WHATEVER BURNED IT WASN'T CARRYING A BLASTER." }] },
     { on: 'enter', tag: 'notch', do: [{ action: 'message', text: "JAN: THE GATE'S SEALED. THERE'S A VENT LEFT OF IT, BEHIND THE CRATES." }] },
     { on: 'enter', tag: 'mess', do: [

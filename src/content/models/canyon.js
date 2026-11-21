@@ -1,8 +1,8 @@
 import { ModelBuilder } from './lib/build.js';
 
-// Mission 3 (docs/mission3.md): the garrison's comm mast, the landmark
-// seen up the canyon; the poles of the power line that runs out from the
-// garrison along the way; the burned Tusken camp; the prototype's cradle.
+// Mission 3 (docs/mission3.md): the garrison's comm mast over the bowl;
+// the beacons set in the rock along the canyon; the burned Tusken camp;
+// the prototype's cradle.
 
 /**
  * A straight bar of square section `r` (half its width) from `a` to `b`
@@ -69,16 +69,14 @@ for (const [sx, sy] of corners) mast.box([sx * 1.2 - 0.4, sy * 1.2 - 0.4, PZ + 0
 mast.box([-0.6, -0.6, TALL + 3.6], [0.6, 0.6, TALL + 4.8], beacon);
 mast.outlineLines([[-1.5, -1.5], [1.5, -1.5], [1.5, 1.5], [-1.5, 1.5]]);
 
-// A power line's pole: a steel post 7 tall on a footing, a crossarm with an
-// insulator at each end (where the cables are tied: 0.95 out, 6.55 up), and
-// a junction box low down.
-const pole = new ModelBuilder('power-pole');
-pole.box([-0.3, -0.3, 0], [0.3, 0.3, 0.25], { color: ['concrete', 0.4], bottom: false });
-pole.loft([[-0.12, -0.12], [0.12, -0.12], [0.12, 0.12], [-0.12, 0.12]], 0.25, [[-0.08, -0.08], [0.08, -0.08], [0.08, 0.08], [-0.08, 0.08]], 7, { color: ['steel', 0.45], bottom: false });
-pole.box([-0.06, -1.05, 6.3], [0.06, 1.05, 6.42], { color: ['steel', 0.35] });
-for (const y of [-0.95, 0.95]) pole.cylinder([0, y, 6.42], 0.06, 0.14, { segments: 6, color: ['gray', 0.7] });
-pole.box([0.1, -0.18, 1.2], [0.34, 0.18, 1.7], { tex: 'imp-panel' });
-pole.box([0.341, -0.06, 1.5], [0.345, 0.06, 1.58], { color: [255, 170, 40], glow: true, bottom: false, top: false });
+// An Imperial perimeter beacon bolted into the rock: a dark housing on a
+// plate, a red lens facing out (+x), a stub aerial. The first sign of the
+// garrison, along the canyon before it. The origin is the rock face.
+const beaconRock = new ModelBuilder('rock-beacon');
+beaconRock.box([-0.05, -0.35, -0.4], [0.03, 0.35, 0.4], { color: ['steel', 0.3] });
+beaconRock.loft([[0.03, -0.25], [0.3, -0.18], [0.3, 0.18], [0.03, 0.25]], -0.3, [[0.03, -0.2], [0.22, -0.14], [0.22, 0.14], [0.03, 0.2]], 0.3, { color: ['steel', 0.2], top: { color: ['steel', 0.35] } });
+beaconRock.box([0.3, -0.09, -0.12], [0.33, 0.09, 0.08], { color: [255, 40, 30], glow: true });
+beaconRock.cylinder([0.1, 0, 0.3], 0.025, 0.7, { segments: 4, color: ['gray', 0.4] });
 
 // A Tusken hut burned to its frame: seven poles leaning in to where they
 // were lashed at the top, charred black, two of them burned through and
@@ -129,4 +127,4 @@ cradle.box([-0.9, -0.5, 5.2], [0.9, 0.5, 5.6], { color: ['steel', 0.35] });
 bar(cradle, [0, 0, 5.6], [0, 0, 7], 0.08, { color: ['gray', 0.2] });
 cradle.outlineLines([[-3, -2.2], [3, -2.2], [3, 2.2], [-3, 2.2]]);
 
-export default [mast.build(), pole.build(), tent.build(), ash.build(), cradle.build()];
+export default [mast.build(), beaconRock.build(), tent.build(), ash.build(), cradle.build()];

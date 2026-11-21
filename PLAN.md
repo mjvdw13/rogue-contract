@@ -1481,17 +1481,12 @@ corridor with two rooms, the vault, the generator), and the pad. Mark
 likes its night look and its light; keep those. Bring it up to Mission 5
 on four things:
 
-- **Progression.** A chain of distinct areas in a line, each with a named,
-  visible goal (as Missions 4 and 5). The goal seen first and all the way:
-  the garrison's **comm mast** on the cliff top over the gate, red beacons
-  blinking, seen from the drop-off far down the canyon and growing at
-  every turn. A **power line** on poles runs up the canyon beside the way
-  to the base (cables between them, sagging): follow the cable. The
-  Imperial presence thickens as you go: Jawas, then a scout post, then
-  the range, then the walls. Height climbs, too: down in the wash, up a
-  ledge path on the canyon wall, in at mid height, down to the
-  generator's cavern, then out high on the cliff face with the whole
-  canyon below you. One change of state: the overload.
+- **Progression.** A chain of distinct areas in a line. The canyon is
+  explored, not crossed (Mark's notes on the first cut, below): Jawa
+  country, with only Imperial beacons set in the rock hinting at what's
+  ahead, until the garrison. Height climbs and falls: ledges, a cave,
+  a climb, in at mid height, down to the generator, out high on the
+  cliff. One change of state: the overload.
 - **Length.** About as long as Missions 4 and 5: a walk of the route with
   no monsters at 105 to 125 s (m4 105, m5 123), par 600. The canyon about
   three times as long as now before the base, the base about twice the
@@ -1514,38 +1509,7 @@ on four things:
   the PA chime, Jan's lines, `setLight` alerts, scrolling textures,
   grime decals, `haze.indoors`, the m4 and m5 model kits where they fit.
 
-**The route** (a proposal, for the design doc and Mark):
-
-```
-[1 the wash: the Crow sets Kyle down, the mast far off]
-   -> [2 the slot canyon: Jawas stripping a wrecked skyhopper]
-   -> [3 the burned camp: what the prototype did; troopers picking over it]
-   -> [4 the scout post: a bunker on a rise, its gate opened from inside]
-   -> [5 the test range: targets, blast scars, a sniper tower, the power line]
-   -> [6 the ledge path: up the canyon wall and across the rock arch]
-   -> [7 the bowl under the garrison (today's): the gate shut, banners, floodlights]
-   -> the vent -> [8 the vent and its fan] -> [9 maintenance (today's)] -> lift
-   -> [10 the cut: an unfinished tunnel in raw rock, work lamps, a cave-in]
-   -> [11 the barracks: corridor, bunks, mess, the office (red key);
-          Mohc through the barred window]
-   -> red door -> [12 detention: Rusk] -> [13 the data vault: the records]
-   -> [14 the test bay: the prototype's empty cradle, the scorched target wall]
-   -> [15 the generator cavern: the overload] -> the alarm
-   -> [16 the cliff face: a gantry high over the canyon, Mohc's shuttle lifting off]
-   -> [17 the pad: the last fight, the Crow comes in]
-```
-
-| Step | Goal | How the player knows |
-|---|---|---|
-| 1-6 | The garrison | Jan's line at the drop-off; the mast and its beacons up the canyon; the power line |
-| 4 | Through the scout post | Its gate is shut; its lit window above it; the switch inside |
-| 7 | In by the vent | The gate is shut and guarded; Jan names the vent |
-| 8 | Past the fan | It's turning; the breaker's light in the side duct |
-| 11 | The red key | The officer, seen through the barred window with Mohc |
-| 12 | Rusk | The PA names the prisoner; his name over his head |
-| 13 | The records | The vault's lit dais; Jan's line after: the generator |
-| 15 | The overload | The switch on the column; signs and the hum growing |
-| 16-17 | The pad | The alarm; the hatch opens; one way on, up |
+**The route:** `docs/mission3.md` (Flow, Areas).
 
 **Decided** (Mark, 2026-11-20):
 
@@ -1607,7 +1571,16 @@ before and after; check in with Mark after each):
       in bands with a glowing, scrolling core and the turning rings,
       conduits hanging in the cavern, struts under the catwalks, steam and
       sparks, a deep hum; the overload's change of state.
-- [ ] **Fights and items by skill:** beats, snipers that matter, the alarm's
+- [x] **Canyon reworked after Mark's notes** (2026-11-20, on the first
+      cut: "the start expects you to go one way, then backtrack, then the
+      other"; "a lot of boring walking"; "the power lines look way too
+      real-world"): the reach, the dry wash, the scout post, the test range
+      and the power line are gone. Now: a hollow facing west, a slot with
+      chockstones, a ledge over a Jawa gulch with a gap to jump, their
+      scrapyard, a cave with a squeeze, the burned camp, a climb and a high
+      ledge over a dry gorge to the arch; Imperial beacons set in the rock
+      along the way (`rock-beacon`), a probe droid near the end.
+- [x] **Fights and items by skill:** beats, snipers that matter, the alarm's
       last fight (not an anti-climax: Mission 4's lesson), the table in
       the design doc, the validator's ammo check.
 - [ ] **Check:** `npm test`, `npm run validate`, `npm run smoke`, the bench,

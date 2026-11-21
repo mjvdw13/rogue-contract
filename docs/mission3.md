@@ -13,14 +13,16 @@ east and 24 south, and the new areas go round them.
 
 ## Story
 
-- **The drop-off.** The Crow sets Kyle down in a dry wash south-east of
-  the garrison and lifts off again. JAN: "The garrison's in the cliff at
-  the head of the canyon. See the mast? Their pad's up on the right. I'll
-  pick you up there."
-- **What the canyon shows.** Jawas stripping a wrecked skyhopper. Then a
-  Tusken camp burned flat, troopers picking over it: what the prototype
-  did (Rusk saw it). Then the range where it was tested, and the scout
-  post that guarded it (Rusk's unit).
+- **The drop-off.** The Crow sets Kyle down in a hollow in the rock
+  south-east of the garrison and lifts off again. JAN: "The garrison's in
+  the cliffs north-west of here. These canyons are Jawa country: watch the
+  ledges. I'll pick you up on their pad."
+- **What the canyon shows.** Jawas, everywhere: in the gulch, in their
+  scrapyard round a skyhopper they've brought down, in the cave. Then a
+  Tusken camp burned flat: what the prototype did (Rusk saw it). No
+  Imperial building until the garrison (Mark, 2026-11-20); only their
+  perimeter beacons set in the rock along the way, red and blinking, and
+  a probe droid over the dry gorge.
 - **Mohc.** Through the office's barred window, an Imperial general (an
   officer's sprite for now: Mark, 2026-11-20) hurries out of a far door.
   He's gone before Kyle can get round. His shuttle leaves the pad as Kyle
@@ -40,28 +42,31 @@ east and 24 south, and the new areas go round them.
   stairs down to the generator. So the overload comes after both.
 - **The exit.** Coming out on the gantry after the overload, the
   general's shuttle lifts off the pad and goes north; then the Crow
-  comes in over the wash and sets down on the pickup spot. Reaching it
+  comes in over the hollow and sets down on the pickup spot. Reaching it
   ends the level (`crow-down`).
 
 ## What makes it work
 
-- **The goal is seen first.** From the drop-off: up the reach to the
-  north-west, the garrison's face lit across the bowl, the rock spire in
-  front of it with the **comm mast** on top, red beacons blinking; and up
-  on the right, the pad on its cliff with the general's shuttle on it.
-  The reach ends under the bowl's lip, too steep to climb: the way is
-  round, west by the old range road. The mast is in view again from the
-  range and the ledge path, and over the bowl.
-- **A chain, not a hub.** Fourteen areas in a line, one way on from each.
-  Loops only inside an area, for fights. The old start bowl is a pocket
+- **Exploring, not crossing** (Mark, 2026-11-20, after the first cut:
+  a backtracking start and a lot of boring walking). The canyon is tight
+  and changes every few seconds: a slot with chockstones overhead, a
+  ledge over a gulch with a gap to jump and Jawas shooting up from below,
+  rock steps down into their scrapyard, a dark cave with a squeeze to
+  crouch through, the burned camp, a climb and a high ledge over a dry
+  gorge to the arch. Start facing the way on.
+- **Hints of the Empire.** Perimeter beacons in the rock (seven, red,
+  blinking) from the slot onward, closer together toward the end; a
+  probe droid over the dry gorge; then the arch's sniper, and over the
+  bowl the garrison's face, banners and the comm mast.
+- **A chain, not a hub.** Areas in a line, one way on from each. A fall
+  off a ledge lands somewhere that leads back (the gulch floor is the
+  route; the dry gorge joins the camp). The old start bowl is a pocket
   off the gorge, under the arch.
-- **The Empire thickens.** Jawas, then a burned camp with a patrol, then
-  a scout post with a gate, then the range with a sniper tower, then the
-  bowl's walls, floodlights and banners.
-- **Height.** Down in the wash (-6), the slot canyon climbing out (-2),
-  up to the range (0), up the ledge path (5) and over the arch, down into
-  the bowl (0), in at 6, down to the generator's floor (-6), out on the
-  cliff at 6 to 10, high over where you started.
+- **Height.** The hollow (-6), the slot rising (-4), the ledge over the
+  gulch (-4 over -10), down into the scrapyard (-10), the cave climbing
+  to the camp (-2), the climb and the high ledge (5), over the arch, down
+  into the bowl (0), in at 6, down to the generator's floor (-6), out on
+  the cliff at 6 to 10, high over where you started.
 - **One change of state.** The overload: the klaxon, red light pulsing
   through the generator, the test bay and the way out, lamps dying,
   steam and sparks, the test bay's blast door opening and the squads
@@ -72,11 +77,10 @@ east and 24 south, and the new areas go round them.
 ## Flow
 
 ```
-[1 the wash: the Crow sets Kyle down] (the reach: the goal seen, too steep)
-   -> [2 the dry wash west: Jawas at the wreck]
-   -> [3 the slot canyon, climbing] -> [4 the burned camp]
-   -> [5 the scout post: the bunker's switch opens its gate]
-   -> [6 the test range] -> [7 the ledge path, up its east wall] -> [8 the arch]
+[1 the hollow: the Crow sets Kyle down] -> [2 the slot, chockstones overhead]
+   -> [3 the ledge over the Jawa gulch, a gap to jump] -> steps down
+   -> [4 the Jawas' scrapyard] -> [5 the cave, a squeeze] -> [6 the burned camp]
+   -> [7 the climb and the high ledge over the dry gorge] -> [8 the arch]
    -> down into [9 the bowl under the garrison] -> the vent
    -> [10 the vent and maintenance] -> lift up -> [11 the cut and the excavation]
    -> [12 the mess hall, the bunk room, the corridor; the office (red key), Mohc]
@@ -88,11 +92,10 @@ east and 24 south, and the new areas go round them.
 
 | Step | Goal | How the player knows |
 |---|---|---|
-| 1 | The garrison | Jan's line; the mast and the lit face up the reach; the pad up on the right |
-| 1-2 | Round by the west | The reach ends in a cliff under the bowl's lip; the wash goes on west |
-| 3-4 | On up the canyon | One way; the power line's poles start at the camp |
-| 5 | Through the post | Its gate is shut across the neck; the bunker's lit window; the switch inside |
-| 6-8 | Over the arch | The range is walled in; the poles go up the ledge path; the mast over the rim |
+| 1-2 | Into the rock | Jan's line; the hollow's only way out is the slot west; the first beacon in it |
+| 3-4 | Along the gulch | The ledge; Jawas below; its far end steps down into their scrapyard |
+| 5-6 | Through the cave | The scrapyard's one way on; moonlight through its roof; the camp's sky at its end |
+| 7-8 | Up and over | The climb at the camp's north end; beacons along the high ledge; the arch beyond the notch |
 | 9 | In by the vent | The gate is shut and guarded; Jan names the vent from the arch |
 | 10-11 | On through the works | One way |
 | 12 | The red key | The officer, seen through the barred window with Mohc |
@@ -109,19 +112,18 @@ garrison's structure (inside). Kept areas are the first map's, moved by
 
 | # | Area | Box (x0..x1, y0..y1) | Floor / ceiling | Notes |
 |---|------|----------------------|-----------------|-------|
-| 1 | The wash, drop-off | 176..236, 118..170 | -6 / sky | Wide, sandy, gravel channels. Start (186.5, 124.5) facing north-west up the reach. The Crow sets down beside and leaves. |
-| 1a | The reach | a band 16 wide from (184, 122) to (140, 92) | -6 / sky | Ends at a cliff under the bowl's south lip (133..147, 84..86: rock at +2 along the bowl's edge, 8 over the reach). The view: the face, the mesa and the mast. |
-| 1b | The pad's cliff | 218..236, 86..124 | (the pad, 10) | Seen from the wash: its edge 16 over the wash floor, the shuttle on it, its landing lights. |
-| 2 | The dry wash | 104..176, 146..172 | -6 / sky | West from the drop-off. Jawas stripping a wrecked skyhopper (128, 160). Boulders. |
-| 3 | The slot canyon | from (106, 158) north-west to (68, 126), 4 to 6 wide | -6 up to -2 | Winding, its walls close; two short flights of rock steps. |
-| 4 | The burned camp | 28..70, 112..146 | -2 / sky | Chamfered bowl. Tents burned to their frames (charred cloth on poles), embers, smoke, scorched ground, a broken moisture vaporator. Troopers picking over it. The power line's first pole. |
-| 5 | The scout post | neck 30..40, 96..112; bunker 40..52, 96..110 | neck -2 up to 0; bunker 0 / 4 | The canyon narrows to a neck climbing to 0, shut at its head (y 96..98) by a wall with a 4-wide gate (remote, `postgate`). The bunker in the rock on the neck's east side: its door, a window over the neck, a terminal and the switch that opens the gate. |
-| 6 | The test range | 12..88, 28..96 | 0 / sky | Broad and flat, walled in by rock. Targets (worn barricades, a blasted landspeeder, scorch marks), a sniper tower (a platform at 6, no way up), the power line's poles crossing it north-east. |
-| 7 | The ledge path | 88..92, 40..88 | 0 up to 5 | Cut along the range's east wall (an Imperial road: grate steps, a railing on the drop), the poles beside it. Rises in flights to 5, turns east at its south end through a notch (92..102, 88..91). |
+| 1 | The hollow, drop-off | round (204, 126) | -6 / sky | Start (205.5, 126.5) facing west. The Crow sets down beside and leaves. Opens north to a bay under the cliff gantry (seen from below). |
+| 2 | The slot | (194, 126) to (166, 139), 3 wide | -6 up to -4 | Winding; two chockstones wedged across it overhead (slabs). A beacon. |
+| 3 | The ledge over the gulch | (166, 140) to (126, 139), 3 wide | -4 | Along the gulch's north wall, 3 m over its floor; a 3-tile gap at x 146..148 to jump (a fall lands on the gulch floor, the way on). A beacon. |
+| 3a | The gulch | round (150, 151), 16 wide | -10 / sky | Jawas. Rock steps (126, 139) to (116, 145) down off the ledge's west end. |
+| 4 | The scrapyard | the gulch's west end, round (124, 150) | -10 | A skyhopper the Jawas brought down, their crates and fire. A beacon. |
+| 5 | The cave | (116, 150) to (74, 130) | -10 up to -2.5 / 4 over the floor | Dark, gravel; a squeeze (96..100, 146..149) 1.3 high to crouch through; moonlight through cracks in two places. |
+| 6 | The burned camp | 28..76, 112..142 | -2 / sky | Tusken huts burned to their frames, scraps of hide, ash heaps smouldering, scorched ground. Two Jawas scavenging. A beacon at its east end. |
+| 7 | The climb and the high ledge | (36, 113) to (38, 96); then to (92, 89.5) | -2 up to 5; 5 | Rock steps up the camp's north end; the ledge east along the north side of a dry gorge (floor -2, joining the camp) to the notch (92..102, 88..91). A probe droid over the gorge; beacons. |
 | 8 | The arch | 102..122, 88..91 | top 5 | The first map's rock arch, now walked over: the gorge 2.5 m below, the old start bowl beyond. Down its east end by rock steps (126..130, 80..91) north into the bowl. |
 | 8a | The gorge and the old start bowl | 102..126, 84..100; 94..118, 100..120 | 0 / sky | A pocket under the arch, off the route. Secret 1: the rock alcove (90..94, 104..108), a shield. |
-| 9 | The bowl | 108..150, 68..84 | 0 / sky | The first map's. The spire (123..129, 73..79) is now a rock mesa 7 m high (scenery, no way up) with the comm mast on it. Ledge A (west, 5): a sniper. Ledge B (east, 3): secret 2. The rock lip along the south-east over the reach. |
-| 9a | The garrison's face | strip 114..158, 60..68 | 0 | The first map's: the gate (134..138), the crest, hazard stripes, light strips. Now: banners either side of the gate, cables from the face to the floodlight towers and the mast, barricades. |
+| 9 | The bowl | 108..150, 68..84 | 0 / sky | The first map's. The spire (123..129, 73..79) is now a rock mesa 7 m high (scenery, no way up) with the comm mast on it. Ledge A (west, 5): a sniper. Ledge B (east, 3): secret 2. |
+| 9a | The garrison's face | strip 114..158, 60..68 | 0 | The first map's: the gate (134..138), the crest, hazard stripes, light strips. Now: banners either side of the gate, cables from the face to the floodlight towers and up to the mast, barricades. |
 | 10 | The vent | 120..122, 50..64 | 0.5 / 1.7 | Crouch. Halfway, a fan turning in a shaft overhead, light falling through it. |
 | 10a | Maintenance | 114..130, 38..50 | 0 / 5 | The first map's. Lift L1 (130..134, 40..44) up to 6, now opening north only. |
 | 11 | The cut | 130..134, 20..40 | 6 / 10 | A tunnel in raw rock: steel ribs, work lamps, cables along the wall. |
@@ -134,7 +136,7 @@ garrison's structure (inside). Kept areas are the first map's, moved by
 | 14 | Detention | 160..192, 10..33 | 6 / 10 | Control (166..180, 26..33) over the vault, a lane east (166..192, 18..22) with cells north and south behind bars; Rusk in the last on the north. From the lane's east end a passage (188..191, 22..50) down the back to the generator's north catwalk. |
 | 15 | The generator | 160..196, 50..86 | -6 / 18 | The first map's: the catwalk ring at 6, the column, lifts L2 and L2b, the overload switch on the column's east face. |
 | 16 | The test bay | 197..226, 54..84 | 6 / 20 | Cut into the rock. The prototype's cradle in the middle (a gantry frame, clamps, cables hanging), the target wall east scorched and pocked. The hatch from the generator (196..197, 67..69) and the blast door south (209..213, 84..85), both opened by the overload. |
-| 17 | The cliff gantry | 207..215, 85..100 | 6 up to 10 / sky | Grate on the cliff face, railings, a floodlight. Below: the reach and the wash. |
+| 17 | The cliff gantry | 207..215, 85..100 | 6 up to 10 / sky | Grate on the cliff face, railings, a floodlight. Below: a bay of the hollow where Kyle started. |
 | 17a | The chasm | 215..218, 86..116 | -6 / sky | The 3-tile jump. Lift L3 (215..218, 110..116) back up if you fall. |
 | 18 | The pad | 218..236, 86..124 | 10 / sky | Floodlit, landing lights. The shuttle until Kyle reaches the gantry. The pickup spot (225..229, 100..104). |
 
@@ -142,8 +144,11 @@ garrison's structure (inside). Kept areas are the first map's, moved by
 
 - **Outside:** the first map's: sandstone walls rising to a rim, gravel
   channels in the sand, the backdrop's ridges, boulders. New: the comm
-  mast (a lattice tower with red beacons), the power line (poles with
-  cables between them), Imperial banners on the face, the burned camp.
+  mast (a lattice tower with red beacons) over the bowl, the Imperial
+  beacons set in the rock (`rock-beacon`: a dark housing, a red lens, a
+  blinking light), chockstones over the slot, the Jawas' scrapyard,
+  Imperial banners on the face, the burned camp. Nothing real-world (the
+  first cut's power line on poles was: Mark, 2026-11-20).
 - **Inside: dug into the cliff.** Where Missions 4 and 5 are all metal,
   the garrison is rock: `sandstone` walls and ceilings where it's raw
   (the cut, the excavation, the test bay, the vent's fan shaft), the
@@ -159,15 +164,11 @@ garrison's structure (inside). Kept areas are the first map's, moved by
 
 The first map's light is kept, area by area. New areas:
 
-- **The wash and the reach:** moonlight 144, the reach's floor in the
-  cliffs' shadow 128. The pad's floodlights and the face's lights seen far
-  off.
-- **The slot canyon:** 120 to 128, the moon hardly reaching in.
+- **The hollow and the gulch:** moonlight 136 to 144. The slot 124, the
+  rock steps 128, the cave 104 with two shafts of moonlight (144).
 - **The burned camp:** 144, with the embers' warm glow (light sources,
-  flickering, +32).
-- **The scout post:** the bunker 160 inside, a lamp over its door and the
-  gate (+48).
-- **The range:** 152 (open), the tower's floodlight pool.
+  flickering, +32). The scrapyard's fire (+56).
+- **The beacons:** each a small blinking red light (+40).
 - **The cut and the excavation:** 120, work lamps in pools (+64).
 - **The mess:** 160, lit ceiling panels. **Detention:** 128, red light
   over the cells (the only red before the alarm).
@@ -186,37 +187,38 @@ The first map's light is kept, area by area. New areas:
 
 ## Enemies and items by skill
 
-To settle in the fights step: about 16 monsters on skill 1, 26 on 3,
-36 on 5, by area: the camp (a patrol of 3), the scout post (2 and a
-sniper on the bunker's roof), the range (the tower sniper, a beat of
-2, a probe droid), the bowl (the first map's), maintenance (the ambush),
-the excavation (2), the mess (3), the barracks and office (the first
-map's), the vault (2), detention (a guard and the officer), the
-generator (the first map's), and after the overload the test bay's
-squad and the pad's (spawned, waiting). Detonators along the way (there's
-no try-out pile at the start: Mark, 2026-11-20), E-11s from the troopers.
+As placed (validator): 25 monsters on skill 1, 45 on 3, 55 on 5, plus the
+squads the overload brings (3 and 2 more from skill 3 in the test bay, 3
+and a commander from skill 2 on the pad). By area: Jawas in the gulch (3
+to 5), the scrapyard (2 to 3), the cave (1 to 2) and the camp (1 to 2); a
+probe droid over the dry gorge; the arch's sniper and the notch's
+trooper; the bowl (the first map's); maintenance (the ambush); the cut
+(1); the excavation (2 to 3 with an officer); the mess (2 to 4); the
+barracks and office (the first map's); the vault (the first map's);
+detention (the officer and a guard); the generator (the first map's).
+Med kits, cells, packs and detonators along the way (no try-out pile at
+the start: Mark, 2026-11-20), E-11s from the troopers. Ammo 15.6x.
 
 ## Engine notes
 
 - **The landmark.** A model shows over the rim only if the 2D line to it
   runs through open tiles (checked 2026-11-20): behind solid rock it's
   hidden. So the mast stands in the open (on the spire's mesa, a raised
-  floor) and the reach and the range are laid out to look at it. A thing
+  floor), seen over the bowl. A thing
   is also cut off at its tile's ceiling, and an open tile's sky starts at
   24: over the bowl it starts at 40, so the mast (34 at its tip) stands
   whole. Through 37 m of haze its steel has to be pale and heavy and its
   beacons big (fullbright faces take the haze too).
-- **The drop.** Monsters in the bowl can see down into the reach; it's
-  out of their reach both ways (the lip is 8 over the reach floor).
-- **Shortcuts.** The chasm under the pad doesn't open into the wash, so
+- **Shortcuts.** The chasm under the pad doesn't open into the hollow, so
   its lift can't take Kyle from the start to the pad.
 - **Mohc leaving** uses the `remove` action (built for this): when the
   player, having seen him through the window, comes back past the
   office's door, he's taken away and his door shuts.
-- **Flights over the wash and the pad** need the sky high: those tiles'
+- **Flights over the hollow and the pad** need the sky high: those tiles'
   sky starts at 48 (the Lambda shuttle stands 19 tall on the pad at 10).
-- **Frame time:** the range and the wash are big open places: bench them
-  at the blockout.
+- **Beacons on the rock** are placed by `wallSpot()` in `m3.js`: the
+  open tile nearest a point with rock (a wall, or a rim 4 over it) on one
+  side; the beacon goes on that face, facing out.
 
 ## Checked
 
