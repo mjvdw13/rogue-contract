@@ -142,6 +142,8 @@ const TEXTURES = {
   'imp-railing': { build: () => resizeRows(load('ZMGRATE1'), 24), seeThrough: true },
   'imp-bars': { from: 'ZWBARS', seeThrough: true },
   'imp-cage': { from: 'ICDELEV', seeThrough: true },
+  // Cloth: the Empire's banner, its swallowtail see-through.
+  'imp-banner': { from: 'ZSBANNLG', seeThrough: true },
 };
 
 const outDir = path.join(here, 'textures');

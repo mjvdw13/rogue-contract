@@ -190,6 +190,18 @@ export default [
   // power line's poles (models/canyon.js).
   defineDecoration({ id: 'comm-mast', model: 'comm-mast', solid: true, radius: 1.5, height: 24, fixed: true }),
   defineDecoration({ id: 'power-pole', model: 'power-pole', solid: true, radius: 0.3, height: 7, fixed: true }),
+  // The burned Tusken camp: huts burned to their frames, and ash heaps
+  // still smouldering, embers lifting off them on the breeze.
+  defineDecoration({ id: 'tent-frame-burnt', model: 'tent-frame-burnt', fixed: true }),
+  defineDecoration({
+    id: 'ash-heap',
+    model: 'ash-heap',
+    fixed: true,
+    emit: [
+      { type: 'ember', count: 1, every: [0.3, 0.8], at: [0, 0, 0.22], radius: 0.4, dir: [0, 0, 1], spread: 0.5, speed: [0.4, 1] },
+      { type: 'smoulder', count: 1, every: [0.6, 1.2], at: [0, 0, 0.3], radius: 0.3, dir: [0.1, 0, 1], spread: 0.3, speed: [0.2, 0.4] },
+    ],
+  }),
   // Mos Eisley's domes, on roofs and over round buildings.
   ...DOMES.map((d) => defineDecoration({ id: d.id, model: d.id, solid: true, radius: d.radius, height: d.height })),
   // Fallen in, in the old quarter.

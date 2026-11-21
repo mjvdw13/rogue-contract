@@ -80,4 +80,33 @@ for (const y of [-0.95, 0.95]) pole.cylinder([0, y, 6.42], 0.06, 0.14, { segment
 pole.box([0.1, -0.18, 1.2], [0.34, 0.18, 1.7], { tex: 'imp-panel' });
 pole.box([0.341, -0.06, 1.5], [0.345, 0.06, 1.58], { color: [255, 170, 40], glow: true, bottom: false, top: false });
 
-export default [mast.build(), pole.build()];
+// A Tusken hut burned to its frame: seven poles leaning in to where they
+// were lashed at the top, charred black, two of them burned through and
+// fallen short; scraps of hide go on as hangings (the level's).
+const tent = new ModelBuilder('tent-frame-burnt');
+const charred = { color: ['gray', 0.07] };
+const APEX = [0.1, -0.05, 2.3];
+for (let i = 0; i < 7; i++) {
+  const a = (i / 7) * Math.PI * 2 + 0.3;
+  const foot = [Math.cos(a) * 1.6, Math.sin(a) * 1.6, 0];
+  // A broken pole stops partway, its top a jagged stump.
+  const k = i === 2 ? 0.45 : i === 5 ? 0.6 : 1;
+  const top = foot.map((v, j) => v + (APEX[j] - v) * k);
+  bar(tent, foot, top, 0.05, charred);
+}
+// The lashing ring at the top.
+tent.cylinder([APEX[0], APEX[1], APEX[2] - 0.25], 0.22, 0.12, { segments: 6, color: ['gray', 0.1] });
+
+// An ash heap where a hut's things burned: a low dark mound, a few embers
+// still glowing in it (it smoulders: decor.js).
+const ash = new ModelBuilder('ash-heap');
+const blob = (r, k) => Array.from({ length: 8 }, (_, i) => {
+  const a = (i / 8) * Math.PI * 2;
+  const w = r * (1 + 0.18 * Math.sin(a * 3 + k));
+  return [Math.cos(a) * w * 1.2, Math.sin(a) * w];
+});
+ash.loft(blob(0.95, 0), 0, blob(0.7, 0.4), 0.12, { color: ['gray', 0.22], top: false, bottom: false });
+ash.loft(blob(0.7, 0.4), 0.12, blob(0.35, 0.9), 0.22, { color: ['gray', 0.27], top: { color: ['gray', 0.3] }, bottom: false });
+for (const [x, y] of [[-0.2, 0.05], [0.18, -0.1], [0.05, 0.18]]) ash.box([x - 0.06, y - 0.06, 0.21], [x + 0.06, y + 0.06, 0.24], { color: [255, 110, 20], glow: true, bottom: false });
+
+export default [mast.build(), pole.build(), tent.build(), ash.build()];

@@ -50,6 +50,8 @@ const lift = (stops, ceilZ, extra = {}) => ({
 });
 
 const p = new Painter(W, H, rock);
+/** Ropes, cables and cloth (world/hangings.js): the banners and the power line. */
+const hangings = [];
 /** Light sources (lamps and light strips), added area by area. */
 const lamps = [];
 /** Decals (signs, the crest, hazard stripes, vents) on wall faces, area by area. */
@@ -231,6 +233,11 @@ decals.push(
   { x: 135, y: 64, z: 4.25, face: 'S', tex: 'decal-hazard' },
   { x: 137, y: 64, z: 4.25, face: 'S', tex: 'decal-hazard' },
 );
+// Grime down the face, the desert's dust and the rain it gets once a year.
+for (const [x, tex] of [[116.5, 'grime-streaks-1'], [123, 'grime-streaks-3'], [132.5, 'grime-streaks-2'], [139.5, 'grime-streaks-2'], [149.5, 'grime-streaks-1'], [155, 'grime-streaks-3']]) {
+  decals.push({ x, y: 64, z: 5.6, face: 'S', tex });
+}
+decals.push({ x: 31, y: 98, z: 5.4, face: 'S', tex: 'grime-streaks-2' }, { x: 39, y: 98, z: 5.4, face: 'S', tex: 'grime-streaks-1' });
 
 // 10. The crawl vent through the face (crouch: 1.2 clear).
 p.rect(120, 50, 122, 64, {
@@ -613,13 +620,82 @@ for (const [x, y, c] of cliff) p.set(x, y, c);
 
 // ---------------------------------------------------------------- things
 const at = (type, x, y, extra = {}) => ({ type, x, y, ...extra });
+/** Things placed by the dressing below, before the list. */
+const placed = [];
+
+// The Empire's banners, 1 x 2 m, hung from the top of an Imperial wall:
+// (x0, y0)-(x1, y1) along the face, `z` where they're tied.
+const banner = (x0, y0, x1, y1, z) => hangings.push({ type: 'imp-banner', from: [x0, y0, z], to: [x1, y1, z], length: 4 });
+// Either side of the main gate, outside the light strips, and one over the
+// scout post's gate on the neck.
+banner(125, 64.05, 127, 64.05, 7.8);
+banner(145, 64.05, 147, 64.05, 7.8);
+banner(34, 98.05, 36, 98.05, 8.4);
+
+// The power line: poles from the scout post across the range, up the
+// ledge path, and from the arch's far end to the garrison's face, two
+// cables between each pair (tied to the insulators 0.95 either side of a
+// pole, 6.55 up). Follow it to the garrison.
+const TIE = 6.55;
+const powerLine = (poles, sag = 0.7) => {
+  let last = null;
+  for (let i = 0; i < poles.length; i++) {
+    const [x, y] = poles[i];
+    const [nx, ny] = poles[Math.min(i + 1, poles.length - 1)];
+    const [px, py] = poles[Math.max(i - 1, 0)];
+    const a = Math.atan2(-(ny - py), nx - px); // content angle along the line
+    const z = p.get(Math.floor(x), Math.floor(y)).floorZ ?? 0;
+    placed.push(at('power-pole', x, y, { angle: (a * 180) / Math.PI }));
+    // The insulators, either side across the line.
+    const ends = [-1, 1].map((k) => [x + k * 0.95 * Math.sin(a), y + k * 0.95 * Math.cos(a), z + TIE]);
+    if (last) for (const k of [0, 1]) hangings.push({ type: 'cable', from: last[k], to: ends[k], sag });
+    last = ends;
+  }
+};
+powerLine([[41, 94], [46, 82], [56, 70], [68, 58], [79, 46], [86.5, 36.5], [90.4, 50], [90.4, 66], [90.4, 82]]);
+powerLine([[129.6, 80.5], [131.5, 72.5], [130.5, 66.5]], 0.5);
+// From the face to the floodlight towers and up to the mast on the mesa.
+hangings.push(
+  { type: 'cable', from: [124.5, 64.05, 7.4], to: [119.8, 69.2, 6.6], sag: 0.8 },
+  { type: 'cable', from: [146.5, 64.05, 7.4], to: [143.8, 68.6, 6.6], sag: 0.6 },
+  { type: 'cable', from: [131, 66.6, TIE], to: [128.6, 74.4, 14.6], sag: 0.9 },
+);
 // Skills (docs/mission3.md has the table): 1-2 thin out the fights and add
 // med kits; 4-5 add a trooper or two to most areas.
 const EASY = [1, 2];
 const NOT_EASIEST = [2, 3, 4, 5];
 const NORMAL_UP = [3, 4, 5];
 const HARD = [4, 5];
+// The burned camp (floor -2): three huts burned to their frames, scraps
+// of hide still hanging off them, ash heaps smouldering, scorched ground.
+placed.push(
+  at('tent-frame-burnt', 50, 128, { angle: 20, z: -2 }), at('tent-frame-burnt', 58.5, 134, { angle: 200, z: -2 }),
+  at('tent-frame-burnt', 43, 133.5, { angle: 110, z: -2 }),
+  at('floor-burn-2', 50, 128, { angle: 30 }), at('floor-burn-2', 58.5, 134, { angle: 160 }), at('floor-burn-1', 43, 133.5),
+  at('floor-burn-1', 55, 126.5, { angle: 70 }), at('floor-burn-1', 46.5, 138, { angle: 250 }),
+  at('ash-heap', 53.5, 130.5), at('ash-heap', 47, 129, { angle: 90 }), at('ash-heap', 61, 128.5, { angle: 200 }),
+);
+for (const [x, y] of [[53.5, 130.5], [47, 129], [61, 128.5]]) lamps.push({ x, y, z: -1.4, radius: 3, light: 32, fx: 'fire' });
+hangings.push(
+  { type: 'rag', from: [49.3, 127.4, -0.1], to: [50.9, 128.3, 0], length: 1.2 },
+  { type: 'rag', from: [57.8, 133.2, -0.3], to: [59.3, 134.4, -0.2], length: 0.9 },
+);
+// The test range: what the prototype was tried on. Wrecks still burning,
+// worn barricades shot up, scorch marks, and a floodlight on the tower.
+placed.push(
+  at('speeder-wreck', 60, 62, { angle: 30 }), at('speeder-wreck', 30, 50, { angle: 200 }),
+  at('barricade-worn', 48, 40, { angle: 80 }), at('barricade-worn', 72, 86, { angle: 10 }), at('barricade-worn', 26, 72, { angle: 120 }),
+  at('floor-burn-2', 60, 62), at('floor-burn-2', 30, 50, { angle: 90 }), at('floor-burn-1', 47, 44), at('floor-burn-1', 74, 82, { angle: 45 }),
+  at('floor-burn-2', 40, 76, { angle: 200 }), at('floor-burn-1', 66, 46, { angle: 120 }),
+  at('floodlight-tower', 58.5, 44.5, { angle: 225, z: 6 }),
+);
+// The wash: Jawas stripping a skyhopper that came down there.
+placed.push(at('skyhopper', 128, 161, { angle: 30 }), at('bay-crate-open-tan', 124.5, 164, { angle: 15 }), at('floor-burn-1', 128, 161));
+// The scout post's bunker: its console and terminal by the switch.
+placed.push(at('console', 50.5, 100.5), at('terminal', 51.4, 106.5, { angle: 180 }), at('supply-crate', 42, 108.5));
+
 const list = [
+  ...placed,
   // The drop-off, facing north-west up the reach to the garrison.
   at('player', 186.5, 124.5, { angle: 141 }),
   // The canyon: snipers on both ledges and the rock arch, two gate guards and
@@ -738,6 +814,19 @@ export default defineLevel({
   // the sky low down), halfway at 20 m.
   haze: { color: [32, 24, 64], half: 40 },
   par: 600,
+  // Still, cold air: a little dust drifting through the floodlights, and a
+  // breeze high up that moves the banners and the cables. No storm.
+  weather: { type: 'dust', count: 70, wind: [0.6, -0.3, 0] },
+  // A pair of TIEs on patrol now and then, in from the east over the wash
+  // and away north-west over the bowl (where the sky is high enough to
+  // show them), heard as they pass.
+  traffic: [
+    { thing: 'tie-patrol', count: 2, gap: 0.45, first: [25, 50], every: [70, 140], paths: [
+      [[239, 150, 30, 145, 0], [190, 118, 32, 145, 3], [150, 90, 34, 145, 3], [110, 60, 36, 140, 3]],
+      [[239, 110, 34, 160, 0], [200, 100, 34, 160, 3], [150, 80, 36, 150, 3], [108, 62, 36, 150, 3]],
+    ] },
+  ],
+  hangings,
   ...p.build(),
   lights: lamps,
   decals,

@@ -78,9 +78,40 @@ function cloth(name, { ramp, tone, deep, shallow, tatters, holes }) {
   };
 }
 
+/**
+ * An Imperial banner (the stand-in for Dark Forces' ZSBANNLG, which the
+ * site swaps in): red cloth with black borders, a black band at the top and
+ * the crest's ring and spokes, its hem cut in a swallowtail.
+ */
+function banner(name) {
+  return () => {
+    const c = new PixelCanvas(W, H);
+    const mottle = fbm(seedFrom(name) + 1, W, { cells: 4, sizeY: H });
+    const black = (x, y) => {
+      if (x < 4 || x >= W - 4 || (y >= 6 && y < 12)) return true;
+      const d = Math.hypot(x + 0.5 - 32, y + 0.5 - 48);
+      if (d > 12 && d < 16) return true;
+      const a = Math.atan2(y + 0.5 - 48, x + 0.5 - 32);
+      return d < 12 && d > 4 && Math.abs(((a / (Math.PI / 3)) % 1 + 1.5) % 1 - 0.5) < 0.09;
+    };
+    for (let y = 0; y < H; y++) {
+      for (let x = 0; x < W; x++) {
+        // The swallowtail: cut up into the hem, deepest in the middle.
+        if (y >= H - 20 + Math.abs(x + 0.5 - 32) * (20 / 32)) continue;
+        const weave = ((x + (y >> 1)) & 1 ? 0.015 : -0.015) + (y & 1 ? 0.01 : -0.01);
+        const t = 0.55 + weave + (mottle(x, y) - 0.5) * 0.12;
+        c.set(x, y, black(x, y) ? C('gray', 0.06 + weave) : C('blood', Math.min(1, Math.max(0, t))));
+      }
+    }
+    return c;
+  };
+}
+
 export default [
   // Rust-red rag: torn hem with tatters, a few holes.
   { name: 'cloth-rag', out: T('cloth-rag'), draw: cloth('cloth-rag', { ramp: 'rust', tone: 0.5, deep: 34, shallow: 8, tatters: 0.3, holes: 3 }) },
   // Pale cloth: worn, lightly torn at the hem, one small hole.
   { name: 'cloth-pale', out: T('cloth-pale'), draw: cloth('cloth-pale', { ramp: 'beige', tone: 0.62, deep: 10, shallow: 2, tatters: 0.2, holes: 1 }) },
+  // The Empire's banner (Mission 3's garrison), 1 x 2 m.
+  { name: 'imp-banner', out: T('imp-banner'), draw: banner('imp-banner') },
 ];

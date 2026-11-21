@@ -75,6 +75,9 @@ test('Mission 3 can be walked from the drop-off to the records, Rusk, the overlo
           break;
         }
         if (what.includes('talk')) {
+          // Face the nearest friendly.
+          const them = world.things.filter((q) => !q.removed && q.kind === 'npc').sort((a, b) => Math.hypot(a.x - pt.x, a.y - pt.y) - Math.hypot(b.x - pt.x, b.y - pt.y))[0];
+          pt.angle = Math.atan2(them.y - pt.y, them.x - pt.x);
           for (let i = 0; i < 600; i++, ticks++) {
             if (i % 30 === 0) input.tap('use');
             tick();

@@ -1583,14 +1583,17 @@ before and after; check in with Mark after each):
       bursts of steam and sparks, squads waiting on the way out with
       `spawn` and `wake: false`), Mohc's shuttle lifting off, the Crow
       coming in; the exit only once Rusk and the records are done.
-- [ ] **New content:** an Imperial banner hanging (`imp-banner`: Dark
+- [x] **New content:** an Imperial banner hanging (`imp-banner`: Dark
       Forces' ZSBANNLG on a cloth, cut by `textures.mjs`), and rock-cut
       walls for the inside (the DF cliff textures, ZWCLIFMD and GWBIGCLF,
       with steel ribs as models or bands). A fan model (spin) for the vent;
       a breaker that stops it needs a model's spin and solidity to follow
       a flag (a small engine piece, with defs, validator, MODDING.md and a
-      test).
-- [ ] **Dress the canyon:** the mast and its beacons, the power line's
+      test). Done: the banner, the comm mast, the power pole, burned
+      huts and ash heaps (`models/canyon.js`); inside, the rock is the
+      canyon's own sandstone. The fan and its breaker are left out (the
+      vent is short; not worth an engine piece).
+- [x] **Dress the canyon:** the mast and its beacons, the power line's
       poles and cables (into the face, to the floodlight towers and the
       mast), banners either side of the gate, the burned camp (charred
       cloth, embers, smoke), the range's targets and scars, the scout post;
