@@ -119,7 +119,7 @@ garrison's structure (inside). Kept areas are the first map's, moved by
 | 4 | The scrapyard | the gulch's west end, round (124, 150) | -10 | A skyhopper the Jawas brought down, their crates and fire. A beacon. |
 | 5 | The cave | (116, 150) to (74, 130) | -10 up to -2.5 / 4 over the floor | Dark, gravel; a squeeze (96..100, 146..149) 1.3 high to crouch through; moonlight through cracks in two places. |
 | 6 | The burned camp | 28..76, 112..142 | -2 / sky | Tusken huts burned to their frames, scraps of hide, ash heaps smouldering, scorched ground. Two Jawas scavenging. A beacon at its east end. |
-| 7 | The climb and the high ledge | (36, 113) to (38, 96); then to (92, 89.5) | -2 up to 5; 5 | Rock steps up the camp's north end; the ledge east along the north side of a dry gorge (floor -2, joining the camp) to the notch (92..102, 88..91). A probe droid over the gorge; beacons. |
+| 7 | The climb and the high ledge | (36, 111) to (38, 96); then to (92, 89.5) | -2 up to 5; 5 | Uneven rock steps up the camp's north end, a landing halfway; the ledge east along the north side of a dry gorge (floor -2, joining the camp) to the notch (92..102, 88..91). A probe droid over the gorge; beacons. |
 | 8 | The arch | 102..122, 88..91 | top 5 | The first map's rock arch, now walked over: the gorge 2.5 m below, the old start bowl beyond. Down its east end by rock steps (126..130, 80..91) north into the bowl. |
 | 8a | The gorge and the old start bowl | 102..126, 84..100; 94..118, 100..120 | 0 / sky | A pocket under the arch, off the route. Secret 1: the rock alcove (90..94, 104..108), a shield. |
 | 9 | The bowl | 108..150, 68..84 | 0 / sky | The first map's. The spire (123..129, 73..79) is now a rock mesa 7 m high (scenery, no way up) with the comm mast on it. Ledge A (west, 5): a sniper. Ledge B (east, 3): secret 2. |
@@ -142,7 +142,8 @@ garrison's structure (inside). Kept areas are the first map's, moved by
 
 ## The kit (design language)
 
-- **Outside:** the first map's: sandstone walls rising to a rim, gravel
+- **Outside:** the first map's: sandstone walls rising to a rim (in the
+  wide places, shelves of darker rock at their foot, 1.25 to 2.25 m), gravel
   channels in the sand, the backdrop's ridges, boulders. New: the comm
   mast (a lattice tower with red beacons) over the bowl, the Imperial
   beacons set in the rock (`rock-beacon`: a dark housing, a red lens, a
