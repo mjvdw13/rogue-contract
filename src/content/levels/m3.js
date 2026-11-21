@@ -511,6 +511,10 @@ p.rect(140, 86, W, H, (x, y, old) => (!old.wall && !old.door && old.ceiling === 
 // with open ground on two sides that meet at a corner (and rock on the
 // other two) becomes an angled wall standing on that ground.
 const OPEN = (c) => c && !c.wall && !c.door && c.ceiling === 'sky';
+/** A carved cave's tile (rock overhead). */
+const CAVE = (c) => c && !c.wall && !c.door && c.ceiling === 'sandstone-dark';
+/** Two tiles a corner between can be cut: both open or both cave, a step of 0.5 at most apart. */
+const alike = (a, b) => ((OPEN(a) && OPEN(b)) || (CAVE(a) && CAVE(b))) && Math.abs((a.floorZ ?? 0) - (b.floorZ ?? 0)) <= 0.5;
 const cuts = [];
 for (const k of carved) {
   const x0 = k % W;
@@ -524,8 +528,8 @@ for (const k of carved) {
     const w = p.get(x - 1, y);
     for (const [a, b, solid] of [[n, e, 'SW'], [n, w, 'SE'], [s, e, 'NW'], [s, w, 'NE']]) {
       const opp = { SW: [s, w], SE: [s, e], NW: [n, w], NE: [n, e] }[solid];
-      if (OPEN(a) && OPEN(b) && a.floorZ === b.floorZ && !a.slab && !b.slab && opp.every((o) => o?.wall === 'sandstone')) {
-        cuts.push([x, y, { ...a, ...rock, diagonal: solid }]);
+      if (alike(a, b) && !a.slab && !b.slab && opp.every((o) => o?.wall === 'sandstone')) {
+        cuts.push([x, y, { ...((a.floorZ ?? 0) >= (b.floorZ ?? 0) ? a : b), ...rock, diagonal: solid }]);
         break;
       }
     }
@@ -575,7 +579,7 @@ const rim = new Map(); // tile -> { x, y, base }
 for (let y = 1; y < H - 1; y++) {
   for (let x = 1; x < W - 1; x++) {
     const c = p.get(x, y);
-    if (!isAir(c) && !(c.wall === 'sandstone' && c.diagonal)) continue;
+    if (!isAir(c) && !(c.wall === 'sandstone' && c.diagonal && c.ceiling === 'sky')) continue;
     for (const [nx, ny] of near4(x, y)) {
       const k = ny * W + nx;
       if (nx < 1 || ny < 1 || nx >= W - 1 || ny >= H - 1 || !isRock(p.get(nx, ny)) || indoorNear(nx, ny)) continue;

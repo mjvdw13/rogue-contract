@@ -1869,7 +1869,7 @@ commit each, checked by snapshot.
 - [x] **The rim over the gap** dips 6 tiles because the gap's floor is
       the gulch's: the rim takes its height from the higher floors near
       it, so a gap or a step down doesn't notch the skyline.
-- [ ] **The cave's walls** are tile-stepped zig-zags: cut to 45 degrees
+- [x] **The cave's walls** are tile-stepped zig-zags: cut to 45 degrees
       like the open canyon's.
 - [ ] **Chockstones:** a square slab each, flat underneath; make them
       rocks wedged across the slot (narrower, at an angle, uneven).
