@@ -225,3 +225,11 @@ the start: Mark, 2026-11-20), E-11s from the troopers. Ammo 15.6x.
 - 2026-11-20, before: the first map's route, 61 s at a walk; bench at
   640 x 400, headless, one thread: 8.6 ms on average, 16.2 at the 90th
   percentile, 18.7 at worst.
+- 2026-11-20, after: `tests/m3-route.test.js` walks the route with no
+  monsters, hollow to the Crow (the jump on the gulch ledge, the squeeze,
+  the records, Rusk, the overload, waiting for the Crow): 156 s. Bench
+  the same way: 8.6 ms on average, 17.4 at the 90th percentile, 19.6 at
+  worst. `npm test`, `npm run validate` (0 errors, 0 warnings) and
+  `npm run smoke` pass. Every area looked at in snapshots with the Dark
+  Forces art. Not checked: the fights by playing, anything in a browser,
+  the sounds by ear.

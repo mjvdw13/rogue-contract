@@ -28,6 +28,23 @@ MODDING.md, if content authors need it). Keep this file short.
 
 These need Mark to try something, or to decide. Don't start them without him.
 
+- **Mission 3 refreshed** (`?map=m3`, 2026-11-20; `docs/mission3.md`).
+  240 x 176, par 600, a route of 156 s at a walk (was 61). The canyon,
+  reworked after your notes: a slot with chockstones, a ledge over a
+  Jawa gulch with a gap to jump, their scrapyard, a cave with a squeeze,
+  the burned camp, a climb and a high ledge to the arch; Imperial beacons
+  in the rock, a probe droid near the end. The bowl has the comm mast on
+  a mesa and banners on the face. The base is twice the rooms: the cut
+  and excavation, a mess, the general through the barred window, the
+  records, detention and Rusk, the generator's overload (klaxon, sparks,
+  arcing rings), the test bay with the prototype's empty cradle, the
+  cliff gantry, the Lambda leaving and the Crow coming in. Decided:
+  the prototype waits for your sheet, the general is an officer's sprite,
+  only campaign weapons. To judge: whether the canyon now reads as
+  exploring, the beacons as a hint, the fights (25/45/55 on skills
+  1/3/5, nobody has played them), the length, Jan's and the PA's lines.
+  Not checked: anything by eye in a browser, the sounds.
+
 - **Mission 4 brought up to Mission 5** (`?map=m4`, 2026-11-15; four of
   the ten ideas, picked by Mark). The unfinished sector shows how far the
   work has got (deck plates laid in patches over the grate, most at the
@@ -1471,125 +1488,6 @@ detonator (`large`) and the concussion rifle (`concussion`).
       - [x] Mos Eisley: `dust`, as thick in view as the bench's 100.
       - [ ] The canyon: thin dust and a breeze, not a storm (section 4).
 - [ ] Bench again with everything on (does the budget hold?).
-
-### 4. Mission 3 refreshed: the Canyon Garrison, longer and in a line (Mark, 2026-11-20)
-
-Mission 3 is the oldest map: 128 x 100 tiles, par 300, built before the
-lessons of Missions 1, 2, 4 and 5. Today it's a short canyon (start bowl,
-gorge, the bowl under the gate), then a compact base (maintenance, a
-corridor with two rooms, the vault, the generator), and the pad. Mark
-likes its night look and its light; keep those. Bring it up to Mission 5
-on four things:
-
-- **Progression.** A chain of distinct areas in a line. The canyon is
-  explored, not crossed (Mark's notes on the first cut, below): Jawa
-  country, with only Imperial beacons set in the rock hinting at what's
-  ahead, until the garrison. Height climbs and falls: ledges, a cave,
-  a climb, in at mid height, down to the generator, out high on the
-  cliff. One change of state: the overload.
-- **Length.** About as long as Missions 4 and 5: a walk of the route with
-  no monsters at 105 to 125 s (m4 105, m5 123), par 600. The canyon about
-  three times as long as now before the base, the base about twice the
-  rooms. The map grows to about 240 x 176 (to settle in the design).
-- **Look, its own.** Mos Eisley is noon and gold, the Homestead dusk and
-  a sandstorm, the station polished grey metal, Breakers' Row rain and
-  rust. The garrison is **night in rock**: moonlight, the purple haze and
-  still, cold air outside (no storm: a little dust drifting through the
-  floodlights' pools, a breeze high up that moves the banners), and a
-  base **cut into the cliff** inside: raw rock walls and ceilings
-  between Imperial panels bolted over them, rock-cut tunnels with steel
-  ribs, the generator in a natural cavern. Blue-white Imperial light
-  against the warm orange of fires outside; red at the end.
-- **Use what the engine has now** (none of it was there when m3 was
-  built): hangings (cables, hoses, cloth), weather with wind, emitters
-  with sounds and story flags (steam, sparks, hum), traffic (a TIE patrol
-  over the canyon), `fly` (the Crow's drop-off and pickup, Mohc's shuttle
-  leaving), beats (patrols), `spawn` with `wake: false` (the squads
-  waiting after the alarm), names over heads, conversations and flags,
-  the PA chime, Jan's lines, `setLight` alerts, scrolling textures,
-  grime decals, `haze.indoors`, the m4 and m5 model kits where they fit.
-
-**The route:** `docs/mission3.md` (Flow, Areas).
-
-**Decided** (Mark, 2026-11-20):
-
-- The prototype comes later. For now the cavern's fight is a squad and a
-  commander, and the test bay shows the empty cradle; the boss goes in
-  when Mark has made its sprite sheet.
-- Mohc at the window is an officer's sprite for now (a friendly
-  character, so it can't be shot), until he has his own.
-- The try-out pile at the start goes (the detonator belt, the
-  concussion rifle and its cells). Mission 3 gives only what the
-  campaign has by then: the pistol, the E-11 from fallen troopers and
-  thermal detonators picked up on the way.
-
-Steps (one commit each, playable at `?map=m3`; snapshots of every area
-before and after; check in with Mark after each):
-
-- [x] **Measure today:** `tests/m3-route.test.js` walks today's route:
-      61 s at a walk. Bench (`tools/bench.mjs m3 --res 2`, headless, one
-      thread): 8.6 ms on average, 16.2 at the 90th percentile, 18.7 at
-      worst.
-- [x] **Design:** rewrite `docs/mission3.md` as Missions 4 and 5's docs
-      (flow, areas with boxes and heights, the kit, light and air,
-      secrets, enemies and items by skill, engine notes). Mark reads it
-      before the blockout.
-- [x] **Blockout, the canyon** (areas 1-7): the map enlarged, today's
-      bowl and gate kept as they are and moved; stand-in props; the route
-      test extended; bench the open stretches before dressing.
-- [x] **Blockout, the base** (8-17): the rock-cut rooms round today's
-      maintenance, barracks, vault and generator, the new detention block,
-      test bay and cliff-face gantry; the route test to the pad.
-- [x] **Story and state:** the drop-off (`fly`), Jan's lines, the PA, Rusk
-      (talks, sets `rusk-free`, "I'll keep behind you", aboard at the end,
-      as Mission 4), the records (a terminal that sets a flag, as Mission
-      5's manifest), the overload (klaxon, red strobes, lamps dying,
-      bursts of steam and sparks, squads waiting on the way out with
-      `spawn` and `wake: false`), Mohc's shuttle lifting off, the Crow
-      coming in; the exit only once Rusk and the records are done.
-- [x] **New content:** an Imperial banner hanging (`imp-banner`: Dark
-      Forces' ZSBANNLG on a cloth, cut by `textures.mjs`), and rock-cut
-      walls for the inside (the DF cliff textures, ZWCLIFMD and GWBIGCLF,
-      with steel ribs as models or bands). A fan model (spin) for the vent;
-      a breaker that stops it needs a model's spin and solidity to follow
-      a flag (a small engine piece, with defs, validator, MODDING.md and a
-      test). Done: the banner, the comm mast, the power pole, burned
-      huts and ash heaps (`models/canyon.js`); inside, the rock is the
-      canyon's own sandstone. The fan and its breaker are left out (the
-      vent is short; not worth an engine piece).
-- [x] **Dress the canyon:** the mast and its beacons, the power line's
-      poles and cables (into the face, to the floodlight towers and the
-      mast), banners either side of the gate, the burned camp (charred
-      cloth, embers, smoke), the range's targets and scars, the scout post;
-      thin dust with a breeze (wind for the banners, not a storm); a TIE
-      patrol across the sky now and then; grime on the Imperial walls.
-- [x] **Dress the base:** the rock-cut kit, cables and hoses along the
-      tunnels, steam off valves, a live cable sparking, hum, the barracks'
-      mess and lockers, cells, the vault's racks, the test bay's cradle and
-      scorch marks; `grimeIndoors`.
-- [x] **The generator** (the showpiece, the old list's ideas): the column
-      in bands with a glowing, scrolling core and the turning rings,
-      conduits hanging in the cavern, struts under the catwalks, steam and
-      sparks, a deep hum; the overload's change of state.
-- [x] **Canyon reworked after Mark's notes** (2026-11-20, on the first
-      cut: "the start expects you to go one way, then backtrack, then the
-      other"; "a lot of boring walking"; "the power lines look way too
-      real-world"): the reach, the dry wash, the scout post, the test range
-      and the power line are gone. Now: a hollow facing west, a slot with
-      chockstones, a ledge over a Jawa gulch with a gap to jump, their
-      scrapyard, a cave with a squeeze, the burned camp, a climb and a high
-      ledge over a dry gorge to the arch; Imperial beacons set in the rock
-      along the way (`rock-beacon`), a probe droid near the end.
-- [x] **Fights and items by skill:** beats, snipers that matter, the alarm's
-      last fight (not an anti-climax: Mission 4's lesson), the table in
-      the design doc, the validator's ammo check.
-- [ ] **Check:** `npm test`, `npm run validate`, `npm run smoke`, the bench,
-      snapshots of every area; then under "Waiting on Mark".
-
-Not in this pass (kept from the old list, not needed for the refresh):
-models in pathfinding and sight (a monster walks into a tank and stalls,
-and sees through it), translucent sprites and fences (glass, light
-shafts), mipmaps for far floors and walls.
 
 ### 5. Dark Forces systems
 
