@@ -974,6 +974,58 @@ const list = [
   at('lambda-shuttle', 227, 93, { angle: 90 }),
 ];
 
+// ---------------------------------------------------------------- the walls' foot
+// One sheer face from floor to rim makes the wide places (the hollow, the
+// gulch, the camp) walled pens. Along stretches of the foot of their walls
+// the rock comes out in a shelf 1.25 to 2.25 m high (out of a jump's
+// reach, 1 m), and in places a footing in front of it, knee high, its top
+// seen from the floor: floor, footing, shelf, then the face up to the rim.
+// Their faces are the darker rock. Kept 2 tiles clear of everything
+// placed, so nothing ends up stood in rock.
+{
+  const sky = (c) => c && !c.wall && !c.door && c.ceiling === 'sky' && !c.scenery && !c.slab;
+  const rockAt = (x, y) => {
+    const c = p.get(x, y);
+    return !c || c.wall === 'sandstone' || !!c.scenery;
+  };
+  const busy = new Set();
+  const keep = (px, py) => {
+    for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) busy.add((Math.floor(py) + dy) * W + Math.floor(px) + dx);
+  };
+  for (const t of list) keep(t.x, t.y);
+  for (const h of hangings) for (const end of [h.from, h.to]) if (end) keep(end[0], end[1]);
+  const benches = [];
+  for (const k of carved) {
+    const x = k % W;
+    const y = (k / W) | 0;
+    const c = p.get(x, y);
+    if (!sky(c) || busy.has(k)) continue;
+    // At the foot of a wall (rock 1 away, or 2 for the footing), and only
+    // where the floor runs on level 6 tiles out from it, and 3 out it runs
+    // 3 either way along it: a wide place, not a slot, a ledge or the
+    // mouth of one.
+    const level = (tx, ty) => sky(p.get(tx, ty)) && Math.abs((p.get(tx, ty).floorZ ?? 0) - (c.floorZ ?? 0)) <= 1;
+    const out = (dx, dy, from) => {
+      for (let i = from; i <= from + 5; i++) if (!level(x - dx * i, y - dy * i)) return false;
+      const mx = x - dx * (from + 2);
+      const my = y - dy * (from + 2);
+      for (let i = -3; i <= 3; i++) if (!level(mx + dy * i, my + dx * i)) return false;
+      return true;
+    };
+    const n = noise(x, y, 5, 31);
+    let at = 0;
+    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+      if (rockAt(x + dx, y + dy) && out(dx, dy, 1)) at = 1;
+      else if (!at && level(x + dx, y + dy) && rockAt(x + 2 * dx, y + 2 * dy) && out(dx, dy, 1)) at = 2;
+    }
+    if ((at === 1 && n > 0.45) || (at === 2 && n > 0.62)) benches.push([x, y, c, at]);
+  }
+  for (const [x, y, c, at] of benches) {
+    const h = at === 1 ? 2.5 + noise(x, y, 3, 37) * 2 : 0.75 + noise(x, y, 3, 41) * 0.5;
+    p.set(x, y, { ...c, floor: 'desert-gravel', side: 'sandstone-dark', floorZ: (c.floorZ ?? 0) + Math.round(h * 4) / 4 });
+  }
+}
+
 export default defineLevel({
   id: 'm3',
   mapLabel: 'M1',

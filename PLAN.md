@@ -1873,7 +1873,7 @@ commit each, checked by snapshot.
       like the open canyon's.
 - [x] **Chockstones:** a square slab each, flat underneath; make them
       rocks wedged across the slot (narrower, at an angle, uneven).
-- [ ] **Wall profile:** every canyon wall is one sheer face from floor
+- [x] **Wall profile:** every canyon wall is one sheer face from floor
       to rim, so the wide places (the hollow, the gulch, the camp) read
       as walled pens. Benches and fallen blocks at the foot of the
       walls, a step part way up.
