@@ -1547,15 +1547,17 @@ on four things:
 | 15 | The overload | The switch on the column; signs and the hum growing |
 | 16-17 | The pad | The alarm; the hatch opens; one way on, up |
 
-**Decisions for Mark** (asked 2026-11-20; record the answers here):
+**Decided** (Mark, 2026-11-20):
 
-- The prototype (the story's boss in the generator): it needs a sprite
-  sheet (Mark's art). Until then, the cavern's fight is a squad and a
-  commander, and the test bay shows the empty cradle.
-- Mohc at the window: no sprite yet. A stand-in (an officer's sprite) or
-  wait for his.
-- The start's try-out pile (detonators, the concussion rifle): keep, or
-  give what the campaign has given by Mission 3.
+- The prototype comes later. For now the cavern's fight is a squad and a
+  commander, and the test bay shows the empty cradle; the boss goes in
+  when Mark has made its sprite sheet.
+- Mohc at the window is an officer's sprite for now (a friendly
+  character, so it can't be shot), until he has his own.
+- The try-out pile at the start goes (the detonator belt, the
+  concussion rifle and its cells). Mission 3 gives only what the
+  campaign has by then: the pistol, the E-11 from fallen troopers and
+  thermal detonators picked up on the way.
 
 Steps (one commit each, playable at `?map=m3`; snapshots of every area
 before and after; check in with Mark after each):
