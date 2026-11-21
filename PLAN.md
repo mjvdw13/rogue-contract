@@ -53,6 +53,17 @@ These need Mark to try something, or to decide. Don't start them without him.
   check there, and anywhere else a rock ends against open air. To
   judge: the shelves' look.
 
+- **Mission 3's garrison, textured** (`?map=m3`, 2026-11-21). The
+  generator's pale textures glowed white in its dark; it's dark steel and
+  DF machinery now: a coupler, hazard band and pipes on the column,
+  pipework and pistons along the shaft's foot, machinery round the
+  column's foot and on the ceiling, conduits on the floor to the
+  switch, dark railings and lift platforms (all of Mission 3's). The
+  test bay is plated to 4 high over the rock, on lit floor plates, a
+  stripe frame round a textured cradle; the back passage is pipework
+  with light strips. To judge: the generator's look (too dark now?),
+  the railings, the bay.
+
 - **Mission 4 brought up to Mission 5** (`?map=m4`, 2026-11-15; four of
   the ten ideas, picked by Mark). The unfinished sector shows how far the
   work has got (deck plates laid in patches over the grate, most at the
