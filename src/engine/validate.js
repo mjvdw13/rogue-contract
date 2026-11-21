@@ -546,7 +546,7 @@ export function validateContent(reg) {
         if (!BUILTIN_ACTION_NAMES.includes(name) && !reg.actions.has(name)) err(`${owner}: ${where} uses unknown action "${name}"`);
         const lit = name === 'setLight' && map.sourcesWithTag(a.tag).length;
         // A signal can be on a placed thing.
-        const placed = name === 'setSignal' && built.spawns.some((sp) => sp.tag === a.tag);
+        const placed = (name === 'setSignal' || name === 'remove') && built.spawns.some((sp) => sp.tag === a.tag);
         if (a.tag && !map.tags.has(a.tag) && !lit && !placed) err(`${owner}: ${where} refers to tag "${a.tag}" which no tile${name === 'setLight' ? ' or light' : name === 'setSignal' ? ' or placed thing' : ''} has`);
         if ((name === 'giveWeapon' || name === 'takeWeapon') && !reg.weapons.has(a.weapon)) err(`${owner}: ${where} ${name === 'giveWeapon' ? 'gives' : 'takes'} unknown weapon "${a.weapon}"`);
         if (a.thing && !reg.things.has(a.thing)) err(`${owner}: ${where} ${name === 'setSignal' ? 'tracks' : 'spawns'} unknown thing "${a.thing}"`);
@@ -555,6 +555,8 @@ export function validateContent(reg) {
           if (a.angle !== undefined && typeof a.angle !== 'number' && typeof a.angle !== 'string') err(`${owner}: ${where}: spawn "angle" is content degrees`);
           if (a.skill !== undefined && !(Array.isArray(a.skill) && a.skill.length && a.skill.every((k) => Number.isInteger(k) && k >= 1 && k <= 5))) err(`${owner}: ${where}: spawn "skill" must be a list of skills, 1 to 5`);
         }
+        if (name === 'remove' && !a.tag && !a.thing) err(`${owner}: ${where}: remove needs a "tag" (placed things) or a "thing" (a type)`);
+        if (name === 'remove' && a.tag && !built.spawns.some((sp) => sp.tag === a.tag)) err(`${owner}: ${where} removes things tagged "${a.tag}" but none are placed`);
         if (name === 'explode' && !reg.explosions?.has(a.explosion)) err(`${owner}: ${where} sets off unknown explosion "${a.explosion}"`);
         if (a.action === 'music' && a.id && !reg.songs.has(a.id)) warn(`${owner}: ${where} plays unknown song "${a.id}"`);
         if (a.action === 'setLight' && a.lightFx !== undefined && LIGHT_FX[a.lightFx] === undefined) err(`${owner}: ${where} sets unknown lightFx "${a.lightFx}"`);

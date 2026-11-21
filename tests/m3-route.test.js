@@ -12,7 +12,8 @@ import { makeWorld, mockInput } from './helpers.js';
 // calling lifts); 'z=N' waits there until the floor is at N (lifts);
 // 'face=A' turns to A degrees there and uses (switches); 'crouch' goes
 // there crouching; 'jump' jumps on setting off; 'call' stands there
-// pressing use until the lift in front of it has come up.
+// pressing use until the lift in front of it has come up; 'talk' talks to
+// whoever is in front; 'flag=F' waits there until the story flag is set.
 const ROUTE = [
   // The drop-off, west along the wash, up the slot canyon to the burned camp.
   [176, 138], [156, 152], [134, 160], [114, 158], [100, 155.5], [88, 147], [90, 137], [80, 129], [68, 127],
@@ -26,17 +27,18 @@ const ROUTE = [
   [121, 62, 'crouch'], [121, 51, 'crouch'], [122, 46], [132, 42, 'z=6'],
   // Up the cut, through the excavation and the mess, the bunk room, the corridor.
   [132, 30], [132, 21], [130, 15], [137, 15, 'use'], [142, 20], [142, 24], [142, 30, 'use'], [142, 36], [142, 41.5, 'use'],
-  // The office (the red key), the red door, the vault, detention, Rusk's cell.
-  [154, 41.5], [154, 36, 'use'], [154, 41.5], [164.5, 42], [168, 42, 'use'], [170, 38], [173, 36], [173, 30, 'use'], [173, 26],
-  [173, 20, 'use'], [189, 20], [189, 15, 'use'], [189, 20],
+  // The general through the barred window, back to the office (the red key),
+  // the red door, the vault's records, detention, Rusk.
+  [159, 42], [154, 41.5], [154, 36, 'use'], [154, 41.5], [164.5, 42], [168, 42, 'use'], [170, 38], [172.5, 38.6], [173, 36],
+  [173, 30, 'use'], [173, 26], [173, 20, 'use'], [189, 20], [189.5, 14.5, 'use', 'talk'], [189, 20, 'use'],
   // Down the back passage onto the generator's catwalk, down lift L2b, the overload switch.
-  [190, 25], [190, 47], [190, 51.5, 'use'], [191, 52.6, 'call'], [191, 55, 'z=-6'], [188, 62], [183.6, 66.5], [183.6, 68, 'face=180'],
+  [190, 25, 'use'], [190, 47], [190, 51.5, 'use'], [191, 52.6, 'call'], [191, 55, 'z=-6'], [188, 62], [183.6, 66.5], [183.6, 68, 'face=180'],
   // Back up, round the ring to the hatch, the test bay, the blast door, the gantry, the jump, the pad.
   [188, 62], [191, 55, 'z=6'], [194.5, 55], [194.5, 68], [198, 68, 'use'], [210, 72], [211, 82], [211, 88],
-  [211, 101.5], [214.6, 101.5], [222, 101.5, 'jump'], [227, 102],
+  [211, 101.5], [214.6, 101.5], [222, 101.5, 'jump'], [222, 116, 'flag=crow-down'], [227, 102],
 ];
 
-test('Mission 3 can be walked from the drop-off to the overload and the pad', (t) => {
+test('Mission 3 can be walked from the drop-off to the records, Rusk, the overload and the Crow', (t) => {
   const world = makeWorld('m3', { noMonsters: true });
   const input = mockInput();
   const pt = world.player;
@@ -72,6 +74,20 @@ test('Mission 3 can be walked from the drop-off to the overload and the pad', (t
           tick();
           break;
         }
+        if (what.includes('talk')) {
+          for (let i = 0; i < 600; i++, ticks++) {
+            if (i % 30 === 0) input.tap('use');
+            tick();
+          }
+          break;
+        }
+        const flag = what.find((w) => w.startsWith('flag='));
+        if (flag) {
+          for (let i = 0; i < 60 * 60 && !world.flags.has(flag.slice(5)); i++, ticks++) tick();
+          assert.ok(world.flags.has(flag.slice(5)), `waited for ${flag.slice(5)}`);
+          assert.ok(!world.exitRequested, 'and the level waits for Kyle to reach the pickup');
+          break;
+        }
         if (what.includes('call')) {
           for (let i = 0; i < 6 * 60; i++, ticks++) {
             if (i % 20 === 0) input.tap('use');
@@ -91,5 +107,8 @@ test('Mission 3 can be walked from the drop-off to the overload and the pad', (t
     input.release('crouch');
   }
   t.diagnostic(`the route takes ${(ticks / 60).toFixed(0)} s at a walk`);
+  assert.ok(world.flags.has('records'), 'the records were read');
+  assert.ok(world.flags.has('rusk-free'), 'Rusk was spoken to');
+  assert.ok(world.flags.has('overload'), 'the generator was overloaded');
   assert.equal(world.exitRequested, 'normal', 'the level ended on the pickup spot');
 });

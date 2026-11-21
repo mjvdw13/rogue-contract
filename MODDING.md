@@ -1612,6 +1612,10 @@ Actions:
   `track`) at the thing placed with the tag (or, with none, the middle of
   the tiles with it), or at the nearest thing of that type. With neither,
   they go dark.
+- `remove` `{ tag }` or `{ thing }`: takes away at once the placed things
+  with the tag, or with no tag every thing of that type: someone who has
+  gone while the player wasn't looking (Mission 3's general, behind a door
+  that has shut). The validator wants the tag on something placed.
 - `giveWeapon` `{ weapon }`: gives the player a weapon and switches to it;
   `takeWeapon` `{ weapon }` takes it away (held, they switch to their best
   weapon)

@@ -1576,7 +1576,7 @@ before and after; check in with Mark after each):
 - [x] **Blockout, the base** (8-17): the rock-cut rooms round today's
       maintenance, barracks, vault and generator, the new detention block,
       test bay and cliff-face gantry; the route test to the pad.
-- [ ] **Story and state:** the drop-off (`fly`), Jan's lines, the PA, Rusk
+- [x] **Story and state:** the drop-off (`fly`), Jan's lines, the PA, Rusk
       (talks, sets `rusk-free`, "I'll keep behind you", aboard at the end,
       as Mission 4), the records (a terminal that sets a flag, as Mission
       5's manifest), the overload (klaxon, red strobes, lamps dying,
@@ -1640,7 +1640,7 @@ conversations, then the fob.
       for a few seconds, HUD and weapon hidden, input locked; use or fire
       skips. An override of `world.camera()`.
 - [ ] **`wait` in trigger lists:** a trigger's actions can pause.
-- [ ] **`remove` and `place` actions.**
+- [ ] **`place` action** (`remove` is built, 2026-11-20).
 - [ ] **`damage { tag, amount }` action** (the overload hurts the prototype).
 - [ ] Nice to have: villagers who see a shooting
       running too (only the one hit runs today), factions (Tuskens

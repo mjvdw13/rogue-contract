@@ -140,6 +140,16 @@ export const BUILTIN_ACTIONS = {
   fly(world, { thing, path, then }) {
     startFlight(world, thing, path, then);
   },
+  /**
+   * Take away at once the placed things with the tag, or with none, every
+   * thing of type `thing`: someone who has gone while the player looked
+   * away (behind a door that has shut).
+   */
+  remove(world, { tag, thing }) {
+    for (const t of world.things) {
+      if (!t.removed && (tag ? t.tag === tag : t.def.id === thing)) world.remove(t);
+    }
+  },
   /** Change the music. */
   music(world, { id }) {
     world.game?.playMusic?.(id);

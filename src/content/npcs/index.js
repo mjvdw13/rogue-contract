@@ -3,5 +3,6 @@
 import villagers from './villagers.js';
 import droids from './droids.js';
 import prisoners from './prisoners.js';
+import imperials from './imperials.js';
 
-export default [...villagers, ...droids, ...prisoners];
+export default [...villagers, ...droids, ...prisoners, ...imperials];

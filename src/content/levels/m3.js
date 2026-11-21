@@ -153,13 +153,13 @@ lamps.push({ x: 58, y: 44, z: 7.5, radius: 9, light: 64 });
 
 // 7. The ledge path: cut up the range's east wall in flights, a railing on
 // the drop, then east through a notch to 8. the arch.
-const road = (z) => sand(z, { floor: 'imp-grate', side: 'imp-panel-dark', light: 144 });
+const road = (z, extra = {}) => sand(z, { floor: 'imp-grate', side: 'imp-panel-dark', light: 144, ...extra });
 p.rect(88, 34, 92, 40, road(0));
 p.stairs(88, 40, 92, 46, 'S', 0.5, 0.5, road);
 p.rect(88, 46, 92, 60, road(3));
 p.stairs(88, 60, 92, 63, 'S', 3.5, 0.5, road);
 p.rect(88, 63, 92, 91, road(5));
-p.rect(92, 88, 102, 91, road(5));
+p.rect(92, 88, 102, 91, road(5, { tag: 'notch' }));
 p.fence(88, 46, 89, 91, 'W', railing);
 
 // ---------------------------------------------------------------- the gorge and the bowl (the first map's)
@@ -270,7 +270,7 @@ for (const [x, y] of [[132, 34], [132, 25], [126, 12], [117, 9]]) p.pool(x, y, 4
 
 // 12. The mess hall, over the bunk room and the office.
 p.rect(134, 4, 162, 28, panel);
-p.rect(135, 6, 160, 27, room(6, 10, { light: 152 }));
+p.rect(135, 6, 160, 27, room(6, 10, { light: 152, tag: 'mess' }));
 for (const x of [140, 148, 155]) p.rect(x, 12, x + 2, 20, room(6, 10, { ceiling: 'imp-ceiling-light', light: 192 }));
 p.chamfer(135, 6, 160, 27, 2, darkPanel, ['NE', 'SE']);
 p.rect(141, 27, 143, 28, door(6));
@@ -301,7 +301,7 @@ p.rect(141, 39, 143, 40, door(6));
 p.rect(150, 28, 160, 39, room(6, 9, { light: 144 }));
 p.rect(151, 29, 154, 32, room(6, 9, { ceiling: 'imp-ceiling-light', light: 192 })); // over the desk
 p.chamfer(150, 28, 160, 39, 2, darkPanel, ['NE']);
-p.rect(153, 39, 155, 40, door(6));
+p.rect(153, 39, 155, 40, door(6, { lock: 'remote', tag: 'office' }));
 // A barred window from the corridor into the office, over a sill.
 p.rect(157, 39, 159, 40, room(7, 8.5, { light: 144, side: 'imp-panel', upper: 'imp-panel' }));
 p.fence(157, 39, 159, 40, 'S', bars);
@@ -331,7 +331,7 @@ p.rect(182, 37, 186, 43, room(6, 9, { light: 120, secret: true }));
 p.rect(160, 8, 194, 26, panel);
 p.rect(166, 24, 180, 33, room(6, 10, { light: 144 }));
 p.chamfer(166, 24, 180, 33, 2, darkPanel, ['NW', 'NE']);
-p.rect(172, 33, 174, 34, door(6, { upper: 'imp-computer' }));
+p.rect(172, 33, 174, 34, door(6, { upper: 'imp-computer', lock: 'remote', tag: 'cellblock' }));
 p.rect(162, 18, 192, 23, room(6, 10, { light: 128 }));
 p.rect(172, 23, 174, 24, door(6));
 // Six cells north of the lane, 4 wide, bars on their fronts; Rusk's, the
@@ -346,7 +346,8 @@ for (let k = 0; k < 6; k++) {
 p.rect(188, 17, 190, 18, door(6));
 // Red light over the cells: the only red before the alarm.
 for (let k = 0; k < 6; k++) lamps.push({ x: 164 + k * 5, y: 14, z: 9, radius: 3, light: 40 });
-p.rect(188, 23, 192, 49, room(6, 10, { light: 136 }));
+p.rect(189, 23, 191, 24, door(6, { lock: 'remote', tag: 'backstairs' }));
+p.rect(188, 24, 192, 49, room(6, 10, { light: 136 }));
 p.rect(189, 49, 191, 50, door(6, { ...tallSide }));
 
 // The generator chamber: a deep shaft round the reactor column, with a
@@ -396,10 +397,21 @@ p.rect(181, 67, 182, 69, {
   wall: 'imp-switch',
   switchTo: 'imp-switch-on',
   use: [
+    { action: 'setFlag', flag: 'overload' },
     { action: 'openDoors', tag: 'escape' },
     { action: 'setLight', tag: 'generator', light: 136, lightFx: 'flicker', lightMin: 72 },
     { action: 'setLight', tag: 'gen-lamps', light: 32, lightFx: 'flicker', lightMin: 0 },
-    { action: 'message', text: 'GENERATOR OVERLOADED. THE ESCAPE HATCH IS OPEN.' },
+    { action: 'setLight', tag: 'testbay', light: 168, lightFx: 'glow', lightMin: 64 },
+    { action: 'setLight', tag: 'bay-squad', light: 168, lightFx: 'glow', lightMin: 64 },
+    { action: 'sound', id: 'alarm-klaxon' },
+    { action: 'message', text: "GENERATOR OVERLOADED. JAN: THE WHOLE CLIFF'S LIGHTING UP. GET OUT: THE HATCH EAST, THEN UP TO THE PAD." },
+    // Rusk is behind Kyle from here (and aboard at the end).
+    { action: 'remove', tag: 'rusk' },
+    // The squads sent to the test bay and the pad wait for him there.
+    { action: 'spawn', thing: 'stormtrooper', tag: 'bay-squad', wake: false, angle: 180, fog: false },
+    { action: 'spawn', thing: 'stormtrooper', tag: 'bay-more', wake: false, angle: 180, fog: false, skill: [3, 4, 5] },
+    { action: 'spawn', thing: 'sandtrooper', tag: 'pad-squad', wake: false, angle: 180, fog: false },
+    { action: 'spawn', thing: 'sandtrooper-commander', tag: 'pad-more', wake: false, angle: 180, fog: false, skill: [2, 3, 4, 5] },
   ],
 });
 
@@ -414,13 +426,19 @@ p.rect(197, 50, 230, 88, rock);
 p.rect(197, 52, 226, 84, cut(6, 20, { floor: 'imp-floor', light: 128, tag: 'testbay' }));
 p.chamfer(197, 52, 226, 84, 5, rock, ['NE', 'SE']);
 p.pool(211.5, 68, 7, 192, { tag: 'testbay' });
+/** Tag single tiles (where a squad appears, where a line is said). */
+const tagTiles = (tag, spots) => {
+  for (const [x, y] of spots) p.set(x, y, { ...p.get(x, y), tag });
+};
+tagTiles('bay-squad', [[216, 60], [219, 72], [214, 80]]);
+tagTiles('bay-more', [[204, 58], [222, 66]]);
 p.rect(209, 84, 213, 86, gate(6, { lock: 'remote', tag: 'escape', stayOpen: true, ...tallSide }));
 
 // 17. The cliff gantry: grate on the cliff face, down from the blast door
 // and up in a flight to 10, railings on the drop. Below, a bay of the wash.
-const gantry = (z) => sand(z, { floor: 'imp-grate', side: 'imp-panel-dark', light: 160 });
+const gantry = (z, extra = {}) => sand(z, { floor: 'imp-grate', side: 'imp-panel-dark', light: 160, ...extra });
 carve([[206, 108, 6], [204, 120, 8]], (z) => sand(z, { light: 128 }), { z0: -6 });
-p.rect(207, 86, 215, 92, gantry(6));
+p.rect(207, 86, 215, 92, gantry(6, { tag: 'gantry' }));
 p.stairs(207, 92, 215, 100, 'S', 6.5, 0.5, gantry);
 p.rect(207, 100, 215, 104, gantry(10));
 p.fence(207, 92, 208, 104, 'W', railing).fence(207, 103, 215, 104, 'S', railing);
@@ -438,7 +456,23 @@ const pad = (extra = {}) => sand(10, { floor: 'imp-floor', side: 'imp-panel-dark
 p.rect(218, 86, 236, 124, pad());
 p.chamfer(218, 86, 236, 124, 4, rock, ['NE', 'SE']);
 p.fence(222, 123, 232, 124, 'S', railing);
-p.rect(225, 100, 229, 104, pad({ floor: 'lift-floor', light: 224, lightFx: 'glow', lightMin: 168, exit: true }));
+p.rect(225, 100, 229, 104, pad({ floor: 'lift-floor', light: 224, lightFx: 'glow', lightMin: 168, tag: 'pickup' }));
+tagTiles('pad-squad', [[222, 112], [231, 108], [226, 116]]);
+tagTiles('pad-more', [[229, 118]]);
+
+// ---------------------------------------------------------------- story tiles
+/** Tag the open tiles of a box that have no tag yet (where a line is said, a door opens). */
+const tagBox = (x0, y0, x1, y1, tag) => p.rect(x0, y0, x1, y1, (x, y, old) => (old.wall || old.door || old.tag ? old : { ...old, tag }));
+tagBox(134, 86, 149, 91, 'reach-end'); // under the lip
+tagBox(48, 125, 60, 137, 'camp');
+tagBox(156, 40, 162, 44, 'window'); // the corridor by the office's barred window
+tagBox(146, 40, 156, 44, 'office-near'); // and by its door
+tagBox(171, 38, 176, 45, 'records'); // round the vault's dais
+
+// The sky over the wash, the reach, the gantry and the pad starts at 48:
+// the general's shuttle stands 19 tall on the pad, and the Crow flies in
+// over the wash (things are cut off at their tile's ceiling).
+p.rect(140, 86, W, H, (x, y, old) => (!old.wall && !old.door && old.ceiling === 'sky' ? { ...old, ceilZ: 48 } : old));
 
 // ---------------------------------------------------------------- the canyon's edges
 // The carved canyons' stepped rock edges, cut to 45 degrees: a rock tile
@@ -649,6 +683,13 @@ const list = [
   at('supply-crate', 138.5, 35.5), at('supply-crate', 144, 36),
   at('med-kit', 146.5, 30),
   at('officer', 154.5, 32.5, { angle: 270, drops: ['keycard-red'] }),
+  // The general, by his own door (an officer's sprite for now: Mark).
+  at('general', 158.5, 32, { angle: 0, tag: 'general' }),
+  // Rusk, in the last cell.
+  at('rusk', 189.5, 13, {
+    angle: 270, tag: 'rusk', name: 'RUSK',
+    talk: [{ lines: ['KATARN? THEY TOLD ME NOBODY WAS COMING.', "THE BACK STAIRS AT THE END OF THE BLOCK GO DOWN TO THE GENERATOR. I'VE SEEN THE CODE. GO, I'LL KEEP BEHIND YOU."], set: 'rusk-free' }],
+  }),
   at('med-kit', 158.5, 30, { skill: EASY }),
   at('console', 151.5, 30),
   // The vault: guards against the far computer banks, lit by the screens'
@@ -681,7 +722,7 @@ const list = [
   at('sandtrooper', 211, 101.5, { angle: 90, skill: NORMAL_UP }),
   at('med-kit', 213, 90, { skill: [1, 2, 3] }),
   // The landing pad, with the general's shuttle north of the marked spot.
-  at('shuttle', 227, 92, { angle: 270 }),
+  at('lambda-shuttle', 227, 93, { angle: 90 }),
   at('stormtrooper', 224, 108, { angle: 180 }),
   at('sandtrooper', 230, 110, { angle: 180, skill: NOT_EASIEST }),
   at('stormtrooper', 222, 98, { angle: 180, skill: HARD }),
@@ -708,5 +749,50 @@ export default defineLevel({
     light: 168,
   }),
   things: [],
+  triggers: [
+    // The drop-off: the Crow lifts off and goes south-east, low over the wash.
+    { on: 'start', do: [
+      { action: 'fly', thing: 'moldy-crow-inbound', path: [[200, 134, 0, 150, 0], [201, 135, 6, 150, 2.5], [218, 150, 26, 130, 4], [236, 172, 36, 120, 4]] },
+      { action: 'message', text: "JAN: THE GARRISON'S IN THE CLIFF AT THE HEAD OF THE CANYON. SEE THE MAST? THEIR PAD'S ON THE CLIFF EAST OF HERE: I'LL PICK YOU UP THERE." },
+    ] },
+    { on: 'enter', tag: 'reach-end', do: [{ action: 'message', text: "JAN: YOU WON'T CLIMB THAT. THE WASH RUNS ON WEST: THERE'S AN OLD RANGE ROAD ROUND THE BACK." }] },
+    { on: 'enter', tag: 'camp', do: [{ action: 'message', text: "JAN: A TUSKEN CAMP. WHATEVER BURNED IT WASN'T CARRYING A BLASTER." }] },
+    { on: 'enter', tag: 'notch', do: [{ action: 'message', text: "JAN: THE GATE'S SEALED. THERE'S A VENT LEFT OF IT, BEHIND THE CRATES." }] },
+    { on: 'enter', tag: 'mess', do: [
+      { action: 'sound', id: 'pa-chime' },
+      { action: 'message', text: 'PA: BLOCK C, PRISONER TRANSFER AT 0600. THE GENERAL\'S SHUTTLE LEAVES AT 0500.' },
+    ] },
+    // The general, seen through the office's barred window, hurries out of
+    // his own door; by the time Kyle is round at the office's, he's gone.
+    { on: 'enter', tag: 'window', do: [
+      { action: 'openDoors', tag: 'mohc-door' },
+      { action: 'setFlag', flag: 'saw-general' },
+      { action: 'message', text: 'THROUGH THE BARS: AN IMPERIAL GENERAL, LEAVING IN A HURRY BY A DOOR AT THE BACK.' },
+    ] },
+    { on: 'enter', tag: 'office-near', if: 'saw-general', do: [
+      { action: 'remove', tag: 'general' },
+      { action: 'closeDoors', tag: 'mohc-door' },
+      { action: 'unlockDoors', tag: 'office' },
+    ] },
+    { on: 'enter', tag: 'records', do: [
+      { action: 'setFlag', flag: 'records' },
+      { action: 'unlockDoors', tag: 'cellblock' },
+      { action: 'message', text: "TEST RECORDS: 'ASSAULT DROID PROTOTYPE, TRIAL 3: TUSKEN CAMP, JUNDLAND. TRIAL 4: A MOISTURE FARM.' A TRANSFER ORDER: RUSK, T., BLOCK C. THE CELL BLOCK DOOR UNLOCKS." },
+    ] },
+    { on: 'talk', tag: 'rusk', if: 'rusk-free', do: [
+      { action: 'unlockDoors', tag: 'backstairs' },
+      { action: 'message', text: 'THE BACK STAIRS ARE OPEN.' },
+    ] },
+    // Out on the cliff: the general's shuttle goes, and the Crow comes in.
+    { on: 'enter', tag: 'gantry', if: 'overload', do: [
+      { action: 'message', text: "JAN: THAT'S THE GENERAL'S SHUTTLE. LET HIM GO. I'M COMING IN." },
+      { action: 'fly', thing: 'lambda-shuttle', path: [[227, 93, 10, 90, 0], [227, 93, 16, 90, 3], [229, 70, 26, 90, 4], [236, 4, 28, 90, 5]], then: [
+        { action: 'fly', thing: 'moldy-crow-inbound', path: [[236, 172, 36, 120, 0], [232, 140, 28, 110, 4], [227, 112, 16, 90, 4], [227, 102, 10, 90, 3]], then: [
+          { action: 'setFlag', flag: 'crow-down' },
+        ] },
+      ] },
+    ] },
+    { on: 'enter', tag: 'pickup', if: 'crow-down', do: [{ action: 'message', text: "JAN: RUSK'S ABOARD. HOLD ON TO SOMETHING." }, { action: 'exit' }] },
+  ],
   list,
 });

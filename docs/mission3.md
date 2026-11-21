@@ -34,8 +34,14 @@ east and 24 south, and the new areas go round them.
 - **The prototype** is the story's boss, but it waits for Mark's sprite
   sheet (2026-11-20). Until then its cradle in the test bay is empty, and
   the generator's fight is a squad and a commander.
-- **The exit** works once Rusk is free and the records are taken: the
-  Crow comes in to the pad when its squad is dead.
+- **The chain of locks.** The office's door opens once the general has
+  gone (seen through the window). Reading the records unlocks the cell
+  block's door north of the vault; talking to Rusk unlocks the back
+  stairs down to the generator. So the overload comes after both.
+- **The exit.** Coming out on the gantry after the overload, the
+  general's shuttle lifts off the pad and goes north; then the Crow
+  comes in over the wash and sets down on the pickup spot. Reaching it
+  ends the level (`crow-down`).
 
 ## What makes it work
 
@@ -204,8 +210,11 @@ no try-out pile at the start: Mark, 2026-11-20), E-11s from the troopers.
   out of their reach both ways (the lip is 8 over the reach floor).
 - **Shortcuts.** The chasm under the pad doesn't open into the wash, so
   its lift can't take Kyle from the start to the pad.
-- **Mohc leaving** needs a `remove` action (PLAN.md section 6): built
-  with this.
+- **Mohc leaving** uses the `remove` action (built for this): when the
+  player, having seen him through the window, comes back past the
+  office's door, he's taken away and his door shuts.
+- **Flights over the wash and the pad** need the sky high: those tiles'
+  sky starts at 48 (the Lambda shuttle stands 19 tall on the pad at 10).
 - **Frame time:** the range and the wash are big open places: bench them
   at the blockout.
 
