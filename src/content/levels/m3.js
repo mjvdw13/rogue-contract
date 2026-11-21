@@ -117,7 +117,22 @@ carve([[216, 128, 6], [204, 126, 8], [194, 126, 4]], (z) => sand(z), { z0: -6 })
 // 2. The slot: a crack 3 wide winding west, rising a little, two
 // chockstones wedged across it overhead.
 carve([[194, 126, 1.8], [184, 123, 1.6], [177, 128, 1.6], [172, 134, 1.6], [166, 139, 1.8]], (z) => sand(z, { light: 124 }), { z0: -6, z1: -4 });
-for (const [x, y] of [[184, 123], [172, 134]]) p.rect(x - 2, y - 2, x + 3, y + 3, (x1, y1, old) => (!old.wall && old.ceiling === 'sky' && old.floorZ <= -4 ? { ...old, light: 104, slab: chock(old.floorZ + 3.5) } : old));
+// Each is one rock, about 1 m through along the slot and wedged wall to
+// wall: lowest in the middle of its underside, curving up toward its
+// faces, tilted a little across the slot. [x, y, dx, dy]: its middle, and
+// the slot's way there.
+for (const [cx, cy, dx, dy] of [[184.5, 123.5, -17, 2], [172.5, 134.5, -11, 11]]) {
+  const n = Math.hypot(dx, dy);
+  const base = p.get(Math.floor(cx), Math.floor(cy)).floorZ;
+  p.rect(Math.floor(cx) - 3, Math.floor(cy) - 3, Math.floor(cx) + 4, Math.floor(cy) + 4, (x, y, old) => {
+    if (old.wall || old.ceiling !== 'sky') return old;
+    const along = Math.abs((x + 0.5 - cx) * dx + (y + 0.5 - cy) * dy) / n;
+    const across = ((x + 0.5 - cx) * -dy + (y + 0.5 - cy) * dx) / n;
+    if (along > 1.3) return old;
+    const bottom = base + 3.25 + along * along * 0.4 + across * 0.15;
+    return { ...old, light: 104, slab: { ...chock(bottom), top: base + 5.25 - along * along * 0.3 + across * 0.1 } };
+  });
+}
 
 // 3. The Jawa gulch: a ledge along its north wall, 3 m over its floor,
 // with a gap to jump; the Jawas below and on the far side.

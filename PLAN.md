@@ -1871,7 +1871,7 @@ commit each, checked by snapshot.
       it, so a gap or a step down doesn't notch the skyline.
 - [x] **The cave's walls** are tile-stepped zig-zags: cut to 45 degrees
       like the open canyon's.
-- [ ] **Chockstones:** a square slab each, flat underneath; make them
+- [x] **Chockstones:** a square slab each, flat underneath; make them
       rocks wedged across the slot (narrower, at an angle, uneven).
 - [ ] **Wall profile:** every canyon wall is one sheer face from floor
       to rim, so the wide places (the hollow, the gulch, the camp) read
