@@ -1566,7 +1566,7 @@ before and after; check in with Mark after each):
       61 s at a walk. Bench (`tools/bench.mjs m3 --res 2`, headless, one
       thread): 8.6 ms on average, 16.2 at the 90th percentile, 18.7 at
       worst.
-- [ ] **Design:** rewrite `docs/mission3.md` as Missions 4 and 5's docs
+- [x] **Design:** rewrite `docs/mission3.md` as Missions 4 and 5's docs
       (flow, areas with boxes and heights, the kit, light and air,
       secrets, enemies and items by skill, engine notes). Mark reads it
       before the blockout.

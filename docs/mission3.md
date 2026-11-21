@@ -1,130 +1,212 @@
 # Mission 3: the Canyon Garrison (design)
 
-The first real level (PLAN.md Phase 1b B, then Phase 4). An original
-mercenary, hired by the Rebellion, breaks into an Imperial garrison dug into
-a desert canyon at night. The objectives and the briefing (Phase 2) don't
-exist yet, so for now the level runs from the canyon to an exit switch on a
-landing pad's pickup spot. The red keycard and a generator switch gate the way.
+The story's Mission 3 (`docs/story.md`): Kyle breaks into the Imperial
+garrison dug into a canyon in the Jundland at night, frees Rusk, takes the
+test records from the vault and overloads the generator under the
+prototype's test bay. Jan picks him up on the garrison's own pad.
 
-## Grid and building
+This is the second design (2026-11-20, PLAN.md item 4). The first map
+(128 x 100, par 300, a route of 61 s at a walk) was built before Missions
+1, 2, 4 and 5. Its night look and its light stay; its canyon, gate,
+maintenance, barracks, vault and generator stay as they were, moved 88
+east and 24 south, and the new areas go round them.
 
-- Fine grid: 1 tile = 0.5 m. The player is 1.7 tall and 1 wide, with the eye
-  at 1. Steps go up to 0.8, jumps up to about 1.56, crouch spaces are 1.2
-  high, and running jumps clear gaps of up to 4 tiles.
-- The map is 128 x 100 tiles. Everything not painted is canyon rock.
-- **Built in code, not typed as ASCII.** `src/content/levels/m3.js` paints
-  areas with a small painter (`src/content/levels/lib/painter.js`): rooms,
-  corridors, chamfered corners, lifts and doors, each cell carrying its own
-  floor, ceiling, heights and light. The painter dedupes the cells into
-  legend glyphs and returns the usual `tiles` and `legend`. Things go in
-  `list` at exact positions. The validator, map viewer and game see an
-  ordinary level.
+## Story
 
-## Route
+- **The drop-off.** The Crow sets Kyle down in a dry wash south-east of
+  the garrison and lifts off again. JAN: "The garrison's in the cliff at
+  the head of the canyon. See the mast? Their pad's up on the right. I'll
+  pick you up there."
+- **What the canyon shows.** Jawas stripping a wrecked skyhopper. Then a
+  Tusken camp burned flat, troopers picking over it: what the prototype
+  did (Rusk saw it). Then the range where it was tested, and the scout
+  post that guarded it (Rusk's unit).
+- **Mohc.** Through the office's barred window, an Imperial general (an
+  officer's sprite for now: Mark, 2026-11-20) hurries out of a far door.
+  He's gone before Kyle can get round. His shuttle leaves the pad as Kyle
+  comes out on the cliff.
+- **Rusk** is in the new detention block's last cell. He talks, sets
+  `rusk-free` and says he'll keep behind Kyle (as in Mission 4); he's
+  aboard at the end.
+- **The records** are on the vault's dais (a terminal that sets
+  `records`, as Mission 5's manifest). Its text names the test bay and
+  the generator under it.
+- **The prototype** is the story's boss, but it waits for Mark's sprite
+  sheet (2026-11-20). Until then its cradle in the test bay is empty, and
+  the generator's fight is a squad and a commander.
+- **The exit** works once Rusk is free and the records are taken: the
+  Crow comes in to the pad when its squad is dead.
 
-canyon (0) → crouch vent (0.5) → maintenance (0) → lift L1 to 6 → barracks
-corridor (6) → officer's office (red keycard) → red door → data vault (6) →
-generator catwalks (6) → lift L2 down to the generator floor (-6) → overload
-switch (opens the escape hatch) → back up → escape hatch → gantry stairs
-(6 → 8) → jump the 3-tile chasm → landing pad (8) → the marked pickup spot (exit).
+## What makes it work
+
+- **The goal is seen first.** From the drop-off: up the reach to the
+  north-west, the garrison's face lit across the bowl, the rock spire in
+  front of it with the **comm mast** on top, red beacons blinking; and up
+  on the right, the pad on its cliff with the general's shuttle on it.
+  The reach ends under the bowl's lip, too steep to climb: the way is
+  round, west by the old range road. The mast is in view again from the
+  range and the ledge path, and over the bowl.
+- **A chain, not a hub.** Fourteen areas in a line, one way on from each.
+  Loops only inside an area, for fights. The old start bowl is a pocket
+  off the gorge, under the arch.
+- **The Empire thickens.** Jawas, then a burned camp with a patrol, then
+  a scout post with a gate, then the range with a sniper tower, then the
+  bowl's walls, floodlights and banners.
+- **Height.** Down in the wash (-6), the slot canyon climbing out (-2),
+  up to the range (0), up the ledge path (5) and over the arch, down into
+  the bowl (0), in at 6, down to the generator's floor (-6), out on the
+  cliff at 6 to 10, high over where you started.
+- **One change of state.** The overload: the klaxon, red light pulsing
+  through the generator, the test bay and the way out, lamps dying,
+  steam and sparks, the test bay's blast door opening and the squads
+  that wait behind it.
+- **Length.** A walk of the route with no monsters of 105 to 125 s
+  (Mission 4: 105, Mission 5: 123), par 600.
+
+## Flow
+
+```
+[1 the wash: the Crow sets Kyle down] (the reach: the goal seen, too steep)
+   -> [2 the dry wash west: Jawas at the wreck]
+   -> [3 the slot canyon, climbing] -> [4 the burned camp]
+   -> [5 the scout post: the bunker's switch opens its gate]
+   -> [6 the test range] -> [7 the ledge path, up its east wall] -> [8 the arch]
+   -> down into [9 the bowl under the garrison] -> the vent
+   -> [10 the vent and maintenance] -> lift up -> [11 the cut and the excavation]
+   -> [12 the mess hall, the bunk room, the corridor; the office (red key), Mohc]
+   -> red door -> [13 the vault: the records] -> [14 detention: Rusk]
+   -> down the back passage -> [15 the generator: the overload]
+   -> the hatch -> [16 the test bay: the blast door] -> [17 the cliff gantry]
+   -> the jump -> [18 the pad: the last fight, the Crow]
+```
+
+| Step | Goal | How the player knows |
+|---|---|---|
+| 1 | The garrison | Jan's line; the mast and the lit face up the reach; the pad up on the right |
+| 1-2 | Round by the west | The reach ends in a cliff under the bowl's lip; the wash goes on west |
+| 3-4 | On up the canyon | One way; the power line's poles start at the camp |
+| 5 | Through the post | Its gate is shut across the neck; the bunker's lit window; the switch inside |
+| 6-8 | Over the arch | The range is walled in; the poles go up the ledge path; the mast over the rim |
+| 9 | In by the vent | The gate is shut and guarded; Jan names the vent from the arch |
+| 10-11 | On through the works | One way |
+| 12 | The red key | The officer, seen through the barred window with Mohc |
+| 13 | The records | The red door at the corridor's end; the vault's lit dais |
+| 14 | Rusk | The records name him; the PA calls his transfer; his name over his head |
+| 15 | The overload | The records name the generator; signs; the hum growing |
+| 16-18 | The pad | The klaxon; the hatch and the blast door open; one way, up |
 
 ## Areas (x, y in tiles; heights in units)
 
+The map is 240 x 176. Everything not painted is rock (outside) or the
+garrison's structure (inside). Kept areas are the first map's, moved by
+(+88, +24).
+
 | # | Area | Box (x0..x1, y0..y1) | Floor / ceiling | Notes |
 |---|------|----------------------|-----------------|-------|
-| 1 | Start bowl | 6..30, 76..96 | 0 / sky 24 | Start (14.5, 90.5) facing north. Secret alcove behind a rock door in the west wall (2..6, 80..84): a shield unit. |
-| 2 | Gorge | 14..34, 60..76 | 0 / sky | Winds north-east, with angled rock walls. A natural rock arch spans it (14..34, 64..67): a slab from 4 to 5 that you walk under, with a sniper on top (skills 2+) facing the start bowl. There's no way up. |
-| 3 | The bowl | 20..60, 44..60 | 0 / sky | Landmark: a rock spire (chamfered 6x6 block at 35..41, 49..55). Sniper ledge A (west, 20..24, floor 5) can't be reached. Ledge B (east, 56..60, floor 5) is reached by rock steps at its south end. |
-| 4 | Garrison face | 26..70, 36..40 | wall | Imperial wall facing the canyon, 4 m tall with the cliff's rock above it (wall bands), with a locked main gate (44..52) between light strips, the Empire's crest over it and hazard stripes along its lintel (decals). The vent mouth is at 32..34. |
-| 5 | Vent | 32..34, 26..40 | 0.5 / 1.7 | Crouch only (1.2 clear). |
-| 6 | Maintenance | 26..42, 14..26 | 0 / 5 | Dim, grate floor, with a lit panel in the middle. Crates in a storage cage (a see-through fence), a console, an ambush trooper. |
-| 7 | Lift L1 shaft | 42..46, 16..20 | lift 0 → 6 / 12 | Opens west at 0 and east at 6. |
-| 8 | Barracks corridor | 46..77, 16..20 | 6 / 10 | Light strips, hanging lamps. A trooper. |
-| 9 | Bunk room | 48..60, 4..15 | 6 / 10 | Door 53..55 x 15..16. Troopers, crates for bunks, a med kit. |
-| 10 | Officer's office | 62..72, 4..15 | 6 / 9 | Door 65..67 x 15..16. An officer carrying the **red keycard** (dropped when killed), a console. A barred window (69..71 x 15..16, over a sill at 7) looks in from the corridor. |
-| 11 | Red door | 77..78, 17..19 | 6 | Into the vault. |
-| 12 | Data vault | 78..92, 10..25 | 6 / 9 | Dark (light 96), computer-bank walls, chamfered corners, ammo, guards against the far banks. Secret niche (92..96, 14..18) behind a computer-bank door: a shield. South door 84..86 x 25..26 onto the generator catwalk. |
-| 13 | Generator chamber | 72..108, 26..62 | -6 / 18 | Catwalk ring at 6 (3 wide). Central reactor column (86..94, 40..48) with chamfered corners. North and south bridges (88..92) join the ring to the column. The ring and bridges are grate slabs (5.5 to 6): the shaft floor runs on underneath them, one open space round the column and out to the walls. Lifts L2 (75..79, 55..59, south-west) and L2b (101..105, 29..33, north-east) run -6 ↔ 6. The overload switch is on the column's south face at the bottom: it opens `escape`, dims the chamber and shows a message. Railings (0.75 tall) along the ring's inner edge and both sides of the bridges, open where the lifts and bridges join. Probe droid, troopers, fuel barrels at the bottom. |
-| 14 | Escape hatch | 108..109, 43..45 | 6 | Remote-locked door, tag `escape`, with a landing outside (109..110, 42..46). |
-| 15 | Gantry | 110..118, 42..46 | 6 → 8 / sky | Stairs up 0.5 per tile to 8. |
-| 16 | Chasm | 118..121, 34..58 | -2 / sky | The 3-tile jump. Lift L3 (118..121, 54..58) runs back up (-2 ↔ 8) if you fall. |
-| 17 | Landing pad | 121..126, 34..58 | 8 / sky | Troopers. The exit is the marked pickup spot on the pad (122..126, 43..47). |
+| 1 | The wash, drop-off | 172..236, 124..172 | -6 / sky | Wide, sandy, gravel channels. Start (204.5, 150.5) facing north-west. The Crow sets down beside and leaves. |
+| 1a | The reach | a band 12 wide from (196, 130) to (150, 92) | -6 / sky | Ends at a cliff under the bowl's south-east lip (a rock lip at +2 along the bowl's edge, 8 over the reach). The view: the bowl, the face, the mast. |
+| 1b | The pad's cliff | 218..236, 86..124 | (the pad, 10) | Seen from the wash: its edge 16 over the wash floor, the shuttle on it, its landing lights. |
+| 2 | The dry wash | 104..176, 146..172 | -6 / sky | West from the drop-off. Jawas stripping a wrecked skyhopper (128, 160). Boulders. |
+| 3 | The slot canyon | from (106, 158) north-west to (68, 126), 4 to 6 wide | -6 up to -2 | Winding, its walls close; two short flights of rock steps. |
+| 4 | The burned camp | 28..70, 112..146 | -2 / sky | Chamfered bowl. Tents burned to their frames (charred cloth on poles), embers, smoke, scorched ground, a broken moisture vaporator. Troopers picking over it. The power line's first pole. |
+| 5 | The scout post | neck 30..40, 96..112; bunker 40..52, 96..110 | neck -2 up to 0; bunker 0 / 4 | The canyon narrows to a neck climbing to 0, shut at its head (y 96..98) by a wall with a 4-wide gate (remote, `postgate`). The bunker in the rock on the neck's east side: its door, a window over the neck, a terminal and the switch that opens the gate. |
+| 6 | The test range | 12..88, 28..96 | 0 / sky | Broad and flat, walled in by rock. Targets (worn barricades, a blasted landspeeder, scorch marks), a sniper tower (a platform at 6, no way up), the power line's poles crossing it north-east. |
+| 7 | The ledge path | 88..92, 40..88 | 0 up to 5 | Cut along the range's east wall (an Imperial road: grate steps, a railing on the drop), the poles beside it. Rises in flights to 5, turns east at its south end through a notch (92..102, 88..91). |
+| 8 | The arch | 102..122, 88..91 | top 5 | The first map's rock arch, now walked over: the gorge 2.5 m below, the old start bowl beyond. Down its east end by rock steps (126..130, 80..91) north into the bowl. |
+| 8a | The gorge and the old start bowl | 102..126, 84..100; 94..118, 100..120 | 0 / sky | A pocket under the arch, off the route. Secret 1: the rock alcove (90..94, 104..108), a shield. |
+| 9 | The bowl | 108..150, 68..84 | 0 / sky | The first map's. The spire (123..129, 73..79) is now a rock mesa 7 m high (scenery, no way up) with the comm mast on it. Ledge A (west, 5): a sniper. Ledge B (east, 3): secret 2. The rock lip along the south-east over the reach. |
+| 9a | The garrison's face | strip 114..158, 60..68 | 0 | The first map's: the gate (134..138), the crest, hazard stripes, light strips. Now: banners either side of the gate, cables from the face to the floodlight towers and the mast, barricades. |
+| 10 | The vent | 120..122, 50..64 | 0.5 / 1.7 | Crouch. Halfway, a fan turning in a shaft overhead, light falling through it. |
+| 10a | Maintenance | 114..130, 38..50 | 0 / 5 | The first map's. Lift L1 (130..134, 40..44) up to 6, now opening north only. |
+| 11 | The cut | 130..134, 20..40 | 6 / 10 | A tunnel in raw rock: steel ribs, work lamps, cables along the wall. |
+| 11a | The excavation | 112..134, 4..20 | 6 / 12 | Unfinished: raw rock, a half-built wall of panels, a cave-in, girders, a cable reel, work lamps. The door east into the mess (134..135, 14..16). |
+| 12 | The mess hall | 135..160, 6..27 | 6 / 10 | Tables and benches, a serving counter. Door south (141..143, 27..28) into the bunk room. |
+| 12a | The bunk room | 136..148, 28..39 | 6 / 10 | The first map's; bunks now. Door to the corridor (141..143, 39..40). |
+| 12b | The corridor | 135..165, 40..44 | 6 / 10 | The first map's, walled at its west end. |
+| 12c | The office | 150..160, 28..39 | 6 / 9 | The first map's: the officer with the red key, the barred window (157..159, 39..40). Mohc's door (160..161, 31..33, never opens for Kyle). |
+| 13 | The vault | 166..180, 34..49 | 6 / 9 | The first map's: the red door (165..166, 41..43). The records on a lit dais in the middle. The south door is gone; a door north (172..174, 33..34) into detention. Secret 3: the niche behind a computer bank (182..186, 37..43). |
+| 14 | Detention | 160..192, 10..33 | 6 / 10 | Control (166..180, 26..33) over the vault, a lane east (166..192, 18..22) with cells north and south behind bars; Rusk in the last on the north. From the lane's east end a passage (188..191, 22..50) down the back to the generator's north catwalk. |
+| 15 | The generator | 160..196, 50..86 | -6 / 18 | The first map's: the catwalk ring at 6, the column, lifts L2 and L2b, the overload switch on the column's east face. |
+| 16 | The test bay | 197..226, 54..84 | 6 / 20 | Cut into the rock. The prototype's cradle in the middle (a gantry frame, clamps, cables hanging), the target wall east scorched and pocked. The hatch from the generator (196..197, 67..69) and the blast door south (209..213, 84..85), both opened by the overload. |
+| 17 | The cliff gantry | 207..215, 85..100 | 6 up to 10 / sky | Grate on the cliff face, railings, a floodlight. Below: the reach and the wash. |
+| 17a | The chasm | 215..218, 86..116 | -6 / sky | The 3-tile jump. Lift L3 (215..218, 110..116) back up if you fall. |
+| 18 | The pad | 218..236, 86..124 | 10 / sky | Floodlit, landing lights. The shuttle until Kyle reaches the gantry. The pickup spot (225..229, 100..104). |
 
-## Lighting
+## The kit (design language)
 
-Light is per tile (0-255; walls take the light of the tile in front of
-them). With the Dark Forces textures, 120 already reads as a dark corner and
-anything under about 110 as black, so dark places stay at 112-128 and the
-contrast comes from bright pools (184-224).
+- **Outside:** the first map's: sandstone walls rising to a rim, gravel
+  channels in the sand, the backdrop's ridges, boulders. New: the comm
+  mast (a lattice tower with red beacons), the power line (poles with
+  cables between them), Imperial banners on the face, the burned camp.
+- **Inside: dug into the cliff.** Where Missions 4 and 5 are all metal,
+  the garrison is rock: `sandstone` walls and ceilings where it's raw
+  (the cut, the excavation, the test bay, the vent's fan shaft), the
+  first map's Imperial panels (`imp-*`) bolted over it where it's
+  finished (the barracks, the vault, detention, the generator), and rock
+  showing above them where a room is taller than its panels.
+- **Not the station.** The Imperial set here is dark blue-grey and worn
+  (grime down the walls), lit blue-white. The station's pale grey models
+  (`ds-*`) only where they're the same gear (tables, lockers, bunks,
+  girders, work lamps).
 
-- **Canyon:** moonlight at 144 (152 in the start bowl), the narrow gorge at
-  136, the spire's shadow and the ledges a little darker, the strip along
-  the garrison face in shadow (120). The rock arch is moonlit on top (152)
-  and casts its shadow under it (112). Floodlights in the gate's light
-  strips (light sources, +96 fading out over 3 m) throw pools on the sand
-  and the wall, with a weaker light over the gate (+40). The rock alcove
-  is dark (112). Far off, the canyon fades into the night's purple haze
-  (`haze: { color: [32, 24, 64], half: 40 }`, halfway at 20 m) instead of
-  going black.
-- **Skyline:** the canyon's walls end 4.5 to 6 m up at a rim of rock out
-  of reach (one tile, its sky just above it so the view ends there),
-  rising to meet the taller cliff the garrison is built into. Above and
-  behind the rim, the backdrop (`canyonBackdrop`) climbs in moonlit slopes
-  and ridges out to 48 m past the map, light 168, fading into the haze.
-- **Vent:** 112, with light falling through a grate halfway (144).
-- **Maintenance:** 128, a bright panel in the middle (192), dark west
-  corners (120), and a broken ceiling light flickering in the south-east.
-- **Barracks:** the corridor at 144 with pools under the ceiling panels
-  (208), and light sources at the light strips and the hanging lamps
-  (+48). The bunk room at 128
-  with a ceiling light in the middle and dark north corners; the office at
-  144 with a light over the desk.
-- **Vault:** 112, with the screens' glow pulsing (104-152) along the
-  computer banks. The niche 120.
-- **Generator:** the shaft floor dark (128), darker under the catwalks
-  (120), a slow pulse (136-200) round the reactor column, catwalks at 152
-  with light strips on the chamber walls: each has a lamp over the catwalk
-  (+48) and one under it lighting the floor below (+56), tagged
-  `gen-lamps`. The overload switch drops the whole chamber to a dim
-  flicker (136, dipping to 72; under the catwalks as much darker as
-  before), and the lamps sputter (+32 or off).
-- **The way out:** the chasm dark (104), the pad floodlit (184), and the
-  pickup spot pulsing (168-224).
+## Light and air
+
+The first map's light is kept, area by area. New areas:
+
+- **The wash and the reach:** moonlight 144, the reach's floor in the
+  cliffs' shadow 128. The pad's floodlights and the face's lights seen far
+  off.
+- **The slot canyon:** 120 to 128, the moon hardly reaching in.
+- **The burned camp:** 144, with the embers' warm glow (light sources,
+  flickering, +32).
+- **The scout post:** the bunker 160 inside, a lamp over its door and the
+  gate (+48).
+- **The range:** 152 (open), the tower's floodlight pool.
+- **The cut and the excavation:** 120, work lamps in pools (+64).
+- **The mess:** 160, lit ceiling panels. **Detention:** 128, red light
+  over the cells (the only red before the alarm).
+- **The test bay:** 128, a pool over the cradle (192).
+- **The alarm:** the generator, the test bay, the gantry and the pad's
+  landing lights pulse red-dark (`setLight`), the klaxon sounds.
+- **Air:** still and cold: no storm. A thin `dust` in the air outside
+  (a few motes catching the floodlights), and a light wind high up
+  (`wind: [0.6, -0.3, 0]`) that moves the banners and the cables.
 
 ## Secrets (3)
 
-1. The start bowl's rock alcove (shield unit).
-2. The vault's computer-bank niche (shield unit).
-3. Ledge B in the bowl. It's reachable but tucked away, so it's marked secret
-   (energy pack, and a view down on the gate).
+1. The old start bowl's rock alcove (a shield unit).
+2. Ledge B in the bowl (an energy pack, a view down on the gate).
+3. The vault's niche behind a computer bank (a shield unit).
 
 ## Enemies and items by skill
 
-Skills 1-2 thin the fights and add med kits; 4-5 add a trooper or two to
-most areas (skill 5 also makes monsters faster and doubles ammo pickups, set
-in the engine). Totals: 14 monsters on skill 1, 21 on 2, 27 on 3, 34 on 4
-and 35 on 5.
+To settle in the fights step: about 16 monsters on skill 1, 26 on 3,
+36 on 5, by area: the camp (a patrol of 3), the scout post (2 and a
+sniper on the bunker's roof), the range (the tower sniper, a beat of
+2, a probe droid), the bowl (the first map's), maintenance (the ambush),
+the excavation (2), the mess (3), the barracks and office (the first
+map's), the vault (2), detention (a guard and the officer), the
+generator (the first map's), and after the overload the test bay's
+squad and the pad's (spawned, waiting). Detonators along the way (there's
+no try-out pile at the start: Mark, 2026-11-20), E-11s from the troopers.
 
-| Area | Every skill | 2+ | 3+ | 4+ (5 only) |
-|------|-------------|----|----|-------------|
-| Canyon | snipers on ledges A and B, a gate sandtrooper, 2 Jawas | a 2nd gate sandtrooper, a sniper on the rock arch, a sandtrooper commander at the gate, a sandtrooper by the big boulder (south-east) | the probe droid, a 3rd Jawa, a commander by the vent mouth | a sandtrooper under ledge A, a 4th Jawa |
-| Maintenance | the ambush trooper by the lift | | | a 2nd ambush trooper on the west side |
-| Barracks | a corridor trooper, a bunk-room trooper, the officer (red keycard) | a 2nd bunk-room trooper | a trooper by the red door | a 3rd bunk-room trooper |
-| Vault | a guard by the far banks | | a 2nd guard | an officer by the south door |
-| Generator | the probe droid (over the north bridge), a catwalk trooper (north-west), one on the floor (west) | an east catwalk trooper | | a south catwalk trooper (a 2nd probe droid down on the floor, west) |
-| Gantry | | | a sandtrooper at the top of the stairs | |
-| Landing pad | a stormtrooper | a sandtrooper | | a 2nd stormtrooper |
+## Engine notes
 
-Items: power cells, energy packs and med kits along the route (the bunk room
-and the generator floor have med kits on every skill). Extra med kits by the
-vent mouth after the gate guards and on the gantry before the pad (skills
-1-3), and in the office (skills 1-2). The vent has a power cell where the
-light falls through, and there's one in the dark under the generator's
-catwalk ring (north-west corner).
+- **The landmark.** A model shows over the rim only if the 2D line to it
+  runs through open tiles (checked 2026-11-20): behind solid rock it's
+  hidden. So the mast stands in the open (on the spire's mesa, a raised
+  floor) and the reach and the range are laid out to look at it.
+- **The drop.** Monsters in the bowl can see down into the reach; it's
+  out of their reach both ways (the lip is 8 over the reach floor).
+- **Shortcuts.** The chasm under the pad doesn't open into the wash, so
+  its lift can't take Kyle from the start to the pad.
+- **Mohc leaving** needs a `remove` action (PLAN.md section 6): built
+  with this.
+- **Frame time:** the range and the wash are big open places: bench them
+  at the blockout.
 
-## Later (after Phase 2)
+## Checked
 
-- Objective 1: the data tape in the vault. Objective 2: the generator
-  overload. The exit only works once both are done.
-- The generator overload could kill the lights outright once the headlamp
-  exists (for now it leaves a dim flicker).
+- 2026-11-20, before: the first map's route, 61 s at a walk; bench at
+  640 x 400, headless, one thread: 8.6 ms on average, 16.2 at the 90th
+  percentile, 18.7 at worst.
