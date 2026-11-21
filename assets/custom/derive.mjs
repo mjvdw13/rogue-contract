@@ -622,6 +622,12 @@ export const GARRISON = [
   { out: 'gar-trim', df: 'IWLOWCON', gradient: IMP_STEEL, keep: 0, contrast: 0.7 },
   // A lift's platform: the Test Base's, dark.
   { out: 'gar-lift', df: 'IPEXELV' },
+  // The test bay: the Test Base's dark plating bolted over the rock to 4
+  // high, its floor plates (their corner lamps glow), and worn warning
+  // stripes on the floor round the cradle.
+  { out: 'gar-bay-wall', df: 'IWEX1', gradient: IMP_STEEL, keep: 0.3, contrast: 1 },
+  { out: 'gar-bay-floor', df: 'IPTSTB3' },
+  { out: 'gar-warn-floor', df: 'NPWRNFAD', gradient: [[20, 18, 14], [52, 50, 46], [90, 84, 70], [150, 126, 80], [196, 160, 90]], keep: 0.5, contrast: 1 },
 ];
 
 /** Smooth value noise in 0-1 that repeats every `period` texels, over cells of `cell`. */

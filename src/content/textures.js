@@ -167,8 +167,8 @@ const CORELLIA_DECALS = ['berth-1', 'berth-2', 'berth-3', 'berth-4', 'puddle-1',
 
 // The canyon garrison (m3): derive.mjs, GARRISON. Its machinery, lift
 // platforms and railings in dark steel; they never glow, but the conduits'
-// lamps do.
-const GARRISON = ['gar-coupler', 'gar-hazard', 'gar-column-pipes', 'gar-pipes', 'gar-pipes-b', 'gar-pistons', 'gar-pit', 'gar-trim', 'gar-lift'];
+// lamps and the test bay's floor lamps do.
+const GARRISON = ['gar-coupler', 'gar-hazard', 'gar-column-pipes', 'gar-pipes', 'gar-pipes-b', 'gar-pistons', 'gar-pit', 'gar-trim', 'gar-lift', 'gar-bay-wall', 'gar-warn-floor'];
 
 const ANIMATED = {
   'imp-computer': { frames: 3, fps: 3 },
@@ -201,6 +201,7 @@ export default [
   ...CORELLIA_DECALS.map((id) => defineTexture({ id, src: `assets/custom/textures/${id}.png`, decal: true, fullbright: false })),
   ...GARRISON.map((id) => defineTexture({ id, src: `assets/custom/textures/${id}.png`, fullbright: false })),
   defineTexture({ id: 'gar-conduit', src: 'assets/custom/textures/gar-conduit.png' }),
+  defineTexture({ id: 'gar-bay-floor', src: 'assets/custom/textures/gar-bay-floor.png' }),
   defineTexture({ id: 'gar-railing', src: 'assets/custom/textures/gar-railing.png', fence: true, fullbright: false }),
   defineTexture({ id: 'sign-bottoms', src: 'assets/custom/textures/sign-bottoms.png', decal: true }),
   defineTexture({ id: 'sky-space', src: 'assets/custom/textures/sky-space.png', sky: true }),

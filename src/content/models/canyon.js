@@ -112,18 +112,18 @@ for (const [x, y] of [[-0.2, 0.05], [0.18, -0.1], [0.05, 0.18]]) ash.box([x - 0.
 // hanging from the beam, arm clamps open on the towers, a red light on
 // each tower. Scorched where it stood.
 const cradle = new ModelBuilder('test-cradle');
-const dark = { color: ['steel', 0.25] };
-cradle.box([-3, -2.2, 0], [3, 2.2, 0.3], { color: ['steel', 0.3], top: { color: ['gray', 0.12] }, bottom: false });
+const dark = { tex: 'gar-trim' };
+cradle.box([-3, -2.2, 0], [3, 2.2, 0.3], { tex: 'gar-trim', top: { tex: 'gar-lift' }, bottom: false });
 for (const sx of [-1, 1]) {
   const x = sx * 2.6;
   for (const sy of [-1, 1]) bar(cradle, [x, sy * 1.6, 0.3], [x, sy * 1.6, 7.2], 0.18, dark);
   for (const z of [1.5, 3.5, 5.5]) bar(cradle, [x, -1.6, z], [x, 1.6, z], 0.1, dark);
   // The arm clamp, swung open toward the middle.
-  cradle.box([x - sx * 1.1, -0.35, 3.3], [x - sx * 0.2, 0.35, 3.7], { color: ['steel', 0.4] });
+  cradle.box([x - sx * 1.1, -0.35, 3.3], [x - sx * 0.2, 0.35, 3.7], { tex: 'gar-hazard' });
   cradle.box([x - 0.15, -0.15, 6.4], [x + 0.15, 0.15, 6.7], { color: [255, 40, 30], glow: true });
 }
-bar(cradle, [-2.8, 0, 7.2], [2.8, 0, 7.2], 0.25, dark);
-cradle.box([-0.9, -0.5, 5.2], [0.9, 0.5, 5.6], { color: ['steel', 0.35] });
+bar(cradle, [-2.8, 0, 7.2], [2.8, 0, 7.2], 0.25, { tex: 'gar-hazard' });
+cradle.box([-0.9, -0.5, 5.2], [0.9, 0.5, 5.6], { tex: 'gar-coupler' });
 bar(cradle, [0, 0, 5.6], [0, 0, 7], 0.08, { color: ['gray', 0.2] });
 cradle.outlineLines([[-3, -2.2], [3, -2.2], [3, 2.2], [-3, 2.2]]);
 

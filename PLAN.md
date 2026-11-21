@@ -1878,7 +1878,7 @@ discs. New garrison textures from the Dark Forces pack (derive.mjs,
       (machinery and pipes at the foot, panels above), its floor
       (machinery pits round the column, conduits under the bridges),
       dark railings, dark lift platforms, the catwalks' edges.
-- [ ] The test bay: more than bare rock round the cradle.
+- [x] The test bay: more than bare rock round the cradle.
 - [ ] The rest: the back passage, detention's lane, the vault, the mess
       (a look in each, fix what's bare or glaring).
 - [ ] Waiting on Mark: the look.

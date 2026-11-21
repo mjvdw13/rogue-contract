@@ -164,7 +164,11 @@ garrison's structure (inside). Kept areas are the first map's, moved by
   pistons at the foot, dark plates up to the catwalks, the panels at
   them; machinery under a grate round the column, a conduit from each
   side wall (the east one to the switch). Railings, lift platforms and
-  the catwalks' edges are dark steel.
+  the catwalks' edges are dark steel. The test bay is finished to 4
+  high (the Test Base's dark plating over the rock, rock above), on the
+  Test Base's floor plates with their lamps, warning stripes in a frame
+  round the cradle; the cradle is dark steel with hazard-striped clamps
+  and beam.
 - **Not the station.** The Imperial set here is dark blue-grey and worn
   (grime down the walls), lit blue-white. The station's pale grey models
   (`ds-*`) only where they're the same gear (tables, lockers, bunks,

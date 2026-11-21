@@ -502,6 +502,12 @@ p.rect(197, 50, 230, 88, rock);
 p.rect(197, 52, 226, 84, cut(6, 20, { floor: 'imp-floor', light: 128, tag: 'testbay' }));
 p.chamfer(197, 52, 226, 84, 5, rock, ['NE', 'SE']);
 p.pool(211.5, 68, 7, 192, { tag: 'testbay' });
+// Finished to 4 high: dark plating bolted over the rock (the generator's
+// wall west has its own), the Test Base's floor plates, and warning stripes
+// on the floor in a frame round the cradle.
+p.rect(197, 51, 227, 85, (x, y, old) => (old.wall === 'sandstone' ? { ...old, bands: [{ to: 10, tex: 'gar-bay-wall' }] } : old));
+p.rect(197, 52, 226, 84, (x, y, old) => (old.wall || old.door ? old : { ...old, floor: 'gar-bay-floor' }));
+p.rect(207, 62, 216, 74, (x, y, old) => (x === 207 || x === 215 || y === 62 || y === 73 ? { ...old, floor: 'gar-warn-floor' } : old));
 /** Tag single tiles (where a squad appears, where a line is said). */
 const tagTiles = (tag, spots) => {
   for (const [x, y] of spots) p.set(x, y, { ...p.get(x, y), tag });
