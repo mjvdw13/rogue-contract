@@ -11,21 +11,28 @@ import { BLOCK } from '../world/backdrop.js';
  * renderer calls this once a column is done, with the rows that showed sky
  * marked (non-zero) in `sky` between rows `lo` and `hi`; only those rows
  * are drawn (the sky stays where the backdrop doesn't reach), and the marks
- * are cleared.
+ * are cleared. The march starts at `backdropFrom[0]`, where the ray first
+ * came out under the sky (0: at the eye): before that it was indoors (in a
+ * cave, a vent), under rock the backdrop stands over, and a sample there
+ * would cover the whole opening from a step away.
  *
  * @param {import('./view.js').View} view
  * @param {import('../world/backdrop.js').Backdrop} bd
  * @param {Float32Array} thr the column's four dither thresholds
  */
+/** Where the next column's march starts (set by the caller: a fraction passed as an argument would be boxed). */
+export const backdropFrom = new Float64Array(1);
+
 export function drawBackdropColumn(view, bd, textures, colormaps, fb, sky, fbW, x, rdx, rdy, thr, lo, hi) {
+  const from = backdropFrom[0];
   const { horizon, fy, camZ, fixedColormap: fixed } = view;
   const px = view.x;
   const py = view.y;
   // Outdoors in haze it fades toward the haze colour instead of fogging darker.
   const hazeOn = view.hazeOn;
   let ybuf = hi;
-  let t = 1;
-  let dt = 0.25;
+  let t = from > 1 ? from : 1;
+  let dt = t * 0.012 > 0.25 ? t * 0.012 : 0.25;
   // (Past where the ray leaves the grid there's nothing to draw.)
   const exit = bd.exit(px, py, rdx, rdy);
   const far = exit < bd.far ? exit : bd.far;

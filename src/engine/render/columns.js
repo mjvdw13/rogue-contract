@@ -3,7 +3,7 @@ import { DIMINISH, MAX_BRIGHTEN, LIGHT_BLACK, HAZE_RES, HAZE_LEN } from './view.
 import { HAZE_ROW, HAZE_STEPS } from '../gfx/palette.js';
 import { LightMap } from '../world/lightmap.js';
 import { layoutDecals } from '../world/decals.js';
-import { drawBackdropColumn } from './backdrop.js';
+import { drawBackdropColumn, backdropFrom } from './backdrop.js';
 import { TEXELS_PER_UNIT as TPU, TRANSPARENT, SHADE_STEP, LIGHT_LEVELS } from '../config.js';
 
 /** The fewest tiles a ray may cross before it gives up (a bigger map allows more: see drawWorld). */
@@ -32,9 +32,11 @@ const runEnd = new Float64Array(MAX_RUN);
  * Numbers handed to drawWorld's bigger helpers, which are too big to be
  * inlined: a fraction passed as an argument is boxed (16 bytes of garbage
  * a time, at every tile of every ray), one left here isn't. For `flats`:
- * [0] t0, [1] t1. For `flatSpan`: [0] t0, [2] kk, [3] l0, [4] dl.
+ * [0] t0, [1] t1. For `flatSpan`: [0] t0, [2] kk, [3] l0, [4] dl. For
+ * the backdrop: [7] how far along the ray it first came out under the sky,
+ * [8] the distance of the sky rows being marked.
  */
-const REG = new Float64Array(8);
+const REG = new Float64Array(9);
 const runTop = new Float64Array(MAX_RUN);
 
 /**
@@ -182,6 +184,10 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
   // Nothing in the level stands higher (TileMap.computeSkyline), nor in each block of it than its blockTops.
   const skyline = map.skyline;
   const { blockTops, blockW, blockH, skyMargin } = map;
+  // Seen from under a ceiling (a cave, a vent), the backdrop starts where a
+  // ray first comes out under the sky; under the sky, at the eye as ever.
+  const camTile = Math.floor(px) >= 0 && Math.floor(py) >= 0 && Math.floor(px) < mw && Math.floor(py) < mh ? Math.floor(py) * mw + Math.floor(px) : -1;
+  const camUnder = camTile < 0 || (flags[camTile] & F_SKY) === 0;
   prepareWorld(map, textures);
   const { edgeDecals, decalEdge, slantDecals } = map;
   const hasDecals = map.decals.length > 0;
@@ -272,6 +278,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
   let segBase = 0;
 
   const markSky = (a, b) => {
+    if (skyHi <= skyLo) REG[7] = REG[8];
     if (a < skyLo) skyLo = a;
     if (b > skyHi) skyHi = b;
     for (let o = a * fbW + x; a < b; a++, o += fbW) bdBuf[o] = 1;
@@ -552,7 +559,10 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
       if (b > clipBot) b = clipBot;
       if (b > a) {
         if (flags[i] & F_SKY && (s || !slab)) {
-          if (backdrop) markSky(a, b);
+          if (backdrop) {
+            REG[8] = t0;
+            markSky(a, b);
+          }
           for (let y = a, o = a * fbW + x; y < b; y++, o += fbW) {
             if (!sky) {
               fb[o] = 0;
@@ -621,6 +631,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
     nw = n;
   };
   // The sky "wall" between two sky tiles of different heights.
+  // (REG[8]: the distance it's at, for the backdrop.)
   const skyFill = (a, b) => {
     if (a < clipTop) a = clipTop;
     if (b > clipBot) b = clipBot;
@@ -1040,8 +1051,10 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
         }
         if (cN < cC) {
           const b = Math.ceil(horizon + ((camZ - cN) * fy) / tExit - 0.5);
-          if (flags[cur] & F_SKY && (s || !curSlab) && f & F_SKY) skyFill(Math.ceil(horizon + ((camZ - cC) * fy) / tExit - 0.5), b);
-          else {
+          if (flags[cur] & F_SKY && (s || !curSlab) && f & F_SKY) {
+            REG[8] = tExit;
+            skyFill(Math.ceil(horizon + ((camZ - cC) * fy) / tExit - 0.5), b);
+          } else {
             seen[next] = 1;
             const lv = faceLevel(s, tExit, contrast, out);
             face(tExit, Math.ceil(horizon + ((camZ - cC) * fy) / tExit - 0.5), b, cN + texHeight(upperTex[next]), upperTex[next], wx, lv, hz);
@@ -1135,6 +1148,7 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
           for (let k = 0; k < nw; k++) {
             clipTop = wTop[k];
             clipBot = wBot[k];
+            REG[8] = tExit;
             skyFill(clipTop, clipBot);
           }
           // (No wall further on can cover the open rows, so the depth stays
@@ -1167,7 +1181,10 @@ export function drawWorld(view, map, textures, sky, fb, fbW, colormaps, backdrop
 
     zbuf[x] = end;
     segCount[x] = nseg;
-    if (skyHi > skyLo) drawBackdropColumn(view, backdrop, textures, colormaps, fb, bdBuf, fbW, x, rdx, rdy, thr, skyLo, skyHi);
+    if (skyHi > skyLo) {
+      backdropFrom[0] = camUnder ? REG[7] : 0;
+      drawBackdropColumn(view, backdrop, textures, colormaps, fb, bdBuf, fbW, x, rdx, rdy, thr, skyLo, skyHi);
+    }
     if (nf) {
       if (!view.depthValid) {
         mdepth.fill(Infinity);

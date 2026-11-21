@@ -92,3 +92,24 @@ test('the backdrop shows where the sky did, and nowhere else', () => {
   assert.equal(renderer.view.bdBuf.length, w * h);
   assert.ok(renderer.view.bdBuf.some((c) => c !== TRANSPARENT));
 });
+
+test('seen from a cave, the backdrop over its rock doesn\'t cover the way out', () => {
+  // A tunnel under rock opening east onto an open yard. The backdrop stands
+  // high over the tunnel (above the eye) and low past its mouth, so from
+  // inside it should show nowhere: the rock over the tunnel is behind the
+  // tunnel's own roof.
+  const yard = ['##########', '####.....#', '#ccc.....#', '####.....#', '##########'];
+  const legend = {
+    '.': { floor: 'imp-floor', ceiling: 'sky', ceilZ: 3, light: 160 },
+    c: { floor: 'imp-floor', ceiling: 'imp-ceiling', ceilZ: 2, light: 160 },
+  };
+  const heights = [];
+  for (let j = 0; j <= 20; j++) for (let i = 0; i <= 40; i++) heights.push(i - 10 <= 3 ? 6 : -10);
+  const rock = { x: -10, y: -8, cell: 1, w: 40, h: 20, heights, tex: 'sandstone' };
+  const cam = { x: 1.5, y: 2.5, angle: 0, z: 1 };
+  const plain = shot(room(yard, ['', ' >'], { legend, sky: 'sky-night' }), cam);
+  const over = shot(room(yard, ['', ' >'], { legend, sky: 'sky-night', backdrop: rock }), cam);
+  let changed = 0;
+  for (let i = 0; i < plain.length; i++) if (plain[i] !== over[i]) changed++;
+  assert.equal(changed, 0, `the sky through the mouth is the sky (${changed} pixels covered)`);
+});
