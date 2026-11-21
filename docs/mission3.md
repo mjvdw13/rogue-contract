@@ -156,6 +156,15 @@ garrison's structure (inside). Kept areas are the first map's, moved by
   first map's Imperial panels (`imp-*`) bolted over it where it's
   finished (the barracks, the vault, detention, the generator), and rock
   showing above them where a room is taller than its panels.
+- **The garrison's own textures** (`gar-*`, derive.mjs `GARRISON`): DF
+  machinery in the panels' dark blue-grey, none of it glowing (the
+  Imperial set's pale texels glow, and blazed white in the generator's
+  dark). The generator's column has a coupler at its foot, hazard stripes
+  at the catwalks and pipes up into the dark; its walls have pipework and
+  pistons at the foot, dark plates up to the catwalks, the panels at
+  them; machinery under a grate round the column, a conduit from each
+  side wall (the east one to the switch). Railings, lift platforms and
+  the catwalks' edges are dark steel.
 - **Not the station.** The Imperial set here is dark blue-grey and worn
   (grime down the walls), lit blue-white. The station's pale grey models
   (`ds-*`) only where they're the same gear (tables, lockers, bunks,

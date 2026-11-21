@@ -1865,6 +1865,24 @@ validate, MODDING.md and a test.
       trolley), a drifting second sky layer and lightning, light that
       runs along a corridor, a sound for the rain.
 
+### 14. Mission 3: the garrison's detail and textures (Mark, 2026-11-21)
+
+Inside the garrison, the generator first ("a lot of the textures there
+are pretty bad"). The Imperial textures glow by default, so the pale
+ones blaze white in the dark: the column's foot, the railings, the lift
+discs. New garrison textures from the Dark Forces pack (derive.mjs,
+`GARRISON`), not glowing unless they're lights.
+
+- [x] The generator: the column (a coupler at its foot, a hazard band
+      at the catwalks, pipes up into the dark), the shaft's walls
+      (machinery and pipes at the foot, panels above), its floor
+      (machinery pits round the column, conduits under the bridges),
+      dark railings, dark lift platforms, the catwalks' edges.
+- [ ] The test bay: more than bare rock round the cradle.
+- [ ] The rest: the back passage, detention's lane, the vault, the mess
+      (a look in each, fix what's bare or glaring).
+- [ ] Waiting on Mark: the look.
+
 ## Small fixes and known rough edges
 
 - [ ] A second `Registry` built from the same content pack finds no sprite

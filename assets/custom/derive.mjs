@@ -598,6 +598,32 @@ export const CORELLIA_DECALS = [
   { out: 'puddle-2', df: 'CFWATER4', size: [64, 64], gradient: PUDDLE, keep: 0, contrast: 0.6, mask: 'blob', seed: 577 },
 ];
 
+// The canyon garrison (m3): its machinery in the dark blue-grey of its
+// panels (IWSECB2), so nothing pale glows in the generator's dark. None of
+// these glows but the conduits' lamps (src/content/textures.js).
+const IMP_STEEL = [[8, 9, 12], [26, 29, 38], [50, 55, 68], [80, 87, 104], [122, 130, 150]];
+export const GARRISON = [
+  // The generator's column: the coupler at its foot (its stripes kept), a
+  // band of hazard stripes where the catwalks meet it, pipes up into the dark.
+  { out: 'gar-coupler', df: 'IPCUPLER', gradient: IMP_STEEL, keep: 0.6, contrast: 1 },
+  { out: 'gar-hazard', df: 'NWWARN1', crop: [0, 0, 64, 64] },
+  { out: 'gar-column-pipes', df: 'IWAPIPE5', gradient: IMP_STEEL, keep: 0.2, contrast: 1 },
+  // The shaft's walls at the foot: pipework, and a run of pistons.
+  { out: 'gar-pipes', df: 'IWAPIPE2', gradient: IMP_STEEL, keep: 0.3, contrast: 1 },
+  { out: 'gar-pipes-b', df: 'IWAPIPE1', gradient: IMP_STEEL, keep: 0.3, contrast: 1 },
+  { out: 'gar-pistons', df: 'IWAPIST1', gradient: IMP_STEEL, keep: 0.5, contrast: 1 },
+  // The floor round the column's foot: machinery under a grate, darker
+  // than the shaft's floor; conduits along it to the switch (their lamps glow).
+  { out: 'gar-pit', df: 'ZPGPIPE1', gradient: IMP_STEEL, keep: 0.3, contrast: 1.1 },
+  { out: 'gar-conduit', df: 'ZPTUBECX', gradient: IMP_STEEL, keep: 0.9, contrast: 1 },
+  // The catwalks' railing: DF's girder truss squashed to 0.75 high, in
+  // dark steel; the catwalks' and the lifts' edges in the same.
+  { out: 'gar-railing', df: 'ZMGRATE1', scale: [64, 24], holes: true, gradient: IMP_STEEL, keep: 0, contrast: 1 },
+  { out: 'gar-trim', df: 'IWLOWCON', gradient: IMP_STEEL, keep: 0, contrast: 0.7 },
+  // A lift's platform: the Test Base's, dark.
+  { out: 'gar-lift', df: 'IPEXELV' },
+];
+
 /** Smooth value noise in 0-1 that repeats every `period` texels, over cells of `cell`. */
 function periodicNoise(x, y, cell, period, seed) {
   const n = period / cell;
@@ -1149,6 +1175,11 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     made.set(spec.out, img);
     fs.writeFileSync(path.join(texDir, `${spec.out}.png`), encodePNG(img.width, img.height, img.data));
     console.log(`${spec.out}.png (${img.width}x${img.height}, the station's)`);
+  }
+  for (const spec of GARRISON) {
+    const img = worked(decodePNG(fs.readFileSync(pack.get(spec.df))), spec);
+    fs.writeFileSync(path.join(texDir, `${spec.out}.png`), encodePNG(img.width, img.height, img.data));
+    console.log(`${spec.out}.png from ${spec.df} (${img.width}x${img.height}, the garrison's)`);
   }
   for (const spec of CORELLIA) {
     const img = worked(decodePNG(fs.readFileSync(pack.get(spec.df))), spec);

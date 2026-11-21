@@ -175,11 +175,13 @@ export default [
       { every: 3.4, sound: 'beam-hum', unless: 'beam-off' },
     ],
   }),
-  // Mission 3's generator: the same ring round its column, quiet until the
-  // overload (the level's `overload` flag), then arcing and crackling.
+  // Mission 3's generator: a still containment ring round its column's
+  // foot (the turning ones' model: dark steel, a cyan glow; the station's
+  // broad white band glared in the dark), quiet until the overload (the
+  // level's `overload` flag), then arcing and crackling.
   defineDecoration({
     id: 'gen-ring',
-    model: 'ds-beam-ring',
+    model: 'reactor-ring',
     fixed: true,
     emit: [
       ...[0, 1, 2, 3, 4, 5].map((k) => {

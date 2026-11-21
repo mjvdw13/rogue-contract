@@ -20,7 +20,7 @@ const darkPanel = { wall: 'imp-panel-dark' };
 const lights = { wall: 'imp-lights' };
 const computer = { wall: 'imp-computer' };
 // See-through fences on tile edges.
-const railing = { tex: 'imp-railing', height: 0.75 };
+const railing = { tex: 'gar-railing', height: 0.75 };
 const bars = { tex: 'imp-bars' };
 const cage = { tex: 'imp-cage' };
 
@@ -46,7 +46,7 @@ const gate = (floorZ, extra = {}) => door(floorZ, { door: 'imp-gate', jamb: 'imp
 const tallSide = { upper: 'imp-panel' };
 /** A lift platform between `stops`. */
 const lift = (stops, ceilZ, extra = {}) => ({
-  floor: 'lift-floor', ceiling: 'imp-ceiling', floorZ: stops[0], ceilZ, light: 160, side: 'imp-stripe', lift: { stops, wait: 3 }, ...extra,
+  floor: 'gar-lift', ceiling: 'imp-ceiling', floorZ: stops[0], ceilZ, light: 160, side: 'gar-trim', lift: { stops, wait: 3 }, ...extra,
 });
 
 const p = new Painter(W, H, rock);
@@ -407,18 +407,18 @@ p.rect(189, 49, 191, 50, door(6, { ...tallSide }));
 // storeys), so the shaft floor runs on underneath them, dark, all the way
 // round the column and to the walls.
 const genFloor = room(-6, 18, { floor: 'imp-grate', light: 128, tag: 'generator' });
-const grate = { bottom: 5.5, top: 6, floor: 'imp-grate', ceiling: 'imp-grate', side: 'imp-stripe', light: 120 };
+const grate = { bottom: 5.5, top: 6, floor: 'imp-grate', ceiling: 'imp-grate', side: 'gar-trim', light: 120 };
 const catwalk = { ...genFloor, light: 152, slab: grate };
 p.rect(160, 50, 196, 86, genFloor);
 p.rect(160, 50, 196, 53, catwalk);
 p.rect(160, 83, 196, 86, catwalk);
 p.rect(160, 50, 163, 86, catwalk);
 p.rect(193, 50, 196, 86, catwalk);
-// The column in bands: a hazard band at its foot and where the catwalks
-// meet it, its lit core between, dark plates up into the dark.
+// The column in bands: a coupler at its foot, hazard stripes where the
+// catwalks meet it, its lit core between, pipes up into the dark.
 const column = {
   wall: 'imp-lights',
-  bands: [{ to: -4.5, tex: 'imp-stripe' }, { from: 5, to: 6.5, tex: 'imp-stripe' }, { from: 15, tex: 'imp-panel-dark' }],
+  bands: [{ to: -2, tex: 'gar-coupler' }, { from: 5, to: 6.5, tex: 'gar-hazard' }, { from: 15, tex: 'gar-column-pipes' }],
 };
 p.pillar(174, 64, 182, 72, 2, column, genFloor);
 // The column lights the shaft floor round it with a slow pulse.
@@ -438,6 +438,22 @@ for (const x of [168, 182]) strip(x, 49, x + 3, 50, x + 1.5, 50.3);
 for (const x of [168, 184]) strip(x, 86, x + 3, 87, x + 1.5, 85.7);
 p.rect(176, 53, 180, 64, catwalk);
 p.rect(176, 72, 180, 83, catwalk);
+// The chamber's walls in bands: machinery at the shaft's foot (pipework
+// and a run of pistons, 8 tiles of each in turn), dark plates up to the
+// catwalks, the panels at the catwalks, dark again up into the dark. The
+// light strips keep their machinery at the foot and their dark at the top.
+const FOOT = ['gar-pipes', 'gar-pistons', 'gar-pipes-b'];
+p.rect(159, 49, 197, 87, (x, y, old) => {
+  if (!(x === 159 || x === 196 || y === 49 || y === 86) || !old.wall) return old;
+  const foot = { to: -2, tex: FOOT[Math.floor((x === 159 || x === 196 ? y : x) / 8) % 3] };
+  if (old.wall === 'imp-lights') return { ...old, bands: [foot, { from: 14, tex: 'imp-panel-dark' }] };
+  return { ...old, bands: [foot, { to: 6, tex: 'imp-panel-dark' }, { from: 14, tex: 'imp-panel-dark' }] };
+});
+// The floor: machinery under a grate round the column's foot, and a conduit
+// from each side wall to it, the east one ending at the overload switch.
+p.rect(172, 62, 184, 74, (x, y, old) => (old.wall ? old : { ...old, floor: 'gar-pit' }));
+p.rect(163, 66, 172, 68, (x, y, old) => ({ ...old, floor: 'gar-conduit' }));
+p.rect(184, 66, 193, 68, (x, y, old) => ({ ...old, floor: 'gar-conduit' }));
 // Railings along the catwalk ring's inner edge and both sides of the
 // bridges, open where the lifts and bridges join the ring.
 p.fence(162, 53, 163, 79, 'E', railing);
