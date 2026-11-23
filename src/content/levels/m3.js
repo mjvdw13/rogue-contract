@@ -454,6 +454,11 @@ p.rect(159, 49, 197, 87, (x, y, old) => {
   if (!(x === 159 || x === 196 || y === 49 || y === 86) || !old.wall) return old;
   const foot = { to: -2, tex: FOOT[Math.floor((x === 159 || x === 196 ? y : x) / 8) % 3] };
   if (old.wall === 'imp-lights') return { ...old, bands: [foot, { from: 14, tex: 'imp-panel-dark' }] };
+  // The vault's back wall: panels, with one run of consoles at waist
+  // height along the catwalk rather than banks from it to the top.
+  if (old.wall === 'imp-computer') {
+    return { ...old, wall: 'imp-panel', bands: [foot, { to: 6, tex: 'imp-panel-dark' }, { from: 6, to: 8, tex: 'imp-computer' }, { from: 14, tex: 'imp-panel-dark' }] };
+  }
   return { ...old, bands: [foot, { to: 6, tex: 'imp-panel-dark' }, { from: 14, tex: 'imp-panel-dark' }] };
 });
 // The floor: machinery under a grate round the column's foot, and a conduit
@@ -472,10 +477,12 @@ for (const [y0, y1] of [[53, 64], [72, 83]]) p.fence(176, y0, 177, y1, 'W', rail
 p.rect(163, 79, 167, 83, lift([-6, 6], 18, { tag: 'generator' }));
 p.rect(189, 53, 193, 57, lift([-6, 6], 18, { tag: 'generator' }));
 // The overload switch on the column's east face, at the bottom, under
-// hazard stripes.
+// hazard stripes: one panel at hand height (the floor up to 1 m), the
+// column's own bands over the rest of the face.
 decals.push({ x: 182, y: 68, z: -3.6, face: 'E', tex: 'decal-hazard' });
 p.rect(181, 67, 182, 69, {
   wall: 'imp-switch',
+  bands: [{ from: -4, to: -2, tex: 'gar-coupler' }, ...column.bands.slice(1), { from: -2, tex: 'imp-lights' }],
   switchTo: 'imp-switch-on',
   use: [
     { action: 'setFlag', flag: 'overload' },
@@ -850,12 +857,12 @@ for (const [y, z, tex] of [[60, 9, 'grime-scorch-1'], [65, 12, 'grime-scorch-2']
   decals.push({ x: 226, y, z, face: 'W', tex });
 }
 
-// The generator: rings glowing round the column at its foot (arcs crackle
-// off them once it's overloaded), live cables and leaking pipes on the
-// floor's walls, conduits from the walls to the column, girders holding
-// up the catwalk ring.
+// The generator: rings glowing round the column over the overload switch
+// and up in the dark (arcs crackle off them once it's overloaded), live
+// cables and leaking pipes on the floor's walls, conduits from the walls
+// to the column, girders holding up the catwalk ring.
 placed.push(
-  at('gen-ring', 178, 68, { z: -5 }), at('gen-ring', 178, 68, { z: -2.5 }), at('gen-ring', 178, 68, { z: 16 }),
+  at('gen-ring', 178, 68, { z: -2.5 }), at('gen-ring', 178, 68, { z: 16 }),
   at('ds-steam-pipe', 160.02, 70, { angle: 0, z: -6 }), at('ds-steam-pipe', 195.98, 62, { angle: 180, z: -6 }),
   at('ds-cables-live', 170, 76, { z: 18 }), at('ds-cables-live', 188, 58, { z: 18 }),
   ...[[165, 66], [165, 74], [191, 64], [191, 72], [170, 55], [186, 55], [170, 81], [186, 81]].map(([x, y]) => at('ds-girder-post', x, y, { z: -6 })),

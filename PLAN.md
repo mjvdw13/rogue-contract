@@ -61,8 +61,11 @@ These need Mark to try something, or to decide. Don't start them without him.
   switch, dark railings and lift platforms (all of Mission 3's). The
   test bay is plated to 4 high over the rock, on lit floor plates, a
   stripe frame round a textured cradle; the back passage is pipework
-  with light strips. To judge: the generator's look (too dark now?),
-  the railings, the bay.
+  with light strips. After Mark's notes (2026-11-22), the vault's wall
+  on the north catwalk is panels with one run of consoles at waist
+  height, and the overload switch is one panel at hand height under the
+  hazard stripes (the ring that crossed it is gone). To judge: the
+  generator's look (too dark now?), the railings, the bay.
 
 - **Mission 4 brought up to Mission 5** (`?map=m4`, 2026-11-15; four of
   the ten ideas, picked by Mark). The unfinished sector shows how far the
